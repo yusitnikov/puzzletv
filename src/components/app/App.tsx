@@ -126,7 +126,7 @@ export const App = () => {
     const [isStickyMode, setIsStickyMode] = useState(false);
 
     // region Sudoku event handlers
-    const handleDigit = (digit: number) => processSelectedCells(cell => {
+    const handleDigit = (digit: number) => {
         if (!isStickyMode && angle % 360 && [6, 9].includes(digit)) {
             digit = 15 - digit;
         }
@@ -136,24 +136,26 @@ export const App = () => {
             sticky: isStickyMode,
         };
 
-        switch (cellWriteMode) {
-            case CellWriteMode.main:
-                return {
-                    ...cell,
-                    usersDigit: rotatableDigit,
-                    centerDigits: cell.centerDigits.clear(),
-                    cornerDigits: cell.cornerDigits.clear(),
-                };
-            case CellWriteMode.center:
-                return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
-            case CellWriteMode.corner:
-                return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
-            case CellWriteMode.color:
-                return {...cell, colors: cell.colors.toggle(digit - 1)};
-        }
+        processSelectedCells(cell => {
+            switch (cellWriteMode) {
+                case CellWriteMode.main:
+                    return {
+                        ...cell,
+                        usersDigit: rotatableDigit,
+                        centerDigits: cell.centerDigits.clear(),
+                        cornerDigits: cell.cornerDigits.clear(),
+                    };
+                case CellWriteMode.center:
+                    return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
+                case CellWriteMode.corner:
+                    return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
+                case CellWriteMode.color:
+                    return {...cell, colors: cell.colors.toggle(digit - 1)};
+            }
 
-        return cell;
-    });
+            return cell;
+        });
+    }
 
     const handleClear = () => processSelectedCells(cell => {
         if (cell.usersDigit) {
