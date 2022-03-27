@@ -51,6 +51,7 @@ export const ControlButton = ({children, left, top, cellSize, flipDirection, ful
         borderWidth={3}
         isActive={checked}
         tabIndex={-1}
+        pointerEvents={true}
         {...otherProps}
     >
         <Absolute

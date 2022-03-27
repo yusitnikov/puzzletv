@@ -7,6 +7,7 @@ export interface AbsoluteProps extends Partial<Rect>, HTMLAttributes<any> {
     angle?: number;
     borderWidth?: number;
     borderColor?: string;
+    pointerEvents?: boolean;
 }
 
 export const Absolute: FC<AbsoluteProps> = (
@@ -21,6 +22,7 @@ export const Absolute: FC<AbsoluteProps> = (
         width = 0,
         height = 0,
         style,
+        pointerEvents,
         ...otherProps
     }
 ) => {
@@ -32,6 +34,7 @@ export const Absolute: FC<AbsoluteProps> = (
             width: `${width}px`,
             height: `${height}px`,
             transform: `rotate(${angle}deg)`,
+            pointerEvents: pointerEvents ? "all" : "none",
             ...style,
         }}
         {...otherProps}

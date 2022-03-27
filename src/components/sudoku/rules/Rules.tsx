@@ -14,7 +14,7 @@ export interface RulesProps {
     cellSize: number;
 }
 
-export const Rules = ({rect, cellSize}: RulesProps) => <StyledContainer {...rect}>
+export const Rules = ({rect, cellSize}: RulesProps) => <StyledContainer {...rect} pointerEvents={true}>
     <div
         style={{
             padding: cellSize / 8,

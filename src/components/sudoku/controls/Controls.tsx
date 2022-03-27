@@ -75,6 +75,7 @@ export const Controls = (
     {!isReady && <Absolute
         width={cellSize * (3 + controlButtonPaddingCoeff * 2)}
         height={cellSize * (3 + controlButtonPaddingCoeff * 2)}
+        pointerEvents={true}
         style={{
             fontSize: cellSize * 0.4,
         }}
