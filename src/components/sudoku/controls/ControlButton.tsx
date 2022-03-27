@@ -52,6 +52,7 @@ export const ControlButton = ({children, left, top, cellSize, flipDirection, ful
         isActive={checked}
         tabIndex={-1}
         pointerEvents={true}
+        onMouseDown={(ev) => ev.stopPropagation()}
         {...otherProps}
     >
         <Absolute

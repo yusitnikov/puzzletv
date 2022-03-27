@@ -8,6 +8,15 @@ import {globalPaddingCoeff, textColor} from "./globals";
 import {controlsWidthCoeff} from "../sudoku/controls/Controls";
 import styled from "@emotion/styled";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
+import {
+    FieldStateHistory, fieldStateHistoryAddState,
+    fieldStateHistoryGetCurrent, fieldStateHistoryRedo,
+    fieldStateHistoryUndo
+} from "../../types/sudoku/FieldStateHistory";
+import {createEmptyFieldState, processFieldStateCells} from "../../types/sudoku/FieldState";
+import {noSelectedCells, SelectedCells} from "../../types/sudoku/SelectedCells";
+import {CellState} from "../../types/sudoku/CellState";
+import {RotatableDigit} from "../../types/sudoku/RotatableDigit";
 
 const getScreenSize = (noTime?: boolean) => ({
     width: window.innerWidth,
@@ -70,7 +79,44 @@ export const App = () => {
     };
     // endregion
 
-    const animationSpeed = 500;
+    const [history, setHistory] = useState<FieldStateHistory>(() => {
+        const state = createEmptyFieldState();
+        state.cells[0][0] = {
+            ...state.cells[0][0],
+            initialDigit: {digit: 6},
+        };
+        state.cells[4][2] = {
+            ...state.cells[4][2],
+            initialDigit: {digit: 6},
+        };
+        state.cells[5][0] = {
+            ...state.cells[5][0],
+            initialDigit: {digit: 9},
+        };
+        state.cells[8][4] = {
+            ...state.cells[8][4],
+            initialDigit: {digit: 5},
+        };
+        state.cells[8][5] = {
+            ...state.cells[8][5],
+            initialDigit: {digit: 2},
+        };
+
+        return {
+            states: [state],
+            currentIndex: 0
+        };
+    });
+    const fieldState = fieldStateHistoryGetCurrent(history);
+
+    const [selectedCells, setSelectedCells] = useState<SelectedCells>(noSelectedCells);
+
+    const processSelectedCells = (processor: (cellState: CellState) => CellState) => setHistory(fieldStateHistoryAddState(
+        history,
+        state => processFieldStateCells(state, selectedCells.items, processor)
+    ));
+
+    const animationSpeed = 1000;
 
     const [cellWriteMode, setCellWriteMode] = useState(CellWriteMode.main);
 
@@ -81,6 +127,10 @@ export const App = () => {
 
     return <StyledContainer {...containerRect}>
         <Field
+            isReady={!isStartAngle}
+            state={fieldState}
+            selectedCells={selectedCells}
+            onSelectedCellsChange={setSelectedCells}
             rect={sudokuRect}
             angle={angle}
             animationSpeed={
@@ -98,10 +148,46 @@ export const App = () => {
             isHorizontal={isHorizontal}
             cellWriteMode={cellWriteMode}
             onCellWriteModeChange={setCellWriteMode}
-            onDigit={() => console.log("Digit not implemented yet...")}
-            onClear={() => console.log("Clear not implemented yet...")}
-            onUndo={() => console.log("Undo not implemented yet...")}
-            onRedo={() => console.log("Redo not implemented yet...")}
+            onDigit={(digit) => processSelectedCells(cell => {
+                if (!isStickyMode && angle % 360 && [6, 9].includes(digit)) {
+                    digit = 15 - digit;
+                }
+
+                const rotatableDigit: RotatableDigit = {
+                    digit,
+                    sticky: isStickyMode,
+                };
+
+                switch (cellWriteMode) {
+                    case CellWriteMode.main: return {...cell, usersDigit: rotatableDigit};
+                    case CellWriteMode.center: return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
+                    case CellWriteMode.corner: return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
+                    case CellWriteMode.color: return {...cell, colors: cell.colors.toggle(digit - 1)};
+                }
+
+                return cell;
+            })}
+            onClear={() => processSelectedCells(cell => {
+                if (cell.usersDigit) {
+                    return {...cell, usersDigit: undefined};
+                }
+
+                if (cell.centerDigits.size) {
+                    return {...cell, centerDigits: cell.centerDigits.clear()};
+                }
+
+                if (cell.cornerDigits.size) {
+                    return {...cell, cornerDigits: cell.cornerDigits.clear()};
+                }
+
+                if (cell.colors.size) {
+                    return {...cell, colors: cell.colors.clear()};
+                }
+
+                return cell;
+            })}
+            onUndo={() => setHistory(fieldStateHistoryUndo)}
+            onRedo={() => setHistory(fieldStateHistoryRedo)}
             isReady={!isStartAngle}
             onRotate={() => setAngle(angle + (isStartAngle ? 90 : 180))}
             isStickyMode={isStickyMode}

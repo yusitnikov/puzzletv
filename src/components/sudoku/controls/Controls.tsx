@@ -8,6 +8,8 @@ import {CellContent} from "../cell-content/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {RotatableDigit} from "../../../types/sudoku/RotatableDigit";
+import {Set} from "../../../types/struct/Set";
+import {emptyCellState} from "../../../types/sudoku/CellState";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 3 + globalPaddingCoeff;
@@ -63,9 +65,9 @@ export const Controls = (
             <CellContent
                 data={{
                     usersDigit: cellWriteMode === CellWriteMode.main ? rotatableDigit : undefined,
-                    cornerDigits: cellWriteMode === CellWriteMode.corner ? [rotatableDigit] : [],
-                    centerDigits: cellWriteMode === CellWriteMode.center ? [rotatableDigit] : [],
-                    colors: cellWriteMode === CellWriteMode.color ? [index] : [],
+                    cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [rotatableDigit] : []),
+                    centerDigits: new Set(cellWriteMode === CellWriteMode.center ? [rotatableDigit] : []),
+                    colors: new Set(cellWriteMode === CellWriteMode.color ? [index] : []),
                 }}
                 size={cellSize}
             />
@@ -102,7 +104,7 @@ export const Controls = (
         title={"Final digit"}
     >
         {contentSize => <CellContent
-            data={{usersDigit: {digit: 9}}}
+            data={{...emptyCellState, usersDigit: {digit: 9}}}
             size={contentSize}
             mainColor={true}
         />}
@@ -117,7 +119,7 @@ export const Controls = (
         title={"Corner"}
     >
         {contentSize => <CellContent
-            data={{cornerDigits: [{digit: 1}, {digit: 2}, {digit: 3}]}}
+            data={{...emptyCellState, cornerDigits: new Set([{digit: 1}, {digit: 2}, {digit: 3}])}}
             size={contentSize}
             mainColor={true}
         />}
@@ -132,7 +134,7 @@ export const Controls = (
         title={"Center"}
     >
         {contentSize => <CellContent
-            data={{centerDigits: [{digit: 1}, {digit: 2}]}}
+            data={{...emptyCellState, centerDigits: new Set([{digit: 1}, {digit: 2}])}}
             size={contentSize}
             mainColor={true}
         />}
@@ -147,7 +149,7 @@ export const Controls = (
         title={"Colors"}
     >
         {contentSize => <CellContent
-            data={{colors: indexes08}}
+            data={{...emptyCellState, colors: new Set(indexes08)}}
             size={contentSize}
         />}
     </ControlButton>
