@@ -46,7 +46,8 @@ export class Set<ItemT> {
         return this.set([...this.remove(item).items, item]);
     }
 
-    public toggle(item: ItemT) {
-        return this.contains(item) ? this.remove(item) : this.add(item);
+    public toggle(item: ItemT, forcedEnable?: boolean) {
+        const enable = forcedEnable ?? !this.contains(item);
+        return enable ? this.add(item) : this.remove(item);
     }
 }

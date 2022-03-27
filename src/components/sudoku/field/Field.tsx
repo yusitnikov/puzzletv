@@ -4,9 +4,11 @@ import {Line} from "../../layout/line/Line";
 import {FieldState} from "../../../types/sudoku/FieldState";
 import {indexes09} from "../../../utils/indexes";
 import {CellContent} from "../cell-content/CellContent";
-import {useEffect} from "react";
 import {Position} from "../../../types/layout/Position";
 import {noSelectedCells, SelectedCells} from "../../../types/sudoku/SelectedCells";
+import {useEventListener} from "../../../hooks/useEventListener";
+import {useControlKeysState} from "../../../hooks/useControlKeysState";
+import {useState} from "react";
 
 export interface FieldProps {
     isReady: boolean;
@@ -24,11 +26,57 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
         onSelectedCellsChange = () => {};
     }
 
-    useEffect(() => {
-        const handler = () => onSelectedCellsChange(noSelectedCells);
-        window.addEventListener("mousedown", handler);
-        return () => window.removeEventListener("mousedown", handler);
-    }, [onSelectedCellsChange]);
+    const isUpsideDown = angle % 360 !== 0;
+
+    const {isAnyKeyDown} = useControlKeysState();
+
+    const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
+
+    // Handle outside click
+    useEventListener(window, "mousedown", () => {
+        if (!isAnyKeyDown) {
+            onSelectedCellsChange(noSelectedCells);
+        }
+
+        setIsDeleteSelectedCellsStroke(false);
+    });
+
+    // Handle arrows
+    useEventListener(window, "keydown", ({code, ctrlKey, shiftKey}: KeyboardEvent) => {
+        const currentCell = selectedCells.last();
+        // Nothing to do when there's no selection
+        if (!currentCell) {
+            return;
+        }
+
+        // Use the key modifiers from the event - they are always up-to-date
+        const isAnyKeyDown = ctrlKey || shiftKey;
+
+        const handleArrow = (xDirection: number, yDirection: number) => {
+            const coeff = isUpsideDown ? -1 : 1;
+            const newCell: Position = {
+                left: (currentCell.left + coeff * xDirection + 9) % 9,
+                top: (currentCell.top + coeff * yDirection + 9) % 9,
+            }
+
+            onSelectedCellsChange(isAnyKeyDown ? selectedCells.add(newCell) : selectedCells.set([newCell]));
+        };
+
+        switch (code) {
+            case "ArrowLeft":
+                handleArrow(-1, 0);
+                break;
+            case "ArrowRight":
+                handleArrow(1, 0);
+                break;
+            case "ArrowUp":
+                handleArrow(0, -1);
+                break;
+            case "ArrowDown":
+                handleArrow(0, 1);
+                break;
+        }
+    });
 
     return <>
         <style dangerouslySetInnerHTML={{__html: `
@@ -72,14 +120,20 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                     onMouseDown={(ev) => {
                         ev.preventDefault();
                         ev.stopPropagation();
-                        onSelectedCellsChange(selectedCells.set([cellPosition]));
+
+                        setIsDeleteSelectedCellsStroke(isAnyKeyDown && selectedCells.contains(cellPosition));
+                        onSelectedCellsChange(
+                            isAnyKeyDown
+                                ? selectedCells.toggle(cellPosition)
+                                : selectedCells.set([cellPosition])
+                        );
                     }}
                     onMouseEnter={(ev) => {
                         if (ev.buttons !== 1) {
                             return;
                         }
 
-                        onSelectedCellsChange(selectedCells.add(cellPosition));
+                        onSelectedCellsChange(selectedCells.toggle(cellPosition, !isDeleteSelectedCellsStroke));
                     }}
                 >
                     <CellContent data={cellState} size={cellSize} sudokuAngle={angle}/>

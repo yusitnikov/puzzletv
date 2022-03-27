@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Rect} from "../../types/layout/Rect";
 import {Absolute} from "../layout/absolute/Absolute";
 import {Field} from "../sudoku/field/Field";
@@ -17,12 +17,10 @@ import {createEmptyFieldState, processFieldStateCells} from "../../types/sudoku/
 import {noSelectedCells, SelectedCells} from "../../types/sudoku/SelectedCells";
 import {CellState} from "../../types/sudoku/CellState";
 import {RotatableDigit} from "../../types/sudoku/RotatableDigit";
-
-const getScreenSize = (noTime?: boolean) => ({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    lastResize: noTime ? 0 : Date.now(),
-})
+import {indexes08} from "../../utils/indexes";
+import {useEventListener} from "../../hooks/useEventListener";
+import {useControlKeysState} from "../../hooks/useControlKeysState";
+import {useWindowSize} from "../../hooks/useWindowSize";
 
 const StyledContainer = styled(Absolute)({
     color: textColor,
@@ -31,12 +29,7 @@ const StyledContainer = styled(Absolute)({
 
 export const App = () => {
     // region Size calculation
-    const [windowSize, setWindowSize] = useState(() => getScreenSize(true));
-    useEffect(() => {
-        const eventHandler = () => setWindowSize(getScreenSize());
-        window.addEventListener("resize", eventHandler);
-        return () => window.removeEventListener("resize", eventHandler);
-    }, [setWindowSize]);
+    const windowSize = useWindowSize();
 
     const isHorizontal = windowSize.width > windowSize.height;
     const maxWindowSize = Math.max(windowSize.width, windowSize.height);
@@ -79,6 +72,8 @@ export const App = () => {
     };
     // endregion
 
+    const {isCtrlDown, isShiftDown} = useControlKeysState();
+
     const [history, setHistory] = useState<FieldStateHistory>(() => {
         const state = createEmptyFieldState();
         state.cells[0][0] = {
@@ -118,16 +113,118 @@ export const App = () => {
 
     const animationSpeed = 1000;
 
-    const [cellWriteMode, setCellWriteMode] = useState(CellWriteMode.main);
+    const [persistentCellWriteMode, setPersistentCellWriteMode] = useState(CellWriteMode.main);
+    const tempCellWriteMode = isCtrlDown
+        ? (isShiftDown ? CellWriteMode.color : CellWriteMode.center)
+        : (isShiftDown ? CellWriteMode.corner : undefined);
+    const cellWriteMode = tempCellWriteMode || persistentCellWriteMode;
 
     const [angle, setAngle] = useState(90);
     const isStartAngle = angle === 90;
+    const isReady = !isStartAngle;
 
     const [isStickyMode, setIsStickyMode] = useState(false);
 
+    // region Sudoku event handlers
+    const handleDigit = (digit: number) => processSelectedCells(cell => {
+        if (!isStickyMode && angle % 360 && [6, 9].includes(digit)) {
+            digit = 15 - digit;
+        }
+
+        const rotatableDigit: RotatableDigit = {
+            digit,
+            sticky: isStickyMode,
+        };
+
+        switch (cellWriteMode) {
+            case CellWriteMode.main: return {...cell, usersDigit: rotatableDigit};
+            case CellWriteMode.center: return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
+            case CellWriteMode.corner: return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
+            case CellWriteMode.color: return {...cell, colors: cell.colors.toggle(digit - 1)};
+        }
+
+        return cell;
+    });
+
+    const handleClear = () => processSelectedCells(cell => {
+        if (cell.usersDigit) {
+            return {...cell, usersDigit: undefined};
+        }
+
+        if (cell.centerDigits.size) {
+            return {...cell, centerDigits: cell.centerDigits.clear()};
+        }
+
+        if (cell.cornerDigits.size) {
+            return {...cell, cornerDigits: cell.cornerDigits.clear()};
+        }
+
+        if (cell.colors.size) {
+            return {...cell, colors: cell.colors.clear()};
+        }
+
+        return cell;
+    });
+
+    const handleUndo = () => setHistory(fieldStateHistoryUndo);
+
+    const handleRedo = () => setHistory(fieldStateHistoryRedo);
+
+    const handleRotate = () => setAngle(angle + (isStartAngle ? 90 : 180));
+
+    const handleToggleStickyMode = () => setIsStickyMode(!isStickyMode);
+    // endregion
+
+    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        const {code, ctrlKey, shiftKey} = ev;
+
+        if (isReady) {
+            for (const index of indexes08) {
+                const digit = index + 1;
+                if (code === `Digit${digit}` || code === `Numpad${digit}`) {
+                    handleDigit(digit);
+                    ev.preventDefault();
+                }
+            }
+        }
+
+        switch (code) {
+            case "KeyR":
+                handleRotate();
+                ev.preventDefault();
+                break;
+            case "KeyS":
+                handleToggleStickyMode();
+                ev.preventDefault();
+                break;
+            case "Delete":
+            case "Backspace":
+                handleClear();
+                ev.preventDefault();
+                break;
+            case "KeyZ":
+                if (ctrlKey) {
+                    if (shiftKey) {
+                        handleRedo();
+                        ev.preventDefault();
+                    } else {
+                        handleUndo();
+                        ev.preventDefault();
+                    }
+                }
+                break;
+            case "KeyY":
+                if (ctrlKey && !shiftKey) {
+                    handleRedo();
+                    ev.preventDefault();
+                }
+                break;
+        }
+    });
+
     return <StyledContainer {...containerRect}>
         <Field
-            isReady={!isStartAngle}
+            isReady={isReady}
             state={fieldState}
             selectedCells={selectedCells}
             onSelectedCellsChange={setSelectedCells}
@@ -147,51 +244,15 @@ export const App = () => {
             cellSize={cellSize}
             isHorizontal={isHorizontal}
             cellWriteMode={cellWriteMode}
-            onCellWriteModeChange={setCellWriteMode}
-            onDigit={(digit) => processSelectedCells(cell => {
-                if (!isStickyMode && angle % 360 && [6, 9].includes(digit)) {
-                    digit = 15 - digit;
-                }
-
-                const rotatableDigit: RotatableDigit = {
-                    digit,
-                    sticky: isStickyMode,
-                };
-
-                switch (cellWriteMode) {
-                    case CellWriteMode.main: return {...cell, usersDigit: rotatableDigit};
-                    case CellWriteMode.center: return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
-                    case CellWriteMode.corner: return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
-                    case CellWriteMode.color: return {...cell, colors: cell.colors.toggle(digit - 1)};
-                }
-
-                return cell;
-            })}
-            onClear={() => processSelectedCells(cell => {
-                if (cell.usersDigit) {
-                    return {...cell, usersDigit: undefined};
-                }
-
-                if (cell.centerDigits.size) {
-                    return {...cell, centerDigits: cell.centerDigits.clear()};
-                }
-
-                if (cell.cornerDigits.size) {
-                    return {...cell, cornerDigits: cell.cornerDigits.clear()};
-                }
-
-                if (cell.colors.size) {
-                    return {...cell, colors: cell.colors.clear()};
-                }
-
-                return cell;
-            })}
-            onUndo={() => setHistory(fieldStateHistoryUndo)}
-            onRedo={() => setHistory(fieldStateHistoryRedo)}
-            isReady={!isStartAngle}
-            onRotate={() => setAngle(angle + (isStartAngle ? 90 : 180))}
+            onCellWriteModeChange={setPersistentCellWriteMode}
+            onDigit={handleDigit}
+            onClear={handleClear}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            isReady={isReady}
+            onRotate={handleRotate}
             isStickyMode={isStickyMode}
-            onToggleStickyMode={() => setIsStickyMode(!isStickyMode)}
+            onToggleStickyMode={handleToggleStickyMode}
         />
     </StyledContainer>;
 }

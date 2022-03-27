@@ -116,7 +116,7 @@ export const Controls = (
         innerBorderWidth={1}
         checked={cellWriteMode === CellWriteMode.corner}
         onClick={() => onCellWriteModeChange(CellWriteMode.corner)}
-        title={"Corner"}
+        title={"Corner (shortcut: Shift)"}
     >
         {contentSize => <CellContent
             data={{...emptyCellState, cornerDigits: new Set([{digit: 1}, {digit: 2}, {digit: 3}])}}
@@ -131,7 +131,7 @@ export const Controls = (
         innerBorderWidth={1}
         checked={cellWriteMode === CellWriteMode.center}
         onClick={() => onCellWriteModeChange(CellWriteMode.center)}
-        title={"Center"}
+        title={"Center (shortcut: Ctrl)"}
     >
         {contentSize => <CellContent
             data={{...emptyCellState, centerDigits: new Set([{digit: 1}, {digit: 2}])}}
@@ -146,7 +146,7 @@ export const Controls = (
         innerBorderWidth={1}
         checked={cellWriteMode === CellWriteMode.color}
         onClick={() => onCellWriteModeChange(CellWriteMode.color)}
-        title={"Colors"}
+        title={"Colors (shortcut: Ctrl+Shift)"}
     >
         {contentSize => <CellContent
             data={{...emptyCellState, colors: new Set(indexes08)}}
@@ -159,7 +159,7 @@ export const Controls = (
         top={3}
         cellSize={cellSize}
         onClick={onRotate}
-        title={"Rotate the puzzle"}
+        title={"Rotate the puzzle (shortcut: R)"}
     >
         <RotateRight/>
     </ControlButton>
@@ -169,7 +169,7 @@ export const Controls = (
         cellSize={cellSize}
         checked={isStickyMode}
         onClick={onToggleStickyMode}
-        title={`Sticky mode: ${isStickyMode ? "ON" : "OFF"} (click to toggle).\nSticky digits will preserve the orientation when rotating the field.\nSticky digits are highlighted in green.`}
+        title={`Sticky mode: ${isStickyMode ? "ON" : "OFF"} (click to toggle, shortcut: S).\nSticky digits will preserve the orientation when rotating the field.\nSticky digits are highlighted in green.`}
     >
         <PushPin/>
     </ControlButton>
@@ -178,7 +178,7 @@ export const Controls = (
         top={3}
         cellSize={cellSize}
         onClick={onClear}
-        title={"Clear the cell contents"}
+        title={"Clear the cell contents (shortcut: Delete or Backspace)"}
     >
         <Clear/>
     </ControlButton>
@@ -195,7 +195,7 @@ export const Controls = (
             flipDirection={!isHorizontal}
             cellSize={cellSize}
             onClick={onUndo}
-            title={"Undo the last action"}
+            title={"Undo the last action (shortcut: Ctrl+Z)"}
         >
             <Undo/>
         </ControlButton>
@@ -205,7 +205,7 @@ export const Controls = (
             flipDirection={!isHorizontal}
             cellSize={cellSize}
             onClick={onRedo}
-            title={"Redo the last action"}
+            title={"Redo the last action (shortcut: Ctrl+Y)"}
         >
             <Redo/>
         </ControlButton>

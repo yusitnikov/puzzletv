@@ -1,6 +1,6 @@
 export enum CellWriteMode {
-    main,
-    center,
-    corner,
-    color
+    main = "main",
+    center = "center",
+    corner = "corner",
+    color = "color",
 }
