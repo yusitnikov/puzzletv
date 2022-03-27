@@ -137,10 +137,19 @@ export const App = () => {
         };
 
         switch (cellWriteMode) {
-            case CellWriteMode.main: return {...cell, usersDigit: rotatableDigit};
-            case CellWriteMode.center: return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
-            case CellWriteMode.corner: return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
-            case CellWriteMode.color: return {...cell, colors: cell.colors.toggle(digit - 1)};
+            case CellWriteMode.main:
+                return {
+                    ...cell,
+                    usersDigit: rotatableDigit,
+                    centerDigits: cell.centerDigits.clear(),
+                    cornerDigits: cell.cornerDigits.clear(),
+                };
+            case CellWriteMode.center:
+                return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
+            case CellWriteMode.corner:
+                return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
+            case CellWriteMode.color:
+                return {...cell, colors: cell.colors.toggle(digit - 1)};
         }
 
         return cell;
