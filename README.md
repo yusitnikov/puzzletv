@@ -2,6 +2,20 @@
 
 A sudoku puzzle that could be rotated clockwise.
 
+## TODO/TOFIX
+Must:
+- Finish writing the rules.
+- Add initial objects to the field.
+- Do something with the empty buttons.
+- Better state selection UI (a border).
+- Sort center/corner digits and colors.
+- Fix unintended animation.
+
+Nice to do:
+- Timer.
+- Checker.
+- Rotation speed controls.
+
 ## Available Scripts
 
 In the project directory, you can run:
