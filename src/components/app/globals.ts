@@ -19,3 +19,5 @@ export const cellBackgroundColors = [
     "#f7d038",
     blueColor,
 ];
+
+export const svgShadowStyle = {filter: "drop-shadow(0px 0px 4px white)"};

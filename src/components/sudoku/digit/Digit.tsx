@@ -1,6 +1,6 @@
 import {memo} from "react";
 import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
-import {textColor} from "../../app/globals";
+import {svgShadowStyle, textColor} from "../../app/globals";
 import {Position} from "../../../types/layout/Position";
 
 const T = true;
@@ -105,17 +105,26 @@ export const Digit = memo(({digit, size, color = textColor, ...containerProps}: 
         top={-size / 2}
         width={size * digitWidthCoeff}
         height={size}
-        style={{filter: "drop-shadow(0px 0px 2px white)"}}
+        style={svgShadowStyle}
     >
-        {matrices[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
-            key={`${rowIndex}-${columnIndex}`}
-            left={size * (columnIndex - 1) * squareSizeCoeff / 2 + size * digitWidthCoeff / 2}
-            top={size * (rowIndex - 2) * squareSizeCoeff / 2 + size / 2}
+        <DigitSvgContent
+            digit={digit}
             size={size}
-            vertical={!!(rowIndex % 2)}
-        />))}
+            left={size * digitWidthCoeff / 2}
+            top={size / 2}
+        />
     </Absolute>
 </Absolute>);
+
+export const DigitSvgContent = memo(({digit, size, left = 0, top = 0}: DigitProps) => <>
+    {matrices[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
+        key={`${rowIndex}-${columnIndex}`}
+        left={left + size * (columnIndex - 1) * squareSizeCoeff / 2}
+        top={top + size * (rowIndex - 2) * squareSizeCoeff / 2}
+        size={size}
+        vertical={!!(rowIndex % 2)}
+    />))}
+</>);
 
 interface DigitLineProps extends Position {
     size: number;

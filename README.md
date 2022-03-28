@@ -5,7 +5,6 @@ A sudoku puzzle that could be rotated clockwise.
 ## TODO/TOFIX
 Must:
 - Finish writing the rules.
-- Add initial objects to the field.
 - Do something with the empty buttons.
 
 Nice to do:

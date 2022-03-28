@@ -1,19 +1,20 @@
-import {ElementType, FC, HTMLAttributes} from "react";
+import {ReactNode} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {Line} from "../line/Line";
 
-export interface AbsoluteProps extends Partial<Rect>, HTMLAttributes<any> {
-    tagName?: ElementType;
+export type AbsoluteProps<TagNameT extends keyof JSX.IntrinsicElements = "div"> = Partial<Rect> & JSX.IntrinsicElements[TagNameT] & {
+    tagName?: TagNameT;
     angle?: number;
     borderWidth?: number;
     borderColor?: string;
     pointerEvents?: boolean;
-}
+    children?: ReactNode;
+};
 
-export const Absolute: FC<AbsoluteProps> = (
+export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
     {
         children,
-        tagName: TagName = "div",
+        tagName = "div" as TagNameT,
         angle = 0,
         borderWidth,
         borderColor,
@@ -24,8 +25,10 @@ export const Absolute: FC<AbsoluteProps> = (
         style,
         pointerEvents,
         ...otherProps
-    }
+    }: AbsoluteProps<TagNameT>
 ) => {
+    const TagName = tagName as any;
+
     return <TagName
         style={{
             position: "absolute",

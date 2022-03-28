@@ -4,7 +4,7 @@ import {Rect} from "../../types/layout/Rect";
 import {Absolute} from "../layout/absolute/Absolute";
 import {Field} from "../sudoku/field/Field";
 import {SidePanel} from "../sudoku/side-panel/SidePanel";
-import {globalPaddingCoeff, textColor} from "./globals";
+import {globalPaddingCoeff, svgShadowStyle, textColor} from "./globals";
 import {controlsWidthCoeff} from "../sudoku/controls/Controls";
 import styled from "@emotion/styled";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
@@ -21,6 +21,12 @@ import {indexes08} from "../../utils/indexes";
 import {useEventListener} from "../../hooks/useEventListener";
 import {useControlKeysState} from "../../hooks/useControlKeysState";
 import {useWindowSize} from "../../hooks/useWindowSize";
+import {GermanWhispers} from "../sudoku/figures/german-whispers/GermanWhispers";
+import {Thermometer} from "../sudoku/figures/thermometer/Thermometer";
+import {Arrow} from "../sudoku/figures/arrow/Arrow";
+import {KillerCage} from "../sudoku/figures/killer-cage/KillerCage";
+import {KropkiDot} from "../sudoku/figures/kropki-dot/KropkiDot";
+import {XMark} from "../sudoku/figures/x-mark/XMark";
 
 const StyledContainer = styled(Absolute)({
     color: textColor,
@@ -259,7 +265,78 @@ export const App = () => {
             angle={angle}
             animationSpeed={animationSpeed}
             cellSize={cellSize}
-        />
+            topChildren={<Absolute
+                tagName={"svg"}
+                width={sudokuSize}
+                height={sudokuSize}
+                viewBox={"0 0 9 9"}
+                style={svgShadowStyle}
+            >
+                <XMark left={7} top={7.5}/>
+
+                <KropkiDot cx={7.5} cy={7} isFilled={true}/>
+
+                <XMark left={8} top={6.5}/>
+            </Absolute>}
+        >
+            <Absolute
+                tagName={"svg"}
+                width={sudokuSize}
+                height={sudokuSize}
+                viewBox={"0 0 9 9"}
+                style={svgShadowStyle}
+            >
+                <Thermometer points={[
+                    [7.5, 1.5],
+                    [6.5, 2.5],
+                ]}/>
+
+                <Thermometer points={[
+                    [1.5, 0.5],
+                    [1.5, 1.5],
+                ]}/>
+
+                <Arrow points={[
+                    [8.5, 4.5],
+                    [6.5, 4.5],
+                    [6.5, 3.5],
+                ]}/>
+
+                <GermanWhispers points={[
+                    [5.5, 1.5],
+                    [4.5, 2.5],
+                    [7.5, 2.5],
+                ]}/>
+
+                <KillerCage
+                    sum={12}
+                    bottomSumPointIndex={2}
+                    points={[
+                        [0, 4],
+                        [0, 6],
+                        [1, 6],
+                        [1, 5],
+                        [2, 5],
+                        [2, 4],
+                    ]}
+                />
+
+                <KillerCage
+                    sum={22}
+                    bottomSumPointIndex={4}
+                    points={[
+                        [5, 7],
+                        [5, 8],
+                        [4, 8],
+                        [4, 9],
+                        [6, 9],
+                        [6, 8],
+                        [7, 8],
+                        [7, 7],
+                    ]}
+                />
+            </Absolute>
+        </Field>
 
         <SidePanel
             rect={controlsRect}

@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import {ButtonHTMLAttributes, ReactNode} from "react";
+import {ButtonHTMLAttributes, MouseEvent, ReactNode} from "react";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Position} from "../../../types/layout/Position";
 import styled from "@emotion/styled";
@@ -52,7 +52,7 @@ export const ControlButton = ({children, left, top, cellSize, flipDirection, ful
         isActive={checked}
         tabIndex={-1}
         pointerEvents={true}
-        onMouseDown={(ev) => ev.stopPropagation()}
+        onMouseDown={(ev: MouseEvent<HTMLButtonElement>) => ev.stopPropagation()}
         {...otherProps}
     >
         <Absolute

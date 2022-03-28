@@ -8,7 +8,7 @@ import {Position} from "../../../types/layout/Position";
 import {noSelectedCells, SelectedCells} from "../../../types/sudoku/SelectedCells";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
-import {useState} from "react";
+import {MouseEvent, ReactNode, useState} from "react";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 
 export interface FieldProps {
@@ -20,9 +20,11 @@ export interface FieldProps {
     angle: number;
     animationSpeed: number;
     cellSize: number;
+    children?: ReactNode;
+    topChildren?: ReactNode;
 }
 
-export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsChange, rect, angle, animationSpeed, cellSize}: FieldProps) => {
+export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsChange, rect, angle, animationSpeed, cellSize, children, topChildren}: FieldProps) => {
     if (!isReady) {
         onSelectedCellsChange = () => {};
     }
@@ -90,11 +92,12 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
         `}}/>
 
         <Absolute
-            className={"Field"}
             {...rect}
             angle={angleAnimation}
             style={{backgroundColor: "white"}}
         >
+            {children}
+
             {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
                 const cellPosition: Position = {
                     left: columnIndex,
@@ -111,7 +114,7 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                     style={{
                         cursor: isReady ? "pointer" : undefined,
                     }}
-                    onMouseDown={(ev) => {
+                    onMouseDown={(ev: MouseEvent<HTMLDivElement>) => {
                         ev.preventDefault();
                         ev.stopPropagation();
 
@@ -122,7 +125,7 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                                 : selectedCells.set([cellPosition])
                         );
                     }}
-                    onMouseEnter={(ev) => {
+                    onMouseEnter={(ev: MouseEvent<HTMLDivElement>) => {
                         if (ev.buttons !== 1) {
                             return;
                         }
@@ -157,6 +160,8 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                 y2={cellSize * 9}
                 width={index % 3 ? 1 : 3}
             />)}
+
+            {topChildren}
         </Absolute>
     </>;
 };
