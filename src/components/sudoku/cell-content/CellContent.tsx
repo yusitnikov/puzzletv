@@ -3,7 +3,8 @@ import {CellState} from "../../../types/sudoku/CellState";
 import {Digit, digitSpaceCoeff} from "../digit/Digit";
 import {cellBackgroundColors} from "../../app/globals";
 import {Position} from "../../../types/layout/Position";
-import {isStickyRotatableDigit} from "../../../types/sudoku/RotatableDigit";
+import {isStickyRotatableDigit, RotatableDigit} from "../../../types/sudoku/RotatableDigit";
+import {Set} from "../../../types/struct/Set";
 
 const centerDigitCoeff = 0.35;
 
@@ -31,7 +32,7 @@ export const CellContent = ({data, size, sudokuAngle = 0, mainColor, style, ...c
     const rotatableDigitColor = mainColor ? undefined : "#00f";
     const stickyDigitColor = mainColor ? undefined : "#0c0";
 
-    const {
+    let {
         initialDigit,
         usersDigit,
         centerDigits,
@@ -39,7 +40,59 @@ export const CellContent = ({data, size, sudokuAngle = 0, mainColor, style, ...c
         colors
     } = data;
 
+    colors = colors.sorted();
+
     const centerDigitsCoeff = centerDigitCoeff / Math.max(1, centerDigitCoeff * digitSpaceCoeff * (centerDigits.size + 1));
+
+    const sudokuAngleCoeff = Math.abs((sudokuAngle % 360) / 180 - 1);
+
+    const renderAnimatedDigitsSet = (
+        keyPrefix: string,
+        digits: Set<RotatableDigit>,
+        digitSize: number,
+        positionFunction: (index: number, upsideDown: boolean) => Position | undefined
+    ) => {
+        const [straightIndexes, upsideDownIndexes] = digits.cached("sortIndexes", () => {
+            const itemsWithIndexes = digits.items.map((value, index) => ({value, index}));
+
+            const getSortIndexes = (upsideDown: boolean) => {
+                const getDisplayDigit = ({digit, sticky}: RotatableDigit) => upsideDown && !sticky && (digit === 6 || digit === 9) ? 15 - digit : digit;
+
+                const indexes = Array(digits.size);
+
+                itemsWithIndexes
+                    .sort(
+                        ({value: a}, {value: b}) =>
+                            getDisplayDigit(a) - getDisplayDigit(b) || (a.sticky ? 1 : 0) - (b.sticky ? 1 : 0)
+                    )
+                    .forEach(
+                        ({value, index: initialIndex}, sortedIndex) =>
+                            indexes[initialIndex] = sortedIndex
+                    );
+
+                return indexes;
+            };
+
+            return [getSortIndexes(false), getSortIndexes(true)];
+        });
+
+        return digits.items.map(({digit, sticky}, index) => {
+            const straight = positionFunction(straightIndexes[index], false);
+            const rotated = positionFunction(upsideDownIndexes[index], true);
+
+            const getAnimatedValue = (straight: number, rotated: number) => straight * sudokuAngleCoeff + rotated * (1 - sudokuAngleCoeff);
+
+            return straight && rotated && <Digit
+                key={`${keyPrefix}-${digit}-${sticky}`}
+                digit={digit}
+                size={digitSize}
+                left={getAnimatedValue(straight.left, -rotated.left)}
+                top={getAnimatedValue(straight.top, -rotated.top)}
+                color={sticky ? stickyDigitColor : rotatableDigitColor}
+                angle={isStickyRotatableDigit({digit, sticky}) ? -sudokuAngle : 0}
+            />;
+        });
+    };
 
     return <Absolute
         width={size}
@@ -88,24 +141,25 @@ export const CellContent = ({data, size, sudokuAngle = 0, mainColor, style, ...c
                 angle={isStickyRotatableDigit(usersDigit) ? -sudokuAngle : 0}
             />}
 
-            {centerDigits.items.map(({digit, sticky}, index) => <Digit
-                key={`center-${digit}-${sticky}`}
-                digit={digit}
-                size={size * centerDigitsCoeff}
-                left={size * centerDigitsCoeff * digitSpaceCoeff * (index - (centerDigits.size - 1) / 2)}
-                color={sticky ? stickyDigitColor : rotatableDigitColor}
-                angle={isStickyRotatableDigit({digit, sticky}) ? -sudokuAngle : 0}
-            />)}
+            {renderAnimatedDigitsSet(
+                "center",
+                centerDigits,
+                size * centerDigitsCoeff,
+                (index) => ({
+                    left: size * centerDigitsCoeff * digitSpaceCoeff * (index - (centerDigits.size - 1) / 2),
+                    top: 0,
+                })
+            )}
 
-            {cornerDigits.items.map(({digit, sticky}, index) => corners[index] && <Digit
-                key={`corner-${digit}-${sticky}`}
-                digit={digit}
-                size={size * cornerDigitCoeff}
-                left={size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5)}
-                top={size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5)}
-                color={sticky ? stickyDigitColor : rotatableDigitColor}
-                angle={isStickyRotatableDigit({digit, sticky}) ? -sudokuAngle : 0}
-            />)}
+            {renderAnimatedDigitsSet(
+                "corner",
+                cornerDigits,
+                size * cornerDigitCoeff,
+                (index) => (corners[index] && {
+                    left: size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5),
+                    top: size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5),
+                })
+            )}
         </Absolute>
     </Absolute>;
 };

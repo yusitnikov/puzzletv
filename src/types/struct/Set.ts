@@ -1,4 +1,6 @@
 export class Set<ItemT> {
+    private cache: Record<string, any> = {};
+
     constructor(
         public readonly items: ItemT[] = [],
         private comparer: (item1: ItemT, item2: ItemT) => boolean = (item1, item2) => JSON.stringify(item1) === JSON.stringify(item2),
@@ -24,6 +26,18 @@ export class Set<ItemT> {
 
     public last() {
         return this.items.length ? this.items[this.items.length - 1] : undefined;
+    }
+
+    public cached<T>(key: string, getter: () => T): T {
+        if (!(key in this.cache)) {
+            this.cache[key] = getter();
+        }
+
+        return this.cache[key];
+    }
+
+    public sorted() {
+        return this.cached("sorted", () => this.set([...this.items].sort()));
     }
 
     public set(items: ItemT[]) {
