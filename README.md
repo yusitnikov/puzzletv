@@ -5,6 +5,7 @@ A sudoku puzzle that could be rotated clockwise.
 ## TODO/TOFIX
 Must:
 - Do something with the empty buttons.
+- Change the icon.
 
 Nice to do:
 - Timer.
