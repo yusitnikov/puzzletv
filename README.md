@@ -7,7 +7,6 @@ Must:
 - Finish writing the rules.
 - Add initial objects to the field.
 - Do something with the empty buttons.
-- Fix performance.
 
 Nice to do:
 - Timer.

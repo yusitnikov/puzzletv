@@ -1,3 +1,4 @@
+import {memo} from "react";
 import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
 import {textColor} from "../../app/globals";
 import {Position} from "../../../types/layout/Position";
@@ -94,7 +95,7 @@ export interface DigitProps extends AbsoluteProps {
     color?: string;
 }
 
-export const Digit = ({digit, size, color = textColor, ...containerProps}: DigitProps) => <Absolute
+export const Digit = memo(({digit, size, color = textColor, ...containerProps}: DigitProps) => <Absolute
     {...containerProps}
     style={{color}}
 >
@@ -114,14 +115,14 @@ export const Digit = ({digit, size, color = textColor, ...containerProps}: Digit
             vertical={!!(rowIndex % 2)}
         />))}
     </Absolute>
-</Absolute>;
+</Absolute>);
 
 interface DigitLineProps extends Position {
     size: number;
     vertical: boolean;
 }
 
-const DigitLine = ({left, top, size, vertical}: DigitLineProps) => <polygon
+const DigitLine = memo(({left, top, size, vertical}: DigitLineProps) => <polygon
     points={
         [
             [
@@ -158,4 +159,4 @@ const DigitLine = ({left, top, size, vertical}: DigitLineProps) => <polygon
             .join(" ")
     }
     fill={"currentColor"}
-/>;
+/>);
