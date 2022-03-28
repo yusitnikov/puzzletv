@@ -4,12 +4,13 @@ import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes08} from "../../../utils/indexes";
 import {globalPaddingCoeff} from "../../app/globals";
 import {Clear, PushPin, Redo, RotateRight, Undo} from "@emotion-icons/material";
-import {CellContent} from "../cell-content/CellContent";
+import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {RotatableDigit} from "../../../types/sudoku/RotatableDigit";
 import {Set} from "../../../types/struct/Set";
-import {emptyCellState} from "../../../types/sudoku/CellState";
+import {CellBackground} from "../cell/CellBackground";
+import {CellDigits} from "../cell/CellDigits";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 3 + globalPaddingCoeff;
@@ -103,8 +104,8 @@ export const Controls = (
         onClick={() => onCellWriteModeChange(CellWriteMode.main)}
         title={"Final digit"}
     >
-        {contentSize => <CellContent
-            data={{...emptyCellState, usersDigit: {digit: 9}}}
+        {contentSize => <CellDigits
+            data={{usersDigit: {digit: 9}}}
             size={contentSize}
             mainColor={true}
         />}
@@ -118,8 +119,8 @@ export const Controls = (
         onClick={() => onCellWriteModeChange(CellWriteMode.corner)}
         title={"Corner (shortcut: Shift)"}
     >
-        {contentSize => <CellContent
-            data={{...emptyCellState, cornerDigits: new Set([{digit: 1}, {digit: 2}, {digit: 3}])}}
+        {contentSize => <CellDigits
+            data={{cornerDigits: new Set([{digit: 1}, {digit: 2}, {digit: 3}])}}
             size={contentSize}
             mainColor={true}
         />}
@@ -133,8 +134,8 @@ export const Controls = (
         onClick={() => onCellWriteModeChange(CellWriteMode.center)}
         title={"Center (shortcut: Ctrl)"}
     >
-        {contentSize => <CellContent
-            data={{...emptyCellState, centerDigits: new Set([{digit: 1}, {digit: 2}])}}
+        {contentSize => <CellDigits
+            data={{centerDigits: new Set([{digit: 1}, {digit: 2}])}}
             size={contentSize}
             mainColor={true}
         />}
@@ -148,8 +149,8 @@ export const Controls = (
         onClick={() => onCellWriteModeChange(CellWriteMode.color)}
         title={"Colors (shortcut: Ctrl+Shift)"}
     >
-        {contentSize => <CellContent
-            data={{...emptyCellState, colors: new Set(indexes08)}}
+        {contentSize => <CellBackground
+            colors={new Set(indexes08)}
             size={contentSize}
         />}
     </ControlButton>

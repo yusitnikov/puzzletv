@@ -3,13 +3,16 @@ import {Rect} from "../../../types/layout/Rect";
 import {Line} from "../../layout/line/Line";
 import {FieldState} from "../../../types/sudoku/FieldState";
 import {indexes09} from "../../../utils/indexes";
-import {CellContent} from "../cell-content/CellContent";
 import {Position} from "../../../types/layout/Position";
 import {noSelectedCells, SelectedCells} from "../../../types/sudoku/SelectedCells";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import {MouseEvent, ReactNode, useState} from "react";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
+import {CellState} from "../../../types/sudoku/CellState";
+import {CellBackground} from "../cell/CellBackground";
+import {CellSelection} from "../cell/CellSelection";
+import {CellDigits} from "../cell/CellDigits";
 
 export interface FieldProps {
     isReady: boolean;
@@ -83,6 +86,23 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
         }
     });
 
+    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState, cellPosition: Position) => ReactNode) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+        const cellPosition: Position = {
+            left: columnIndex,
+            top: rowIndex,
+        };
+
+        return <Absolute
+            key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
+            left={cellSize * cellPosition.left}
+            top={cellSize * cellPosition.top}
+            width={cellSize}
+            height={cellSize}
+        >
+            {renderer(cellState, cellPosition)}
+        </Absolute>;
+    }));
+
     return <>
         <style dangerouslySetInnerHTML={{__html: `
             html,
@@ -96,52 +116,17 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
             angle={angleAnimation}
             style={{backgroundColor: "white"}}
         >
+            {renderCellsLayer("background", ({colors}) => <CellBackground
+                colors={colors}
+                size={cellSize}
+            />)}
+
+            {renderCellsLayer("selection", (cellState, cellPosition) => selectedCells.contains(cellPosition) && <CellSelection
+                size={cellSize}
+                isSecondary={selectedCells.last()?.left !== cellPosition.left || selectedCells.last()?.top !== cellPosition.top}
+            />)}
+
             {children}
-
-            {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
-                const cellPosition: Position = {
-                    left: columnIndex,
-                    top: rowIndex,
-                };
-
-                return <Absolute
-                    key={`cell-${rowIndex}-${columnIndex}`}
-                    left={cellSize * cellPosition.left}
-                    top={cellSize * cellPosition.top}
-                    width={cellSize}
-                    height={cellSize}
-                    pointerEvents={true}
-                    style={{
-                        cursor: isReady ? "pointer" : undefined,
-                    }}
-                    onMouseDown={(ev: MouseEvent<HTMLDivElement>) => {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-
-                        setIsDeleteSelectedCellsStroke(isAnyKeyDown && selectedCells.contains(cellPosition));
-                        onSelectedCellsChange(
-                            isAnyKeyDown
-                                ? selectedCells.toggle(cellPosition)
-                                : selectedCells.set([cellPosition])
-                        );
-                    }}
-                    onMouseEnter={(ev: MouseEvent<HTMLDivElement>) => {
-                        if (ev.buttons !== 1) {
-                            return;
-                        }
-
-                        onSelectedCellsChange(selectedCells.toggle(cellPosition, !isDeleteSelectedCellsStroke));
-                    }}
-                >
-                    <CellContent
-                        data={cellState}
-                        size={cellSize}
-                        sudokuAngle={angleAnimation}
-                        isSelected={selectedCells.contains(cellPosition)}
-                        isLastSelected={selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top}
-                    />
-                </Absolute>;
-            }))}
 
             {indexes09.map(index => <Line
                 key={`h-line-${index}`}
@@ -162,6 +147,39 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
             />)}
 
             {topChildren}
+
+            {renderCellsLayer("digits", (cellState) => <CellDigits
+                data={cellState}
+                size={cellSize}
+                sudokuAngle={angleAnimation}
+            />)}
+
+            {renderCellsLayer("mouse-handler", (cellState, cellPosition) => <Absolute
+                width={cellSize}
+                height={cellSize}
+                pointerEvents={true}
+                style={{
+                    cursor: isReady ? "pointer" : undefined,
+                }}
+                onMouseDown={(ev: MouseEvent<HTMLDivElement>) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+
+                    setIsDeleteSelectedCellsStroke(isAnyKeyDown && selectedCells.contains(cellPosition));
+                    onSelectedCellsChange(
+                        isAnyKeyDown
+                            ? selectedCells.toggle(cellPosition)
+                            : selectedCells.set([cellPosition])
+                    );
+                }}
+                onMouseEnter={(ev: MouseEvent<HTMLDivElement>) => {
+                    if (ev.buttons !== 1) {
+                        return;
+                    }
+
+                    onSelectedCellsChange(selectedCells.toggle(cellPosition, !isDeleteSelectedCellsStroke));
+                }}
+            />)}
         </Absolute>
     </>;
 };
