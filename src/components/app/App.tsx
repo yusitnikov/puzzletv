@@ -230,6 +230,14 @@ export const App = () => {
                     ev.preventDefault();
                 }
                 break;
+            case "KeyA":
+                if (ctrlKey && !shiftKey && isReady) {
+                    setSelectedCells(selectedCells.set(
+                        indexes08.flatMap(top => indexes08.map(left => ({left, top})))
+                    ));
+                    ev.preventDefault();
+                }
+                break;
         }
     });
 
