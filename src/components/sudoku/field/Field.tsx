@@ -9,6 +9,7 @@ import {noSelectedCells, SelectedCells} from "../../../types/sudoku/SelectedCell
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import {useState} from "react";
+import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 
 export interface FieldProps {
     isReady: boolean;
@@ -25,6 +26,8 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
     if (!isReady) {
         onSelectedCellsChange = () => {};
     }
+
+    const angleAnimation = useAnimatedValue(angle, animationSpeed);
 
     const isUpsideDown = angle % 360 !== 0;
 
@@ -84,18 +87,12 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
             body {
                 overflow: hidden;
             }
-    
-            .Field,
-            .Field * {
-                transition: all linear ${animationSpeed}ms;
-                transition-property: transform, left, top;
-            }
         `}}/>
 
         <Absolute
             className={"Field"}
             {...rect}
-            angle={angle}
+            angle={angleAnimation}
             style={{backgroundColor: "white"}}
         >
             {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
@@ -136,7 +133,7 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                         onSelectedCellsChange(selectedCells.toggle(cellPosition, !isDeleteSelectedCellsStroke));
                     }}
                 >
-                    <CellContent data={cellState} size={cellSize} sudokuAngle={angle}/>
+                    <CellContent data={cellState} size={cellSize} sudokuAngle={angleAnimation}/>
                 </Absolute>;
             }))}
 

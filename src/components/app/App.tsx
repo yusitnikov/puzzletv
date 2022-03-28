@@ -241,12 +241,7 @@ export const App = () => {
             onSelectedCellsChange={setSelectedCells}
             rect={sudokuRect}
             angle={angle}
-            animationSpeed={
-                // Disable animation during window resize
-                Date.now() > windowSize.lastResize + animationSpeed
-                    ? animationSpeed
-                    : 0
-            }
+            animationSpeed={animationSpeed}
             cellSize={cellSize}
         />
 

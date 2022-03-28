@@ -1,14 +1,13 @@
 import {useState} from "react";
 import {useEventListener} from "./useEventListener";
 
-const calculateWindowSize = (noTime?: boolean) => ({
+const calculateWindowSize = () => ({
     width: window.innerWidth,
     height: window.innerHeight,
-    lastResize: noTime ? 0 : Date.now(),
 })
 
 export const useWindowSize = () => {
-    const [windowSize, setWindowSize] = useState(() => calculateWindowSize(true));
+    const [windowSize, setWindowSize] = useState(calculateWindowSize);
 
     useEventListener(window, "resize", () => setWindowSize(calculateWindowSize()));
 
