@@ -131,6 +131,18 @@ export const App = () => {
 
     const [isStickyMode, setIsStickyMode] = useState(false);
 
+    const [isFullScreen, setIsFullScreen] = useState(false);
+    useEventListener(window, "fullscreenchange", () => {
+        const target = window.document as any;
+
+        setIsFullScreen(!!(
+            target.fullscreenElement ||
+            target.webkitFullscreenElement ||
+            target.mozFullscreenElement ||
+            target.msFullscreenElement
+        ));
+    });
+
     // region Sudoku event handlers
     const handleDigit = (digit: number) => {
         if (cellWriteMode !== CellWriteMode.color && !isStickyMode && angle % 360 && [6, 9].includes(digit)) {
@@ -190,6 +202,16 @@ export const App = () => {
     const handleRotate = () => setAngle(angle + (isStartAngle ? 90 : 180));
 
     const handleToggleStickyMode = () => setIsStickyMode(!isStickyMode);
+
+    const handleToggleFullScreen = () => {
+        if (isFullScreen) {
+            const target = window.document as any;
+            (target.exitFullscreen || target.webkitExitFullscreen || target.msExitFullscreen).call(target);
+        } else {
+            const target = window.document.documentElement as any;
+            (target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen).call(target);
+        }
+    };
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
@@ -358,6 +380,8 @@ export const App = () => {
             onRotate={handleRotate}
             isStickyMode={isStickyMode}
             onToggleStickyMode={handleToggleStickyMode}
+            isFullScreen={isFullScreen}
+            onToggleFullScreen={handleToggleFullScreen}
         />
     </StyledContainer>;
 }

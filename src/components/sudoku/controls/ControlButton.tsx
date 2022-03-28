@@ -4,6 +4,7 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Position} from "../../../types/layout/Position";
 import styled from "@emotion/styled";
 import {lightGreyColor, textColor} from "../../app/globals";
+import {EmotionIconBase} from "@emotion-icons/emotion-icon";
 
 export const controlButtonPaddingCoeff = 0.15;
 
@@ -22,6 +23,9 @@ const StyledContainer = styled(Absolute, {
     "&:hover": {
         backgroundColor: lightGreyColor,
         opacity: opacityOnHover ? 0.8 : 1,
+    },
+    [EmotionIconBase.toString()]: {
+        verticalAlign: "top",
     },
 }));
 

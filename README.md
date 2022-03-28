@@ -10,6 +10,7 @@ Nice to do:
 - Timer.
 - Checker.
 - Rotation speed controls.
+- Touch events support for mobile.
 
 ## Available Scripts
 

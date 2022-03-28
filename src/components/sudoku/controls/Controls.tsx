@@ -2,7 +2,7 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes08} from "../../../utils/indexes";
-import {Clear, PushPin, Redo, RotateRight, Undo} from "@emotion-icons/material";
+import {Clear, Fullscreen, FullscreenExit, PushPin, Redo, RotateRight, Undo} from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
@@ -28,6 +28,8 @@ export interface ControlsProps {
     onRotate: () => void;
     isStickyMode: boolean;
     onToggleStickyMode: () => void;
+    isFullScreen: boolean;
+    onToggleFullScreen: () => void;
 }
 
 export const Controls = (
@@ -45,6 +47,8 @@ export const Controls = (
         onRotate,
         isStickyMode,
         onToggleStickyMode,
+        isFullScreen,
+        onToggleFullScreen,
     }: ControlsProps
 ) => <Absolute {...rect}>
     {isReady && indexes08.map(index => {
@@ -216,12 +220,15 @@ export const Controls = (
         {/*    cellSize={cellSize}*/}
         {/*>*/}
         {/*</ControlButton>*/}
-        {/*<ControlButton*/}
-        {/*    left={3}*/}
-        {/*    top={0}*/}
-        {/*    flipDirection={!isHorizontal}*/}
-        {/*    cellSize={cellSize}*/}
-        {/*>*/}
-        {/*</ControlButton>*/}
+        <ControlButton
+            left={3}
+            top={0}
+            flipDirection={!isHorizontal}
+            cellSize={cellSize}
+            onClick={onToggleFullScreen}
+            fullSize={true}
+        >
+            {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
+        </ControlButton>
     </Absolute>
 </Absolute>;
