@@ -244,6 +244,12 @@ export const App = () => {
                     ev.preventDefault();
                 }
                 break;
+            case "Escape":
+                if (!ctrlKey && !shiftKey) {
+                    setSelectedCells(selectedCells.clear());
+                    ev.preventDefault();
+                }
+                break;
             case "PageUp":
                 setPersistentCellWriteMode((persistentCellWriteMode + 3) % 4);
                 ev.preventDefault();
