@@ -4,9 +4,9 @@ A sudoku puzzle that could be rotated clockwise.
 
 ## TODO/TOFIX
 Nice to do:
+- Touch events support for mobile.
 - Timer.
 - Checker.
-- Touch events support for mobile.
 
 ## Available Scripts
 
