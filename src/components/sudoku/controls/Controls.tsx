@@ -2,7 +2,6 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes08} from "../../../utils/indexes";
-import {globalPaddingCoeff} from "../../app/globals";
 import {Clear, PushPin, Redo, RotateRight, Undo} from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
@@ -13,7 +12,7 @@ import {CellBackground} from "../cell/CellBackground";
 import {CellDigits} from "../cell/CellDigits";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
-export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 3 + globalPaddingCoeff;
+export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
 
 export interface ControlsProps {
     rect: Rect;

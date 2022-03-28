@@ -9,6 +9,16 @@ const StyledContainer = styled(Absolute)({
     flexDirection: "column",
 });
 
+const StyledParagraph = styled("p")({
+    marginTop: 0,
+    marginBottom: "0.3em",
+});
+
+const StyledList = styled("ul")({
+    marginTop: 0,
+    marginBottom: "1em",
+});
+
 export interface RulesProps {
     rect: Rect;
     cellSize: number;
@@ -19,7 +29,7 @@ export const Rules = ({rect, cellSize}: RulesProps) => <StyledContainer {...rect
         style={{
             padding: cellSize / 8,
             textAlign: "center",
-            marginBottom: cellSize * Math.min(1 / 4, globalPaddingCoeff),
+            marginBottom: cellSize * globalPaddingCoeff / 2,
             backgroundColor: blueColor,
         }}
     >
@@ -41,10 +51,22 @@ export const Rules = ({rect, cellSize}: RulesProps) => <StyledContainer {...rect
         <div
             style={{
                 padding: cellSize / 8,
-                fontSize: cellSize / 4,
+                fontSize: cellSize / 5,
             }}
         >
-            Normal sudoku rules apply.<br/>
+            <StyledParagraph>Normal sudoku rules apply.</StyledParagraph>
+            <StyledParagraph><strong>The sudoku field can be rotated clockwise.</strong> It's not known in advance in which orientation the puzzle is solvable.</StyledParagraph>
+            <StyledParagraph>Anti-knight sudoku rules apply: cells separated by a chess knight's move cannot contain the same digit.</StyledParagraph>
+            <StyledParagraph>Conventional notations for common sudoku objects apply:</StyledParagraph>
+            <StyledList>
+                <li>Killer cages: cells in cages must sum to the total given in the corner of each cage, digits cannot repeat within a cage.</li>
+                <li>Arrows: digits along arrows sum to the numbers in the circles.</li>
+                <li>Thermometers: along thermometers, digits must increase from the bulb end.</li>
+                <li>Kropki dots: cells separated by a black dot have a ratio of 1:2.</li>
+                <li>XV: cells separated by X must sum to 10.</li>
+                <li>German whispers: consecutive digits along the purple line must have difference of 5 or more.</li>
+            </StyledList>
+            <StyledParagraph>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</StyledParagraph>
         </div>
     </div>
 </StyledContainer>;
