@@ -8,4 +8,4 @@ export const isStickyRotatableDigit = ({digit, sticky}: RotatableDigit) => stick
 export const cloneRotatableDigit = (digit: RotatableDigit) => ({...digit});
 
 export const areSameRotatableDigits = ({digit, sticky = false}: RotatableDigit, {digit: digit2, sticky: sticky2 = false}: RotatableDigit) =>
-    digit === digit2 && sticky === sticky2;
+    digit === digit2 && (sticky === sticky2 || ![6, 9].includes(digit));
