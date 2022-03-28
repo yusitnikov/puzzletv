@@ -2,7 +2,17 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes08} from "../../../utils/indexes";
-import {Clear, Fullscreen, FullscreenExit, PushPin, Redo, RotateRight, Undo} from "@emotion-icons/material";
+import {
+    Clear,
+    FastForward,
+    Fullscreen,
+    FullscreenExit,
+    PlayArrow,
+    PushPin,
+    Redo,
+    RotateRight, Timelapse,
+    Undo
+} from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
@@ -10,6 +20,7 @@ import {RotatableDigit} from "../../../types/sudoku/RotatableDigit";
 import {Set} from "../../../types/struct/Set";
 import {CellBackground} from "../cell/CellBackground";
 import {CellDigits} from "../cell/CellDigits";
+import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
@@ -28,6 +39,8 @@ export interface ControlsProps {
     onRotate: () => void;
     isStickyMode: boolean;
     onToggleStickyMode: () => void;
+    animationSpeed: AnimationSpeed;
+    onAnimationSpeedToggle: () => void;
     isFullScreen: boolean;
     onToggleFullScreen: () => void;
 }
@@ -47,6 +60,8 @@ export const Controls = (
         onRotate,
         isStickyMode,
         onToggleStickyMode,
+        animationSpeed,
+        onAnimationSpeedToggle,
         isFullScreen,
         onToggleFullScreen,
     }: ControlsProps
@@ -194,7 +209,7 @@ export const Controls = (
         height={isHorizontal ? cellSize : rect.height}
     >
         <ControlButton
-            left={1}
+            left={0}
             top={0}
             flipDirection={!isHorizontal}
             cellSize={cellSize}
@@ -204,7 +219,7 @@ export const Controls = (
             <Undo/>
         </ControlButton>
         <ControlButton
-            left={2}
+            left={1}
             top={0}
             flipDirection={!isHorizontal}
             cellSize={cellSize}
@@ -213,13 +228,18 @@ export const Controls = (
         >
             <Redo/>
         </ControlButton>
-        {/*<ControlButton*/}
-        {/*    left={2}*/}
-        {/*    top={0}*/}
-        {/*    flipDirection={!isHorizontal}*/}
-        {/*    cellSize={cellSize}*/}
-        {/*>*/}
-        {/*</ControlButton>*/}
+        <ControlButton
+            left={2}
+            top={0}
+            flipDirection={!isHorizontal}
+            cellSize={cellSize}
+            onClick={onAnimationSpeedToggle}
+            title={`Rotation speed: ${animationSpeedToString(animationSpeed)} (click to toggle)`}
+        >
+            {animationSpeed === AnimationSpeed.regular && <PlayArrow/>}
+            {animationSpeed === AnimationSpeed.immediate && <FastForward/>}
+            {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
+        </ControlButton>
         <ControlButton
             left={3}
             top={0}
@@ -227,6 +247,7 @@ export const Controls = (
             cellSize={cellSize}
             onClick={onToggleFullScreen}
             fullSize={true}
+            title={isFullScreen ? "Exit full screen mode" : "Enter full screen mode"}
         >
             {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
         </ControlButton>

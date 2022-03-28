@@ -9,8 +9,10 @@ import {controlsWidthCoeff} from "../sudoku/controls/Controls";
 import styled from "@emotion/styled";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
 import {
-    FieldStateHistory, fieldStateHistoryAddState,
-    fieldStateHistoryGetCurrent, fieldStateHistoryRedo,
+    FieldStateHistory,
+    fieldStateHistoryAddState,
+    fieldStateHistoryGetCurrent,
+    fieldStateHistoryRedo,
     fieldStateHistoryUndo
 } from "../../types/sudoku/FieldStateHistory";
 import {createEmptyFieldState, processFieldStateCells} from "../../types/sudoku/FieldState";
@@ -27,6 +29,7 @@ import {Arrow} from "../sudoku/figures/arrow/Arrow";
 import {KillerCage} from "../sudoku/figures/killer-cage/KillerCage";
 import {KropkiDot} from "../sudoku/figures/kropki-dot/KropkiDot";
 import {XMark} from "../sudoku/figures/x-mark/XMark";
+import {AnimationSpeed} from "../../types/sudoku/AnimationSpeed";
 
 const StyledContainer = styled(Absolute)({
     color: textColor,
@@ -117,7 +120,7 @@ export const App = () => {
         state => processFieldStateCells(state, selectedCells.items, processor)
     ));
 
-    const animationSpeed = 1000;
+    const [animationSpeed, setAnimationSpeed] = useState(AnimationSpeed.regular);
 
     const [persistentCellWriteMode, setPersistentCellWriteMode] = useState(CellWriteMode.main);
     const tempCellWriteMode = isCtrlDown
@@ -202,6 +205,20 @@ export const App = () => {
     const handleRotate = () => setAngle(angle + (isStartAngle ? 90 : 180));
 
     const handleToggleStickyMode = () => setIsStickyMode(!isStickyMode);
+
+    const handleAnimationSpeedToggle = () => {
+        switch (animationSpeed) {
+            case AnimationSpeed.regular:
+                setAnimationSpeed(AnimationSpeed.immediate);
+                break;
+            case AnimationSpeed.immediate:
+                setAnimationSpeed(AnimationSpeed.slow);
+                break;
+            case AnimationSpeed.slow:
+                setAnimationSpeed(AnimationSpeed.regular);
+                break;
+        }
+    };
 
     const handleToggleFullScreen = () => {
         if (isFullScreen) {
@@ -380,6 +397,8 @@ export const App = () => {
             onRotate={handleRotate}
             isStickyMode={isStickyMode}
             onToggleStickyMode={handleToggleStickyMode}
+            animationSpeed={animationSpeed}
+            onAnimationSpeedToggle={handleAnimationSpeedToggle}
             isFullScreen={isFullScreen}
             onToggleFullScreen={handleToggleFullScreen}
         />
