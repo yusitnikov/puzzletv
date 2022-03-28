@@ -6,7 +6,6 @@ A sudoku puzzle that could be rotated clockwise.
 Must:
 - Do something with the empty buttons.
 - Change the icon.
-- Don't allow entering the same rotatable and sticky digit when it's not 6 or 9.
 
 Nice to do:
 - Timer.
