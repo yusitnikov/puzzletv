@@ -100,7 +100,6 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                     left: columnIndex,
                     top: rowIndex,
                 };
-                const isSelected = selectedCells.contains(cellPosition);
 
                 return <Absolute
                     key={`cell-${rowIndex}-${columnIndex}`}
@@ -111,8 +110,6 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                     pointerEvents={true}
                     style={{
                         cursor: isReady ? "pointer" : undefined,
-                        // TODO: better visual effect for the cell selection
-                        backgroundColor: isSelected ? "lightblue" : undefined,
                     }}
                     onMouseDown={(ev) => {
                         ev.preventDefault();
@@ -133,7 +130,13 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                         onSelectedCellsChange(selectedCells.toggle(cellPosition, !isDeleteSelectedCellsStroke));
                     }}
                 >
-                    <CellContent data={cellState} size={cellSize} sudokuAngle={angleAnimation}/>
+                    <CellContent
+                        data={cellState}
+                        size={cellSize}
+                        sudokuAngle={angleAnimation}
+                        isSelected={selectedCells.contains(cellPosition)}
+                        isLastSelected={selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top}
+                    />
                 </Absolute>;
             }))}
 

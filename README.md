@@ -7,7 +7,7 @@ Must:
 - Finish writing the rules.
 - Add initial objects to the field.
 - Do something with the empty buttons.
-- Better state selection UI (a border).
+- Fix performance.
 
 Nice to do:
 - Timer.

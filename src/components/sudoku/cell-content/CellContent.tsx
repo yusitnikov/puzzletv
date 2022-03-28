@@ -1,7 +1,7 @@
 import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
 import {CellState} from "../../../types/sudoku/CellState";
 import {Digit, digitSpaceCoeff} from "../digit/Digit";
-import {cellBackgroundColors} from "../../app/globals";
+import {blueColor, cellBackgroundColors, lighterBlueColor} from "../../app/globals";
 import {Position} from "../../../types/layout/Position";
 import {isStickyRotatableDigit, RotatableDigit} from "../../../types/sudoku/RotatableDigit";
 import {Set} from "../../../types/struct/Set";
@@ -25,10 +25,12 @@ export interface CellContentProps extends Omit<AbsoluteProps, "width" | "height"
     data: CellState;
     size: number;
     sudokuAngle?: number;
+    isSelected?: boolean;
+    isLastSelected?: boolean;
     mainColor?: boolean;
 }
 
-export const CellContent = ({data, size, sudokuAngle = 0, mainColor, style, ...containerProps}: CellContentProps) => {
+export const CellContent = ({data, size, sudokuAngle = 0, isSelected, isLastSelected, mainColor, style, ...containerProps}: CellContentProps) => {
     const rotatableDigitColor = mainColor ? undefined : "#00f";
     const stickyDigitColor = mainColor ? undefined : "#0c0";
 
@@ -94,6 +96,9 @@ export const CellContent = ({data, size, sudokuAngle = 0, mainColor, style, ...c
         });
     };
 
+    const selectionBorderWidth = size * 0.1;
+    const selectionBorderWidth2 = 2;
+
     return <Absolute
         width={size}
         height={size}
@@ -124,6 +129,25 @@ export const CellContent = ({data, size, sudokuAngle = 0, mainColor, style, ...c
                 fill={cellBackgroundColors[color]}
             />)}
         </Absolute>}
+
+        {isSelected && <>
+            <Absolute
+                left={selectionBorderWidth / 2}
+                top={selectionBorderWidth / 2}
+                width={size - selectionBorderWidth}
+                height={size - selectionBorderWidth}
+                borderWidth={selectionBorderWidth}
+                borderColor={isLastSelected ? blueColor : lighterBlueColor}
+            />
+            <Absolute
+                left={selectionBorderWidth + selectionBorderWidth2 / 2}
+                top={selectionBorderWidth + selectionBorderWidth2 / 2}
+                width={size - selectionBorderWidth * 2 - selectionBorderWidth2}
+                height={size - selectionBorderWidth * 2 - selectionBorderWidth2}
+                borderWidth={selectionBorderWidth2}
+                borderColor={"#fff"}
+            />
+        </>}
 
         <Absolute left={size / 2} top={size / 2}>
             {initialDigit && <Digit

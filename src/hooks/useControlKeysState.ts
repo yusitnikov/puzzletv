@@ -1,8 +1,8 @@
-import {useState} from "react";
+import {usePureState} from "./usePureState";
 import {useEventListener} from "./useEventListener";
 
 export const useControlKeysState = () => {
-    const [state, setState] = useState({
+    const [state, setState] = usePureState({
         isCtrlDown: false,
         isShiftDown: false,
         isAnyKeyDown: false,

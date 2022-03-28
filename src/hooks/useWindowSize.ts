@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {usePureState} from "./usePureState";
 import {useEventListener} from "./useEventListener";
 
 const calculateWindowSize = () => ({
@@ -7,7 +7,7 @@ const calculateWindowSize = () => ({
 })
 
 export const useWindowSize = () => {
-    const [windowSize, setWindowSize] = useState(calculateWindowSize);
+    const [windowSize, setWindowSize] = usePureState(calculateWindowSize);
 
     useEventListener(window, "resize", () => setWindowSize(calculateWindowSize()));
 

@@ -117,7 +117,7 @@ export const App = () => {
     const tempCellWriteMode = isCtrlDown
         ? (isShiftDown ? CellWriteMode.color : CellWriteMode.center)
         : (isShiftDown ? CellWriteMode.corner : undefined);
-    const cellWriteMode = tempCellWriteMode || persistentCellWriteMode;
+    const cellWriteMode = tempCellWriteMode ?? persistentCellWriteMode;
 
     const [angle, setAngle] = useState(90);
     const isStartAngle = angle === 90;
@@ -127,7 +127,7 @@ export const App = () => {
 
     // region Sudoku event handlers
     const handleDigit = (digit: number) => {
-        if (!isStickyMode && angle % 360 && [6, 9].includes(digit)) {
+        if (cellWriteMode !== CellWriteMode.color && !isStickyMode && angle % 360 && [6, 9].includes(digit)) {
             digit = 15 - digit;
         }
 
@@ -237,6 +237,14 @@ export const App = () => {
                     ));
                     ev.preventDefault();
                 }
+                break;
+            case "PageUp":
+                setPersistentCellWriteMode((persistentCellWriteMode + 3) % 4);
+                ev.preventDefault();
+                break;
+            case "PageDown":
+                setPersistentCellWriteMode((persistentCellWriteMode + 1) % 4);
+                ev.preventDefault();
                 break;
         }
     });
