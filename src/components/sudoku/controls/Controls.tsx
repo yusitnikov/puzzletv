@@ -190,7 +190,7 @@ export const Controls = (
         height={isHorizontal ? cellSize : rect.height}
     >
         <ControlButton
-            left={0}
+            left={1}
             top={0}
             flipDirection={!isHorizontal}
             cellSize={cellSize}
@@ -200,7 +200,7 @@ export const Controls = (
             <Undo/>
         </ControlButton>
         <ControlButton
-            left={1}
+            left={2}
             top={0}
             flipDirection={!isHorizontal}
             cellSize={cellSize}
@@ -209,19 +209,19 @@ export const Controls = (
         >
             <Redo/>
         </ControlButton>
-        <ControlButton
-            left={2}
-            top={0}
-            flipDirection={!isHorizontal}
-            cellSize={cellSize}
-        >
-        </ControlButton>
-        <ControlButton
-            left={3}
-            top={0}
-            flipDirection={!isHorizontal}
-            cellSize={cellSize}
-        >
-        </ControlButton>
+        {/*<ControlButton*/}
+        {/*    left={2}*/}
+        {/*    top={0}*/}
+        {/*    flipDirection={!isHorizontal}*/}
+        {/*    cellSize={cellSize}*/}
+        {/*>*/}
+        {/*</ControlButton>*/}
+        {/*<ControlButton*/}
+        {/*    left={3}*/}
+        {/*    top={0}*/}
+        {/*    flipDirection={!isHorizontal}*/}
+        {/*    cellSize={cellSize}*/}
+        {/*>*/}
+        {/*</ControlButton>*/}
     </Absolute>
 </Absolute>;
