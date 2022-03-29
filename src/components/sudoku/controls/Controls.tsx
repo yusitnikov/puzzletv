@@ -178,7 +178,7 @@ export const Controls = (
         top={3}
         cellSize={cellSize}
         onClick={onRotate}
-        title={"Rotate the puzzle (shortcut: R)"}
+        title={"Rotate the puzzle (shortcut: R)\nTip: use the button below to control the rotation speed"}
     >
         <RotateRight/>
     </ControlButton>
