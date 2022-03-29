@@ -300,6 +300,14 @@ export const App = () => {
         }
     });
 
+    useEventListener(window, "beforeunload", (ev: BeforeUnloadEvent) => {
+        if (isReady) {
+            ev.preventDefault();
+            ev.returnValue = "";
+            return "";
+        }
+    });
+
     return <StyledContainer {...containerRect}>
         <Field
             isReady={isReady}
