@@ -18,7 +18,7 @@ import {
 import {
     createEmptyFieldState,
     areAllFieldStateCells,
-    processFieldStateCells
+    processFieldStateCells, isAnyFieldStateCell
 } from "../../types/sudoku/FieldState";
 import {noSelectedCells, SelectedCells} from "../../types/sudoku/SelectedCells";
 import {CellState} from "../../types/sudoku/CellState";
@@ -127,6 +127,9 @@ export const App = () => {
     const areAllSelectedCells = (predicate: (cellState: CellState) => boolean) =>
         areAllFieldStateCells(fieldState, selectedCells.items, predicate);
 
+    const isAnySelectedCell = (predicate: (cellState: CellState) => boolean) =>
+        isAnyFieldStateCell(fieldState, selectedCells.items, predicate);
+
     const [animationSpeed, setAnimationSpeed] = useState(AnimationSpeed.regular);
 
     const [persistentCellWriteMode, setPersistentCellWriteMode] = useState(CellWriteMode.main);
@@ -187,25 +190,34 @@ export const App = () => {
         }
     }
 
-    const handleClear = () => processSelectedCells(cell => {
-        if (cell.usersDigit) {
-            return {...cell, usersDigit: undefined};
-        }
+    const handleClear = () => {
+        const clearCenter = () => processSelectedCells(cell => ({...cell, centerDigits: cell.centerDigits.clear()}));
+        const clearCorner = () => processSelectedCells(cell => ({...cell, cornerDigits: cell.cornerDigits.clear()}));
+        const clearColor = () => processSelectedCells(cell => ({...cell, colors: cell.colors.clear()}));
 
-        if (cell.centerDigits.size) {
-            return {...cell, centerDigits: cell.centerDigits.clear()};
+        switch (cellWriteMode) {
+            case CellWriteMode.main:
+                if (isAnySelectedCell(cell => !!cell.usersDigit)) {
+                    processSelectedCells(cell => ({...cell, usersDigit: undefined}));
+                } else if (isAnySelectedCell(cell => !!cell.centerDigits.size)) {
+                    clearCenter();
+                } else if (isAnySelectedCell(cell => !!cell.cornerDigits.size)) {
+                    clearCorner();
+                } else {
+                    clearColor();
+                }
+                break;
+            case CellWriteMode.center:
+                clearCenter();
+                break;
+            case CellWriteMode.corner:
+                clearCorner()
+                break;
+            case CellWriteMode.color:
+                clearColor();
+                break;
         }
-
-        if (cell.cornerDigits.size) {
-            return {...cell, cornerDigits: cell.cornerDigits.clear()};
-        }
-
-        if (cell.colors.size) {
-            return {...cell, colors: cell.colors.clear()};
-        }
-
-        return cell;
-    });
+    };
 
     const handleUndo = () => setHistory(fieldStateHistoryUndo);
 

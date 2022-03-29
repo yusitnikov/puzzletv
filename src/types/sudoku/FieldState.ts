@@ -25,6 +25,9 @@ export const processFieldStateCells = (fieldState: FieldState, affectedCells: Po
 export const areAllFieldStateCells = (fieldState: FieldState, affectedCells: Position[], predicate: (cellState: CellState) => boolean) =>
     affectedCells.every(({left: columnIndex, top: rowIndex}) => predicate(fieldState.cells[rowIndex][columnIndex]));
 
+export const isAnyFieldStateCell = (fieldState: FieldState, affectedCells: Position[], predicate: (cellState: CellState) => boolean) =>
+    affectedCells.some(({left: columnIndex, top: rowIndex}) => predicate(fieldState.cells[rowIndex][columnIndex]));
+
 export const areFieldStatesEqual = ({cells}: FieldState, {cells: cells2}: FieldState) => cells.every(
     (row, rowIndex) => row.every(
         (cell, columnIndex) => areCellStatesEqual(cell, cells2[rowIndex][columnIndex])
