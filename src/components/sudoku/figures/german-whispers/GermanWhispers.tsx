@@ -2,6 +2,6 @@ import {RoundedPolyLine, RoundedPolyLineProps} from "../../../svg/rounded-poly-l
 
 export const GermanWhispers = (props: RoundedPolyLineProps) => <RoundedPolyLine
     strokeWidth={0.15}
-    stroke={"#f0f"}
+    stroke={"#0f0"}
     {...props}
 />;

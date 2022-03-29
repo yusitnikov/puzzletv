@@ -64,7 +64,7 @@ export const Rules = ({rect, cellSize}: RulesProps) => <StyledContainer {...rect
                 <li>Thermometers: along thermometers, digits must increase from the bulb end.</li>
                 <li>Kropki dots: cells separated by a black dot have a ratio of 1:2.</li>
                 <li>XV: cells separated by X must sum to 10.</li>
-                <li>German whispers: consecutive digits along the purple line must have difference of 5 or more.</li>
+                <li>German whispers: consecutive digits along the green line must have difference of 5 or more.</li>
             </StyledList>
             <StyledParagraph>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</StyledParagraph>
         </div>
