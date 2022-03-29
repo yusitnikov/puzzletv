@@ -128,8 +128,8 @@ export const App = () => {
         : (isShiftDown ? CellWriteMode.corner : undefined);
     const cellWriteMode = tempCellWriteMode ?? persistentCellWriteMode;
 
-    const [angle, setAngle] = useState(90);
-    const isStartAngle = angle === 90;
+    const [angle, setAngle] = useState(-90);
+    const isStartAngle = angle === -90;
     const isReady = !isStartAngle;
 
     const [isStickyMode, setIsStickyMode] = useState(false);
