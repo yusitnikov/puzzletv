@@ -15,7 +15,11 @@ import {
     fieldStateHistoryRedo,
     fieldStateHistoryUndo
 } from "../../types/sudoku/FieldStateHistory";
-import {createEmptyFieldState, processFieldStateCells} from "../../types/sudoku/FieldState";
+import {
+    createEmptyFieldState,
+    areAllFieldStateCells,
+    processFieldStateCells
+} from "../../types/sudoku/FieldState";
 import {noSelectedCells, SelectedCells} from "../../types/sudoku/SelectedCells";
 import {CellState} from "../../types/sudoku/CellState";
 import {RotatableDigit} from "../../types/sudoku/RotatableDigit";
@@ -120,6 +124,9 @@ export const App = () => {
         state => processFieldStateCells(state, selectedCells.items, processor)
     ));
 
+    const areAllSelectedCells = (predicate: (cellState: CellState) => boolean) =>
+        areAllFieldStateCells(fieldState, selectedCells.items, predicate);
+
     const [animationSpeed, setAnimationSpeed] = useState(AnimationSpeed.regular);
 
     const [persistentCellWriteMode, setPersistentCellWriteMode] = useState(CellWriteMode.main);
@@ -157,25 +164,27 @@ export const App = () => {
             sticky: isStickyMode,
         };
 
-        processSelectedCells(cell => {
-            switch (cellWriteMode) {
-                case CellWriteMode.main:
-                    return {
-                        ...cell,
-                        usersDigit: rotatableDigit,
-                        centerDigits: cell.centerDigits.clear(),
-                        cornerDigits: cell.cornerDigits.clear(),
-                    };
-                case CellWriteMode.center:
-                    return {...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit)};
-                case CellWriteMode.corner:
-                    return {...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit)};
-                case CellWriteMode.color:
-                    return {...cell, colors: cell.colors.toggle(digit - 1)};
-            }
-
-            return cell;
-        });
+        switch (cellWriteMode) {
+            case CellWriteMode.main:
+                processSelectedCells(cell => ({
+                    ...cell,
+                    usersDigit: rotatableDigit,
+                    centerDigits: cell.centerDigits.clear(),
+                    cornerDigits: cell.cornerDigits.clear(),
+                }));
+                break;
+            case CellWriteMode.center:
+                const areAllCentersEnabled = areAllSelectedCells(cell => cell.centerDigits.contains(rotatableDigit));
+                processSelectedCells(cell => ({...cell, centerDigits: cell.centerDigits.toggle(rotatableDigit, !areAllCentersEnabled)}));
+                break;
+            case CellWriteMode.corner:
+                const areAllCornersEnabled = areAllSelectedCells(cell => cell.cornerDigits.contains(rotatableDigit));
+                processSelectedCells(cell => ({...cell, cornerDigits: cell.cornerDigits.toggle(rotatableDigit, !areAllCornersEnabled)}));
+                break;
+            case CellWriteMode.color:
+                processSelectedCells(cell => ({...cell, colors: cell.colors.toggle(digit - 1)}));
+                break;
+        }
     }
 
     const handleClear = () => processSelectedCells(cell => {
