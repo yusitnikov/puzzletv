@@ -213,13 +213,25 @@ export const Controls = (
             top={0}
             flipDirection={!isHorizontal}
             cellSize={cellSize}
+            onClick={onAnimationSpeedToggle}
+            title={`Rotation speed: ${animationSpeedToString(animationSpeed)} (click to toggle)`}
+        >
+            {animationSpeed === AnimationSpeed.regular && <PlayArrow/>}
+            {animationSpeed === AnimationSpeed.immediate && <FastForward/>}
+            {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
+        </ControlButton>
+        <ControlButton
+            left={1}
+            top={0}
+            flipDirection={!isHorizontal}
+            cellSize={cellSize}
             onClick={onUndo}
             title={"Undo the last action (shortcut: Ctrl+Z)"}
         >
             <Undo/>
         </ControlButton>
         <ControlButton
-            left={1}
+            left={2}
             top={0}
             flipDirection={!isHorizontal}
             cellSize={cellSize}
@@ -227,18 +239,6 @@ export const Controls = (
             title={"Redo the last action (shortcut: Ctrl+Y)"}
         >
             <Redo/>
-        </ControlButton>
-        <ControlButton
-            left={2}
-            top={0}
-            flipDirection={!isHorizontal}
-            cellSize={cellSize}
-            onClick={onAnimationSpeedToggle}
-            title={`Rotation speed: ${animationSpeedToString(animationSpeed)} (click to toggle)`}
-        >
-            {animationSpeed === AnimationSpeed.regular && <PlayArrow/>}
-            {animationSpeed === AnimationSpeed.immediate && <FastForward/>}
-            {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
         </ControlButton>
         <ControlButton
             left={3}
