@@ -167,14 +167,16 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                     ev.preventDefault();
                     ev.stopPropagation();
                 }}
-                onPointerDown={({target, pointerId}: PointerEvent<HTMLDivElement>) => {
+                onPointerDown={({target, pointerId, ctrlKey, shiftKey, isPrimary}: PointerEvent<HTMLDivElement>) => {
                     if ((target as HTMLDivElement).hasPointerCapture?.(pointerId)) {
                         (target as HTMLDivElement).releasePointerCapture?.(pointerId);
                     }
 
-                    setIsDeleteSelectedCellsStroke(isAnyKeyDown && selectedCells.contains(cellPosition));
+                    const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
+
+                    setIsDeleteSelectedCellsStroke(isMultiSelection && selectedCells.contains(cellPosition));
                     onSelectedCellsChange(
-                        isAnyKeyDown
+                        isMultiSelection
                             ? selectedCells.toggle(cellPosition)
                             : selectedCells.set([cellPosition])
                     );
