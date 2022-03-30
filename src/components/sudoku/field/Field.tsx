@@ -7,7 +7,7 @@ import {Position} from "../../../types/layout/Position";
 import {noSelectedCells, SelectedCells} from "../../../types/sudoku/SelectedCells";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
-import {MouseEvent, ReactNode, useState} from "react";
+import {MouseEvent, PointerEvent, ReactNode, useState} from "react";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
@@ -160,10 +160,17 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                 pointerEvents={true}
                 style={{
                     cursor: isReady ? "pointer" : undefined,
+                    touchAction: "none",
+                    userSelect: "none",
                 }}
                 onMouseDown={(ev: MouseEvent<HTMLDivElement>) => {
                     ev.preventDefault();
                     ev.stopPropagation();
+                }}
+                onPointerDown={({target, pointerId}: PointerEvent<HTMLDivElement>) => {
+                    if ((target as HTMLDivElement).hasPointerCapture?.(pointerId)) {
+                        (target as HTMLDivElement).releasePointerCapture?.(pointerId);
+                    }
 
                     setIsDeleteSelectedCellsStroke(isAnyKeyDown && selectedCells.contains(cellPosition));
                     onSelectedCellsChange(
@@ -172,8 +179,8 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                             : selectedCells.set([cellPosition])
                     );
                 }}
-                onMouseEnter={(ev: MouseEvent<HTMLDivElement>) => {
-                    if (ev.buttons !== 1) {
+                onPointerEnter={({buttons}: PointerEvent<HTMLDivElement>) => {
+                    if (buttons !== 1) {
                         return;
                     }
 
