@@ -13,6 +13,7 @@ import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
 import {CellSelection} from "../cell/CellSelection";
 import {CellDigits} from "../cell/CellDigits";
+import {FieldSvg} from "./FieldSvg";
 
 export interface FieldProps {
     isReady: boolean;
@@ -126,7 +127,7 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                 isSecondary={selectedCells.last()?.left !== cellPosition.left || selectedCells.last()?.top !== cellPosition.top}
             />)}
 
-            {children}
+            <FieldSvg cellSize={cellSize}>{children}</FieldSvg>
 
             {indexes09.map(index => <Line
                 key={`h-line-${index}`}
@@ -146,7 +147,7 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                 width={index % 3 ? 1 : 3}
             />)}
 
-            {topChildren}
+            <FieldSvg cellSize={cellSize}>{topChildren}</FieldSvg>
 
             {renderCellsLayer("digits", (cellState) => <CellDigits
                 data={cellState}
