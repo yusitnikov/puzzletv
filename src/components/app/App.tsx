@@ -16,9 +16,10 @@ import {
     fieldStateHistoryUndo
 } from "../../types/sudoku/FieldStateHistory";
 import {
-    createEmptyFieldState,
     areAllFieldStateCells,
-    processFieldStateCells, isAnyFieldStateCell
+    processFieldStateCells,
+    isAnyFieldStateCell,
+    fillFieldStateInitialDigits
 } from "../../types/sudoku/FieldState";
 import {noSelectedCells, SelectedCells} from "../../types/sudoku/SelectedCells";
 import {CellState} from "../../types/sudoku/CellState";
@@ -90,27 +91,21 @@ export const App = () => {
     const {isCtrlDown, isShiftDown} = useControlKeysState();
 
     const [history, setHistory] = useState<FieldStateHistory>(() => {
-        const state = createEmptyFieldState();
-        state.cells[0][0] = {
-            ...state.cells[0][0],
-            initialDigit: {digit: 6},
-        };
-        state.cells[4][2] = {
-            ...state.cells[4][2],
-            initialDigit: {digit: 6},
-        };
-        state.cells[5][0] = {
-            ...state.cells[5][0],
-            initialDigit: {digit: 9},
-        };
-        state.cells[8][4] = {
-            ...state.cells[8][4],
-            initialDigit: {digit: 5},
-        };
-        state.cells[8][5] = {
-            ...state.cells[8][5],
-            initialDigit: {digit: 2},
-        };
+        const state = fillFieldStateInitialDigits({
+            0: {
+                0: {digit: 6},
+            },
+            4: {
+                2: {digit: 6},
+            },
+            5: {
+                0: {digit: 9},
+            },
+            8: {
+                4: {digit: 5},
+                5: {digit: 2},
+            },
+        });
 
         return {
             states: [state],

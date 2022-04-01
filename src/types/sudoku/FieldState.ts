@@ -1,6 +1,7 @@
 import {areCellStatesEqual, CellState, cloneCellState, emptyCellState} from "./CellState";
 import {indexes08} from "../../utils/indexes";
 import {Position} from "../layout/Position";
+import {RotatableDigit} from "./RotatableDigit";
 
 export interface FieldState {
     cells: CellState[][];
@@ -8,6 +9,19 @@ export interface FieldState {
 
 export const createEmptyFieldState = (): FieldState => ({
     cells: indexes08.map(() => indexes08.map(() => emptyCellState)),
+});
+
+export type FieldStateInitialDigitsMap = Record<number, Record<number, RotatableDigit>>;
+
+export const fillFieldStateInitialDigits = (
+    initialDigits: FieldStateInitialDigitsMap,
+    fieldState: FieldState = createEmptyFieldState()
+) => ({
+    ...fieldState,
+    cells: fieldState.cells.map((row, rowIndex) => row.map((cell, columnIndex) => ({
+        ...cell,
+        initialDigit: cell.initialDigit || initialDigits[rowIndex]?.[columnIndex],
+    }))),
 });
 
 export const cloneFieldState = ({cells}: FieldState): FieldState => ({
