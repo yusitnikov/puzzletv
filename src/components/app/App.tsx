@@ -34,6 +34,8 @@ import {KillerCage} from "../sudoku/figures/killer-cage/KillerCage";
 import {KropkiDot} from "../sudoku/figures/kropki-dot/KropkiDot";
 import {XMark} from "../sudoku/figures/x-mark/XMark";
 import {AnimationSpeed} from "../../types/sudoku/AnimationSpeed";
+import {useIsFullScreen} from "../../hooks/useIsFullScreen";
+import {toggleFullScreen} from "../../utils/fullScreen";
 
 const StyledContainer = styled(Absolute)({
     color: textColor,
@@ -144,17 +146,7 @@ export const App = () => {
 
     const [isStickyMode, setIsStickyMode] = useState(false);
 
-    const [isFullScreen, setIsFullScreen] = useState(false);
-    useEventListener(window, "fullscreenchange", () => {
-        const target = window.document as any;
-
-        setIsFullScreen(!!(
-            target.fullscreenElement ||
-            target.webkitFullscreenElement ||
-            target.mozFullscreenElement ||
-            target.msFullscreenElement
-        ));
-    });
+    const isFullScreen = useIsFullScreen();
 
     // region Sudoku event handlers
     const handleDigit = (digit: number) => {
@@ -241,15 +233,7 @@ export const App = () => {
         }
     };
 
-    const handleToggleFullScreen = () => {
-        if (isFullScreen) {
-            const target = window.document as any;
-            (target.exitFullscreen || target.webkitExitFullscreen || target.msExitFullscreen).call(target);
-        } else {
-            const target = window.document.documentElement as any;
-            (target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen).call(target);
-        }
-    };
+    const handleToggleFullScreen = toggleFullScreen;
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
