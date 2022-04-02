@@ -10,7 +10,6 @@ import styled from "@emotion/styled";
 import {useEventListener} from "../../hooks/useEventListener";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {useGameState} from "../../hooks/sudoku/useGameState";
-import {isStartAngle} from "../../utils/rotation";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 
 const StyledContainer = styled(Absolute)({
@@ -65,10 +64,8 @@ export const App = (puzzle: PuzzleDefinition) => {
 
     const [gameState, mergeGameState] = useGameState(puzzle);
 
-    const isReady = !isStartAngle(gameState.angle);
-
     useEventListener(window, "beforeunload", (ev: BeforeUnloadEvent) => {
-        if (isReady) {
+        if (gameState.isReady) {
             ev.preventDefault();
             ev.returnValue = "";
             return "";
@@ -80,7 +77,6 @@ export const App = (puzzle: PuzzleDefinition) => {
             puzzle={puzzle}
             state={gameState}
             onStateChange={mergeGameState}
-            isReady={isReady}
             rect={sudokuRect}
             cellSize={cellSize}
         />
@@ -92,7 +88,6 @@ export const App = (puzzle: PuzzleDefinition) => {
             isHorizontal={isHorizontal}
             state={gameState}
             onStateChange={mergeGameState}
-            isReady={isReady}
         />
     </StyledContainer>;
 }

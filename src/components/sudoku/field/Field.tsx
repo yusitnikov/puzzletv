@@ -25,15 +25,14 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface FieldProps {
     puzzle: PuzzleDefinition;
-    isReady: boolean;
     state: ProcessedGameState;
     onStateChange: (state: MergeStateAction<ProcessedGameState>) => void;
     rect: Rect;
     cellSize: number;
 }
 
-export const Field = ({puzzle: {backgroundItems, topItems}, isReady, state, onStateChange, rect, cellSize}: FieldProps) => {
-    const {selectedCells, angle, animationSpeed} = state;
+export const Field = ({puzzle: {backgroundItems, topItems}, state, onStateChange, rect, cellSize}: FieldProps) => {
+    const {selectedCells, angle, animationSpeed, isReady} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (!isReady) {

@@ -10,7 +10,8 @@ import {
     PlayArrow,
     PushPin,
     Redo,
-    RotateRight, Timelapse,
+    RotateRight,
+    Timelapse,
     Undo
 } from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
@@ -22,7 +23,8 @@ import {CellBackground} from "../cell/CellBackground";
 import {CellDigits} from "../cell/CellDigits";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 import {
-    gameStateClearSelectedCellsContent, gameStateHandleDigit,
+    gameStateClearSelectedCellsContent,
+    gameStateHandleDigit,
     gameStateRedo,
     gameStateUndo
 } from "../../../types/sudoku/GameState";
@@ -42,7 +44,6 @@ export interface ControlsProps {
     isHorizontal: boolean;
     state: ProcessedGameState;
     onStateChange: (state: MergeStateAction<ProcessedGameState>) => void;
-    isReady: boolean;
 }
 
 export const Controls = (
@@ -51,13 +52,13 @@ export const Controls = (
         cellSize,
         isHorizontal,
         state: {
+            isReady,
             persistentCellWriteMode,
             cellWriteMode,
             isStickyMode,
             animationSpeed,
         },
         onStateChange,
-        isReady,
     }: ControlsProps
 ) => {
     const isFullScreen = useIsFullScreen();

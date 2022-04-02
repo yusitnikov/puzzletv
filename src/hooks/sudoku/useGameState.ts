@@ -7,9 +7,11 @@ import {MergeStateAction} from "../../types/react/MergeStateAction";
 import {AnimationSpeed} from "../../types/sudoku/AnimationSpeed";
 import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {isStartAngle} from "../../utils/rotation";
 
 export interface ProcessedGameState extends GameState {
     cellWriteMode: CellWriteMode;
+    isReady: boolean;
 }
 
 export const useGameState = ({initialDigits = {}}: PuzzleDefinition): [ProcessedGameState, Dispatch<MergeStateAction<ProcessedGameState>>] => {
@@ -29,11 +31,13 @@ export const useGameState = ({initialDigits = {}}: PuzzleDefinition): [Processed
     }));
 
     const cellWriteMode = useFinalCellWriteMode(gameState.persistentCellWriteMode);
+    const isReady = !isStartAngle(gameState.angle);
 
     const calculateProcessedGameState = useCallback((gameState: GameState): ProcessedGameState => ({
         ...gameState,
         cellWriteMode,
-    }), [cellWriteMode]);
+        isReady,
+    }), [cellWriteMode, isReady]);
 
     const processedGameState = useMemo(() => calculateProcessedGameState(gameState), [gameState, calculateProcessedGameState]);
 
