@@ -1,10 +1,8 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import {Line} from "../../layout/line/Line";
-import {FieldState} from "../../../types/sudoku/FieldState";
 import {indexes09} from "../../../utils/indexes";
 import {Position} from "../../../types/layout/Position";
-import {noSelectedCells, SelectedCells} from "../../../types/sudoku/SelectedCells";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import {MouseEvent, PointerEvent, ReactNode, useState} from "react";
@@ -14,28 +12,35 @@ import {CellBackground} from "../cell/CellBackground";
 import {CellSelection} from "../cell/CellSelection";
 import {CellDigits} from "../cell/CellDigits";
 import {FieldSvg} from "./FieldSvg";
+import {
+    gameStateApplyArrowToSelectedCells,
+    gameStateClearSelectedCells,
+    gameStateGetCurrentFieldState, gameStateSelectAllCells,
+    gameStateSetSelectedCells,
+    gameStateToggleSelectedCell
+} from "../../../types/sudoku/GameState";
+import {MergeStateAction} from "../../../types/react/MergeStateAction";
+import {ProcessedGameState} from "../../../hooks/sudoku/useGameState";
 
 export interface FieldProps {
     isReady: boolean;
-    state: FieldState;
-    selectedCells: SelectedCells;
-    onSelectedCellsChange: (selected: SelectedCells) => void;
+    state: ProcessedGameState;
+    onStateChange: (state: MergeStateAction<ProcessedGameState>) => void;
     rect: Rect;
-    angle: number;
-    animationSpeed: number;
     cellSize: number;
     children?: ReactNode;
     topChildren?: ReactNode;
 }
 
-export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsChange, rect, angle, animationSpeed, cellSize, children, topChildren}: FieldProps) => {
+export const Field = ({isReady, state, onStateChange, rect, cellSize, children, topChildren}: FieldProps) => {
+    const {selectedCells, angle, animationSpeed} = state;
+    const {cells} = gameStateGetCurrentFieldState(state);
+
     if (!isReady) {
-        onSelectedCellsChange = () => {};
+        onStateChange = () => {};
     }
 
     const angleAnimation = useAnimatedValue(angle, animationSpeed);
-
-    const isUpsideDown = angle % 360 !== 0;
 
     const {isAnyKeyDown} = useControlKeysState();
 
@@ -44,32 +49,22 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
     // Handle outside click
     useEventListener(window, "mousedown", () => {
         if (!isAnyKeyDown) {
-            onSelectedCellsChange(noSelectedCells);
+            onStateChange(gameStateClearSelectedCells);
         }
 
         setIsDeleteSelectedCellsStroke(false);
     });
 
     // Handle arrows
-    useEventListener(window, "keydown", ({code, ctrlKey, shiftKey}: KeyboardEvent) => {
-        const currentCell = selectedCells.last();
-        // Nothing to do when there's no selection
-        if (!currentCell) {
-            return;
-        }
+    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        const {code, ctrlKey, shiftKey} = ev;
 
         // Use the key modifiers from the event - they are always up-to-date
         const isAnyKeyDown = ctrlKey || shiftKey;
 
-        const handleArrow = (xDirection: number, yDirection: number) => {
-            const coeff = isUpsideDown ? -1 : 1;
-            const newCell: Position = {
-                left: (currentCell.left + coeff * xDirection + 9) % 9,
-                top: (currentCell.top + coeff * yDirection + 9) % 9,
-            }
-
-            onSelectedCellsChange(isAnyKeyDown ? selectedCells.add(newCell) : selectedCells.set([newCell]));
-        };
+        const handleArrow = (xDirection: number, yDirection: number) => onStateChange(
+            gameState => gameStateApplyArrowToSelectedCells(gameState, xDirection, yDirection, isAnyKeyDown)
+        );
 
         switch (code) {
             case "ArrowLeft":
@@ -83,6 +78,18 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                 break;
             case "ArrowDown":
                 handleArrow(0, 1);
+                break;
+            case "KeyA":
+                if (ctrlKey && !shiftKey) {
+                    onStateChange(gameStateSelectAllCells);
+                    ev.preventDefault();
+                }
+                break;
+            case "Escape":
+                if (!isAnyKeyDown) {
+                    onStateChange(gameStateClearSelectedCells);
+                    ev.preventDefault();
+                }
                 break;
         }
     });
@@ -165,6 +172,7 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                     userSelect: "none",
                 }}
                 onMouseDown={(ev: MouseEvent<HTMLDivElement>) => {
+                    // Make sure that clicking on the grid won't be recognized as an outside click and won't try to drag
                     ev.preventDefault();
                     ev.stopPropagation();
                 }}
@@ -176,10 +184,10 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                     const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
 
                     setIsDeleteSelectedCellsStroke(isMultiSelection && selectedCells.contains(cellPosition));
-                    onSelectedCellsChange(
-                        isMultiSelection
-                            ? selectedCells.toggle(cellPosition)
-                            : selectedCells.set([cellPosition])
+                    onStateChange(
+                        gameState => isMultiSelection
+                            ? gameStateToggleSelectedCell(gameState, cellPosition)
+                            : gameStateSetSelectedCells(gameState, [cellPosition])
                     );
                 }}
                 onPointerEnter={({buttons}: PointerEvent<HTMLDivElement>) => {
@@ -187,7 +195,7 @@ export const Field = ({isReady, state: {cells}, selectedCells, onSelectedCellsCh
                         return;
                     }
 
-                    onSelectedCellsChange(selectedCells.toggle(cellPosition, !isDeleteSelectedCellsStroke));
+                    onStateChange(gameState => gameStateToggleSelectedCell(gameState, cellPosition, !isDeleteSelectedCellsStroke));
                 }}
             />)}
         </Absolute>

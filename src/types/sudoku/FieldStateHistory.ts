@@ -1,4 +1,5 @@
 import {areFieldStatesEqual, cloneFieldState, FieldState} from "./FieldState";
+import {SetStateAction} from "react";
 
 export interface FieldStateHistory {
     states: FieldState[];
@@ -25,7 +26,7 @@ export const fieldStateHistoryRedo = (history: FieldStateHistory) => fieldStateH
     }
     : history;
 
-export const fieldStateHistoryAddState = (history: FieldStateHistory, state: FieldState | ((prevState: FieldState) => FieldState)) => {
+export const fieldStateHistoryAddState = (history: FieldStateHistory, state: SetStateAction<FieldState>) => {
     const currentState = fieldStateHistoryGetCurrent(history);
 
     if (typeof state === "function") {
