@@ -1,4 +1,4 @@
-import {FieldState} from "../../types/sudoku/FieldState";
+import {fillFieldStateInitialDigits} from "../../types/sudoku/FieldState";
 import {Dispatch, useCallback, useMemo, useState} from "react";
 import {GameState} from "../../types/sudoku/GameState";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
@@ -6,15 +6,18 @@ import {noSelectedCells} from "../../types/sudoku/SelectedCells";
 import {MergeStateAction} from "../../types/react/MergeStateAction";
 import {AnimationSpeed} from "../../types/sudoku/AnimationSpeed";
 import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
+import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 
 export interface ProcessedGameState extends GameState {
     cellWriteMode: CellWriteMode;
 }
 
-export const useGameState = (initialFieldState: FieldState | (() => FieldState)): [ProcessedGameState, Dispatch<MergeStateAction<ProcessedGameState>>] => {
+export const useGameState = ({initialDigits = {}}: PuzzleDefinition): [ProcessedGameState, Dispatch<MergeStateAction<ProcessedGameState>>] => {
     const [gameState, setGameState] = useState<GameState>(() => ({
         fieldStateHistory: {
-            states: [typeof initialFieldState === "function" ? initialFieldState() : initialFieldState],
+            states: [
+                fillFieldStateInitialDigits(initialDigits)
+            ],
             currentIndex: 0,
         },
         persistentCellWriteMode: CellWriteMode.main,

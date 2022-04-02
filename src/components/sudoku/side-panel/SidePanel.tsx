@@ -3,11 +3,13 @@ import {Controls, controlsHeightCoeff, ControlsProps, controlsWidthCoeff} from "
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface SidePanelProps extends ControlsProps {
+    puzzle: PuzzleDefinition;
 }
 
-export const SidePanel = ({rect, cellSize, isHorizontal, ...controlsProps}: SidePanelProps) => {
+export const SidePanel = ({puzzle, rect, cellSize, isHorizontal, ...controlsProps}: SidePanelProps) => {
     const padding = cellSize * globalPaddingCoeff;
 
     const controlsSize: Size = {
@@ -21,6 +23,7 @@ export const SidePanel = ({rect, cellSize, isHorizontal, ...controlsProps}: Side
 
     return <Absolute {...rect}>
         <Rules
+            puzzle={puzzle}
             rect={{
                 left: 0,
                 top: 0,

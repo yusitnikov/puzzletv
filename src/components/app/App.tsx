@@ -7,40 +7,18 @@ import {SidePanel} from "../sudoku/side-panel/SidePanel";
 import {globalPaddingCoeff, textColor} from "./globals";
 import {controlsWidthCoeff} from "../sudoku/controls/Controls";
 import styled from "@emotion/styled";
-import {fillFieldStateInitialDigits} from "../../types/sudoku/FieldState";
 import {useEventListener} from "../../hooks/useEventListener";
 import {useWindowSize} from "../../hooks/useWindowSize";
-import {GermanWhispers} from "../sudoku/figures/german-whispers/GermanWhispers";
-import {Thermometer} from "../sudoku/figures/thermometer/Thermometer";
-import {Arrow} from "../sudoku/figures/arrow/Arrow";
-import {KillerCage} from "../sudoku/figures/killer-cage/KillerCage";
-import {KropkiDot} from "../sudoku/figures/kropki-dot/KropkiDot";
-import {XMark} from "../sudoku/figures/x-mark/XMark";
 import {useGameState} from "../../hooks/sudoku/useGameState";
 import {isStartAngle} from "../../utils/rotation";
-
-const initialState = fillFieldStateInitialDigits({
-    0: {
-        0: {digit: 6},
-    },
-    4: {
-        2: {digit: 6},
-    },
-    5: {
-        0: {digit: 9},
-    },
-    8: {
-        4: {digit: 5},
-        5: {digit: 2},
-    },
-});
+import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 
 const StyledContainer = styled(Absolute)({
     color: textColor,
     fontFamily: "Lato, sans-serif",
 });
 
-export const App = () => {
+export const App = (puzzle: PuzzleDefinition) => {
     // region Size calculation
     const windowSize = useWindowSize();
 
@@ -85,7 +63,7 @@ export const App = () => {
     };
     // endregion
 
-    const [gameState, mergeGameState] = useGameState(initialState);
+    const [gameState, mergeGameState] = useGameState(puzzle);
 
     const isReady = !isStartAngle(gameState.angle);
 
@@ -99,71 +77,16 @@ export const App = () => {
 
     return <StyledContainer {...containerRect}>
         <Field
+            puzzle={puzzle}
             state={gameState}
             onStateChange={mergeGameState}
             isReady={isReady}
             rect={sudokuRect}
             cellSize={cellSize}
-            topChildren={<>
-                <XMark left={7} top={7.5}/>
-
-                <KropkiDot cx={7.5} cy={7} isFilled={true}/>
-
-                <XMark left={8} top={6.5}/>
-            </>}
-        >
-            <Thermometer points={[
-                [7.5, 1.5],
-                [6.5, 2.5],
-            ]}/>
-
-            <Thermometer points={[
-                [1.5, 0.5],
-                [1.5, 1.5],
-            ]}/>
-
-            <Arrow points={[
-                [8.5, 4.5],
-                [6.5, 4.5],
-                [6.5, 3.5],
-            ]}/>
-
-            <GermanWhispers points={[
-                [5.5, 1.5],
-                [4.5, 2.5],
-                [7.5, 2.5],
-            ]}/>
-
-            <KillerCage
-                sum={12}
-                bottomSumPointIndex={2}
-                points={[
-                    [0, 4],
-                    [0, 6],
-                    [1, 6],
-                    [1, 5],
-                    [2, 5],
-                    [2, 4],
-                ]}
-            />
-
-            <KillerCage
-                sum={22}
-                bottomSumPointIndex={4}
-                points={[
-                    [5, 7],
-                    [5, 8],
-                    [4, 8],
-                    [4, 9],
-                    [6, 9],
-                    [6, 8],
-                    [7, 8],
-                    [7, 7],
-                ]}
-            />
-        </Field>
+        />
 
         <SidePanel
+            puzzle={puzzle}
             rect={controlsRect}
             cellSize={cellSize}
             isHorizontal={isHorizontal}

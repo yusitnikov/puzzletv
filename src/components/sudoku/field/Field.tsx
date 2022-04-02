@@ -21,18 +21,18 @@ import {
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {ProcessedGameState} from "../../../hooks/sudoku/useGameState";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface FieldProps {
+    puzzle: PuzzleDefinition;
     isReady: boolean;
     state: ProcessedGameState;
     onStateChange: (state: MergeStateAction<ProcessedGameState>) => void;
     rect: Rect;
     cellSize: number;
-    children?: ReactNode;
-    topChildren?: ReactNode;
 }
 
-export const Field = ({isReady, state, onStateChange, rect, cellSize, children, topChildren}: FieldProps) => {
+export const Field = ({puzzle: {backgroundItems, topItems}, isReady, state, onStateChange, rect, cellSize}: FieldProps) => {
     const {selectedCells, angle, animationSpeed} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
@@ -134,7 +134,7 @@ export const Field = ({isReady, state, onStateChange, rect, cellSize, children, 
                 isSecondary={selectedCells.last()?.left !== cellPosition.left || selectedCells.last()?.top !== cellPosition.top}
             />)}
 
-            <FieldSvg cellSize={cellSize}>{children}</FieldSvg>
+            <FieldSvg cellSize={cellSize}>{backgroundItems}</FieldSvg>
 
             {indexes09.map(index => <Line
                 key={`h-line-${index}`}
@@ -154,7 +154,7 @@ export const Field = ({isReady, state, onStateChange, rect, cellSize, children, 
                 width={index % 3 ? 1 : 3}
             />)}
 
-            <FieldSvg cellSize={cellSize}>{topChildren}</FieldSvg>
+            <FieldSvg cellSize={cellSize}>{topItems}</FieldSvg>
 
             {renderCellsLayer("digits", (cellState) => <CellDigits
                 data={cellState}
