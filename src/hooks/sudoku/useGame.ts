@@ -8,13 +8,14 @@ import {AnimationSpeed} from "../../types/sudoku/AnimationSpeed";
 import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {isStartAngle} from "../../utils/rotation";
+import {useEventListener} from "../useEventListener";
 
 export interface ProcessedGameState extends GameState {
     cellWriteMode: CellWriteMode;
     isReady: boolean;
 }
 
-export const useGameState = ({initialDigits = {}}: PuzzleDefinition): [ProcessedGameState, Dispatch<MergeStateAction<ProcessedGameState>>] => {
+export const useGame = ({initialDigits = {}}: PuzzleDefinition): [ProcessedGameState, Dispatch<MergeStateAction<ProcessedGameState>>] => {
     const [gameState, setGameState] = useState<GameState>(() => ({
         fieldStateHistory: {
             states: [
@@ -52,6 +53,14 @@ export const useGameState = ({initialDigits = {}}: PuzzleDefinition): [Processed
         }),
         [setGameState, calculateProcessedGameState]
     );
+
+    useEventListener(window, "beforeunload", (ev: BeforeUnloadEvent) => {
+        if (isReady) {
+            ev.preventDefault();
+            ev.returnValue = "";
+            return "";
+        }
+    });
 
     return [processedGameState, mergeGameState];
 };

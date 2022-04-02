@@ -7,9 +7,8 @@ import {SidePanel} from "../sudoku/side-panel/SidePanel";
 import {globalPaddingCoeff, textColor} from "./globals";
 import {controlsWidthCoeff} from "../sudoku/controls/Controls";
 import styled from "@emotion/styled";
-import {useEventListener} from "../../hooks/useEventListener";
 import {useWindowSize} from "../../hooks/useWindowSize";
-import {useGameState} from "../../hooks/sudoku/useGameState";
+import {useGame} from "../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 
 const StyledContainer = styled(Absolute)({
@@ -62,15 +61,7 @@ export const App = (puzzle: PuzzleDefinition) => {
     };
     // endregion
 
-    const [gameState, mergeGameState] = useGameState(puzzle);
-
-    useEventListener(window, "beforeunload", (ev: BeforeUnloadEvent) => {
-        if (gameState.isReady) {
-            ev.preventDefault();
-            ev.returnValue = "";
-            return "";
-        }
-    });
+    const [gameState, mergeGameState] = useGame(puzzle);
 
     return <StyledContainer {...containerRect}>
         <Field

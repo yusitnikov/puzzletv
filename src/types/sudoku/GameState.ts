@@ -13,7 +13,7 @@ import {indexes08} from "../../utils/indexes";
 import {Position} from "../layout/Position";
 import {AnimationSpeed} from "./AnimationSpeed";
 import {isUpsideDownAngle} from "../../utils/rotation";
-import {ProcessedGameState} from "../../hooks/sudoku/useGameState";
+import {ProcessedGameState} from "../../hooks/sudoku/useGame";
 import {RotatableDigit} from "./RotatableDigit";
 
 export interface GameState {

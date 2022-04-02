@@ -33,7 +33,7 @@ import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {rotateClockwise} from "../../../utils/rotation";
-import {ProcessedGameState} from "../../../hooks/sudoku/useGameState";
+import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;

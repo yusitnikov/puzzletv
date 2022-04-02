@@ -20,7 +20,7 @@ import {
     gameStateToggleSelectedCell
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
-import {ProcessedGameState} from "../../../hooks/sudoku/useGameState";
+import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface FieldProps {
