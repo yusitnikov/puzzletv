@@ -17,7 +17,6 @@ import {
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
-import {RotatableDigit} from "../../../types/sudoku/RotatableDigit";
 import {Set} from "../../../types/struct/Set";
 import {CellBackground} from "../cell/CellBackground";
 import {CellDigits} from "../cell/CellDigits";
@@ -34,41 +33,46 @@ import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {rotateClockwise} from "../../../utils/rotation";
 import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
+import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
 
-export interface ControlsProps {
+export interface ControlsProps<CellType> {
     rect: Rect;
     cellSize: number;
     isHorizontal: boolean;
-    state: ProcessedGameState;
-    onStateChange: (state: MergeStateAction<ProcessedGameState>) => void;
+    typeManager: SudokuTypeManager<CellType>;
+    state: ProcessedGameState<CellType>;
+    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType>>) => void;
 }
 
-export const Controls = (
+export const Controls = <CellType,>(
     {
         rect,
         cellSize,
         isHorizontal,
-        state: {
-            isReady,
-            persistentCellWriteMode,
-            cellWriteMode,
-            isStickyMode,
-            animationSpeed,
-        },
+        typeManager,
+        state,
         onStateChange,
-    }: ControlsProps
+    }: ControlsProps<CellType>
 ) => {
+    const {
+        isReady,
+        persistentCellWriteMode,
+        cellWriteMode,
+        isStickyMode,
+        animationSpeed,
+    } = state;
+
     const isFullScreen = useIsFullScreen();
 
     // region Event handlers
     const handleSetCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode});
 
-    const handleDigit = (digit: number) => isReady && onStateChange(gameState => gameStateHandleDigit(gameState, digit));
+    const handleDigit = (digit: number) => isReady && onStateChange(gameState => gameStateHandleDigit(typeManager, gameState, digit));
 
-    const handleClear = () => onStateChange(gameStateClearSelectedCellsContent);
+    const handleClear = () => onStateChange(gameState => gameStateClearSelectedCellsContent(typeManager, gameState));
 
     const handleUndo = () => onStateChange(gameStateUndo);
 
@@ -151,10 +155,7 @@ export const Controls = (
 
     return <Absolute {...rect}>
         {isReady && indexes08.map(index => {
-            const rotatableDigit: RotatableDigit = {
-                digit: index + 1,
-                sticky: isStickyMode,
-            };
+            const cellData = typeManager.createCellDataByDisplayDigit(index + 1, state);
 
             return <ControlButton
                 key={`digit-${index + 1}`}
@@ -166,10 +167,11 @@ export const Controls = (
                 onClick={() => handleDigit(index + 1)}
             >
                 <CellContent
+                    typeManager={typeManager}
                     data={{
-                        usersDigit: cellWriteMode === CellWriteMode.main ? rotatableDigit : undefined,
-                        cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [rotatableDigit] : []),
-                        centerDigits: new Set(cellWriteMode === CellWriteMode.center ? [rotatableDigit] : []),
+                        usersDigit: cellWriteMode === CellWriteMode.main ? cellData : undefined,
+                        cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [cellData] : []),
+                        centerDigits: new Set(cellWriteMode === CellWriteMode.center ? [cellData] : []),
                         colors: new Set(cellWriteMode === CellWriteMode.color ? [index] : []),
                     }}
                     size={cellSize}
@@ -207,7 +209,8 @@ export const Controls = (
             title={"Final digit"}
         >
             {contentSize => <CellDigits
-                data={{usersDigit: {digit: 9}}}
+                typeManager={typeManager}
+                data={{usersDigit: typeManager.createCellDataByDisplayDigit(9, state)}}
                 size={contentSize}
                 mainColor={true}
             />}
@@ -223,7 +226,8 @@ export const Controls = (
             title={"Corner (shortcut: Shift)"}
         >
             {contentSize => <CellDigits
-                data={{cornerDigits: new Set([{digit: 1}, {digit: 2}, {digit: 3}])}}
+                typeManager={typeManager}
+                data={{cornerDigits: new Set([1, 2, 3].map(digit => typeManager.createCellDataByDisplayDigit(digit, state)))}}
                 size={contentSize}
                 mainColor={true}
             />}
@@ -239,7 +243,8 @@ export const Controls = (
             title={"Center (shortcut: Ctrl)"}
         >
             {contentSize => <CellDigits
-                data={{centerDigits: new Set([{digit: 1}, {digit: 2}])}}
+                typeManager={typeManager}
+                data={{centerDigits: new Set([1, 2].map(digit => typeManager.createCellDataByDisplayDigit(digit, state)))}}
                 size={contentSize}
                 mainColor={true}
             />}

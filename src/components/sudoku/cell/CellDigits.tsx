@@ -1,9 +1,9 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {CellState} from "../../../types/sudoku/CellState";
-import {Digit, digitSpaceCoeff} from "../digit/Digit";
 import {Position} from "../../../types/layout/Position";
-import {isStickyRotatableDigit, RotatableDigit} from "../../../types/sudoku/RotatableDigit";
 import {Set} from "../../../types/struct/Set";
+import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
+import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
 
 const centerDigitCoeff = 0.35;
 
@@ -20,16 +20,21 @@ const corners: Position[] = [
     {left: 0, top: 0},
 ];
 
-export interface CellDigitsProps {
-    data: Partial<CellState>;
+export interface CellDigitsProps<CellType> {
+    typeManager: SudokuTypeManager<CellType>;
+    data: Partial<CellState<CellType>>;
     size: number;
-    sudokuAngle?: number;
+    state?: ProcessedGameState<CellType>;
     mainColor?: boolean;
 }
 
-export const CellDigits = ({data, size, sudokuAngle = 0, mainColor}: CellDigitsProps) => {
-    const rotatableDigitColor = mainColor ? undefined : "#00f";
-    const stickyDigitColor = mainColor ? undefined : "#0c0";
+export const CellDigits = <CellType,>({typeManager, data, size, state, mainColor}: CellDigitsProps<CellType>) => {
+    const {
+        cellDataComponentType: {
+            component: CellData,
+            widthCoeff,
+        },
+    } = typeManager;
 
     const {
         initialDigit,
@@ -38,72 +43,55 @@ export const CellDigits = ({data, size, sudokuAngle = 0, mainColor}: CellDigitsP
         cornerDigits
     } = data;
 
-    const centerDigitsCoeff = centerDigitCoeff / Math.max(1, centerDigitCoeff * digitSpaceCoeff * ((centerDigits?.size || 0) + 1));
-
-    const sudokuAngleCoeff = Math.abs((sudokuAngle % 360) / 180 - 1);
+    const centerDigitsCoeff = centerDigitCoeff / Math.max(1, centerDigitCoeff * widthCoeff * ((centerDigits?.size || 0) + 1));
 
     const renderAnimatedDigitsSet = (
         keyPrefix: string,
-        digits: Set<RotatableDigit>,
+        digits: Set<CellType>,
         digitSize: number,
-        positionFunction: (index: number, upsideDown: boolean) => Position | undefined
+        positionFunction: (index: number) => Position | undefined
     ) => {
-        const [straightIndexes, upsideDownIndexes] = digits.cached("sortIndexes", () => {
-            const itemsWithIndexes = digits.items.map((value, index) => ({value, index}));
+        const straightIndexes = getCellDataSortIndexes(digits, typeManager.compareCellData);
 
-            const getSortIndexes = (upsideDown: boolean) => {
-                const getDisplayDigit = ({digit, sticky}: RotatableDigit) => upsideDown && !sticky && (digit === 6 || digit === 9) ? 15 - digit : digit;
+        return digits.items.map((cellData, index) => {
+            let position = positionFunction(straightIndexes[index]);
+            if (!position) {
+                return undefined;
+            }
 
-                const indexes = Array(digits.size);
+            if (typeManager.processCellDataPosition) {
+                position = typeManager.processCellDataPosition(position, digits, index, positionFunction, state);
+                if (!position) {
+                    return undefined;
+                }
+            }
 
-                itemsWithIndexes
-                    .sort(
-                        ({value: a}, {value: b}) =>
-                            getDisplayDigit(a) - getDisplayDigit(b) || (a.sticky ? 1 : 0) - (b.sticky ? 1 : 0)
-                    )
-                    .forEach(
-                        ({value, index: initialIndex}, sortedIndex) =>
-                            indexes[initialIndex] = sortedIndex
-                    );
-
-                return indexes;
-            };
-
-            return [getSortIndexes(false), getSortIndexes(true)];
-        });
-
-        return digits.items.map(({digit, sticky}, index) => {
-            const straight = positionFunction(straightIndexes[index], false);
-            const rotated = positionFunction(upsideDownIndexes[index], true);
-
-            const getAnimatedValue = (straight: number, rotated: number) => straight * sudokuAngleCoeff + rotated * (1 - sudokuAngleCoeff);
-
-            return straight && rotated && <Digit
-                key={`${keyPrefix}-${digit}-${sticky}`}
-                digit={digit}
+            return <CellData
+                key={`${keyPrefix}-${typeManager.getCellDataHash(cellData)}`}
+                data={cellData}
                 size={digitSize}
-                left={getAnimatedValue(straight.left, -rotated.left)}
-                top={getAnimatedValue(straight.top, -rotated.top)}
-                color={sticky ? stickyDigitColor : rotatableDigitColor}
-                angle={isStickyRotatableDigit({digit, sticky}) ? -sudokuAngle : 0}
+                {...position}
+                state={state}
+                isInitial={mainColor}
             />;
         });
     };
 
     return <Absolute left={size / 2} top={size / 2}>
-        {initialDigit && <Digit
+        {initialDigit && <CellData
             key={"initial"}
-            digit={initialDigit.digit}
+            data={initialDigit}
             size={size * 0.7}
-            angle={isStickyRotatableDigit(initialDigit) ? -sudokuAngle : 0}
+            state={state}
+            isInitial={true}
         />}
 
-        {!initialDigit && usersDigit && <Digit
+        {!initialDigit && usersDigit && <CellData
             key={"users"}
-            digit={usersDigit.digit}
+            data={usersDigit}
             size={size * 0.7}
-            color={usersDigit.sticky ? stickyDigitColor : rotatableDigitColor}
-            angle={isStickyRotatableDigit(usersDigit) ? -sudokuAngle : 0}
+            state={state}
+            isInitial={mainColor}
         />}
 
         {centerDigits && renderAnimatedDigitsSet(
@@ -111,7 +99,7 @@ export const CellDigits = ({data, size, sudokuAngle = 0, mainColor}: CellDigitsP
             centerDigits,
             size * centerDigitsCoeff,
             (index) => ({
-                left: size * centerDigitsCoeff * digitSpaceCoeff * (index - (centerDigits.size - 1) / 2),
+                left: size * centerDigitsCoeff * widthCoeff * (index - (centerDigits.size - 1) / 2),
                 top: 0,
             })
         )}
@@ -126,4 +114,28 @@ export const CellDigits = ({data, size, sudokuAngle = 0, mainColor}: CellDigitsP
             })
         )}
     </Absolute>;
+};
+
+export const getCellDataSortIndexes = <CellType,>(
+    digits: Set<CellType>,
+    compareFn: (a: CellType, b: CellType) => number,
+    cacheKey: string = "sortIndexes"
+) => {
+    const itemsWithIndexes = digits.cached(
+        "withIndexes",
+        () => digits.items.map((value, index) => ({value, index}))
+    );
+
+    return digits.cached(cacheKey, () => {
+        const indexes = Array(digits.size);
+
+        itemsWithIndexes
+            .sort(({value: a}, {value: b}) => compareFn(a, b))
+            .forEach(
+                ({value, index: initialIndex}, sortedIndex) =>
+                    indexes[initialIndex] = sortedIndex
+            );
+
+        return indexes;
+    });
 };

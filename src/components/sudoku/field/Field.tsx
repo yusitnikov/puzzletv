@@ -6,7 +6,6 @@ import {Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import {MouseEvent, PointerEvent, ReactNode, useState} from "react";
-import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
 import {CellSelection} from "../cell/CellSelection";
@@ -22,24 +21,24 @@ import {
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 
-export interface FieldProps {
-    puzzle: PuzzleDefinition;
-    state: ProcessedGameState;
-    onStateChange: (state: MergeStateAction<ProcessedGameState>) => void;
+export interface FieldProps<CellType> {
+    typeManager: SudokuTypeManager<CellType>;
+    puzzle: PuzzleDefinition<CellType>;
+    state: ProcessedGameState<CellType>;
+    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType>>) => void;
     rect: Rect;
     cellSize: number;
 }
 
-export const Field = ({puzzle: {backgroundItems, topItems}, state, onStateChange, rect, cellSize}: FieldProps) => {
-    const {selectedCells, angle, animationSpeed, isReady} = state;
+export const Field = <CellType,>({typeManager, puzzle: {backgroundItems, topItems}, state, onStateChange, rect, cellSize}: FieldProps<CellType>) => {
+    const {selectedCells, animatedAngle, isReady} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (!isReady) {
         onStateChange = () => {};
     }
-
-    const angleAnimation = useAnimatedValue(angle, animationSpeed);
 
     const {isAnyKeyDown} = useControlKeysState();
 
@@ -93,7 +92,7 @@ export const Field = ({puzzle: {backgroundItems, topItems}, state, onStateChange
         }
     });
 
-    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState, cellPosition: Position) => ReactNode) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
         const cellPosition: Position = {
             left: columnIndex,
             top: rowIndex,
@@ -120,7 +119,7 @@ export const Field = ({puzzle: {backgroundItems, topItems}, state, onStateChange
 
         <Absolute
             {...rect}
-            angle={angleAnimation}
+            angle={animatedAngle}
             style={{backgroundColor: "white"}}
         >
             {renderCellsLayer("background", ({colors}) => <CellBackground
@@ -156,9 +155,10 @@ export const Field = ({puzzle: {backgroundItems, topItems}, state, onStateChange
             <FieldSvg cellSize={cellSize}>{topItems}</FieldSvg>
 
             {renderCellsLayer("digits", (cellState) => <CellDigits
+                typeManager={typeManager}
                 data={cellState}
                 size={cellSize}
-                sudokuAngle={angleAnimation}
+                state={state}
             />)}
 
             {renderCellsLayer("mouse-handler", (cellState, cellPosition) => <Absolute

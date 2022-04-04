@@ -1,7 +1,9 @@
 import {memo} from "react";
-import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
+import {Absolute} from "../../layout/absolute/Absolute";
 import {svgShadowStyle, textColor} from "../../app/globals";
 import {Position} from "../../../types/layout/Position";
+import {DigitProps} from "./DigitProps";
+import {DigitComponentType} from "./DigitComponentType";
 
 const T = true;
 const F = false;
@@ -85,17 +87,9 @@ const matrices = [
 const lineWidthCoeff = 0.1;
 const lineSpacingCoeff = lineWidthCoeff * 0.3;
 const squareSizeCoeff = (1 - lineWidthCoeff) / 2;
-export const digitWidthCoeff = squareSizeCoeff + lineWidthCoeff;
-// width + margin
-export const digitSpaceCoeff = digitWidthCoeff + lineWidthCoeff;
+const digitWidthCoeff = squareSizeCoeff + lineWidthCoeff;
 
-export interface DigitProps extends AbsoluteProps {
-    digit: number;
-    size: number;
-    color?: string;
-}
-
-export const Digit = memo(({digit, size, color = textColor, ...containerProps}: DigitProps) => <Absolute
+export const CalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <Absolute
     {...containerProps}
     style={{color}}
 >
@@ -107,7 +101,7 @@ export const Digit = memo(({digit, size, color = textColor, ...containerProps}: 
         height={size}
         style={svgShadowStyle}
     >
-        <DigitSvgContent
+        <CalculatorDigitSvgContent
             digit={digit}
             size={size}
             left={size * digitWidthCoeff / 2}
@@ -116,7 +110,7 @@ export const Digit = memo(({digit, size, color = textColor, ...containerProps}: 
     </Absolute>
 </Absolute>);
 
-export const DigitSvgContent = memo(({digit, size, left = 0, top = 0}: DigitProps) => <>
+export const CalculatorDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, top = 0}: DigitProps) => <>
     {matrices[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
         key={`${rowIndex}-${columnIndex}`}
         left={left + size * (columnIndex - 1) * squareSizeCoeff / 2}
@@ -169,3 +163,9 @@ const DigitLine = memo(({left, top, size, vertical}: DigitLineProps) => <polygon
     }
     fill={"currentColor"}
 />);
+
+export const CalculatorDigitComponentType: DigitComponentType = {
+    component: CalculatorDigit,
+    svgContentComponent: CalculatorDigitSvgContent,
+    widthCoeff: digitWidthCoeff + lineWidthCoeff,
+};

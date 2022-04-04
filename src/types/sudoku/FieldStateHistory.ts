@@ -1,39 +1,44 @@
 import {areFieldStatesEqual, cloneFieldState, FieldState} from "./FieldState";
 import {SetStateAction} from "react";
+import {SudokuTypeManager} from "./SudokuTypeManager";
 
-export interface FieldStateHistory {
-    states: FieldState[];
+export interface FieldStateHistory<CellType> {
+    states: FieldState<CellType>[];
     currentIndex: number;
 }
 
-export const fieldStateHistoryGetCurrent = ({states, currentIndex}: FieldStateHistory) => states[currentIndex];
+export const fieldStateHistoryGetCurrent = <CellType>({states, currentIndex}: FieldStateHistory<CellType>) => states[currentIndex];
 
-export const fieldStateHistoryCanUndo = ({currentIndex}: FieldStateHistory) => currentIndex > 0;
+export const fieldStateHistoryCanUndo = <CellType>({currentIndex}: FieldStateHistory<CellType>) => currentIndex > 0;
 
-export const fieldStateHistoryUndo = (history: FieldStateHistory) => fieldStateHistoryCanUndo(history)
+export const fieldStateHistoryUndo = <CellType>(history: FieldStateHistory<CellType>) => fieldStateHistoryCanUndo(history)
     ? {
         ...history,
         currentIndex: Math.max(0, history.currentIndex - 1),
     }
     : history;
 
-export const fieldStateHistoryCanRedo = ({currentIndex, states}: FieldStateHistory) => currentIndex < states.length - 1;
+export const fieldStateHistoryCanRedo = <CellType>({currentIndex, states}: FieldStateHistory<CellType>) => currentIndex < states.length - 1;
 
-export const fieldStateHistoryRedo = (history: FieldStateHistory) => fieldStateHistoryCanRedo(history)
+export const fieldStateHistoryRedo = <CellType>(history: FieldStateHistory<CellType>) => fieldStateHistoryCanRedo(history)
     ? {
         ...history,
         currentIndex: Math.min(history.states.length - 1, history.currentIndex + 1),
     }
     : history;
 
-export const fieldStateHistoryAddState = (history: FieldStateHistory, state: SetStateAction<FieldState>) => {
+export const fieldStateHistoryAddState = <CellType>(
+    typeManager: SudokuTypeManager<CellType>,
+    history: FieldStateHistory<CellType>,
+    state: SetStateAction<FieldState<CellType>>
+) => {
     const currentState = fieldStateHistoryGetCurrent(history);
 
     if (typeof state === "function") {
-        state = state(cloneFieldState(currentState));
+        state = state(cloneFieldState(typeManager, currentState));
     }
 
-    if (areFieldStatesEqual(state, currentState)) {
+    if (areFieldStatesEqual(typeManager, state, currentState)) {
         return history;
     }
 

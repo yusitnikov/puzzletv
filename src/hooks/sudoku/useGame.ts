@@ -1,4 +1,4 @@
-import {fillFieldStateInitialDigits} from "../../types/sudoku/FieldState";
+import {createEmptyFieldState, fillFieldStateInitialDigits} from "../../types/sudoku/FieldState";
 import {Dispatch, useCallback, useMemo, useState} from "react";
 import {GameState} from "../../types/sudoku/GameState";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
@@ -9,17 +9,24 @@ import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {isStartAngle} from "../../utils/rotation";
 import {useEventListener} from "../useEventListener";
+import {useAnimatedValue} from "../useAnimatedValue";
+import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 
-export interface ProcessedGameState extends GameState {
+export interface ProcessedGameState<CellType> extends GameState<CellType> {
     cellWriteMode: CellWriteMode;
     isReady: boolean;
+
+    animatedAngle: number;
 }
 
-export const useGame = ({initialDigits = {}}: PuzzleDefinition): [ProcessedGameState, Dispatch<MergeStateAction<ProcessedGameState>>] => {
-    const [gameState, setGameState] = useState<GameState>(() => ({
+export const useGame = <CellType>(
+    typeManager: SudokuTypeManager<CellType>,
+    {initialDigits = {}}: PuzzleDefinition<CellType>
+): [ProcessedGameState<CellType>, Dispatch<MergeStateAction<ProcessedGameState<CellType>>>] => {
+    const [gameState, setGameState] = useState<GameState<CellType>>(() => ({
         fieldStateHistory: {
             states: [
-                fillFieldStateInitialDigits(initialDigits)
+                fillFieldStateInitialDigits(initialDigits, createEmptyFieldState(typeManager))
             ],
             currentIndex: 0,
         },
@@ -33,17 +40,19 @@ export const useGame = ({initialDigits = {}}: PuzzleDefinition): [ProcessedGameS
 
     const cellWriteMode = useFinalCellWriteMode(gameState.persistentCellWriteMode);
     const isReady = !isStartAngle(gameState.angle);
+    const animatedAngle = useAnimatedValue(gameState.angle, gameState.animationSpeed);
 
-    const calculateProcessedGameState = useCallback((gameState: GameState): ProcessedGameState => ({
+    const calculateProcessedGameState = useCallback((gameState: GameState<CellType>): ProcessedGameState<CellType> => ({
         ...gameState,
         cellWriteMode,
         isReady,
-    }), [cellWriteMode, isReady]);
+        animatedAngle,
+    }), [cellWriteMode, isReady, animatedAngle]);
 
     const processedGameState = useMemo(() => calculateProcessedGameState(gameState), [gameState, calculateProcessedGameState]);
 
     const mergeGameState = useCallback(
-        (gameStateAction: MergeStateAction<ProcessedGameState>) => setGameState(gameState => {
+        (gameStateAction: MergeStateAction<ProcessedGameState<CellType>>) => setGameState(gameState => {
             const processedGameState = calculateProcessedGameState(gameState);
 
             return {

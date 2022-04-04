@@ -8,6 +8,7 @@ import {GermanWhispers} from "../../components/sudoku/figures/german-whispers/Ge
 import {KillerCage} from "../../components/sudoku/figures/killer-cage/KillerCage";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import {RotatableDigit} from "../../types/sudoku/RotatableDigit";
 
 export default {
     title: "North or South?",
@@ -100,4 +101,4 @@ export default {
 
         <XMark left={8} top={6.5}/>
     </>,
-} as PuzzleDefinition;
+} as PuzzleDefinition<RotatableDigit>;

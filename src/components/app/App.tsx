@@ -10,6 +10,8 @@ import styled from "@emotion/styled";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {useGame} from "../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
+import {DigitComponentTypeContext} from "../../contexts/DigitComponentTypeContext";
 
 const sudokuCoeff = 9;
 const panelCoeff = controlsWidthCoeff;
@@ -21,7 +23,12 @@ const StyledContainer = styled(Absolute)({
     fontFamily: "Lato, sans-serif",
 });
 
-export const App = (puzzle: PuzzleDefinition) => {
+export interface AppProps<CellType> {
+    typeManager: SudokuTypeManager<CellType>;
+    puzzle: PuzzleDefinition<CellType>;
+}
+
+export const App = <CellType,>({typeManager, puzzle}: AppProps<CellType>) => {
     // region Size calculation
     const windowSize = useWindowSize();
 
@@ -44,38 +51,42 @@ export const App = (puzzle: PuzzleDefinition) => {
     const controlsOffset = sudokuSize + padding * 2;
     // endregion
 
-    const [gameState, mergeGameState] = useGame(puzzle);
+    const [gameState, mergeGameState] = useGame(typeManager, puzzle);
 
-    return <StyledContainer
-        left={(windowSize.width - containerSize.width) / 2}
-        top={(windowSize.height - containerSize.height) / 2}
-        {...containerSize}
-    >
-        <Field
-            puzzle={puzzle}
-            state={gameState}
-            onStateChange={mergeGameState}
-            rect={{
-                left: padding,
-                top: padding,
-                width: sudokuSize,
-                height: sudokuSize,
-            }}
-            cellSize={cellSize}
-        />
+    return <DigitComponentTypeContext.Provider value={typeManager.digitComponentType}>
+        <StyledContainer
+            left={(windowSize.width - containerSize.width) / 2}
+            top={(windowSize.height - containerSize.height) / 2}
+            {...containerSize}
+        >
+            <Field
+                typeManager={typeManager}
+                puzzle={puzzle}
+                state={gameState}
+                onStateChange={mergeGameState}
+                rect={{
+                    left: padding,
+                    top: padding,
+                    width: sudokuSize,
+                    height: sudokuSize,
+                }}
+                cellSize={cellSize}
+            />
 
-        <SidePanel
-            puzzle={puzzle}
-            rect={{
-                left: isHorizontal ? controlsOffset : padding,
-                top: isHorizontal ? padding : controlsOffset,
-                width: isHorizontal ? controlsSize : sudokuSize,
-                height: isHorizontal ? sudokuSize : controlsSize,
-            }}
-            cellSize={cellSize}
-            isHorizontal={isHorizontal}
-            state={gameState}
-            onStateChange={mergeGameState}
-        />
-    </StyledContainer>;
+            <SidePanel
+                typeManager={typeManager}
+                puzzle={puzzle}
+                rect={{
+                    left: isHorizontal ? controlsOffset : padding,
+                    top: isHorizontal ? padding : controlsOffset,
+                    width: isHorizontal ? controlsSize : sudokuSize,
+                    height: isHorizontal ? sudokuSize : controlsSize,
+                }}
+                cellSize={cellSize}
+                isHorizontal={isHorizontal}
+                state={gameState}
+                onStateChange={mergeGameState}
+            />
+        </StyledContainer>
+    </DigitComponentTypeContext.Provider>;
 }

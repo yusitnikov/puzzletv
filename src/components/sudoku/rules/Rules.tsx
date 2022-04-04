@@ -10,13 +10,13 @@ const StyledContainer = styled(Absolute)({
     flexDirection: "column",
 });
 
-export interface RulesProps {
-    puzzle: PuzzleDefinition;
+export interface RulesProps<CellType> {
+    puzzle: PuzzleDefinition<CellType>;
     rect: Rect;
     cellSize: number;
 }
 
-export const Rules = ({puzzle: {title, author, rules}, rect, cellSize}: RulesProps) => <StyledContainer {...rect} pointerEvents={true}>
+export const Rules = <CellType,>({puzzle: {title, author, rules}, rect, cellSize}: RulesProps<CellType>) => <StyledContainer {...rect} pointerEvents={true}>
     <div
         style={{
             padding: cellSize / 8,
