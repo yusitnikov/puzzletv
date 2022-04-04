@@ -1,9 +1,9 @@
 import {AbsoluteProps} from "../../layout/absolute/Absolute";
-import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
+import {ProcessedGameState} from "../../../types/sudoku/GameState";
 
-export interface CellDataProps<CellType> extends AbsoluteProps {
+export interface CellDataProps<CellType, ProcessedGameStateExtensionType = {}> extends AbsoluteProps {
     data: CellType;
     size: number;
-    state?: ProcessedGameState<CellType>;
+    state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     isInitial?: boolean;
 }

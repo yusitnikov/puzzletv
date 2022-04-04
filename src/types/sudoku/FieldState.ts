@@ -7,7 +7,7 @@ export interface FieldState<CellType> {
     cells: CellState<CellType>[][];
 }
 
-export const createEmptyFieldState = <CellType>(typeManager: SudokuTypeManager<CellType>): FieldState<CellType> => ({
+export const createEmptyFieldState = <CellType>(typeManager: SudokuTypeManager<CellType, any, any>): FieldState<CellType> => ({
     cells: indexes08.map(() => indexes08.map(() => createEmptyCellState(typeManager))),
 });
 

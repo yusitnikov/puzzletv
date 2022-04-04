@@ -1,10 +1,13 @@
 import {CellBackground} from "./CellBackground";
 import {CellDigits, CellDigitsProps} from "./CellDigits";
 
-export interface CellContentProps<CellType> extends CellDigitsProps<CellType> {
+export interface CellContentProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
+    extends CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
 }
 
-export const CellContent = <CellType,>({data, size, ...otherProps}: CellContentProps<CellType>) => <>
+export const CellContent = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {data, size, ...otherProps}: CellContentProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => <>
     {data.colors && <CellBackground colors={data.colors} size={size}/>}
 
     <CellDigits data={data} size={size} {...otherProps}/>

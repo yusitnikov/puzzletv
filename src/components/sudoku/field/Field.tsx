@@ -16,24 +16,33 @@ import {
     gameStateClearSelectedCells,
     gameStateGetCurrentFieldState, gameStateSelectAllCells,
     gameStateSetSelectedCells,
-    gameStateToggleSelectedCell
+    gameStateToggleSelectedCell,
+    ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
-import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 
-export interface FieldProps<CellType> {
-    typeManager: SudokuTypeManager<CellType>;
+export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     puzzle: PuzzleDefinition<CellType>;
-    state: ProcessedGameState<CellType>;
-    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType>>) => void;
+    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
+    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
     rect: Rect;
     cellSize: number;
 }
 
-export const Field = <CellType,>({typeManager, puzzle: {backgroundItems, topItems}, state, onStateChange, rect, cellSize}: FieldProps<CellType>) => {
-    const {selectedCells, animatedAngle, isReady} = state;
+export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {
+        typeManager,
+        puzzle: {backgroundItems, topItems},
+        state,
+        onStateChange,
+        rect,
+        cellSize
+    }: FieldProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => {
+    const {selectedCells, isReady} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (!isReady) {
@@ -61,7 +70,7 @@ export const Field = <CellType,>({typeManager, puzzle: {backgroundItems, topItem
         const isAnyKeyDown = ctrlKey || shiftKey;
 
         const handleArrow = (xDirection: number, yDirection: number) => onStateChange(
-            gameState => gameStateApplyArrowToSelectedCells(gameState, xDirection, yDirection, isAnyKeyDown)
+            gameState => gameStateApplyArrowToSelectedCells(typeManager, gameState, xDirection, yDirection, isAnyKeyDown)
         );
 
         switch (code) {
@@ -119,7 +128,7 @@ export const Field = <CellType,>({typeManager, puzzle: {backgroundItems, topItem
 
         <Absolute
             {...rect}
-            angle={animatedAngle}
+            angle={typeManager.getFieldAngle?.(state)}
             style={{backgroundColor: "white"}}
         >
             {renderCellsLayer("background", ({colors}) => <CellBackground

@@ -23,12 +23,14 @@ const StyledContainer = styled(Absolute)({
     fontFamily: "Lato, sans-serif",
 });
 
-export interface AppProps<CellType> {
-    typeManager: SudokuTypeManager<CellType>;
+export interface AppProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     puzzle: PuzzleDefinition<CellType>;
 }
 
-export const App = <CellType,>({typeManager, puzzle}: AppProps<CellType>) => {
+export const App = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {typeManager, puzzle}: AppProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => {
     // region Size calculation
     const windowSize = useWindowSize();
 

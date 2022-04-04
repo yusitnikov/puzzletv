@@ -28,7 +28,7 @@ export const fieldStateHistoryRedo = <CellType>(history: FieldStateHistory<CellT
     : history;
 
 export const fieldStateHistoryAddState = <CellType>(
-    typeManager: SudokuTypeManager<CellType>,
+    typeManager: SudokuTypeManager<CellType, any, any>,
     history: FieldStateHistory<CellType>,
     state: SetStateAction<FieldState<CellType>>
 ) => {

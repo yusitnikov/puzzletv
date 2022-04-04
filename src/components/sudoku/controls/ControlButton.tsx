@@ -2,6 +2,7 @@
 import {ButtonHTMLAttributes, MouseEvent, ReactNode} from "react";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Position} from "../../../types/layout/Position";
+import {Size} from "../../../types/layout/Size";
 import styled from "@emotion/styled";
 import {lightGreyColor, textColor} from "../../app/globals";
 import {EmotionIconBase} from "@emotion-icons/emotion-icon";
@@ -29,7 +30,7 @@ const StyledContainer = styled(Absolute, {
     },
 }));
 
-export interface ControlButtonProps extends Position, ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ControlButtonProps extends Position, Partial<Size>, ButtonHTMLAttributes<HTMLButtonElement> {
     cellSize: number;
     checked?: boolean;
     flipDirection?: boolean;
@@ -39,19 +40,20 @@ export interface ControlButtonProps extends Position, ButtonHTMLAttributes<HTMLB
     children?: ReactNode | ((contentSize: number) => ReactNode);
 }
 
-export const ControlButton = ({children, left, top, cellSize, flipDirection, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
+export const ControlButton = ({children, left, top, width = 1, height = 1, cellSize, flipDirection, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
     const contentSize = fullSize
         ? cellSize
         : cellSize * 0.7;
-    const contentOffset = (cellSize - contentSize) / 2;
+    const containerWidth = cellSize * (width + controlButtonPaddingCoeff * (width - 1));
+    const containerHeight = cellSize * (height + controlButtonPaddingCoeff * (height - 1));
 
     return <StyledContainer
         tagName={"button"}
         type={"button"}
         left={cellSize * (1 + controlButtonPaddingCoeff) * (flipDirection ? top : left)}
         top={cellSize * (1 + controlButtonPaddingCoeff) * (flipDirection ? left : top)}
-        width={cellSize}
-        height={cellSize}
+        width={containerWidth}
+        height={containerHeight}
         borderWidth={3}
         isActive={checked}
         tabIndex={-1}
@@ -60,8 +62,8 @@ export const ControlButton = ({children, left, top, cellSize, flipDirection, ful
         {...otherProps}
     >
         <Absolute
-            left={contentOffset}
-            top={contentOffset}
+            left={(containerWidth - contentSize) / 2}
+            top={(containerHeight - contentSize) / 2}
             width={contentSize}
             height={contentSize}
             borderWidth={innerBorderWidth}

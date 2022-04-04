@@ -11,37 +11,39 @@ import {CellState} from "./CellState";
 import {areAllFieldStateCells, isAnyFieldStateCell, processFieldStateCells} from "./FieldState";
 import {indexes08} from "../../utils/indexes";
 import {Position} from "../layout/Position";
-import {AnimationSpeed} from "./AnimationSpeed";
-import {isUpsideDownAngle} from "../../utils/rotation";
-import {ProcessedGameState} from "../../hooks/sudoku/useGame";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
     persistentCellWriteMode: CellWriteMode;
     selectedCells: SelectedCells;
+}
 
-    angle: number;
-    isStickyMode: boolean;
-    animationSpeed: AnimationSpeed;
+export interface ProcessedGameState<CellType> extends GameState<CellType> {
+    cellWriteMode: CellWriteMode;
+    isReady: boolean;
 }
 
 // region History
-export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: GameState<CellType>) =>
+export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: ProcessedGameState<CellType>) =>
     fieldStateHistoryGetCurrent(fieldStateHistory);
 
-export const gameStateUndo = <CellType>({fieldStateHistory}: GameState<CellType>): Partial<GameState<CellType>> => ({
+export const gameStateUndo = <CellType, ProcessedGameStateExtensionType = {}>(
+    {fieldStateHistory}: ProcessedGameState<CellType>
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     fieldStateHistory: fieldStateHistoryUndo(fieldStateHistory),
-});
+} as any);
 
-export const gameStateRedo = <CellType>({fieldStateHistory}: GameState<CellType>): Partial<GameState<CellType>> => ({
+export const gameStateRedo = <CellType, ProcessedGameStateExtensionType = {}>(
+    {fieldStateHistory}: ProcessedGameState<CellType>
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     fieldStateHistory: fieldStateHistoryRedo(fieldStateHistory),
-});
+} as any);
 // endregion
 
 // region Selected cells
 export const gameStateAreAllSelectedCells = <CellType>(
-    gameState: GameState<CellType>,
+    gameState: ProcessedGameState<CellType>,
     predicate: (cellState: CellState<CellType>) => boolean
 ) =>
     areAllFieldStateCells(
@@ -51,7 +53,7 @@ export const gameStateAreAllSelectedCells = <CellType>(
     );
 
 export const gameStateIsAnySelectedCell = <CellType>(
-    gameState: GameState<CellType>,
+    gameState: ProcessedGameState<CellType>,
     predicate: (cellState: CellState<CellType>) => boolean
 ) =>
     isAnyFieldStateCell(
@@ -60,53 +62,60 @@ export const gameStateIsAnySelectedCell = <CellType>(
         predicate
     );
 
-export const gameStateAddSelectedCell = <CellType>(
-    gameState: GameState<CellType>,
+export const gameStateAddSelectedCell = <CellType, ProcessedGameStateExtensionType = {}>(
+    gameState: ProcessedGameState<CellType>,
     cellPosition: Position
-): Partial<GameState<CellType>> => ({
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     selectedCells: gameState.selectedCells.add(cellPosition),
-});
+} as any);
 
-export const gameStateSetSelectedCells = <CellType>(
-    gameState: GameState<CellType>,
+export const gameStateSetSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
+    gameState: ProcessedGameState<CellType>,
     cellPositions: Position[]
-): Partial<GameState<CellType>> => ({
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     selectedCells: gameState.selectedCells.set(cellPositions),
-});
+} as any);
 
-export const gameStateToggleSelectedCell = <CellType>(
-    gameState: GameState<CellType>,
+export const gameStateToggleSelectedCell = <CellType, ProcessedGameStateExtensionType = {}>(
+    gameState: ProcessedGameState<CellType>,
     cellPosition: Position,
     forcedEnable?: boolean
-): Partial<GameState<CellType>> => ({
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     selectedCells: gameState.selectedCells.toggle(cellPosition, forcedEnable),
-});
+} as any);
 
-export const gameStateSelectAllCells = <CellType>(gameState: GameState<CellType>) => gameStateSetSelectedCells(
-    gameState,
-    indexes08.flatMap(top => indexes08.map(left => ({left, top})))
-);
+export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionType = {}>(gameState: ProcessedGameState<CellType>) =>
+    gameStateSetSelectedCells<CellType, ProcessedGameStateExtensionType>(
+        gameState,
+        indexes08.flatMap(top => indexes08.map(left => ({left, top})))
+    );
 
-export const gameStateClearSelectedCells = <CellType>(gameState: GameState<CellType>): Partial<GameState<CellType>> => ({
+export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
+    gameState: ProcessedGameState<CellType>
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     selectedCells: gameState.selectedCells.clear(),
-});
+} as any);
 
-export const gameStateApplyArrowToSelectedCells = <CellType>(
-    gameState: GameState<CellType>,
+export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {processArrowDirection}: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     xDirection: number,
     yDirection: number,
     isMultiSelection: boolean
-) => {
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
     const currentCell = gameState.selectedCells.last();
     // Nothing to do when there's no selection
     if (!currentCell) {
         return gameState;
     }
 
-    const coeff = isUpsideDownAngle(gameState.angle) ? -1 : 1;
+    if (processArrowDirection) {
+        [xDirection, yDirection] = processArrowDirection(xDirection, yDirection, gameState);
+    }
+
     const newCell: Position = {
-        left: (currentCell.left + coeff * xDirection + 9) % 9,
-        top: (currentCell.top + coeff * yDirection + 9) % 9,
+        left: (currentCell.left + xDirection + 9) % 9,
+        top: (currentCell.top + yDirection + 9) % 9,
     }
 
     return isMultiSelection
@@ -114,21 +123,21 @@ export const gameStateApplyArrowToSelectedCells = <CellType>(
         : gameStateSetSelectedCells(gameState, [newCell]);
 };
 
-export const gameStateProcessSelectedCells = <CellType>(
-    typeManager: SudokuTypeManager<CellType>,
-    gameState: GameState<CellType>,
+export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     fieldStateProcessor: (cellState: CellState<CellType>) => CellState<CellType>
-): Partial<GameState<CellType>> => ({
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     fieldStateHistory: fieldStateHistoryAddState(
         typeManager,
         gameState.fieldStateHistory,
         state => processFieldStateCells(state, gameState.selectedCells.items, fieldStateProcessor)
     ),
-});
+} as any);
 
-export const gameStateHandleDigit = <CellType>(
-    typeManager: SudokuTypeManager<CellType>,
-    gameState: ProcessedGameState<CellType>,
+export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     digit: number
 ) => {
     const cellData = typeManager.createCellDataByTypedDigit(digit, gameState);
@@ -172,10 +181,10 @@ export const gameStateHandleDigit = <CellType>(
     return gameState;
 }
 
-export const gameStateClearSelectedCellsContent = <CellType>(
-    typeManager: SudokuTypeManager<CellType>,
-    gameState: ProcessedGameState<CellType>
-) => {
+export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
     const clearCenter = () => gameStateProcessSelectedCells(typeManager, gameState, cell => ({
         ...cell,
         centerDigits: cell.centerDigits.clear()

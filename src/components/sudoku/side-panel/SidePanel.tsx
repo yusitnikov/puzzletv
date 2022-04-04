@@ -5,11 +5,14 @@ import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
-export interface SidePanelProps<CellType> extends ControlsProps<CellType> {
+export interface SidePanelProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
+    extends ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
     puzzle: PuzzleDefinition<CellType>;
 }
 
-export const SidePanel = <CellType,>({puzzle, rect, cellSize, isHorizontal, ...controlsProps}: SidePanelProps<CellType>) => {
+export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {puzzle, rect, cellSize, isHorizontal, ...controlsProps}: SidePanelProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => {
     const padding = cellSize * globalPaddingCoeff;
 
     const controlsSize: Size = {

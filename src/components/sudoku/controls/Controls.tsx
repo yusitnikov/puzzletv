@@ -1,74 +1,59 @@
 import {Absolute} from "../../layout/absolute/Absolute";
-import {Rect} from "../../../types/layout/Rect";
+import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes08} from "../../../utils/indexes";
-import {
-    Clear,
-    FastForward,
-    Fullscreen,
-    FullscreenExit,
-    PlayArrow,
-    PushPin,
-    Redo,
-    RotateRight,
-    Timelapse,
-    Undo
-} from "@emotion-icons/material";
+import {Clear, Fullscreen, FullscreenExit, Redo, Undo} from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {Set} from "../../../types/struct/Set";
 import {CellBackground} from "../cell/CellBackground";
 import {CellDigits} from "../cell/CellDigits";
-import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 import {
     gameStateClearSelectedCellsContent,
     gameStateHandleDigit,
     gameStateRedo,
-    gameStateUndo
+    gameStateUndo,
+    ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {rotateClockwise} from "../../../utils/rotation";
-import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
 
-export interface ControlsProps<CellType> {
+export interface ControlsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     rect: Rect;
     cellSize: number;
     isHorizontal: boolean;
-    typeManager: SudokuTypeManager<CellType>;
-    state: ProcessedGameState<CellType>;
-    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType>>) => void;
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
+    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
 }
 
-export const Controls = <CellType,>(
-    {
-        rect,
+export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {rect, ...otherProps}: ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => {
+    const {
         cellSize,
         isHorizontal,
         typeManager,
         state,
         onStateChange,
-    }: ControlsProps<CellType>
-) => {
+    } = otherProps;
+
     const {
         isReady,
         persistentCellWriteMode,
         cellWriteMode,
-        isStickyMode,
-        animationSpeed,
     } = state;
 
     const isFullScreen = useIsFullScreen();
 
     // region Event handlers
-    const handleSetCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode});
+    const handleSetCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode} as any);
 
     const handleDigit = (digit: number) => isReady && onStateChange(gameState => gameStateHandleDigit(typeManager, gameState, digit));
 
@@ -77,25 +62,6 @@ export const Controls = <CellType,>(
     const handleUndo = () => onStateChange(gameStateUndo);
 
     const handleRedo = () => onStateChange(gameStateRedo);
-
-    const handleRotate = () => onStateChange(({angle}) => ({angle: rotateClockwise(angle)}));
-
-    const handleToggleStickyMode = () => onStateChange(({isStickyMode}) => ({isStickyMode: !isStickyMode}));
-
-    const handleSetAnimationSpeed = (animationSpeed: AnimationSpeed) => onStateChange({animationSpeed});
-    const handleAnimationSpeedToggle = () => {
-        switch (animationSpeed) {
-            case AnimationSpeed.regular:
-                handleSetAnimationSpeed(AnimationSpeed.immediate);
-                break;
-            case AnimationSpeed.immediate:
-                handleSetAnimationSpeed(AnimationSpeed.slow);
-                break;
-            case AnimationSpeed.slow:
-                handleSetAnimationSpeed(AnimationSpeed.regular);
-                break;
-        }
-    };
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
@@ -112,14 +78,6 @@ export const Controls = <CellType,>(
         }
 
         switch (code) {
-            case "KeyR":
-                handleRotate();
-                ev.preventDefault();
-                break;
-            case "KeyS":
-                handleToggleStickyMode();
-                ev.preventDefault();
-                break;
             case "Delete":
             case "Backspace":
                 handleClear();
@@ -153,6 +111,12 @@ export const Controls = <CellType,>(
         }
     });
 
+    const mainControlsCount = typeManager.mainControlsCount || 0;
+    const MainControls = typeManager.mainControlsComponent;
+
+    const secondaryControlsCount = typeManager.secondaryControlsCount || 0;
+    const SecondaryControls = typeManager.secondaryControlsComponent;
+
     return <Absolute {...rect}>
         {isReady && indexes08.map(index => {
             const cellData = typeManager.createCellDataByDisplayDigit(index + 1, state);
@@ -178,26 +142,6 @@ export const Controls = <CellType,>(
                 />
             </ControlButton>;
         })}
-
-        {!isReady && <Absolute
-            width={cellSize * (3 + controlButtonPaddingCoeff * 2)}
-            height={cellSize * (3 + controlButtonPaddingCoeff * 2)}
-            pointerEvents={true}
-            style={{
-                fontSize: cellSize * 0.4,
-            }}
-        >
-            <div>Please rotate the field once to start solving the puzzle!</div>
-
-            <Absolute
-                width={cellSize * 1.5}
-                height={cellSize * 1.5}
-                left={-cellSize * 0.25}
-                top={cellSize * (1.5 + controlButtonPaddingCoeff * 2)}
-            >
-                <ArrowCurveDownLeft/>
-            </Absolute>
-        </Absolute>}
 
         <ControlButton
             left={3}
@@ -266,28 +210,8 @@ export const Controls = <CellType,>(
         </ControlButton>
 
         <ControlButton
-            left={0}
-            top={3}
-            cellSize={cellSize}
-            onClick={handleRotate}
-            title={"Rotate the puzzle (shortcut: R)\nTip: use the button below to control the rotation speed"}
-        >
-            <RotateRight/>
-        </ControlButton>
-
-        <ControlButton
-            left={1}
-            top={3}
-            cellSize={cellSize}
-            checked={isStickyMode}
-            onClick={handleToggleStickyMode}
-            title={`Sticky mode: ${isStickyMode ? "ON" : "OFF"} (click to toggle, shortcut: S).\nSticky digits will preserve the orientation when rotating the field.\nSticky digits are highlighted in green.`}
-        >
-            <PushPin/>
-        </ControlButton>
-
-        <ControlButton
-            left={2}
+            left={mainControlsCount}
+            width={3 - mainControlsCount}
             top={3}
             cellSize={cellSize}
             onClick={handleClear}
@@ -296,27 +220,18 @@ export const Controls = <CellType,>(
             <Clear/>
         </ControlButton>
 
+        {MainControls && <MainControls rect={emptyRect} {...otherProps}/>}
+
         <Absolute
             left={isHorizontal ? 0 : rect.width - cellSize}
             top={isHorizontal ? rect.height - cellSize : 0}
             width={isHorizontal ? rect.width : cellSize}
             height={isHorizontal ? cellSize : rect.height}
         >
-            <ControlButton
-                left={0}
-                top={0}
-                flipDirection={!isHorizontal}
-                cellSize={cellSize}
-                onClick={handleAnimationSpeedToggle}
-                title={`Rotation speed: ${animationSpeedToString(animationSpeed)} (click to toggle)`}
-            >
-                {animationSpeed === AnimationSpeed.regular && <PlayArrow/>}
-                {animationSpeed === AnimationSpeed.immediate && <FastForward/>}
-                {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
-            </ControlButton>
+            {SecondaryControls && <SecondaryControls rect={emptyRect} {...otherProps}/>}
 
             <ControlButton
-                left={1}
+                left={secondaryControlsCount}
                 top={0}
                 flipDirection={!isHorizontal}
                 cellSize={cellSize}
@@ -327,7 +242,7 @@ export const Controls = <CellType,>(
             </ControlButton>
 
             <ControlButton
-                left={2}
+                left={secondaryControlsCount + 1}
                 top={0}
                 flipDirection={!isHorizontal}
                 cellSize={cellSize}

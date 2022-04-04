@@ -1,5 +1,10 @@
-import {Position} from "./Position";
-import {Size} from "./Size";
+import {emptyPosition, Position} from "./Position";
+import {emptySize, Size} from "./Size";
 
 export interface Rect extends Position, Size {
 }
+
+export const emptyRect: Rect = {
+    ...emptyPosition,
+    ...emptySize,
+};

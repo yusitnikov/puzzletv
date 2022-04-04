@@ -1,12 +1,16 @@
 import {RotatableDigit} from "./RotatableDigit";
 import {SudokuTypeManager} from "./SudokuTypeManager";
-import {ProcessedGameState} from "../../hooks/sudoku/useGame";
-import {isUpsideDownAngle} from "../../utils/rotation";
+import {isStartAngle, isUpsideDownAngle} from "../../utils/rotation";
 import {CalculatorDigitComponentType} from "../../components/sudoku/digit/CalculatorDigit";
 import {RotatableDigitCellDataComponentType} from "../../components/sudoku/cell/RotatableDigitCellData";
 import {Position} from "../layout/Position";
 import {getCellDataSortIndexes} from "../../components/sudoku/cell/CellDigits";
 import {Set} from "../struct/Set";
+import {RotatableGameState, RotatableProcessedGameState} from "./RotatableGameState";
+import {AnimationSpeed} from "./AnimationSpeed";
+import {useAnimatedValue} from "../../hooks/useAnimatedValue";
+import {RotatableMainControls} from "../../components/sudoku/controls/RotatableMainControls";
+import {RotatableSecondaryControls} from "../../components/sudoku/controls/RotatableSecondaryControls";
 
 const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);
@@ -14,7 +18,7 @@ const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRo
 const toggleDigit = (data: RotatableDigit, upsideDown = true) =>
     upsideDown && isRotatableCellData(data) ? 15 - data.digit : data.digit;
 
-export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit> = {
+export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
     areSameCellData({digit, sticky = false}: RotatableDigit, {digit: digit2, sticky: sticky2 = false}: RotatableDigit) {
         return digit === digit2 && (sticky === sticky2 || !isRotatableDigit(digit));
     },
@@ -32,17 +36,14 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit> 
         return {...digit};
     },
 
-    createCellDataByDisplayDigit(digit: number, {isStickyMode}: ProcessedGameState<RotatableDigit>): RotatableDigit {
+    createCellDataByDisplayDigit(digit: number, {isStickyMode}: RotatableGameState): RotatableDigit {
         return {
             digit,
             sticky: isStickyMode,
         };
     },
 
-    createCellDataByTypedDigit(
-        digit: number,
-        {isStickyMode, angle}: ProcessedGameState<RotatableDigit>
-    ): RotatableDigit {
+    createCellDataByTypedDigit(digit: number, {isStickyMode, angle}: RotatableGameState): RotatableDigit {
         const naiveResult: RotatableDigit = {
             digit,
             sticky: isStickyMode,
@@ -59,7 +60,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit> 
         dataSet: Set<RotatableDigit>,
         dataIndex: number,
         positionFunction: (index: number) => (Position | undefined),
-        state?: ProcessedGameState<RotatableDigit>
+        state?: RotatableProcessedGameState
     ): Position | undefined {
         const upsideDownIndexes = getCellDataSortIndexes<RotatableDigit>(
             dataSet,
@@ -86,4 +87,38 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit> 
     digitComponentType: CalculatorDigitComponentType,
 
     cellDataComponentType: RotatableDigitCellDataComponentType,
+
+    initialGameStateExtension: {
+        angle: -90,
+        isStickyMode: false,
+        animationSpeed: AnimationSpeed.regular,
+    },
+
+    isReady({angle}: RotatableGameState): boolean {
+        return !isStartAngle(angle);
+    },
+
+    useProcessedGameStateExtension({angle, animationSpeed}: RotatableGameState): Omit<RotatableProcessedGameState, keyof RotatableGameState> {
+        const animatedAngle = useAnimatedValue(angle, animationSpeed);
+
+        return {animatedAngle};
+    },
+
+    getFieldAngle({animatedAngle}: RotatableProcessedGameState): number {
+        return animatedAngle;
+    },
+
+    processArrowDirection(xDirection: number, yDirection: number, gameState?: RotatableGameState): [number, number] {
+        const coeff = isUpsideDownAngle(gameState?.angle || 0) ? -1 : 1;
+
+        return [coeff * xDirection, coeff * yDirection];
+    },
+
+    mainControlsCount: 2,
+
+    mainControlsComponent: RotatableMainControls,
+
+    secondaryControlsCount: 1,
+
+    secondaryControlsComponent: RotatableSecondaryControls,
 };

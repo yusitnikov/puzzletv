@@ -3,7 +3,7 @@ import {CellState} from "../../../types/sudoku/CellState";
 import {Position} from "../../../types/layout/Position";
 import {Set} from "../../../types/struct/Set";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {ProcessedGameState} from "../../../hooks/sudoku/useGame";
+import {ProcessedGameState} from "../../../types/sudoku/GameState";
 
 const centerDigitCoeff = 0.35;
 
@@ -20,15 +20,17 @@ const corners: Position[] = [
     {left: 0, top: 0},
 ];
 
-export interface CellDigitsProps<CellType> {
-    typeManager: SudokuTypeManager<CellType>;
+export interface CellDigitsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     data: Partial<CellState<CellType>>;
     size: number;
-    state?: ProcessedGameState<CellType>;
+    state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     mainColor?: boolean;
 }
 
-export const CellDigits = <CellType,>({typeManager, data, size, state, mainColor}: CellDigitsProps<CellType>) => {
+export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {typeManager, data, size, state, mainColor}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => {
     const {
         cellDataComponentType: {
             component: CellData,

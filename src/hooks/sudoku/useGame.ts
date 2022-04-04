@@ -1,29 +1,19 @@
 import {createEmptyFieldState, fillFieldStateInitialDigits} from "../../types/sudoku/FieldState";
 import {Dispatch, useCallback, useMemo, useState} from "react";
-import {GameState} from "../../types/sudoku/GameState";
+import {GameState, ProcessedGameState} from "../../types/sudoku/GameState";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
 import {noSelectedCells} from "../../types/sudoku/SelectedCells";
 import {MergeStateAction} from "../../types/react/MergeStateAction";
-import {AnimationSpeed} from "../../types/sudoku/AnimationSpeed";
 import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {isStartAngle} from "../../utils/rotation";
 import {useEventListener} from "../useEventListener";
-import {useAnimatedValue} from "../useAnimatedValue";
 import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 
-export interface ProcessedGameState<CellType> extends GameState<CellType> {
-    cellWriteMode: CellWriteMode;
-    isReady: boolean;
-
-    animatedAngle: number;
-}
-
-export const useGame = <CellType>(
-    typeManager: SudokuTypeManager<CellType>,
+export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     {initialDigits = {}}: PuzzleDefinition<CellType>
-): [ProcessedGameState<CellType>, Dispatch<MergeStateAction<ProcessedGameState<CellType>>>] => {
-    const [gameState, setGameState] = useState<GameState<CellType>>(() => ({
+): [ProcessedGameState<CellType> & ProcessedGameStateExtensionType, Dispatch<MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>>] => {
+    const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => ({
         fieldStateHistory: {
             states: [
                 fillFieldStateInitialDigits(initialDigits, createEmptyFieldState(typeManager))
@@ -33,26 +23,29 @@ export const useGame = <CellType>(
         persistentCellWriteMode: CellWriteMode.main,
         selectedCells: noSelectedCells,
 
-        angle: -90,
-        isStickyMode: false,
-        animationSpeed: AnimationSpeed.regular,
+        ...(typeManager.initialGameStateExtension as any),
     }));
 
     const cellWriteMode = useFinalCellWriteMode(gameState.persistentCellWriteMode);
-    const isReady = !isStartAngle(gameState.angle);
-    const animatedAngle = useAnimatedValue(gameState.angle, gameState.animationSpeed);
+    const isReady = !typeManager.isReady || typeManager.isReady(gameState);
+    const processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType> = typeManager.useProcessedGameStateExtension?.(gameState) || ({} as any);
+    const processedGameStateExtensionDep = JSON.stringify(processedGameStateExtension);
 
-    const calculateProcessedGameState = useCallback((gameState: GameState<CellType>): ProcessedGameState<CellType> => ({
-        ...gameState,
-        cellWriteMode,
-        isReady,
-        animatedAngle,
-    }), [cellWriteMode, isReady, animatedAngle]);
+    const calculateProcessedGameState = useCallback(
+        (gameState: GameState<CellType> & GameStateExtensionType): ProcessedGameState<CellType> & ProcessedGameStateExtensionType => ({
+            ...gameState,
+            cellWriteMode,
+            isReady,
+            ...(processedGameStateExtension as any),
+        }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [cellWriteMode, isReady, processedGameStateExtensionDep]
+    );
 
     const processedGameState = useMemo(() => calculateProcessedGameState(gameState), [gameState, calculateProcessedGameState]);
 
     const mergeGameState = useCallback(
-        (gameStateAction: MergeStateAction<ProcessedGameState<CellType>>) => setGameState(gameState => {
+        (gameStateAction: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => setGameState(gameState => {
             const processedGameState = calculateProcessedGameState(gameState);
 
             return {
