@@ -1,7 +1,7 @@
-import {CellDataProps} from "./CellDataProps";
-import {userDigitColor} from "../../app/globals";
-import {CellDataComponentType} from "./CellDataComponentType";
-import {RegularDigit, RegularDigitComponentType} from "../digit/RegularDigit";
+import {CellDataProps} from "../../../components/sudoku/cell/CellDataProps";
+import {userDigitColor} from "../../../components/app/globals";
+import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
+import {RegularDigit, RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 
 export const DigitCellData = ({data: digit, size, state, isInitial, ...absoluteProps}: CellDataProps<number>) => <RegularDigit
     {...absoluteProps}

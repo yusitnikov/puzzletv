@@ -1,6 +1,6 @@
-import {SudokuTypeManager} from "./SudokuTypeManager";
-import {RegularDigitComponentType} from "../../components/sudoku/digit/RegularDigit";
-import {DigitCellDataComponentType} from "../../components/sudoku/cell/DigitCellData";
+import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
+import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
+import {DigitCellDataComponentType} from "../components/DigitCellData";
 
 export const DigitSudokuTypeManager: SudokuTypeManager<number> = {
     areSameCellData(digit1: number, digit2: number): boolean {
