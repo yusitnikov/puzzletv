@@ -8,7 +8,7 @@ import {GermanWhispers} from "../../components/sudoku/figures/german-whispers/Ge
 import {KillerCage} from "../../components/sudoku/figures/killer-cage/KillerCage";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {RotatableDigit} from "../../types/sudoku/RotatableDigit";
+import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
 
 export default {
     title: "North or South?",

@@ -1,9 +1,9 @@
-import {CellDataProps} from "./CellDataProps";
-import {isStickyRotatableDigit, RotatableDigit} from "../../../types/sudoku/RotatableDigit";
-import {CalculatorDigit, CalculatorDigitComponentType} from "../digit/CalculatorDigit";
-import {userDigitColor} from "../../app/globals";
-import {CellDataComponentType} from "./CellDataComponentType";
-import {RotatableProcessedGameState} from "../../../types/sudoku/RotatableGameState";
+import {CellDataProps} from "../../../components/sudoku/cell/CellDataProps";
+import {isStickyRotatableDigit, RotatableDigit} from "../types/RotatableDigit";
+import {CalculatorDigit, CalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
+import {userDigitColor} from "../../../components/app/globals";
+import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
+import {RotatableProcessedGameState} from "../types/RotatableGameState";
 
 export const RotatableDigitCellData = (
     {data, size, state, isInitial, ...absoluteProps}: CellDataProps<RotatableDigit, RotatableProcessedGameState>

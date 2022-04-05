@@ -1,9 +1,9 @@
-import {ControlButton} from "./ControlButton";
+import {ControlButton} from "../../../components/sudoku/controls/ControlButton";
 import {FastForward, PlayArrow, Timelapse} from "@emotion-icons/material";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
-import {ControlsProps} from "./Controls";
-import {RotatableDigit} from "../../../types/sudoku/RotatableDigit";
-import {RotatableGameState, RotatableProcessedGameState} from "../../../types/sudoku/RotatableGameState";
+import {ControlsProps} from "../../../components/sudoku/controls/Controls";
+import {RotatableDigit} from "../types/RotatableDigit";
+import {RotatableGameState, RotatableProcessedGameState} from "../types/RotatableGameState";
 
 export const RotatableSecondaryControls = (
     {

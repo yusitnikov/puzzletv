@@ -1,4 +1,4 @@
-import {AnimationSpeed} from "./AnimationSpeed";
+import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 
 export interface RotatableGameState {
     angle: number;

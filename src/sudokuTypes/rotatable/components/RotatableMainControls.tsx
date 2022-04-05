@@ -1,12 +1,12 @@
-import {Absolute} from "../../layout/absolute/Absolute";
-import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
+import {Absolute} from "../../../components/layout/absolute/Absolute";
+import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
 import {PushPin, RotateRight} from "@emotion-icons/material";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {rotateClockwise} from "../../../utils/rotation";
-import {RotatableDigit} from "../../../types/sudoku/RotatableDigit";
-import {RotatableGameState, RotatableProcessedGameState} from "../../../types/sudoku/RotatableGameState";
-import {ControlsProps} from "./Controls";
+import {rotateClockwise} from "../utils/rotation";
+import {RotatableDigit} from "../types/RotatableDigit";
+import {RotatableGameState, RotatableProcessedGameState} from "../types/RotatableGameState";
+import {ControlsProps} from "../../../components/sudoku/controls/Controls";
 
 export const RotatableMainControls = (
     {
@@ -35,6 +35,7 @@ export const RotatableMainControls = (
     });
 
     return <>
+        {/* eslint-disable-next-line react/jsx-no-undef */}
         {!isReady && <Absolute
             width={cellSize * (3 + controlButtonPaddingCoeff * 2)}
             height={cellSize * (3 + controlButtonPaddingCoeff * 2)}

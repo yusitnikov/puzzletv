@@ -1,16 +1,16 @@
 import {RotatableDigit} from "./RotatableDigit";
-import {SudokuTypeManager} from "./SudokuTypeManager";
-import {isStartAngle, isUpsideDownAngle} from "../../utils/rotation";
-import {CalculatorDigitComponentType} from "../../components/sudoku/digit/CalculatorDigit";
-import {RotatableDigitCellDataComponentType} from "../../components/sudoku/cell/RotatableDigitCellData";
-import {Position} from "../layout/Position";
-import {getCellDataSortIndexes} from "../../components/sudoku/cell/CellDigits";
-import {Set} from "../struct/Set";
+import {isStartAngle, isUpsideDownAngle} from "../utils/rotation";
+import {RotatableDigitCellDataComponentType} from "../components/RotatableDigitCellData";
+import {Set} from "../../../types/struct/Set";
 import {RotatableGameState, RotatableProcessedGameState} from "./RotatableGameState";
-import {AnimationSpeed} from "./AnimationSpeed";
-import {useAnimatedValue} from "../../hooks/useAnimatedValue";
-import {RotatableMainControls} from "../../components/sudoku/controls/RotatableMainControls";
-import {RotatableSecondaryControls} from "../../components/sudoku/controls/RotatableSecondaryControls";
+import {RotatableMainControls} from "../components/RotatableMainControls";
+import {RotatableSecondaryControls} from "../components/RotatableSecondaryControls";
+import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
+import {Position} from "../../../types/layout/Position";
+import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
+import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
+import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
+import {CalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 
 const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);

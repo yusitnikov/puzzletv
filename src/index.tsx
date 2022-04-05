@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {App} from "./components/app/App";
 import NorthOrSouth from "./data/puzzles/NorthOrSouth";
-import {RotatableDigitSudokuTypeManager} from "./types/sudoku/RotatableDigitSudokuTypeManager";
+import {RotatableDigitSudokuTypeManager} from "./sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 
 ReactDOM.render(
     <App
