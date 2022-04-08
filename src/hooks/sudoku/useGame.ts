@@ -7,11 +7,9 @@ import {MergeStateAction} from "../../types/react/MergeStateAction";
 import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useEventListener} from "../useEventListener";
-import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 
 export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    {initialDigits = {}}: PuzzleDefinition<CellType>
+    {typeManager, initialDigits = {}}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ): [ProcessedGameState<CellType> & ProcessedGameStateExtensionType, Dispatch<MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>>] => {
     const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => ({
         fieldStateHistory: {

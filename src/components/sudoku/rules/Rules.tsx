@@ -11,7 +11,7 @@ const StyledContainer = styled(Absolute)({
 });
 
 export interface RulesProps<CellType> {
-    puzzle: PuzzleDefinition<CellType>;
+    puzzle: PuzzleDefinition<CellType, any, any>;
     rect: Rect;
     cellSize: number;
 }

@@ -6,8 +6,8 @@ import {globalPaddingCoeff} from "../../app/globals";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface SidePanelProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
-    extends ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
-    puzzle: PuzzleDefinition<CellType>;
+    extends Omit<ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>, "typeManager"> {
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }
 
 export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -44,6 +44,7 @@ export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameSt
             rect={{...controlsPosition, ...controlsSize}}
             cellSize={cellSize}
             isHorizontal={isHorizontal}
+            typeManager={puzzle.typeManager}
             {...controlsProps}
         />
     </Absolute>;

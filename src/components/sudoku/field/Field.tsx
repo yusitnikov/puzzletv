@@ -14,18 +14,17 @@ import {FieldSvg} from "./FieldSvg";
 import {
     gameStateApplyArrowToSelectedCells,
     gameStateClearSelectedCells,
-    gameStateGetCurrentFieldState, gameStateSelectAllCells,
+    gameStateGetCurrentFieldState,
+    gameStateSelectAllCells,
     gameStateSetSelectedCells,
     gameStateToggleSelectedCell,
     ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    puzzle: PuzzleDefinition<CellType>;
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
     rect: Rect;
@@ -34,8 +33,7 @@ export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGame
 
 export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {
-        typeManager,
-        puzzle: {backgroundItems, topItems},
+        puzzle: {typeManager, backgroundItems, topItems},
         state,
         onStateChange,
         rect,

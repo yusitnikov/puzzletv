@@ -10,7 +10,6 @@ import styled from "@emotion/styled";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {useGame} from "../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 import {DigitComponentTypeContext} from "../../contexts/DigitComponentTypeContext";
 import {Title} from "../layout/title/Title";
 
@@ -25,13 +24,14 @@ const StyledContainer = styled(Absolute)({
 });
 
 export interface AppProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    puzzle: PuzzleDefinition<CellType>;
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }
 
 export const App = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {typeManager, puzzle}: AppProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {puzzle}: AppProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    const {title, author, typeManager} = puzzle;
+
     // region Size calculation
     const windowSize = useWindowSize();
 
@@ -54,12 +54,12 @@ export const App = <CellType, GameStateExtensionType = {}, ProcessedGameStateExt
     const controlsOffset = sudokuSize + padding * 2;
     // endregion
 
-    const [gameState, mergeGameState] = useGame(typeManager, puzzle);
+    const [gameState, mergeGameState] = useGame(puzzle);
 
     return <DigitComponentTypeContext.Provider value={typeManager.digitComponentType}>
         <Title>
-            {puzzle.title}
-            {puzzle.author && <> by {puzzle.author}</>}
+            {title}
+            {author && <> by {author}</>}
         </Title>
 
         <StyledContainer
@@ -68,7 +68,6 @@ export const App = <CellType, GameStateExtensionType = {}, ProcessedGameStateExt
             {...containerSize}
         >
             <Field
-                typeManager={typeManager}
                 puzzle={puzzle}
                 state={gameState}
                 onStateChange={mergeGameState}
@@ -82,7 +81,6 @@ export const App = <CellType, GameStateExtensionType = {}, ProcessedGameStateExt
             />
 
             <SidePanel
-                typeManager={typeManager}
                 puzzle={puzzle}
                 rect={{
                     left: isHorizontal ? controlsOffset : padding,

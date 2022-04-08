@@ -9,6 +9,8 @@ import {KillerCage} from "../../components/sudoku/figures/killer-cage/KillerCage
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
+import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
+import {RotatableGameState, RotatableProcessedGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
 
 export default {
     title: "North or South?",
@@ -28,6 +30,7 @@ export default {
         </RulesUnorderedList>
         <RulesParagraph>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</RulesParagraph>
     </>,
+    typeManager: RotatableDigitSudokuTypeManager,
     initialDigits: {
         0: {
             0: {digit: 6},
@@ -101,4 +104,4 @@ export default {
 
         <XMark left={8} top={6.5}/>
     </>,
-} as PuzzleDefinition<RotatableDigit>;
+} as PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState>;
