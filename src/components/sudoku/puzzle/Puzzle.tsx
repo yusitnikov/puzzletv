@@ -1,17 +1,17 @@
 /** @jsxImportSource @emotion/react */
 import React from "react";
-import {Size} from "../../types/layout/Size";
-import {Absolute} from "../layout/absolute/Absolute";
-import {Field} from "../sudoku/field/Field";
-import {SidePanel} from "../sudoku/side-panel/SidePanel";
-import {globalPaddingCoeff, textColor} from "./globals";
-import {controlsWidthCoeff} from "../sudoku/controls/Controls";
+import {Size} from "../../../types/layout/Size";
+import {Absolute} from "../../layout/absolute/Absolute";
+import {Field} from "../field/Field";
+import {SidePanel} from "../side-panel/SidePanel";
+import {globalPaddingCoeff, textColor} from "../../app/globals";
+import {controlsWidthCoeff} from "../controls/Controls";
 import styled from "@emotion/styled";
-import {useWindowSize} from "../../hooks/useWindowSize";
-import {useGame} from "../../hooks/sudoku/useGame";
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {DigitComponentTypeContext} from "../../contexts/DigitComponentTypeContext";
-import {Title} from "../layout/title/Title";
+import {useWindowSize} from "../../../hooks/useWindowSize";
+import {useGame} from "../../../hooks/sudoku/useGame";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {DigitComponentTypeContext} from "../../../contexts/DigitComponentTypeContext";
+import {Title} from "../../layout/title/Title";
 
 const sudokuCoeff = 9;
 const panelCoeff = controlsWidthCoeff;
@@ -23,12 +23,12 @@ const StyledContainer = styled(Absolute)({
     fontFamily: "Lato, sans-serif",
 });
 
-export interface AppProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+export interface PuzzleProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }
 
-export const App = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle}: AppProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {puzzle}: PuzzleProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {title, author, typeManager} = puzzle;
 

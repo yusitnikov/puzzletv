@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {App} from "./components/app/App";
+import {Puzzle} from "./components/sudoku/puzzle/Puzzle";
 import NorthOrSouth from "./data/puzzles/NorthOrSouth";
 
 ReactDOM.render(
-    <App puzzle={NorthOrSouth}/>,
+    <Puzzle puzzle={NorthOrSouth}/>,
     document.getElementById("root")
 );
