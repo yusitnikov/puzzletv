@@ -13,11 +13,6 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitComponentTypeContext} from "../../../contexts/DigitComponentTypeContext";
 import {Title} from "../../layout/title/Title";
 
-const sudokuCoeff = 9;
-const panelCoeff = controlsWidthCoeff;
-const maxCoeff = sudokuCoeff + panelCoeff + globalPaddingCoeff * 3;
-const minCoeff = sudokuCoeff + globalPaddingCoeff * 2;
-
 const StyledContainer = styled(Absolute)({
     color: textColor,
     fontFamily: "Lato, sans-serif",
@@ -30,7 +25,7 @@ export interface PuzzleProps<CellType, GameStateExtensionType = {}, ProcessedGam
 export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {puzzle}: PuzzleProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const {title, author, typeManager} = puzzle;
+    const {title, author, typeManager, fieldSize: {fieldSize}} = puzzle;
 
     // region Size calculation
     const windowSize = useWindowSize();
@@ -39,9 +34,13 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     const maxWindowSize = Math.max(windowSize.width, windowSize.height);
     const minWindowSize = Math.min(windowSize.width, windowSize.height);
 
+    const panelCoeff = controlsWidthCoeff;
+    const maxCoeff = fieldSize + panelCoeff + globalPaddingCoeff * 3;
+    const minCoeff = fieldSize + globalPaddingCoeff * 2;
+
     const cellSize = Math.min(minWindowSize / minCoeff, maxWindowSize / maxCoeff);
     const padding = cellSize * globalPaddingCoeff;
-    const sudokuSize = cellSize * sudokuCoeff;
+    const sudokuSize = cellSize * fieldSize;
     const controlsSize = cellSize * panelCoeff;
     const maxContainerSize = cellSize * maxCoeff;
     const minContainerSize = cellSize * minCoeff;

@@ -9,9 +9,10 @@ import {CellWriteMode} from "./CellWriteMode";
 import {SelectedCells} from "./SelectedCells";
 import {CellState} from "./CellState";
 import {areAllFieldStateCells, isAnyFieldStateCell, processFieldStateCells} from "./FieldState";
-import {indexes08} from "../../utils/indexes";
+import {indexes} from "../../utils/indexes";
 import {Position} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
+import {PuzzleDefinition} from "./PuzzleDefinition";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -84,10 +85,13 @@ export const gameStateToggleSelectedCell = <CellType, ProcessedGameStateExtensio
     selectedCells: gameState.selectedCells.toggle(cellPosition, forcedEnable),
 } as any);
 
-export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionType = {}>(gameState: ProcessedGameState<CellType>) =>
+export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionType = {}>(
+    {fieldSize: {fieldSize}}: PuzzleDefinition<CellType, any, ProcessedGameStateExtensionType>,
+    gameState: ProcessedGameState<CellType>
+) =>
     gameStateSetSelectedCells<CellType, ProcessedGameStateExtensionType>(
         gameState,
-        indexes08.flatMap(top => indexes08.map(left => ({left, top})))
+        indexes(fieldSize).flatMap(top => indexes(fieldSize).map(left => ({left, top})))
     );
 
 export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
@@ -97,7 +101,10 @@ export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensio
 } as any);
 
 export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {processArrowDirection}: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    {
+        typeManager: {processArrowDirection},
+        fieldSize: {fieldSize},
+    }: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     xDirection: number,
     yDirection: number,
@@ -114,8 +121,8 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
     }
 
     const newCell: Position = {
-        left: (currentCell.left + xDirection + 9) % 9,
-        top: (currentCell.top + yDirection + 9) % 9,
+        left: (currentCell.left + xDirection + fieldSize) % fieldSize,
+        top: (currentCell.top + yDirection + fieldSize) % fieldSize,
     }
 
     return isMultiSelection

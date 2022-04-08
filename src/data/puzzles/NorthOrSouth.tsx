@@ -11,6 +11,7 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 import {RotatableGameState, RotatableProcessedGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
+import {FieldSize9} from "../../types/sudoku/FieldSize";
 
 export default {
     title: "North or South?",
@@ -32,6 +33,7 @@ export default {
         <RulesParagraph>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</RulesParagraph>
     </>,
     typeManager: RotatableDigitSudokuTypeManager,
+    fieldSize: FieldSize9,
     initialDigits: {
         0: {
             0: {digit: 6},

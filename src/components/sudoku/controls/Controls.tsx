@@ -1,7 +1,7 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
-import {indexes08} from "../../../utils/indexes";
+import {indexes} from "../../../utils/indexes";
 import {Clear, Fullscreen, FullscreenExit, Redo, Undo} from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
@@ -19,7 +19,7 @@ import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
@@ -28,7 +28,7 @@ export interface ControlsProps<CellType, GameStateExtensionType = {}, ProcessedG
     rect: Rect;
     cellSize: number;
     isHorizontal: boolean;
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
 }
@@ -39,7 +39,11 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const {
         cellSize,
         isHorizontal,
-        typeManager,
+        puzzle: {
+            typeManager,
+            fieldSize: {fieldSize},
+            digitsCount = fieldSize,
+        },
         state,
         onStateChange,
     } = otherProps;
@@ -49,6 +53,9 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         persistentCellWriteMode,
         cellWriteMode,
     } = state;
+
+    const isColorMode = cellWriteMode === CellWriteMode.color;
+    const digitsCountInCurrentMode = isColorMode ? 9 : digitsCount;
 
     const isFullScreen = useIsFullScreen();
 
@@ -68,7 +75,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         const {code, ctrlKey, shiftKey} = ev;
 
         if (isReady) {
-            for (const index of indexes08) {
+            for (const index of indexes(digitsCountInCurrentMode)) {
                 const digit = index + 1;
                 if (code === `Digit${digit}` || code === `Numpad${digit}`) {
                     handleDigit(digit);
@@ -118,7 +125,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const SecondaryControls = typeManager.secondaryControlsComponent;
 
     return <Absolute {...rect}>
-        {isReady && indexes08.map(index => {
+        {isReady && indexes(digitsCountInCurrentMode).map(index => {
             const cellData = typeManager.createCellDataByDisplayDigit(index + 1, state);
 
             return <ControlButton
@@ -127,7 +134,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 top={(index - index % 3) / 3}
                 cellSize={cellSize}
                 fullSize={true}
-                opacityOnHover={cellWriteMode === CellWriteMode.color}
+                opacityOnHover={isColorMode}
                 onClick={() => handleDigit(index + 1)}
             >
                 <CellContent
@@ -154,7 +161,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         >
             {contentSize => <CellDigits
                 typeManager={typeManager}
-                data={{usersDigit: typeManager.createCellDataByDisplayDigit(9, state)}}
+                data={{usersDigit: typeManager.createCellDataByDisplayDigit(fieldSize, state)}}
                 size={contentSize}
                 mainColor={true}
             />}
@@ -204,7 +211,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             title={"Colors (shortcut: Ctrl+Shift)"}
         >
             {contentSize => <CellBackground
-                colors={new Set(indexes08)}
+                colors={new Set(indexes(9))}
                 size={contentSize}
             />}
         </ControlButton>

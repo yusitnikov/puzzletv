@@ -1,7 +1,7 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import {Line} from "../../layout/line/Line";
-import {indexes09} from "../../../utils/indexes";
+import {indexes} from "../../../utils/indexes";
 import {Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
@@ -33,13 +33,24 @@ export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGame
 
 export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {
-        puzzle: {typeManager, backgroundItems, topItems},
+        puzzle,
         state,
         onStateChange,
         rect,
         cellSize
     }: FieldProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    const {
+        typeManager,
+        fieldSize: {
+            fieldSize,
+            verticalLines,
+            horizontalLines,
+        },
+        backgroundItems,
+        topItems,
+    } = puzzle;
+
     const {selectedCells, isReady} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
@@ -68,7 +79,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         const isAnyKeyDown = ctrlKey || shiftKey;
 
         const handleArrow = (xDirection: number, yDirection: number) => onStateChange(
-            gameState => gameStateApplyArrowToSelectedCells(typeManager, gameState, xDirection, yDirection, isAnyKeyDown)
+            gameState => gameStateApplyArrowToSelectedCells(puzzle, gameState, xDirection, yDirection, isAnyKeyDown)
         );
 
         switch (code) {
@@ -86,7 +97,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 break;
             case "KeyA":
                 if (ctrlKey && !shiftKey) {
-                    onStateChange(gameStateSelectAllCells);
+                    onStateChange(gameState => gameStateSelectAllCells(puzzle, gameState));
                     ev.preventDefault();
                 }
                 break;
@@ -139,27 +150,27 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 isSecondary={selectedCells.last()?.left !== cellPosition.left || selectedCells.last()?.top !== cellPosition.top}
             />)}
 
-            <FieldSvg cellSize={cellSize}>{backgroundItems}</FieldSvg>
+            <FieldSvg fieldSize={fieldSize} cellSize={cellSize}>{backgroundItems}</FieldSvg>
 
-            {indexes09.map(index => <Line
+            {indexes(fieldSize, true).map(index => <Line
                 key={`h-line-${index}`}
                 x1={0}
                 y1={cellSize * index}
-                x2={cellSize * 9}
+                x2={cellSize * fieldSize}
                 y2={cellSize * index}
-                width={index % 3 ? 1 : 3}
+                width={[0, fieldSize, ...horizontalLines].includes(index) ? 3 : 1}
             />)}
 
-            {indexes09.map(index => <Line
+            {indexes(fieldSize, true).map(index => <Line
                 key={`v-line-${index}`}
                 x1={cellSize * index}
                 y1={0}
                 x2={cellSize * index}
-                y2={cellSize * 9}
-                width={index % 3 ? 1 : 3}
+                y2={cellSize * fieldSize}
+                width={[0, fieldSize, ...verticalLines].includes(index) ? 3 : 1}
             />)}
 
-            <FieldSvg cellSize={cellSize}>{topItems}</FieldSvg>
+            <FieldSvg fieldSize={fieldSize} cellSize={cellSize}>{topItems}</FieldSvg>
 
             {renderCellsLayer("digits", (cellState) => <CellDigits
                 typeManager={typeManager}

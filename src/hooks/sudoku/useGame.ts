@@ -9,24 +9,33 @@ import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useEventListener} from "../useEventListener";
 
 export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {typeManager, initialDigits = {}}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ): [ProcessedGameState<CellType> & ProcessedGameStateExtensionType, Dispatch<MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>>] => {
+    const {
+        typeManager: {
+            initialGameStateExtension,
+            isReady: isReadyFn = () => true,
+            useProcessedGameStateExtension = () => ({} as any)
+        },
+        initialDigits = {}
+    } = puzzle;
+
     const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => ({
         fieldStateHistory: {
             states: [
-                fillFieldStateInitialDigits(initialDigits, createEmptyFieldState(typeManager))
+                fillFieldStateInitialDigits(initialDigits, createEmptyFieldState(puzzle))
             ],
             currentIndex: 0,
         },
         persistentCellWriteMode: CellWriteMode.main,
         selectedCells: noSelectedCells,
 
-        ...(typeManager.initialGameStateExtension as any),
+        ...(initialGameStateExtension as any),
     }));
 
     const cellWriteMode = useFinalCellWriteMode(gameState.persistentCellWriteMode);
-    const isReady = !typeManager.isReady || typeManager.isReady(gameState);
-    const processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType> = typeManager.useProcessedGameStateExtension?.(gameState) || ({} as any);
+    const isReady = isReadyFn(gameState);
+    const processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType> = useProcessedGameStateExtension(gameState);
     const processedGameStateExtensionDep = JSON.stringify(processedGameStateExtension);
 
     const calculateProcessedGameState = useCallback(

@@ -3,14 +3,15 @@ import {svgShadowStyle} from "../../app/globals";
 import {Absolute} from "../../layout/absolute/Absolute";
 
 export interface FieldSvgProps {
+    fieldSize: number;
     cellSize: number;
 }
 
-export const FieldSvg = ({cellSize, children}: PropsWithChildren<FieldSvgProps>) => <Absolute
+export const FieldSvg = ({fieldSize, cellSize, children}: PropsWithChildren<FieldSvgProps>) => <Absolute
     tagName={"svg"}
-    width={cellSize * 9}
-    height={cellSize * 9}
-    viewBox={"0 0 9 9"}
+    width={cellSize * fieldSize}
+    height={cellSize * fieldSize}
+    viewBox={`0 0 ${fieldSize} ${fieldSize}`}
     style={svgShadowStyle}
 >
     {children}

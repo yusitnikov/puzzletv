@@ -1,14 +1,17 @@
 import {areCellStatesEqual, CellState, cloneCellState, createEmptyCellState} from "./CellState";
-import {indexes08} from "../../utils/indexes";
+import {indexes} from "../../utils/indexes";
 import {Position} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
+import {PuzzleDefinition} from "./PuzzleDefinition";
 
 export interface FieldState<CellType> {
     cells: CellState<CellType>[][];
 }
 
-export const createEmptyFieldState = <CellType>(typeManager: SudokuTypeManager<CellType, any, any>): FieldState<CellType> => ({
-    cells: indexes08.map(() => indexes08.map(() => createEmptyCellState(typeManager))),
+export const createEmptyFieldState = <CellType>(
+    {typeManager, fieldSize: {fieldSize}}: PuzzleDefinition<CellType, any, any>
+): FieldState<CellType> => ({
+    cells: indexes(fieldSize).map(() => indexes(fieldSize).map(() => createEmptyCellState(typeManager))),
 });
 
 export type FieldStateInitialDigitsMap<CellType> = Record<number, Record<number, CellType>>;

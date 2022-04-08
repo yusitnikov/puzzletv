@@ -1,3 +1,2 @@
-export const indexes08 = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-
-export const indexes09 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+export const indexes = (n: number, inclusive = false) =>
+    Array(n + (inclusive ? 1 : 0)).fill(0).map((_, index) => index);
