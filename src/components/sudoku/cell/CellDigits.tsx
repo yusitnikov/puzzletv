@@ -23,13 +23,14 @@ const corners: Position[] = [
 export interface CellDigitsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     data: Partial<CellState<CellType>>;
+    initialData?: CellType;
     size: number;
     state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     mainColor?: boolean;
 }
 
 export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {typeManager, data, size, state, mainColor}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {typeManager, data, initialData, size, state, mainColor}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {
         cellDataComponentType: {
@@ -39,7 +40,6 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
     } = typeManager;
 
     const {
-        initialDigit,
         usersDigit,
         centerDigits,
         cornerDigits
@@ -80,15 +80,15 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
     };
 
     return <Absolute left={size / 2} top={size / 2}>
-        {initialDigit && <CellData
+        {initialData && <CellData
             key={"initial"}
-            data={initialDigit}
+            data={initialData}
             size={size * 0.7}
             state={state}
             isInitial={true}
         />}
 
-        {!initialDigit && usersDigit && <CellData
+        {!initialData && usersDigit && <CellData
             key={"users"}
             data={usersDigit}
             size={size * 0.7}

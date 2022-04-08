@@ -47,6 +47,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             verticalLines,
             horizontalLines,
         },
+        initialDigits,
         veryBackgroundItems,
         backgroundItems,
         topItems,
@@ -175,9 +176,10 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
             <FieldSvg fieldSize={fieldSize} cellSize={cellSize}>{topItems}</FieldSvg>
 
-            {renderCellsLayer("digits", (cellState) => <CellDigits
+            {renderCellsLayer("digits", (cellState, {top, left}) => <CellDigits
                 typeManager={typeManager}
                 data={cellState}
+                initialData={initialDigits?.[top]?.[left]}
                 size={cellSize}
                 state={state}
             />)}

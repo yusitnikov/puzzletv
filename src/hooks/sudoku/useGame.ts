@@ -1,4 +1,4 @@
-import {createEmptyFieldState, fillFieldStateInitialDigits} from "../../types/sudoku/FieldState";
+import {createEmptyFieldState} from "../../types/sudoku/FieldState";
 import {Dispatch, useCallback, useMemo, useState} from "react";
 import {GameState, ProcessedGameState} from "../../types/sudoku/GameState";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
@@ -17,13 +17,12 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             isReady: isReadyFn = () => true,
             useProcessedGameStateExtension = () => ({} as any)
         },
-        initialDigits = {}
     } = puzzle;
 
     const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => ({
         fieldStateHistory: {
             states: [
-                fillFieldStateInitialDigits(initialDigits, createEmptyFieldState(puzzle))
+                createEmptyFieldState(puzzle)
             ],
             currentIndex: 0,
         },
