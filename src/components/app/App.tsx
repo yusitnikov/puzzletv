@@ -6,7 +6,7 @@ import AllPuzzles from "../../data/puzzles/AllPuzzles";
 export const App = () => {
     const hash = useHash();
 
-    if (!hash) {
+    if (!hash || hash === "list") {
         return <>
             <h1>Sudoku Puzzles</h1>
 
@@ -27,6 +27,6 @@ export const App = () => {
     return <>
         <h1>Oops, the puzzle not found!</h1>
 
-        <a href={"#"}>Check out the puzzles list</a>
+        <a href={"#list"}>Check out the puzzles list</a>
     </>;
 };
