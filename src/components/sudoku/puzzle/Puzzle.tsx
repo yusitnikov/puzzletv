@@ -12,6 +12,7 @@ import {useGame} from "../../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitComponentTypeContext} from "../../../contexts/DigitComponentTypeContext";
 import {Title} from "../../layout/title/Title";
+import {RegularDigitComponentType} from "../digit/RegularDigit";
 
 const StyledContainer = styled(Absolute)({
     color: textColor,
@@ -25,7 +26,14 @@ export interface PuzzleProps<CellType, GameStateExtensionType = {}, ProcessedGam
 export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {puzzle}: PuzzleProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const {title, author, typeManager, fieldSize: {fieldSize}} = puzzle;
+    const {
+        title,
+        author,
+        typeManager: {
+            digitComponentType = RegularDigitComponentType,
+        },
+        fieldSize: {fieldSize},
+    } = puzzle;
 
     // region Size calculation
     const windowSize = useWindowSize();
@@ -55,7 +63,7 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
 
     const [gameState, mergeGameState] = useGame(puzzle);
 
-    return <DigitComponentTypeContext.Provider value={typeManager.digitComponentType}>
+    return <DigitComponentTypeContext.Provider value={digitComponentType}>
         <Title>
             {title}
             {author && <> by {author}</>}

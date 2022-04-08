@@ -12,6 +12,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     fieldSize: FieldSize;
     digitsCount?: number;
     initialDigits?: FieldStateInitialDigitsMap<CellType>;
+    veryBackgroundItems?: ReactNode;
     backgroundItems?: ReactNode;
     topItems?: ReactNode;
 }

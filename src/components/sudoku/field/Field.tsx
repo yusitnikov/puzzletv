@@ -47,6 +47,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             verticalLines,
             horizontalLines,
         },
+        veryBackgroundItems,
         backgroundItems,
         topItems,
     } = puzzle;
@@ -140,6 +141,8 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             angle={typeManager.getFieldAngle?.(state)}
             style={{backgroundColor: "white"}}
         >
+            <FieldSvg fieldSize={fieldSize} cellSize={cellSize}>{veryBackgroundItems}</FieldSvg>
+
             {renderCellsLayer("background", ({colors}) => <CellBackground
                 colors={colors}
                 size={cellSize}

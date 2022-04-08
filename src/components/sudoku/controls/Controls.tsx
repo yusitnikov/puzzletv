@@ -42,11 +42,21 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         puzzle: {
             typeManager,
             fieldSize: {fieldSize},
-            digitsCount = fieldSize,
+            digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
         },
         state,
         onStateChange,
     } = otherProps;
+
+    const {
+        createCellDataByDisplayDigit,
+        mainControlsCount = 0,
+        mainControlsComponent: MainControls,
+        secondaryControlsCount = 0,
+        secondaryControlsComponent: SecondaryControls,
+        digitShortcuts = [],
+        digitShortcutTips = [],
+    } = typeManager;
 
     const {
         isReady,
@@ -77,7 +87,12 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         if (isReady) {
             for (const index of indexes(digitsCountInCurrentMode)) {
                 const digit = index + 1;
-                if (code === `Digit${digit}` || code === `Numpad${digit}`) {
+                const shortcut = !isColorMode && digitShortcuts[index];
+                if (
+                    code === `Digit${digit}` ||
+                    code === `Numpad${digit}` ||
+                    (shortcut && code === `Key${shortcut}`)
+                ) {
                     handleDigit(digit);
                     ev.preventDefault();
                 }
@@ -118,24 +133,30 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         }
     });
 
-    const mainControlsCount = typeManager.mainControlsCount || 0;
-    const MainControls = typeManager.mainControlsComponent;
-
-    const secondaryControlsCount = typeManager.secondaryControlsCount || 0;
-    const SecondaryControls = typeManager.secondaryControlsComponent;
-
     return <Absolute {...rect}>
         {isReady && indexes(digitsCountInCurrentMode).map(index => {
-            const cellData = typeManager.createCellDataByDisplayDigit(index + 1, state);
+            const digit = index + 1;
+            const cellData = createCellDataByDisplayDigit(digit, state);
+            const shortcut = !isColorMode && digitShortcuts[index];
+            const shortcutTip = !isColorMode && digitShortcutTips[index];
+
+            let title = `Shortcut: ${digit}`;
+            if (shortcut) {
+                title = `${title} or ${shortcut}`;
+            }
+            if (shortcutTip) {
+                title = `${title} (${shortcutTip})`;
+            }
 
             return <ControlButton
-                key={`digit-${index + 1}`}
+                key={`digit-${digit}`}
                 left={index % 3}
                 top={(index - index % 3) / 3}
                 cellSize={cellSize}
                 fullSize={true}
                 opacityOnHover={isColorMode}
-                onClick={() => handleDigit(index + 1)}
+                onClick={() => handleDigit(digit)}
+                title={title}
             >
                 <CellContent
                     typeManager={typeManager}
@@ -161,7 +182,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         >
             {contentSize => <CellDigits
                 typeManager={typeManager}
-                data={{usersDigit: typeManager.createCellDataByDisplayDigit(fieldSize, state)}}
+                data={{usersDigit: createCellDataByDisplayDigit(digitsCount, state)}}
                 size={contentSize}
                 mainColor={true}
             />}
@@ -178,7 +199,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         >
             {contentSize => <CellDigits
                 typeManager={typeManager}
-                data={{cornerDigits: new Set([1, 2, 3].map(digit => typeManager.createCellDataByDisplayDigit(digit, state)))}}
+                data={{cornerDigits: new Set([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
                 size={contentSize}
                 mainColor={true}
             />}
@@ -195,7 +216,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         >
             {contentSize => <CellDigits
                 typeManager={typeManager}
-                data={{centerDigits: new Set([1, 2].map(digit => typeManager.createCellDataByDisplayDigit(digit, state)))}}
+                data={{centerDigits: new Set([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
                 size={contentSize}
                 mainColor={true}
             />}

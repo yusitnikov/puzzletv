@@ -8,6 +8,9 @@ A web application for creating and solving different types of sudoku.
 - Double-click on cell to select similar cells.
 - Keep the progress when refreshing/duplicating the tab + restart button.
 - Setter mode.
+- Rule text snippets.
+- Don't warn about refreshing the page unless really started to do something.
+- Warn about the progress when navigating to another hash (possibly by history API).
 
 ## Available Scripts
 

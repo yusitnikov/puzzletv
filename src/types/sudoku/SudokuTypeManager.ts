@@ -33,7 +33,7 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): Position | undefined;
 
-    digitComponentType: DigitComponentType;
+    digitComponentType?: DigitComponentType;
 
     cellDataComponentType: CellDataComponentType<CellType, ProcessedGameStateExtensionType>;
 
@@ -58,4 +58,10 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     secondaryControlsCount?: number;
 
     secondaryControlsComponent?: ComponentType<ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
+
+    maxDigitsCount?: number;
+
+    digitShortcuts?: string[];
+
+    digitShortcutTips?: (string|undefined)[];
 }
