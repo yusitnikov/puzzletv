@@ -14,6 +14,7 @@ import {RotatableGameState, RotatableProcessedGameState} from "../../sudokuTypes
 
 export default {
     title: "North or South?",
+    slug: "north-or-south",
     author: "Chameleon",
     rules: <>
         <RulesParagraph>Normal sudoku rules apply.</RulesParagraph>

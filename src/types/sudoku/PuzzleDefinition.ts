@@ -4,6 +4,7 @@ import {SudokuTypeManager} from "./SudokuTypeManager";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     title: ReactNode;
+    slug: string;
     author?: ReactNode;
     rules: ReactNode;
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
