@@ -1,6 +1,6 @@
-# Rotatable Sudoku by Chameleon
+# Sudoku
 
-A sudoku puzzle that could be rotated clockwise.
+A web application for creating and solving different types of sudoku.
 
 ## TODO/TOFIX
 - Timer.
