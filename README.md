@@ -3,9 +3,11 @@
 A sudoku puzzle that could be rotated clockwise.
 
 ## TODO/TOFIX
-Nice to do:
 - Timer.
 - Checker.
+- Double-click on cell to select similar cells.
+- Keep the progress when refreshing/duplicating the tab + restart button.
+- Setter mode.
 
 ## Available Scripts
 
