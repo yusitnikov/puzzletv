@@ -12,6 +12,7 @@ import {useGame} from "../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 import {DigitComponentTypeContext} from "../../contexts/DigitComponentTypeContext";
+import {Title} from "../layout/title/Title";
 
 const sudokuCoeff = 9;
 const panelCoeff = controlsWidthCoeff;
@@ -56,6 +57,11 @@ export const App = <CellType, GameStateExtensionType = {}, ProcessedGameStateExt
     const [gameState, mergeGameState] = useGame(typeManager, puzzle);
 
     return <DigitComponentTypeContext.Provider value={typeManager.digitComponentType}>
+        <Title>
+            {puzzle.title}
+            {puzzle.author && <> by {puzzle.author}</>}
+        </Title>
+
         <StyledContainer
             left={(windowSize.width - containerSize.width) / 2}
             top={(windowSize.height - containerSize.height) / 2}
