@@ -36,6 +36,12 @@ export default {
         "g2": {color: ChessColor.white, type: ChessPieceType.bishop},
         "c2": {color: ChessColor.white, type: ChessPieceType.pawn},
         "a3": {color: ChessColor.white, type: ChessPieceType.pawn},
+        // Solution:
+        // "g8": {color: ChessColor.black, type: ChessPieceType.knight},
+        // "d4": {color: ChessColor.white, type: ChessPieceType.king},
+        // "e4": {color: ChessColor.white, type: ChessPieceType.queen},
+        // "f5": {color: ChessColor.white, type: ChessPieceType.rook},
+        // "c3": {color: ChessColor.white, type: ChessPieceType.knight},
     }),
     veryBackgroundItems: <ChessBoardCellsBackground/>,
 } as PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState>;
