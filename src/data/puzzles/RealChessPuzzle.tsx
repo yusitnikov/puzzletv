@@ -21,14 +21,21 @@ export default {
     fieldSize: FieldSize8,
     initialDigits: chessInitialPiecesByCellNames({
         "h8": {color: ChessColor.black, type: ChessPieceType.rook},
+        "b1": {color: ChessColor.black, type: ChessPieceType.rook},
         "h7": {color: ChessColor.black, type: ChessPieceType.king},
         "h6": {color: ChessColor.black, type: ChessPieceType.queen},
+        "f8": {color: ChessColor.black, type: ChessPieceType.bishop},
+        "h5": {color: ChessColor.black, type: ChessPieceType.bishop},
         "d7": {color: ChessColor.black, type: ChessPieceType.knight},
+        "e6": {color: ChessColor.black, type: ChessPieceType.pawn},
+        "b5": {color: ChessColor.black, type: ChessPieceType.pawn},
+        "g4": {color: ChessColor.black, type: ChessPieceType.pawn},
         "e5": {color: ChessColor.white, type: ChessPieceType.knight},
-        "e4": {color: ChessColor.white, type: ChessPieceType.rook},
+        "d3": {color: ChessColor.white, type: ChessPieceType.rook},
         "e3": {color: ChessColor.white, type: ChessPieceType.bishop},
+        "g2": {color: ChessColor.white, type: ChessPieceType.bishop},
+        "c2": {color: ChessColor.white, type: ChessPieceType.pawn},
+        "a3": {color: ChessColor.white, type: ChessPieceType.pawn},
     }),
-    veryBackgroundItems: <>
-        <ChessBoardCellsBackground/>
-    </>,
+    veryBackgroundItems: <ChessBoardCellsBackground/>,
 } as PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState>;
