@@ -45,5 +45,5 @@ export const ChessPieceCellData = (
 
 export const ChessPieceCellDataComponentType: CellDataComponentType<ChessPiece, ChessGameState> = {
     component: ChessPieceCellData,
-    widthCoeff: 1,
+    widthCoeff: 0.7,
 };
