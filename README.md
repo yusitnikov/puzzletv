@@ -3,6 +3,7 @@
 A web application for creating and solving different types of sudoku.
 
 ## TODO/TOFIX
+- Localization.
 - Timer.
 - Checker.
 - Double-click on cell to select similar cells.
@@ -13,8 +14,8 @@ A web application for creating and solving different types of sudoku.
 - Warn about the progress when navigating to another hash (possibly by history API).
 - 2-color solid chess pieces.
 - Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).
-- Tooltip about the chess piece color button (in the empty space).
 - Visual tooltips on the grid when hovering/clicking specific sudoku rules.
+- Improve selection when dragging the mouse diagonally (don't include unwanted cells).
 
 ## Available Scripts
 
