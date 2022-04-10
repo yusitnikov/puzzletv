@@ -11,7 +11,7 @@ export const App = () => {
             <h1>Sudoku Puzzles</h1>
 
             <ul>
-                {AllPuzzles.map(({slug, title}) => <li key={slug}>
+                {AllPuzzles.map(({slug, title, noIndex}) => !noIndex && <li key={slug}>
                     <a href={`#${slug}`}>{title}</a>
                 </li>)}
             </ul>

@@ -15,8 +15,22 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
     slug: "real-chess-puzzle",
     author: "Chameleon",
     rules: <>
-        <RulesParagraph>Normal sudoku rules apply.</RulesParagraph>
-        <RulesParagraph>TODO</RulesParagraph>
+        <RulesParagraph>
+            <strong>Normal chess rules apply</strong>:
+            put chess pieces to the board so that they will form a valid chess position
+            (that is result of some chess game).
+        </RulesParagraph>
+        <RulesParagraph>
+            <strong>Normal sudoku rules apply</strong>:
+            chess pieces cannot repeat in rows, columns and boxes
+            (e.g. there could be no other knights in the top-left box, on column <strong>d</strong> and on row <strong>7</strong>).
+        </RulesParagraph>
+        <RulesParagraph>
+            There were no pawn promotions in the game that led to the current position on the board.
+        </RulesParagraph>
+        <RulesParagraph>
+            Both white and black have a mate in 1 move in case it's their turn.
+        </RulesParagraph>
     </>,
     typeManager: ChessSudokuTypeManager,
     fieldSize: FieldSize8,
@@ -47,4 +61,30 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
     }),
     veryBackgroundItems: <ChessBoardCellsBackground/>,
     backgroundItems: <ChessBoardIndexes/>,
+};
+
+export const RealChessPuzzleRu: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
+    ...RealChessPuzzle,
+    title: "Шахматный судоку",
+    slug: "real-chess-puzzle-ru",
+    author: "Хамелеон",
+    rules: <>
+        <RulesParagraph>
+            <strong>Обычные правила шахмат</strong>:
+            поставьте шахматные фигуры на доску так, чтоб они образовали позицию,
+            которая может получиться в результате игры в шахматы.
+        </RulesParagraph>
+        <RulesParagraph>
+            <strong>Обычные правила судоку</strong>:
+            шахматные фигуры не могут повторяться на каждой линии и в каждом регионе, огражденном жирными линиями
+            (например, в верхне-левом регионе, на линии <strong>d</strong> и на линии <strong>7</strong> не может быть других коней).
+        </RulesParagraph>
+        <RulesParagraph>
+            В игре, результат которой мы видим на доске, не было превращений пешек.
+        </RulesParagraph>
+        <RulesParagraph>
+            И белые, и черные могут поставить мат в 1 ход, если это их ход.
+        </RulesParagraph>
+    </>,
+    noIndex: true,
 };

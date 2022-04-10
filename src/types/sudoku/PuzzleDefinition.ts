@@ -16,4 +16,5 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     veryBackgroundItems?: ReactNode;
     backgroundItems?: ReactNode;
     topItems?: ReactNode;
+    noIndex?: boolean;
 }
