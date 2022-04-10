@@ -2,6 +2,10 @@ import {Position} from "../../../types/layout/Position";
 import {ChessPiece} from "../types/ChessPiece";
 import {FieldStateInitialDigitsMap} from "../../../types/sudoku/FieldState";
 
+export const chessColumnNameFromIndex = (column: number) => String.fromCharCode("a".charCodeAt(0) + column);
+
+export const chessRowNameFromIndex = (row: number) => 8 - row;
+
 export const chessColumnNameToIndex = (column: string) => column.charCodeAt(0) - "a".charCodeAt(0);
 
 export const chessRowNameToIndex = (row: number | string) => 8 - Number(row);

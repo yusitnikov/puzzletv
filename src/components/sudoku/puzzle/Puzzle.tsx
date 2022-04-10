@@ -33,6 +33,7 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
             digitComponentType = RegularDigitComponentType,
         },
         fieldSize: {fieldSize},
+        fieldMargin = 0,
     } = puzzle;
 
     // region Size calculation
@@ -42,13 +43,14 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     const maxWindowSize = Math.max(windowSize.width, windowSize.height);
     const minWindowSize = Math.min(windowSize.width, windowSize.height);
 
+    const fieldSizeWithMargin = fieldSize + 2 * fieldMargin;
     const panelCoeff = controlsWidthCoeff;
-    const maxCoeff = fieldSize + panelCoeff + globalPaddingCoeff * 3;
-    const minCoeff = fieldSize + globalPaddingCoeff * 2;
+    const maxCoeff = fieldSizeWithMargin + panelCoeff + globalPaddingCoeff * 3;
+    const minCoeff = fieldSizeWithMargin + globalPaddingCoeff * 2;
 
     const cellSize = Math.min(minWindowSize / minCoeff, maxWindowSize / maxCoeff);
     const padding = cellSize * globalPaddingCoeff;
-    const sudokuSize = cellSize * fieldSize;
+    const sudokuSize = cellSize * fieldSizeWithMargin;
     const controlsSize = cellSize * panelCoeff;
     const maxContainerSize = cellSize * maxCoeff;
     const minContainerSize = cellSize * minCoeff;

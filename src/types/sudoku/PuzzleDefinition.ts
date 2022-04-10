@@ -10,6 +10,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     rules: ReactNode;
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     fieldSize: FieldSize;
+    fieldMargin?: number;
     digitsCount?: number;
     initialDigits?: FieldStateInitialDigitsMap<CellType>;
     veryBackgroundItems?: ReactNode;

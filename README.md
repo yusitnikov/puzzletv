@@ -13,7 +13,8 @@ A web application for creating and solving different types of sudoku.
 - Warn about the progress when navigating to another hash (possibly by history API).
 - 2-color solid chess pieces.
 - Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).
-- The rules' panel is too small on 8x8 field.
+- Tooltip about the chess piece color button (in the empty space).
+- Visual tooltips on the grid when hovering/clicking specific sudoku rules.
 
 ## Available Scripts
 

@@ -47,6 +47,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             verticalLines,
             horizontalLines,
         },
+        fieldMargin = 0,
         initialDigits,
         veryBackgroundItems,
         backgroundItems,
@@ -112,7 +113,18 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         }
     });
 
-    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+    const absoluteFieldMargin = cellSize * fieldMargin;
+    const renderInnerFieldRect = (children: ReactNode) => <Absolute
+        left={absoluteFieldMargin}
+        top={absoluteFieldMargin}
+        width={rect.width - absoluteFieldMargin}
+        height={rect.height - absoluteFieldMargin}
+    >
+        {children}
+    </Absolute>;
+
+    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode) =>
+        renderInnerFieldRect(cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
         const cellPosition: Position = {
             left: columnIndex,
             top: rowIndex,
@@ -127,7 +139,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         >
             {renderer(cellState, cellPosition)}
         </Absolute>;
-    }));
+    })));
 
     return <>
         <style dangerouslySetInnerHTML={{__html: `
@@ -142,7 +154,13 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             angle={typeManager.getFieldAngle?.(state)}
             style={{backgroundColor: "white"}}
         >
-            <FieldSvg fieldSize={fieldSize} cellSize={cellSize}>{veryBackgroundItems}</FieldSvg>
+            <FieldSvg
+                fieldSize={fieldSize}
+                fieldMargin={fieldMargin}
+                cellSize={cellSize}
+            >
+                {veryBackgroundItems}
+            </FieldSvg>
 
             {renderCellsLayer("background", ({colors}) => <CellBackground
                 colors={colors}
@@ -154,27 +172,39 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 isSecondary={selectedCells.last()?.left !== cellPosition.left || selectedCells.last()?.top !== cellPosition.top}
             />)}
 
-            <FieldSvg fieldSize={fieldSize} cellSize={cellSize}>{backgroundItems}</FieldSvg>
+            <FieldSvg
+                fieldSize={fieldSize}
+                fieldMargin={fieldMargin}
+                cellSize={cellSize}
+            >
+                {backgroundItems}
+            </FieldSvg>
 
-            {indexes(fieldSize, true).map(index => <Line
+            {renderInnerFieldRect(indexes(fieldSize, true).map(index => <Line
                 key={`h-line-${index}`}
                 x1={0}
                 y1={cellSize * index}
                 x2={cellSize * fieldSize}
                 y2={cellSize * index}
                 width={[0, fieldSize, ...horizontalLines].includes(index) ? 3 : 1}
-            />)}
+            />))}
 
-            {indexes(fieldSize, true).map(index => <Line
+            {renderInnerFieldRect(indexes(fieldSize, true).map(index => <Line
                 key={`v-line-${index}`}
                 x1={cellSize * index}
                 y1={0}
                 x2={cellSize * index}
                 y2={cellSize * fieldSize}
                 width={[0, fieldSize, ...verticalLines].includes(index) ? 3 : 1}
-            />)}
+            />))}
 
-            <FieldSvg fieldSize={fieldSize} cellSize={cellSize}>{topItems}</FieldSvg>
+            <FieldSvg
+                fieldSize={fieldSize}
+                fieldMargin={fieldMargin}
+                cellSize={cellSize}
+            >
+                {topItems}
+            </FieldSvg>
 
             {renderCellsLayer("digits", (cellState, {top, left}) => <CellDigits
                 typeManager={typeManager}

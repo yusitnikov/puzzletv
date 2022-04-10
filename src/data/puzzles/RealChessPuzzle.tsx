@@ -8,6 +8,7 @@ import {chessInitialPiecesByCellNames} from "../../sudokuTypes/chess/utils/chess
 import {ChessPieceType} from "../../sudokuTypes/chess/types/ChessPieceType";
 import {ChessColor} from "../../sudokuTypes/chess/types/ChessColor";
 import {ChessBoardCellsBackground} from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
+import {ChessBoardIndexes, chessBoardIndexesMargin} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
 
 export default {
     title: "Real Chess Puzzle",
@@ -19,6 +20,7 @@ export default {
     </>,
     typeManager: ChessSudokuTypeManager,
     fieldSize: FieldSize8,
+    fieldMargin: chessBoardIndexesMargin,
     initialDigits: chessInitialPiecesByCellNames({
         "h8": {color: ChessColor.black, type: ChessPieceType.rook},
         "b1": {color: ChessColor.black, type: ChessPieceType.rook},
@@ -44,4 +46,5 @@ export default {
         // "c3": {color: ChessColor.white, type: ChessPieceType.knight},
     }),
     veryBackgroundItems: <ChessBoardCellsBackground/>,
+    backgroundItems: <ChessBoardIndexes/>,
 } as PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState>;
