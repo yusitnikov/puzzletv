@@ -1,6 +1,6 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import NorthOrSouth from "./NorthOrSouth";
-import RealChessPuzzle from "./RealChessPuzzle";
+import {NorthOrSouth} from "./NorthOrSouth";
+import {RealChessPuzzle} from "./RealChessPuzzle";
 
 export default [
     NorthOrSouth,

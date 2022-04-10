@@ -13,7 +13,7 @@ import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types
 import {RotatableGameState, RotatableProcessedGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
 
-export default {
+export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
     title: "North or South?",
     slug: "north-or-south",
     author: "Chameleon",
@@ -107,4 +107,4 @@ export default {
 
         <XMark left={8} top={6.5}/>
     </>,
-} as PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState>;
+};

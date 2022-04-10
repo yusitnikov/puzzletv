@@ -10,7 +10,7 @@ import {ChessColor} from "../../sudokuTypes/chess/types/ChessColor";
 import {ChessBoardCellsBackground} from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
 import {ChessBoardIndexes, chessBoardIndexesMargin} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
 
-export default {
+export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
     title: "Real Chess Puzzle",
     slug: "real-chess-puzzle",
     author: "Chameleon",
@@ -47,4 +47,4 @@ export default {
     }),
     veryBackgroundItems: <ChessBoardCellsBackground/>,
     backgroundItems: <ChessBoardIndexes/>,
-} as PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState>;
+};
