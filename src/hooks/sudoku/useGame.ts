@@ -63,7 +63,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
     );
 
     useEventListener(window, "beforeunload", (ev: BeforeUnloadEvent) => {
-        if (isReady) {
+        if (gameState.fieldStateHistory.states.length > 1) {
             ev.preventDefault();
             ev.returnValue = "";
             return "";

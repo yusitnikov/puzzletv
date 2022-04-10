@@ -10,7 +10,6 @@ A web application for creating and solving different types of sudoku.
 - Keep the progress when refreshing/duplicating the tab + restart button.
 - Setter mode.
 - Rule text snippets.
-- Don't warn about refreshing the page unless really started to do something.
 - Warn about the progress when navigating to another hash (possibly by history API).
 - 2-color solid chess pieces.
 - Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).
