@@ -11,8 +11,8 @@ import {ChessBoardCellsBackground} from "../../sudokuTypes/chess/components/Ches
 import {ChessBoardIndexes, chessBoardIndexesMargin} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
-    title: "Real Chess Puzzle",
-    slug: "real-chess-puzzle",
+    title: "Real Chess Sudoku",
+    slug: "real-chess-sudoku",
     author: "Chameleon",
     rules: <>
         <RulesParagraph>
@@ -63,10 +63,16 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
     backgroundItems: <ChessBoardIndexes/>,
 };
 
-export const RealChessPuzzleRu: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
+export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {
+    ...RealChessPuzzle,
+    slug: "real-chess-puzzle",
+    noIndex: true,
+};
+
+export const RealChessPuzzleRu: typeof RealChessPuzzle = {
     ...RealChessPuzzle,
     title: "Шахматный судоку",
-    slug: "real-chess-puzzle-ru",
+    slug: "real-chess-sudoku-ru",
     author: "Хамелеон",
     rules: <>
         <RulesParagraph>
