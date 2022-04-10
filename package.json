@@ -20,7 +20,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "publish":  "git rm -r docs && npm run build && move build docs && git add docs && git commit -m Build && git push"
+        "publish":  "npm run build && git rm -r docs && move build docs && git add docs && git commit -m Build && git push"
     },
     "eslintConfig": {
         "extends": [
