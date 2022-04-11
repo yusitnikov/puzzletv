@@ -3,8 +3,13 @@ import {LanguageCode} from "../types/translations/LanguageCode";
 import React, {ReactNode} from "react";
 
 export const normalSudokuRulesApply: Translatable = {
-    [LanguageCode.en]: "Normal sudoku rules apply",
-    [LanguageCode.ru]: "Обычные правила судоку",
+    [LanguageCode.en]: "Standard sudoku rules apply",
+    [LanguageCode.ru]: "Стандартные правила судоку",
+};
+
+export const almostNormalSudokuRulesApply: Translatable = {
+    [LanguageCode.en]: "Standard (almost) sudoku rules apply",
+    [LanguageCode.ru]: "Стандартные (почти) правила судоку",
 };
 
 export const antiKnightRulesApply: Translatable = {

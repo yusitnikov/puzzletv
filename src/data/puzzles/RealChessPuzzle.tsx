@@ -11,9 +11,11 @@ import {ChessBoardCellsBackground} from "../../sudokuTypes/chess/components/Ches
 import {ChessBoardIndexes, chessBoardIndexesMargin} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {Chameleon} from "../authors";
-import {normalSudokuRulesApply} from "../ruleSnippets";
+import {almostNormalSudokuRulesApply} from "../ruleSnippets";
 import {
-    chessSudokuRules, mateInOne,
+    chessSudokuRules,
+    emptyCells,
+    mateInOne,
     noPastPromotions,
     normalSudokuRulesForChessPieces
 } from "../../sudokuTypes/chess/data/ruleSnippets";
@@ -30,10 +32,10 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
             {translate(chessSudokuRules)}.
         </RulesParagraph>
         <RulesParagraph>
-            <strong>{translate(normalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)} ({translate({
+            <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)} ({translate({
                 [LanguageCode.en]: <>e.g. there could be no other knights in the top-left box, on column <strong>d</strong> and on row <strong>7</strong></>,
                 [LanguageCode.ru]: <>например, в верхне-левом регионе, на линии <strong>d</strong> и на линии <strong>7</strong> не может быть других коней</>,
-            })}).
+            })}). {translate(emptyCells)}.
         </RulesParagraph>
         <RulesParagraph>
             {translate(noPastPromotions)}.
