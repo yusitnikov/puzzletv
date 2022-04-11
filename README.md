@@ -3,16 +3,18 @@
 A web application for creating and solving different types of sudoku.
 
 ## TODO/TOFIX
-- Timer.
-- Checker.
-- Double-click on cell to select similar cells.
-- Keep the progress when refreshing/duplicating the tab + restart button.
-- Setter mode.
-- Warn about the progress when navigating to another hash (possibly by history API).
-- 2-color solid chess pieces.
-- Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).
-- Visual tooltips on the grid when hovering/clicking specific sudoku rules.
-- Improve selection when dragging the mouse diagonally (don't include unwanted cells).
+| Type | Easy? |  Important?  | Task                                                                                 |
+|:----:|:-----:|:------------:|--------------------------------------------------------------------------------------|
+| Feat | Easy  |  Important   | Timer.                                                                               |
+| Feat | Easy  |  Important   | Double-click on cell to select similar cells.                                        |
+| Mix  | Easy  |  Important   | Improve selection when dragging the mouse diagonally (don't include unwanted cells). |
+| Feat |  Mid  |  Important   | Checker.                                                                             |
+| Mix  | Hard  |  Must have   | Keep the progress when refreshing/duplicating the tab + restart button.              |
+| Feat | Hard  |  Must have   | Setter mode.                                                                         |
+| Bug  |  Mid  |   Not sure   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).            |
+| Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.            |
+| Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API).   |
+| Bug  |  Mid  | Nice to have | 2-color solid chess pieces.                                                          |
 
 ## Available Scripts
 
