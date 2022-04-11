@@ -5,13 +5,16 @@ import React, {ReactNode} from "react";
 export const chessSudokuRules: Translatable<ReactNode> = {
     [LanguageCode.en]: <>
         <strong>Standard chess rules apply</strong>:
-        put chess pieces to the board so that they will form a valid chess position
-        (that is result of some chess game)
+        place chess pieces on the board to create a position that could be reached in a standard game of chess.
+        It's not mandatory to use all possible chess pieces
+        (if placing a piece doesn't affect puzzle correctness, don't place it)
     </>,
     [LanguageCode.ru]: <>
         <strong>Стандартные правила шахмат</strong>:
         поставьте шахматные фигуры на доску так, чтоб они образовали позицию,
-        которая может получиться в результате игры в шахматы
+        которая может получиться в результате игры в шахматы.
+        Не обязательно использовать все возможные фигуры
+        (если размещение фигуры не влияет на корректность решения, не ставьте её на доску)
     </>,
 };
 
@@ -21,8 +24,8 @@ export const normalSudokuRulesForChessPieces: Translatable = {
 };
 
 export const emptyCells: Translatable = {
-    [LanguageCode.en]: "However, unlike in sudoku, you are not required to fill every cell (there will be blank spaces). You are also not required to put all possible chess pieces to the board",
-    [LanguageCode.ru]: "Однако, в отличие от обычного судоку, не обязательно заполнять каждую клетку. Также, не обязательно ставить на доску все возможные фигуры",
+    [LanguageCode.en]: "However, unlike in sudoku, you are not required to fill every cell (there will be blank spaces)",
+    [LanguageCode.ru]: "Однако, в отличие от обычного судоку, не обязательно заполнять каждую клетку",
 };
 
 export const noPastPromotions: Translatable = {

@@ -32,10 +32,10 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
             {translate(chessSudokuRules)}.
         </RulesParagraph>
         <RulesParagraph>
-            <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)} ({translate({
-                [LanguageCode.en]: <>e.g. there could be no other knights in the top-left box, on column <strong>d</strong> and on row <strong>7</strong></>,
-                [LanguageCode.ru]: <>например, в верхне-левом регионе, на линии <strong>d</strong> и на линии <strong>7</strong> не может быть других коней</>,
-            })}). {translate(emptyCells)}.
+            <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)}. {translate({
+                [LanguageCode.en]: <>For instance, there could be no other knights (regardless of color) in the top-left box, on column <strong>d</strong> and on row <strong>7</strong></>,
+                [LanguageCode.ru]: <>Например, в верхне-левом регионе, на линии <strong>d</strong> и на линии <strong>7</strong> не может быть других коней (любого цвета)</>,
+            })}. {translate(emptyCells)}.
         </RulesParagraph>
         <RulesParagraph>
             {translate(noPastPromotions)}.
