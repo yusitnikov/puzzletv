@@ -14,7 +14,7 @@ A web application for creating and solving different types of sudoku.
 | Bug  |  Mid  |   Not sure   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).            |
 | Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.            |
 | Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API).   |
-| Bug  |  Mid  | Nice to have | 2-color solid chess pieces.                                                          |
+| Bug  |  Mid  | Nice to have | 2-color solid chess pieces with a normal font.                                       |
 
 ## Available Scripts
 

@@ -27,7 +27,24 @@ const map: Record<ChessColor, Record<ChessPieceType, string>> = {
 };
 
 export const ChessPieceCellData = (
-    {data: {type, color}, size, isInitial, left = 0, top = 0}: CellDataProps<ChessPiece, ChessGameState>
+    {data: {type, color}, ...otherProps}: CellDataProps<ChessPiece, ChessGameState>
+) => <>
+    <ChessPieceCellDataBase
+        data={{
+            type,
+            color: color === ChessColor.white ? ChessColor.black : ChessColor.white,
+        }}
+        inverted={true}
+        {...otherProps}
+    />
+    <ChessPieceCellDataBase
+        data={{type, color}}
+        {...otherProps}
+    />
+</>;
+
+export const ChessPieceCellDataBase = (
+    {data: {type, color}, inverted, size, isInitial, left = 0, top = 0}: CellDataProps<ChessPiece, ChessGameState> & {inverted?: boolean}
 ) => <Absolute
     left={left - size / 2}
     top={top - size/ 2}
@@ -37,7 +54,7 @@ export const ChessPieceCellData = (
         fontSize: size,
         lineHeight: `${size}px`,
         textAlign: "center",
-        color: isInitial ? textColor : userDigitColor,
+        color: inverted ? "#fff" : (isInitial ? textColor : userDigitColor),
     }}
 >
     {map[color][type]}
