@@ -21,8 +21,8 @@ export const normalSudokuRulesForChessPieces: Translatable = {
 };
 
 export const emptyCells: Translatable = {
-    [LanguageCode.en]: "However, unlike in sudoku, you are not required to fill every cell (there will be blank spaces) as doing so will break chess rules. You are also not required to put all possible chess pieces to the board",
-    [LanguageCode.ru]: "Однако, в отличие от обычного судоку, не обязательно заполнять каждую клетку, т.к. это противоречило бы правилам шахмат. Также, не обязательно ставить на доску все возможные фигуры",
+    [LanguageCode.en]: "However, unlike in sudoku, you are not required to fill every cell (there will be blank spaces). You are also not required to put all possible chess pieces to the board",
+    [LanguageCode.ru]: "Однако, в отличие от обычного судоку, не обязательно заполнять каждую клетку. Также, не обязательно ставить на доску все возможные фигуры",
 };
 
 export const noPastPromotions: Translatable = {
