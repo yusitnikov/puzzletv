@@ -12,25 +12,45 @@ import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 import {RotatableGameState, RotatableProcessedGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
+import {LanguageCode} from "../../types/translations/LanguageCode";
+import {Chameleon} from "../authors";
+import {
+    antiKnightRulesApply,
+    antiKnightRulesExplained,
+    arrows,
+    blackKropkiDotsExplained,
+    conventionalNotationsApply,
+    germanWhispers,
+    killerCages,
+    kropkiDotsTitle,
+    noBifurcation,
+    normalSudokuRulesApply,
+    thermometers,
+    xExplained
+} from "../ruleSnippets";
+import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
-    title: "North or South?",
+    title: {
+        [LanguageCode.en]: "North or South?",
+        [LanguageCode.ru]: "Север или юг?",
+    },
     slug: "north-or-south",
-    author: "Chameleon",
-    rules: <>
-        <RulesParagraph>Normal sudoku rules apply.</RulesParagraph>
-        <RulesParagraph><strong>The sudoku field can be rotated clockwise.</strong> It's not known in advance in which orientation the puzzle is solvable.</RulesParagraph>
-        <RulesParagraph>Anti-knight sudoku rules apply: cells separated by a chess knight's move cannot contain the same digit.</RulesParagraph>
-        <RulesParagraph>Conventional notations for common sudoku objects apply:</RulesParagraph>
+    author: Chameleon,
+    rules: translate => <>
+        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
+        <RulesParagraph>{translate(antiKnightRulesApply)}: {translate(antiKnightRulesExplained)}.</RulesParagraph>
+        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
         <RulesUnorderedList>
-            <li>Killer cages: cells in cages must sum to the total given in the corner of each cage, digits cannot repeat within a cage.</li>
-            <li>Arrows: digits along arrows sum to the numbers in the circles.</li>
-            <li>Thermometers: along thermometers, digits must increase from the bulb end.</li>
-            <li>Kropki dots: cells separated by a black dot have a ratio of 1:2.</li>
-            <li>XV: cells separated by X must sum to 10.</li>
-            <li>German whispers: consecutive digits along the green line must have difference of 5 or more.</li>
+            <li>{translate(killerCages)}.</li>
+            <li>{translate(arrows)}.</li>
+            <li>{translate(thermometers)}.</li>
+            <li>{translate(kropkiDotsTitle)}: {translate(blackKropkiDotsExplained)}.</li>
+            <li>XV: {translate(xExplained)}.</li>
+            <li>{translate(germanWhispers)}.</li>
         </RulesUnorderedList>
-        <RulesParagraph>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</RulesParagraph>
+        <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
     </>,
     typeManager: RotatableDigitSudokuTypeManager,
     fieldSize: FieldSize9,

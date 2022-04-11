@@ -4,6 +4,7 @@ import {ChessPiece} from "./ChessPiece";
 import {ChessColor} from "./ChessColor";
 import {ChessPieceCellDataComponentType} from "../components/ChessPieceCellData";
 import {ChessMainControls} from "../components/ChessMainControls";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState, ChessGameState> = {
     areSameCellData({type: type1, color: color1}, {type: type2, color: color2}): boolean {
@@ -50,5 +51,11 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
 
     digitShortcuts: ["P", "N", "B", "R", "Q", "K"],
 
-    digitShortcutTips: [undefined, "please note that Ctrl+N may not work"],
+    digitShortcutTips: [
+        undefined,
+        {
+            [LanguageCode.en]: "please note that Ctrl+N may not work",
+            [LanguageCode.ru]: "Ctrl+N может не работать",
+        },
+    ],
 };

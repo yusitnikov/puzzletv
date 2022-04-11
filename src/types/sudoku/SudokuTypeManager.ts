@@ -5,6 +5,7 @@ import {Set} from "../struct/Set";
 import {GameState, ProcessedGameState} from "./GameState";
 import {ComponentType} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
+import {Translatable} from "../translations/Translatable";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(data1: CellType, data2: CellType): boolean;
@@ -63,5 +64,5 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     digitShortcuts?: string[];
 
-    digitShortcutTips?: (string|undefined)[];
+    digitShortcutTips?: (Translatable|undefined)[];
 }

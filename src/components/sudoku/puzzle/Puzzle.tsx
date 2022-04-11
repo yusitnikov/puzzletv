@@ -13,6 +13,7 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitComponentTypeContext} from "../../../contexts/DigitComponentTypeContext";
 import {Title} from "../../layout/title/Title";
 import {RegularDigitComponentType} from "../digit/RegularDigit";
+import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
 const StyledContainer = styled(Absolute)({
     color: textColor,
@@ -35,6 +36,8 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
         fieldSize: {fieldSize},
         fieldMargin = 0,
     } = puzzle;
+
+    const translate = useTranslate();
 
     // region Size calculation
     const windowSize = useWindowSize();
@@ -67,8 +70,8 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
 
     return <DigitComponentTypeContext.Provider value={digitComponentType}>
         <Title>
-            {title}
-            {author && <> by {author}</>}
+            {translate(title)}
+            {author && <> {translate("by")} {translate(author)}</>}
         </Title>
 
         <StyledContainer

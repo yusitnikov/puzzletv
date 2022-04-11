@@ -2,17 +2,44 @@ import React from "react";
 import {Puzzle} from "../sudoku/puzzle/Puzzle";
 import {useHash} from "../../hooks/useHash";
 import AllPuzzles from "../../data/puzzles/AllPuzzles";
+import {LanguageCode} from "../../types/translations/LanguageCode";
+import {LanguageCodeContext, useLanguageCode, useTranslate} from "../../contexts/LanguageCodeContext";
 
 export const App = () => {
-    const hash = useHash();
+    let hash = useHash();
+
+    let language = LanguageCode.en;
+
+    for (const languageOption in LanguageCode) {
+        const suffix = `-${languageOption}`;
+
+        if (hash.endsWith(suffix)) {
+            language = languageOption as LanguageCode;
+            hash = hash.substring(0, hash.length - suffix.length);
+            break;
+        }
+    }
+
+    return <LanguageCodeContext.Provider value={language}>
+        <AppContent hash={hash}/>
+    </LanguageCodeContext.Provider>;
+};
+
+interface AppContentProps {
+    hash: string;
+}
+
+const AppContent = ({hash}: AppContentProps) => {
+    const language = useLanguageCode();
+    const translate = useTranslate();
 
     if (!hash || hash === "list") {
         return <>
-            <h1>Sudoku Puzzles</h1>
+            <h1>{translate("Sudoku Puzzles")}</h1>
 
             <ul>
                 {AllPuzzles.map(({slug, title, noIndex}) => !noIndex && <li key={slug}>
-                    <a href={`#${slug}`}>{title}</a>
+                    <a href={`#${slug}-${language}`}>{translate(title)}</a>
                 </li>)}
             </ul>
         </>;
@@ -25,8 +52,8 @@ export const App = () => {
     }
 
     return <>
-        <h1>Oops, the puzzle not found!</h1>
+        <h1>{translate("Oops, the puzzle not found!")}</h1>
 
-        <a href={"#list"}>Check out the puzzles list</a>
+        <a href={`#list-${language}`}>{translate("Check out the puzzles list")}</a>
     </>;
 };

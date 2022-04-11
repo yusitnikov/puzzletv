@@ -2,12 +2,14 @@ import {FieldStateInitialDigitsMap} from "./FieldState";
 import {ReactNode} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
+import {PartiallyTranslatable, Translatable} from "../translations/Translatable";
+import {useTranslate} from "../../contexts/LanguageCodeContext";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    title: ReactNode;
+    title: Translatable<ReactNode>;
     slug: string;
-    author?: ReactNode;
-    rules: ReactNode;
+    author?: PartiallyTranslatable<ReactNode>;
+    rules: (translate: ReturnType<typeof useTranslate>) => ReactNode;
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     fieldSize: FieldSize;
     fieldMargin?: number;

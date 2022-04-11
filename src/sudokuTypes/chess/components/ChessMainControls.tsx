@@ -8,6 +8,7 @@ import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {useState} from "react";
+import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
 export const ChessMainControls = (
     {
@@ -16,6 +17,8 @@ export const ChessMainControls = (
         onStateChange,
     }: ControlsProps<ChessPiece, ChessGameState, ChessGameState>
 ) => {
+    const translate = useTranslate();
+
     const [usedColorSelectionOnce, setUsedColorSelectionOnce] = useState(false);
 
     const handleToggleColor = () => {
@@ -46,7 +49,7 @@ export const ChessMainControls = (
                 lineHeight: `${cellSize * 0.3}px`,
             }}
         >
-            Chess piece color
+            {translate("Chess piece color")}
 
             <Absolute
                 left={cellSize * 0.25}
@@ -63,7 +66,7 @@ export const ChessMainControls = (
             top={3}
             cellSize={cellSize}
             onClick={handleToggleColor}
-            title={"Chess piece color (click to toggle, shortcut: C)"}
+            title={`${translate("Chess piece color")} (${translate("click to toggle")}, ${translate("shortcut")}: C)`}
         >
             {(contentSize) => <Absolute
                 width={contentSize}

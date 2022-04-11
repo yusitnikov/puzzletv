@@ -3,13 +3,11 @@
 A web application for creating and solving different types of sudoku.
 
 ## TODO/TOFIX
-- Localization.
 - Timer.
 - Checker.
 - Double-click on cell to select similar cells.
 - Keep the progress when refreshing/duplicating the tab + restart button.
 - Setter mode.
-- Rule text snippets.
 - Warn about the progress when navigating to another hash (possibly by history API).
 - 2-color solid chess pieces.
 - Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).

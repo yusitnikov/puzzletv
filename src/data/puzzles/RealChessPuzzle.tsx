@@ -9,27 +9,37 @@ import {ChessPieceType} from "../../sudokuTypes/chess/types/ChessPieceType";
 import {ChessColor} from "../../sudokuTypes/chess/types/ChessColor";
 import {ChessBoardCellsBackground} from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
 import {ChessBoardIndexes, chessBoardIndexesMargin} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
+import {LanguageCode} from "../../types/translations/LanguageCode";
+import {Chameleon} from "../authors";
+import {normalSudokuRulesApply} from "../ruleSnippets";
+import {
+    chessSudokuRules, mateInOne,
+    noPastPromotions,
+    normalSudokuRulesForChessPieces
+} from "../../sudokuTypes/chess/data/ruleSnippets";
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
-    title: "Real Chess Sudoku",
+    title: {
+        [LanguageCode.en]: "Real Chess Sudoku",
+        [LanguageCode.ru]: "Шахматный судоку",
+    },
     slug: "real-chess-sudoku",
-    author: "Chameleon",
-    rules: <>
+    author: Chameleon,
+    rules: translate => <>
         <RulesParagraph>
-            <strong>Normal chess rules apply</strong>:
-            put chess pieces to the board so that they will form a valid chess position
-            (that is result of some chess game).
+            {translate(chessSudokuRules)}.
         </RulesParagraph>
         <RulesParagraph>
-            <strong>Normal sudoku rules apply</strong>:
-            chess pieces cannot repeat in rows, columns and boxes
-            (e.g. there could be no other knights in the top-left box, on column <strong>d</strong> and on row <strong>7</strong>).
+            <strong>{translate(normalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)} ({translate({
+                [LanguageCode.en]: <>e.g. there could be no other knights in the top-left box, on column <strong>d</strong> and on row <strong>7</strong></>,
+                [LanguageCode.ru]: <>например, в верхне-левом регионе, на линии <strong>d</strong> и на линии <strong>7</strong> не может быть других коней</>,
+            })}).
         </RulesParagraph>
         <RulesParagraph>
-            There were no pawn promotions in the game that led to the current position on the board.
+            {translate(noPastPromotions)}.
         </RulesParagraph>
         <RulesParagraph>
-            Both white and black have a mate in 1 move in case it's their turn.
+            {translate(mateInOne)}.
         </RulesParagraph>
     </>,
     typeManager: ChessSudokuTypeManager,
@@ -66,31 +76,5 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
 export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {
     ...RealChessPuzzle,
     slug: "real-chess-puzzle",
-    noIndex: true,
-};
-
-export const RealChessPuzzleRu: typeof RealChessPuzzle = {
-    ...RealChessPuzzle,
-    title: "Шахматный судоку",
-    slug: "real-chess-sudoku-ru",
-    author: "Хамелеон",
-    rules: <>
-        <RulesParagraph>
-            <strong>Обычные правила шахмат</strong>:
-            поставьте шахматные фигуры на доску так, чтоб они образовали позицию,
-            которая может получиться в результате игры в шахматы.
-        </RulesParagraph>
-        <RulesParagraph>
-            <strong>Обычные правила судоку</strong>:
-            шахматные фигуры не могут повторяться на каждой линии и в каждом регионе, огражденном жирными линиями
-            (например, в верхне-левом регионе, на линии <strong>d</strong> и на линии <strong>7</strong> не может быть других коней).
-        </RulesParagraph>
-        <RulesParagraph>
-            В игре, результат которой мы видим на доске, не было превращений пешек.
-        </RulesParagraph>
-        <RulesParagraph>
-            И белые, и черные могут поставить мат в 1 ход, если это их ход.
-        </RulesParagraph>
-    </>,
     noIndex: true,
 };

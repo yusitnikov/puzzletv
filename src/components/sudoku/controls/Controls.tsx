@@ -20,6 +20,7 @@ import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
@@ -47,6 +48,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         state,
         onStateChange,
     } = otherProps;
+
+    const translate = useTranslate();
 
     const {
         createCellDataByDisplayDigit,
@@ -140,12 +143,12 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             const shortcut = !isColorMode && digitShortcuts[index];
             const shortcutTip = !isColorMode && digitShortcutTips[index];
 
-            let title = `Shortcut: ${digit}`;
+            let title = `${translate("Shortcut")}: ${digit}`;
             if (shortcut) {
-                title = `${title} or ${shortcut}`;
+                title = `${title} ${translate("or")} ${shortcut}`;
             }
             if (shortcutTip) {
-                title = `${title} (${shortcutTip})`;
+                title = `${title} (${translate(shortcutTip)})`;
             }
 
             return <ControlButton
@@ -178,7 +181,6 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             innerBorderWidth={1}
             checked={cellWriteMode === CellWriteMode.main}
             onClick={() => handleSetCellWriteMode(CellWriteMode.main)}
-            title={"Final digit"}
         >
             {contentSize => <CellDigits
                 typeManager={typeManager}
@@ -195,7 +197,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             innerBorderWidth={1}
             checked={cellWriteMode === CellWriteMode.corner}
             onClick={() => handleSetCellWriteMode(CellWriteMode.corner)}
-            title={"Corner (shortcut: Shift)"}
+            title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}
         >
             {contentSize => <CellDigits
                 typeManager={typeManager}
@@ -212,7 +214,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             innerBorderWidth={1}
             checked={cellWriteMode === CellWriteMode.center}
             onClick={() => handleSetCellWriteMode(CellWriteMode.center)}
-            title={"Center (shortcut: Ctrl)"}
+            title={`${translate("Center")} (${translate("shortcut")}: Ctrl)`}
         >
             {contentSize => <CellDigits
                 typeManager={typeManager}
@@ -229,7 +231,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             innerBorderWidth={1}
             checked={cellWriteMode === CellWriteMode.color}
             onClick={() => handleSetCellWriteMode(CellWriteMode.color)}
-            title={"Colors (shortcut: Ctrl+Shift)"}
+            title={`${translate("Colors")} (${translate("shortcut")}: Ctrl+Shift)`}
         >
             {contentSize => <CellBackground
                 colors={new Set(indexes(9))}
@@ -243,7 +245,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             top={3}
             cellSize={cellSize}
             onClick={handleClear}
-            title={"Clear the cell contents (shortcut: Delete or Backspace)"}
+            title={`${translate("Clear the cell contents")} (${translate("shortcut")}: Delete ${translate("or")} Backspace)`}
         >
             <Clear/>
         </ControlButton>
@@ -264,7 +266,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 flipDirection={!isHorizontal}
                 cellSize={cellSize}
                 onClick={handleUndo}
-                title={"Undo the last action (shortcut: Ctrl+Z)"}
+                title={`${translate("Undo the last action")} (${translate("shortcut")}: Ctrl+Z)`}
             >
                 <Undo/>
             </ControlButton>
@@ -275,7 +277,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 flipDirection={!isHorizontal}
                 cellSize={cellSize}
                 onClick={handleRedo}
-                title={"Redo the last action (shortcut: Ctrl+Y)"}
+                title={`${translate("Redo the last action")} (${translate("shortcut")}: Ctrl+Y)`}
             >
                 <Redo/>
             </ControlButton>
@@ -287,7 +289,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 cellSize={cellSize}
                 onClick={toggleFullScreen}
                 fullSize={true}
-                title={isFullScreen ? "Exit full screen mode" : "Enter full screen mode"}
+                title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
             >
                 {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
             </ControlButton>

@@ -7,6 +7,7 @@ import {rotateClockwise} from "../utils/rotation";
 import {RotatableDigit} from "../types/RotatableDigit";
 import {RotatableGameState, RotatableProcessedGameState} from "../types/RotatableGameState";
 import {ControlsProps} from "../../../components/sudoku/controls/Controls";
+import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
 export const RotatableMainControls = (
     {
@@ -15,6 +16,8 @@ export const RotatableMainControls = (
         onStateChange,
     }: ControlsProps<RotatableDigit, RotatableGameState, RotatableProcessedGameState>
 ) => {
+    const translate = useTranslate();
+
     const handleRotate = () => onStateChange(({angle}) => ({angle: rotateClockwise(angle)}));
 
     const handleToggleStickyMode = () => onStateChange(({isStickyMode}) => ({isStickyMode: !isStickyMode}));
@@ -44,7 +47,7 @@ export const RotatableMainControls = (
                 fontSize: cellSize * 0.4,
             }}
         >
-            <div>Please rotate the field once to start solving the puzzle!</div>
+            <div>{translate("Please rotate the field once to start solving the puzzle!")}</div>
 
             <Absolute
                 width={cellSize * 1.5}
@@ -61,7 +64,7 @@ export const RotatableMainControls = (
             top={3}
             cellSize={cellSize}
             onClick={handleRotate}
-            title={"Rotate the puzzle (shortcut: R)\nTip: use the button below to control the rotation speed"}
+            title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: R)\n${translate("Tip")}: ${translate("use the button below to control the rotation speed")}`}
         >
             <RotateRight/>
         </ControlButton>
@@ -72,7 +75,7 @@ export const RotatableMainControls = (
             cellSize={cellSize}
             checked={isStickyMode}
             onClick={handleToggleStickyMode}
-            title={`Sticky mode: ${isStickyMode ? "ON" : "OFF"} (click to toggle, shortcut: S).\nSticky digits will preserve the orientation when rotating the field.\nSticky digits are highlighted in green.`}
+            title={`${translate("Sticky mode")}: ${translate(isStickyMode ? "ON" : "OFF")} (${translate("click to toggle")}, ${translate("shortcut")}: S).\n${translate("Sticky digits will preserve the orientation when rotating the field")}.\n${translate("Sticky digits are highlighted in green")}.`}
         >
             <PushPin/>
         </ControlButton>
