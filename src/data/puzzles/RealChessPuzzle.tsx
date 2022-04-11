@@ -20,8 +20,8 @@ import {
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
     title: {
-        [LanguageCode.en]: "Real Chess Sudoku",
-        [LanguageCode.ru]: "Шахматный судоку",
+        [LanguageCode.en]: "Easy-peasy, Mate in One",
+        [LanguageCode.ru]: "Мат в 1 ход",
     },
     slug: "real-chess-sudoku",
     author: Chameleon,
