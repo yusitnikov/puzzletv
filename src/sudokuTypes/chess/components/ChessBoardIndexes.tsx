@@ -16,7 +16,11 @@ const commonProps: SVGAttributes<SVGTextElement> = {
     fill: textColor,
 };
 
-export const ChessBoardIndexes = () => <>
+export interface ChessBoardIndexesProps {
+    shifted?: boolean;
+}
+
+export const ChessBoardIndexes = ({shifted}: ChessBoardIndexesProps) => <>
     {indexes(8).map(index => <text
         key={`top-${index}`}
         x={index + 0.5}
@@ -28,8 +32,8 @@ export const ChessBoardIndexes = () => <>
 
     {indexes(8).map(index => <text
         key={`bottom-${index}`}
-        x={index + 0.5}
-        y={8 + chessBoardIndexesMargin / 2}
+        x={index + (shifted ? 1 : 0) + 0.5}
+        y={8 + (shifted ? 1 : 0) + chessBoardIndexesMargin / 2}
         {...commonProps}
     >
         {chessColumnNameFromIndex(index)}
@@ -38,7 +42,7 @@ export const ChessBoardIndexes = () => <>
     {indexes(8).map(index => <text
         key={`left-${index}`}
         x={-chessBoardIndexesMargin / 2}
-        y={index + 0.5}
+        y={index + (shifted ? 1 : 0) + 0.5}
         {...commonProps}
     >
         {chessRowNameFromIndex(index)}
@@ -46,7 +50,7 @@ export const ChessBoardIndexes = () => <>
 
     {indexes(8).map(index => <text
         key={`right-${index}`}
-        x={8 + chessBoardIndexesMargin / 2}
+        x={8 + (shifted ? 1 : 0) + chessBoardIndexesMargin / 2}
         y={index + 0.5}
         {...commonProps}
     >
