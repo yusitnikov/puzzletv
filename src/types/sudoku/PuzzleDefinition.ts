@@ -1,4 +1,4 @@
-import {FieldStateInitialDigitsMap} from "./FieldState";
+import {GivenDigitsMap} from "./GivenDigitsMap";
 import {ReactNode} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
@@ -14,7 +14,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     fieldSize: FieldSize;
     fieldMargin?: number;
     digitsCount?: number;
-    initialDigits?: FieldStateInitialDigitsMap<CellType>;
+    initialDigits?: GivenDigitsMap<CellType>;
     veryBackgroundItems?: ReactNode;
     backgroundItems?: ReactNode;
     topItems?: ReactNode;

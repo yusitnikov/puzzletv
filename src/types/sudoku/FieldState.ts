@@ -14,8 +14,6 @@ export const createEmptyFieldState = <CellType>(
     cells: indexes(fieldSize).map(() => indexes(fieldSize).map(() => createEmptyCellState(typeManager))),
 });
 
-export type FieldStateInitialDigitsMap<CellType> = Record<number, Record<number, CellType>>;
-
 export const cloneFieldState = <CellType>(
     typeManager: SudokuTypeManager<CellType>,
     {cells}: FieldState<CellType>
