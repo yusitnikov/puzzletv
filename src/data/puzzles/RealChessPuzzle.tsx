@@ -19,6 +19,7 @@ import {
     noPastPromotions,
     normalSudokuRulesForChessPieces
 } from "../../sudokuTypes/chess/data/ruleSnippets";
+import {RulesSpoiler} from "../../components/sudoku/rules/RulesSpoiler";
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
     title: {
@@ -42,6 +43,12 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
         </RulesParagraph>
         <RulesParagraph>
             {translate(mateInOne)}.
+        </RulesParagraph>
+        <RulesParagraph>
+            {translate("Tip")}: <RulesSpoiler>{translate({
+                [LanguageCode.en]: "use colors to mark possible options to place different chess pieces, or to mark which cells are already under attack",
+                [LanguageCode.ru]: "используйте цвета, чтобы пометить возможные места расположения различных фигур, или чтобы пометить какие поля уже атакованы",
+            })}.</RulesSpoiler>
         </RulesParagraph>
     </>,
     typeManager: ChessSudokuTypeManager,

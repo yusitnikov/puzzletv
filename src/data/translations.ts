@@ -67,6 +67,14 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Войти в полноэкранный режим",
     },
     // endregion
+    // region RulesSpoiler
+    "Spoiler": {
+        [LanguageCode.ru]: "Спойлер",
+    },
+    "Click to show": {
+        [LanguageCode.ru]: "Нажмите, чтоб показать",
+    },
+    // endregion
     // region ChessMainControls
     "Chess piece color": {
         [LanguageCode.ru]: "Цвет шахматных фигур",
