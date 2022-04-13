@@ -4,6 +4,7 @@ import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
 import {PartiallyTranslatable, Translatable} from "../translations/Translatable";
 import {useTranslate} from "../../contexts/LanguageCodeContext";
+import {ProcessedGameState} from "./GameState";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     title: Translatable<ReactNode>;
@@ -15,6 +16,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     fieldMargin?: number;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
+    resultChecker?: (gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => boolean,
     veryBackgroundItems?: ReactNode;
     backgroundItems?: ReactNode;
     topItems?: ReactNode;

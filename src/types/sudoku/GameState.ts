@@ -13,6 +13,7 @@ import {indexes} from "../../utils/indexes";
 import {Position} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
+import {GivenDigitsMap} from "./GivenDigitsMap";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -28,6 +29,25 @@ export interface ProcessedGameState<CellType> extends GameState<CellType> {
 // region History
 export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: ProcessedGameState<CellType>) =>
     fieldStateHistoryGetCurrent(fieldStateHistory);
+
+export const gameStateGetCurrentGivenDigits = <CellType>(gameState: ProcessedGameState<CellType>) => {
+    const result: GivenDigitsMap<CellType> = {};
+
+    gameStateGetCurrentFieldState(gameState)
+        .cells
+        .forEach(
+            (row, rowIndex) => row.forEach(
+                ({usersDigit}, columnIndex) => {
+                    if (usersDigit) {
+                        result[rowIndex] = result[rowIndex] || {};
+                        result[rowIndex][columnIndex] = usersDigit;
+                    }
+                }
+            )
+        );
+
+    return result;
+};
 
 export const gameStateUndo = <CellType, ProcessedGameStateExtensionType = {}>(
     {fieldStateHistory}: ProcessedGameState<CellType>

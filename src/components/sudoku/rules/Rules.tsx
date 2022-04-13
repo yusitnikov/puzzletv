@@ -2,7 +2,14 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import styled from "@emotion/styled";
-import {blueColor, globalPaddingCoeff, greenColor} from "../../app/globals";
+import {
+    blueColor,
+    globalPaddingCoeff,
+    greenColor,
+    h1HeightCoeff,
+    h2HeightCoeff,
+    textHeightCoeff
+} from "../../app/globals";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
@@ -29,9 +36,9 @@ export const Rules = <CellType,>({puzzle: {title, author, rules}, rect, cellSize
                 backgroundColor: blueColor,
             }}
         >
-            <h1 style={{fontSize: cellSize / 3, margin: 0}}>{translate(title)}</h1>
+            <h1 style={{fontSize: cellSize * h1HeightCoeff, margin: 0}}>{translate(title)}</h1>
 
-            {author && <div style={{fontSize: cellSize / 4}}>{translate("by")} {translate(author)}</div>}
+            {author && <div style={{fontSize: cellSize * h2HeightCoeff}}>{translate("by")} {translate(author)}</div>}
         </div>
 
         <div
@@ -47,7 +54,7 @@ export const Rules = <CellType,>({puzzle: {title, author, rules}, rect, cellSize
             <div
                 style={{
                     padding: cellSize / 8,
-                    fontSize: cellSize / 5,
+                    fontSize: cellSize * textHeightCoeff,
                 }}
             >
                 {rules(translate)}

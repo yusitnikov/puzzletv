@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React from "react";
+import React, {useRef} from "react";
 import {Size} from "../../../types/layout/Size";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
@@ -14,8 +14,9 @@ import {DigitComponentTypeContext} from "../../../contexts/DigitComponentTypeCon
 import {Title} from "../../layout/title/Title";
 import {RegularDigitComponentType} from "../digit/RegularDigit";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 
-const StyledContainer = styled(Absolute)({
+const StyledContainer = styled("div")({
     color: textColor,
     fontFamily: "Lato, sans-serif",
 });
@@ -68,43 +69,49 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
 
     const [gameState, mergeGameState] = useGame(puzzle);
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
     return <DigitComponentTypeContext.Provider value={digitComponentType}>
         <Title>
             {translate(title)}
             {author && <> {translate("by")} {translate(author)}</>}
         </Title>
 
-        <StyledContainer
-            left={(windowSize.width - containerSize.width) / 2}
-            top={(windowSize.height - containerSize.height) / 2}
-            {...containerSize}
-        >
-            <Field
-                puzzle={puzzle}
-                state={gameState}
-                onStateChange={mergeGameState}
-                rect={{
-                    left: padding,
-                    top: padding,
-                    width: sudokuSize,
-                    height: sudokuSize,
-                }}
-                cellSize={cellSize}
-            />
+        <StyledContainer ref={containerRef}>
+            <PuzzleContainerContext.Provider value={containerRef}>
+                <Absolute
+                    left={(windowSize.width - containerSize.width) / 2}
+                    top={(windowSize.height - containerSize.height) / 2}
+                    {...containerSize}
+                >
+                    <Field
+                        puzzle={puzzle}
+                        state={gameState}
+                        onStateChange={mergeGameState}
+                        rect={{
+                            left: padding,
+                            top: padding,
+                            width: sudokuSize,
+                            height: sudokuSize,
+                        }}
+                        cellSize={cellSize}
+                    />
 
-            <SidePanel
-                puzzle={puzzle}
-                rect={{
-                    left: isHorizontal ? controlsOffset : padding,
-                    top: isHorizontal ? padding : controlsOffset,
-                    width: isHorizontal ? controlsSize : sudokuSize,
-                    height: isHorizontal ? sudokuSize : controlsSize,
-                }}
-                cellSize={cellSize}
-                isHorizontal={isHorizontal}
-                state={gameState}
-                onStateChange={mergeGameState}
-            />
+                    <SidePanel
+                        puzzle={puzzle}
+                        rect={{
+                            left: isHorizontal ? controlsOffset : padding,
+                            top: isHorizontal ? padding : controlsOffset,
+                            width: isHorizontal ? controlsSize : sudokuSize,
+                            height: isHorizontal ? sudokuSize : controlsSize,
+                        }}
+                        cellSize={cellSize}
+                        isHorizontal={isHorizontal}
+                        state={gameState}
+                        onStateChange={mergeGameState}
+                    />
+                </Absolute>
+            </PuzzleContainerContext.Provider>
         </StyledContainer>
     </DigitComponentTypeContext.Provider>;
 }

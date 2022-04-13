@@ -20,6 +20,39 @@ import {
     normalSudokuRulesForChessPieces
 } from "../../sudokuTypes/chess/data/ruleSnippets";
 import {RulesSpoiler} from "../../components/sudoku/rules/RulesSpoiler";
+import {gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
+import {areSameGivenDigitsMaps, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
+
+const initialPieces = chessInitialPiecesByCellNames({
+    "h8": {color: ChessColor.black, type: ChessPieceType.rook},
+    "b1": {color: ChessColor.black, type: ChessPieceType.rook},
+    "h7": {color: ChessColor.black, type: ChessPieceType.king},
+    "h6": {color: ChessColor.black, type: ChessPieceType.queen},
+    "f8": {color: ChessColor.black, type: ChessPieceType.bishop},
+    "h5": {color: ChessColor.black, type: ChessPieceType.bishop},
+    "d7": {color: ChessColor.black, type: ChessPieceType.knight},
+    "e6": {color: ChessColor.black, type: ChessPieceType.pawn},
+    "b5": {color: ChessColor.black, type: ChessPieceType.pawn},
+    "g4": {color: ChessColor.black, type: ChessPieceType.pawn},
+    "e5": {color: ChessColor.white, type: ChessPieceType.knight},
+    "d3": {color: ChessColor.white, type: ChessPieceType.rook},
+    "e3": {color: ChessColor.white, type: ChessPieceType.bishop},
+    "g2": {color: ChessColor.white, type: ChessPieceType.bishop},
+    "c2": {color: ChessColor.white, type: ChessPieceType.pawn},
+    "a3": {color: ChessColor.white, type: ChessPieceType.pawn},
+});
+
+const mandatorySolutionPieces = chessInitialPiecesByCellNames({
+    "g8": {color: ChessColor.black, type: ChessPieceType.knight},
+    "d4": {color: ChessColor.white, type: ChessPieceType.king},
+    "e4": {color: ChessColor.white, type: ChessPieceType.queen},
+    "f5": {color: ChessColor.white, type: ChessPieceType.rook},
+    "c3": {color: ChessColor.white, type: ChessPieceType.knight},
+});
+
+const optionalSolutionPieces = chessInitialPiecesByCellNames({
+    "f7": {color: ChessColor.black, type: ChessPieceType.pawn},
+});
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
     title: {
@@ -54,30 +87,24 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
     typeManager: ChessSudokuTypeManager,
     fieldSize: FieldSize8,
     fieldMargin: chessBoardIndexesMargin,
-    initialDigits: chessInitialPiecesByCellNames({
-        "h8": {color: ChessColor.black, type: ChessPieceType.rook},
-        "b1": {color: ChessColor.black, type: ChessPieceType.rook},
-        "h7": {color: ChessColor.black, type: ChessPieceType.king},
-        "h6": {color: ChessColor.black, type: ChessPieceType.queen},
-        "f8": {color: ChessColor.black, type: ChessPieceType.bishop},
-        "h5": {color: ChessColor.black, type: ChessPieceType.bishop},
-        "d7": {color: ChessColor.black, type: ChessPieceType.knight},
-        "e6": {color: ChessColor.black, type: ChessPieceType.pawn},
-        "b5": {color: ChessColor.black, type: ChessPieceType.pawn},
-        "g4": {color: ChessColor.black, type: ChessPieceType.pawn},
-        "e5": {color: ChessColor.white, type: ChessPieceType.knight},
-        "d3": {color: ChessColor.white, type: ChessPieceType.rook},
-        "e3": {color: ChessColor.white, type: ChessPieceType.bishop},
-        "g2": {color: ChessColor.white, type: ChessPieceType.bishop},
-        "c2": {color: ChessColor.white, type: ChessPieceType.pawn},
-        "a3": {color: ChessColor.white, type: ChessPieceType.pawn},
-        // Solution:
-        // "g8": {color: ChessColor.black, type: ChessPieceType.knight},
-        // "d4": {color: ChessColor.white, type: ChessPieceType.king},
-        // "e4": {color: ChessColor.white, type: ChessPieceType.queen},
-        // "f5": {color: ChessColor.white, type: ChessPieceType.rook},
-        // "c3": {color: ChessColor.white, type: ChessPieceType.knight},
-    }),
+    initialDigits: initialPieces,
+    resultChecker: (gameState) => {
+        const currentGivenDigits = gameStateGetCurrentGivenDigits(gameState);
+
+        const currentFinalDigits = mergeGivenDigitsMaps(
+            initialPieces,
+            currentGivenDigits,
+            optionalSolutionPieces
+        );
+
+        const correctFinalDigits = mergeGivenDigitsMaps(
+            initialPieces,
+            mandatorySolutionPieces,
+            optionalSolutionPieces
+        );
+
+        return areSameGivenDigitsMaps(RealChessPuzzle.typeManager, currentFinalDigits, correctFinalDigits);
+    },
     veryBackgroundItems: <ChessBoardCellsBackground/>,
     backgroundItems: <ChessBoardIndexes/>,
 };

@@ -60,6 +60,15 @@ export const translationsExactType = {
     "Redo the last action": {
         [LanguageCode.ru]: "Повторить последнее действие",
     },
+    "Check the result": {
+        [LanguageCode.ru]: "Проверить результат",
+    },
+    "Absolutely right": {
+        [LanguageCode.ru]: "Совершенно верно",
+    },
+    "Something's wrong here": {
+        [LanguageCode.ru]: "Что-то тут не так",
+    },
     "Exit full screen mode": {
         [LanguageCode.ru]: "Выйти из полноэкранного режима",
     },

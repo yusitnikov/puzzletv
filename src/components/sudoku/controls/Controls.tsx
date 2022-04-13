@@ -2,7 +2,7 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes} from "../../../utils/indexes";
-import {Clear, Fullscreen, FullscreenExit, Redo, Undo} from "@emotion-icons/material";
+import {Check, Clear, Fullscreen, FullscreenExit, Redo, Undo} from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
@@ -21,6 +21,10 @@ import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useMemo, useState} from "react";
+import {Modal} from "../../layout/modal/Modal";
+import {Button} from "../../layout/button/Button";
+import {globalPaddingCoeff} from "../../app/globals";
 
 export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
 export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
@@ -42,6 +46,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         isHorizontal,
         puzzle: {
             typeManager,
+            resultChecker,
             fieldSize: {fieldSize},
             digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
         },
@@ -67,6 +72,9 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         cellWriteMode,
     } = state;
 
+    const [isShowingResult, setIsShowingResult] = useState(false);
+    const isCorrectResult = useMemo(() => resultChecker?.(state), [resultChecker, state]);
+
     const isColorMode = cellWriteMode === CellWriteMode.color;
     const digitsCountInCurrentMode = isColorMode ? 9 : digitsCount;
 
@@ -82,6 +90,9 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const handleUndo = () => onStateChange(gameStateUndo);
 
     const handleRedo = () => onStateChange(gameStateRedo);
+
+    const handleCheckResult = () => setIsShowingResult(true);
+    const handleCloseCheckResult = () => setIsShowingResult(false);
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
@@ -281,6 +292,36 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             >
                 <Redo/>
             </ControlButton>
+
+            {resultChecker && secondaryControlsCount === 0 && <ControlButton
+                left={secondaryControlsCount + 2}
+                top={0}
+                flipDirection={!isHorizontal}
+                cellSize={cellSize}
+                onClick={handleCheckResult}
+                title={`${translate("Check the result")}`}
+            >
+                <Check/>
+            </ControlButton>}
+            {isShowingResult && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
+                <div>
+                    {isCorrectResult ? `${translate("Absolutely right")}!` : `${translate("Something's wrong here")}...`}
+                </div>
+                <div>
+                    <Button
+                        type={"button"}
+                        cellSize={cellSize}
+                        onClick={handleCloseCheckResult}
+                        autoFocus={true}
+                        style={{
+                            marginTop: cellSize * globalPaddingCoeff,
+                            padding: "0.5em 1em",
+                        }}
+                    >
+                        OK
+                    </Button>
+                </div>
+            </Modal>}
 
             <ControlButton
                 left={3}
