@@ -30,12 +30,14 @@ export const ChessMainControls = (
     };
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
-        const {code} = ev;
+        const {code, ctrlKey, metaKey} = ev;
 
         switch (code) {
             case "KeyC":
-                handleToggleColor();
-                ev.preventDefault();
+                if (!ctrlKey && !metaKey) {
+                    handleToggleColor();
+                    ev.preventDefault();
+                }
                 break;
         }
     });
