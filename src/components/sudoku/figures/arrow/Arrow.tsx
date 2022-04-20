@@ -1,15 +1,31 @@
 import {RoundedPolyLine, RoundedPolyLineProps} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {lightGreyColor} from "../../../app/globals";
+import {darkGreyColor} from "../../../app/globals";
 import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 
 const lineWidth = 0.1;
 const arrowSize = 0.35;
+const circleRadius = 0.4;
 
-export const Arrow = ({points, ...props}: RoundedPolyLineProps) => {
+export interface ArrowProps extends RoundedPolyLineProps {
+    transparentCircle?: boolean;
+}
+
+export const Arrow = ({points, transparentCircle, ...props}: ArrowProps) => {
     const isLayer = useIsFieldLayer(FieldLayer.regular);
 
     points = points.map(([x, y]) => [x - 0.5, y - 0.5]);
+
+    const [[x1, y1], [x2, y2]] = points;
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    const dLength = Math.hypot(dx, dy);
+    dx /= dLength;
+    dy /= dLength;
+    points[0] = [
+        x1 + circleRadius * dx,
+        y1 + circleRadius * dy,
+    ];
 
     const [lastX, lastY] = points[points.length - 1];
     const [prevX, prevY] = points[points.length - 2];
@@ -23,13 +39,13 @@ export const Arrow = ({points, ...props}: RoundedPolyLineProps) => {
         <RoundedPolyLine
             points={points}
             strokeWidth={lineWidth}
-            stroke={lightGreyColor}
+            stroke={darkGreyColor}
             {...props}
         />
 
         <RoundedPolyLine
             strokeWidth={lineWidth}
-            stroke={lightGreyColor}
+            stroke={darkGreyColor}
             {...props}
             points={[
                 [lastX + arrowSize * (-dirX + dirY), lastY + arrowSize * (-dirY - dirX)],
@@ -39,12 +55,12 @@ export const Arrow = ({points, ...props}: RoundedPolyLineProps) => {
         />
 
         <circle
-            cx={points[0][0]}
-            cy={points[0][1]}
-            r={0.4}
+            cx={x1}
+            cy={y1}
+            r={circleRadius}
             strokeWidth={lineWidth}
-            stroke={lightGreyColor}
-            fill={"white"}
+            stroke={darkGreyColor}
+            fill={transparentCircle ? "none" : "#fff"}
         />
     </>;
 };

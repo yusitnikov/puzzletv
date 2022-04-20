@@ -5,6 +5,7 @@ export const textHeightCoeff = 1 / 5;
 
 export const blackColor = "#000";
 export const lightGreyColor = "#cfcfcf";
+export const darkGreyColor = "#afafaf";
 export const blueColor = "#7eb7f8";
 export const lighterBlueColor = "#aec7fc";
 export const greenColor = "#a3e048";
