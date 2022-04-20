@@ -2,6 +2,8 @@ import {SVGAttributes} from "react";
 import {blackColor} from "../../../app/globals";
 import {Position} from "../../../../types/layout/Position";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
+import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 
 const borderPadding = 0.1;
 const sumDigitSize = 0.15;
@@ -13,9 +15,11 @@ export interface KillerCageProps extends Omit<SVGAttributes<SVGPolygonElement>, 
 }
 
 export const KillerCage = ({points, sum, bottomSumPointIndex, ...polygonProps}: KillerCageProps) => {
+    const isLayer = useIsFieldLayer(FieldLayer.regular);
+
     const {widthCoeff} = useDigitComponentType();
 
-    return <>
+    return isLayer && <>
         <polygon
             points={
                 points

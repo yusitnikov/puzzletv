@@ -22,6 +22,7 @@ import {
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -49,9 +50,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         },
         fieldMargin = 0,
         initialDigits,
-        veryBackgroundItems,
-        backgroundItems,
-        topItems,
+        items,
     } = puzzle;
 
     const {selectedCells, isReady} = state;
@@ -158,14 +157,24 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 fieldSize={fieldSize}
                 fieldMargin={fieldMargin}
                 cellSize={cellSize}
+                layer={FieldLayer.beforeBackground}
             >
-                {veryBackgroundItems}
+                {items}
             </FieldSvg>
 
             {renderCellsLayer("background", ({colors}) => <CellBackground
                 colors={colors}
                 size={cellSize}
             />)}
+
+            <FieldSvg
+                fieldSize={fieldSize}
+                fieldMargin={fieldMargin}
+                cellSize={cellSize}
+                layer={FieldLayer.beforeSelection}
+            >
+                {items}
+            </FieldSvg>
 
             {renderCellsLayer("selection", (cellState, cellPosition) => selectedCells.contains(cellPosition) && <CellSelection
                 size={cellSize}
@@ -176,8 +185,9 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 fieldSize={fieldSize}
                 fieldMargin={fieldMargin}
                 cellSize={cellSize}
+                layer={FieldLayer.regular}
             >
-                {backgroundItems}
+                {items}
             </FieldSvg>
 
             {renderInnerFieldRect(indexes(fieldSize, true).map(index => <Line
@@ -202,8 +212,9 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 fieldSize={fieldSize}
                 fieldMargin={fieldMargin}
                 cellSize={cellSize}
+                layer={FieldLayer.top}
             >
-                {topItems}
+                {items}
             </FieldSvg>
 
             {renderCellsLayer("digits", (cellState, {top, left}) => <CellDigits

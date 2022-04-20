@@ -17,8 +17,6 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
     resultChecker?: (gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => boolean,
-    veryBackgroundItems?: ReactNode;
-    backgroundItems?: ReactNode;
-    topItems?: ReactNode;
+    items?: ReactNode;
     noIndex?: boolean;
 }

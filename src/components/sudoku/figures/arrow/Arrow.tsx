@@ -1,10 +1,14 @@
 import {RoundedPolyLine, RoundedPolyLineProps} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {lightGreyColor} from "../../../app/globals";
+import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 
 const lineWidth = 0.1;
 const arrowSize = 0.35;
 
 export const Arrow = (props: RoundedPolyLineProps) => {
+    const isLayer = useIsFieldLayer(FieldLayer.regular);
+
     const [lastX, lastY] = props.points[props.points.length - 1];
     const [prevX, prevY] = props.points[props.points.length - 2];
     let dirX = lastX - prevX;
@@ -13,7 +17,7 @@ export const Arrow = (props: RoundedPolyLineProps) => {
     dirX /= dirLength;
     dirY /= dirLength;
 
-    return <>
+    return isLayer && <>
         <RoundedPolyLine
             strokeWidth={lineWidth}
             stroke={lightGreyColor}

@@ -105,8 +105,10 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
 
         return areSameGivenDigitsMaps(RealChessPuzzle.typeManager, currentFinalDigits, correctFinalDigits);
     },
-    veryBackgroundItems: <ChessBoardCellsBackground/>,
-    backgroundItems: <ChessBoardIndexes/>,
+    items: <>
+        <ChessBoardCellsBackground/>
+        <ChessBoardIndexes/>
+    </>,
 };
 
 export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {

@@ -81,6 +81,8 @@ export const RealChessPuzzleRubberBlando: PuzzleDefinition<ChessPiece, ChessGame
             2: {color: ChessColor.white, type: ChessPieceType.knight},
         },
     },
-    veryBackgroundItems: <ChessBoardCellsBackground shifted={true}/>,
-    backgroundItems: <ChessBoardIndexes shifted={true}/>,
+    items: <>
+        <ChessBoardCellsBackground shifted={true}/>
+        <ChessBoardIndexes shifted={true}/>
+    </>,
 };

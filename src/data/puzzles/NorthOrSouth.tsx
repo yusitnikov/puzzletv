@@ -69,7 +69,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
             5: {digit: 2},
         },
     },
-    backgroundItems: <>
+    items: <>
         <Thermometer points={[
             [7.5, 1.5],
             [6.5, 2.5],
@@ -119,8 +119,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
                 [7, 7],
             ]}
         />
-    </>,
-    topItems: <>
+
         <XMark left={7} top={7.5}/>
 
         <KropkiDot cx={7.5} cy={7} isFilled={true}/>
