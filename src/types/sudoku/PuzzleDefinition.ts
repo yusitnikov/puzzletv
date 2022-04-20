@@ -2,12 +2,12 @@ import {GivenDigitsMap} from "./GivenDigitsMap";
 import {ReactNode} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
-import {PartiallyTranslatable, Translatable} from "../translations/Translatable";
+import {PartiallyTranslatable} from "../translations/Translatable";
 import {useTranslate} from "../../contexts/LanguageCodeContext";
 import {ProcessedGameState} from "./GameState";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    title: Translatable<ReactNode>;
+    title: PartiallyTranslatable<ReactNode>;
     slug: string;
     author?: PartiallyTranslatable<ReactNode>;
     rules: (translate: ReturnType<typeof useTranslate>) => ReactNode;
