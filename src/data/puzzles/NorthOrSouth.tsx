@@ -71,25 +71,25 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
     },
     items: <>
         <Thermometer points={[
-            [7.5, 1.5],
-            [6.5, 2.5],
+            [8, 2],
+            [7, 3],
         ]}/>
 
         <Thermometer points={[
-            [1.5, 0.5],
-            [1.5, 1.5],
+            [2, 1],
+            [2, 2],
         ]}/>
 
         <Arrow points={[
-            [8.5, 4.5],
-            [6.5, 4.5],
-            [6.5, 3.5],
+            [9, 5],
+            [7, 5],
+            [7, 4],
         ]}/>
 
         <GermanWhispers points={[
-            [5.5, 1.5],
-            [4.5, 2.5],
-            [7.5, 2.5],
+            [6, 2],
+            [5, 3],
+            [8, 3],
         ]}/>
 
         <KillerCage
@@ -120,10 +120,10 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
             ]}
         />
 
-        <XMark left={7} top={7.5}/>
+        <XMark left={7.5} top={8}/>
 
-        <KropkiDot cx={7.5} cy={7} isFilled={true}/>
+        <KropkiDot left={8} top={7.5} isFilled={true}/>
 
-        <XMark left={8} top={6.5}/>
+        <XMark left={8.5} top={7}/>
     </>,
 };

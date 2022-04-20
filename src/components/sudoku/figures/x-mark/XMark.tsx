@@ -13,6 +13,9 @@ export interface XMarkProps extends Position {
 export const XMark = ({left, top}: XMarkProps) => {
     const isLayer = useIsFieldLayer(FieldLayer.top);
 
+    left -= 0.5;
+    top -= 0.5;
+
     return isLayer && <>
         <line
             x1={left - radius * 0.7}

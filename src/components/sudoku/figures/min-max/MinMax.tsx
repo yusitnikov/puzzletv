@@ -2,22 +2,24 @@ import {lightGreyColor, textColor} from "../../../app/globals";
 import {SVGAttributes} from "react";
 import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
+import {Position} from "../../../../types/layout/Position";
 
 const arrowWidth = 0.1;
 const arrowHeight = 0.05;
 
-export interface MinMaxProps extends Omit<SVGAttributes<SVGRectElement>, "x" | "y"> {
-    cx: number;
-    cy: number;
+export interface MinMaxProps extends Position, Omit<SVGAttributes<SVGRectElement>, "x" | "y"> {
 }
 
-export const MinMax = ({cx, cy, coeff, ...otherProps}: MinMaxProps & {coeff: number}) => {
+export const MinMax = ({left, top, coeff, ...otherProps}: MinMaxProps & {coeff: number}) => {
     const layer = useFieldLayer();
+
+    left -= 0.5;
+    top -= 0.5;
 
     return <>
         {layer === FieldLayer.beforeSelection && <rect
-            x={cx - 0.5}
-            y={cy - 0.5}
+            x={left - 0.5}
+            y={top - 0.5}
             width={1}
             height={1}
             {...otherProps}
@@ -26,10 +28,10 @@ export const MinMax = ({cx, cy, coeff, ...otherProps}: MinMaxProps & {coeff: num
         />}
 
         {layer === FieldLayer.regular && <>
-            <Arrow cx={cx} cy={cy} dx={1} dy={0} coeff={coeff}/>
-            <Arrow cx={cx} cy={cy} dx={-1} dy={0} coeff={coeff}/>
-            <Arrow cx={cx} cy={cy} dx={0} dy={1} coeff={coeff}/>
-            <Arrow cx={cx} cy={cy} dx={0} dy={-1} coeff={coeff}/>
+            <Arrow cx={left} cy={top} dx={1} dy={0} coeff={coeff}/>
+            <Arrow cx={left} cy={top} dx={-1} dy={0} coeff={coeff}/>
+            <Arrow cx={left} cy={top} dx={0} dy={1} coeff={coeff}/>
+            <Arrow cx={left} cy={top} dx={0} dy={-1} coeff={coeff}/>
         </>}
     </>;
 };
