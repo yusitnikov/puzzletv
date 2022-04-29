@@ -45,3 +45,17 @@ export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeMa
 
     return true;
 };
+
+export const createGivenDigitsMapFromArray = <CellType>(array: CellType[][]): GivenDigitsMap<CellType> => {
+    const map: GivenDigitsMap<CellType> = {};
+
+    array.forEach((row, rowIndex) => {
+        map[rowIndex] = {};
+
+        row.forEach((cell, columnIndex) => {
+            map[rowIndex][columnIndex] = cell;
+        });
+    });
+
+    return map;
+};
