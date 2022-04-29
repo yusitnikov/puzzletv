@@ -1,4 +1,4 @@
-import {blackColor, blueColor, greenColor, lightGreyColor} from "../../app/globals";
+import {blackColor, blueColor, greenColor, lightGreyColor, redColor, yellowColor} from "../../app/globals";
 import {Set} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
@@ -9,8 +9,8 @@ const backgroundColors = [
     greenColor,
     "#d23be7",
     "#eb7532",
-    "#e6261f",
-    "#f7d038",
+    redColor,
+    yellowColor,
     blueColor,
 ];
 

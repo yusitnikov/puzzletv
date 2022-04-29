@@ -1,6 +1,7 @@
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
+import {CellSelectionColor, CellSelectionProps} from "../../../components/sudoku/cell/CellSelection";
 
 export const CubedokuTypeManager: SudokuTypeManager<number> = {
     ...DigitSudokuTypeManager(),
@@ -45,6 +46,74 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
             top: top - Math.abs(left - realFieldSize) / 2,
         };
     },
+
+    getCellSelectionType: function ({top, left}, {fieldSize: {fieldSize}}, {selectedCells}) {
+        const realFieldSize = fieldSize / 2;
+
+        const tooltipResult: Required<Pick<CellSelectionProps, "color" | "strokeWidth">> = {
+            color: CellSelectionColor.secondary,
+            strokeWidth: 1,
+        };
+        const trackResult: Required<Pick<CellSelectionProps, "color" | "strokeWidth">> = {
+            color: CellSelectionColor.secondary,
+            strokeWidth: 0.5,
+        };
+
+        let isTrack = false;
+
+        for (const {top: selectedTop, left: selectedLeft} of selectedCells.items) {
+            if (selectedTop < realFieldSize) {
+                if (left === selectedLeft && top > selectedTop) {
+                    if (top >= realFieldSize) {
+                        return tooltipResult;
+                    }
+                    isTrack = true;
+                }
+
+                if (top === selectedTop && left > selectedLeft) {
+                    isTrack = true;
+                }
+
+                if (left === fieldSize - 1 - selectedTop) {
+                    return tooltipResult;
+                }
+            } else if (selectedLeft < realFieldSize) {
+                if (left === selectedLeft && top < selectedTop) {
+                    if (top < realFieldSize) {
+                        return tooltipResult;
+                    }
+
+                    isTrack = true;
+                }
+
+                if (top === selectedTop && left > selectedLeft) {
+                    if (left >= realFieldSize) {
+                        return tooltipResult;
+                    }
+
+                    isTrack = true;
+                }
+            } else {
+                if (left === selectedLeft && top < selectedTop) {
+                    isTrack = true;
+                }
+
+                if (top === selectedTop && left < selectedLeft) {
+                    if (left < realFieldSize) {
+                        return tooltipResult;
+                    }
+
+                    isTrack = true;
+                }
+
+                if (top === fieldSize - 1 - selectedLeft) {
+                    return tooltipResult;
+                }
+            }
+        }
+
+        return isTrack ? trackResult : undefined;
+    }
 };
 
 export const createCubedokuFieldSize = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth): FieldSize => ({

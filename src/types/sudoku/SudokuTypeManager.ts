@@ -8,6 +8,7 @@ import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
 import {FieldSize} from "./FieldSize";
 import {PuzzleDefinition} from "./PuzzleDefinition";
+import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(data1: CellType, data2: CellType): boolean;
@@ -48,7 +49,7 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     getFieldAngle?(gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType): number;
 
-    isValidCell?(cell: Position, puzzle: PuzzleDefinition<any, any, any>): boolean;
+    isValidCell?(cell: Position, puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): boolean;
 
     processArrowDirection?(
         currentCell: Position,
@@ -59,7 +60,13 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): Position | undefined;
 
-    transformCoords?(coords: Position, puzzle: PuzzleDefinition<any, any, any>): Position;
+    transformCoords?(coords: Position, puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Position;
+
+    getCellSelectionType?(
+        cell: Position,
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined;
 
     mainControlsCount?: number;
 

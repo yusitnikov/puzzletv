@@ -1,12 +1,19 @@
-import {blueColor, lighterBlueColor} from "../../app/globals";
+import {blueColor, lighterBlueColor, yellowColor} from "../../app/globals";
+
+export const CellSelectionColor = {
+    mainCurrent: blueColor,
+    mainPrevious: lighterBlueColor,
+    secondary: yellowColor,
+};
 
 export interface CellSelectionProps {
     size: number;
-    isSecondary?: boolean;
+    color?: string;
+    strokeWidth?: number;
 }
 
-export const CellSelection = ({size, isSecondary}: CellSelectionProps) => {
-    const selectionBorderWidth = 0.1;
+export const CellSelection = ({size, color = CellSelectionColor.mainCurrent, strokeWidth = 1}: CellSelectionProps) => {
+    const selectionBorderWidth = 0.1 * strokeWidth;
     const selectionBorderWidth2 = 2 / size;
 
     return <>
@@ -17,7 +24,7 @@ export const CellSelection = ({size, isSecondary}: CellSelectionProps) => {
             height={1 - selectionBorderWidth}
             fill={"none"}
             strokeWidth={selectionBorderWidth}
-            stroke={isSecondary ? lighterBlueColor : blueColor}
+            stroke={color}
         />
         <rect
             x={selectionBorderWidth + selectionBorderWidth2 / 2}

@@ -9,6 +9,8 @@ export const darkGreyColor = "#afafaf";
 export const blueColor = "#7eb7f8";
 export const lighterBlueColor = "#aec7fc";
 export const greenColor = "#a3e048";
+export const redColor = "#e6261f";
+export const yellowColor = "#f7d038";
 
 export const textColor = blackColor;
 

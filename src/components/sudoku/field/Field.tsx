@@ -7,7 +7,7 @@ import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import {FC, memo, MouseEvent, PointerEvent, ReactNode, useState} from "react";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
-import {CellSelection} from "../cell/CellSelection";
+import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
 import {CellDigits} from "../cell/CellDigits";
 import {FieldSvg} from "./FieldSvg";
 import {
@@ -54,6 +54,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     const {
         isValidCell = () => true,
         transformCoords = coords => coords,
+        getCellSelectionType,
     } = typeManager;
 
     const Items: FC<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> = typeof items === "function"
@@ -213,11 +214,28 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 </FieldLayerContext.Provider>
             </FieldSvg>
 
-            {renderCellsLayer("selection", (cellState, cellPosition) => selectedCells.contains(cellPosition) &&
-                <CellSelection
+            {renderCellsLayer("selection", (cellState, cellPosition) => {
+                let color = "";
+                let width = 1;
+
+                if (selectedCells.contains(cellPosition)) {
+                    color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
+                        ? CellSelectionColor.mainCurrent
+                        : CellSelectionColor.mainPrevious;
+                } else if (getCellSelectionType) {
+                    const customSelection = getCellSelectionType(cellPosition, puzzle, state);
+                    if (customSelection) {
+                        color = customSelection.color;
+                        width = customSelection.strokeWidth;
+                    }
+                }
+
+                return !!color && <CellSelection
                     size={cellSize}
-                    isSecondary={selectedCells.last()?.left !== cellPosition.left || selectedCells.last()?.top !== cellPosition.top}
-                />)}
+                    color={color}
+                    strokeWidth={width}
+                />;
+            })}
 
             <FieldSvg
                 fieldSize={fieldSize}
