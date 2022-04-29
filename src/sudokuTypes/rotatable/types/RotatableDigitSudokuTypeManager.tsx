@@ -8,7 +8,7 @@ import {RotatableSecondaryControls} from "../components/RotatableSecondaryContro
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 import {Position} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
+import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {CalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 
@@ -108,10 +108,26 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         return animatedAngle;
     },
 
-    processArrowDirection(xDirection: number, yDirection: number, gameState?: RotatableGameState): [number, number] {
-        const coeff = isUpsideDownAngle(gameState?.angle || 0) ? -1 : 1;
+    processArrowDirection(
+        currentCell,
+        xDirection,
+        yDirection,
+        fieldSize,
+        isMainKeyboard,
+        gameState
+    ) {
+        if (!isMainKeyboard) {
+            return undefined;
+        }
 
-        return [coeff * xDirection, coeff * yDirection];
+        const coeff = isUpsideDownAngle(gameState.angle || 0) ? -1 : 1;
+
+        return defaultProcessArrowDirection(
+            currentCell,
+            coeff * xDirection,
+            coeff * yDirection,
+            fieldSize
+        );
     },
 
     mainControlsCount: 2,

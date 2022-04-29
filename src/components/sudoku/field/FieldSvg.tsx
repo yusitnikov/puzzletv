@@ -1,25 +1,28 @@
 import {PropsWithChildren} from "react";
 import {svgShadowStyle} from "../../app/globals";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {FieldSize} from "../../../types/sudoku/FieldSize";
 
 export interface FieldSvgProps {
-    fieldSize: number;
+    fieldSize: FieldSize;
     fieldMargin?: number;
     cellSize: number;
     useShadow?: boolean;
 }
 
-export const FieldSvg = ({fieldSize, fieldMargin = 0, cellSize, useShadow = true, children}: PropsWithChildren<FieldSvgProps>) => {
+export const FieldSvg = ({fieldSize: {fieldSize, rowsCount, columnsCount}, fieldMargin = 0, cellSize, useShadow = true, children}: PropsWithChildren<FieldSvgProps>) => {
     const extraMargin = fieldSize;
 
     fieldMargin += extraMargin;
 
+    const totalWidth = fieldSize + 2 * fieldMargin;
+
     return <AutoSvg
         left={-cellSize * extraMargin}
         top={-cellSize * extraMargin}
-        width={cellSize * (fieldSize + 2 * fieldMargin)}
-        height={cellSize * (fieldSize + 2 * fieldMargin)}
-        viewBox={`${-fieldMargin} ${-fieldMargin} ${fieldSize + 2 * fieldMargin} ${fieldSize + 2 * fieldMargin}`}
+        width={cellSize * totalWidth}
+        height={cellSize * totalWidth}
+        viewBox={`${(columnsCount - fieldSize) / 2 - fieldMargin} ${(rowsCount - fieldSize) / 2 - fieldMargin} ${totalWidth} ${totalWidth}`}
         style={useShadow ? svgShadowStyle : undefined}
     >
         {children}

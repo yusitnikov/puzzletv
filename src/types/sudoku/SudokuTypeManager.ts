@@ -6,6 +6,8 @@ import {GameState, ProcessedGameState} from "./GameState";
 import {ComponentType} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
+import {FieldSize} from "./FieldSize";
+import {PuzzleDefinition} from "./PuzzleDefinition";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(data1: CellType, data2: CellType): boolean;
@@ -46,11 +48,18 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     getFieldAngle?(gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType): number;
 
+    isValidCell?(cell: Position, puzzle: PuzzleDefinition<any, any, any>): boolean;
+
     processArrowDirection?(
+        currentCell: Position,
         xDirection: number,
         yDirection: number,
+        fieldSize: FieldSize,
+        isMainKeyboard: boolean,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
-    ): [number, number];
+    ): Position | undefined;
+
+    transformCoords?(coords: Position, puzzle: PuzzleDefinition<any, any, any>): Position;
 
     mainControlsCount?: number;
 
@@ -66,3 +75,13 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     digitShortcutTips?: (Translatable|undefined)[];
 }
+
+export const defaultProcessArrowDirection = (
+    {left, top}: Position,
+    xDirection: number,
+    yDirection: number,
+    {rowsCount, columnsCount}: FieldSize
+): Position => ({
+    left: (left + xDirection + columnsCount) % columnsCount,
+    top: (top + yDirection + rowsCount) % rowsCount,
+});

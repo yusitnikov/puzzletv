@@ -9,6 +9,7 @@ import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudok
 import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
 import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
 import {ChessGameState} from "../../sudokuTypes/chess/types/ChessGameState";
+import {createCubedokuFieldSize, CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
@@ -37,4 +38,13 @@ export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameS
     slug: "empty-chess",
     typeManager: ChessSudokuTypeManager,
     fieldSize: FieldSize8,
+};
+
+export const EmptyCubedoku: PuzzleDefinition<number> = {
+    noIndex: true,
+    title,
+    slug: "empty-cubedoku",
+    typeManager: CubedokuTypeManager,
+    fieldSize: createCubedokuFieldSize(6, 3),
+    digitsCount: 6,
 };

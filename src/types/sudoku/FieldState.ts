@@ -9,9 +9,9 @@ export interface FieldState<CellType> {
 }
 
 export const createEmptyFieldState = <CellType>(
-    {typeManager, fieldSize: {fieldSize}}: PuzzleDefinition<CellType, any, any>
+    {typeManager, fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<CellType, any, any>
 ): FieldState<CellType> => ({
-    cells: indexes(fieldSize).map(() => indexes(fieldSize).map(() => createEmptyCellState(typeManager))),
+    cells: indexes(rowsCount).map(() => indexes(columnsCount).map(() => createEmptyCellState(typeManager))),
 });
 
 export const cloneFieldState = <CellType>(

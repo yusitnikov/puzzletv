@@ -11,7 +11,7 @@ import {CellState} from "./CellState";
 import {areAllFieldStateCells, isAnyFieldStateCell, processFieldStateCells} from "./FieldState";
 import {indexes} from "../../utils/indexes";
 import {Position} from "../layout/Position";
-import {SudokuTypeManager} from "./SudokuTypeManager";
+import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap} from "./GivenDigitsMap";
 
@@ -106,13 +106,23 @@ export const gameStateToggleSelectedCell = <CellType, ProcessedGameStateExtensio
 } as any);
 
 export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionType = {}>(
-    {fieldSize: {fieldSize}}: PuzzleDefinition<CellType, any, ProcessedGameStateExtensionType>,
+    puzzle: PuzzleDefinition<CellType, any, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType>
-) =>
-    gameStateSetSelectedCells<CellType, ProcessedGameStateExtensionType>(
+) => {
+    const {
+        fieldSize: {rowsCount, columnsCount},
+        typeManager: {
+            isValidCell = () => true,
+        },
+    } = puzzle;
+
+    return gameStateSetSelectedCells<CellType, ProcessedGameStateExtensionType>(
         gameState,
-        indexes(fieldSize).flatMap(top => indexes(fieldSize).map(left => ({left, top})))
+        indexes(rowsCount)
+            .flatMap(top => indexes(columnsCount).map(left => ({left, top})))
+            .filter(cell => isValidCell(cell, puzzle))
     );
+};
 
 export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
     gameState: ProcessedGameState<CellType>
@@ -122,13 +132,14 @@ export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensio
 
 export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {
-        typeManager: {processArrowDirection},
-        fieldSize: {fieldSize},
+        typeManager: {processArrowDirection = defaultProcessArrowDirection},
+        fieldSize,
     }: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     xDirection: number,
     yDirection: number,
-    isMultiSelection: boolean
+    isMultiSelection: boolean,
+    isMainKeyboard: boolean
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
     const currentCell = gameState.selectedCells.last();
     // Nothing to do when there's no selection
@@ -136,13 +147,9 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
         return gameState;
     }
 
-    if (processArrowDirection) {
-        [xDirection, yDirection] = processArrowDirection(xDirection, yDirection, gameState);
-    }
-
-    const newCell: Position = {
-        left: (currentCell.left + xDirection + fieldSize) % fieldSize,
-        top: (currentCell.top + yDirection + fieldSize) % fieldSize,
+    const newCell = processArrowDirection(currentCell, xDirection, yDirection, fieldSize, isMainKeyboard, gameState);
+    if (!newCell) {
+        return gameState;
     }
 
     return isMultiSelection
