@@ -1,6 +1,5 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
-import {Line} from "../../layout/line/Line";
 import {indexes} from "../../../utils/indexes";
 import {Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
@@ -23,6 +22,10 @@ import {
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
+import {textColor} from "../../app/globals";
+import {RoundedPolyLine} from "../../svg/rounded-poly-line/RoundedPolyLine";
+import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -116,33 +119,31 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         }
     });
 
-    const absoluteFieldMargin = cellSize * fieldMargin;
-    const renderInnerFieldRect = (children: ReactNode) => <Absolute
-        left={absoluteFieldMargin}
-        top={absoluteFieldMargin}
-        width={rect.width - absoluteFieldMargin}
-        height={rect.height - absoluteFieldMargin}
-    >
-        {children}
-    </Absolute>;
-
-    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode) =>
-        renderInnerFieldRect(cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
-        const cellPosition: Position = {
-            left: columnIndex,
-            top: rowIndex,
-        };
-
-        return <Absolute
-            key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
-            left={cellSize * cellPosition.left}
-            top={cellSize * cellPosition.top}
-            width={cellSize}
-            height={cellSize}
+    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode, clip = false, useShadow = false) =>
+        <FieldSvg
+            fieldSize={fieldSize}
+            fieldMargin={fieldMargin}
+            cellSize={cellSize}
+            useShadow={useShadow}
         >
-            {renderer(cellState, cellPosition)}
-        </Absolute>;
-    })));
+            {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+                const cellPosition: Position = {
+                    left: columnIndex,
+                    top: rowIndex,
+                };
+
+                return <AutoSvg
+                    key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
+                    left={cellPosition.left}
+                    top={cellPosition.top}
+                    width={1}
+                    height={1}
+                    clip={clip}
+                >
+                    {renderer(cellState, cellPosition)}
+                </AutoSvg>;
+            }))}
+        </FieldSvg>;
 
     return <>
         <style dangerouslySetInnerHTML={{__html: `
@@ -161,23 +162,24 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 fieldSize={fieldSize}
                 fieldMargin={fieldMargin}
                 cellSize={cellSize}
-                layer={FieldLayer.beforeBackground}
             >
-                <Items {...state}/>
+                <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
+                    <Items {...state}/>
+                </FieldLayerContext.Provider>
             </FieldSvg>
 
             {renderCellsLayer("background", ({colors}) => <CellBackground
                 colors={colors}
-                size={cellSize}
             />)}
 
             <FieldSvg
                 fieldSize={fieldSize}
                 fieldMargin={fieldMargin}
                 cellSize={cellSize}
-                layer={FieldLayer.beforeSelection}
             >
-                <Items {...state}/>
+                <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
+                    <Items {...state}/>
+                </FieldLayerContext.Provider>
             </FieldSvg>
 
             {renderCellsLayer("selection", (cellState, cellPosition) => selectedCells.contains(cellPosition) && <CellSelection
@@ -189,63 +191,76 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 fieldSize={fieldSize}
                 fieldMargin={fieldMargin}
                 cellSize={cellSize}
-                layer={FieldLayer.regular}
             >
-                <Items {...state}/>
+                <FieldLayerContext.Provider value={FieldLayer.regular}>
+                    <Items {...state}/>
+                </FieldLayerContext.Provider>
             </FieldSvg>
-
-            {renderInnerFieldRect(indexes(fieldSize, true).map(index => <Line
-                key={`h-line-${index}`}
-                x1={0}
-                y1={cellSize * index}
-                x2={cellSize * fieldSize}
-                y2={cellSize * index}
-                width={[0, fieldSize, ...horizontalLines].includes(index) ? 3 : 1}
-            />))}
-
-            {renderInnerFieldRect(indexes(fieldSize, true).map(index => <Line
-                key={`v-line-${index}`}
-                x1={cellSize * index}
-                y1={0}
-                x2={cellSize * index}
-                y2={cellSize * fieldSize}
-                width={[0, fieldSize, ...verticalLines].includes(index) ? 3 : 1}
-            />))}
 
             <FieldSvg
                 fieldSize={fieldSize}
                 fieldMargin={fieldMargin}
                 cellSize={cellSize}
-                layer={FieldLayer.top}
+                useShadow={false}
             >
-                <Items {...state}/>
+                {indexes(fieldSize, true).map(index => <RoundedPolyLine
+                    key={`h-line-${index}`}
+                    points={[
+                        [0, index],
+                        [fieldSize, index],
+                    ]}
+                    stroke={textColor}
+                    strokeWidth={([0, fieldSize, ...horizontalLines].includes(index) ? 3 : 1) / cellSize}
+                />)}
+
+                {indexes(fieldSize, true).map(index => <RoundedPolyLine
+                    key={`v-line-${index}`}
+                    points={[
+                        [index, 0],
+                        [index, fieldSize],
+                    ]}
+                    stroke={textColor}
+                    strokeWidth={([0, fieldSize, ...verticalLines].includes(index) ? 3 : 1) / cellSize}
+                />)}
+            </FieldSvg>
+
+            <FieldSvg
+                fieldSize={fieldSize}
+                fieldMargin={fieldMargin}
+                cellSize={cellSize}
+            >
+                <FieldLayerContext.Provider value={FieldLayer.top}>
+                    <Items {...state}/>
+                </FieldLayerContext.Provider>
             </FieldSvg>
 
             {renderCellsLayer("digits", (cellState, {top, left}) => <CellDigits
                 typeManager={typeManager}
                 data={cellState}
                 initialData={initialDigits?.[top]?.[left]}
-                size={cellSize}
+                size={1}
                 state={state}
-            />)}
+            />, false, true)}
 
-            {renderCellsLayer("mouse-handler", (cellState, cellPosition) => <Absolute
-                width={cellSize}
-                height={cellSize}
-                pointerEvents={true}
+            {renderCellsLayer("mouse-handler", (cellState, cellPosition) => <rect
+                width={1}
+                height={1}
+                fill={"none"}
+                stroke={"none"}
                 style={{
                     cursor: isReady ? "pointer" : undefined,
                     touchAction: "none",
                     userSelect: "none",
+                    pointerEvents: "all",
                 }}
-                onMouseDown={(ev: MouseEvent<HTMLDivElement>) => {
+                onMouseDown={(ev: MouseEvent<any>) => {
                     // Make sure that clicking on the grid won't be recognized as an outside click and won't try to drag
                     ev.preventDefault();
                     ev.stopPropagation();
                 }}
-                onPointerDown={({target, pointerId, ctrlKey, shiftKey, isPrimary}: PointerEvent<HTMLDivElement>) => {
-                    if ((target as HTMLDivElement).hasPointerCapture?.(pointerId)) {
-                        (target as HTMLDivElement).releasePointerCapture?.(pointerId);
+                onPointerDown={({target, pointerId, ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
+                    if ((target as Element).hasPointerCapture?.(pointerId)) {
+                        (target as Element).releasePointerCapture?.(pointerId);
                     }
 
                     const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
@@ -257,14 +272,14 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                             : gameStateSetSelectedCells(gameState, [cellPosition])
                     );
                 }}
-                onPointerEnter={({buttons}: PointerEvent<HTMLDivElement>) => {
+                onPointerEnter={({buttons}: PointerEvent<any>) => {
                     if (buttons !== 1) {
                         return;
                     }
 
                     onStateChange(gameState => gameStateToggleSelectedCell(gameState, cellPosition, !isDeleteSelectedCellsStroke));
                 }}
-            />)}
+            />, true)}
         </Absolute>
     </>;
 };

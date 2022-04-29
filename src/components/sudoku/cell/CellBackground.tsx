@@ -1,6 +1,6 @@
-import {Absolute} from "../../layout/absolute/Absolute";
 import {blackColor, blueColor, greenColor, lightGreyColor} from "../../app/globals";
 import {Set} from "../../../types/struct/Set";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
 const backgroundColors = [
     lightGreyColor,
@@ -16,24 +16,28 @@ const backgroundColors = [
 
 export interface CellBackgroundProps {
     colors: Set<number>;
-    size: number;
+    size?: number;
 }
 
-export const CellBackground = ({colors, size}: CellBackgroundProps) => {
+export const CellBackground = ({colors, size = 1}: CellBackgroundProps) => {
     if (!colors.size) {
         return null;
     }
 
     colors = colors.sorted();
 
-    return <Absolute
+    return <AutoSvg
         width={size}
         height={size}
-        style={{
-            backgroundColor: backgroundColors[colors.first()],
-        }}
+        clip={colors.size > 1}
     >
-        {colors.size > 1 && <Absolute tagName={"svg"} width={size} height={size}>
+        <rect
+            width={size}
+            height={size}
+            fill={backgroundColors[colors.first()]}
+        />
+
+        {colors.size > 1 && <>
             {colors.items.map((color, index) => !!index && <polygon
                 key={index}
                 points={
@@ -53,6 +57,6 @@ export const CellBackground = ({colors, size}: CellBackgroundProps) => {
                 }
                 fill={backgroundColors[color]}
             />)}
-        </Absolute>}
-    </Absolute>;
+        </>}
+    </AutoSvg>;
 };

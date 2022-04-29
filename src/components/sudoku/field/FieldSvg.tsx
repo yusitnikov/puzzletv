@@ -1,24 +1,27 @@
 import {PropsWithChildren} from "react";
 import {svgShadowStyle} from "../../app/globals";
-import {Absolute} from "../../layout/absolute/Absolute";
-import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
 export interface FieldSvgProps {
     fieldSize: number;
     fieldMargin?: number;
     cellSize: number;
-    layer: FieldLayer;
+    useShadow?: boolean;
 }
 
-export const FieldSvg = ({fieldSize, fieldMargin = 0, cellSize, layer, children}: PropsWithChildren<FieldSvgProps>) => <Absolute
-    tagName={"svg"}
-    width={cellSize * (fieldSize + 2 * fieldMargin)}
-    height={cellSize * (fieldSize + 2 * fieldMargin)}
-    viewBox={`${-fieldMargin} ${-fieldMargin} ${fieldSize + 2 * fieldMargin} ${fieldSize + 2 * fieldMargin}`}
-    style={svgShadowStyle}
->
-    <FieldLayerContext.Provider value={layer}>
+export const FieldSvg = ({fieldSize, fieldMargin = 0, cellSize, useShadow = true, children}: PropsWithChildren<FieldSvgProps>) => {
+    const extraMargin = fieldSize;
+
+    fieldMargin += extraMargin;
+
+    return <AutoSvg
+        left={-cellSize * extraMargin}
+        top={-cellSize * extraMargin}
+        width={cellSize * (fieldSize + 2 * fieldMargin)}
+        height={cellSize * (fieldSize + 2 * fieldMargin)}
+        viewBox={`${-fieldMargin} ${-fieldMargin} ${fieldSize + 2 * fieldMargin} ${fieldSize + 2 * fieldMargin}`}
+        style={useShadow ? svgShadowStyle : undefined}
+    >
         {children}
-    </FieldLayerContext.Provider>
-</Absolute>;
+    </AutoSvg>;
+};

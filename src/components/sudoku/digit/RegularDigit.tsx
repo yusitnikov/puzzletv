@@ -1,27 +1,20 @@
 import {memo} from "react";
-import {Absolute} from "../../layout/absolute/Absolute";
-import {svgShadowStyle, textColor} from "../../app/globals";
+import {textColor} from "../../app/globals";
 import {DigitProps} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
-export const RegularDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <Absolute
+export const RegularDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+    width={size}
+    height={size}
     {...containerProps}
-    style={{
-        ...svgShadowStyle,
-        color,
-    }}
+    style={{color}}
 >
-    <div
-        style={{
-            position: "absolute",
-            fontSize: size,
-            lineHeight: `${size}px`,
-            transform: "translate(-50%, -50%)",
-        }}
-    >
-        {digit}
-    </div>
-</Absolute>);
+    <RegularDigitSvgContent
+        digit={digit}
+        size={size}
+    />
+</AutoSvg>);
 
 export const RegularDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, top = 0}: DigitProps) => <text
     x={left}
@@ -32,6 +25,7 @@ export const RegularDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, 
         fontSize: `${size}px`,
         lineHeight: `${size}px`,
     }}
+    fill={"currentColor"}
 >
     {digit}
 </text>);

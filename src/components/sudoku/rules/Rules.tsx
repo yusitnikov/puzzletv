@@ -57,7 +57,7 @@ export const Rules = <CellType,>({puzzle: {title, author, rules}, rect, cellSize
                     fontSize: cellSize * textHeightCoeff,
                 }}
             >
-                {rules(translate)}
+                {rules?.(translate)}
             </div>
         </div>
     </StyledContainer>;

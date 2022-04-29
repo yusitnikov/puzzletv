@@ -1,9 +1,9 @@
 import {memo} from "react";
-import {Absolute} from "../../layout/absolute/Absolute";
-import {svgShadowStyle, textColor} from "../../app/globals";
+import {textColor} from "../../app/globals";
 import {Position} from "../../../types/layout/Position";
 import {DigitProps} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
 const T = true;
 const F = false;
@@ -89,26 +89,17 @@ const lineSpacingCoeff = lineWidthCoeff * 0.3;
 const squareSizeCoeff = (1 - lineWidthCoeff) / 2;
 const digitWidthCoeff = squareSizeCoeff + lineWidthCoeff;
 
-export const CalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <Absolute
+export const CalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+    width={size}
+    height={size}
     {...containerProps}
     style={{color}}
 >
-    <Absolute
-        tagName={"svg"}
-        left={-size * digitWidthCoeff / 2}
-        top={-size / 2}
-        width={size * digitWidthCoeff}
-        height={size}
-        style={svgShadowStyle}
-    >
-        <CalculatorDigitSvgContent
-            digit={digit}
-            size={size}
-            left={size * digitWidthCoeff / 2}
-            top={size / 2}
-        />
-    </Absolute>
-</Absolute>);
+    <CalculatorDigitSvgContent
+        digit={digit}
+        size={size}
+    />
+</AutoSvg>);
 
 export const CalculatorDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, top = 0}: DigitProps) => <>
     {matrices[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine

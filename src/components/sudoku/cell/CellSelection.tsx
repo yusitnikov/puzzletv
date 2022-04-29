@@ -1,4 +1,3 @@
-import {Absolute} from "../../layout/absolute/Absolute";
 import {blueColor, lighterBlueColor} from "../../app/globals";
 
 export interface CellSelectionProps {
@@ -7,25 +6,27 @@ export interface CellSelectionProps {
 }
 
 export const CellSelection = ({size, isSecondary}: CellSelectionProps) => {
-    const selectionBorderWidth = size * 0.1;
-    const selectionBorderWidth2 = 2;
+    const selectionBorderWidth = 0.1;
+    const selectionBorderWidth2 = 2 / size;
 
     return <>
-        <Absolute
-            left={selectionBorderWidth / 2}
-            top={selectionBorderWidth / 2}
-            width={size - selectionBorderWidth}
-            height={size - selectionBorderWidth}
-            borderWidth={selectionBorderWidth}
-            borderColor={isSecondary ? lighterBlueColor : blueColor}
+        <rect
+            x={selectionBorderWidth / 2}
+            y={selectionBorderWidth / 2}
+            width={1 - selectionBorderWidth}
+            height={1 - selectionBorderWidth}
+            fill={"none"}
+            strokeWidth={selectionBorderWidth}
+            stroke={isSecondary ? lighterBlueColor : blueColor}
         />
-        <Absolute
-            left={selectionBorderWidth + selectionBorderWidth2 / 2}
-            top={selectionBorderWidth + selectionBorderWidth2 / 2}
-            width={size - selectionBorderWidth * 2 - selectionBorderWidth2}
-            height={size - selectionBorderWidth * 2 - selectionBorderWidth2}
-            borderWidth={selectionBorderWidth2}
-            borderColor={"#fff"}
+        <rect
+            x={selectionBorderWidth + selectionBorderWidth2 / 2}
+            y={selectionBorderWidth + selectionBorderWidth2 / 2}
+            width={1 - selectionBorderWidth * 2 - selectionBorderWidth2}
+            height={1 - selectionBorderWidth * 2 - selectionBorderWidth2}
+            fill={"none"}
+            strokeWidth={selectionBorderWidth2}
+            stroke={"#fff"}
         />
     </>;
 };

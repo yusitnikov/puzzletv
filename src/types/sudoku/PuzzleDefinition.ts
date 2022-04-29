@@ -10,7 +10,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     title: PartiallyTranslatable<ReactNode>;
     slug: string;
     author?: PartiallyTranslatable<ReactNode>;
-    rules: (translate: ReturnType<typeof useTranslate>) => ReactNode;
+    rules?: (translate: ReturnType<typeof useTranslate>) => ReactNode;
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     fieldSize: FieldSize;
     fieldMargin?: number;

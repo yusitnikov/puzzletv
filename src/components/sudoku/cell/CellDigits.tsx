@@ -1,9 +1,9 @@
-import {Absolute} from "../../layout/absolute/Absolute";
 import {CellState} from "../../../types/sudoku/CellState";
 import {Position} from "../../../types/layout/Position";
 import {Set} from "../../../types/struct/Set";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {ProcessedGameState} from "../../../types/sudoku/GameState";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
 const centerDigitCoeff = 0.35;
 
@@ -79,43 +79,53 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         });
     };
 
-    return <Absolute left={size / 2} top={size / 2}>
-        {initialData && <CellData
-            key={"initial"}
-            data={initialData}
-            size={size * 0.7}
-            state={state}
-            isInitial={true}
-        />}
+    return <AutoSvg
+        width={size}
+        height={size}
+    >
+        <AutoSvg
+            left={size / 2}
+            top={size / 2}
+            width={size}
+            height={size}
+        >
+            {initialData && <CellData
+                key={"initial"}
+                data={initialData}
+                size={size * 0.7}
+                state={state}
+                isInitial={true}
+            />}
 
-        {!initialData && usersDigit && <CellData
-            key={"users"}
-            data={usersDigit}
-            size={size * 0.7}
-            state={state}
-            isInitial={mainColor}
-        />}
+            {!initialData && usersDigit && <CellData
+                key={"users"}
+                data={usersDigit}
+                size={size * 0.7}
+                state={state}
+                isInitial={mainColor}
+            />}
 
-        {centerDigits && renderAnimatedDigitsSet(
-            "center",
-            centerDigits,
-            size * centerDigitsCoeff,
-            (index) => ({
-                left: size * centerDigitsCoeff * widthCoeff * (index - (centerDigits.size - 1) / 2),
-                top: 0,
-            })
-        )}
+            {centerDigits && renderAnimatedDigitsSet(
+                "center",
+                centerDigits,
+                size * centerDigitsCoeff,
+                (index) => ({
+                    left: size * centerDigitsCoeff * widthCoeff * (index - (centerDigits.size - 1) / 2),
+                    top: 0,
+                })
+            )}
 
-        {cornerDigits && renderAnimatedDigitsSet(
-            "corner",
-            cornerDigits,
-            size * cornerDigitCoeff,
-            (index) => (corners[index] && {
-                left: size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5),
-                top: size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5),
-            })
-        )}
-    </Absolute>;
+            {cornerDigits && renderAnimatedDigitsSet(
+                "corner",
+                cornerDigits,
+                size * cornerDigitCoeff,
+                (index) => (corners[index] && {
+                    left: size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5),
+                    top: size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5),
+                })
+            )}
+        </AutoSvg>
+    </AutoSvg>;
 };
 
 export const getCellDataSortIndexes = <CellType,>(
