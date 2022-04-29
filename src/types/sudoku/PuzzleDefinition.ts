@@ -1,5 +1,5 @@
 import {GivenDigitsMap} from "./GivenDigitsMap";
-import {ReactNode} from "react";
+import {FC, ReactNode} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
 import {PartiallyTranslatable} from "../translations/Translatable";
@@ -17,6 +17,6 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
     resultChecker?: (gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => boolean,
-    items?: ReactNode;
+    items?: ReactNode | FC<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
     noIndex?: boolean;
 }
