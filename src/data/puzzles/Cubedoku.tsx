@@ -7,6 +7,12 @@ import {
     mergeGivenDigitsMaps
 } from "../../types/sudoku/GivenDigitsMap";
 import {gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
+import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import {
+    cubedokuIndexingDetails,
+    cubedokuIndexingRules,
+    cubedokuNormalSudokuRules
+} from "../../sudokuTypes/cubedoku/data/ruleSnippets";
 
 const regularFieldSize4 = createCubedokuFieldSize(4, 2);
 
@@ -55,6 +61,11 @@ export const IntroToCubedoku: PuzzleDefinition<number> = {
     },
     digitsCount: 4,
     fieldMargin: 1,
+    rules: translate => <>
+        <RulesParagraph>{translate(cubedokuNormalSudokuRules(4))}.</RulesParagraph>
+        <RulesParagraph>{translate(cubedokuIndexingRules)}.</RulesParagraph>
+        <RulesParagraph>{translate(cubedokuIndexingDetails)}.</RulesParagraph>
+    </>,
     initialDigits: {
         3: {
             3: 3,
