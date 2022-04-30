@@ -51,7 +51,8 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         keyPrefix: string,
         digits: Set<CellType>,
         digitSize: number,
-        positionFunction: (index: number) => PositionWithAngle | undefined
+        positionFunction: (index: number) => PositionWithAngle | undefined,
+        isInitial = false
     ) => {
         const straightIndexes = getCellDataSortIndexes(digits, typeManager.compareCellData);
 
@@ -74,7 +75,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 size={digitSize}
                 {...position}
                 state={state}
-                isInitial={mainColor}
+                isInitial={isInitial || mainColor}
             />;
         });
     };
@@ -89,13 +90,13 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
             width={size}
             height={size}
         >
-            {initialData && <CellData
-                key={"initial"}
-                data={initialData}
-                size={size * 0.7}
-                state={state}
-                isInitial={true}
-            />}
+            {initialData && renderAnimatedDigitsSet(
+                "initial",
+                new Set([initialData]),
+                size * 0.7,
+                () => emptyPositionWithAngle,
+                true
+            )}
 
             {!initialData && usersDigit && renderAnimatedDigitsSet(
                 "users",
