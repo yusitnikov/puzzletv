@@ -1,12 +1,11 @@
 import {isStickyRotatableDigit, RotatableDigit} from "./RotatableDigit";
 import {isStartAngle, isUpsideDownAngle} from "../utils/rotation";
 import {RotatableDigitCellDataComponentType} from "../components/RotatableDigitCellData";
-import {Set} from "../../../types/struct/Set";
 import {RotatableGameState, RotatableProcessedGameState} from "./RotatableGameState";
 import {RotatableMainControls} from "../components/RotatableMainControls";
 import {RotatableSecondaryControls} from "../components/RotatableSecondaryControls";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
-import {Position, PositionWithAngle} from "../../../types/layout/Position";
+import {PositionWithAngle} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
@@ -56,10 +55,12 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
     },
 
     processCellDataPosition(
+        puzzle,
         basePosition,
         dataSet,
         dataIndex,
         positionFunction,
+        cellPosition?,
         state?
     ): PositionWithAngle | undefined {
         const upsideDownIndexes = getCellDataSortIndexes<RotatableDigit>(

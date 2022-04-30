@@ -2,6 +2,7 @@ import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/su
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
 import {CellSelectionColor, CellSelectionProps} from "../../../components/sudoku/cell/CellSelection";
+import {PositionWithAngle} from "../../../types/layout/Position";
 
 export const CubedokuTypeManager: SudokuTypeManager<number> = {
     ...DigitSudokuTypeManager(),
@@ -29,6 +30,26 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
         }
 
         return cell;
+    },
+
+    processCellDataPosition(
+        {fieldSize: {fieldSize}},
+        basePosition,
+        dataSet,
+        dataIndex,
+        positionFunction,
+        cellPosition?
+    ): PositionWithAngle | undefined {
+        const position = positionFunction(dataIndex);
+        if (!position || !cellPosition || cellPosition.top * 2 >= fieldSize) {
+            return position;
+        }
+
+        return {
+            left: (position.left + position.top) * 0.6,
+            top: (position.top - position.left) * 0.6,
+            angle: position.angle - 45,
+        };
     },
 
     transformCoords({top, left}, {fieldSize: {fieldSize}}) {

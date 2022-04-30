@@ -44,15 +44,17 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const {
         cellSize,
         isHorizontal,
-        puzzle: {
-            typeManager,
-            resultChecker,
-            fieldSize: {fieldSize},
-            digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
-        },
+        puzzle,
         state,
         onStateChange,
     } = otherProps;
+
+    const {
+        typeManager,
+        resultChecker,
+        fieldSize: {fieldSize},
+        digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
+    } = puzzle;
 
     const translate = useTranslate();
 
@@ -173,7 +175,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 title={title}
             >
                 <CellContent
-                    typeManager={typeManager}
+                    puzzle={puzzle}
                     data={{
                         usersDigit: cellWriteMode === CellWriteMode.main ? cellData : undefined,
                         cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [cellData] : []),
@@ -194,7 +196,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             onClick={() => handleSetCellWriteMode(CellWriteMode.main)}
         >
             {contentSize => <CellDigits
-                typeManager={typeManager}
+                puzzle={puzzle}
                 data={{usersDigit: createCellDataByDisplayDigit(digitsCount, state)}}
                 size={contentSize}
                 mainColor={true}
@@ -211,7 +213,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}
         >
             {contentSize => <CellDigits
-                typeManager={typeManager}
+                puzzle={puzzle}
                 data={{cornerDigits: new Set([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
                 size={contentSize}
                 mainColor={true}
@@ -228,7 +230,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             title={`${translate("Center")} (${translate("shortcut")}: Ctrl)`}
         >
             {contentSize => <CellDigits
-                typeManager={typeManager}
+                puzzle={puzzle}
                 data={{centerDigits: new Set([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
                 size={contentSize}
                 mainColor={true}

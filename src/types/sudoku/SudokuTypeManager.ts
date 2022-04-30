@@ -30,10 +30,12 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     ): CellType;
 
     processCellDataPosition?(
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         basePosition: PositionWithAngle,
         dataSet: Set<CellType>,
         dataIndex: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
+        cellPosition?: Position,
         state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): PositionWithAngle | undefined;
 

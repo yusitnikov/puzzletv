@@ -1,9 +1,9 @@
 import {CellState} from "../../../types/sudoku/CellState";
 import {emptyPositionWithAngle, Position, PositionWithAngle} from "../../../types/layout/Position";
 import {Set} from "../../../types/struct/Set";
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {ProcessedGameState} from "../../../types/sudoku/GameState";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 const centerDigitCoeff = 0.35;
 
@@ -21,23 +21,29 @@ const corners: Position[] = [
 ];
 
 export interface CellDigitsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     data: Partial<CellState<CellType>>;
     initialData?: CellType;
     size: number;
+    cellPosition?: Position;
     state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     mainColor?: boolean;
 }
 
 export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {typeManager, data, initialData, size, state, mainColor}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {puzzle, data, initialData, size, cellPosition, state, mainColor}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {
-        cellDataComponentType: {
-            component: CellData,
-            widthCoeff,
+        typeManager: {
+            cellDataComponentType: {
+                component: CellData,
+                widthCoeff,
+            },
+            processCellDataPosition,
+            getCellDataHash,
+            compareCellData,
         },
-    } = typeManager;
+    } = puzzle;
 
     const {
         usersDigit,
@@ -54,7 +60,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         positionFunction: (index: number) => PositionWithAngle | undefined,
         isInitial = false
     ) => {
-        const straightIndexes = getCellDataSortIndexes(digits, typeManager.compareCellData);
+        const straightIndexes = getCellDataSortIndexes(digits, compareCellData);
 
         return digits.items.map((cellData, index) => {
             let position = positionFunction(straightIndexes[index]);
@@ -62,15 +68,15 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 return undefined;
             }
 
-            if (typeManager.processCellDataPosition) {
-                position = typeManager.processCellDataPosition(position, digits, index, positionFunction, state);
+            if (processCellDataPosition) {
+                position = processCellDataPosition(puzzle, position, digits, index, positionFunction, cellPosition, state);
                 if (!position) {
                     return undefined;
                 }
             }
 
             return <CellData
-                key={`${keyPrefix}-${typeManager.getCellDataHash(cellData)}`}
+                key={`${keyPrefix}-${getCellDataHash(cellData)}`}
                 data={cellData}
                 size={digitSize}
                 {...position}

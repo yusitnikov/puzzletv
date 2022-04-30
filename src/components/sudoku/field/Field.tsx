@@ -267,11 +267,12 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 </FieldLayerContext.Provider>
             </FieldSvg>
 
-            {renderCellsLayer("digits", (cellState, {top, left}) => <CellDigits
-                typeManager={typeManager}
+            {renderCellsLayer("digits", (cellState, cell) => <CellDigits
+                puzzle={puzzle}
                 data={cellState}
-                initialData={initialDigits?.[top]?.[left]}
+                initialData={initialDigits?.[cell.top]?.[cell.left]}
                 size={1}
+                cellPosition={cell}
                 state={state}
             />, false, true)}
 
