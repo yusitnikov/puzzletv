@@ -25,6 +25,7 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {textColor} from "../../app/globals";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {RoundedPolyLine} from "../../svg/rounded-poly-line/RoundedPolyLine";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -363,20 +364,17 @@ export const FieldLines = memo<Pick<FieldProps<any, any, any>, "puzzle" | "cellS
             ];
         }))}
 
-        {regions.map((region, index) => <polygon
+        {regions.map((region, index) => <RoundedPolyLine
             key={`region-${index}`}
             points={
-                region
+                [...region, region[0]]
                     .map(([left, top]) => {
                         const transformed = transformCoords({left, top}, puzzle);
                         return [transformed.left, transformed.top];
                     })
-                    .map(([x, y]) => `${x},${y}`)
-                    .join(" ")
             }
             stroke={textColor}
-            strokeWidth={3 / cellSize}
-            fill={"none"}
+            strokeWidth={Math.min(5 / cellSize, 0.05)}
         />)}
     </>;
 });
