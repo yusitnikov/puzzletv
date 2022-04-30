@@ -1,5 +1,5 @@
 import {CellState} from "../../../types/sudoku/CellState";
-import {Position} from "../../../types/layout/Position";
+import {emptyPositionWithAngle, Position, PositionWithAngle} from "../../../types/layout/Position";
 import {Set} from "../../../types/struct/Set";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {ProcessedGameState} from "../../../types/sudoku/GameState";
@@ -51,7 +51,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         keyPrefix: string,
         digits: Set<CellType>,
         digitSize: number,
-        positionFunction: (index: number) => Position | undefined
+        positionFunction: (index: number) => PositionWithAngle | undefined
     ) => {
         const straightIndexes = getCellDataSortIndexes(digits, typeManager.compareCellData);
 
@@ -97,13 +97,12 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 isInitial={true}
             />}
 
-            {!initialData && usersDigit && <CellData
-                key={"users"}
-                data={usersDigit}
-                size={size * 0.7}
-                state={state}
-                isInitial={mainColor}
-            />}
+            {!initialData && usersDigit && renderAnimatedDigitsSet(
+                "users",
+                new Set([usersDigit]),
+                size * 0.7,
+                () => emptyPositionWithAngle
+            )}
 
             {centerDigits && renderAnimatedDigitsSet(
                 "center",
@@ -112,6 +111,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 (index) => ({
                     left: size * centerDigitsCoeff * widthCoeff * (index - (centerDigits.size - 1) / 2),
                     top: 0,
+                    angle: 0,
                 })
             )}
 
@@ -122,6 +122,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 (index) => (corners[index] && {
                     left: size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5),
                     top: size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5),
+                    angle: 0,
                 })
             )}
         </AutoSvg>
@@ -139,7 +140,7 @@ export const getCellDataSortIndexes = <CellType,>(
     );
 
     return digits.cached(cacheKey, () => {
-        const indexes = Array(digits.size);
+        const indexes = Array<number>(digits.size);
 
         itemsWithIndexes
             .sort(({value: a}, {value: b}) => compareFn(a, b))

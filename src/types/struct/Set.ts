@@ -20,6 +20,10 @@ export class Set<ItemT> {
         return this.size === set.size && this.items.every(item => set.contains(item));
     }
 
+    public at(index: number) {
+        return this.items[index < 0 ? this.size + index : index];
+    }
+
     public first() {
         return this.items[0];
     }

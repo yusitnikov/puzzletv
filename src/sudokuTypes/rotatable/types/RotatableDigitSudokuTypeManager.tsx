@@ -1,4 +1,4 @@
-import {RotatableDigit} from "./RotatableDigit";
+import {isStickyRotatableDigit, RotatableDigit} from "./RotatableDigit";
 import {isStartAngle, isUpsideDownAngle} from "../utils/rotation";
 import {RotatableDigitCellDataComponentType} from "../components/RotatableDigitCellData";
 import {Set} from "../../../types/struct/Set";
@@ -6,7 +6,7 @@ import {RotatableGameState, RotatableProcessedGameState} from "./RotatableGameSt
 import {RotatableMainControls} from "../components/RotatableMainControls";
 import {RotatableSecondaryControls} from "../components/RotatableSecondaryControls";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
-import {Position} from "../../../types/layout/Position";
+import {Position, PositionWithAngle} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
@@ -56,12 +56,12 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
     },
 
     processCellDataPosition(
-        basePosition: Position,
-        dataSet: Set<RotatableDigit>,
-        dataIndex: number,
-        positionFunction: (index: number) => (Position | undefined),
-        state?: RotatableProcessedGameState
-    ): Position | undefined {
+        basePosition,
+        dataSet,
+        dataIndex,
+        positionFunction,
+        state?
+    ): PositionWithAngle | undefined {
         const upsideDownIndexes = getCellDataSortIndexes<RotatableDigit>(
             dataSet,
             (a, b) =>
@@ -81,6 +81,8 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         return {
             left: getAnimatedValue(basePosition.left, -upsideDownPosition.left),
             top: getAnimatedValue(basePosition.top, -upsideDownPosition.top),
+            angle: getAnimatedValue(basePosition.angle, -upsideDownPosition.angle)
+                + (isStickyRotatableDigit(dataSet.at(dataIndex)) ? -(state?.animatedAngle || 0) : 0),
         }
     },
 
