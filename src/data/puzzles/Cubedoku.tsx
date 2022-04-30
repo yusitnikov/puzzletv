@@ -54,6 +54,7 @@ export const IntroToCubedoku: PuzzleDefinition<number> = {
         ],
     },
     digitsCount: 4,
+    fieldMargin: 1,
     initialDigits: {
         3: {
             3: 3,
