@@ -21,6 +21,7 @@ export const AutoSvg = ({children, clip, style, ...props}: AutoSvgProps) => {
         top = 0,
         width,
         height,
+        angle = 0,
     } = props;
 
     if (!svgParentExists) {
@@ -59,7 +60,7 @@ export const AutoSvg = ({children, clip, style, ...props}: AutoSvgProps) => {
 
     if (left || top || style) {
         return <g
-            transform={`translate(${left} ${top})`}
+            transform={`translate(${left} ${top}) rotate(${angle})`}
             style={style}
         >
             {children}
