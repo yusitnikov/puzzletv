@@ -13,6 +13,7 @@ A web application for creating and solving different types of sudoku.
 | Mix  | Hard  |  Must have   | Keep the progress when refreshing/duplicating the tab + restart button.              |
 | Feat | Hard  |  Must have   | Setter mode.                                                                         |
 | Bug  |  Mid  |   Not sure   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).            |
+| Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                             |
 | Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.            |
 | Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API).   |
 | Bug  |  Mid  | Nice to have | 2-color solid chess pieces with a normal font.                                       |
