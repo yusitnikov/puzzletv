@@ -3,7 +3,6 @@ import {isStartAngle, isUpsideDownAngle} from "../utils/rotation";
 import {RotatableDigitCellDataComponentType} from "../components/RotatableDigitCellData";
 import {RotatableGameState, RotatableProcessedGameState} from "./RotatableGameState";
 import {RotatableMainControls} from "../components/RotatableMainControls";
-import {RotatableSecondaryControls} from "../components/RotatableSecondaryControls";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 import {PositionWithAngle} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
@@ -133,11 +132,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         );
     },
 
-    mainControlsCount: 2,
+    hasBottomRowControls: true,
 
     mainControlsComponent: RotatableMainControls,
-
-    secondaryControlsCount: 1,
-
-    secondaryControlsComponent: RotatableSecondaryControls,
 };

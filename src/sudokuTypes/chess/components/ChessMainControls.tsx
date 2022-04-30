@@ -6,7 +6,7 @@ import {ChessGameState} from "../types/ChessGameState";
 import {ChessColor} from "../types/ChessColor";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
+import {ArrowLeft} from "@emotion-icons/fluentui-system-filled";
 import {useState} from "react";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
@@ -44,28 +44,38 @@ export const ChessMainControls = (
 
     return <>
         {cellWriteMode !== CellWriteMode.color && !usedColorSelectionOnce && <Absolute
-            top={cellSize * (2 + 3 * controlButtonPaddingCoeff)}
-            width={cellSize * (3 + 2 * controlButtonPaddingCoeff)}
+            left={cellSize}
+            top={cellSize * 2 * (1 + controlButtonPaddingCoeff)}
+            width={cellSize * 2 * (1 + controlButtonPaddingCoeff)}
             style={{
                 fontSize: cellSize * 0.3,
                 lineHeight: `${cellSize * 0.3}px`,
             }}
         >
-            {translate("Chess piece color")}
+            <Absolute
+                left={cellSize * 0.5}
+                width={cellSize * (1.5 + 2 * controlButtonPaddingCoeff)}
+                height={cellSize}
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                }}
+            >
+                {translate("Chess piece color")}
+            </Absolute>
 
             <Absolute
-                left={cellSize * 0.25}
-                top={cellSize * 0.4}
+                top={cellSize * 0.25}
                 width={cellSize * 0.5}
                 height={cellSize * 0.5}
             >
-                <ArrowCurveDownLeft/>
+                <ArrowLeft/>
             </Absolute>
         </Absolute>}
 
         <ControlButton
             left={0}
-            top={3}
+            top={2}
             cellSize={cellSize}
             onClick={handleToggleColor}
             title={`${translate("Chess piece color")} (${translate("click to toggle")}, ${translate("shortcut")}: C)`}

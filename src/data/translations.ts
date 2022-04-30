@@ -86,7 +86,7 @@ export const translationsExactType = {
     // endregion
     // region ChessMainControls
     "Chess piece color": {
-        [LanguageCode.ru]: "Цвет шахматных фигур",
+        [LanguageCode.ru]: "Цвет фигур",
     },
     // endregion
     // region RotatableMainControls
@@ -96,8 +96,8 @@ export const translationsExactType = {
     "Rotate the puzzle": {
         [LanguageCode.ru]: "Повернуть поле",
     },
-    "use the button below to control the rotation speed": {
-        [LanguageCode.ru]: "нажмите на кнопку ниже, чтобы изменить скорость вращения поля",
+    "use the button from the right side to control the rotation speed": {
+        [LanguageCode.ru]: "нажмите на кнопку справа, чтобы изменить скорость вращения поля",
     },
     "Sticky mode": {
         [LanguageCode.ru]: "Фиксированный режим",

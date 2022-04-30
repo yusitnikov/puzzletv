@@ -1,8 +1,13 @@
 import {Rules} from "../rules/Rules";
-import {Controls, controlsHeightCoeff, ControlsProps, controlsWidthCoeff} from "../controls/Controls";
+import {
+    Controls,
+    ControlsProps,
+    controlsWidthCoeff
+} from "../controls/Controls";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
+import {controlButtonPaddingCoeff} from "../controls/ControlButton";
 
 export interface SidePanelProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
     extends ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
@@ -11,7 +16,15 @@ export interface SidePanelProps<CellType, GameStateExtensionType = {}, Processed
 export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {puzzle, rect, cellSize, isHorizontal, ...controlsProps}: SidePanelProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    const {
+        typeManager: {
+            hasBottomRowControls = false,
+        }
+    } = puzzle;
+
     const padding = cellSize * globalPaddingCoeff;
+
+    const controlsHeightCoeff = controlsWidthCoeff - (hasBottomRowControls ? 0 : 1 + controlButtonPaddingCoeff);
 
     const controlsSize: Size = {
         width: cellSize * (isHorizontal ? controlsWidthCoeff : controlsHeightCoeff),
@@ -42,7 +55,7 @@ export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameSt
             puzzle={puzzle}
             rect={{...controlsPosition, ...controlsSize}}
             cellSize={cellSize}
-            isHorizontal={isHorizontal}
+            isHorizontal={isHorizontal || hasBottomRowControls}
             {...controlsProps}
         />
     </Absolute>;

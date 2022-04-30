@@ -8,6 +8,7 @@ import {RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState} from 
 export const RotatablePuzzleBoxMainControls = (
     {
         cellSize,
+        isHorizontal,
         onStateChange,
     }: ControlsProps<number, RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState>
 ) => {
@@ -28,8 +29,8 @@ export const RotatablePuzzleBoxMainControls = (
 
     return <>
         <ControlButton
-            left={0}
-            top={3}
+            left={isHorizontal ? 4 : 3}
+            top={isHorizontal ? 3 : 4}
             cellSize={cellSize}
             onClick={handleRotate}
             title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: R)`}

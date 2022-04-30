@@ -70,13 +70,9 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined;
 
-    mainControlsCount?: number;
+    hasBottomRowControls?: boolean;
 
     mainControlsComponent?: ComponentType<ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
-
-    secondaryControlsCount?: number;
-
-    secondaryControlsComponent?: ComponentType<ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
 
     maxDigitsCount?: number;
 

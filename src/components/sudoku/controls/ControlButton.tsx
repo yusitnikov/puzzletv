@@ -33,14 +33,13 @@ const StyledContainer = styled(Absolute, {
 export interface ControlButtonProps extends Position, Partial<Size>, ButtonHTMLAttributes<HTMLButtonElement> {
     cellSize: number;
     checked?: boolean;
-    flipDirection?: boolean;
     fullSize?: boolean;
     innerBorderWidth?: number;
     opacityOnHover?: boolean;
     children?: ReactNode | ((contentSize: number) => ReactNode);
 }
 
-export const ControlButton = ({children, left, top, width = 1, height = 1, cellSize, flipDirection, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
+export const ControlButton = ({children, left, top, width = 1, height = 1, cellSize, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
     const contentSize = fullSize
         ? cellSize
         : cellSize * 0.7;
@@ -50,8 +49,8 @@ export const ControlButton = ({children, left, top, width = 1, height = 1, cellS
     return <StyledContainer
         tagName={"button"}
         type={"button"}
-        left={cellSize * (1 + controlButtonPaddingCoeff) * (flipDirection ? top : left)}
-        top={cellSize * (1 + controlButtonPaddingCoeff) * (flipDirection ? left : top)}
+        left={cellSize * (1 + controlButtonPaddingCoeff) * left}
+        top={cellSize * (1 + controlButtonPaddingCoeff) * top}
         width={containerWidth}
         height={containerHeight}
         borderWidth={3}

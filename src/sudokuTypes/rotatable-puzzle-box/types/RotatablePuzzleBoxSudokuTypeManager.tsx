@@ -9,10 +9,10 @@ import {RotatablePuzzleBoxMainControls} from "../components/RotatablePuzzleBoxMa
 const {
     cellDataComponentType,
     mainControlsComponent,
-    secondaryControlsComponent,
     isValidCell,
     transformCoords,
     getCellSelectionType,
+    processCellDataPosition,
     ...otherRegularImplementation
 } = DigitSudokuTypeManager();
 
@@ -29,8 +29,6 @@ export const RotatablePuzzleBoxSudokuTypeManager: SudokuTypeManager<number, Rota
 
         return {animatedAngle};
     },
-
-    mainControlsCount: 1,
 
     mainControlsComponent: RotatablePuzzleBoxMainControls,
 };

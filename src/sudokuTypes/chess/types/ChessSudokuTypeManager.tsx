@@ -43,8 +43,6 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
         selectedColor: ChessColor.black,
     },
 
-    mainControlsCount: 1,
-
     mainControlsComponent: ChessMainControls,
 
     maxDigitsCount: 6,

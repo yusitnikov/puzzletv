@@ -26,8 +26,7 @@ import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff} from "../../app/globals";
 
-export const controlsWidthCoeff = 4 + controlButtonPaddingCoeff * 3;
-export const controlsHeightCoeff = 5 + controlButtonPaddingCoeff * 4;
+export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
 export interface ControlsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     rect: Rect;
@@ -60,10 +59,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     const {
         createCellDataByDisplayDigit,
-        mainControlsCount = 0,
         mainControlsComponent: MainControls,
-        secondaryControlsCount = 0,
-        secondaryControlsComponent: SecondaryControls,
         digitShortcuts = [],
         digitShortcutTips = [],
     } = typeManager;
@@ -150,43 +146,78 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     });
 
     return <Absolute {...rect}>
-        {isReady && indexes(digitsCountInCurrentMode).map(index => {
-            const digit = index + 1;
-            const cellData = createCellDataByDisplayDigit(digit, state);
-            const shortcut = !isColorMode && digitShortcuts[index];
-            const shortcutTip = !isColorMode && digitShortcutTips[index];
+        {isReady && <>
+            {indexes(digitsCountInCurrentMode).map(index => {
+                const digit = index + 1;
+                const cellData = createCellDataByDisplayDigit(digit, state);
+                const shortcut = !isColorMode && digitShortcuts[index];
+                const shortcutTip = !isColorMode && digitShortcutTips[index];
 
-            let title = `${translate("Shortcut")}: ${digit}`;
-            if (shortcut) {
-                title = `${title} ${translate("or")} ${shortcut}`;
-            }
-            if (shortcutTip) {
-                title = `${title} (${translate(shortcutTip)})`;
-            }
+                let title = `${translate("Shortcut")}: ${digit}`;
+                if (shortcut) {
+                    title = `${title} ${translate("or")} ${shortcut}`;
+                }
+                if (shortcutTip) {
+                    title = `${title} (${translate(shortcutTip)})`;
+                }
 
-            return <ControlButton
-                key={`digit-${digit}`}
-                left={index % 3}
-                top={(index - index % 3) / 3}
+                return <ControlButton
+                    key={`digit-${digit}`}
+                    left={index % 3}
+                    top={(index - index % 3) / 3}
+                    cellSize={cellSize}
+                    fullSize={true}
+                    opacityOnHover={isColorMode}
+                    onClick={() => handleDigit(digit)}
+                    title={title}
+                >
+                    <CellContent
+                        puzzle={puzzle}
+                        data={{
+                            usersDigit: cellWriteMode === CellWriteMode.main ? cellData : undefined,
+                            cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [cellData] : []),
+                            centerDigits: new Set(cellWriteMode === CellWriteMode.center ? [cellData] : []),
+                            colors: new Set(cellWriteMode === CellWriteMode.color ? [index] : []),
+                        }}
+                        size={cellSize}
+                    />
+                </ControlButton>;
+            })}
+
+            <ControlButton
+                left={0}
+                top={3}
                 cellSize={cellSize}
-                fullSize={true}
-                opacityOnHover={isColorMode}
-                onClick={() => handleDigit(digit)}
-                title={title}
+                onClick={handleUndo}
+                title={`${translate("Undo the last action")} (${translate("shortcut")}: Ctrl+Z)`}
             >
-                <CellContent
-                    puzzle={puzzle}
-                    data={{
-                        usersDigit: cellWriteMode === CellWriteMode.main ? cellData : undefined,
-                        cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [cellData] : []),
-                        centerDigits: new Set(cellWriteMode === CellWriteMode.center ? [cellData] : []),
-                        colors: new Set(cellWriteMode === CellWriteMode.color ? [index] : []),
-                    }}
-                    size={cellSize}
-                />
-            </ControlButton>;
-        })}
+                <Undo/>
+            </ControlButton>
 
+            <ControlButton
+                left={1}
+                top={3}
+                cellSize={cellSize}
+                onClick={handleRedo}
+                title={`${translate("Redo the last action")} (${translate("shortcut")}: Ctrl+Y)`}
+            >
+                <Redo/>
+            </ControlButton>
+
+            <ControlButton
+                left={2}
+                top={3}
+                cellSize={cellSize}
+                onClick={handleClear}
+                title={`${translate("Clear the cell contents")} (${translate("shortcut")}: Delete ${translate("or")} Backspace)`}
+            >
+                <Clear/>
+            </ControlButton>
+        </>}
+
+        {MainControls && <MainControls rect={emptyRect} {...otherProps}/>}
+
+        {/*region: Cell write mode*/}
         <ControlButton
             left={3}
             top={0}
@@ -251,91 +282,46 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 size={contentSize}
             />}
         </ControlButton>
+        {/*endregion*/}
 
         <ControlButton
-            left={mainControlsCount}
-            width={3 - mainControlsCount}
-            top={3}
+            left={isHorizontal ? 4 : 0}
+            top={isHorizontal ? 0 : 4}
             cellSize={cellSize}
-            onClick={handleClear}
-            title={`${translate("Clear the cell contents")} (${translate("shortcut")}: Delete ${translate("or")} Backspace)`}
+            onClick={toggleFullScreen}
+            fullSize={true}
+            title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
         >
-            <Clear/>
+            {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
         </ControlButton>
 
-        {MainControls && <MainControls rect={emptyRect} {...otherProps}/>}
-
-        <Absolute
-            left={isHorizontal ? 0 : rect.width - cellSize}
-            top={isHorizontal ? rect.height - cellSize : 0}
-            width={isHorizontal ? rect.width : cellSize}
-            height={isHorizontal ? cellSize : rect.height}
+        {resultChecker && <ControlButton
+            left={isHorizontal ? 4 : 1}
+            top={isHorizontal ? 1 : 4}
+            cellSize={cellSize}
+            onClick={handleCheckResult}
+            title={`${translate("Check the result")}`}
         >
-            {SecondaryControls && <SecondaryControls rect={emptyRect} {...otherProps}/>}
-
-            <ControlButton
-                left={secondaryControlsCount}
-                top={0}
-                flipDirection={!isHorizontal}
-                cellSize={cellSize}
-                onClick={handleUndo}
-                title={`${translate("Undo the last action")} (${translate("shortcut")}: Ctrl+Z)`}
-            >
-                <Undo/>
-            </ControlButton>
-
-            <ControlButton
-                left={secondaryControlsCount + 1}
-                top={0}
-                flipDirection={!isHorizontal}
-                cellSize={cellSize}
-                onClick={handleRedo}
-                title={`${translate("Redo the last action")} (${translate("shortcut")}: Ctrl+Y)`}
-            >
-                <Redo/>
-            </ControlButton>
-
-            {resultChecker && secondaryControlsCount === 0 && <ControlButton
-                left={secondaryControlsCount + 2}
-                top={0}
-                flipDirection={!isHorizontal}
-                cellSize={cellSize}
-                onClick={handleCheckResult}
-                title={`${translate("Check the result")}`}
-            >
-                <Check/>
-            </ControlButton>}
-            {isShowingResult && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
-                <div>
-                    {isCorrectResult ? `${translate("Absolutely right")}!` : `${translate("Something's wrong here")}...`}
-                </div>
-                <div>
-                    <Button
-                        type={"button"}
-                        cellSize={cellSize}
-                        onClick={handleCloseCheckResult}
-                        autoFocus={true}
-                        style={{
-                            marginTop: cellSize * globalPaddingCoeff,
-                            padding: "0.5em 1em",
-                        }}
-                    >
-                        OK
-                    </Button>
-                </div>
-            </Modal>}
-
-            <ControlButton
-                left={3}
-                top={0}
-                flipDirection={!isHorizontal}
-                cellSize={cellSize}
-                onClick={toggleFullScreen}
-                fullSize={true}
-                title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
-            >
-                {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
-            </ControlButton>
-        </Absolute>
+            <Check/>
+        </ControlButton>}
+        {isShowingResult && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
+            <div>
+                {isCorrectResult ? `${translate("Absolutely right")}!` : `${translate("Something's wrong here")}...`}
+            </div>
+            <div>
+                <Button
+                    type={"button"}
+                    cellSize={cellSize}
+                    onClick={handleCloseCheckResult}
+                    autoFocus={true}
+                    style={{
+                        marginTop: cellSize * globalPaddingCoeff,
+                        padding: "0.5em 1em",
+                    }}
+                >
+                    OK
+                </Button>
+            </div>
+        </Modal>}
     </Absolute>;
 };
