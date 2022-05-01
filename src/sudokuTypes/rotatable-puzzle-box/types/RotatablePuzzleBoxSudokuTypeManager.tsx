@@ -11,6 +11,7 @@ const {
     mainControlsComponent,
     isValidCell,
     transformCoords,
+    getRegionsWithSameCoordsTransformation,
     getCellSelectionType,
     processCellDataPosition,
     ...otherRegularImplementation

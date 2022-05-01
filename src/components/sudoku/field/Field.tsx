@@ -24,8 +24,9 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {textColor} from "../../app/globals";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
-import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {RoundedPolyLine} from "../../svg/rounded-poly-line/RoundedPolyLine";
+import {FieldRect} from "./FieldRect";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -54,13 +55,38 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
     const {
         isValidCell = () => true,
-        transformCoords = coords => coords,
+        getRegionsWithSameCoordsTransformation,
         getCellSelectionType,
     } = typeManager;
 
-    const Items: FC<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> = typeof items === "function"
+    const ItemsInOneRegion: FC<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> = typeof items === "function"
         ? items as FC<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>
         : () => <>{items}</>;
+
+    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle) || [{
+        left: -fieldMargin,
+        top: -fieldSize,
+        width: fieldSize.columnsCount + fieldMargin * 2,
+        height: fieldSize.rowsCount + fieldMargin * 2,
+    }];
+
+    const Items = (props: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => <>
+        {regionsWithSameCoordsTransformation.map((rect, index) => <FieldRect
+            key={`items-region-${index}`}
+            puzzle={puzzle}
+            clip={true}
+            {...rect}
+        >
+            <AutoSvg
+                left={-rect.left}
+                top={-rect.top}
+                width={1}
+                height={1}
+            >
+                <ItemsInOneRegion {...props}/>
+            </AutoSvg>
+        </FieldRect>)}
+    </>;
 
     const {selectedCells, isReady} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
@@ -149,30 +175,14 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     return null;
                 }
 
-                const base = transformCoords(cellPosition, puzzle);
-                const right = transformCoords({left: columnIndex + 1, top: rowIndex}, puzzle);
-                const bottom = transformCoords({left: columnIndex, top: rowIndex + 1}, puzzle);
-                const rightVector: Position = {
-                    left: right.left - base.left,
-                    top: right.top - base.top,
-                };
-                const bottomVector: Position = {
-                    left: bottom.left - base.left,
-                    top: bottom.top - base.top,
-                };
-
-                return <g
+                return <FieldRect
                     key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
-                    transform={`matrix(${rightVector.left} ${rightVector.top} ${bottomVector.left} ${bottomVector.top} ${base.left} ${base.top})`}
+                    puzzle={puzzle}
+                    clip={clip}
+                    {...cellPosition}
                 >
-                    <AutoSvg
-                        width={1}
-                        height={1}
-                        clip={clip}
-                    >
-                        {renderer(cellState, cellPosition)}
-                    </AutoSvg>
-                </g>;
+                    {renderer(cellState, cellPosition)}
+                </FieldRect>;
             }))}
         </FieldSvg>;
 
@@ -328,6 +338,7 @@ export const FieldLines = memo<Pick<FieldProps<any, any, any>, "puzzle" | "cellS
         typeManager: {
             isValidCell = () => true,
             transformCoords = coords => coords,
+            borderColor = textColor,
         },
         fieldSize: {columnsCount, regions, rowsCount},
     } = puzzle;
@@ -349,7 +360,7 @@ export const FieldLines = memo<Pick<FieldProps<any, any, any>, "puzzle" | "cellS
                     y1={base.top}
                     x2={right.left}
                     y2={right.top}
-                    stroke={textColor}
+                    stroke={borderColor}
                     strokeWidth={1 / cellSize}
                 />,
 
@@ -359,7 +370,7 @@ export const FieldLines = memo<Pick<FieldProps<any, any, any>, "puzzle" | "cellS
                     y1={base.top}
                     x2={bottom.left}
                     y2={bottom.top}
-                    stroke={textColor}
+                    stroke={borderColor}
                     strokeWidth={1 / cellSize}
                 />,
             ];

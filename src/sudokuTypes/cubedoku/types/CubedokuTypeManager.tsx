@@ -3,6 +3,8 @@ import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager
 import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
 import {CellSelectionColor, CellSelectionProps} from "../../../components/sudoku/cell/CellSelection";
 import {PositionWithAngle} from "../../../types/layout/Position";
+import {Rect} from "../../../types/layout/Rect";
+import {darkGreyColor} from "../../../components/app/globals";
 
 export const CubedokuTypeManager: SudokuTypeManager<number> = {
     ...DigitSudokuTypeManager(),
@@ -67,6 +69,33 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
             top: top - Math.abs(left - realFieldSize) / 2,
         };
     },
+
+    getRegionsWithSameCoordsTransformation({fieldSize: {fieldSize}, fieldMargin = 0}): Rect[] {
+        const realFieldSize = fieldSize / 2;
+
+        return [
+            {
+                left: -fieldMargin,
+                top: -fieldMargin,
+                width: realFieldSize + fieldMargin,
+                height: realFieldSize + fieldMargin,
+            },
+            {
+                left: -fieldMargin,
+                top: realFieldSize,
+                width: realFieldSize + fieldMargin,
+                height: realFieldSize + fieldMargin,
+            },
+            {
+                left: realFieldSize,
+                top: realFieldSize,
+                width: realFieldSize + fieldMargin,
+                height: realFieldSize + fieldMargin,
+            },
+        ];
+    },
+
+    borderColor: darkGreyColor,
 
     getCellSelectionType: function ({top, left}, {fieldSize: {fieldSize}}, {selectedCells}) {
         const realFieldSize = fieldSize / 2;

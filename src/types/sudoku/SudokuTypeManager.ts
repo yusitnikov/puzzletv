@@ -9,6 +9,7 @@ import {Translatable} from "../translations/Translatable";
 import {FieldSize} from "./FieldSize";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
+import {Rect} from "../layout/Rect";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(data1: CellType, data2: CellType): boolean;
@@ -63,6 +64,10 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     ): Position | undefined;
 
     transformCoords?(coords: Position, puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Position;
+
+    getRegionsWithSameCoordsTransformation?(puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Rect[];
+
+    borderColor?: string;
 
     getCellSelectionType?(
         cell: Position,
