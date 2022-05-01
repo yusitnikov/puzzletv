@@ -106,7 +106,7 @@ export const CubeIt: PuzzleDefinition<number> = {
         [LanguageCode.en]: "Cube It",
     },
     author: Chilly,
-    slug: "cube-it",
+    slug: "chilly-cbit",
     typeManager: CubedokuTypeManager,
     fieldSize: {
         ...regularFieldSize5,
