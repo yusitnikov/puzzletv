@@ -1,6 +1,7 @@
 import {translations} from "../data/translations";
 import {LanguageCode} from "../types/translations/LanguageCode";
 import {PartiallyTranslatable} from "../types/translations/Translatable";
+import {TranslationItem} from "../types/translations/TranslationItem";
 
 export const translate = <T = string>(phrase: PartiallyTranslatable<T>, languageCode: LanguageCode): T => {
     if (typeof phrase === "string") {
@@ -15,3 +16,12 @@ export const translate = <T = string>(phrase: PartiallyTranslatable<T>, language
 
 export const bindTranslate = (languageCode: LanguageCode) =>
     <T = string>(phrase: PartiallyTranslatable<T>) => translate(phrase, languageCode);
+
+export const processTranslations = <T = string>(processor: (...items: T[]) => T, ...items: TranslationItem<T>[]) =>
+    Object.fromEntries(
+        Object.keys(items[0])
+            .map((language) => [
+                language,
+                processor(...items.map(item => item[language as LanguageCode]))
+            ])
+    ) as TranslationItem<T>;

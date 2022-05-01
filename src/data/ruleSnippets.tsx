@@ -1,6 +1,7 @@
 import {Translatable} from "../types/translations/Translatable";
 import {LanguageCode} from "../types/translations/LanguageCode";
 import React, {ReactNode} from "react";
+import {processTranslations} from "../utils/translate";
 
 export const normalSudokuRulesApply: Translatable = {
     [LanguageCode.en]: "Standard sudoku rules apply",
@@ -37,10 +38,21 @@ export const arrows: Translatable = {
     [LanguageCode.ru]: "Стрелки: сумма цифр, расположенных вдоль стрелок, равняется цифре в кружке",
 };
 
-export const thermometers: Translatable = {
-    [LanguageCode.en]: "Thermometers: along thermometers, digits must increase from the bulb end",
-    [LanguageCode.ru]: "Термометры: цифры возрастают вдоль термометров, начиная с \"колбы\"",
+export const thermometersTitle: Translatable = {
+    [LanguageCode.en]: "Thermometers",
+    [LanguageCode.ru]: "Термометры",
 };
+
+export const thermometersExplained: Translatable = {
+    [LanguageCode.en]: "Along thermometers, digits must increase from the bulb end",
+    [LanguageCode.ru]: "Цифры возрастают вдоль термометров, начиная с \"колбы\"",
+};
+
+export const thermometers: Translatable = processTranslations(
+    (title, explained) => `${title}: ${explained.toLowerCase()}`,
+    thermometersTitle,
+    thermometersExplained
+);
 
 export const kropkiDotsTitle: Translatable = {
     [LanguageCode.en]: "Kropki dots",
