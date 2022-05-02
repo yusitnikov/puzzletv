@@ -2,7 +2,7 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes} from "../../../utils/indexes";
-import {Check, Clear, Fullscreen, FullscreenExit, Redo, Undo} from "@emotion-icons/material";
+import {Check, Clear, Fullscreen, FullscreenExit, Redo, Settings, Undo} from "@emotion-icons/material";
 import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
@@ -78,6 +78,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     const isFullScreen = useIsFullScreen();
 
+    const [isShowingSettings, setIsShowingSettings] = useState(false);
+
     // region Event handlers
     const handleSetCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode} as any);
 
@@ -91,6 +93,9 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     const handleCheckResult = () => setIsShowingResult(true);
     const handleCloseCheckResult = () => setIsShowingResult(false);
+
+    const handleOpenSettings = () => setIsShowingSettings(true);
+    const handleCloseSettings = () => setIsShowingSettings(false);
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
@@ -295,9 +300,37 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
         </ControlButton>
 
-        {resultChecker && <ControlButton
+        <ControlButton
             left={isHorizontal ? 4 : 1}
             top={isHorizontal ? 1 : 4}
+            cellSize={cellSize}
+            onClick={handleOpenSettings}
+            title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
+        >
+            <Settings/>
+        </ControlButton>
+        {isShowingSettings && <Modal cellSize={cellSize} onClose={handleCloseSettings}>
+            <div>
+                Settings!
+            </div>
+            <div>
+                <Button
+                    type={"button"}
+                    cellSize={cellSize}
+                    onClick={handleCloseSettings}
+                    style={{
+                        marginTop: cellSize * globalPaddingCoeff,
+                        padding: "0.5em 1em",
+                    }}
+                >
+                    OK
+                </Button>
+            </div>
+        </Modal>}
+
+        {resultChecker && <ControlButton
+            left={isHorizontal ? 4 : 2}
+            top={isHorizontal ? 2 : 4}
             cellSize={cellSize}
             onClick={handleCheckResult}
             title={`${translate("Check the result")}`}
