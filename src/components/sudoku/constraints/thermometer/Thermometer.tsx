@@ -46,7 +46,12 @@ export const ThermometerConstraint = <CellType,>(...cellLiterals: PositionLitera
                     continue;
                 }
 
-                const isLowerThanCurrentCell = compareCellData(constraintDigit, digit, state, true) < 0;
+                const comparison = compareCellData(constraintDigit, digit, state, true);
+                if (comparison === 0) {
+                    return false;
+                }
+
+                const isLowerThanCurrentCell = comparison < 0;
                 if (isLowerThanCurrentCell !== isBeforeCurrentCell) {
                     return false;
                 }
