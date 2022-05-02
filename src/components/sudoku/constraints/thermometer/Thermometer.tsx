@@ -41,8 +41,12 @@ export const ThermometerConstraint = <CellType,>(...cellLiterals: PositionLitera
             for (const constraintCell of cells) {
                 const constraintDigit = digits[constraintCell.top]?.[constraintCell.left];
 
-                if (constraintDigit === undefined || isSamePosition(constraintCell, cell)) {
+                if (isSamePosition(constraintCell, cell)) {
                     isBeforeCurrentCell = false;
+                    continue;
+                }
+
+                if (constraintDigit === undefined) {
                     continue;
                 }
 
