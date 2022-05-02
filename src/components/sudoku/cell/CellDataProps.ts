@@ -7,4 +7,5 @@ export interface CellDataProps<CellType, ProcessedGameStateExtensionType = {}> e
     size: number;
     state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     isInitial?: boolean;
+    isValid?: boolean;
 }

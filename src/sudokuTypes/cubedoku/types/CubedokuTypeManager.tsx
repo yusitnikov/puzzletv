@@ -2,9 +2,11 @@ import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/su
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
 import {CellSelectionColor, CellSelectionProps} from "../../../components/sudoku/cell/CellSelection";
-import {PositionWithAngle} from "../../../types/layout/Position";
+import {Position, PositionWithAngle} from "../../../types/layout/Position";
 import {Rect} from "../../../types/layout/Rect";
 import {darkGreyColor} from "../../../components/app/globals";
+import {indexes} from "../../../utils/indexes";
+import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
 
 export const CubedokuTypeManager: SudokuTypeManager<number> = {
     ...DigitSudokuTypeManager(),
@@ -42,7 +44,7 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
         positionFunction,
         cellPosition?
     ): PositionWithAngle | undefined {
-        const position = positionFunction(dataIndex);
+        const position = basePosition;
         if (!position || !cellPosition || cellPosition.top * 2 >= fieldSize) {
             return position;
         }
@@ -72,27 +74,43 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
 
     getRegionsWithSameCoordsTransformation({fieldSize: {fieldSize}, fieldMargin = 0}): Rect[] {
         const realFieldSize = fieldSize / 2;
+        const fullMargin = fieldMargin + fieldSize;
 
         return [
             {
-                left: -fieldMargin,
-                top: -fieldMargin,
-                width: realFieldSize + fieldMargin,
-                height: realFieldSize + fieldMargin,
+                left: -fullMargin,
+                top: -fullMargin,
+                width: realFieldSize + fullMargin,
+                height: realFieldSize + fullMargin,
             },
             {
-                left: -fieldMargin,
+                left: -fullMargin,
                 top: realFieldSize,
-                width: realFieldSize + fieldMargin,
-                height: realFieldSize + fieldMargin,
+                width: realFieldSize + fullMargin,
+                height: realFieldSize + fullMargin,
             },
             {
                 left: realFieldSize,
                 top: realFieldSize,
-                width: realFieldSize + fieldMargin,
-                height: realFieldSize + fieldMargin,
+                width: realFieldSize + fullMargin,
+                height: realFieldSize + fullMargin,
             },
         ];
+    },
+
+    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}) {
+        const realFieldSize = fieldSize / 2;
+
+        const cubeFaces: Position[] = [
+            {left: 0, top: 0},
+            {left: 0, top: realFieldSize},
+            {left: realFieldSize, top: realFieldSize},
+        ];
+
+        return cubeFaces.flatMap(({left, top}) => indexes(realFieldSize).flatMap(i => [
+            RegionConstraint(indexes(realFieldSize).map(j => ({left: left + i, top: top + j})), false, "column"),
+            RegionConstraint(indexes(realFieldSize).map(j => ({left: left + j, top: top + i})), false, "row"),
+        ]));
     },
 
     borderColor: darkGreyColor,
@@ -171,5 +189,5 @@ export const createCubedokuFieldSize = (fieldSize: number, regionWidth: number, 
     rowsCount: fieldSize * 2,
     columnsCount: fieldSize * 2,
     regions: createRegularRegions(fieldSize * 2, fieldSize * 2, regionWidth, regionHeight)
-        .filter(([[x, y]]) => x < fieldSize || y >= fieldSize)
+        .filter(([{left, top}]) => left < fieldSize || top >= fieldSize)
 });

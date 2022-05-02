@@ -10,10 +10,12 @@ const {
     cellDataComponentType,
     mainControlsComponent,
     isValidCell,
+    transformDigit,
     transformCoords,
     getRegionsWithSameCoordsTransformation,
     getCellSelectionType,
     processCellDataPosition,
+    getRegionsForRowsAndColumns,
     ...otherRegularImplementation
 } = DigitSudokuTypeManager();
 

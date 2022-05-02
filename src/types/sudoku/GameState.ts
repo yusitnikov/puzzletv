@@ -30,24 +30,25 @@ export interface ProcessedGameState<CellType> extends GameState<CellType> {
 export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: ProcessedGameState<CellType>) =>
     fieldStateHistoryGetCurrent(fieldStateHistory);
 
-export const gameStateGetCurrentGivenDigits = <CellType>(gameState: ProcessedGameState<CellType>) => {
+export const gameStateGetCurrentGivenDigitsByCells = <CellType>(cells: CellState<CellType>[][]) => {
     const result: GivenDigitsMap<CellType> = {};
 
-    gameStateGetCurrentFieldState(gameState)
-        .cells
-        .forEach(
-            (row, rowIndex) => row.forEach(
-                ({usersDigit}, columnIndex) => {
-                    if (usersDigit) {
-                        result[rowIndex] = result[rowIndex] || {};
-                        result[rowIndex][columnIndex] = usersDigit;
-                    }
+    cells.forEach(
+        (row, rowIndex) => row.forEach(
+            ({usersDigit}, columnIndex) => {
+                if (usersDigit) {
+                    result[rowIndex] = result[rowIndex] || {};
+                    result[rowIndex][columnIndex] = usersDigit;
                 }
-            )
-        );
+            }
+        )
+    );
 
     return result;
 };
+
+export const gameStateGetCurrentGivenDigits = <CellType>(gameState: ProcessedGameState<CellType>) =>
+    gameStateGetCurrentGivenDigitsByCells(gameStateGetCurrentFieldState(gameState).cells);
 
 export const gameStateUndo = <CellType, ProcessedGameStateExtensionType = {}>(
     {fieldStateHistory}: ProcessedGameState<CellType>

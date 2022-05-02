@@ -28,6 +28,10 @@ export const DigitSudokuTypeManager = (digitComponentType: DigitComponentType = 
         return digit;
     },
 
+    getDigitByCellData(digit: number) {
+        return digit;
+    },
+
     digitComponentType,
 
     cellDataComponentType: DigitCellDataComponentType(digitComponentType.component),

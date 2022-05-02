@@ -28,10 +28,11 @@ export interface CellDigitsProps<CellType, GameStateExtensionType = {}, Processe
     cellPosition?: Position;
     state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     mainColor?: boolean;
+    isValidUserDigit?: boolean;
 }
 
 export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle, data, initialData, size, cellPosition, state, mainColor}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {puzzle, data, initialData, size, cellPosition, state, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {
         typeManager: {
@@ -58,9 +59,10 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         digits: Set<CellType>,
         digitSize: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
-        isInitial = false
+        isInitial = false,
+        isValid = true
     ) => {
-        const straightIndexes = getCellDataSortIndexes(digits, compareCellData);
+        const straightIndexes = getCellDataSortIndexes(digits, (a, b) => compareCellData(a, b, undefined, false));
 
         return digits.items.map((cellData, index) => {
             let position = positionFunction(straightIndexes[index]);
@@ -82,6 +84,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 {...position}
                 state={state}
                 isInitial={isInitial || mainColor}
+                isValid={isValid}
             />;
         });
     };
@@ -108,7 +111,9 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 "users",
                 new Set([usersDigit]),
                 size * 0.7,
-                () => emptyPositionWithAngle
+                () => emptyPositionWithAngle,
+                false,
+                isValidUserDigit
             )}
 
             {centerDigits && renderAnimatedDigitsSet(

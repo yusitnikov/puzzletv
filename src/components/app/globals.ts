@@ -13,6 +13,7 @@ export const redColor = "#e6261f";
 export const yellowColor = "#f7d038";
 
 export const textColor = blackColor;
+export const errorColor = redColor;
 
 export const userDigitColor = "#00f";
 

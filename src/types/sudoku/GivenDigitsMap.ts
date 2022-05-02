@@ -2,22 +2,39 @@ import {SudokuTypeManager} from "./SudokuTypeManager";
 
 export type GivenDigitsMap<CellType> = Record<number, Record<number, CellType>>;
 
-export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) => {
-    const result: GivenDigitsMap<CellType> = {};
+export const processGivenDigitsMaps = <CellType, ResultType = CellType>(processor: (...cells: CellType[]) => ResultType, ...maps: GivenDigitsMap<CellType>[]) => {
+    const arrayMap: GivenDigitsMap<CellType[]> = {};
 
     for (const map of maps) {
         for (const [rowIndexStr, row] of Object.entries(map)) {
             const rowIndex = Number(rowIndexStr);
             for (const [columnIndexStr, cell] of Object.entries(row)) {
                 const columnIndex = Number(columnIndexStr);
-                result[rowIndex] = result[rowIndex] || {};
-                result[rowIndex][columnIndex] = result[rowIndex][columnIndex] || cell;
+                arrayMap[rowIndex] = arrayMap[rowIndex] || {};
+                arrayMap[rowIndex][columnIndex] = arrayMap[rowIndex][columnIndex] || [];
+                arrayMap[rowIndex][columnIndex].push(cell);
             }
+        }
+    }
+
+    const result: GivenDigitsMap<ResultType> = {};
+
+    for (const [rowIndexStr, row] of Object.entries(arrayMap)) {
+        const rowIndex = Number(rowIndexStr);
+        for (const [columnIndexStr, cells] of Object.entries(row)) {
+            const columnIndex = Number(columnIndexStr);
+            result[rowIndex] = result[rowIndex] || {};
+            result[rowIndex][columnIndex] = processor(...cells);
         }
     }
 
     return result;
 };
+
+export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) => processGivenDigitsMaps(
+    first => first,
+    ...maps
+);
 
 export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeManager<CellType, any, any>, map1: GivenDigitsMap<CellType>, map2: GivenDigitsMap<CellType>) => {
     const mergedMap = mergeGivenDigitsMaps(map1, map2);
@@ -37,7 +54,7 @@ export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeMa
                 continue;
             }
 
-            if (!areSameCellData(cell1, cell2)) {
+            if (!areSameCellData(cell1, cell2, false)) {
                 return false;
             }
         }

@@ -1,5 +1,5 @@
 import {CellDataProps} from "../../../components/sudoku/cell/CellDataProps";
-import {textColor, userDigitColor} from "../../../components/app/globals";
+import {errorColor, textColor, userDigitColor} from "../../../components/app/globals";
 import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
 import {ChessPiece} from "../types/ChessPiece";
 import {ChessGameState} from "../types/ChessGameState";
@@ -44,14 +44,14 @@ export const ChessPieceCellData = (
 </>;
 
 export const ChessPieceCellDataBase = (
-    {data: {type, color}, inverted, size, isInitial, left = 0, top = 0}: CellDataProps<ChessPiece, ChessGameState> & {inverted?: boolean}
+    {data: {type, color}, inverted, size, isInitial, isValid = true, left = 0, top = 0}: CellDataProps<ChessPiece, ChessGameState> & {inverted?: boolean}
 ) => <AutoSvg
     left={left}
     top={top}
     width={size}
     height={size}
     style={{
-        color: inverted ? "#fff" : (isInitial ? textColor : userDigitColor),
+        color: inverted ? "#fff" : (!isValid ? errorColor : (isInitial ? textColor : userDigitColor)),
     }}
 >
     <text

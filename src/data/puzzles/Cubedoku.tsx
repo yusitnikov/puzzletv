@@ -13,8 +13,10 @@ import {
     cubedokuIndexingRules,
     cubedokuNormalSudokuRules
 } from "../../sudokuTypes/cubedoku/data/ruleSnippets";
-import {Thermometer} from "../../components/sudoku/figures/thermometer/Thermometer";
+import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
 import {thermometersExplained} from "../ruleSnippets";
+import {parsePositionLiterals2} from "../../types/layout/Position";
+import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 
 const regularFieldSize4 = createCubedokuFieldSize(4, 2);
 const regularFieldSize5 = createCubedokuFieldSize(5, 1);
@@ -38,31 +40,13 @@ export const IntroToCubedoku: PuzzleDefinition<number> = {
     fieldSize: {
         ...regularFieldSize4,
         regions: [
+            ...parsePositionLiterals2([
+                ["R1C1", "R2C1", "R3C1", "R4C1"],
+                ["R1C2", "R2C2", "R1C3", "R2C3"],
+                ["R3C2", "R4C2", "R3C3", "R4C3"],
+                ["R1C4", "R2C4", "R3C4", "R4C4"],
+            ]),
             ...regularFieldSize4.regions.slice(4),
-            [
-                [0, 0],
-                [1, 0],
-                [1, 4],
-                [0, 4],
-            ],
-            [
-                [1, 0],
-                [3, 0],
-                [3, 2],
-                [1, 2],
-            ],
-            [
-                [1, 2],
-                [3, 2],
-                [3, 4],
-                [1, 4],
-            ],
-            [
-                [3, 0],
-                [4, 0],
-                [4, 4],
-                [3, 4],
-            ],
         ],
     },
     digitsCount: 4,
@@ -85,6 +69,9 @@ export const IntroToCubedoku: PuzzleDefinition<number> = {
             7: 2,
         },
     },
+    items: [
+        CubedokuIndexingConstraint(),
+    ],
     resultChecker: (gameState) => areSameGivenDigitsMaps(
         CubedokuTypeManager,
         mergeGivenDigitsMaps(gameStateGetCurrentGivenDigits(gameState), IntroToCubedoku.initialDigits!),
@@ -110,148 +97,25 @@ export const CubeIt: PuzzleDefinition<number> = {
     typeManager: CubedokuTypeManager,
     fieldSize: {
         ...regularFieldSize5,
-        regions: [
-            [
-                [0, 0],
-                [4, 0],
-                [4, 2],
-                [3, 2],
-                [3, 1],
-                [0, 1],
-            ],
-            [
-                [4, 0],
-                [5, 0],
-                [5, 4],
-                [3, 4],
-                [3, 3],
-                [4, 3],
-            ],
-            [
-                [0, 1],
-                [2, 1],
-                [2, 2],
-                [1, 2],
-                [1, 5],
-                [0, 5],
-            ],
-            [
-                [1, 3],
-                [2, 3],
-                [2, 4],
-                [5, 4],
-                [5, 5],
-                [1, 5],
-            ],
-            [
-                [2, 1],
-                [3, 1],
-                [3, 2],
-                [4, 2],
-                [4, 3],
-                [3, 3],
-                [3, 4],
-                [2, 4],
-                [2, 3],
-                [1, 3],
-                [1, 2],
-                [2, 2],
-            ],
+        regions: parsePositionLiterals2([
+            ["R1C1", "R1C2", "R1C3", "R1C4", "R2C4"],
+            ["R1C5", "R2C5", "R3C5", "R4C4", "R4C5"],
+            ["R2C1", "R2C2", "R3C1", "R4C1", "R5C1"],
+            ["R2C3", "R3C2", "R3C3", "R3C4", "R4C3"],
+            ["R4C2", "R5C2", "R5C3", "R5C4", "R5C5"],
 
-            [
-                [0, 5],
-                [4, 5],
-                [4, 6],
-                [3, 6],
-                [3, 7],
-                [2, 7],
-                [2, 6],
-                [0, 6],
-            ],
-            [
-                [4, 5],
-                [5, 5],
-                [5, 9],
-                [3, 9],
-                [3, 8],
-                [4, 8],
-            ],
-            [
-                [0, 6],
-                [2, 6],
-                [2, 7],
-                [1, 7],
-                [1, 10],
-                [0, 10],
-            ],
-            [
-                [2, 8],
-                [3, 8],
-                [3, 9],
-                [5, 9],
-                [5, 10],
-                [1, 10],
-                [1, 9],
-                [2, 9],
-            ],
-            [
-                [3, 6],
-                [4, 6],
-                [4, 8],
-                [2, 8],
-                [2, 9],
-                [1, 9],
-                [1, 7],
-                [3, 7],
-            ],
+            ["R6C1", "R6C2", "R6C3", "R6C4", "R7C3"],
+            ["R6C5", "R7C5", "R8C5", "R9C4", "R9C5"],
+            ["R7C1", "R7C2", "R8C1", "R9C1", "R10C1"],
+            ["R7C4", "R8C2", "R8C3", "R8C4", "R9C2"],
+            ["R9C3", "R10C2", "R10C3", "R10C4", "R10C5"],
 
-            [
-                [5, 5],
-                [6, 5],
-                [6, 7],
-                [7, 7],
-                [7, 8],
-                [6, 8],
-                [6, 9],
-                [5, 9],
-            ],
-            [
-                [6, 5],
-                [10, 5],
-                [10, 6],
-                [7, 6],
-                [7, 7],
-                [6, 7],
-            ],
-            [
-                [8, 6],
-                [10, 6],
-                [10, 10],
-                [9, 10],
-                [9, 7],
-                [8, 7],
-            ],
-            [
-                [5, 9],
-                [8, 9],
-                [8, 8],
-                [9, 8],
-                [9, 10],
-                [5, 10],
-            ],
-            [
-                [7, 6],
-                [8, 6],
-                [8, 7],
-                [9, 7],
-                [9, 8],
-                [8, 8],
-                [8, 9],
-                [6, 9],
-                [6, 8],
-                [7, 8],
-            ],
-        ],
+            ["R6C6", "R7C6", "R8C6", "R8C7", "R9C6"],
+            ["R6C7", "R6C8", "R6C9", "R6C10", "R7C7"],
+            ["R7C8", "R8C8", "R8C9", "R9C7", "R9C8"],
+            ["R7C9", "R7C10", "R8C10", "R9C10", "R10C10"],
+            ["R9C9", "R10C6", "R10C7", "R10C8", "R10C9"],
+        ]),
     },
     digitsCount: 5,
     rules: translate => <>
@@ -260,27 +124,13 @@ export const CubeIt: PuzzleDefinition<number> = {
         <RulesParagraph>{translate(cubedokuIndexingDetails)}.</RulesParagraph>
         <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
     </>,
-    items: <>
-        <Thermometer points={[
-            [1, 5],
-            [1, 3],
-        ]}/>
-
-        <Thermometer points={[
-            [2, 4],
-            [4, 4],
-        ]}/>
-
-        <Thermometer points={[
-            [3, 8],
-            [3, 5],
-        ]}/>
-
-        <Thermometer points={[
-            [8, 6],
-            [9, 7],
-        ]}/>
-    </>,
+    items: [
+        ThermometerConstraint("R5C1", "R3C1"),
+        ThermometerConstraint("R4C2", "R4C4"),
+        ThermometerConstraint("R8C3", "R5C3"),
+        ThermometerConstraint("R6C8", "R7C9"),
+        CubedokuIndexingConstraint(),
+    ],
     resultChecker: (gameState) => areSameGivenDigitsMaps(
         CubedokuTypeManager,
         mergeGivenDigitsMaps(gameStateGetCurrentGivenDigits(gameState), IntroToCubedoku.initialDigits!),

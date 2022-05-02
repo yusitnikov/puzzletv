@@ -10,11 +10,17 @@ import {FieldSize} from "./FieldSize";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {Rect} from "../layout/Rect";
+import {Constraint} from "./Constraint";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    areSameCellData(data1: CellType, data2: CellType): boolean;
+    areSameCellData(data1: CellType, data2: CellType, forConstraints: boolean): boolean;
 
-    compareCellData(data1: CellType, data2: CellType): number;
+    compareCellData(
+        data1: CellType,
+        data2: CellType,
+        gameState: (ProcessedGameState<CellType> & ProcessedGameStateExtensionType) | undefined,
+        forConstraints: boolean
+    ): number;
 
     getCellDataHash(data: CellType): string;
 
@@ -29,6 +35,17 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         digit: number,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): CellType;
+
+    getDigitByCellData(
+        data: CellType,
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    ): number;
+
+    transformDigit?(
+        digit: number,
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    ): number;
 
     processCellDataPosition?(
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
@@ -66,6 +83,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     transformCoords?(coords: Position, puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Position;
 
     getRegionsWithSameCoordsTransformation?(puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Rect[];
+
+    getRegionsForRowsAndColumns?(
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    ): Constraint<any>[];
 
     borderColor?: string;
 

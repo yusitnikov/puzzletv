@@ -7,12 +7,21 @@ import {ChessMainControls} from "../components/ChessMainControls";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState, ChessGameState> = {
-    areSameCellData({type: type1, color: color1}, {type: type2, color: color2}): boolean {
-        return type1 === type2 && color1 === color2;
+    areSameCellData(
+        {type: type1, color: color1},
+        {type: type2, color: color2},
+        forConstraints
+    ): boolean {
+        return type1 === type2 && (forConstraints || color1 === color2);
     },
 
-    compareCellData({type: type1, color: color1}, {type: type2, color: color2}): number {
-        return color1 - color2 || type1 - type2;
+    compareCellData(
+        {type: type1, color: color1},
+        {type: type2, color: color2},
+        state,
+        forConstraints
+    ): number {
+        return (forConstraints ? 0 : color1 - color2) || type1 - type2;
     },
 
     getCellDataHash({type, color}): string {
@@ -35,6 +44,10 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
             type: digit,
             color: selectedColor,
         }
+    },
+
+    getDigitByCellData(data: ChessPiece) {
+        return data.type;
     },
 
     cellDataComponentType: ChessPieceCellDataComponentType,

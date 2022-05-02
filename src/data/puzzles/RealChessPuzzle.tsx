@@ -22,6 +22,7 @@ import {
 import {RulesSpoiler} from "../../components/sudoku/rules/RulesSpoiler";
 import {gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
 import {areSameGivenDigitsMaps, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
+import {ValidChessPositionConstraint} from "../../sudokuTypes/chess/constraints/ValidChessPosition";
 
 const initialPieces = chessInitialPiecesByCellNames({
     "h8": {color: ChessColor.black, type: ChessPieceType.rook},
@@ -105,10 +106,11 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
 
         return areSameGivenDigitsMaps(RealChessPuzzle.typeManager, currentFinalDigits, correctFinalDigits);
     },
-    items: <>
-        <ChessBoardCellsBackground/>
-        <ChessBoardIndexes/>
-    </>,
+    items: [
+        <ChessBoardCellsBackground/>,
+        <ChessBoardIndexes/>,
+        ValidChessPositionConstraint,
+    ],
 };
 
 export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {

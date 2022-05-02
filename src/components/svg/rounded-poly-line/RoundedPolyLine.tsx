@@ -1,18 +1,19 @@
 import {Fragment, SVGAttributes} from "react";
+import {Position} from "../../../types/layout/Position";
 
 export interface RoundedPolyLineProps extends Omit<SVGAttributes<SVGLineElement>, "points"> {
-    points: [number, number][];
+    points: Position[];
 }
 
 export const RoundedPolyLine = ({points, ...lineProps}: RoundedPolyLineProps) => <>
-    <circle key={"first-circle"} cx={points[0][0]} cy={points[0][1]} r={(lineProps.strokeWidth! as number) / 2} fill={lineProps.stroke}/>
+    <circle key={"first-circle"} cx={points[0].left} cy={points[0].top} r={(lineProps.strokeWidth! as number) / 2} fill={lineProps.stroke}/>
 
-    {points.map(([x1, y1], index) => {
+    {points.map(({left: x1, top: y1}, index) => {
         if (!points[index + 1]) {
             return undefined;
         }
 
-        const [x2, y2] = points[index + 1];
+        const {left: x2, top: y2} = points[index + 1];
 
         return <Fragment key={`line-${index}`}>
             <line x1={x1} y1={y1} x2={x2} y2={y2} {...lineProps}/>

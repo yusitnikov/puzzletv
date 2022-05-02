@@ -1,10 +1,11 @@
 import {indexes} from "../../utils/indexes";
+import {Position} from "../layout/Position";
 
 export interface FieldSize {
     fieldSize: number;
     rowsCount: number;
     columnsCount: number;
-    regions: [number, number][][];
+    regions: Position[][];
 }
 
 export const createRegularRegions = (
@@ -12,14 +13,16 @@ export const createRegularRegions = (
     columnsCount: number,
     regionWidth: number,
     regionHeight = columnsCount / regionWidth
-): FieldSize["regions"] => indexes(rowsCount / regionHeight).flatMap(
-    (top) => indexes(columnsCount / regionWidth).map(
-        (left): [number, number][] => [
-            [left * regionWidth, top * regionHeight],
-            [(left + 1) * regionWidth, top * regionHeight],
-            [(left + 1) * regionWidth, (top + 1) * regionHeight],
-            [left * regionWidth, (top + 1) * regionHeight],
-        ]
+): Position[][] => indexes(rowsCount / regionHeight).flatMap(
+    (regionTop) => indexes(columnsCount / regionWidth).map(
+        (regionLeft) => indexes(regionHeight).flatMap(
+            (cellTop) => indexes(regionWidth).map(
+                (cellLeft): Position => ({
+                    left: regionLeft * regionWidth + cellLeft,
+                    top: regionTop * regionHeight + cellTop,
+                })
+            )
+        )
     )
 );
 

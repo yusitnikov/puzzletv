@@ -13,17 +13,41 @@ import {CalculatorDigitComponentType} from "../../../components/sudoku/digit/Cal
 const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);
 
-const toggleDigit = (data: RotatableDigit, upsideDown = true) =>
-    upsideDown && isRotatableCellData(data) ? 15 - data.digit : data.digit;
+const toggleDigit = (digit: number, upsideDown = true) => upsideDown && isRotatableDigit(digit) ? 15 - digit : digit;
+
+const toggleNumber = (digit: number, upsideDown = true) =>
+    !upsideDown
+        ? digit
+        : Number(
+            digit
+                .toString()
+                .split("")
+                .map(c => toggleDigit(Number(c)))
+                .reverse()
+                .join("")
+        );
+
+const toggleData = (data: RotatableDigit, upsideDown = true) =>
+    toggleDigit(data.digit, upsideDown && isRotatableCellData(data));
 
 export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
-    areSameCellData({digit, sticky = false}: RotatableDigit, {digit: digit2, sticky: sticky2 = false}: RotatableDigit) {
+    areSameCellData(
+        {digit, sticky = false},
+        {digit: digit2, sticky: sticky2 = false}
+    ) {
         return digit === digit2 && (sticky === sticky2 || !isRotatableDigit(digit));
     },
 
-    compareCellData(data1: RotatableDigit, data2: RotatableDigit, upsideDown = false): number {
-        return toggleDigit(data1, upsideDown) - toggleDigit(data2, upsideDown)
-            || (data1.sticky ? 1 : 0) - (data2.sticky ? 1 : 0);
+    compareCellData(
+        data1,
+        data2,
+        state,
+        forConstraints
+    ): number {
+        const upsideDown = isUpsideDownAngle(state?.angle || 0);
+
+        return toggleData(data1, upsideDown) - toggleData(data2, upsideDown)
+            || (forConstraints ? 0 : (data1.sticky ? 1 : 0) - (data2.sticky ? 1 : 0));
     },
 
     getCellDataHash(data: RotatableDigit): string {
@@ -49,8 +73,16 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
 
         return {
             ...naiveResult,
-            digit: toggleDigit(naiveResult, isUpsideDownAngle(angle))
+            digit: toggleData(naiveResult, isUpsideDownAngle(angle))
         }
+    },
+
+    getDigitByCellData(data, {angle}) {
+        return toggleData(data, isUpsideDownAngle(angle));
+    },
+
+    transformDigit(digit, puzzle, {angle}) {
+        return toggleNumber(digit, isUpsideDownAngle(angle));
     },
 
     processCellDataPosition(
@@ -65,7 +97,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         const upsideDownIndexes = getCellDataSortIndexes<RotatableDigit>(
             dataSet,
             (a, b) =>
-                toggleDigit(a) - toggleDigit(b) || (a.sticky ? 1 : 0) - (b.sticky ? 1 : 0),
+                toggleData(a) - toggleData(b) || (a.sticky ? 1 : 0) - (b.sticky ? 1 : 0),
             "sortUpsideDownIndexes"
         );
 

@@ -1,11 +1,11 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {XMark} from "../../components/sudoku/figures/x-mark/XMark";
-import {KropkiDot} from "../../components/sudoku/figures/kropki-dot/KropkiDot";
+import {XMarkConstraint} from "../../components/sudoku/constraints/x-mark/XMark";
+import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
 import React from "react";
-import {Thermometer} from "../../components/sudoku/figures/thermometer/Thermometer";
-import {Arrow} from "../../components/sudoku/figures/arrow/Arrow";
-import {GermanWhispers} from "../../components/sudoku/figures/german-whispers/GermanWhispers";
-import {KillerCage} from "../../components/sudoku/figures/killer-cage/KillerCage";
+import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
+import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
+import {GermanWhispersConstraint} from "../../components/sudoku/constraints/german-whispers/GermanWhispers";
+import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
@@ -29,6 +29,7 @@ import {
     xExplained
 } from "../ruleSnippets";
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
+import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
     title: {
@@ -69,61 +70,16 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
             5: {digit: 2},
         },
     },
-    items: <>
-        <Thermometer points={[
-            [8, 2],
-            [7, 3],
-        ]}/>
-
-        <Thermometer points={[
-            [2, 1],
-            [2, 2],
-        ]}/>
-
-        <Arrow points={[
-            [9, 5],
-            [7, 5],
-            [7, 4],
-        ]}/>
-
-        <GermanWhispers points={[
-            [6, 2],
-            [5, 3],
-            [8, 3],
-        ]}/>
-
-        <KillerCage
-            sum={12}
-            bottomSumPointIndex={2}
-            points={[
-                [0, 4],
-                [0, 6],
-                [1, 6],
-                [1, 5],
-                [2, 5],
-                [2, 4],
-            ]}
-        />
-
-        <KillerCage
-            sum={22}
-            bottomSumPointIndex={4}
-            points={[
-                [5, 7],
-                [5, 8],
-                [4, 8],
-                [4, 9],
-                [6, 9],
-                [6, 8],
-                [7, 8],
-                [7, 7],
-            ]}
-        />
-
-        <XMark left={7.5} top={8}/>
-
-        <KropkiDot left={8} top={7.5} isFilled={true}/>
-
-        <XMark left={8.5} top={7}/>
-    </>,
+    items: [
+        AntiKnightConstraint,
+        ThermometerConstraint("R2C8", "R3C7"),
+        ThermometerConstraint("R1C2", "R2C2"),
+        ArrowConstraint("R5C9", ["R5C7", "R4C7"]),
+        GermanWhispersConstraint("R2C6", "R3C5", "R3C8"),
+        KillerCageConstraint(["R5C1", "R5C2", "R6C1"], 12, true),
+        KillerCageConstraint(["R8C6", "R8C7", "R9C5", "R9C6"], 22, true),
+        XMarkConstraint("R8C7", "R8C8"),
+        KropkiDotConstraint("R7C8", "R8C8", true),
+        XMarkConstraint("R7C8", "R7C9"),
+    ],
 };

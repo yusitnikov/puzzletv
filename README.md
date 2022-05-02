@@ -9,7 +9,6 @@ A web application for creating and solving different types of sudoku.
 | Feat | Easy  |  Important   | Double-click on cell to select similar cells.                                        |
 | Mix  | Easy  |  Important   | Improve selection when dragging the mouse diagonally (don't include unwanted cells). |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).                         |
-| Feat |  Mid  |  Important   | Checker.                                                                             |
 | Mix  | Hard  |  Must have   | Keep the progress when refreshing/duplicating the tab + restart button.              |
 | Feat | Hard  |  Must have   | Setter mode.                                                                         |
 | Bug  |  Mid  |   Not sure   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).            |
