@@ -7,6 +7,8 @@ import {MergeStateAction} from "../../types/react/MergeStateAction";
 import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useEventListener} from "../useEventListener";
+import {LocalStorageKeys} from "../../data/LocalStorageKeys";
+import {loadBoolFromLocalStorage} from "../../utils/localStorage";
 
 export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
@@ -28,6 +30,9 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         },
         persistentCellWriteMode: CellWriteMode.main,
         selectedCells: noSelectedCells,
+
+        enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
+        autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
 
         ...(initialGameStateExtension as any),
     }));

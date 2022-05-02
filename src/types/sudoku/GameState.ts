@@ -19,6 +19,9 @@ export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
     persistentCellWriteMode: CellWriteMode;
     selectedCells: SelectedCells;
+
+    enableConflictChecker: boolean;
+    autoCheckOnFinish: boolean;
 }
 
 export interface ProcessedGameState<CellType> extends GameState<CellType> {

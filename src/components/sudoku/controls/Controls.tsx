@@ -21,10 +21,11 @@ import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff} from "../../app/globals";
+import {SettingsContent} from "./SettingsContent";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -68,10 +69,17 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         isReady,
         persistentCellWriteMode,
         cellWriteMode,
+        autoCheckOnFinish,
     } = state;
 
     const [isShowingResult, setIsShowingResult] = useState(false);
     const isCorrectResult = useMemo(() => resultChecker?.(state), [resultChecker, state]);
+
+    useEffect(() => {
+        if (autoCheckOnFinish && resultChecker && isCorrectResult) {
+            setIsShowingResult(true);
+        }
+    }, [autoCheckOnFinish, resultChecker, isCorrectResult, setIsShowingResult]);
 
     const isColorMode = cellWriteMode === CellWriteMode.color;
     const digitsCountInCurrentMode = isColorMode ? 9 : digitsCount;
@@ -311,7 +319,11 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         </ControlButton>
         {isShowingSettings && <Modal cellSize={cellSize} onClose={handleCloseSettings}>
             <div>
-                Settings!
+                <SettingsContent
+                    cellSize={cellSize}
+                    state={state}
+                    onStateChange={onStateChange}
+                />
             </div>
             <div>
                 <Button

@@ -132,7 +132,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         </FieldRect>)}
     </>;
 
-    const {selectedCells, isReady} = state;
+    const {selectedCells, isReady, enableConflictChecker} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (!isReady) {
@@ -331,7 +331,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             {renderCellsLayer("digits", (cellState, cell) => {
                 let isValidUserDigit = true;
                 const userDigit = userDigits[cell.top]?.[cell.left];
-                if (userDigit !== undefined) {
+                if (enableConflictChecker && userDigit !== undefined) {
                     for (const constraint of constraints) {
                         if (constraint.cells.length && !constraint.cells.some((constraintCell: Position) => isSamePosition(constraintCell, cell))) {
                             continue;

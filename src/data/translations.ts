@@ -114,6 +114,17 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Скорость вращения поля",
     },
     // endregion
+    // region SettingsContent
+    "Settings": {
+        [LanguageCode.ru]: "Настройки",
+    },
+    "Highlight conflicts": {
+        [LanguageCode.ru]: "Подсвечивать конфликты",
+    },
+    "Auto-check on finish": {
+        [LanguageCode.ru]: "Авто-проверка при завершении",
+    },
+    // endregion
 };
 
 export const translations: Record<string, TranslationItemNoEn> = translationsExactType;
