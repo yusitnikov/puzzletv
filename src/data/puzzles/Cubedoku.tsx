@@ -1,12 +1,6 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {createCubedokuFieldSize, CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
-import {
-    areSameGivenDigitsMaps,
-    createGivenDigitsMapFromArray,
-    mergeGivenDigitsMaps
-} from "../../types/sudoku/GivenDigitsMap";
-import {gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
     cubedokuIndexingDetails,
@@ -17,6 +11,7 @@ import {ThermometerConstraint} from "../../components/sudoku/constraints/thermom
 import {thermometersExplained} from "../ruleSnippets";
 import {parsePositionLiterals2} from "../../types/layout/Position";
 import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
+import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 
 const regularFieldSize4 = createCubedokuFieldSize(4, 2);
 const regularFieldSize5 = createCubedokuFieldSize(5, 1);
@@ -72,20 +67,7 @@ export const IntroToCubedoku: PuzzleDefinition<number> = {
     items: [
         CubedokuIndexingConstraint(),
     ],
-    resultChecker: (gameState) => areSameGivenDigitsMaps(
-        CubedokuTypeManager,
-        mergeGivenDigitsMaps(gameStateGetCurrentGivenDigits(gameState), IntroToCubedoku.initialDigits!),
-        createGivenDigitsMapFromArray([
-            [2, 3, 4, 1],
-            [3, 1, 2, 4],
-            [1, 4, 3, 2],
-            [4, 2, 1, 3],
-            [2, 3, 1, 4, 2, 4, 3, 1],
-            [4, 1, 3, 2, 3, 1, 2, 4],
-            [3, 4, 2, 1, 1, 2, 4, 3],
-            [1, 2, 4, 3, 4, 3, 1, 2],
-        ]),
-    ),
+    resultChecker: isValidFinishedPuzzleByConstraints,
 };
 
 export const CubeIt: PuzzleDefinition<number> = {
@@ -131,20 +113,5 @@ export const CubeIt: PuzzleDefinition<number> = {
         ThermometerConstraint("R6C8", "R7C9"),
         CubedokuIndexingConstraint(),
     ],
-    resultChecker: (gameState) => areSameGivenDigitsMaps(
-        CubedokuTypeManager,
-        mergeGivenDigitsMaps(gameStateGetCurrentGivenDigits(gameState), IntroToCubedoku.initialDigits!),
-        createGivenDigitsMapFromArray([
-            [5, 3, 4, 1, 2],
-            [4, 5, 1, 2, 3],
-            [3, 4, 2, 5, 1],
-            [2, 1, 3, 4, 5],
-            [1, 2, 5, 3, 4],
-            [1, 2, 4, 5, 3, 5, 4, 1, 3, 2],
-            [2, 1, 3, 4, 5, 4, 5, 3, 2, 1],
-            [3, 5, 2, 1, 4, 2, 3, 5, 1, 4],
-            [4, 3, 5, 2, 1, 1, 2, 4, 5, 3],
-            [5, 4, 1, 3, 2, 3, 1, 2, 4, 5],
-        ]),
-    ),
+    resultChecker: isValidFinishedPuzzleByConstraints,
 };

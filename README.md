@@ -16,7 +16,6 @@ A web application for creating and solving different types of sudoku.
 | Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.            |
 | Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API).   |
 | Bug  |  Mid  | Nice to have | 2-color solid chess pieces with a normal font.                                       |
-| Feat | Easy  | Nice to have | Function to auto-check the puzzle based on constraints.                              |
 
 ## Available Scripts
 

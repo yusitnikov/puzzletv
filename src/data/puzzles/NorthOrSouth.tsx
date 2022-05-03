@@ -30,6 +30,7 @@ import {
 } from "../ruleSnippets";
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
+import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
     title: {
@@ -82,4 +83,5 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
         KropkiDotConstraint("R7C8", "R8C8", true),
         XMarkConstraint("R7C8", "R7C9"),
     ],
+    resultChecker: isValidFinishedPuzzleByConstraints,
 };

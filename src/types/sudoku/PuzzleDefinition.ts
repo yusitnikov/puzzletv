@@ -17,7 +17,10 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     fieldMargin?: number;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
-    resultChecker?: (gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => boolean,
+    resultChecker?: (
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    ) => boolean,
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
     noIndex?: boolean;

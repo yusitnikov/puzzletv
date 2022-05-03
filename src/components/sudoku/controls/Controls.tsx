@@ -73,7 +73,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     } = state;
 
     const [isShowingResult, setIsShowingResult] = useState(false);
-    const isCorrectResult = useMemo(() => resultChecker?.(state), [resultChecker, state]);
+    const isCorrectResult = useMemo(() => resultChecker?.(puzzle, state), [resultChecker, puzzle, state]);
 
     useEffect(() => {
         if (autoCheckOnFinish && resultChecker && isCorrectResult) {
