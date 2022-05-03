@@ -1,5 +1,5 @@
 import {blackColor} from "../../../app/globals";
-import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
@@ -8,18 +8,14 @@ export interface KropkiDotProps {
     isFilled?: boolean;
 }
 
-export const KropkiDot = ({cells: [cell1, cell2], isFilled}: ConstraintProps<any, KropkiDotProps>) => {
-    const isLayer = useIsFieldLayer(FieldLayer.top);
-
-    return isLayer && <circle
-        cx={(cell1.left + cell2.left) / 2 + 0.5}
-        cy={(cell1.top + cell2.top) / 2 + 0.5}
-        r={0.2}
-        strokeWidth={0.02}
-        stroke={blackColor}
-        fill={isFilled ? blackColor : "white"}
-    />;
-};
+export const KropkiDot = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2], isFilled}: ConstraintProps<any, KropkiDotProps>) => <circle
+    cx={(cell1.left + cell2.left) / 2 + 0.5}
+    cy={(cell1.top + cell2.top) / 2 + 0.5}
+    r={0.2}
+    strokeWidth={0.02}
+    stroke={blackColor}
+    fill={isFilled ? blackColor : "white"}
+/>);
 
 export const KropkiDotConstraint = <CellType,>(
     cellLiteral1: PositionLiteral,

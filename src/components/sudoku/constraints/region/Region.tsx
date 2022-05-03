@@ -6,7 +6,7 @@ import {
     Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders} from "../../../../utils/regions";
@@ -14,17 +14,15 @@ import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
 
-export const Region = ({cells, cellSize}: ConstraintProps<any>) => {
-    const isLayer = useIsFieldLayer(FieldLayer.lines);
-
+export const Region = withFieldLayer(FieldLayer.lines, ({cells, cellSize}: ConstraintProps) => {
     const points = useMemo(() => getRegionBorders(cells, true), [cells]);
 
-    return isLayer && <RoundedPolyLine
+    return <RoundedPolyLine
         points={points}
         stroke={textColor}
         strokeWidth={Math.min(5 / cellSize, 0.05)}
     />;
-};
+});
 
 export const isValidCellForRegion = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
     region: Position[],

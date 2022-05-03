@@ -1,5 +1,5 @@
 import {lightGreyColor, textColor} from "../../../app/globals";
-import {ComponentType} from "react";
+import {ComponentType, memo} from "react";
 import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
@@ -13,7 +13,7 @@ import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 const arrowWidth = 0.1;
 const arrowHeight = 0.05;
 
-export const MinMax = ({cells: [{left, top}], coeff}: ConstraintProps & {coeff: number}) => {
+export const MinMax = memo(({cells: [{left, top}], coeff}: ConstraintProps & {coeff: number}) => {
     const layer = useFieldLayer();
 
     left += 0.5;
@@ -36,7 +36,7 @@ export const MinMax = ({cells: [{left, top}], coeff}: ConstraintProps & {coeff: 
             <Arrow cx={left} cy={top} dx={0} dy={-1} coeff={coeff}/>
         </>}
     </>;
-};
+});
 
 export const Min = (props: ConstraintProps) => <MinMax coeff={-1} {...props}/>;
 

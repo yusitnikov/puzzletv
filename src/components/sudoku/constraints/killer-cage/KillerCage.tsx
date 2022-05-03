@@ -7,7 +7,7 @@ import {
     PositionLiteral
 } from "../../../../types/layout/Position";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
-import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions";
@@ -21,9 +21,7 @@ export interface KillerCageProps {
     showBottomSum?: boolean;
 }
 
-export const KillerCage = ({cells, sum, showBottomSum}: ConstraintProps<any, KillerCageProps>) => {
-    const isLayer = useIsFieldLayer(FieldLayer.regular);
-
+export const KillerCage = withFieldLayer(FieldLayer.regular, ({cells, sum, showBottomSum}: ConstraintProps<any, KillerCageProps>) => {
     const {widthCoeff} = useDigitComponentType();
 
     const points = useMemo(() => getRegionBorders(cells), [cells]);
@@ -35,7 +33,7 @@ export const KillerCage = ({cells, sum, showBottomSum}: ConstraintProps<any, Kil
         [cells, bottom]
     );
 
-    return isLayer && <>
+    return <>
         <polygon
             points={formatSvgPointsArray(
                 points
@@ -73,7 +71,7 @@ export const KillerCage = ({cells, sum, showBottomSum}: ConstraintProps<any, Kil
             />}
         </>}
     </>;
-};
+});
 
 interface KillerCageSumProps extends Position {
     sum: number;

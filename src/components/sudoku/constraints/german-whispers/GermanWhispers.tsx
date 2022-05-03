@@ -1,19 +1,15 @@
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 
-export const GermanWhispers = ({cells}: ConstraintProps) => {
-    const isLayer = useIsFieldLayer(FieldLayer.regular);
-
-    return isLayer && <RoundedPolyLine
-        points={cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}))}
-        strokeWidth={0.15}
-        stroke={"#0f0"}
-    />;
-};
+export const GermanWhispers = withFieldLayer(FieldLayer.regular, ({cells}: ConstraintProps) => <RoundedPolyLine
+    points={cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}))}
+    strokeWidth={0.15}
+    stroke={"#0f0"}
+/>);
 
 export const GermanWhispersConstraint = <CellType,>(...cellLiterals: PositionLiteral[]): Constraint<CellType> => {
     const cells = splitMultiLine(parsePositionLiterals(cellLiterals));

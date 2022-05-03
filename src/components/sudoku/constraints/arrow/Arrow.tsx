@@ -1,6 +1,6 @@
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {darkGreyColor} from "../../../app/globals";
-import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     parsePositionLiteral,
@@ -18,9 +18,7 @@ export interface ArrowProps {
     transparentCircle?: boolean;
 }
 
-export const Arrow = ({cells, transparentCircle}: ConstraintProps<any, ArrowProps>) => {
-    const isLayer = useIsFieldLayer(FieldLayer.regular);
-
+export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCircle}: ConstraintProps<any, ArrowProps>) => {
     cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
     const [{left: x1, top: y1}, {left: x2, top: y2}] = cells;
@@ -42,7 +40,7 @@ export const Arrow = ({cells, transparentCircle}: ConstraintProps<any, ArrowProp
     dirX /= dirLength;
     dirY /= dirLength;
 
-    return isLayer && <>
+    return <>
         <RoundedPolyLine
             points={cells}
             strokeWidth={lineWidth}
@@ -77,7 +75,7 @@ export const Arrow = ({cells, transparentCircle}: ConstraintProps<any, ArrowProp
             fill={transparentCircle ? "none" : "#fff"}
         />
     </>;
-};
+});
 
 export const ArrowConstraint = <CellType,>(
     circleCellLiteral: PositionLiteral,
