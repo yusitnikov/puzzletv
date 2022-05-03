@@ -36,7 +36,9 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
         onIsDeleteSelectedCellsStrokeChange,
     }: FieldCellMouseHandlerProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const cellSelectionPadding = state.isSelectingCells ? 0 : borderPaddingCoeff;
+    const cellSelectionPadding = !allowDrawingBorders || state.isSelectingCells
+        ? 0
+        : borderPaddingCoeff;
 
     const handleCellClick = ({ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
         const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
@@ -67,7 +69,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     };
 
     return <>
-        {indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
+        {allowDrawingBorders && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
             const cornerPosition: Position = {
                 left: cellPosition.left + leftOffset,
                 top: cellPosition.top + topOffset,
