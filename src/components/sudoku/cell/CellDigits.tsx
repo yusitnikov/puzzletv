@@ -1,4 +1,4 @@
-import {CellState} from "../../../types/sudoku/CellState";
+import {CellState, isEmptyCellState} from "../../../types/sudoku/CellState";
 import {emptyPositionWithAngle, Position, PositionWithAngle} from "../../../types/layout/Position";
 import {Set} from "../../../types/struct/Set";
 import {ProcessedGameState} from "../../../types/sudoku/GameState";
@@ -31,9 +31,16 @@ export interface CellDigitsProps<CellType, GameStateExtensionType = {}, Processe
     isValidUserDigit?: boolean;
 }
 
+export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, data: Partial<CellState<CellType>>) =>
+    initialData === undefined && isEmptyCellState(data, true);
+
 export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {puzzle, data, initialData, size, cellPosition, state, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    if (shouldSkipCellDigits(initialData, data)) {
+        return null;
+    }
+
     const {
         typeManager: {
             cellDataComponentType: {
@@ -99,7 +106,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
             width={size}
             height={size}
         >
-            {initialData && renderAnimatedDigitsSet(
+            {initialData !== undefined && renderAnimatedDigitsSet(
                 "initial",
                 new Set([initialData]),
                 size * 0.7,
@@ -107,7 +114,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 true
             )}
 
-            {!initialData && usersDigit && renderAnimatedDigitsSet(
+            {initialData === undefined && usersDigit !== undefined && renderAnimatedDigitsSet(
                 "users",
                 new Set([usersDigit]),
                 size * 0.7,
@@ -116,7 +123,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 isValidUserDigit
             )}
 
-            {centerDigits && renderAnimatedDigitsSet(
+            {centerDigits?.size && renderAnimatedDigitsSet(
                 "center",
                 centerDigits,
                 size * centerDigitsCoeff,
@@ -127,7 +134,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 })
             )}
 
-            {cornerDigits && renderAnimatedDigitsSet(
+            {cornerDigits?.size && renderAnimatedDigitsSet(
                 "corner",
                 cornerDigits,
                 size * cornerDigitCoeff,

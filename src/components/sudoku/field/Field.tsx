@@ -7,7 +7,7 @@ import {Fragment, ReactNode, useMemo, useState} from "react";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
 import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
-import {CellDigits} from "../cell/CellDigits";
+import {CellDigits, shouldSkipCellDigits} from "../cell/CellDigits";
 import {FieldSvg} from "./FieldSvg";
 import {
     gameStateApplyArrowToSelectedCells,
@@ -194,12 +194,14 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     return null;
                 }
 
-                return <FieldRect
+                const content = renderer(cellState, cellPosition);
+
+                return content && <FieldRect
                     key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
                     puzzle={puzzle}
                     {...cellPosition}
                 >
-                    {renderer(cellState, cellPosition)}
+                    {content}
                 </FieldRect>;
             }))}
         </FieldSvg>;
@@ -219,7 +221,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             </FieldLayerContext.Provider>
         </FieldSvg>
 
-        {renderCellsLayer("background", ({colors}) => <CellBackground
+        {renderCellsLayer("background", ({colors}) => !!colors?.size && <CellBackground
             colors={colors}
         />)}
 
@@ -287,15 +289,19 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             </FieldLayerContext.Provider>
         </FieldSvg>
 
-        {renderCellsLayer("digits", (cellState, cell) => <CellDigits
-            puzzle={puzzle}
-            data={cellState}
-            initialData={initialDigits?.[cell.top]?.[cell.left]}
-            size={1}
-            cellPosition={cell}
-            state={state}
-            isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
-        />, true)}
+        {renderCellsLayer("digits", (cellState, cell) => {
+            const initialData = initialDigits?.[cell.top]?.[cell.left];
+
+            return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
+                puzzle={puzzle}
+                data={cellState}
+                initialData={initialData}
+                size={1}
+                cellPosition={cell}
+                state={state}
+                isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
+            />;
+        }, true)}
 
         {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
             puzzle={puzzle}

@@ -14,6 +14,9 @@ export const createEmptyCellState = <CellType>({areSameCellData, cloneCellData}:
     colors: new Set<number>([], (i1, i2) => i1 === i2, i => i),
 });
 
+export const isEmptyCellState = ({usersDigit, centerDigits, cornerDigits, colors}: Partial<CellState<any>>, ignoreColors = false) =>
+    usersDigit === undefined && !centerDigits?.size && !cornerDigits?.size && (ignoreColors || !colors?.size);
+
 export const cloneCellState = <CellType>(
     {cloneCellData}: SudokuTypeManager<CellType>,
     {usersDigit, centerDigits, cornerDigits, colors}: CellState<CellType>

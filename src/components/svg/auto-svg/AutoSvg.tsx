@@ -58,7 +58,7 @@ export const AutoSvg = ({children, clip, style, ...props}: AutoSvgProps) => {
         </>;
     }
 
-    if (left || top || style) {
+    if (left || top || angle || style) {
         return <g
             transform={`translate(${left} ${top}) rotate(${angle})`}
             style={style}
