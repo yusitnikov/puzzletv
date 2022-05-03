@@ -42,8 +42,12 @@ export const ChessMainControls = (
         }
     });
 
+    if (cellWriteMode === CellWriteMode.color) {
+        return null;
+    }
+
     return <>
-        {cellWriteMode !== CellWriteMode.color && !usedColorSelectionOnce && <Absolute
+        {!usedColorSelectionOnce && <Absolute
             left={cellSize}
             top={cellSize * 2 * (1 + controlButtonPaddingCoeff)}
             width={cellSize * 2 * (1 + controlButtonPaddingCoeff)}
