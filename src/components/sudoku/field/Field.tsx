@@ -93,7 +93,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
 
     // Handle outside click
-    useEventListener(window, "mousedown", (ev: MouseEvent) => {
+    useEventListener(window, "mousedown", () => {
         if (!isAnyKeyDown) {
             onStateChange(gameStateClearSelectedCells);
         }
