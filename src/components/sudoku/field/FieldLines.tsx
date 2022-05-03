@@ -1,13 +1,8 @@
 import {indexes} from "../../../utils/indexes";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {textColor} from "../../app/globals";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
-
-export interface FieldLinesProps {
-    puzzle: PuzzleDefinition<any, any, any>;
-    cellSize: number;
-}
+import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 
 export const FieldLines = withFieldLayer(FieldLayer.lines, (
     {
@@ -18,7 +13,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
             fieldSize: {columnsCount, rowsCount},
         },
         cellSize
-    }: FieldLinesProps
+    }: ConstraintProps
 ) => <>
     {indexes(rowsCount, true).map(rowIndex => {
         return <line
@@ -43,4 +38,8 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
     />)}
 </>);
 
-export const bindFieldLines = (props: FieldLinesProps) => <FieldLines {...props}/>;
+export const FieldLinesConstraint: Constraint<any> = {
+    name: "field lines",
+    cells: [],
+    component: FieldLines,
+}

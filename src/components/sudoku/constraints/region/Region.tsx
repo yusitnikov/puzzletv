@@ -1,5 +1,5 @@
 import {useMemo} from "react";
-import {textColor} from "../../../app/globals";
+import {getRegionBorderWidth, textColor} from "../../../app/globals";
 import {
     isSamePosition,
     parsePositionLiterals,
@@ -21,7 +21,7 @@ export const Region = withFieldLayer(FieldLayer.lines, ({cells, cellSize}: Const
     return <RoundedPolyLine
         points={points}
         stroke={textColor}
-        strokeWidth={Math.min(5 / cellSize, 0.05)}
+        strokeWidth={getRegionBorderWidth(cellSize)}
     />;
 });
 

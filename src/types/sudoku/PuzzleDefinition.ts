@@ -23,5 +23,6 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     ) => boolean,
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
+    allowDrawingBorders?: boolean;
     noIndex?: boolean;
 }

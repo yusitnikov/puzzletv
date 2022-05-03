@@ -13,6 +13,11 @@ export interface Position3D {
     z: number;
 }
 
+export interface Line {
+    start: Position;
+    end: Position;
+}
+
 export const emptyPosition: Position = {
     left: 0,
     top: 0,
@@ -55,3 +60,6 @@ export const parsePositionLiterals2 = (positions: PositionLiteral[][]): Position
 export const parsePositionLiterals3 = (positions: PositionLiteral[][][]): Position[][][] => positions.map(parsePositionLiterals2);
 
 export const isSamePosition = (p1: Position, p2: Position) => p1.left === p2.left && p1.top === p2.top;
+export const isSameLine = (line1: Line, line2: Line) =>
+    (isSamePosition(line1.start, line2.start) && isSamePosition(line1.end, line2.end)) ||
+    (isSamePosition(line1.start, line2.end) && isSamePosition(line1.end, line2.start));

@@ -10,10 +10,10 @@ import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
 import {CellDigits, shouldSkipCellDigits} from "../cell/CellDigits";
 import {FieldSvg} from "./FieldSvg";
 import {
-    gameStateApplyArrowToSelectedCells,
+    gameStateApplyArrowToSelectedCells, gameStateApplyCurrentMultiLine,
     gameStateClearSelectedCells,
-    gameStateGetCurrentFieldState,
-    gameStateSelectAllCells,
+    gameStateGetCurrentFieldState, gameStateResetCurrentMultiLine,
+    gameStateSelectAllCells, gameStateSetSelectingCells,
     ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
@@ -93,12 +93,20 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
 
     // Handle outside click
-    useEventListener(window, "mousedown", () => {
+    useEventListener(window, "mousedown", (ev: MouseEvent) => {
         if (!isAnyKeyDown) {
             onStateChange(gameStateClearSelectedCells);
         }
 
         setIsDeleteSelectedCellsStroke(false);
+        onStateChange(gameStateResetCurrentMultiLine);
+    });
+
+    useEventListener(window, "mouseup", () => {
+        onStateChange(gameState => ({
+            ...gameStateApplyCurrentMultiLine(typeManager, gameState),
+            ...gameStateSetSelectingCells(false),
+        }));
     });
 
     // Handle arrows
@@ -281,7 +289,6 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             state={state}
             onStateChange={onStateChange}
             cellPosition={cellPosition}
-            cellState={cellState}
             isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
             onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
         />)}
@@ -290,12 +297,13 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
 interface ItemsInOneRegionProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     items: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[];
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     cellSize: number;
 }
 
 const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {items, state, cellSize}: ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {items, puzzle, state, cellSize}: ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     return <>
         {items.map((item, index) => {
@@ -304,6 +312,7 @@ const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameSt
 
                 return Component && <Component
                     key={index}
+                    puzzle={puzzle}
                     gameState={state}
                     cellSize={cellSize}
                     {...otherData}
@@ -325,14 +334,13 @@ interface ItemsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateEx
 
 const Items = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {
-        puzzle,
         regionsWithSameCoordsTransformation,
         ...otherProps
     }: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => <>
     {regionsWithSameCoordsTransformation.map((rect, index) => <FieldRect
         key={`items-region-${index}`}
-        puzzle={puzzle}
+        puzzle={otherProps.puzzle}
         clip={true}
         {...rect}
     >

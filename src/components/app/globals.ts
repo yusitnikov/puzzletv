@@ -17,4 +17,6 @@ export const errorColor = redColor;
 
 export const userDigitColor = "#00f";
 
+export const getRegionBorderWidth = (cellSize: number) => Math.min(5 / cellSize, 0.05);
+
 export const svgShadowStyle = {filter: "drop-shadow(0px 0px 4px white)"};

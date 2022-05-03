@@ -8,9 +8,9 @@ import {
 import {CellWriteMode} from "./CellWriteMode";
 import {SelectedCells} from "./SelectedCells";
 import {CellState} from "./CellState";
-import {areAllFieldStateCells, isAnyFieldStateCell, processFieldStateCells} from "./FieldState";
+import {areAllFieldStateCells, isAnyFieldStateCell, processFieldStateCells, processFieldStateLines} from "./FieldState";
 import {indexes} from "../../utils/indexes";
-import {Position} from "../layout/Position";
+import {isSamePosition, Position} from "../layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap} from "./GivenDigitsMap";
@@ -18,7 +18,12 @@ import {GivenDigitsMap} from "./GivenDigitsMap";
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
     persistentCellWriteMode: CellWriteMode;
+
     selectedCells: SelectedCells;
+    isSelectingCells: boolean;
+
+    currentMultiLine: Position[];
+    isAddingLine: boolean;
 
     enableConflictChecker: boolean;
     autoCheckOnFinish: boolean;
@@ -132,6 +137,13 @@ export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensio
     gameState: ProcessedGameState<CellType>
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     selectedCells: gameState.selectedCells.clear(),
+    isSelectingCells: false,
+} as any);
+
+export const gameStateSetSelectingCells = <CellType, ProcessedGameStateExtensionType = {}>(
+    isSelectingCells: boolean
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+    isSelectingCells,
 } as any);
 
 export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -266,4 +278,80 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
     }
 };
 
+// endregion
+
+// region Drawing
+export const gameStateResetCurrentMultiLine = <CellType, ProcessedGameStateExtensionType = {}>()
+    : Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+    currentMultiLine: [],
+} as any);
+
+export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    gameState: ProcessedGameState<CellType>
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+    currentMultiLine: [],
+    fieldStateHistory: fieldStateHistoryAddState(
+        typeManager,
+        gameState.fieldStateHistory,
+        state => processFieldStateLines(state, (lines) => {
+            gameState.currentMultiLine.forEach((start, index) => {
+                const end = gameState.currentMultiLine[index + 1];
+                if (!end) {
+                    return;
+                }
+
+                lines = lines.toggle({start, end}, gameState.isAddingLine);
+            });
+
+            return lines;
+        })
+    ),
+} as any);
+
+export const gameStateStartMultiLine = <CellType, ProcessedGameStateExtensionType = {}>(
+    gameState: ProcessedGameState<CellType>,
+    point: Position
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+    currentMultiLine: [point],
+    ...gameStateClearSelectedCells(gameState),
+} as any);
+
+export const gameStateContinueMultiLine = <CellType, ProcessedGameStateExtensionType = {}>(
+    gameState: ProcessedGameState<CellType>,
+    point: Position
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+    const lastPoint = gameState.currentMultiLine[gameState.currentMultiLine.length - 1];
+    if (!lastPoint) {
+        return {};
+    }
+
+    if (isSamePosition(lastPoint, point)) {
+        return {};
+    }
+
+    let {left, top} = lastPoint;
+    const dx = Math.sign(point.left - lastPoint.left);
+    const dy = Math.sign(point.top - lastPoint.top);
+    const length = Math.max(Math.abs(point.left - lastPoint.left), Math.abs(point.top - lastPoint.top));
+    const newPoints: Position[] = [];
+    for (let i = 0; i < length; i++) {
+        if (left !== point.left) {
+            left += dx;
+            newPoints.push({left, top});
+        }
+
+        if (top !== point.top) {
+            top += dy;
+            newPoints.push({left, top});
+        }
+    }
+
+    return {
+        currentMultiLine: [...gameState.currentMultiLine, ...newPoints],
+        isAddingLine: gameState.currentMultiLine.length === 1
+            ? !gameStateGetCurrentFieldState(gameState).lines.contains({start: lastPoint, end: newPoints[0]})
+            : gameState.isAddingLine,
+    } as any;
+};
 // endregion

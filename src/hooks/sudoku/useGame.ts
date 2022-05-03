@@ -31,6 +31,10 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         persistentCellWriteMode: CellWriteMode.main,
         selectedCells: noSelectedCells,
 
+        isSelectingCells: false,
+        currentMultiLine: [],
+        isAddingLine: false,
+
         enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
         autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
 
