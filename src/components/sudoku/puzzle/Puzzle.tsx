@@ -17,6 +17,9 @@ import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 
 const StyledContainer = styled("div")({
+    position: "absolute",
+    inset: 0,
+    overflow: "hidden",
     color: textColor,
     fontFamily: "Lato, sans-serif",
 });

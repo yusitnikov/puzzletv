@@ -207,147 +207,136 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             }))}
         </FieldSvg>;
 
-    return <>
-        <style dangerouslySetInnerHTML={{
-            __html: `
-            html,
-            body {
-                overflow: hidden;
-            }
-        `
-        }}/>
-
-        <Absolute
-            {...rect}
-            angle={typeManager.getFieldAngle?.(state)}
-            style={{backgroundColor: "white"}}
+    return <Absolute
+        {...rect}
+        angle={typeManager.getFieldAngle?.(state)}
+        style={{backgroundColor: "white"}}
+    >
+        <FieldSvg
+            fieldSize={fieldSize}
+            fieldMargin={fieldMargin}
+            cellSize={cellSize}
         >
-            <FieldSvg
-                fieldSize={fieldSize}
-                fieldMargin={fieldMargin}
-                cellSize={cellSize}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                    <Items/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+            <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
+                <Items/>
+            </FieldLayerContext.Provider>
+        </FieldSvg>
 
-            {renderCellsLayer("background", ({colors}) => <CellBackground
-                colors={colors}
-            />)}
+        {renderCellsLayer("background", ({colors}) => <CellBackground
+            colors={colors}
+        />)}
 
-            <FieldSvg
-                fieldSize={fieldSize}
-                fieldMargin={fieldMargin}
-                cellSize={cellSize}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                    <Items/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+        <FieldSvg
+            fieldSize={fieldSize}
+            fieldMargin={fieldMargin}
+            cellSize={cellSize}
+        >
+            <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
+                <Items/>
+            </FieldLayerContext.Provider>
+        </FieldSvg>
 
-            {renderCellsLayer("selection", (cellState, cellPosition) => {
-                let color = "";
-                let width = 1;
+        {renderCellsLayer("selection", (cellState, cellPosition) => {
+            let color = "";
+            let width = 1;
 
-                if (selectedCells.contains(cellPosition)) {
-                    color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
-                        ? CellSelectionColor.mainCurrent
-                        : CellSelectionColor.mainPrevious;
-                } else if (getCellSelectionType) {
-                    const customSelection = getCellSelectionType(cellPosition, puzzle, state);
-                    if (customSelection) {
-                        color = customSelection.color;
-                        width = customSelection.strokeWidth;
-                    }
+            if (selectedCells.contains(cellPosition)) {
+                color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
+                    ? CellSelectionColor.mainCurrent
+                    : CellSelectionColor.mainPrevious;
+            } else if (getCellSelectionType) {
+                const customSelection = getCellSelectionType(cellPosition, puzzle, state);
+                if (customSelection) {
+                    color = customSelection.color;
+                    width = customSelection.strokeWidth;
+                }
+            }
+
+            return !!color && <CellSelection
+                size={cellSize}
+                color={color}
+                strokeWidth={width}
+            />;
+        })}
+
+        <FieldSvg
+            fieldSize={fieldSize}
+            fieldMargin={fieldMargin}
+            cellSize={cellSize}
+        >
+            <FieldLayerContext.Provider value={FieldLayer.regular}>
+                <Items/>
+            </FieldLayerContext.Provider>
+        </FieldSvg>
+
+        <FieldSvg
+            fieldSize={fieldSize}
+            fieldMargin={fieldMargin}
+            cellSize={cellSize}
+            useShadow={false}
+        >
+            <FieldLayerContext.Provider value={FieldLayer.lines}>
+                <Items/>
+            </FieldLayerContext.Provider>
+        </FieldSvg>
+
+        <FieldSvg
+            fieldSize={fieldSize}
+            fieldMargin={fieldMargin}
+            cellSize={cellSize}
+        >
+            <FieldLayerContext.Provider value={FieldLayer.top}>
+                <Items/>
+            </FieldLayerContext.Provider>
+        </FieldSvg>
+
+        {renderCellsLayer("digits", (cellState, cell) => <CellDigits
+            puzzle={puzzle}
+            data={cellState}
+            initialData={initialDigits?.[cell.top]?.[cell.left]}
+            size={1}
+            cellPosition={cell}
+            state={state}
+            isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
+        />, false, true)}
+
+        {renderCellsLayer("mouse-handler", (cellState, cellPosition) => <rect
+            width={1}
+            height={1}
+            fill={"none"}
+            stroke={"none"}
+            style={{
+                cursor: isReady ? "pointer" : undefined,
+                touchAction: "none",
+                userSelect: "none",
+                pointerEvents: "all",
+            }}
+            onMouseDown={(ev: MouseEvent<any>) => {
+                // Make sure that clicking on the grid won't be recognized as an outside click and won't try to drag
+                ev.preventDefault();
+                ev.stopPropagation();
+            }}
+            onPointerDown={({target, pointerId, ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
+                if ((target as Element).hasPointerCapture?.(pointerId)) {
+                    (target as Element).releasePointerCapture?.(pointerId);
                 }
 
-                return !!color && <CellSelection
-                    size={cellSize}
-                    color={color}
-                    strokeWidth={width}
-                />;
-            })}
+                const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
 
-            <FieldSvg
-                fieldSize={fieldSize}
-                fieldMargin={fieldMargin}
-                cellSize={cellSize}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.regular}>
-                    <Items/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+                setIsDeleteSelectedCellsStroke(isMultiSelection && selectedCells.contains(cellPosition));
+                onStateChange(
+                    gameState => isMultiSelection
+                        ? gameStateToggleSelectedCell(gameState, cellPosition)
+                        : gameStateSetSelectedCells(gameState, [cellPosition])
+                );
+            }}
+            onPointerEnter={({buttons}: PointerEvent<any>) => {
+                if (buttons !== 1) {
+                    return;
+                }
 
-            <FieldSvg
-                fieldSize={fieldSize}
-                fieldMargin={fieldMargin}
-                cellSize={cellSize}
-                useShadow={false}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.lines}>
-                    <Items/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
-
-            <FieldSvg
-                fieldSize={fieldSize}
-                fieldMargin={fieldMargin}
-                cellSize={cellSize}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.top}>
-                    <Items/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
-
-            {renderCellsLayer("digits", (cellState, cell) => <CellDigits
-                puzzle={puzzle}
-                data={cellState}
-                initialData={initialDigits?.[cell.top]?.[cell.left]}
-                size={1}
-                cellPosition={cell}
-                state={state}
-                isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
-            />, false, true)}
-
-            {renderCellsLayer("mouse-handler", (cellState, cellPosition) => <rect
-                width={1}
-                height={1}
-                fill={"none"}
-                stroke={"none"}
-                style={{
-                    cursor: isReady ? "pointer" : undefined,
-                    touchAction: "none",
-                    userSelect: "none",
-                    pointerEvents: "all",
-                }}
-                onMouseDown={(ev: MouseEvent<any>) => {
-                    // Make sure that clicking on the grid won't be recognized as an outside click and won't try to drag
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                }}
-                onPointerDown={({target, pointerId, ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
-                    if ((target as Element).hasPointerCapture?.(pointerId)) {
-                        (target as Element).releasePointerCapture?.(pointerId);
-                    }
-
-                    const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
-
-                    setIsDeleteSelectedCellsStroke(isMultiSelection && selectedCells.contains(cellPosition));
-                    onStateChange(
-                        gameState => isMultiSelection
-                            ? gameStateToggleSelectedCell(gameState, cellPosition)
-                            : gameStateSetSelectedCells(gameState, [cellPosition])
-                    );
-                }}
-                onPointerEnter={({buttons}: PointerEvent<any>) => {
-                    if (buttons !== 1) {
-                        return;
-                    }
-
-                    onStateChange(gameState => gameStateToggleSelectedCell(gameState, cellPosition, !isDeleteSelectedCellsStroke));
-                }}
-            />, true)}
-        </Absolute>
-    </>;
+                onStateChange(gameState => gameStateToggleSelectedCell(gameState, cellPosition, !isDeleteSelectedCellsStroke));
+            }}
+        />, true)}
+    </Absolute>;
 };
