@@ -67,13 +67,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
     const items = useMemo(() => getAllPuzzleConstraintsAndComponents(puzzle, state, cellSize), [puzzle, state, cellSize]);
 
-    const fullMargin = fieldMargin + fieldSize.fieldSize;
-    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle) || [{
-        left: -fullMargin,
-        top: -fullMargin,
-        width: fieldSize.columnsCount + fullMargin * 2,
-        height: fieldSize.rowsCount + fullMargin * 2,
-    }];
+    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle);
 
     const itemsProps: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
         items,
@@ -329,7 +323,7 @@ const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameSt
 interface ItemsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
     extends ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    regionsWithSameCoordsTransformation: Rect[];
+    regionsWithSameCoordsTransformation?: Rect[];
 }
 
 const Items = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -338,7 +332,7 @@ const Items = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensio
         ...otherProps
     }: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => <>
-    {regionsWithSameCoordsTransformation.map((rect, index) => <FieldRect
+    {regionsWithSameCoordsTransformation?.map((rect, index) => <FieldRect
         key={`items-region-${index}`}
         puzzle={otherProps.puzzle}
         clip={true}
@@ -353,4 +347,6 @@ const Items = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensio
             <ItemsInOneRegion {...otherProps}/>
         </AutoSvg>
     </FieldRect>)}
+
+    {!regionsWithSameCoordsTransformation && <ItemsInOneRegion {...otherProps}/>}
 </>;
