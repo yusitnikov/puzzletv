@@ -23,7 +23,7 @@ import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
 import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {
-    asConstraint,
+    asConstraint, ConstraintOrComponent,
     getAllPuzzleConstraintsAndComponents,
     isConstraint,
     isValidUserDigit,
@@ -63,23 +63,6 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
     const items = useMemo(() => getAllPuzzleConstraintsAndComponents(puzzle, state, cellSize), [puzzle, state, cellSize]);
 
-    const ItemsInOneRegion = () => <>
-        {items.map((item, index) => {
-            if (isConstraint(item)) {
-                const {component: Component, ...otherData} = asConstraint(item);
-
-                return Component && <Component
-                    key={index}
-                    gameState={state}
-                    cellSize={cellSize}
-                    {...otherData}
-                />;
-            } else {
-                return <Fragment key={index}>{item as ReactNode}</Fragment>;
-            }
-        })}
-    </>;
-
     const fullMargin = fieldMargin + fieldSize.fieldSize;
     const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle) || [{
         left: -fullMargin,
@@ -88,23 +71,13 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         height: fieldSize.rowsCount + fullMargin * 2,
     }];
 
-    const Items = () => <>
-        {regionsWithSameCoordsTransformation.map((rect, index) => <FieldRect
-            key={`items-region-${index}`}
-            puzzle={puzzle}
-            clip={true}
-            {...rect}
-        >
-            <AutoSvg
-                left={-rect.left}
-                top={-rect.top}
-                width={1}
-                height={1}
-            >
-                <ItemsInOneRegion/>
-            </AutoSvg>
-        </FieldRect>)}
-    </>;
+    const itemsProps: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
+        items,
+        puzzle,
+        state,
+        regionsWithSameCoordsTransformation,
+        cellSize,
+    };
 
     const {selectedCells, isReady, enableConflictChecker} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
@@ -217,7 +190,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             cellSize={cellSize}
         >
             <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                <Items/>
+                <Items {...itemsProps}/>
             </FieldLayerContext.Provider>
         </FieldSvg>
 
@@ -231,7 +204,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             cellSize={cellSize}
         >
             <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                <Items/>
+                <Items {...itemsProps}/>
             </FieldLayerContext.Provider>
         </FieldSvg>
 
@@ -264,7 +237,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             cellSize={cellSize}
         >
             <FieldLayerContext.Provider value={FieldLayer.regular}>
-                <Items/>
+                <Items {...itemsProps}/>
             </FieldLayerContext.Provider>
         </FieldSvg>
 
@@ -275,7 +248,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             useShadow={false}
         >
             <FieldLayerContext.Provider value={FieldLayer.lines}>
-                <Items/>
+                <Items {...itemsProps}/>
             </FieldLayerContext.Provider>
         </FieldSvg>
 
@@ -285,7 +258,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             cellSize={cellSize}
         >
             <FieldLayerContext.Provider value={FieldLayer.top}>
-                <Items/>
+                <Items {...itemsProps}/>
             </FieldLayerContext.Provider>
         </FieldSvg>
 
@@ -314,3 +287,62 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         />)}
     </Absolute>;
 };
+
+interface ItemsInOneRegionProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+    items: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[];
+    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
+    cellSize: number;
+}
+
+const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {items, state, cellSize}: ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => {
+    return <>
+        {items.map((item, index) => {
+            if (isConstraint(item)) {
+                const {component: Component, ...otherData} = asConstraint(item);
+
+                return Component && <Component
+                    key={index}
+                    gameState={state}
+                    cellSize={cellSize}
+                    {...otherData}
+                />;
+            } else {
+                return (item as any)?.key
+                    ? item as ReactNode
+                    : <Fragment key={index}>{item as ReactNode}</Fragment>;
+            }
+        })}
+    </>;
+};
+
+interface ItemsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
+    extends ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    regionsWithSameCoordsTransformation: Rect[];
+}
+
+const Items = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {
+        puzzle,
+        regionsWithSameCoordsTransformation,
+        ...otherProps
+    }: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+) => <>
+    {regionsWithSameCoordsTransformation.map((rect, index) => <FieldRect
+        key={`items-region-${index}`}
+        puzzle={puzzle}
+        clip={true}
+        {...rect}
+    >
+        <AutoSvg
+            left={-rect.left}
+            top={-rect.top}
+            width={1}
+            height={1}
+        >
+            <ItemsInOneRegion {...otherProps}/>
+        </AutoSvg>
+    </FieldRect>)}
+</>;

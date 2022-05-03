@@ -3,14 +3,10 @@ import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes} from "../../../utils/indexes";
 import {Check, Clear, Fullscreen, FullscreenExit, Redo, Settings, Undo} from "@emotion-icons/material";
-import {CellContent} from "../cell/CellContent";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
-import {CellBackground} from "../cell/CellBackground";
-import {CellDigits} from "../cell/CellDigits";
 import {
     gameStateClearSelectedCellsContent,
-    gameStateHandleDigit,
     gameStateRedo,
     gameStateUndo,
     ProcessedGameState
@@ -21,11 +17,13 @@ import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
-import {useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff} from "../../app/globals";
 import {SettingsContent} from "./SettingsContent";
+import {DigitControlButton} from "./DigitControlButton";
+import {CellWriteModeButton} from "./CellWriteModeButton";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -61,8 +59,6 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const {
         createCellDataByDisplayDigit,
         mainControlsComponent: MainControls,
-        digitShortcuts = [],
-        digitShortcutTips = [],
     } = typeManager;
 
     const {
@@ -89,40 +85,29 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const [isShowingSettings, setIsShowingSettings] = useState(false);
 
     // region Event handlers
-    const handleSetCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode} as any);
+    const handleSetCellWriteMode = useCallback(
+        (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode} as any),
+        [onStateChange]
+    );
 
-    const handleDigit = (digit: number) => isReady && onStateChange(gameState => gameStateHandleDigit(typeManager, gameState, digit));
+    const handleClear = useCallback(
+        () => onStateChange(gameState => gameStateClearSelectedCellsContent(typeManager, gameState)),
+        [onStateChange, typeManager]
+    );
 
-    const handleClear = () => onStateChange(gameState => gameStateClearSelectedCellsContent(typeManager, gameState));
+    const handleUndo = useCallback(() => onStateChange(gameStateUndo), [onStateChange]);
 
-    const handleUndo = () => onStateChange(gameStateUndo);
+    const handleRedo = useCallback(() => onStateChange(gameStateRedo), [onStateChange]);
 
-    const handleRedo = () => onStateChange(gameStateRedo);
+    const handleCheckResult = useCallback(() => setIsShowingResult(true), [setIsShowingResult]);
+    const handleCloseCheckResult = useCallback(() => setIsShowingResult(false), [setIsShowingResult]);
 
-    const handleCheckResult = () => setIsShowingResult(true);
-    const handleCloseCheckResult = () => setIsShowingResult(false);
-
-    const handleOpenSettings = () => setIsShowingSettings(true);
-    const handleCloseSettings = () => setIsShowingSettings(false);
+    const handleOpenSettings = useCallback(() => setIsShowingSettings(true), [setIsShowingSettings]);
+    const handleCloseSettings = useCallback(() => setIsShowingSettings(false), [setIsShowingSettings]);
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
         const {code, ctrlKey, shiftKey} = ev;
-
-        if (isReady) {
-            for (const index of indexes(digitsCountInCurrentMode)) {
-                const digit = index + 1;
-                const shortcut = !isColorMode && digitShortcuts[index];
-                if (
-                    code === `Digit${digit}` ||
-                    code === `Numpad${digit}` ||
-                    (shortcut && code === `Key${shortcut}`)
-                ) {
-                    handleDigit(digit);
-                    ev.preventDefault();
-                }
-            }
-        }
 
         switch (code) {
             case "Delete":
@@ -160,42 +145,14 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     return <Absolute {...rect}>
         {isReady && <>
-            {indexes(digitsCountInCurrentMode).map(index => {
-                const digit = index + 1;
-                const cellData = createCellDataByDisplayDigit(digit, state);
-                const shortcut = !isColorMode && digitShortcuts[index];
-                const shortcutTip = !isColorMode && digitShortcutTips[index];
-
-                let title = `${translate("Shortcut")}: ${digit}`;
-                if (shortcut) {
-                    title = `${title} ${translate("or")} ${shortcut}`;
-                }
-                if (shortcutTip) {
-                    title = `${title} (${translate(shortcutTip)})`;
-                }
-
-                return <ControlButton
-                    key={`digit-${digit}`}
-                    left={index % 3}
-                    top={(index - index % 3) / 3}
-                    cellSize={cellSize}
-                    fullSize={true}
-                    opacityOnHover={isColorMode}
-                    onClick={() => handleDigit(digit)}
-                    title={title}
-                >
-                    <CellContent
-                        puzzle={puzzle}
-                        data={{
-                            usersDigit: cellWriteMode === CellWriteMode.main ? cellData : undefined,
-                            cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [cellData] : []),
-                            centerDigits: new Set(cellWriteMode === CellWriteMode.center ? [cellData] : []),
-                            colors: new Set(cellWriteMode === CellWriteMode.color ? [index] : []),
-                        }}
-                        size={cellSize}
-                    />
-                </ControlButton>;
-            })}
+            {indexes(digitsCountInCurrentMode).map(index => <DigitControlButton
+                key={`digit-${index}`}
+                index={index}
+                puzzle={puzzle}
+                state={state}
+                onStateChange={onStateChange}
+                cellSize={cellSize}
+            />)}
 
             <ControlButton
                 left={0}
@@ -231,70 +188,48 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         {MainControls && <MainControls rect={emptyRect} {...otherProps}/>}
 
         {/*region: Cell write mode*/}
-        <ControlButton
-            left={3}
+        <CellWriteModeButton
             top={0}
+            cellWriteMode={CellWriteMode.main}
+            data={{usersDigit: createCellDataByDisplayDigit(digitsCount, state)}}
+            onStateChange={onStateChange}
+            puzzle={puzzle}
+            state={state}
             cellSize={cellSize}
-            innerBorderWidth={1}
-            checked={cellWriteMode === CellWriteMode.main}
-            onClick={() => handleSetCellWriteMode(CellWriteMode.main)}
-        >
-            {contentSize => <CellDigits
-                puzzle={puzzle}
-                data={{usersDigit: createCellDataByDisplayDigit(digitsCount, state)}}
-                size={contentSize}
-                mainColor={true}
-            />}
-        </ControlButton>
+        />
 
-        <ControlButton
-            left={3}
+        <CellWriteModeButton
             top={1}
-            cellSize={cellSize}
-            innerBorderWidth={1}
-            checked={cellWriteMode === CellWriteMode.corner}
-            onClick={() => handleSetCellWriteMode(CellWriteMode.corner)}
+            cellWriteMode={CellWriteMode.corner}
+            data={{cornerDigits: new Set([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}
-        >
-            {contentSize => <CellDigits
-                puzzle={puzzle}
-                data={{cornerDigits: new Set([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
-                size={contentSize}
-                mainColor={true}
-            />}
-        </ControlButton>
+            onStateChange={onStateChange}
+            puzzle={puzzle}
+            state={state}
+            cellSize={cellSize}
+        />
 
-        <ControlButton
-            left={3}
+        <CellWriteModeButton
             top={2}
-            cellSize={cellSize}
-            innerBorderWidth={1}
-            checked={cellWriteMode === CellWriteMode.center}
-            onClick={() => handleSetCellWriteMode(CellWriteMode.center)}
+            cellWriteMode={CellWriteMode.center}
+            data={{centerDigits: new Set([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Center")} (${translate("shortcut")}: Ctrl)`}
-        >
-            {contentSize => <CellDigits
-                puzzle={puzzle}
-                data={{centerDigits: new Set([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
-                size={contentSize}
-                mainColor={true}
-            />}
-        </ControlButton>
-
-        <ControlButton
-            left={3}
-            top={3}
+            onStateChange={onStateChange}
+            puzzle={puzzle}
+            state={state}
             cellSize={cellSize}
-            innerBorderWidth={1}
-            checked={cellWriteMode === CellWriteMode.color}
-            onClick={() => handleSetCellWriteMode(CellWriteMode.color)}
+        />
+
+        <CellWriteModeButton
+            top={3}
+            cellWriteMode={CellWriteMode.color}
+            data={{colors: new Set(indexes(9))}}
             title={`${translate("Colors")} (${translate("shortcut")}: Ctrl+Shift)`}
-        >
-            {contentSize => <CellBackground
-                colors={new Set(indexes(9))}
-                size={contentSize}
-            />}
-        </ControlButton>
+            onStateChange={onStateChange}
+            puzzle={puzzle}
+            state={state}
+            cellSize={cellSize}
+        />
         {/*endregion*/}
 
         <ControlButton

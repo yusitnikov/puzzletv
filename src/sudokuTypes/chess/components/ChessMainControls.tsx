@@ -7,7 +7,7 @@ import {ChessColor} from "../types/ChessColor";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowLeft} from "@emotion-icons/fluentui-system-filled";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
 export const ChessMainControls = (
@@ -21,13 +21,13 @@ export const ChessMainControls = (
 
     const [usedColorSelectionOnce, setUsedColorSelectionOnce] = useState(false);
 
-    const handleToggleColor = () => {
+    const handleToggleColor = useCallback(() => {
         onStateChange(({selectedColor}) => ({
             selectedColor: selectedColor === ChessColor.white ? ChessColor.black : ChessColor.white,
         }));
 
         setUsedColorSelectionOnce(true);
-    };
+    }, [onStateChange, setUsedColorSelectionOnce]);
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
         const {code, ctrlKey, metaKey} = ev;

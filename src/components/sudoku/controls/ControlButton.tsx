@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import {ButtonHTMLAttributes, MouseEvent, ReactNode} from "react";
+import {ButtonHTMLAttributes, memo, MouseEvent, ReactNode} from "react";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Position} from "../../../types/layout/Position";
 import {Size} from "../../../types/layout/Size";
@@ -39,7 +39,7 @@ export interface ControlButtonProps extends Position, Partial<Size>, ButtonHTMLA
     children?: ReactNode | ((contentSize: number) => ReactNode);
 }
 
-export const ControlButton = ({children, left, top, width = 1, height = 1, cellSize, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
+export const ControlButton = memo(({children, left, top, width = 1, height = 1, cellSize, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
     const contentSize = fullSize
         ? cellSize
         : cellSize * 0.7;
@@ -74,4 +74,4 @@ export const ControlButton = ({children, left, top, width = 1, height = 1, cellS
             {typeof children === "function" ? children(contentSize) : children}
         </Absolute>
     </StyledContainer>;
-};
+});

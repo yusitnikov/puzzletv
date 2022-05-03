@@ -8,7 +8,7 @@ export interface CellContentProps<CellType, GameStateExtensionType = {}, Process
 export const CellContent = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {data, size, ...otherProps}: CellContentProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => <>
-    {data.colors && <CellBackground colors={data.colors} size={size}/>}
+    {!!data.colors?.size && <CellBackground colors={data.colors} size={size}/>}
 
     <CellDigits data={data} size={size} {...otherProps}/>
 </>;
