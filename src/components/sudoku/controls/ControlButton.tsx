@@ -37,9 +37,10 @@ export interface ControlButtonProps extends Position, Partial<Size>, ButtonHTMLA
     innerBorderWidth?: number;
     opacityOnHover?: boolean;
     children?: ReactNode | ((contentSize: number) => ReactNode);
+    childrenOnTopOfBorders?: boolean;
 }
 
-export const ControlButton = memo(({children, left, top, width = 1, height = 1, cellSize, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
+export const ControlButton = memo(({children, childrenOnTopOfBorders, left, top, width = 1, height = 1, cellSize, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
     const contentSize = fullSize
         ? cellSize
         : cellSize * 0.7;
@@ -58,6 +59,7 @@ export const ControlButton = memo(({children, left, top, width = 1, height = 1, 
         tabIndex={-1}
         pointerEvents={true}
         onMouseDown={(ev: MouseEvent<HTMLButtonElement>) => ev.stopPropagation()}
+        childrenOnTopOfBorders={childrenOnTopOfBorders}
         {...otherProps}
     >
         <Absolute
@@ -66,6 +68,7 @@ export const ControlButton = memo(({children, left, top, width = 1, height = 1, 
             width={contentSize}
             height={contentSize}
             borderWidth={innerBorderWidth}
+            childrenOnTopOfBorders={childrenOnTopOfBorders}
             style={{
                 fontSize: contentSize,
                 lineHeight: `${contentSize}px`,

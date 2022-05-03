@@ -9,11 +9,13 @@ export type AbsoluteProps<TagNameT extends keyof JSX.IntrinsicElements = "div"> 
     borderColor?: string;
     pointerEvents?: boolean;
     children?: ReactNode;
+    childrenOnTopOfBorders?: boolean;
 };
 
 export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
     {
         children,
+        childrenOnTopOfBorders,
         tagName = "div" as TagNameT,
         angle = 0,
         borderWidth,
@@ -42,7 +44,7 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
         }}
         {...otherProps}
     >
-        {children}
+        {!childrenOnTopOfBorders && children}
 
         {(!!borderWidth || !!borderColor) && <>
             <Line x1={0} y1={0} x2={width} y2={0} width={borderWidth} color={borderColor}/>
@@ -50,5 +52,7 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
             <Line x1={0} y1={height} x2={width} y2={height} width={borderWidth} color={borderColor}/>
             <Line x1={width} y1={0} x2={width} y2={height} width={borderWidth} color={borderColor}/>
         </>}
+
+        {childrenOnTopOfBorders && children}
     </TagName>;
 };

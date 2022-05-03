@@ -51,6 +51,9 @@ export const translationsExactType = {
     "Colors": {
         [LanguageCode.ru]: "Цвета",
     },
+    "Lines": {
+        [LanguageCode.ru]: "Линии",
+    },
     "Clear the cell contents": {
         [LanguageCode.ru]: "Очистить содержимое ячейки",
     },

@@ -3,7 +3,7 @@ import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes} from "../../../utils/indexes";
 import {Check, Clear, Fullscreen, FullscreenExit, Redo, Settings, Undo} from "@emotion-icons/material";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
 import {
     gameStateClearSelectedCellsContent,
@@ -24,6 +24,10 @@ import {globalPaddingCoeff} from "../../app/globals";
 import {SettingsContent} from "./SettingsContent";
 import {DigitControlButton} from "./DigitControlButton";
 import {CellWriteModeButton} from "./CellWriteModeButton";
+import {RoundedPolyLine} from "../../svg/rounded-poly-line/RoundedPolyLine";
+import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {formatSvgPointsArray} from "../../../types/layout/Position";
+import {UserLinesByData} from "../constraints/user-lines/UserLines";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -52,6 +56,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         resultChecker,
         fieldSize: {fieldSize},
         digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
+        allowDrawingBorders,
     } = puzzle;
 
     const translate = useTranslate();
@@ -77,8 +82,15 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         }
     }, [autoCheckOnFinish, resultChecker, isCorrectResult, setIsShowingResult]);
 
-    const isColorMode = cellWriteMode === CellWriteMode.color;
-    const digitsCountInCurrentMode = isColorMode ? 9 : digitsCount;
+    let digitsCountInCurrentMode = digitsCount;
+    switch (cellWriteMode) {
+        case CellWriteMode.color:
+            digitsCountInCurrentMode = 9;
+            break;
+        case CellWriteMode.lines:
+            digitsCountInCurrentMode = 0;
+            break;
+    }
 
     const isFullScreen = useIsFullScreen();
 
@@ -133,11 +145,11 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 }
                 break;
             case "PageUp":
-                handleSetCellWriteMode((persistentCellWriteMode + 3) % 4);
+                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, -1, allowDrawingBorders));
                 ev.preventDefault();
                 break;
             case "PageDown":
-                handleSetCellWriteMode((persistentCellWriteMode + 1) % 4);
+                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, +1, allowDrawingBorders));
                 ev.preventDefault();
                 break;
         }
@@ -230,6 +242,38 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             state={state}
             cellSize={cellSize}
         />
+
+        {allowDrawingBorders && <CellWriteModeButton
+            top={3}
+            left={1}
+            cellWriteMode={CellWriteMode.lines}
+            data={contentSize => {
+                const offset = (cellSize - contentSize) / 2;
+
+                return <AutoSvg
+                    left={-offset}
+                    top={-offset}
+                    width={cellSize}
+                    height={cellSize}
+                    viewBox={`${-offset / contentSize} ${-offset / contentSize} ${cellSize / contentSize} ${cellSize / contentSize}`}
+                >
+                    <UserLinesByData
+                        cellSize={contentSize}
+                        currentMultiLine={[
+                            {left: 0, top: 1},
+                            {left: 0, top: 0},
+                            {left: 1, top: 0},
+                        ]}
+                    />
+                </AutoSvg>;
+            }}
+            childrenOnTopOfBorders={true}
+            title={`${translate("Lines")}`}
+            onStateChange={onStateChange}
+            puzzle={puzzle}
+            state={state}
+            cellSize={cellSize}
+        />}
         {/*endregion*/}
 
         <ControlButton

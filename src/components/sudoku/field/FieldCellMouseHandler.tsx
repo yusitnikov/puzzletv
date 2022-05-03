@@ -1,10 +1,7 @@
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {
     gameStateContinueMultiLine,
-    gameStateResetCurrentMultiLine,
     gameStateSetSelectedCells,
     gameStateStartMultiLine,
-    gameStateSetSelectingCells,
     gameStateToggleSelectedCell,
     ProcessedGameState
 } from "../../../types/sudoku/GameState";
@@ -14,11 +11,11 @@ import {MouseEvent, PointerEvent} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {globalPaddingCoeff} from "../../app/globals";
 import {indexes} from "../../../utils/indexes";
+import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
 
-const borderPaddingCoeff = Math.max(0.15, globalPaddingCoeff);
+const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
-export interface FieldCellMouseHandlerProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface FieldCellMouseHandlerProps<CellType, ProcessedGameStateExtensionType = {}> {
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
     cellPosition: Position;
@@ -26,32 +23,27 @@ export interface FieldCellMouseHandlerProps<CellType, GameStateExtensionType = {
     onIsDeleteSelectedCellsStrokeChange: (newValue: boolean) => void;
 }
 
-export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const FieldCellMouseHandler = <CellType, ProcessedGameStateExtensionType = {}>(
     {
-        puzzle: {allowDrawingBorders},
         state,
         onStateChange,
         cellPosition,
         isDeleteSelectedCellsStroke,
         onIsDeleteSelectedCellsStrokeChange,
-    }: FieldCellMouseHandlerProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    }: FieldCellMouseHandlerProps<CellType, ProcessedGameStateExtensionType>
 ) => {
-    const cellSelectionPadding = !allowDrawingBorders || state.isSelectingCells
-        ? 0
-        : borderPaddingCoeff;
+    const isSelecting = !isNoSelectionWriteMode(state.cellWriteMode);
+    const isDrawing = state.cellWriteMode === CellWriteMode.lines;
 
     const handleCellClick = ({ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
         const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
 
         onIsDeleteSelectedCellsStrokeChange(isMultiSelection && state.selectedCells.contains(cellPosition));
-        onStateChange(gameState => ({
-            ...(
-                isMultiSelection
-                    ? gameStateToggleSelectedCell(gameState, cellPosition)
-                    : gameStateSetSelectedCells(gameState, [cellPosition])
-            ),
-            ...gameStateSetSelectingCells(true),
-        }));
+        onStateChange(
+            gameState => isMultiSelection
+                ? gameStateToggleSelectedCell(gameState, cellPosition)
+                : gameStateSetSelectedCells(gameState, [cellPosition])
+        );
     };
 
     const handleContinueCellSelection = () => {
@@ -60,16 +52,8 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
         }
     };
 
-    const handleCornerClick = (ev: PointerEvent<any>, point: Position) => {
-        if (allowDrawingBorders) {
-            onStateChange(gameState => gameStateStartMultiLine(gameState, point));
-        } else {
-            handleCellClick(ev);
-        }
-    };
-
     return <>
-        {allowDrawingBorders && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
+        {isDrawing && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
             const cornerPosition: Position = {
                 left: cellPosition.left + leftOffset,
                 top: cellPosition.top + topOffset,
@@ -77,56 +61,42 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 
             return <MouseHandlerRect
                 key={`draw-corner-${topOffset}-${leftOffset}`}
-                disabled={state.isSelectingCells}
                 left={leftOffset * 0.5}
                 top={topOffset * 0.5}
                 width={0.5}
                 height={0.5}
-                onClick={(ev) => handleCornerClick(ev, cornerPosition)}
-                onEnter={() => {
-                    handleContinueCellSelection();
-
-                    if (allowDrawingBorders) {
-                        onStateChange(gameState => gameStateContinueMultiLine(gameState, cornerPosition));
-                    }
-                }}
+                onClick={() => onStateChange(gameState => gameStateStartMultiLine(gameState, cornerPosition))}
+                onEnter={() => onStateChange(gameState => gameStateContinueMultiLine(gameState, cornerPosition))}
             />;
         }))}
 
-        <MouseHandlerRect
-            key={"cell-selection"}
-            disabled={state.currentMultiLine.length !== 0}
-            left={cellSelectionPadding}
-            top={cellSelectionPadding}
-            width={1 - 2 * cellSelectionPadding}
-            height={1 - 2 * cellSelectionPadding}
-            onClick={(ev) => {
-                handleCellClick(ev);
-                onStateChange(gameStateResetCurrentMultiLine);
-            }}
-            onEnter={handleContinueCellSelection}
-        />
+        {!isDrawing && isSelecting && <>
+            <MouseHandlerRect
+                key={"cell-selection"}
+                onClick={handleCellClick}
+                onEnter={handleContinueCellSelection}
+            />
 
-        {indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
-            return <MouseHandlerRect
-                key={`no-interaction-corner-${topOffset}-${leftOffset}`}
-                disabled={!state.isSelectingCells}
-                left={leftOffset * (1 - borderPaddingCoeff)}
-                top={topOffset * (1 - borderPaddingCoeff)}
-                width={borderPaddingCoeff}
-                height={borderPaddingCoeff}
-            />;
-        }))}
+            {indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
+                return <MouseHandlerRect
+                    key={`no-interaction-corner-${topOffset}-${leftOffset}`}
+                    left={leftOffset * (1 - borderPaddingCoeff)}
+                    top={topOffset * (1 - borderPaddingCoeff)}
+                    width={borderPaddingCoeff}
+                    height={borderPaddingCoeff}
+                    onClick={handleCellClick}
+                />;
+            }))}
+        </>}
     </>;
 };
 
 interface MouseHandlerRectProps extends Partial<Rect> {
-    disabled?: boolean;
     onClick?: (ev: PointerEvent<any>) => void;
     onEnter?: (ev: PointerEvent<any>) => void;
 }
 
-export const MouseHandlerRect = ({disabled, onClick, onEnter, left = 0, top = 0, width = 1, height = 1}: MouseHandlerRectProps) => <rect
+export const MouseHandlerRect = ({onClick, onEnter, left = 0, top = 0, width = 1, height = 1}: MouseHandlerRectProps) => <rect
     x={left}
     y={top}
     width={width}
@@ -138,7 +108,7 @@ export const MouseHandlerRect = ({disabled, onClick, onEnter, left = 0, top = 0,
         cursor: "pointer",
         touchAction: "none",
         userSelect: "none",
-        pointerEvents: disabled ? "none" : "all",
+        pointerEvents: "all",
     }}
     onMouseDown={(ev: MouseEvent<any>) => {
         // Make sure that clicking on the grid won't be recognized as an outside click and won't try to drag

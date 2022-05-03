@@ -2,7 +2,7 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {gameStateHandleDigit, ProcessedGameState} from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode, isDigitWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useCallback} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {ControlButton} from "./ControlButton";
@@ -39,9 +39,9 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
     const digit = index + 1;
     const cellData = createCellDataByDisplayDigit(digit, state);
-    const isColorMode = cellWriteMode === CellWriteMode.color;
-    const shortcut = !isColorMode && digitShortcuts[index];
-    const shortcutTip = !isColorMode && digitShortcutTips[index];
+    const isDigitMode = isDigitWriteMode(cellWriteMode);
+    const shortcut = isDigitMode && digitShortcuts[index];
+    const shortcutTip = isDigitMode && digitShortcutTips[index];
 
     let title = `${translate("Shortcut")}: ${digit}`;
     if (shortcut) {
@@ -74,7 +74,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
         top={(index - index % 3) / 3}
         cellSize={cellSize}
         fullSize={true}
-        opacityOnHover={isColorMode}
+        opacityOnHover={cellWriteMode === CellWriteMode.color}
         onClick={handleDigit}
         title={title}
     >

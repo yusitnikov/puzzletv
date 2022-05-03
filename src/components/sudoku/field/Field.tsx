@@ -10,10 +10,12 @@ import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
 import {CellDigits, shouldSkipCellDigits} from "../cell/CellDigits";
 import {FieldSvg} from "./FieldSvg";
 import {
-    gameStateApplyArrowToSelectedCells, gameStateApplyCurrentMultiLine,
+    gameStateApplyArrowToSelectedCells,
+    gameStateApplyCurrentMultiLine,
     gameStateClearSelectedCells,
-    gameStateGetCurrentFieldState, gameStateResetCurrentMultiLine,
-    gameStateSelectAllCells, gameStateSetSelectingCells,
+    gameStateGetCurrentFieldState,
+    gameStateResetCurrentMultiLine,
+    gameStateSelectAllCells,
     ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
@@ -23,13 +25,15 @@ import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
 import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {
-    asConstraint, ConstraintOrComponent,
+    asConstraint,
+    ConstraintOrComponent,
     getAllPuzzleConstraintsAndComponents,
     isConstraint,
     isValidUserDigit,
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
+import {isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -79,7 +83,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         cellSize,
     };
 
-    const {selectedCells, isReady, enableConflictChecker} = state;
+    const {selectedCells, isReady, cellWriteMode, enableConflictChecker} = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (!isReady) {
@@ -103,10 +107,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     });
 
     useEventListener(window, "mouseup", () => {
-        onStateChange(gameState => ({
-            ...gameStateApplyCurrentMultiLine(typeManager, gameState),
-            ...gameStateSetSelectingCells(false),
-        }));
+        onStateChange(gameState => gameStateApplyCurrentMultiLine(typeManager, gameState));
     });
 
     // Handle arrows
@@ -216,7 +217,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             </FieldLayerContext.Provider>
         </FieldSvg>
 
-        {renderCellsLayer("selection", (cellState, cellPosition) => {
+        {!isNoSelectionWriteMode(cellWriteMode) && renderCellsLayer("selection", (cellState, cellPosition) => {
             let color = "";
             let width = 1;
 
@@ -285,7 +286,6 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         }, true)}
 
         {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
-            puzzle={puzzle}
             state={state}
             onStateChange={onStateChange}
             cellPosition={cellPosition}

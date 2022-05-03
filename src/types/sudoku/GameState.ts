@@ -5,7 +5,7 @@ import {
     fieldStateHistoryRedo,
     fieldStateHistoryUndo
 } from "./FieldStateHistory";
-import {CellWriteMode} from "./CellWriteMode";
+import {CellWriteMode, isNoSelectionWriteMode} from "./CellWriteMode";
 import {SelectedCells} from "./SelectedCells";
 import {CellState} from "./CellState";
 import {areAllFieldStateCells, isAnyFieldStateCell, processFieldStateCells, processFieldStateLines} from "./FieldState";
@@ -20,7 +20,6 @@ export interface GameState<CellType> {
     persistentCellWriteMode: CellWriteMode;
 
     selectedCells: SelectedCells;
-    isSelectingCells: boolean;
 
     currentMultiLine: Position[];
     isAddingLine: boolean;
@@ -96,14 +95,18 @@ export const gameStateAddSelectedCell = <CellType, ProcessedGameStateExtensionTy
     gameState: ProcessedGameState<CellType>,
     cellPosition: Position
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    selectedCells: gameState.selectedCells.add(cellPosition),
+    selectedCells: isNoSelectionWriteMode(gameState.cellWriteMode)
+        ? gameState.selectedCells
+        : gameState.selectedCells.add(cellPosition),
 } as any);
 
 export const gameStateSetSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
     gameState: ProcessedGameState<CellType>,
     cellPositions: Position[]
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    selectedCells: gameState.selectedCells.set(cellPositions),
+    selectedCells: isNoSelectionWriteMode(gameState.cellWriteMode)
+        ? gameState.selectedCells
+        : gameState.selectedCells.set(cellPositions),
 } as any);
 
 export const gameStateToggleSelectedCell = <CellType, ProcessedGameStateExtensionType = {}>(
@@ -111,7 +114,9 @@ export const gameStateToggleSelectedCell = <CellType, ProcessedGameStateExtensio
     cellPosition: Position,
     forcedEnable?: boolean
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    selectedCells: gameState.selectedCells.toggle(cellPosition, forcedEnable),
+    selectedCells: isNoSelectionWriteMode(gameState.cellWriteMode)
+        ? gameState.selectedCells
+        : gameState.selectedCells.toggle(cellPosition, forcedEnable),
 } as any);
 
 export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionType = {}>(
@@ -137,13 +142,6 @@ export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensio
     gameState: ProcessedGameState<CellType>
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     selectedCells: gameState.selectedCells.clear(),
-    isSelectingCells: false,
-} as any);
-
-export const gameStateSetSelectingCells = <CellType, ProcessedGameStateExtensionType = {}>(
-    isSelectingCells: boolean
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    isSelectingCells,
 } as any);
 
 export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -157,6 +155,10 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
     isMultiSelection: boolean,
     isMainKeyboard: boolean
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+    if (isNoSelectionWriteMode(gameState.cellWriteMode)) {
+        return gameState;
+    }
+
     const currentCell = gameState.selectedCells.last();
     // Nothing to do when there's no selection
     if (!currentCell) {
@@ -178,11 +180,13 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
     gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     fieldStateProcessor: (cellState: CellState<CellType>) => CellState<CellType>
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    fieldStateHistory: fieldStateHistoryAddState(
-        typeManager,
-        gameState.fieldStateHistory,
-        state => processFieldStateCells(state, gameState.selectedCells.items, fieldStateProcessor)
-    ),
+    fieldStateHistory: isNoSelectionWriteMode(gameState.cellWriteMode)
+        ? gameState.fieldStateHistory
+        : fieldStateHistoryAddState(
+            typeManager,
+            gameState.fieldStateHistory,
+            state => processFieldStateCells(state, gameState.selectedCells.items, fieldStateProcessor)
+        ),
 } as any);
 
 export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -247,6 +251,7 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
         ...cell,
         colors: cell.colors.clear()
     }));
+    const clearLines = () => gameStateDeleteAllLines(typeManager, gameState);
 
     switch (gameState.cellWriteMode) {
         case CellWriteMode.main:
@@ -265,7 +270,11 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
                 return clearCorner();
             }
 
-            return clearColor();
+            if (gameStateIsAnySelectedCell(gameState, cell => !!cell.colors.size)) {
+                return clearColor();
+            }
+
+            return clearLines();
 
         case CellWriteMode.center:
             return clearCenter();
@@ -275,6 +284,9 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
 
         case CellWriteMode.color:
             return clearColor();
+
+        case CellWriteMode.lines:
+            return clearLines();
     }
 };
 
@@ -306,6 +318,17 @@ export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType 
 
             return lines;
         })
+    ),
+} as any);
+
+export const gameStateDeleteAllLines = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    gameState: ProcessedGameState<CellType>
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+    fieldStateHistory: fieldStateHistoryAddState(
+        typeManager,
+        gameState.fieldStateHistory,
+        state => processFieldStateLines(state, lines => lines.clear())
     ),
 } as any);
 
