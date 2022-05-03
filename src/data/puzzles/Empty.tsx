@@ -24,6 +24,14 @@ export const EmptyRegular: PuzzleDefinition<number> = {
     fieldSize: FieldSize9,
 };
 
+export const EmptyChaosConstruction: PuzzleDefinition<number> = {
+    noIndex: true,
+    title,
+    slug: "empty-chaos-construction",
+    typeManager: DigitSudokuTypeManager(),
+    fieldSize: {...FieldSize9, regions: []},
+};
+
 export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
     noIndex: true,
     title,
