@@ -242,8 +242,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         />
 
         {allowDrawingBorders && <CellWriteModeButton
-            top={3}
-            left={1}
+            left={isHorizontal ? 4 : 3}
+            top={isHorizontal ? 3 : 4}
             cellWriteMode={CellWriteMode.lines}
             data={contentSize => {
                 const offset = (cellSize - contentSize) / 2;

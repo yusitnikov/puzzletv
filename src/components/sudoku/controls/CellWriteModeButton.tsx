@@ -25,7 +25,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
     {
         cellWriteMode,
         top,
-        left = 0,
+        left = 3,
         data,
         title,
         cellSize,
@@ -41,7 +41,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
     );
 
     return <ControlButton
-        left={left + 3}
+        left={left}
         top={top}
         cellSize={cellSize}
         innerBorderWidth={1}
