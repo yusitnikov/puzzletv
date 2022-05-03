@@ -1,6 +1,7 @@
 import {blackColor, blueColor, greenColor, lightGreyColor, redColor, yellowColor} from "../../app/globals";
 import {Set} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {formatSvgPointsArray} from "../../../types/layout/Position";
 
 const backgroundColors = [
     lightGreyColor,
@@ -40,7 +41,7 @@ export const CellBackground = ({colors, size = 1}: CellBackgroundProps) => {
         {colors.size > 1 && <>
             {colors.items.map((color, index) => !!index && <polygon
                 key={index}
-                points={
+                points={formatSvgPointsArray(
                     [
                         [0, index - 0.5],
                         [1, index - 0.5],
@@ -48,13 +49,11 @@ export const CellBackground = ({colors, size = 1}: CellBackgroundProps) => {
                         [1, index + 0.5]
                     ]
                         .map(([y, i]) => [y * size * 2, Math.PI * (2 * i / colors.size - 0.25)])
-                        .map(([y, a]) => [
-                            size / 2 + y * Math.cos(a),
-                            size / 2 + y * Math.sin(a),
-                        ])
-                        .map(([x, y]) => `${x},${y}`)
-                        .join(" ")
-                }
+                        .map(([y, a]) => ({
+                            left: size / 2 + y * Math.cos(a),
+                            top: size / 2 + y * Math.sin(a),
+                        }))
+                )}
                 fill={backgroundColors[color]}
             />)}
         </>}

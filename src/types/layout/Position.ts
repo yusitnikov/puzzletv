@@ -27,6 +27,8 @@ export const emptyPositionWithAngle: PositionWithAngle = {
 export type PositionLiteral = Position | string;
 
 export const stringifyPosition = ({left, top}: Position) => `${left},${top}`;
+export const formatSvgPointsArray = (points: Position[]) => points.map(stringifyPosition).join(" ");
+
 export const stringifyCellCoords = ({left, top}: Position) => `R${top + 1}C${left + 1}`;
 export const parsePositionLiteral = (position: PositionLiteral): Position => {
     if (typeof position !== "string") {

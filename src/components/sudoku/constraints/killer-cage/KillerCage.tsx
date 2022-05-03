@@ -1,6 +1,11 @@
 import {useMemo} from "react";
 import {blackColor} from "../../../app/globals";
-import {parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
+import {
+    formatSvgPointsArray,
+    parsePositionLiterals,
+    Position,
+    PositionLiteral
+} from "../../../../types/layout/Position";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {useIsFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
@@ -32,7 +37,7 @@ export const KillerCage = ({cells, sum, showBottomSum}: ConstraintProps<any, Kil
 
     return isLayer && <>
         <polygon
-            points={
+            points={formatSvgPointsArray(
                 points
                     .map(({left: x, top: y}, index) => {
                         const {left: prevX, top: prevY} = points[(index + points.length - 1) % points.length];
@@ -47,9 +52,7 @@ export const KillerCage = ({cells, sum, showBottomSum}: ConstraintProps<any, Kil
                             top: y - borderPadding * (nextDirX + prevDirX)
                         };
                     })
-                    .map(({left, top}) => `${left},${top}`)
-                    .join(" ")
-            }
+            )}
             strokeWidth={0.02}
             strokeDasharray={0.15}
             stroke={blackColor}

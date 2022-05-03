@@ -2,7 +2,12 @@ import {lightGreyColor, textColor} from "../../../app/globals";
 import {ComponentType} from "react";
 import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {isSamePosition, parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
+import {
+    formatSvgPointsArray,
+    isSamePosition,
+    parsePositionLiteral,
+    PositionLiteral
+} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 
 const arrowWidth = 0.1;
@@ -53,15 +58,20 @@ const Arrow = ({cx, cy, dx, dy, coeff}: ArrowProps) => {
     dy *= coeff;
 
     return <polyline
-        points={
-            [
-                [cx - arrowHeight * dx + arrowWidth * dy, cy - arrowHeight * dy + arrowWidth * dx],
-                [cx, cy],
-                [cx - arrowHeight * dx - arrowWidth * dy, cy - arrowHeight * dy - arrowWidth * dx],
-            ]
-                .map(([x, y]) => `${x},${y}`)
-                .join(" ")
-        }
+        points={formatSvgPointsArray([
+            {
+                left: cx - arrowHeight * dx + arrowWidth * dy,
+                top: cy - arrowHeight * dy + arrowWidth * dx
+            },
+            {
+                left: cx,
+                top: cy
+            },
+            {
+                left: cx - arrowHeight * dx - arrowWidth * dy,
+                top: cy - arrowHeight * dy - arrowWidth * dx
+            },
+        ])}
         stroke={textColor}
         strokeWidth={arrowHeight / 2}
         fill={"none"}

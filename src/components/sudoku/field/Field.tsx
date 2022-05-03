@@ -3,7 +3,7 @@ import {Rect} from "../../../types/layout/Rect";
 import {Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
-import {Fragment, MouseEvent, PointerEvent, ReactNode, useMemo, useState} from "react";
+import {Fragment, ReactNode, useMemo, useState} from "react";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
 import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
@@ -14,8 +14,6 @@ import {
     gameStateClearSelectedCells,
     gameStateGetCurrentFieldState,
     gameStateSelectAllCells,
-    gameStateSetSelectedCells,
-    gameStateToggleSelectedCell,
     ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
@@ -31,6 +29,7 @@ import {
     isValidUserDigit,
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
+import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -111,8 +110,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (!isReady) {
-        onStateChange = () => {
-        };
+        onStateChange = () => {};
     }
 
     const userDigits = useMemo(() => prepareGivenDigitsMapForConstraints(puzzle, cells), [puzzle, cells]);
@@ -179,7 +177,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         }
     });
 
-    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode, clip = false, useShadow = false) =>
+    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode, useShadow = false) =>
         <FieldSvg
             fieldSize={fieldSize}
             fieldMargin={fieldMargin}
@@ -199,7 +197,6 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 return <FieldRect
                     key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
                     puzzle={puzzle}
-                    clip={clip}
                     {...cellPosition}
                 >
                     {renderer(cellState, cellPosition)}
@@ -298,45 +295,16 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             cellPosition={cell}
             state={state}
             isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
-        />, false, true)}
-
-        {renderCellsLayer("mouse-handler", (cellState, cellPosition) => <rect
-            width={1}
-            height={1}
-            fill={"none"}
-            stroke={"none"}
-            style={{
-                cursor: isReady ? "pointer" : undefined,
-                touchAction: "none",
-                userSelect: "none",
-                pointerEvents: "all",
-            }}
-            onMouseDown={(ev: MouseEvent<any>) => {
-                // Make sure that clicking on the grid won't be recognized as an outside click and won't try to drag
-                ev.preventDefault();
-                ev.stopPropagation();
-            }}
-            onPointerDown={({target, pointerId, ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
-                if ((target as Element).hasPointerCapture?.(pointerId)) {
-                    (target as Element).releasePointerCapture?.(pointerId);
-                }
-
-                const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
-
-                setIsDeleteSelectedCellsStroke(isMultiSelection && selectedCells.contains(cellPosition));
-                onStateChange(
-                    gameState => isMultiSelection
-                        ? gameStateToggleSelectedCell(gameState, cellPosition)
-                        : gameStateSetSelectedCells(gameState, [cellPosition])
-                );
-            }}
-            onPointerEnter={({buttons}: PointerEvent<any>) => {
-                if (buttons !== 1) {
-                    return;
-                }
-
-                onStateChange(gameState => gameStateToggleSelectedCell(gameState, cellPosition, !isDeleteSelectedCellsStroke));
-            }}
         />, true)}
+
+        {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
+            puzzle={puzzle}
+            state={state}
+            onStateChange={onStateChange}
+            cellPosition={cellPosition}
+            cellState={cellState}
+            isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
+            onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
+        />)}
     </Absolute>;
 };

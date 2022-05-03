@@ -1,6 +1,6 @@
 import {memo} from "react";
 import {textColor} from "../../app/globals";
-import {Position} from "../../../types/layout/Position";
+import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {DigitProps} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
@@ -117,41 +117,39 @@ interface DigitLineProps extends Position {
 }
 
 const DigitLine = memo(({left, top, size, vertical}: DigitLineProps) => <polygon
-    points={
+    points={formatSvgPointsArray(
         [
-            [
-                lineWidthCoeff + lineSpacingCoeff,
-                0
-            ],
-            [
-                digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
-                0
-            ],
-            [
-                digitWidthCoeff - lineWidthCoeff / 2 - lineSpacingCoeff,
-                lineWidthCoeff / 2
-            ],
-            [
-                digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
-                lineWidthCoeff
-            ],
-            [
-                lineWidthCoeff + lineSpacingCoeff,
-                lineWidthCoeff
-            ],
-            [
-                lineWidthCoeff / 2 + lineSpacingCoeff,
-                lineWidthCoeff / 2
-            ],
+            {
+                left: lineWidthCoeff + lineSpacingCoeff,
+                top: 0
+            },
+            {
+                left: digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
+                top: 0
+            },
+            {
+                left: digitWidthCoeff - lineWidthCoeff / 2 - lineSpacingCoeff,
+                top: lineWidthCoeff / 2
+            },
+            {
+                left: digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
+                top: lineWidthCoeff
+            },
+            {
+                left: lineWidthCoeff + lineSpacingCoeff,
+                top: lineWidthCoeff
+            },
+            {
+                left: lineWidthCoeff / 2 + lineSpacingCoeff,
+                top: lineWidthCoeff / 2
+            },
         ]
-            .map(([x, y]) => vertical ? [y, x] : [x, y])
-            .map(([x, y]) => [
-                left + size * (x - (vertical ? lineWidthCoeff : digitWidthCoeff) / 2),
-                top + size * (y - (vertical ? digitWidthCoeff : lineWidthCoeff) / 2)
-            ])
-            .map(([x, y]) => `${x},${y}`)
-            .join(" ")
-    }
+            .map(coords => (vertical ? {left: coords.top, top: coords.left} : coords))
+            .map(({left: x, top: y}) => ({
+                left: left + size * (x - (vertical ? lineWidthCoeff : digitWidthCoeff) / 2),
+                top: top + size * (y - (vertical ? digitWidthCoeff : lineWidthCoeff) / 2)
+            }))
+    )}
     fill={"currentColor"}
 />);
 
