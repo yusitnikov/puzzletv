@@ -13,6 +13,7 @@ import {getRegionBorders} from "../../../../utils/regions";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
+import {ProcessedGameState} from "../../../../types/sudoku/GameState";
 
 export const Region = withFieldLayer(FieldLayer.lines, ({cells, cellSize}: ConstraintProps) => {
     const points = useMemo(() => getRegionBorders(cells, true), [cells]);
@@ -28,7 +29,8 @@ export const isValidCellForRegion = <CellType, GameStateExtensionType = any, Pro
     region: Position[],
     cell: Position,
     digits: GivenDigitsMap<CellType>,
-    {typeManager: {areSameCellData}}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {typeManager: {areSameCellData}}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
 ) => {
     const digit = digits[cell.top][cell.left]!;
 
@@ -39,7 +41,7 @@ export const isValidCellForRegion = <CellType, GameStateExtensionType = any, Pro
             continue;
         }
 
-        if (areSameCellData(constraintDigit, digit, true)) {
+        if (areSameCellData(constraintDigit, digit, state, true)) {
             return false;
         }
     }
@@ -54,8 +56,8 @@ export const RegionConstraint = <CellType,>(cellLiterals: PositionLiteral[], sho
         name,
         cells,
         component: showBorders ? Region : undefined,
-        isValidCell(cell, digits, puzzle) {
-            return isValidCellForRegion(cells, cell, digits, puzzle);
+        isValidCell(cell, digits, puzzle, state) {
+            return isValidCellForRegion(cells, cell, digits, puzzle, state);
         },
     });
 };

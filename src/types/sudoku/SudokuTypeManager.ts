@@ -13,7 +13,12 @@ import {Rect} from "../layout/Rect";
 import {Constraint} from "./Constraint";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    areSameCellData(data1: CellType, data2: CellType, forConstraints: boolean): boolean;
+    areSameCellData(
+        data1: CellType,
+        data2: CellType,
+        gameState: (ProcessedGameState<CellType> & ProcessedGameStateExtensionType) | undefined,
+        forConstraints: boolean
+    ): boolean;
 
     compareCellData(
         data1: CellType,

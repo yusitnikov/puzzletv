@@ -10,6 +10,7 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
     areSameCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
+        state,
         forConstraints
     ): boolean {
         return type1 === type2 && (forConstraints || color1 === color2);

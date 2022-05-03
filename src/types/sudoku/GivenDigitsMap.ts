@@ -54,7 +54,7 @@ export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeMa
                 continue;
             }
 
-            if (!areSameCellData(cell1, cell2, false)) {
+            if (!areSameCellData(cell1, cell2, undefined, false)) {
                 return false;
             }
         }

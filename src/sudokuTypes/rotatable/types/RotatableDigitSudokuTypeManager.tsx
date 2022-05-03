@@ -32,9 +32,18 @@ const toggleData = (data: RotatableDigit, upsideDown = true) =>
 
 export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
     areSameCellData(
-        {digit, sticky = false},
-        {digit: digit2, sticky: sticky2 = false}
+        data1,
+        data2,
+        state,
+        forConstraint
     ) {
+        if (forConstraint) {
+            const isUpsideDown = isUpsideDownAngle(state?.angle || 0);
+            return toggleData(data1, isUpsideDown) === toggleData(data2, isUpsideDown);
+        }
+
+        const {digit, sticky = false} = data1;
+        const {digit: digit2, sticky: sticky2 = false} = data2;
         return digit === digit2 && (sticky === sticky2 || !isRotatableDigit(digit));
     },
 
