@@ -3,18 +3,21 @@
 A web application for creating and solving different types of sudoku.
 
 ## TODO/TOFIX
-| Type | Easy? |  Important?  | Task                                                                                 |
-|:----:|:-----:|:------------:|--------------------------------------------------------------------------------------|
-| Feat | Easy  |  Important   | Timer.                                                                               |
-| Feat | Easy  |  Important   | Double-click on cell to select similar cells.                                        |
-| Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).                         |
-| Mix  | Hard  |  Must have   | Keep the progress when refreshing/duplicating the tab + restart button.              |
-| Feat | Hard  |  Must have   | Setter mode.                                                                         |
-| Bug  |  Mid  |   Not sure   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).            |
-| Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                             |
-| Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.            |
-| Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API).   |
-| Bug  |  Mid  | Nice to have | 2-color solid chess pieces with a normal font.                                       |
+| Type | Easy? |  Important?  | Task                                                                               |
+|:----:|:-----:|:------------:|------------------------------------------------------------------------------------|
+| Feat |  Mid  |  Must have   | Put X on a border.                                                                 |
+| Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders.                             |
+| Feat | Hard  |  Must have   | Torus support.                                                                     |
+| Feat | Easy  |  Important   | Timer.                                                                             |
+| Feat | Easy  |  Important   | Double-click on cell to select similar cells.                                      |
+| Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).                       |
+| Mix  | Hard  |  Must have   | Keep the progress when refreshing/duplicating the tab + restart button.            |
+| Feat | Hard  |  Must have   | Setter mode.                                                                       |
+| Bug  |  Mid  |   Not sure   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).          |
+| Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                           |
+| Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.          |
+| Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API). |
+| Bug  |  Mid  | Nice to have | 2-color solid chess pieces with a normal font.                                     |
 
 ## Available Scripts
 
