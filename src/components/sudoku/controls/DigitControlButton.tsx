@@ -53,7 +53,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
     const handleDigit = useCallback(
         () => onStateChange(gameState => gameStateHandleDigit(typeManager, gameState, digit)),
-        [onStateChange, typeManager]
+        [onStateChange, typeManager, digit]
     );
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
