@@ -24,9 +24,7 @@ import {globalPaddingCoeff} from "../../app/globals";
 import {SettingsContent} from "./SettingsContent";
 import {DigitControlButton} from "./DigitControlButton";
 import {CellWriteModeButton} from "./CellWriteModeButton";
-import {RoundedPolyLine} from "../../svg/rounded-poly-line/RoundedPolyLine";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {formatSvgPointsArray} from "../../../types/layout/Position";
 import {UserLinesByData} from "../constraints/user-lines/UserLines";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
