@@ -24,7 +24,7 @@ export const EvenConstraint = <CellType,>(cellLiteral: PositionLiteral): Constra
         name: "even",
         cells: [cell],
         component: Even,
-        isValidCell(cell, digits, {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, _, {typeManager: {getDigitByCellData}}, state) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 
             return digit % 2 === 0;

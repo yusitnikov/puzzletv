@@ -107,10 +107,10 @@ export const CubeIt: PuzzleDefinition<number> = {
         <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
     </>,
     items: [
-        ThermometerConstraint("R5C1", "R3C1"),
-        ThermometerConstraint("R4C2", "R4C4"),
-        ThermometerConstraint("R8C3", "R5C3"),
-        ThermometerConstraint("R6C8", "R7C9"),
+        ThermometerConstraint(["R5C1", "R3C1"]),
+        ThermometerConstraint(["R4C2", "R4C4"]),
+        ThermometerConstraint(["R8C3", "R5C3"]),
+        ThermometerConstraint(["R6C8", "R7C9"]),
         CubedokuIndexingConstraint(),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,

@@ -13,9 +13,11 @@ export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, Proce
     name: string;
     cells: Position[];
     component?: ComponentType<ConstraintProps<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>>;
+    color?: string;
     isValidCell?(
         cell: Position,
         digits: GivenDigitsMap<CellType>,
+        regionCells: Position[],
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): boolean;
@@ -40,8 +42,7 @@ export const asConstraint = <CellType, DataT = {}, GameStateExtensionType = any,
 
 export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
-    cellSize: number
+    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
 ): ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[] => {
     const {
         fieldSize,
@@ -80,6 +81,17 @@ export const prepareGivenDigitsMapForConstraints = <CellType>(
     cells: CellState<CellType>[][]
 ) => mergeGivenDigitsMaps(gameStateGetCurrentGivenDigitsByCells(cells), initialDigits);
 
+export const normalizeConstraintCell = (
+    {left, top}: Position,
+    {fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<any, any, any>
+): Position => ({
+    left: (left + columnsCount) % columnsCount,
+    top: (top + rowsCount) % rowsCount,
+});
+
+export const normalizeConstraintCells = (positions: Position[], puzzle: PuzzleDefinition<any, any, any>) =>
+    positions.map(position => normalizeConstraintCell(position, puzzle));
+
 export const isValidUserDigit = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
     cell: Position,
     userDigits: GivenDigitsMap<CellType>,
@@ -99,11 +111,12 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
 
         const constraint = asConstraint(item);
 
-        if (constraint.cells.length && !constraint.cells.some((constraintCell: Position) => isSamePosition(constraintCell, cell))) {
+        const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, puzzle);
+        if (normalizedConstraintCells.length && !normalizedConstraintCells.some((constraintCell: Position) => isSamePosition(constraintCell, cell))) {
             continue;
         }
 
-        if (constraint.isValidCell && !constraint.isValidCell(cell, userDigits, puzzle, state)) {
+        if (constraint.isValidCell && !constraint.isValidCell(cell, userDigits, normalizedConstraintCells, puzzle, state)) {
             return false;
         }
     }
@@ -116,7 +129,7 @@ export const isValidFinishedPuzzleByConstraints = <CellType, GameStateExtensionT
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
 ) => {
     const {typeManager: {isValidCell = () => true}} = puzzle;
-    const constraints = getAllPuzzleConstraintsAndComponents(puzzle, state, 1).filter(isConstraint).map(asConstraint);
+    const constraints = getAllPuzzleConstraintsAndComponents(puzzle, state).filter(isConstraint).map(asConstraint);
     const {cells} = gameStateGetCurrentFieldState(state);
     const userDigits = prepareGivenDigitsMapForConstraints(puzzle, cells);
 

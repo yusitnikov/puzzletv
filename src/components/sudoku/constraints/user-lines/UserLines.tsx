@@ -1,5 +1,6 @@
+import {memo} from "react";
 import {getRegionBorderWidth} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
+import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
@@ -9,7 +10,7 @@ import {getLineVector, Position} from "../../../../types/layout/Position";
 const regularBorderColor = "#080";
 const removingBorderColor = "#e00";
 
-export const UserLines = withFieldLayer(FieldLayer.lines, (
+export const UserLines = memo((
     {
         cellSize,
         puzzle: {
@@ -23,6 +24,8 @@ export const UserLines = withFieldLayer(FieldLayer.lines, (
         gameState,
     }: ConstraintProps
 ) => {
+    const layer = useFieldLayer();
+
     const {currentMultiLine, isAddingLine} = gameState;
 
     const {lines} = gameStateGetCurrentFieldState(gameState);
@@ -30,7 +33,7 @@ export const UserLines = withFieldLayer(FieldLayer.lines, (
     const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
 
     return <>
-        {lines.items.map((line, index) => {
+        {layer === FieldLayer.givenUserLines && lines.items.map((line, index) => {
             const vector = getLineVector(line);
 
             let {start: {left, top}} = line;
@@ -49,11 +52,11 @@ export const UserLines = withFieldLayer(FieldLayer.lines, (
             />;
         })}
 
-        <UserLinesByData
+        {layer === FieldLayer.newUserLines && <UserLinesByData
             cellSize={cellSize}
             currentMultiLine={currentMultiLine}
             isAdding={isAddingLine}
-        />
+        />}
     </>;
 });
 

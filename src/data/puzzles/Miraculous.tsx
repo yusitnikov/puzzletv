@@ -74,7 +74,7 @@ export const Miraculous: PuzzleDefinition<number> = {
         },
     },
     items: [
-        ThermometerConstraint("R5C2", "R4C1"),
+        ThermometerConstraint(["R5C2", "R4C1"]),
         KropkiDotConstraint("R1C7", "R1C8", true),
     ],
     allowDrawingBorders: true,

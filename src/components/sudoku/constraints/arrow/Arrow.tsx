@@ -84,14 +84,13 @@ export const ArrowConstraint = <CellType,>(
 ): Constraint<CellType, ArrowProps> => {
     const circleCell = parsePositionLiteral(circleCellLiteral);
     const cells = splitMultiLine([circleCell, ...parsePositionLiterals(arrowCellLiterals)]);
-    const arrowCells = cells.slice(1);
 
     return ({
         name: "arrow",
         cells,
         transparentCircle,
         component: Arrow,
-        isValidCell(cell, digits, {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, [circleCell, ...arrowCells], {typeManager: {getDigitByCellData}}, state) {
             const sumData = digits[circleCell.top]?.[circleCell.left];
             if (sumData === undefined) {
                 return true;

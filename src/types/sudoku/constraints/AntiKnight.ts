@@ -3,7 +3,7 @@ import {Constraint} from "../Constraint";
 export const AntiKnightConstraint: Constraint<any> = {
     name: "anti-knight",
     cells: [],
-    isValidCell({left, top}, digits, {typeManager: {areSameCellData}}, state) {
+    isValidCell({left, top}, digits, _, {typeManager: {areSameCellData}}, state) {
         const digit = digits[top][left]!;
 
         for (let dx = -2; dx <= 2; dx++) {

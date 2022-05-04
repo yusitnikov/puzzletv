@@ -7,7 +7,7 @@ import {isSamePosition, Position} from "../../../types/layout/Position";
 export const ValidChessPositionConstraint: Constraint<ChessPiece, {}, ChessGameState, ChessGameState> = {
     name: "valid chess position",
     cells: [],
-    isValidCell(cell, pieces, puzzle, state): boolean {
+    isValidCell(cell, pieces): boolean {
         const {left, top} = cell;
         const {color, type} = pieces[top][left]!;
 

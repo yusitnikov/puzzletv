@@ -1,19 +1,28 @@
-import {PropsWithChildren} from "react";
 import {svgShadowStyle} from "../../app/globals";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {FieldSize} from "../../../types/sudoku/FieldSize";
+import {indexesFromTo} from "../../../utils/indexes";
+import {ReactNode} from "react";
+import {Position} from "../../../types/layout/Position";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface FieldSvgProps {
-    fieldSize: FieldSize;
-    fieldMargin?: number;
+    puzzle: PuzzleDefinition<any, any, any>;
     cellSize: number;
     useShadow?: boolean;
+    children: ReactNode | ((offset: Position) => ReactNode);
 }
 
-export const FieldSvg = ({fieldSize: {fieldSize, rowsCount, columnsCount}, fieldMargin = 0, cellSize, useShadow = true, children}: PropsWithChildren<FieldSvgProps>) => {
+export const FieldSvg = ({puzzle, cellSize, useShadow = true, children}: FieldSvgProps) => {
+    const {
+        fieldSize: {fieldSize, rowsCount, columnsCount},
+        fieldMargin: initialFieldMargin = 0,
+        loopHorizontally,
+        loopVertically,
+    } = puzzle;
+
     const extraMargin = fieldSize;
 
-    fieldMargin += extraMargin;
+    const fieldMargin = initialFieldMargin + extraMargin;
 
     const totalWidth = fieldSize + 2 * fieldMargin;
 
@@ -25,6 +34,23 @@ export const FieldSvg = ({fieldSize: {fieldSize, rowsCount, columnsCount}, field
         viewBox={`${(columnsCount - fieldSize) / 2 - fieldMargin} ${(rowsCount - fieldSize) / 2 - fieldMargin} ${totalWidth} ${totalWidth}`}
         style={useShadow ? svgShadowStyle : undefined}
     >
-        {children}
+        {indexesFromTo(loopVertically ? -1 : 0, loopVertically ? 1 : 0, true).flatMap(
+            topOffset => indexesFromTo(loopHorizontally ? -1 : 0, loopHorizontally ? 1 : 0, true).map(
+                leftOffset => <AutoSvg
+                    key={`${topOffset}-${leftOffset}`}
+                    left={leftOffset * columnsCount}
+                    top={topOffset * rowsCount}
+                >
+                    {
+                        typeof children === "function"
+                            ? children({
+                                left: leftOffset * columnsCount,
+                                top: topOffset * rowsCount
+                            })
+                            : children
+                    }
+                </AutoSvg>
+            )
+        )}
     </AutoSvg>;
 };

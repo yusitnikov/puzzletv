@@ -5,7 +5,6 @@ A web application for creating and solving different types of sudoku.
 ## TODO/TOFIX
 | Type | Easy? |  Important?  | Task                                                                               |
 |:----:|:-----:|:------------:|------------------------------------------------------------------------------------|
-| Bug  |  Mid  |  Must have   | Fix drawing borders between the looped grid parts.                                 |
 | Feat |  Mid  |  Must have   | Put X on a border.                                                                 |
 | Feat |  Mid  |  Must have   | Draw lines between the cells.                                                      |
 | Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders and/or colors.               |

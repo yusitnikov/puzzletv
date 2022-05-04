@@ -18,7 +18,7 @@ export const OddConstraint = <CellType,>(cellLiteral: PositionLiteral): Constrai
         name: "odd",
         cells: [cell],
         component: Odd,
-        isValidCell(cell, digits, {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, _, {typeManager: {getDigitByCellData}}, state) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 
             return digit % 2 === 1;

@@ -1,13 +1,12 @@
 import {createContext, useContext} from "react";
 import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
 import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
-import {Size} from "../../../types/layout/Size";
 
 const SvgParentExistsContext = createContext<boolean>(false);
 
 export const useSvgParentExists = () => useContext(SvgParentExistsContext);
 
-export interface AutoSvgProps extends Size, Omit<AbsoluteProps<"svg">, "tagName" | "clip" | keyof Size> {
+export interface AutoSvgProps extends Omit<AbsoluteProps<"svg">, "tagName" | "clip"> {
     clip?: boolean;
 }
 
@@ -19,8 +18,8 @@ export const AutoSvg = ({children, clip, style, ...props}: AutoSvgProps) => {
     const {
         left = 0,
         top = 0,
-        width,
-        height,
+        width = 0,
+        height = 0,
         angle = 0,
     } = props;
 

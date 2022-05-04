@@ -85,18 +85,18 @@ export const MinMaxConstraint = <CellType,>(
     coeff: number
 ): Constraint<CellType> => {
     const mainCell = parsePositionLiteral(cellLiteral);
-    const neighborCells = [
-        {left: mainCell.left - 1, top: mainCell.top},
-        {left: mainCell.left + 1, top: mainCell.top},
-        {left: mainCell.left, top: mainCell.top - 1},
-        {left: mainCell.left, top: mainCell.top + 1},
-    ];
 
     return ({
         name,
-        cells: [mainCell, ...neighborCells],
+        cells: [
+            mainCell,
+            {left: mainCell.left - 1, top: mainCell.top},
+            {left: mainCell.left + 1, top: mainCell.top},
+            {left: mainCell.left, top: mainCell.top - 1},
+            {left: mainCell.left, top: mainCell.top + 1},
+        ],
         component,
-        isValidCell(cell, digits, {typeManager: {compareCellData}}, state) {
+        isValidCell(cell, digits, [mainCell, ...neighborCells], {typeManager: {compareCellData}}, state) {
             const digit = digits[cell.top][cell.left]!;
 
             const mainDigit = digits[mainCell.top]?.[mainCell.left];

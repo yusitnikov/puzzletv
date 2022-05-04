@@ -6,7 +6,7 @@ import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
 import {splitMultiLine} from "../../../../utils/lines";
 
-export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points}: ConstraintProps) => {
+export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points, color = lightGreyColor}: ConstraintProps) => {
     points = points.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
     return <>
@@ -14,25 +14,26 @@ export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points}: 
             cx={points[0].left}
             cy={points[0].top}
             r={0.4}
-            fill={lightGreyColor}
+            fill={color}
         />
 
         <RoundedPolyLine
             points={points}
             strokeWidth={0.35}
-            stroke={lightGreyColor}
+            stroke={color}
         />
     </>;
 });
 
-export const ThermometerConstraint = <CellType,>(...cellLiterals: PositionLiteral[]): Constraint<CellType> => {
+export const ThermometerConstraint = <CellType,>(cellLiterals: PositionLiteral[], color?: string): Constraint<CellType> => {
     const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
 
     return ({
         name: "thermometer",
         cells,
         component: Thermometer,
-        isValidCell(cell, digits, {typeManager: {compareCellData}}, state) {
+        color,
+        isValidCell(cell, digits, cells, {typeManager: {compareCellData}}, state) {
             const digit = digits[cell.top][cell.left]!;
 
             let isBeforeCurrentCell = true;

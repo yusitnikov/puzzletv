@@ -8,9 +8,10 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
     {
         puzzle: {
             typeManager: {
-                borderColor = textColor,
+                borderColor: typeBorderColor,
             },
             fieldSize: {columnsCount, rowsCount},
+            borderColor: puzzleBorderColor,
         },
         cellSize
     }: ConstraintProps
@@ -22,7 +23,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
             y1={rowIndex}
             x2={columnsCount}
             y2={rowIndex}
-            stroke={borderColor}
+            stroke={puzzleBorderColor || typeBorderColor || textColor}
             strokeWidth={1 / cellSize}
         />;
     })}
@@ -33,7 +34,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
         y1={0}
         x2={columnIndex}
         y2={rowsCount}
-        stroke={borderColor}
+        stroke={puzzleBorderColor || typeBorderColor || textColor}
         strokeWidth={1 / cellSize}
     />)}
 </>);

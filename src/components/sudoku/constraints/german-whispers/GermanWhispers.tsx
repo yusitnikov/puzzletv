@@ -18,7 +18,7 @@ export const GermanWhispersConstraint = <CellType,>(...cellLiterals: PositionLit
         name: "german whispers",
         cells,
         component: GermanWhispers,
-        isValidCell(cell, digits, {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, cells, {typeManager: {getDigitByCellData}}, state) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 
             const index = cells.findIndex(constraintCell => isSamePosition(constraintCell, cell));
