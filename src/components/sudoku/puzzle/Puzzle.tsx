@@ -20,6 +20,8 @@ const StyledContainer = styled("div")({
     position: "absolute",
     inset: 0,
     overflow: "hidden",
+    touchAction: "none",
+    userSelect: "none",
     color: textColor,
     fontFamily: "Lato, sans-serif",
 });

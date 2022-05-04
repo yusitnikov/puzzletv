@@ -109,8 +109,6 @@ export const MouseHandlerRect = ({onClick, onEnter, left = 0, top = 0, width = 1
     strokeWidth={0}
     style={{
         cursor: "pointer",
-        touchAction: "none",
-        userSelect: "none",
         pointerEvents: "all",
     }}
     onMouseDown={(ev: MouseEvent<any>) => {

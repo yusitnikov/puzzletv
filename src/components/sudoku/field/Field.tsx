@@ -111,7 +111,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         onStateChange(gameStateResetCurrentMultiLine);
     });
 
-    useEventListener(window, "mouseup", () => {
+    useEventListener(window, "pointerup", () => {
         onStateChange(gameState => gameStateApplyCurrentMultiLine(typeManager, gameState));
     });
 
