@@ -147,13 +147,7 @@ export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensio
 } as any);
 
 export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {
-        typeManager: {processArrowDirection = defaultProcessArrowDirection},
-        fieldSize,
-        fieldMargin = 0,
-        loopHorizontally,
-        loopVertically,
-    }: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     xDirection: number,
     yDirection: number,
@@ -169,6 +163,13 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
     if (!currentCell) {
         return gameState;
     }
+
+    const {
+        typeManager: {processArrowDirection = defaultProcessArrowDirection},
+        fieldSize,
+        loopHorizontally,
+        loopVertically,
+    } = puzzle;
 
     const newCell = processArrowDirection(currentCell, xDirection, yDirection, fieldSize, isMainKeyboard, gameState);
     if (!newCell) {
@@ -187,12 +188,12 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
         if (left < min) {
             loopOffset = {
                 ...loopOffset,
-                left: (loopOffset.left + (min - left)) % fieldSize.columnsCount,
+                left: loopOffset.left + (min - left),
             };
         } else if (left > max) {
             loopOffset = {
                 ...loopOffset,
-                left: (loopOffset.left + fieldSize.columnsCount - (left - max)) % fieldSize.columnsCount,
+                left: loopOffset.left - (left - max),
             };
         }
     }
@@ -204,19 +205,19 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
         if (top < min) {
             loopOffset = {
                 ...loopOffset,
-                top: (loopOffset.top + (min - top)) % fieldSize.rowsCount,
+                top: loopOffset.top + (min - top),
             };
         } else if (top > max) {
             loopOffset = {
                 ...loopOffset,
-                top: (loopOffset.top + fieldSize.rowsCount - (top - max)) % fieldSize.rowsCount,
+                top: loopOffset.top + fieldSize.rowsCount - (top - max),
             };
         }
     }
 
     return {
         ...result,
-        loopOffset,
+        loopOffset: gameStateNormalizeLoopOffset(puzzle, loopOffset),
     };
 };
 
@@ -340,6 +341,14 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
 // endregion
 
 // region Drawing
+export const gameStateNormalizeLoopOffset = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {fieldSize: {rowsCount, columnsCount}, fieldMargin = 0}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    {left, top}: Position
+): Position => ({
+    left: ((left + fieldMargin) % columnsCount + columnsCount) % columnsCount - fieldMargin,
+    top: ((top + fieldMargin) % rowsCount + rowsCount) % rowsCount - fieldMargin,
+});
+
 export const gameStateResetCurrentMultiLine = <CellType, ProcessedGameStateExtensionType = {}>()
     : Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     currentMultiLine: [],

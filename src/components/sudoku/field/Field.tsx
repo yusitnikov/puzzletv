@@ -14,6 +14,7 @@ import {
     gameStateApplyCurrentMultiLine,
     gameStateClearSelectedCells,
     gameStateGetCurrentFieldState,
+    gameStateNormalizeLoopOffset,
     gameStateResetCurrentMultiLine,
     gameStateSelectAllCells,
     ProcessedGameState
@@ -129,14 +130,14 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     useEventListener(window, "pointermove", ({screenX, screenY}: PointerEvent) => {
         if (dragStart) {
             onStateChange({
-                loopOffset: {
+                loopOffset: gameStateNormalizeLoopOffset(puzzle, {
                     left: loopHorizontally
-                        ? ((dragStart.left + screenX / cellSize) % fieldSize.columnsCount + fieldSize.columnsCount) % fieldSize.columnsCount
+                        ? dragStart.left + screenX / cellSize
                         : loopOffset.left,
                     top: loopVertically
-                        ? ((dragStart.top + screenY / cellSize) % fieldSize.rowsCount + fieldSize.rowsCount) % fieldSize.rowsCount
+                        ? dragStart.top + screenY / cellSize
                         : loopOffset.top,
-                }
+                }),
             } as Partial<ProcessedGameState<CellType>> as any);
         }
     });

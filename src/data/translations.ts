@@ -55,7 +55,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Линии",
     },
     "Move the grid": {
-        [LanguageCode.ru]: "Переместить поле",
+        [LanguageCode.ru]: "Двигать поле",
     },
     "Clear the cell contents": {
         [LanguageCode.ru]: "Очистить содержимое ячейки",

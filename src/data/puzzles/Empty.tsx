@@ -33,7 +33,7 @@ export const EmptyChaosConstruction: PuzzleDefinition<number> = {
     allowDrawingBorders: true,
     loopHorizontally: true,
     loopVertically: true,
-    fieldMargin: 0.25,
+    fieldMargin: 0.99,
 };
 
 export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {

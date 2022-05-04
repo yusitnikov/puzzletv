@@ -1,7 +1,8 @@
 import {Translatable} from "../types/translations/Translatable";
 import {LanguageCode} from "../types/translations/LanguageCode";
 import React, {ReactNode} from "react";
-import {processTranslations} from "../utils/translate";
+
+export const ruleWithTitle = (title: ReactNode, explained: string) => <>{title}: {(explained as string).toLowerCase()}</>;
 
 export const normalSudokuRulesApply: Translatable = {
     [LanguageCode.en]: "Standard sudoku rules apply",
@@ -13,14 +14,19 @@ export const almostNormalSudokuRulesApply: Translatable = {
     [LanguageCode.ru]: "Стандартные (почти) правила судоку",
 };
 
+export const chaosConstructionRulesApply: Translatable = {
+    [LanguageCode.en]: "Regions must be connected and determined by the solver",
+    [LanguageCode.ru]: "Области должны быть связаны и определены Вами",
+};
+
 export const antiKnightRulesApply: Translatable = {
     [LanguageCode.en]: "Anti-knight sudoku rules apply",
     [LanguageCode.ru]: "Правила судоку \"анти-конь\"",
 };
 
 export const antiKnightRulesExplained: Translatable = {
-    [LanguageCode.en]: "cells separated by a chess knight's move cannot contain the same digit",
-    [LanguageCode.ru]: "клетки, разделенные ходом коня, не могут содержать одну и ту же цифру",
+    [LanguageCode.en]: "Cells separated by a chess knight's move cannot contain the same digit",
+    [LanguageCode.ru]: "Клетки, разделенные ходом коня, не могут содержать одну и ту же цифру",
 };
 
 export const conventionalNotationsApply: Translatable = {
@@ -48,30 +54,29 @@ export const thermometersExplained: Translatable = {
     [LanguageCode.ru]: "Цифры возрастают вдоль термометров, начиная с \"колбы\"",
 };
 
-export const thermometers: Translatable = processTranslations(
-    (title, explained) => `${title}: ${explained.toLowerCase()}`,
-    thermometersTitle,
-    thermometersExplained
-);
-
 export const kropkiDotsTitle: Translatable = {
     [LanguageCode.en]: "Kropki dots",
     [LanguageCode.ru]: "Точки Кропки",
 };
 
 export const blackKropkiDotsExplained: Translatable = {
-    [LanguageCode.en]: "cells separated by a black dot have a ratio of 1:2",
-    [LanguageCode.ru]: "ячейки, разделенные чёрной точкой, имеют соотношение 1:2",
+    [LanguageCode.en]: "Cells separated by a black dot have a ratio of 1:2",
+    [LanguageCode.ru]: "Ячейки, разделенные чёрной точкой, имеют соотношение 1:2",
+};
+
+export const notAllDotsGiven: Translatable = {
+    [LanguageCode.en]: "Not all dots are given",
+    [LanguageCode.ru]: "Не все точки даны",
 };
 
 export const xExplained: Translatable = {
-    [LanguageCode.en]: "cells separated by X must sum to 10",
-    [LanguageCode.ru]: "сумма цифр, разделённых знаком X, равна 10",
+    [LanguageCode.en]: "Cells separated by X must sum to 10",
+    [LanguageCode.ru]: "Сумма цифр, разделённых знаком X, равна 10",
 };
 
 export const vExplained: Translatable = {
-    [LanguageCode.en]: "cells separated by V must sum to 5",
-    [LanguageCode.ru]: "сумма цифр, разделённых знаком V, равна 5",
+    [LanguageCode.en]: "Cells separated by V must sum to 5",
+    [LanguageCode.ru]: "Сумма цифр, разделённых знаком V, равна 5",
 };
 
 export const germanWhispers: Translatable = {
