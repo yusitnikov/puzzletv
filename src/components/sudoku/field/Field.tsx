@@ -61,6 +61,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         fieldMargin = 0,
         initialDigits = {},
         initialColors = {},
+        allowOverridingInitialColors = false,
         loopHorizontally,
         loopVertically,
     } = puzzle;
@@ -275,7 +276,10 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                         </FieldSvg>
 
                         {renderCellsLayer("background", topOffset, leftOffset, ({colors}, {left , top}) => {
-                            const finalColors = colors?.size ? colors : new Set(initialColors[top]?.[left] || []);
+                            const initialCellColors = initialColors[top]?.[left];
+                            const finalColors = allowOverridingInitialColors
+                                ? (colors?.size ? colors : new Set(initialCellColors || []))
+                                : (initialCellColors ? new Set(initialCellColors) : colors);
 
                             return !!finalColors?.size && <CellBackground
                                 colors={finalColors}

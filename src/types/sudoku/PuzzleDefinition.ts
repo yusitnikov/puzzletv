@@ -19,6 +19,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
     initialColors?: GivenDigitsMap<CellColor[]>;
+    allowOverridingInitialColors?: boolean;
     resultChecker?: (
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
