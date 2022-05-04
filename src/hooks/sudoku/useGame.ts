@@ -20,6 +20,9 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             isReady: isReadyFn = () => true,
             useProcessedGameStateExtension = () => ({} as any)
         },
+        allowDrawingBorders = false,
+        loopHorizontally = false,
+        loopVertically = false,
     } = puzzle;
 
     const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => ({
@@ -43,7 +46,11 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         ...(initialGameStateExtension as any),
     }));
 
-    const cellWriteMode = useFinalCellWriteMode(gameState.persistentCellWriteMode);
+    const cellWriteMode = useFinalCellWriteMode(
+        gameState.persistentCellWriteMode,
+        allowDrawingBorders,
+        loopHorizontally || loopVertically
+    );
     const isReady = isReadyFn(gameState);
     const processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType> = useProcessedGameStateExtension(gameState);
     const processedGameStateExtensionDep = JSON.stringify(processedGameStateExtension);

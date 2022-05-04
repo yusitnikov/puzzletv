@@ -280,7 +280,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 </AutoSvg>;
             }}
             childrenOnTopOfBorders={true}
-            title={`${translate("Lines")}`}
+            title={`${translate("Lines")} (${translate("shortcut")}: Alt)`}
             onStateChange={onStateChange}
             puzzle={puzzle}
             state={state}
@@ -293,7 +293,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             cellWriteMode={CellWriteMode.move}
             data={() => <SettingsOverscan/>}
             noBorders={true}
-            title={`${translate("Move the grid")}`}
+            title={`${translate("Move the grid")} (${translate("shortcut")}: Alt+Shift)`}
             onStateChange={onStateChange}
             puzzle={puzzle}
             state={state}
