@@ -33,7 +33,8 @@ import {
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
-import {isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {indexesFromTo} from "../../../utils/indexes";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -57,6 +58,8 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         fieldSize,
         fieldMargin = 0,
         initialDigits = {},
+        loopHorizontally,
+        loopVertically,
     } = puzzle;
 
     const {
@@ -77,7 +80,13 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         cellSize,
     };
 
-    const {selectedCells, isReady, cellWriteMode, enableConflictChecker} = state;
+    const {
+        selectedCells,
+        isReady,
+        cellWriteMode,
+        enableConflictChecker,
+        loopOffset,
+    } = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (!isReady) {
@@ -89,6 +98,8 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     const {isAnyKeyDown} = useControlKeysState();
 
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
+
+    const [dragStart, setDragStart] = useState<Position | undefined>(undefined);
 
     // Handle outside click
     useEventListener(window, "mousedown", () => {
@@ -102,6 +113,39 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
     useEventListener(window, "mouseup", () => {
         onStateChange(gameState => gameStateApplyCurrentMultiLine(typeManager, gameState));
+    });
+
+    useEventListener(window, "pointerdown", ({screenX, screenY}: PointerEvent) => {
+        if (cellWriteMode === CellWriteMode.move) {
+            setDragStart({
+                left: loopOffset.left - screenX / cellSize,
+                top: loopOffset.top - screenY / cellSize,
+            });
+        }
+    });
+
+    useEventListener(window, "pointermove", ({screenX, screenY}: PointerEvent) => {
+        if (dragStart) {
+            onStateChange({
+                loopOffset: {
+                    left: loopHorizontally
+                        ? ((dragStart.left + screenX / cellSize) % fieldSize.columnsCount + fieldSize.columnsCount) % fieldSize.columnsCount
+                        : loopOffset.left,
+                    top: loopVertically
+                        ? ((dragStart.top + screenY / cellSize) % fieldSize.rowsCount + fieldSize.rowsCount) % fieldSize.rowsCount
+                        : loopOffset.top,
+                }
+            } as Partial<ProcessedGameState<CellType>> as any);
+        }
+    });
+
+    useEventListener(window, "pointerup", () => {
+        setDragStart(undefined);
+    });
+
+    useEventListener(window, "contextmenu", (ev: MouseEvent) => {
+        ev.preventDefault();
+        return false;
     });
 
     // Handle arrows
@@ -153,7 +197,13 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         }
     });
 
-    const renderCellsLayer = (keyPrefix: string, renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode, useShadow = false) =>
+    const renderCellsLayer = (
+        keyPrefix: string,
+        topOffset: number,
+        leftOffset: number,
+        renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
+        useShadow = false
+    ) =>
         <FieldSvg
             fieldSize={fieldSize}
             fieldMargin={fieldMargin}
@@ -161,6 +211,16 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             useShadow={useShadow}
         >
             {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+                const finalTop = topOffset * fieldSize.rowsCount + loopOffset.top + rowIndex;
+                if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
+                    return null;
+                }
+
+                const finalLeft = leftOffset * fieldSize.columnsCount + loopOffset.left + columnIndex;
+                if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
+                    return null;
+                }
+
                 const cellPosition: Position = {
                     left: columnIndex,
                     top: rowIndex,
@@ -185,107 +245,164 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     return <Absolute
         {...rect}
         angle={typeManager.getFieldAngle?.(state)}
-        style={{backgroundColor: "white"}}
+        style={{
+            backgroundColor: "white",
+            overflow: loopHorizontally || loopVertically ? "hidden" : undefined,
+        }}
     >
-        <FieldSvg
-            fieldSize={fieldSize}
-            fieldMargin={fieldMargin}
-            cellSize={cellSize}
+        <Absolute
+            left={loopOffset.left * cellSize}
+            top={loopOffset.top * cellSize}
         >
-            <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                <Items {...itemsProps}/>
-            </FieldLayerContext.Provider>
-        </FieldSvg>
+            {indexesFromTo(loopVertically ? -1 : 0, loopVertically ? 1 : 0, true).flatMap(
+                topOffset => indexesFromTo(loopHorizontally ? -1 : 0, loopHorizontally ? 1 : 0, true).map(
+                    leftOffset => <Absolute
+                        key={`${topOffset}-${leftOffset}`}
+                        left={leftOffset * fieldSize.columnsCount * cellSize}
+                        top={topOffset * fieldSize.rowsCount * cellSize}
+                    >
+                        <FieldSvg
+                            fieldSize={fieldSize}
+                            fieldMargin={fieldMargin}
+                            cellSize={cellSize}
+                        >
+                            <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
+                                <Items {...itemsProps}/>
+                            </FieldLayerContext.Provider>
+                        </FieldSvg>
 
-        {renderCellsLayer("background", ({colors}) => !!colors?.size && <CellBackground
-            colors={colors}
-        />)}
+                        {renderCellsLayer("background", topOffset, leftOffset, ({colors}) => !!colors?.size && <CellBackground
+                            colors={colors}
+                        />)}
 
-        <FieldSvg
-            fieldSize={fieldSize}
-            fieldMargin={fieldMargin}
-            cellSize={cellSize}
-        >
-            <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                <Items {...itemsProps}/>
-            </FieldLayerContext.Provider>
-        </FieldSvg>
+                        <FieldSvg
+                            fieldSize={fieldSize}
+                            fieldMargin={fieldMargin}
+                            cellSize={cellSize}
+                        >
+                            <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
+                                <Items {...itemsProps}/>
+                            </FieldLayerContext.Provider>
+                        </FieldSvg>
 
-        {!isNoSelectionWriteMode(cellWriteMode) && renderCellsLayer("selection", (cellState, cellPosition) => {
-            let color = "";
-            let width = 1;
+                        {!isNoSelectionWriteMode(cellWriteMode) && renderCellsLayer("selection", topOffset, leftOffset, (cellState, cellPosition) => {
+                            let color = "";
+                            let width = 1;
 
-            if (selectedCells.contains(cellPosition)) {
-                color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
-                    ? CellSelectionColor.mainCurrent
-                    : CellSelectionColor.mainPrevious;
-            } else if (getCellSelectionType) {
-                const customSelection = getCellSelectionType(cellPosition, puzzle, state);
-                if (customSelection) {
-                    color = customSelection.color;
-                    width = customSelection.strokeWidth;
-                }
-            }
+                            if (selectedCells.contains(cellPosition)) {
+                                color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
+                                    ? CellSelectionColor.mainCurrent
+                                    : CellSelectionColor.mainPrevious;
+                            } else if (getCellSelectionType) {
+                                const customSelection = getCellSelectionType(cellPosition, puzzle, state);
+                                if (customSelection) {
+                                    color = customSelection.color;
+                                    width = customSelection.strokeWidth;
+                                }
+                            }
 
-            return !!color && <CellSelection
-                size={cellSize}
-                color={color}
-                strokeWidth={width}
-            />;
-        })}
+                            return !!color && <CellSelection
+                                size={cellSize}
+                                color={color}
+                                strokeWidth={width}
+                            />;
+                        })}
 
-        <FieldSvg
-            fieldSize={fieldSize}
-            fieldMargin={fieldMargin}
-            cellSize={cellSize}
-        >
-            <FieldLayerContext.Provider value={FieldLayer.regular}>
-                <Items {...itemsProps}/>
-            </FieldLayerContext.Provider>
-        </FieldSvg>
+                        <FieldSvg
+                            fieldSize={fieldSize}
+                            fieldMargin={fieldMargin}
+                            cellSize={cellSize}
+                        >
+                            <FieldLayerContext.Provider value={FieldLayer.regular}>
+                                <Items {...itemsProps}/>
+                            </FieldLayerContext.Provider>
+                        </FieldSvg>
 
-        <FieldSvg
-            fieldSize={fieldSize}
-            fieldMargin={fieldMargin}
-            cellSize={cellSize}
-            useShadow={false}
-        >
-            <FieldLayerContext.Provider value={FieldLayer.lines}>
-                <Items {...itemsProps}/>
-            </FieldLayerContext.Provider>
-        </FieldSvg>
+                        <FieldSvg
+                            fieldSize={fieldSize}
+                            fieldMargin={fieldMargin}
+                            cellSize={cellSize}
+                            useShadow={false}
+                        >
+                            <FieldLayerContext.Provider value={FieldLayer.lines}>
+                                <Items {...itemsProps}/>
+                            </FieldLayerContext.Provider>
+                        </FieldSvg>
 
-        <FieldSvg
-            fieldSize={fieldSize}
-            fieldMargin={fieldMargin}
-            cellSize={cellSize}
-        >
-            <FieldLayerContext.Provider value={FieldLayer.top}>
-                <Items {...itemsProps}/>
-            </FieldLayerContext.Provider>
-        </FieldSvg>
+                        <FieldSvg
+                            fieldSize={fieldSize}
+                            fieldMargin={fieldMargin}
+                            cellSize={cellSize}
+                        >
+                            <FieldLayerContext.Provider value={FieldLayer.top}>
+                                <Items {...itemsProps}/>
+                            </FieldLayerContext.Provider>
+                        </FieldSvg>
 
-        {renderCellsLayer("digits", (cellState, cell) => {
-            const initialData = initialDigits?.[cell.top]?.[cell.left];
+                        {renderCellsLayer("digits", topOffset, leftOffset, (cellState, cell) => {
+                            const initialData = initialDigits?.[cell.top]?.[cell.left];
 
-            return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
-                puzzle={puzzle}
-                data={cellState}
-                initialData={initialData}
-                size={1}
-                cellPosition={cell}
-                state={state}
-                isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
-            />;
-        }, true)}
+                            return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
+                                puzzle={puzzle}
+                                data={cellState}
+                                initialData={initialData}
+                                size={1}
+                                cellPosition={cell}
+                                state={state}
+                                isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
+                            />;
+                        }, true)}
 
-        {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
-            state={state}
-            onStateChange={onStateChange}
-            cellPosition={cellPosition}
-            isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
-            onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
-        />)}
+                        {isReady && renderCellsLayer("mouse-handler", topOffset, leftOffset, (cellState, cellPosition) => <FieldCellMouseHandler
+                            puzzle={puzzle}
+                            state={state}
+                            onStateChange={onStateChange}
+                            cellPosition={cellPosition}
+                            isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
+                            onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
+                        />)}
+                    </Absolute>
+                )
+            )}
+        </Absolute>
+
+        {loopHorizontally && <>
+            <Absolute
+                width={fieldMargin * cellSize}
+                height={rect.height}
+                style={{
+                    background: "linear-gradient(to right, white, transparent)",
+                }}
+            />
+
+            <Absolute
+                left={rect.width - fieldMargin * cellSize}
+                width={fieldMargin * cellSize}
+                height={rect.height}
+                style={{
+                    background: "linear-gradient(to left, white, transparent)",
+                }}
+            />
+        </>}
+
+        {loopVertically && <>
+            <Absolute
+                width={rect.width}
+                height={fieldMargin * cellSize}
+                style={{
+                    background: "linear-gradient(to bottom, white, transparent)",
+                }}
+            />
+
+            <Absolute
+                top={rect.height - fieldMargin * cellSize}
+                width={rect.width}
+                height={fieldMargin * cellSize}
+                style={{
+                    background: "linear-gradient(to top, white, transparent)",
+                }}
+            />
+        </>}
     </Absolute>;
 };
 

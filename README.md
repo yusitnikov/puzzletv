@@ -7,7 +7,6 @@ A web application for creating and solving different types of sudoku.
 |:----:|:-----:|:------------:|------------------------------------------------------------------------------------|
 | Feat |  Mid  |  Must have   | Put X on a border.                                                                 |
 | Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders.                             |
-| Feat | Hard  |  Must have   | Torus support.                                                                     |
 | Feat | Easy  |  Important   | Timer.                                                                             |
 | Feat | Easy  |  Important   | Double-click on cell to select similar cells.                                      |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).                       |

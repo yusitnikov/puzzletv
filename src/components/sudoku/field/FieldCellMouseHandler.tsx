@@ -12,10 +12,12 @@ import {Rect} from "../../../types/layout/Rect";
 import {globalPaddingCoeff} from "../../app/globals";
 import {indexes} from "../../../utils/indexes";
 import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
-export interface FieldCellMouseHandlerProps<CellType, ProcessedGameStateExtensionType = {}> {
+export interface FieldCellMouseHandlerProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
     cellPosition: Position;
@@ -23,14 +25,15 @@ export interface FieldCellMouseHandlerProps<CellType, ProcessedGameStateExtensio
     onIsDeleteSelectedCellsStrokeChange: (newValue: boolean) => void;
 }
 
-export const FieldCellMouseHandler = <CellType, ProcessedGameStateExtensionType = {}>(
+export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {
+        puzzle,
         state,
         onStateChange,
         cellPosition,
         isDeleteSelectedCellsStroke,
         onIsDeleteSelectedCellsStrokeChange,
-    }: FieldCellMouseHandlerProps<CellType, ProcessedGameStateExtensionType>
+    }: FieldCellMouseHandlerProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const isSelecting = !isNoSelectionWriteMode(state.cellWriteMode);
     const isDrawing = state.cellWriteMode === CellWriteMode.lines;
@@ -66,7 +69,7 @@ export const FieldCellMouseHandler = <CellType, ProcessedGameStateExtensionType 
                 width={0.5}
                 height={0.5}
                 onClick={() => onStateChange(gameState => gameStateStartMultiLine(gameState, cornerPosition))}
-                onEnter={() => onStateChange(gameState => gameStateContinueMultiLine(gameState, cornerPosition))}
+                onEnter={() => onStateChange(gameState => gameStateContinueMultiLine(puzzle, gameState, cornerPosition))}
             />;
         }))}
 

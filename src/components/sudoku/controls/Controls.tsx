@@ -2,7 +2,16 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes} from "../../../utils/indexes";
-import {Check, Clear, Fullscreen, FullscreenExit, Redo, Settings, Undo} from "@emotion-icons/material";
+import {
+    Check,
+    Clear,
+    Fullscreen,
+    FullscreenExit,
+    Redo,
+    Settings,
+    SettingsOverscan,
+    Undo
+} from "@emotion-icons/material";
 import {CellWriteMode, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
 import {
@@ -54,8 +63,12 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         resultChecker,
         fieldSize: {fieldSize},
         digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
-        allowDrawingBorders,
+        allowDrawingBorders = false,
+        loopHorizontally = false,
+        loopVertically = false,
     } = puzzle;
+
+    const allowDragging = loopHorizontally || loopVertically;
 
     const translate = useTranslate();
 
@@ -86,6 +99,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             digitsCountInCurrentMode = 9;
             break;
         case CellWriteMode.lines:
+        case CellWriteMode.move:
             digitsCountInCurrentMode = 0;
             break;
     }
@@ -143,11 +157,11 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 }
                 break;
             case "PageUp":
-                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, -1, allowDrawingBorders));
+                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, -1, allowDrawingBorders, allowDragging));
                 ev.preventDefault();
                 break;
             case "PageDown":
-                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, +1, allowDrawingBorders));
+                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, +1, allowDrawingBorders, allowDragging));
                 ev.preventDefault();
                 break;
         }
@@ -242,8 +256,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         />
 
         {allowDrawingBorders && <CellWriteModeButton
-            left={isHorizontal ? 4 : 3}
-            top={isHorizontal ? 3 : 4}
+            left={(isHorizontal !== allowDragging) ? 4 : 3}
+            top={(isHorizontal !== allowDragging) ? 3 : 4}
             cellWriteMode={CellWriteMode.lines}
             data={contentSize => {
                 const offset = (cellSize - contentSize) / 2;
@@ -267,6 +281,19 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             }}
             childrenOnTopOfBorders={true}
             title={`${translate("Lines")}`}
+            onStateChange={onStateChange}
+            puzzle={puzzle}
+            state={state}
+            cellSize={cellSize}
+        />}
+
+        {allowDragging && <CellWriteModeButton
+            left={isHorizontal ? 4 : 3}
+            top={isHorizontal ? 3 : 4}
+            cellWriteMode={CellWriteMode.move}
+            data={() => <SettingsOverscan/>}
+            noBorders={true}
+            title={`${translate("Move the grid")}`}
             onStateChange={onStateChange}
             puzzle={puzzle}
             state={state}

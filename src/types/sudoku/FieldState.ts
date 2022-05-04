@@ -1,6 +1,13 @@
 import {areCellStatesEqual, CellState, cloneCellState, createEmptyCellState} from "./CellState";
 import {indexes} from "../../utils/indexes";
-import {isSameLine, Line, Position} from "../layout/Position";
+import {
+    getLineVector,
+    invertLine,
+    invertPosition,
+    isSamePosition,
+    Line,
+    Position
+} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {Set} from "../struct/Set";
@@ -11,10 +18,36 @@ export interface FieldState<CellType> {
 }
 
 export const createEmptyFieldState = <CellType>(
-    {typeManager, fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<CellType, any, any>
+    {typeManager, fieldSize: {rowsCount, columnsCount}, loopHorizontally, loopVertically}: PuzzleDefinition<CellType, any, any>
 ): FieldState<CellType> => ({
     cells: indexes(rowsCount).map(() => indexes(columnsCount).map(() => createEmptyCellState(typeManager))),
-    lines: new Set([], isSameLine),
+    lines: new Set<Line>(
+        [],
+        (line1, line2) => {
+            const vector1 = getLineVector(line1);
+            const vector2 = getLineVector(line2);
+
+            if (!isSamePosition(vector1, vector2)) {
+                if (!isSamePosition(vector1, invertPosition(vector2))) {
+                    return false;
+                }
+
+                line2 = invertLine(line2);
+            }
+
+            let {left, top} = getLineVector({start: line1.start, end: line2.start});
+
+            if (loopVertically) {
+                top %= rowsCount;
+            }
+
+            if (loopHorizontally) {
+                left %= columnsCount;
+            }
+
+            return !left && !top;
+        }
+    ),
 });
 
 export const cloneFieldState = <CellType>(

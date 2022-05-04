@@ -24,5 +24,18 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
     allowDrawingBorders?: boolean;
+    loopHorizontally?: boolean;
+    loopVertically?: boolean;
     noIndex?: boolean;
 }
+
+export const isPuzzleHasBottomRowControls = (
+    {
+        typeManager: {
+            hasBottomRowControls = false,
+        },
+        allowDrawingBorders = false,
+        loopHorizontally = false,
+        loopVertically = false,
+    }: PuzzleDefinition<any, any, any>
+) => hasBottomRowControls || (allowDrawingBorders && (loopHorizontally || loopVertically));

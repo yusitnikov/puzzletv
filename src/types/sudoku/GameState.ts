@@ -24,6 +24,8 @@ export interface GameState<CellType> {
     currentMultiLine: Position[];
     isAddingLine: boolean;
 
+    loopOffset: Position;
+
     enableConflictChecker: boolean;
     autoCheckOnFinish: boolean;
 }
@@ -148,6 +150,9 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
     {
         typeManager: {processArrowDirection = defaultProcessArrowDirection},
         fieldSize,
+        fieldMargin = 0,
+        loopHorizontally,
+        loopVertically,
     }: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     xDirection: number,
@@ -170,9 +175,49 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
         return gameState;
     }
 
-    return isMultiSelection
+    const result: Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> = isMultiSelection
         ? gameStateAddSelectedCell(gameState, newCell)
         : gameStateSetSelectedCells(gameState, [newCell]);
+    let {loopOffset} = gameState;
+
+    if (loopHorizontally) {
+        const left = (newCell.left + loopOffset.left) % fieldSize.columnsCount;
+        const min = 1;
+        const max = fieldSize.columnsCount - 1 - min;
+        if (left < min) {
+            loopOffset = {
+                ...loopOffset,
+                left: (loopOffset.left + (min - left)) % fieldSize.columnsCount,
+            };
+        } else if (left > max) {
+            loopOffset = {
+                ...loopOffset,
+                left: (loopOffset.left + fieldSize.columnsCount - (left - max)) % fieldSize.columnsCount,
+            };
+        }
+    }
+
+    if (loopVertically) {
+        const top = (newCell.top + loopOffset.top) % fieldSize.rowsCount;
+        const min = 1;
+        const max = fieldSize.rowsCount - 1 - min;
+        if (top < min) {
+            loopOffset = {
+                ...loopOffset,
+                top: (loopOffset.top + (min - top)) % fieldSize.rowsCount,
+            };
+        } else if (top > max) {
+            loopOffset = {
+                ...loopOffset,
+                top: (loopOffset.top + fieldSize.rowsCount - (top - max)) % fieldSize.rowsCount,
+            };
+        }
+    }
+
+    return {
+        ...result,
+        loopOffset,
+    };
 };
 
 export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -288,6 +333,8 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
         case CellWriteMode.lines:
             return clearLines();
     }
+
+    return {};
 };
 
 // endregion
@@ -340,7 +387,8 @@ export const gameStateStartMultiLine = <CellType, ProcessedGameStateExtensionTyp
     ...gameStateClearSelectedCells(gameState),
 } as any);
 
-export const gameStateContinueMultiLine = <CellType, ProcessedGameStateExtensionType = {}>(
+export const gameStateContinueMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {loopHorizontally, loopVertically, fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType>,
     point: Position
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
@@ -354,17 +402,36 @@ export const gameStateContinueMultiLine = <CellType, ProcessedGameStateExtension
     }
 
     let {left, top} = lastPoint;
-    const dx = Math.sign(point.left - lastPoint.left);
-    const dy = Math.sign(point.top - lastPoint.top);
-    const length = Math.max(Math.abs(point.left - lastPoint.left), Math.abs(point.top - lastPoint.top));
+    let fullDx = point.left - lastPoint.left;
+    if (loopHorizontally) {
+        fullDx = ((fullDx % columnsCount) + columnsCount) % columnsCount;
+        if (fullDx * 2 > columnsCount) {
+            fullDx -= columnsCount;
+        }
+    }
+    let fullDy = point.top - lastPoint.top;
+    if (loopVertically) {
+        fullDy = ((fullDy % rowsCount) + rowsCount) % rowsCount;
+        if (fullDy * 2 > rowsCount) {
+            fullDy -= rowsCount;
+        }
+    }
+    const dx = Math.sign(fullDx);
+    const dy = Math.sign(fullDy);
+    const length = Math.max(Math.abs(fullDx), Math.abs(fullDy));
+
+    if (length === 0) {
+        return {};
+    }
+
     const newPoints: Position[] = [];
     for (let i = 0; i < length; i++) {
-        if (left !== point.left) {
+        if ((left - point.left) % columnsCount !== 0) {
             left += dx;
             newPoints.push({left, top});
         }
 
-        if (top !== point.top) {
+        if ((top - point.top) % rowsCount !== 0) {
             top += dy;
             newPoints.push({left, top});
         }

@@ -18,6 +18,7 @@ export interface CellWriteModeButtonProps<CellType, GameStateExtensionType = {},
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
+    noBorders?: boolean;
     childrenOnTopOfBorders?: boolean;
 }
 
@@ -32,6 +33,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         puzzle,
         state,
         onStateChange,
+        noBorders,
         childrenOnTopOfBorders,
     }: CellWriteModeButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
@@ -44,7 +46,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         left={left}
         top={top}
         cellSize={cellSize}
-        innerBorderWidth={1}
+        innerBorderWidth={noBorders ? 0 : 1}
         checked={state.cellWriteMode === cellWriteMode}
         onClick={handleSetCellWriteMode}
         title={title}

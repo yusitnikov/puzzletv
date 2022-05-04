@@ -31,6 +31,9 @@ export const EmptyChaosConstruction: PuzzleDefinition<number> = {
     typeManager: DigitSudokuTypeManager(),
     fieldSize: {...FieldSize9, regions: []},
     allowDrawingBorders: true,
+    loopHorizontally: true,
+    loopVertically: true,
+    fieldMargin: 0.25,
 };
 
 export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {

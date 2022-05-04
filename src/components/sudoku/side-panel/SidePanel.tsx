@@ -8,6 +8,7 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
 import {controlButtonPaddingCoeff} from "../controls/ControlButton";
+import {isPuzzleHasBottomRowControls} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface SidePanelProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
     extends ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
@@ -16,11 +17,7 @@ export interface SidePanelProps<CellType, GameStateExtensionType = {}, Processed
 export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {puzzle, rect, cellSize, isHorizontal, ...controlsProps}: SidePanelProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const {
-        typeManager: {
-            hasBottomRowControls = false,
-        }
-    } = puzzle;
+    const hasBottomRowControls = isPuzzleHasBottomRowControls(puzzle);
 
     const padding = cellSize * globalPaddingCoeff;
 

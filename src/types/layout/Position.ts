@@ -63,3 +63,18 @@ export const isSamePosition = (p1: Position, p2: Position) => p1.left === p2.lef
 export const isSameLine = (line1: Line, line2: Line) =>
     (isSamePosition(line1.start, line2.start) && isSamePosition(line1.end, line2.end)) ||
     (isSamePosition(line1.start, line2.end) && isSamePosition(line1.end, line2.start));
+
+export const invertPosition = ({left, top}: Position): Position => ({
+    left: -left,
+    top: -top,
+});
+
+export const invertLine = ({start, end}: Line): Line => ({
+    start: end,
+    end: start,
+});
+
+export const getLineVector = ({start, end}: Line): Position => ({
+    left: end.left - start.left,
+    top: end.top - start.top,
+});
