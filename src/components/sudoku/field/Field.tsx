@@ -274,8 +274,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                         </FieldSvg>
 
                         {renderCellsLayer("background", topOffset, leftOffset, ({colors}, {left , top}) => {
-                            const initialCellColors = initialColors[top]?.[left];
-                            const finalColors = initialCellColors ? new Set(initialCellColors) : colors;
+                            const finalColors = colors?.size ? colors : new Set(initialColors[top]?.[left] || []);
 
                             return !!finalColors?.size && <CellBackground
                                 colors={finalColors}
