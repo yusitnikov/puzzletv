@@ -15,8 +15,13 @@ import {Title} from "../../layout/title/Title";
 import {RegularDigitComponentType} from "../digit/RegularDigit";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 
-const StyledContainer = styled("div")({
+const StyledContainer = styled("div", {
+    shouldForwardProp(propName) {
+        return propName !== "isDragMode";
+    }
+})(({isDragMode}: {isDragMode: boolean}) => ({
     position: "absolute",
     inset: 0,
     overflow: "hidden",
@@ -24,7 +29,8 @@ const StyledContainer = styled("div")({
     userSelect: "none",
     color: textColor,
     fontFamily: "Lato, sans-serif",
-});
+    cursor: isDragMode ? "pointer" : undefined,
+}));
 
 export interface PuzzleProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -82,7 +88,10 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
             {author && <> {translate("by")} {translate(author)}</>}
         </Title>
 
-        <StyledContainer ref={containerRef}>
+        <StyledContainer
+            ref={containerRef}
+            isDragMode={gameState.cellWriteMode === CellWriteMode.move}
+        >
             <PuzzleContainerContext.Provider value={containerRef}>
                 <Absolute
                     left={(windowSize.width - containerSize.width) / 2}
