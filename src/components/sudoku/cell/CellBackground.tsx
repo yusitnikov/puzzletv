@@ -1,22 +1,10 @@
-import {blackColor, blueColor, greenColor, lightGreyColor, redColor, yellowColor} from "../../app/globals";
 import {Set} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {formatSvgPointsArray} from "../../../types/layout/Position";
-
-const backgroundColors = [
-    lightGreyColor,
-    "#5f5f5f",
-    blackColor,
-    greenColor,
-    "#d23be7",
-    "#eb7532",
-    redColor,
-    yellowColor,
-    blueColor,
-];
+import {CellColor, cellColors} from "../../../types/sudoku/CellColor";
 
 export interface CellBackgroundProps {
-    colors: Set<number>;
+    colors: Set<CellColor>;
     size?: number;
 }
 
@@ -35,7 +23,7 @@ export const CellBackground = ({colors, size = 1}: CellBackgroundProps) => {
         <rect
             width={size}
             height={size}
-            fill={backgroundColors[colors.first()]}
+            fill={cellColors[colors.first()]}
         />
 
         {colors.size > 1 && <>
@@ -54,7 +42,7 @@ export const CellBackground = ({colors, size = 1}: CellBackgroundProps) => {
                             top: size / 2 + y * Math.sin(a),
                         }))
                 )}
-                fill={backgroundColors[color]}
+                fill={cellColors[color]}
             />)}
         </>}
     </AutoSvg>;

@@ -1,17 +1,18 @@
 import {Set} from "../struct/Set";
 import {SudokuTypeManager} from "./SudokuTypeManager";
+import {CellColor} from "./CellColor";
 
 export interface CellState<CellType> {
     usersDigit?: CellType;
     centerDigits: Set<CellType>;
     cornerDigits: Set<CellType>;
-    colors: Set<number>;
+    colors: Set<CellColor>;
 }
 
 export const createEmptyCellState = <CellType>({areSameCellData, cloneCellData}: SudokuTypeManager<CellType>): CellState<CellType> => ({
     centerDigits: new Set([], (a, b) => areSameCellData(a, b, undefined, false), cloneCellData),
     cornerDigits: new Set([], (a, b) => areSameCellData(a, b, undefined, false), cloneCellData),
-    colors: new Set<number>([], (i1, i2) => i1 === i2, i => i),
+    colors: new Set<CellColor>([], (i1, i2) => i1 === i2, i => i),
 });
 
 export const isEmptyCellState = ({usersDigit, centerDigits, cornerDigits, colors}: Partial<CellState<any>>, ignoreColors = false) =>
@@ -24,7 +25,7 @@ export const cloneCellState = <CellType>(
     usersDigit: usersDigit && cloneCellData(usersDigit),
     centerDigits: centerDigits.clone(),
     cornerDigits: cornerDigits.clone(),
-    colors,
+    colors: colors.clone(),
 });
 
 export const areCellStatesEqual = <CellType>(
