@@ -25,7 +25,9 @@ import {
     kropkiDotsTitle,
     noBifurcation,
     normalSudokuRulesApply,
-    thermometers,
+    ruleWithTitle,
+    thermometersExplained,
+    thermometersTitle,
     xExplained
 } from "../ruleSnippets";
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
@@ -42,14 +44,14 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
     rules: translate => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
-        <RulesParagraph>{translate(antiKnightRulesApply)}: {translate(antiKnightRulesExplained)}.</RulesParagraph>
+        <RulesParagraph>{ruleWithTitle(translate(antiKnightRulesApply), translate(antiKnightRulesExplained))}.</RulesParagraph>
         <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
         <RulesUnorderedList>
             <li>{translate(killerCages)}.</li>
             <li>{translate(arrows)}.</li>
-            <li>{translate(thermometers)}.</li>
-            <li>{translate(kropkiDotsTitle)}: {translate(blackKropkiDotsExplained)}.</li>
-            <li>XV: {translate(xExplained)}.</li>
+            <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
+            <li>{ruleWithTitle(translate(kropkiDotsTitle), translate(blackKropkiDotsExplained))}.</li>
+            <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
             <li>{translate(germanWhispers)}.</li>
         </RulesUnorderedList>
         <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>

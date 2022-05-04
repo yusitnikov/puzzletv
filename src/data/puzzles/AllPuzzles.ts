@@ -4,6 +4,7 @@ import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzz
 import {RealChessPuzzleRubberBlando} from "./RealChessPuzzleRubberBlando";
 import {EmptyChaosConstruction, EmptyChess, EmptyCubedoku, EmptyRegular, EmptyRotatable} from "./Empty";
 import {CubeIt, IntroToCubedoku} from "./Cubedoku";
+import {Miraculous} from "./Miraculous";
 
 export default [
     EmptyRegular,
@@ -20,4 +21,6 @@ export default [
 
     IntroToCubedoku,
     CubeIt,
+
+    Miraculous,
 ] as PuzzleDefinition<any, any, any>[];
