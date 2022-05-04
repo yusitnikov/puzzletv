@@ -35,6 +35,7 @@ import {
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {indexesFromTo} from "../../../utils/indexes";
+import {Set} from "../../../types/struct/Set";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -58,6 +59,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         fieldSize,
         fieldMargin = 0,
         initialDigits = {},
+        initialColors = {},
         loopHorizontally,
         loopVertically,
     } = puzzle;
@@ -271,9 +273,14 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                             </FieldLayerContext.Provider>
                         </FieldSvg>
 
-                        {renderCellsLayer("background", topOffset, leftOffset, ({colors}) => !!colors?.size && <CellBackground
-                            colors={colors}
-                        />)}
+                        {renderCellsLayer("background", topOffset, leftOffset, ({colors}, {left , top}) => {
+                            const initialCellColors = initialColors[top]?.[left];
+                            const finalColors = initialCellColors ? new Set(initialCellColors) : colors;
+
+                            return !!finalColors?.size && <CellBackground
+                                colors={finalColors}
+                            />;
+                        })}
 
                         <FieldSvg
                             fieldSize={fieldSize}

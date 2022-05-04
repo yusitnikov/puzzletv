@@ -6,6 +6,7 @@ import {PartiallyTranslatable} from "../translations/Translatable";
 import {useTranslate} from "../../contexts/LanguageCodeContext";
 import {ProcessedGameState} from "./GameState";
 import {ConstraintOrComponent} from "./Constraint";
+import {CellColor} from "./CellColor";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     title: PartiallyTranslatable<ReactNode>;
@@ -17,6 +18,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     fieldMargin?: number;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
+    initialColors?: GivenDigitsMap<CellColor[]>;
     resultChecker?: (
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
