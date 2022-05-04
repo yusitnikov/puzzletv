@@ -9,9 +9,11 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
     blackKropkiDotsExplained,
     chaosConstructionRulesApply,
+    moveButtonTip,
     normalSudokuRulesApply,
     notAllDotsGiven,
-    thermometersExplained
+    thermometersExplained,
+    toroidalRulesApply
 } from "../ruleSnippets";
 
 export const Miraculous: PuzzleDefinition<number> = {
@@ -34,10 +36,7 @@ export const Miraculous: PuzzleDefinition<number> = {
             [LanguageCode.en]: "All digits must be consecutive to their adjacent neighbours. For the purpose of this rule 1 and 9 are consecutive",
             [LanguageCode.ru]: "Соседние ячейки содержат последовательные цифры (различающиеся на 1). Для этого правила, 1 и 9 считаются последовательными",
         })}.</RulesParagraph>
-        <RulesParagraph>{translate({
-            [LanguageCode.en]: "The grid is toroidal: the top connects to the bottom, the left connects to the right. Use the \"move\" button or the arrow keys to move the grid",
-            [LanguageCode.ru]: "Поле имеет форму тора: верх соединяется с низом, левая часть соединяется с правой. Используйте кнопку «двигать» или стрелки, чтобы двигать поле",
-        })}.</RulesParagraph>
+        <RulesParagraph>{translate(toroidalRulesApply)}. {translate(moveButtonTip)}.</RulesParagraph>
         <RulesParagraph>{translate(blackKropkiDotsExplained)}. {translate(notAllDotsGiven)}.</RulesParagraph>
         <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
     </>,

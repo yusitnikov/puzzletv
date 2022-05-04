@@ -19,6 +19,16 @@ export const chaosConstructionRulesApply: Translatable = {
     [LanguageCode.ru]: "Области должны быть связаны и определены Вами",
 };
 
+export const toroidalRulesApply: Translatable = {
+    [LanguageCode.en]: "The grid is toroidal: the top connects to the bottom, the left connects to the right",
+    [LanguageCode.ru]: "Поле имеет форму тора: верх соединяется с низом, левая часть соединяется с правой",
+};
+
+export const moveButtonTip: Translatable = {
+    [LanguageCode.en]: "Use the \"move\" button or the arrow keys to move the grid",
+    [LanguageCode.ru]: "Используйте кнопку «двигать» или стрелки, чтобы двигать поле",
+};
+
 export const antiKnightRulesApply: Translatable = {
     [LanguageCode.en]: "Anti-knight sudoku rules apply",
     [LanguageCode.ru]: "Правила судоку \"анти-конь\"",
