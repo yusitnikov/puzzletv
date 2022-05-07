@@ -2,7 +2,7 @@ import {Translatable} from "../types/translations/Translatable";
 import {LanguageCode} from "../types/translations/LanguageCode";
 import React, {ReactNode} from "react";
 
-export const ruleWithTitle = (title: ReactNode, explained: string) => <>{title}: {(explained as string).toLowerCase()}</>;
+export const ruleWithTitle = (title: ReactNode, ...explained: string[]) => <>{title}: {explained.map(s => s.toLowerCase()).join(", ")}</>;
 
 export const normalSudokuRulesApply: Translatable = {
     [LanguageCode.en]: "Standard sudoku rules apply",
@@ -35,8 +35,13 @@ export const antiKnightRulesApply: Translatable = {
 };
 
 export const antiKnightRulesExplained: Translatable = {
-    [LanguageCode.en]: "Cells separated by a chess knight's move cannot contain the same digit",
+    [LanguageCode.en]: "Cells a knight's move apart cannot contain the same digit",
     [LanguageCode.ru]: "Клетки, разделенные ходом коня, не могут содержать одну и ту же цифру",
+};
+
+export const antiBishopFromCenterRulesExplained: Translatable = {
+    [LanguageCode.en]: "Cells a bishop's move from a box's center cell cannot contain that center cell's digit",
+    [LanguageCode.ru]: "Клетки, находящиеся в ходе слона от центра региона, не могут содержать цифру из центра",
 };
 
 export const conventionalNotationsApply: Translatable = {
@@ -44,9 +49,19 @@ export const conventionalNotationsApply: Translatable = {
     [LanguageCode.ru]: "Традиционные знаки ограничений судоку",
 };
 
-export const killerCages: Translatable = {
-    [LanguageCode.en]: "Killer cages: cells in cages must sum to the total given in the corner of each cage, digits cannot repeat within a cage",
-    [LanguageCode.ru]: "Клетки: сумма цифр в клетках равняется числу в углу каждой клетки, цифры не могут повторяться внутри клетки",
+export const killerCagesTitle: Translatable = {
+    [LanguageCode.en]: "Killer cages",
+    [LanguageCode.ru]: "Клетки",
+};
+
+export const killerCagesExplained: Translatable = {
+    [LanguageCode.en]: "Cells in cages must sum to the total given in the corner of each cage",
+    [LanguageCode.ru]: "Сумма цифр в клетках равняется числу в углу каждой клетки",
+};
+
+export const cannotRepeatInCage: Translatable = {
+    [LanguageCode.en]: "Digits cannot repeat within a cage",
+    [LanguageCode.ru]: "Цифры не могут повторяться внутри клетки",
 };
 
 export const arrows: Translatable = {
@@ -62,6 +77,11 @@ export const thermometersTitle: Translatable = {
 export const thermometersExplained: Translatable = {
     [LanguageCode.en]: "Along thermometers, digits must increase from the bulb end",
     [LanguageCode.ru]: "Цифры возрастают вдоль термометров, начиная с \"колбы\"",
+};
+
+export const inequalitySignsExplained: Translatable = {
+    [LanguageCode.en]: "Inequality signs point to the smaller digit",
+    [LanguageCode.ru]: "Знаки неравенства указывают на меньшую цифру",
 };
 
 export const kropkiDotsTitle: Translatable = {

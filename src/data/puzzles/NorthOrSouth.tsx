@@ -21,14 +21,14 @@ import {
     blackKropkiDotsExplained,
     conventionalNotationsApply,
     germanWhispers,
-    killerCages,
+    killerCagesTitle, killerCagesExplained,
     kropkiDotsTitle,
     noBifurcation,
     normalSudokuRulesApply,
     ruleWithTitle,
     thermometersExplained,
     thermometersTitle,
-    xExplained
+    xExplained, cannotRepeatInCage
 } from "../ruleSnippets";
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
@@ -47,7 +47,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
         <RulesParagraph>{ruleWithTitle(translate(antiKnightRulesApply), translate(antiKnightRulesExplained))}.</RulesParagraph>
         <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
         <RulesUnorderedList>
-            <li>{translate(killerCages)}.</li>
+            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
             <li>{translate(arrows)}.</li>
             <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
             <li>{ruleWithTitle(translate(kropkiDotsTitle), translate(blackKropkiDotsExplained))}.</li>

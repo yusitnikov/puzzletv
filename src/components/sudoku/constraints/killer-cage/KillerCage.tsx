@@ -2,6 +2,7 @@ import {useMemo} from "react";
 import {blackColor} from "../../../app/globals";
 import {
     formatSvgPointsArray,
+    parsePositionLiteral,
     parsePositionLiterals,
     Position,
     PositionLiteral
@@ -12,6 +13,7 @@ import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions";
 import {isValidCellForRegion} from "../region/Region";
+import {indexes} from "../../../../utils/indexes";
 
 const borderPadding = 0.1;
 const sumDigitSize = 0.15;
@@ -139,4 +141,14 @@ export const KillerCageConstraint = <CellType,>(cellLiterals: PositionLiteral[],
             return realSum === expectedSum;
         },
     });
+};
+
+export const KillerCageConstraintByRect = <CellType,>(topLeft: PositionLiteral, width: number, height: number, sum?: number, showBottomSum?: boolean) => {
+    const {top, left} = parsePositionLiteral(topLeft);
+
+    return KillerCageConstraint<CellType>(
+        indexes(height).flatMap(dy => indexes(width).map(dx => ({top: top + dy, left: left + dx}))),
+        sum,
+        showBottomSum
+    );
 };

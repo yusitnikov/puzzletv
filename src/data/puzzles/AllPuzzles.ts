@@ -6,6 +6,7 @@ import {EmptyChaosConstruction, EmptyChess, EmptyCubedoku, EmptyRegular, EmptyRo
 import {CubeIt, IntroToCubedoku} from "./Cubedoku";
 import {Miraculous} from "./Miraculous";
 import {MeteorShower} from "./MeteorShower";
+import {MultiColorMadness} from "./MultiColorMadness";
 
 export default [
     EmptyRegular,
@@ -24,6 +25,7 @@ export default [
     CubeIt,
 
     Miraculous,
+    MultiColorMadness,
     MeteorShower(true),
     MeteorShower(false),
 ] as PuzzleDefinition<any, any, any>[];
