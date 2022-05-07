@@ -5,6 +5,7 @@ import AllPuzzles from "../../data/puzzles/AllPuzzles";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {LanguageCodeContext, useLanguageCode, useTranslate} from "../../contexts/LanguageCodeContext";
 import {AllowLmdContext} from "../../contexts/AllowLmdContext";
+import {PageLayout} from "../layout/page-layout/PageLayout";
 
 export const App = () => {
     let hash = useHash();
@@ -43,26 +44,28 @@ const AppContent = ({hash}: AppContentProps) => {
     const translate = useTranslate();
 
     if (!hash || hash === "list") {
-        return <>
-            <h1>{translate("Sudoku Puzzles")}</h1>
+        return <PageLayout>
+            <h1 style={{marginTop: 0}}>{translate("Sudoku Puzzles")}</h1>
 
             <ul>
                 {AllPuzzles.map(({slug, title, noIndex}) => !noIndex && <li key={slug}>
                     <a href={`#${slug}-${language}`}>{translate(title)}</a>
                 </li>)}
             </ul>
-        </>;
+        </PageLayout>;
     }
 
     for (const puzzle of AllPuzzles) {
         if (hash === puzzle.slug) {
-            return <Puzzle key={puzzle.slug} puzzle={puzzle}/>;
+            return <PageLayout addPadding={false}>
+                <Puzzle key={puzzle.slug} puzzle={puzzle}/>
+            </PageLayout>;
         }
     }
 
-    return <>
-        <h1>{translate("Oops, the puzzle not found!")}</h1>
+    return <PageLayout>
+        <h1 style={{marginTop: 0}}>{translate("Oops, the puzzle not found!")}</h1>
 
         <a href={`#list-${language}`}>{translate("Check out the puzzles list")}</a>
-    </>;
+    </PageLayout>;
 };

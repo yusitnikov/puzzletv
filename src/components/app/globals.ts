@@ -1,3 +1,6 @@
+export const headerHeight = 50;
+export const headerPadding = headerHeight / 4;
+
 export const globalPaddingCoeff = 0.25;
 export const h1HeightCoeff = 1 / 3;
 export const h2HeightCoeff = 1 / 4;

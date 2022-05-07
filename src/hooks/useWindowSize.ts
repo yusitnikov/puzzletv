@@ -1,9 +1,10 @@
 import {usePureState} from "./usePureState";
 import {useEventListener} from "./useEventListener";
+import {headerHeight} from "../components/app/globals";
 
 const calculateWindowSize = () => ({
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight - headerHeight,
 })
 
 export const useWindowSize = () => {

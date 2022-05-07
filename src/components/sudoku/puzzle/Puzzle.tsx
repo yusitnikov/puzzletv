@@ -24,11 +24,6 @@ const StyledContainer = styled("div", {
 })(({isDragMode}: {isDragMode: boolean}) => ({
     position: "absolute",
     inset: 0,
-    overflow: "hidden",
-    touchAction: "none",
-    userSelect: "none",
-    color: textColor,
-    fontFamily: "Lato, sans-serif",
     cursor: isDragMode ? "pointer" : undefined,
 }));
 
@@ -86,6 +81,7 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
         <Title>
             {translate(title)}
             {author && <> {translate("by")} {translate(author)}</>}
+            {" "}– Puzzle TV
         </Title>
 
         <StyledContainer
@@ -95,7 +91,7 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
             <PuzzleContainerContext.Provider value={containerRef}>
                 <Absolute
                     left={(windowSize.width - containerSize.width) / 2}
-                    top={(windowSize.height - containerSize.height) / 2}
+                    top={0}
                     {...containerSize}
                 >
                     <Field
