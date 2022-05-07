@@ -16,6 +16,10 @@ export class Set<ItemT> {
         return this.items.some(i => this.comparer(i, item));
     }
 
+    public containsOneOf(items: ItemT[]) {
+        return items.some(item => this.contains(item));
+    }
+
     public equals(set: Set<ItemT>) {
         return this.size === set.size && this.items.every(item => set.contains(item));
     }
@@ -67,5 +71,13 @@ export class Set<ItemT> {
     public toggle(item: ItemT, forcedEnable?: boolean) {
         const enable = forcedEnable ?? !this.contains(item);
         return enable ? this.add(item) : this.remove(item);
+    }
+
+    public toggleAll(items: ItemT[], forcedEnable?: boolean) {
+        let result: Set<ItemT> = this;
+        for (const item of items) {
+            result = result.toggle(item, forcedEnable);
+        }
+        return result;
     }
 }

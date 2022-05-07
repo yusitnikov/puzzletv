@@ -111,14 +111,14 @@ export const gameStateSetSelectedCells = <CellType, ProcessedGameStateExtensionT
         : gameState.selectedCells.set(cellPositions),
 } as any);
 
-export const gameStateToggleSelectedCell = <CellType, ProcessedGameStateExtensionType = {}>(
+export const gameStateToggleSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
     gameState: ProcessedGameState<CellType>,
-    cellPosition: Position,
+    cellPositions: Position[],
     forcedEnable?: boolean
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     selectedCells: isNoSelectionWriteMode(gameState.cellWriteMode)
         ? gameState.selectedCells
-        : gameState.selectedCells.toggle(cellPosition, forcedEnable),
+        : gameState.selectedCells.toggleAll(cellPositions, forcedEnable),
 } as any);
 
 export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionType = {}>(

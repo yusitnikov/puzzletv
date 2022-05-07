@@ -1,8 +1,9 @@
 import {
     gameStateContinueMultiLine,
+    gameStateGetCurrentFieldState,
     gameStateSetSelectedCells,
     gameStateStartMultiLine,
-    gameStateToggleSelectedCell,
+    gameStateToggleSelectedCells,
     ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
@@ -13,6 +14,7 @@ import {globalPaddingCoeff} from "../../app/globals";
 import {indexes} from "../../../utils/indexes";
 import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {CellState} from "../../../types/sudoku/CellState";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
@@ -44,14 +46,53 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
         onIsDeleteSelectedCellsStrokeChange(isMultiSelection && state.selectedCells.contains(cellPosition));
         onStateChange(
             gameState => isMultiSelection
-                ? gameStateToggleSelectedCell(gameState, cellPosition)
+                ? gameStateToggleSelectedCells(gameState, [cellPosition])
                 : gameStateSetSelectedCells(gameState, [cellPosition])
         );
     };
 
+    const handleCellDoubleClick = ({ctrlKey, shiftKey}: MouseEvent<any>) => {
+        const {initialDigits, typeManager: {areSameCellData}} = puzzle;
+        const {cells} = gameStateGetCurrentFieldState(state);
+
+        const {usersDigit, colors, centerDigits, cornerDigits} = cells[cellPosition.top][cellPosition.left];
+        const mainDigit = initialDigits?.[cellPosition.top]?.[cellPosition.left] || usersDigit;
+
+        let filter: (cell: CellState<CellType>, initialDigit?: CellType) => boolean;
+        if (mainDigit) {
+            filter = ({usersDigit}, initialDigit) => {
+                const otherMainDigit = initialDigit || usersDigit;
+                return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, state, true);
+            };
+        } else if (colors.size) {
+            filter = ({colors: otherColors}) => otherColors.containsOneOf(colors.items);
+        } else if (centerDigits.size) {
+            filter = ({centerDigits: otherCenterDigits}) => otherCenterDigits.containsOneOf(centerDigits.items);
+        } else if (cornerDigits.size) {
+            filter = ({cornerDigits: otherCornerDigits}) => otherCornerDigits.containsOneOf(cornerDigits.items);
+        } else {
+            return;
+        }
+
+        const matchingPositions: Position[] = cells
+            .flatMap((row, top) => row.map((cellState, left) => ({
+                position: {top, left},
+                cellState,
+                initialDigit: initialDigits?.[top]?.[left],
+            })))
+            .filter(({cellState, initialDigit}) => filter(cellState, initialDigit))
+            .map(({position}) => position);
+
+        if (ctrlKey || shiftKey) {
+            onStateChange(gameState => gameStateToggleSelectedCells(gameState, matchingPositions, true));
+        } else {
+            onStateChange(gameState => gameStateSetSelectedCells(gameState, matchingPositions));
+        }
+    };
+
     const handleContinueCellSelection = () => {
         if (!state.currentMultiLine.length) {
-            onStateChange(gameState => gameStateToggleSelectedCell(gameState, cellPosition, !isDeleteSelectedCellsStroke));
+            onStateChange(gameState => gameStateToggleSelectedCells(gameState, [cellPosition], !isDeleteSelectedCellsStroke));
         }
     };
 
@@ -77,6 +118,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
             <MouseHandlerRect
                 key={"cell-selection"}
                 onClick={handleCellClick}
+                onDoubleClick={handleCellDoubleClick}
                 onEnter={handleContinueCellSelection}
             />
 
@@ -88,6 +130,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
                     width={borderPaddingCoeff}
                     height={borderPaddingCoeff}
                     onClick={handleCellClick}
+                    onDoubleClick={handleCellDoubleClick}
                 />;
             }))}
         </>}
@@ -96,10 +139,11 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 
 interface MouseHandlerRectProps extends Partial<Rect> {
     onClick?: (ev: PointerEvent<any>) => void;
+    onDoubleClick?: (ev: MouseEvent<any>) => void;
     onEnter?: (ev: PointerEvent<any>) => void;
 }
 
-export const MouseHandlerRect = ({onClick, onEnter, left = 0, top = 0, width = 1, height = 1}: MouseHandlerRectProps) => <rect
+export const MouseHandlerRect = ({onClick, onDoubleClick, onEnter, left = 0, top = 0, width = 1, height = 1}: MouseHandlerRectProps) => <rect
     x={left}
     y={top}
     width={width}
@@ -116,6 +160,7 @@ export const MouseHandlerRect = ({onClick, onEnter, left = 0, top = 0, width = 1
         ev.preventDefault();
         ev.stopPropagation();
     }}
+    onDoubleClick={onDoubleClick}
     onPointerDown={(ev: PointerEvent<any>) => {
         if ((ev.target as Element).hasPointerCapture?.(ev.pointerId)) {
             (ev.target as Element).releasePointerCapture?.(ev.pointerId);

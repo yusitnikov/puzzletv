@@ -10,7 +10,6 @@ A web application for creating and solving different types of sudoku.
 | Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders and/or colors.               |
 | Feat | Easy  |  Important   | Torus support for the anti-knight constraint.                                      |
 | Feat | Easy  |  Important   | Timer.                                                                             |
-| Feat | Easy  |  Important   | Double-click on cell to select similar cells.                                      |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).                       |
 | Mix  | Hard  |  Must have   | Keep the progress when refreshing/duplicating the tab + restart button.            |
 | Feat | Hard  |  Must have   | Setter mode.                                                                       |
