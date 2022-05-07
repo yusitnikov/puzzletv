@@ -62,7 +62,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
         if (mainDigit) {
             filter = ({usersDigit}, initialDigit) => {
                 const otherMainDigit = initialDigit || usersDigit;
-                return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, state, true);
+                return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, undefined, false);
             };
         } else if (colors.size) {
             filter = ({colors: otherColors}) => otherColors.containsOneOf(colors.items);
