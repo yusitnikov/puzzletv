@@ -29,12 +29,13 @@ import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
-import {globalPaddingCoeff} from "../../app/globals";
+import {globalPaddingCoeff, textColor} from "../../app/globals";
 import {SettingsContent} from "./SettingsContent";
 import {DigitControlButton} from "./DigitControlButton";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {UserLinesByData} from "../constraints/user-lines/UserLines";
+import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -61,6 +62,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const {
         typeManager,
         resultChecker,
+        getLmdSolutionCode,
         fieldSize: {fieldSize},
         digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
         allowDrawingBorders = false,
@@ -86,6 +88,9 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     const [isShowingResult, setIsShowingResult] = useState(false);
     const isCorrectResult = useMemo(() => resultChecker?.(puzzle, state), [resultChecker, puzzle, state]);
+    const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
+
+    const isLmdAllowed = useAllowLmd();
 
     useEffect(() => {
         if (autoCheckOnFinish && resultChecker && isCorrectResult) {
@@ -357,6 +362,27 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             <div>
                 {isCorrectResult ? `${translate("Absolutely right")}!` : `${translate("Something's wrong here")}...`}
             </div>
+
+            {isLmdAllowed && isCorrectResult && lmdSolutionCode !== undefined && <>
+                <div style={{marginTop: cellSize * globalPaddingCoeff}}>
+                    {translate("Solution code")}:
+                </div>
+                <div>
+                    <input
+                        value={lmdSolutionCode}
+                        readOnly={true}
+                        style={{
+                            marginTop: cellSize * globalPaddingCoeff / 4,
+                            border: `1px solid ${textColor}`,
+                            background: "#fff",
+                            fontSize: "inherit",
+                            padding: "0.25em",
+                            textAlign: "center",
+                        }}
+                    />
+                </div>
+            </>}
+
             <div>
                 <Button
                     type={"button"}

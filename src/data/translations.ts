@@ -75,6 +75,9 @@ export const translationsExactType = {
     "Something's wrong here": {
         [LanguageCode.ru]: "Что-то тут не так",
     },
+    "Solution code": {
+        [LanguageCode.ru]: "Код решения",
+    },
     "Exit full screen mode": {
         [LanguageCode.ru]: "Выйти из полноэкранного режима",
     },

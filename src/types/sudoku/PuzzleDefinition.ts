@@ -30,6 +30,10 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     allowDrawingBorders?: boolean;
     loopHorizontally?: boolean;
     loopVertically?: boolean;
+    getLmdSolutionCode?: (
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    ) => string;
     noIndex?: boolean;
 }
 

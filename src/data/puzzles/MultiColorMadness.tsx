@@ -17,6 +17,7 @@ import {AntiBishopFromCenterConstraint} from "../../types/sudoku/constraints/Ant
 import {GreaterConstraint} from "../../components/sudoku/constraints/greater/Greater";
 import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 
 export const MultiColorMadness: PuzzleDefinition<number> = {
     slug: "multi-color-madness",
@@ -56,4 +57,8 @@ export const MultiColorMadness: PuzzleDefinition<number> = {
     loopVertically: true,
     fieldMargin: 0.99,
     resultChecker: isValidFinishedPuzzleByConstraints,
+    getLmdSolutionCode: (puzzle, state) => {
+        const {cells} = gameStateGetCurrentFieldState(state);
+        return cells[0].map(cell => cell.usersDigit).join("") + cells[8].map(cell => cell.usersDigit).join("");
+    },
 };

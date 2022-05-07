@@ -4,6 +4,7 @@ import {useHash} from "../../hooks/useHash";
 import AllPuzzles from "../../data/puzzles/AllPuzzles";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {LanguageCodeContext, useLanguageCode, useTranslate} from "../../contexts/LanguageCodeContext";
+import {AllowLmdContext} from "../../contexts/AllowLmdContext";
 
 export const App = () => {
     let hash = useHash();
@@ -20,8 +21,16 @@ export const App = () => {
         }
     }
 
+    let allowLmd = false;
+    if (hash.endsWith("-lmd")) {
+        allowLmd = true;
+        hash = hash.substring(0, hash.length - 4);
+    }
+
     return <LanguageCodeContext.Provider value={language}>
-        <AppContent hash={hash}/>
+        <AllowLmdContext.Provider value={allowLmd}>
+            <AppContent hash={hash}/>
+        </AllowLmdContext.Provider>
     </LanguageCodeContext.Provider>;
 };
 
