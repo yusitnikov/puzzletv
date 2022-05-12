@@ -60,3 +60,14 @@ export const EmptyCubedoku: PuzzleDefinition<number> = {
     fieldSize: createCubedokuFieldSize(6, 3),
     digitsCount: 6,
 };
+
+export const EmptyToroidal: PuzzleDefinition<number> = {
+    noIndex: true,
+    title,
+    slug: "empty-toroidal",
+    typeManager: DigitSudokuTypeManager(),
+    fieldSize: FieldSize9,
+    loopHorizontally: true,
+    loopVertically: true,
+    fieldMargin: 0.99,
+};

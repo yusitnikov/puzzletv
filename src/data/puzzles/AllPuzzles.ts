@@ -2,7 +2,7 @@ import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {NorthOrSouth} from "./NorthOrSouth";
 import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {RealChessPuzzleRubberBlando} from "./RealChessPuzzleRubberBlando";
-import {EmptyChaosConstruction, EmptyChess, EmptyCubedoku, EmptyRegular, EmptyRotatable} from "./Empty";
+import {EmptyChaosConstruction, EmptyChess, EmptyCubedoku, EmptyRegular, EmptyRotatable, EmptyToroidal} from "./Empty";
 import {CubeIt, IntroToCubedoku} from "./Cubedoku";
 import {Miraculous} from "./Miraculous";
 import {MeteorShower} from "./MeteorShower";
@@ -14,6 +14,7 @@ export default [
     EmptyRotatable,
     EmptyChess,
     EmptyCubedoku,
+    EmptyToroidal,
 
     NorthOrSouth,
 
