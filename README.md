@@ -16,6 +16,7 @@ A web application for creating and solving different types of sudoku.
 | Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                           |
 | Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.          |
 | Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API). |
+| Feat |  Mid  | Nice to have | Multiple color palettes that could be used simultaneously.                         |
 | Bug  |  Mid  |   Won't do   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).          |
 | Bug  |  Mid  |   Won't do   | 2-color solid chess pieces with a normal font.                                     |
 
