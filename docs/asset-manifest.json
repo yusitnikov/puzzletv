@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/sudoku/static/js/main.86ba25ff.js",
+    "main.js": "/sudoku/static/js/main.a9cc64c9.js",
     "index.html": "/sudoku/index.html",
-    "main.86ba25ff.js.map": "/sudoku/static/js/main.86ba25ff.js.map"
+    "main.a9cc64c9.js.map": "/sudoku/static/js/main.a9cc64c9.js.map"
   },
   "entrypoints": [
-    "static/js/main.86ba25ff.js"
+    "static/js/main.a9cc64c9.js"
   ]
 }
