@@ -33,7 +33,7 @@ export const PageLayout = ({addPadding = true, children}: PageLayoutProps) => <d
             padding: `0 ${headerPadding}px`,
         }}
     >
-        <div style={{display: "flex", alignItems: "center"}} title={"Puzzle Twisted Variant app"}>
+        <div style={{display: "flex", alignItems: "center"}}>
             <span>Puzzle</span>
             <svg style={{width: headerHeight * 1.2, height: headerHeight, marginLeft: "0.2em"}} viewBox={"0 0 30 25"}>
                 <rect x={2} y={5} width={26} height={15} fill={textColor} stroke={textColor}/>
