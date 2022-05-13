@@ -5,6 +5,7 @@ import {Line} from "../line/Line";
 export type AbsoluteProps<TagNameT extends keyof JSX.IntrinsicElements = "div"> = Partial<Rect> & JSX.IntrinsicElements[TagNameT] & {
     tagName?: TagNameT;
     angle?: number;
+    fitParent?: boolean;
     borderWidth?: number;
     borderColor?: string;
     pointerEvents?: boolean;
@@ -24,6 +25,7 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
         top = 0,
         width = 0,
         height = 0,
+        fitParent = false,
         style,
         pointerEvents,
         ...otherProps
@@ -34,10 +36,10 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
     return <TagName
         style={{
             position: "absolute",
-            left: `${left}px`,
-            top: `${top}px`,
-            width: `${width}px`,
-            height: `${height}px`,
+            left: fitParent ? 0 : `${left}px`,
+            top: fitParent ? 0 : `${top}px`,
+            width: fitParent ? "100%" : `${width}px`,
+            height: fitParent ? "100%" : `${height}px`,
             transform: `rotate(${angle}deg)`,
             pointerEvents: pointerEvents ? "all" : "none",
             ...style,

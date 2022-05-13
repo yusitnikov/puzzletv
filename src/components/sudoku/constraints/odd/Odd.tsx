@@ -11,13 +11,13 @@ export const Odd = withFieldLayer(FieldLayer.beforeSelection, ({cells: [{left, t
     fill={lightGreyColor}
 />);
 
-export const OddConstraint = <CellType,>(cellLiteral: PositionLiteral): Constraint<CellType> => {
+export const OddConstraint = <CellType,>(cellLiteral: PositionLiteral, visible = true): Constraint<CellType> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     return ({
         name: "odd",
         cells: [cell],
-        component: Odd,
+        component: visible ? Odd : undefined,
         isValidCell(cell, digits, _, {typeManager: {getDigitByCellData}}, state) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 

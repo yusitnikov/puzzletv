@@ -68,9 +68,10 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         allowDrawingBorders = false,
         loopHorizontally = false,
         loopVertically = false,
+        enableDragMode = false,
     } = puzzle;
 
-    const allowDragging = loopHorizontally || loopVertically;
+    const allowDragging = loopHorizontally || loopVertically || enableDragMode;
 
     const translate = useTranslate();
 

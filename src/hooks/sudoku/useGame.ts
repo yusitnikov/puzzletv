@@ -23,6 +23,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         allowDrawingBorders = false,
         loopHorizontally = false,
         loopVertically = false,
+        enableDragMode = false,
     } = puzzle;
 
     const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => ({
@@ -49,7 +50,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
     const cellWriteMode = useFinalCellWriteMode(
         gameState.persistentCellWriteMode,
         allowDrawingBorders,
-        loopHorizontally || loopVertically
+        loopHorizontally || loopVertically || enableDragMode
     );
     const isReady = isReadyFn(gameState);
     const processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType> = useProcessedGameStateExtension(gameState);

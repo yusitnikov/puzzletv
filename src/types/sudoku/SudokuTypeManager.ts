@@ -85,7 +85,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): Position | undefined;
 
-    transformCoords?(coords: Position, puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Position;
+    transformCoords?(
+        coords: Position,
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    ): Position;
 
     getRegionsWithSameCoordsTransformation?(puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Rect[];
 

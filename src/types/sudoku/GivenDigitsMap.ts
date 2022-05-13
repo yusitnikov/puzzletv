@@ -1,8 +1,9 @@
 import {SudokuTypeManager} from "./SudokuTypeManager";
+import {Position} from "../layout/Position";
 
 export type GivenDigitsMap<CellType> = Record<number, Record<number, CellType>>;
 
-export const processGivenDigitsMaps = <CellType, ResultType = CellType>(processor: (...cells: CellType[]) => ResultType, ...maps: GivenDigitsMap<CellType>[]) => {
+export const processGivenDigitsMaps = <CellType, ResultType = CellType>(processor: (cells: CellType[], position: Position) => ResultType, maps: GivenDigitsMap<CellType>[]) => {
     const arrayMap: GivenDigitsMap<CellType[]> = {};
 
     for (const map of maps) {
@@ -24,17 +25,15 @@ export const processGivenDigitsMaps = <CellType, ResultType = CellType>(processo
         for (const [columnIndexStr, cells] of Object.entries(row)) {
             const columnIndex = Number(columnIndexStr);
             result[rowIndex] = result[rowIndex] || {};
-            result[rowIndex][columnIndex] = processor(...cells);
+            result[rowIndex][columnIndex] = processor(cells, {top: rowIndex, left: columnIndex});
         }
     }
 
     return result;
 };
 
-export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) => processGivenDigitsMaps(
-    first => first,
-    ...maps
-);
+export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) =>
+    processGivenDigitsMaps(([first]) => first, maps);
 
 export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeManager<CellType, any, any>, map1: GivenDigitsMap<CellType>, map2: GivenDigitsMap<CellType>) => {
     const mergedMap = mergeGivenDigitsMaps(map1, map2);

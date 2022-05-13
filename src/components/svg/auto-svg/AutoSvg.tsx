@@ -1,4 +1,4 @@
-import {createContext, useContext} from "react";
+import {createContext, ReactNode, useContext} from "react";
 import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
 import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 
@@ -7,7 +7,7 @@ const SvgParentExistsContext = createContext<boolean>(false);
 export const useSvgParentExists = () => useContext(SvgParentExistsContext);
 
 export interface AutoSvgProps extends Omit<AbsoluteProps<"svg">, "tagName" | "clip"> {
-    clip?: boolean;
+    clip?: boolean | ReactNode;
 }
 
 export const AutoSvg = ({children, clip, style, ...props}: AutoSvgProps) => {
@@ -42,12 +42,12 @@ export const AutoSvg = ({children, clip, style, ...props}: AutoSvgProps) => {
         children = <>
             <defs>
                 <clipPath id={id}>
-                    <rect
+                    {clip !== true ? clip : <rect
                         x={0}
                         y={0}
                         width={width}
                         height={height}
-                    />
+                    />}
                 </clipPath>
             </defs>
 

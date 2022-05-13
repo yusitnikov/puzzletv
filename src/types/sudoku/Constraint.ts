@@ -61,10 +61,11 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
                 )),
             ],
         },
+        customCellBounds,
     } = puzzle;
 
     return [
-        FieldLinesConstraint,
+        customCellBounds ? undefined : FieldLinesConstraint,
         ...getRegionsForRowsAndColumns(puzzle, state),
         ...fieldSize.regions.map(region => RegionConstraint(region)),
         UserLinesConstraint,
@@ -73,7 +74,7 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
                 ? itemsOrFn(state)
                 : itemsOrFn as ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         ),
-    ];
+    ].filter(v => v);
 };
 
 export const prepareGivenDigitsMapForConstraints = <CellType>(

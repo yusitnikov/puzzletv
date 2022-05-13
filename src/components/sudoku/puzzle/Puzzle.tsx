@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, {useRef} from "react";
+import React, {useMemo, useRef} from "react";
 import {Size} from "../../../types/layout/Size";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
@@ -16,6 +16,7 @@ import {RegularDigitComponentType} from "../digit/RegularDigit";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 const StyledContainer = styled("div", {
     shouldForwardProp(propName) {
@@ -75,6 +76,16 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
 
     const [gameState, mergeGameState] = useGame(puzzle);
 
+    const context = useMemo<PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>(
+        () => ({
+            puzzle,
+            state: gameState,
+            onStateChange: mergeGameState,
+            cellSize,
+        }),
+        [puzzle, gameState, mergeGameState, cellSize]
+    );
+
     const containerRef = useRef<HTMLDivElement>(null);
 
     return <DigitComponentTypeContext.Provider value={digitComponentType}>
@@ -95,16 +106,13 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
                     {...containerSize}
                 >
                     <Field
-                        puzzle={puzzle}
-                        state={gameState}
-                        onStateChange={mergeGameState}
+                        context={context}
                         rect={{
                             left: padding,
                             top: padding,
                             width: sudokuSize,
                             height: sudokuSize,
                         }}
-                        cellSize={cellSize}
                     />
 
                     <SidePanel

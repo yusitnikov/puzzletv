@@ -19,8 +19,6 @@ import {
     gameStateSelectAllCells,
     ProcessedGameState
 } from "../../../types/sudoku/GameState";
-import {MergeStateAction} from "../../../types/react/MergeStateAction";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
 import {FieldRect} from "./FieldRect";
@@ -36,28 +34,37 @@ import {
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
+import {PassThrough} from "../../layout/pass-through/PassThrough";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
-    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     rect: Rect;
-    cellSize: number;
 }
 
 export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {
-        puzzle,
-        state,
-        onStateChange,
+        context,
         rect,
-        cellSize
     }: FieldProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    context = useMemo(
+        () => ({
+            ...context,
+            onStateChange: context.state.isReady ? context.onStateChange : () => {}
+        }),
+        [context]
+    );
+
+    const {puzzle, state, onStateChange, cellSize} = context;
+
     const {
         typeManager,
         fieldSize,
         fieldMargin = 0,
+        fieldWrapperComponent: FieldWrapper = PassThrough,
+        fieldFitsWrapper,
+        customCellBounds,
         initialDigits = {},
         initialColors = {},
         allowOverridingInitialColors = false,
@@ -76,11 +83,9 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle);
 
     const itemsProps: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
+        context,
         items,
-        puzzle,
-        state,
         regionsWithSameCoordsTransformation,
-        cellSize,
     };
 
     const {
@@ -91,10 +96,6 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         loopOffset,
     } = state;
     const {cells} = gameStateGetCurrentFieldState(state);
-
-    if (!isReady) {
-        onStateChange = () => {};
-    }
 
     const userDigits = useMemo(() => prepareGivenDigitsMapForConstraints(puzzle, cells), [puzzle, cells]);
 
@@ -200,20 +201,18 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
         useShadow = false
     ) =>
-        <FieldSvg
-            puzzle={puzzle}
-            cellSize={cellSize}
-            useShadow={useShadow}
-        >
+        <FieldSvg context={context} useShadow={useShadow}>
             {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
-                const finalTop = topOffset + loopOffset.top + rowIndex;
-                if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
-                    return null;
-                }
+                if (!fieldFitsWrapper && !customCellBounds) {
+                    const finalTop = topOffset + loopOffset.top + rowIndex;
+                    if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
+                        return null;
+                    }
 
-                const finalLeft = leftOffset + loopOffset.left + columnIndex;
-                if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
-                    return null;
+                    const finalLeft = leftOffset + loopOffset.left + columnIndex;
+                    if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
+                        return null;
+                    }
                 }
 
                 const cellPosition: Position = {
@@ -229,7 +228,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
                 return content && <FieldRect
                     key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
-                    puzzle={puzzle}
+                    context={context}
                     {...cellPosition}
                 >
                     {content}
@@ -245,172 +244,165 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             overflow: loopHorizontally || loopVertically ? "hidden" : undefined,
         }}
     >
-        <Absolute
-            left={loopOffset.left * cellSize}
-            top={loopOffset.top * cellSize}
-        >
-            <FieldSvg puzzle={puzzle} cellSize={cellSize}>
-                <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                    <Items {...itemsProps}/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+        <FieldWrapper context={context}>
+            <Absolute
+                left={loopOffset.left * cellSize}
+                top={loopOffset.top * cellSize}
+                fitParent={fieldFitsWrapper}
+            >
+                <FieldSvg context={context}>
+                    <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
+                        <Items {...itemsProps}/>
+                    </FieldLayerContext.Provider>
+                </FieldSvg>
 
-            {renderCellsLayer("background", ({colors}, {left , top}) => {
-                const initialCellColors = initialColors[top]?.[left];
-                const finalColors = allowOverridingInitialColors
-                    ? (colors?.size ? colors : new Set(initialCellColors || []))
-                    : (initialCellColors ? new Set(initialCellColors) : colors);
+                {renderCellsLayer("background", ({colors}, cellPosition) => {
+                    const initialCellColors = initialColors[cellPosition.top]?.[cellPosition.left];
+                    const finalColors = allowOverridingInitialColors
+                        ? (colors?.size ? colors : new Set(initialCellColors || []))
+                        : (initialCellColors ? new Set(initialCellColors) : colors);
 
-                return !!finalColors?.size && <CellBackground
-                    colors={finalColors}
-                />;
-            })}
+                    return !!finalColors?.size && <CellBackground
+                        context={context}
+                        cellPosition={cellPosition}
+                        colors={finalColors}
+                    />;
+                })}
 
-            <FieldSvg puzzle={puzzle} cellSize={cellSize}>
-                <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                    <Items {...itemsProps}/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+                <FieldSvg context={context}>
+                    <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
+                        <Items {...itemsProps}/>
+                    </FieldLayerContext.Provider>
+                </FieldSvg>
 
-            {!isNoSelectionWriteMode(cellWriteMode) && renderCellsLayer("selection", (cellState, cellPosition) => {
-                let color = "";
-                let width = 1;
+                {!isNoSelectionWriteMode(cellWriteMode) && renderCellsLayer("selection", (cellState, cellPosition) => {
+                    let color = "";
+                    let width = 1;
 
-                if (selectedCells.contains(cellPosition)) {
-                    color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
-                        ? CellSelectionColor.mainCurrent
-                        : CellSelectionColor.mainPrevious;
-                } else if (getCellSelectionType) {
-                    const customSelection = getCellSelectionType(cellPosition, puzzle, state);
-                    if (customSelection) {
-                        color = customSelection.color;
-                        width = customSelection.strokeWidth;
+                    if (selectedCells.contains(cellPosition)) {
+                        color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
+                            ? CellSelectionColor.mainCurrent
+                            : CellSelectionColor.mainPrevious;
+                    } else if (getCellSelectionType) {
+                        const customSelection = getCellSelectionType(cellPosition, puzzle, state);
+                        if (customSelection) {
+                            color = customSelection.color;
+                            width = customSelection.strokeWidth;
+                        }
                     }
-                }
 
-                return !!color && <CellSelection
-                    size={cellSize}
-                    color={color}
-                    strokeWidth={width}
-                />;
-            })}
+                    return !!color && <CellSelection
+                        context={context}
+                        cellPosition={cellPosition}
+                        size={cellSize}
+                        color={color}
+                        strokeWidth={width}
+                    />;
+                })}
 
-            <FieldSvg puzzle={puzzle} cellSize={cellSize}>
-                <FieldLayerContext.Provider value={FieldLayer.regular}>
-                    <Items {...itemsProps}/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+                <FieldSvg context={context}>
+                    <FieldLayerContext.Provider value={FieldLayer.regular}>
+                        <Items {...itemsProps}/>
+                    </FieldLayerContext.Provider>
+                </FieldSvg>
 
-            <FieldSvg
-                puzzle={puzzle}
-                cellSize={cellSize}
-                useShadow={false}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.lines}>
-                    <Items {...itemsProps}/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+                <FieldSvg context={context} useShadow={false}>
+                    <FieldLayerContext.Provider value={FieldLayer.lines}>
+                        <Items {...itemsProps}/>
+                    </FieldLayerContext.Provider>
+                </FieldSvg>
 
-            <FieldSvg
-                puzzle={puzzle}
-                cellSize={cellSize}
-                useShadow={false}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
-                    <Items {...itemsProps}/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+                <FieldSvg context={context} useShadow={false}>
+                    <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
+                        <Items {...itemsProps}/>
+                    </FieldLayerContext.Provider>
+                </FieldSvg>
 
-            <FieldSvg
-                puzzle={puzzle}
-                cellSize={cellSize}
-                useShadow={false}
-            >
-                <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
-                    <Items {...itemsProps}/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+                <FieldSvg context={context} useShadow={false}>
+                    <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
+                        <Items {...itemsProps}/>
+                    </FieldLayerContext.Provider>
+                </FieldSvg>
 
-            <FieldSvg puzzle={puzzle} cellSize={cellSize}>
-                <FieldLayerContext.Provider value={FieldLayer.top}>
-                    <Items {...itemsProps}/>
-                </FieldLayerContext.Provider>
-            </FieldSvg>
+                <FieldSvg context={context} useShadow={false}>
+                    <FieldLayerContext.Provider value={FieldLayer.top}>
+                        <Items {...itemsProps}/>
+                    </FieldLayerContext.Provider>
+                </FieldSvg>
 
-            {renderCellsLayer("digits", (cellState, cell) => {
-                const initialData = initialDigits?.[cell.top]?.[cell.left];
+                {renderCellsLayer("digits", (cellState, cell) => {
+                    const initialData = initialDigits?.[cell.top]?.[cell.left];
 
-                return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
-                    puzzle={puzzle}
-                    data={cellState}
-                    initialData={initialData}
-                    size={1}
-                    cellPosition={cell}
-                    state={state}
-                    isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
-                />;
-            }, true)}
+                    return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
+                        puzzle={puzzle}
+                        data={cellState}
+                        initialData={initialData}
+                        size={1}
+                        cellPosition={cell}
+                        state={state}
+                        isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
+                    />;
+                }, true)}
 
-            {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
-                puzzle={puzzle}
-                state={state}
-                onStateChange={onStateChange}
-                cellPosition={cellPosition}
-                isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
-                onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
-            />)}
-        </Absolute>
+                {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
+                    context={context}
+                    cellPosition={cellPosition}
+                    isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
+                    onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
+                />)}
+            </Absolute>
 
-        {loopHorizontally && <>
-            <Absolute
-                width={fieldMargin * cellSize}
-                height={rect.height}
-                style={{
-                    background: "linear-gradient(to right, white, transparent)",
-                }}
-            />
+            {loopHorizontally && <>
+                <Absolute
+                    width={fieldMargin * cellSize}
+                    height={rect.height}
+                    style={{
+                        background: "linear-gradient(to right, white, transparent)",
+                    }}
+                />
 
-            <Absolute
-                left={rect.width - fieldMargin * cellSize}
-                width={fieldMargin * cellSize}
-                height={rect.height}
-                style={{
-                    background: "linear-gradient(to left, white, transparent)",
-                }}
-            />
-        </>}
+                <Absolute
+                    left={rect.width - fieldMargin * cellSize}
+                    width={fieldMargin * cellSize}
+                    height={rect.height}
+                    style={{
+                        background: "linear-gradient(to left, white, transparent)",
+                    }}
+                />
+            </>}
 
-        {loopVertically && <>
-            <Absolute
-                width={rect.width}
-                height={fieldMargin * cellSize}
-                style={{
-                    background: "linear-gradient(to bottom, white, transparent)",
-                }}
-            />
+            {loopVertically && <>
+                <Absolute
+                    width={rect.width}
+                    height={fieldMargin * cellSize}
+                    style={{
+                        background: "linear-gradient(to bottom, white, transparent)",
+                    }}
+                />
 
-            <Absolute
-                top={rect.height - fieldMargin * cellSize}
-                width={rect.width}
-                height={fieldMargin * cellSize}
-                style={{
-                    background: "linear-gradient(to top, white, transparent)",
-                }}
-            />
-        </>}
+                <Absolute
+                    top={rect.height - fieldMargin * cellSize}
+                    width={rect.width}
+                    height={fieldMargin * cellSize}
+                    style={{
+                        background: "linear-gradient(to top, white, transparent)",
+                    }}
+                />
+            </>}
+        </FieldWrapper>
     </Absolute>;
 };
 
 interface ItemsInOneRegionProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     items: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[];
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
-    cellSize: number;
 }
 
 const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {items, puzzle, state, cellSize}: ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {context, items}: ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    const {puzzle, state, cellSize} = context;
+
     return <>
         {items.map((item, index) => {
             if (isConstraint(item)) {
@@ -434,7 +426,6 @@ const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameSt
 
 interface ItemsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
     extends ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     regionsWithSameCoordsTransformation?: Rect[];
 }
 
@@ -446,7 +437,7 @@ const Items = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensio
 ) => <>
     {regionsWithSameCoordsTransformation?.map((rect, index) => <FieldRect
         key={`items-region-${index}`}
-        puzzle={otherProps.puzzle}
+        context={otherProps.context}
         clip={true}
         {...rect}
     >

@@ -7,6 +7,7 @@ import {CubeIt, IntroToCubedoku} from "./Cubedoku";
 import {Miraculous} from "./Miraculous";
 import {MeteorShower} from "./MeteorShower";
 import {MultiColorMadness} from "./MultiColorMadness";
+import {Africa} from "./Africa";
 
 export default [
     EmptyRegular,
@@ -29,4 +30,6 @@ export default [
     MultiColorMadness,
     MeteorShower(true),
     MeteorShower(false),
+
+    Africa,
 ] as PuzzleDefinition<any, any, any>[];

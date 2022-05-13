@@ -3,19 +3,18 @@ import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {indexesFromTo} from "../../../utils/indexes";
 import {ReactNode} from "react";
 import {Position} from "../../../types/layout/Position";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 
-export interface FieldSvgProps {
-    puzzle: PuzzleDefinition<any, any, any>;
-    cellSize: number;
+export interface FieldSvgProps extends PuzzleContextProps<any, any, any> {
     useShadow?: boolean;
     children: ReactNode | ((offset: Position) => ReactNode);
 }
 
-export const FieldSvg = ({puzzle, cellSize, useShadow = true, children}: FieldSvgProps) => {
+export const FieldSvg = ({context: {puzzle, cellSize}, useShadow = true, children}: FieldSvgProps) => {
     const {
         fieldSize: {fieldSize, rowsCount, columnsCount},
         fieldMargin: initialFieldMargin = 0,
+        fieldFitsWrapper,
         loopHorizontally,
         loopVertically,
     } = puzzle;
@@ -31,7 +30,8 @@ export const FieldSvg = ({puzzle, cellSize, useShadow = true, children}: FieldSv
         top={-cellSize * extraMargin}
         width={cellSize * totalWidth}
         height={cellSize * totalWidth}
-        viewBox={`${(columnsCount - fieldSize) / 2 - fieldMargin} ${(rowsCount - fieldSize) / 2 - fieldMargin} ${totalWidth} ${totalWidth}`}
+        fitParent={fieldFitsWrapper}
+        viewBox={fieldFitsWrapper ? undefined : `${(columnsCount - fieldSize) / 2 - fieldMargin} ${(rowsCount - fieldSize) / 2 - fieldMargin} ${totalWidth} ${totalWidth}`}
         style={useShadow ? svgShadowStyle : undefined}
     >
         {indexesFromTo(loopVertically ? -1 : 0, loopVertically ? 1 : 0, true).flatMap(

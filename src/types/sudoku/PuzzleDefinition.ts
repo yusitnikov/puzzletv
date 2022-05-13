@@ -1,5 +1,5 @@
 import {GivenDigitsMap} from "./GivenDigitsMap";
-import {ReactNode} from "react";
+import {ComponentType, ReactNode} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
 import {PartiallyTranslatable} from "../translations/Translatable";
@@ -7,6 +7,8 @@ import {useTranslate} from "../../contexts/LanguageCodeContext";
 import {ProcessedGameState} from "./GameState";
 import {ConstraintOrComponent} from "./Constraint";
 import {CellColor} from "./CellColor";
+import {PuzzleContextProps} from "./PuzzleContext";
+import {CustomCellBounds} from "./CustomCellBounds";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     title: PartiallyTranslatable<ReactNode>;
@@ -16,6 +18,9 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     fieldSize: FieldSize;
     fieldMargin?: number;
+    fieldWrapperComponent?: ComponentType<PuzzleContextProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
+    fieldFitsWrapper?: boolean;
+    customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
     initialColors?: GivenDigitsMap<CellColor[]>;
@@ -30,6 +35,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     allowDrawingBorders?: boolean;
     loopHorizontally?: boolean;
     loopVertically?: boolean;
+    enableDragMode?: boolean;
     getLmdSolutionCode?: (
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
@@ -45,5 +51,6 @@ export const isPuzzleHasBottomRowControls = (
         allowDrawingBorders = false,
         loopHorizontally = false,
         loopVertically = false,
+        enableDragMode = false,
     }: PuzzleDefinition<any, any, any>
-) => hasBottomRowControls || (allowDrawingBorders && (loopHorizontally || loopVertically));
+) => hasBottomRowControls || (allowDrawingBorders && (loopHorizontally || loopVertically || enableDragMode));

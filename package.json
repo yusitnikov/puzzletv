@@ -6,21 +6,25 @@
         "@emotion-icons/fluentui-system-filled": "^3.15.0",
         "@emotion-icons/material": "^3.14.0",
         "@emotion/styled": "^11.8.1",
+        "@googlemaps/react-wrapper": "^1.1.32",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-scripts": "^5.0.0"
     },
     "devDependencies": {
+        "@types/geojson": "^7946.0.8",
+        "@types/googlemaps": "^3.43.3",
         "@types/node": "^16.11.26",
         "@types/react": "^17.0.43",
         "@types/react-dom": "^17.0.14",
         "@types/styled-components": "^5.1.24",
+        "geojson": "^0.5.0",
         "typescript": "^4.6.3"
     },
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "publish":  "npm run build && git rm -r docs && move build docs && git add docs && git commit -m Build"
+        "publish": "npm run build && git rm -r docs && move build docs && git add docs && git commit -m Build"
     },
     "eslintConfig": {
         "extends": [

@@ -1,3 +1,5 @@
+import {Rect} from "./Rect";
+
 export interface Position {
     left: number;
     top: number;
@@ -78,3 +80,17 @@ export const getLineVector = ({start, end}: Line): Position => ({
     left: end.left - start.left,
     top: end.top - start.top,
 });
+
+export const getVectorLength = ({left, top}: Position) => Math.hypot(left, top);
+
+export const normalizeVector = (vector: Position, length = getVectorLength(vector) || 1): Position => ({
+    left: vector.left / length,
+    top: vector.top / length,
+});
+
+export const getRectPoints = ({left, top, width, height}: Rect): Position[] => [
+    {left, top},
+    {left: left + width, top},
+    {left: left + width, top: top + height},
+    {left, top: top + height},
+];
