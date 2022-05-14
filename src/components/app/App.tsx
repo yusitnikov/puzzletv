@@ -48,8 +48,8 @@ const AppContent = ({hash}: AppContentProps) => {
             <h1 style={{marginTop: 0}}>{translate("Sudoku Puzzles")}</h1>
 
             <ul>
-                {AllPuzzles.map(({slug, title, noIndex}) => !noIndex && <li key={slug}>
-                    <a href={`#${slug}-${language}`}>{translate(title)}</a>
+                {AllPuzzles.map(({slug, title, author, noIndex}) => !noIndex && <li key={slug}>
+                    <a href={`#${slug}-${language}`}>{translate(title)}</a> {author && <>{translate("by")} {translate(author)}</>}
                 </li>)}
             </ul>
         </PageLayout>;
