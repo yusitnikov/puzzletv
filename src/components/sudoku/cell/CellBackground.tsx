@@ -49,6 +49,7 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
         width={size}
         height={size}
         clip={(colors.size > 1 || !!customCellBounds) && <FieldCellShape context={context} cellPosition={cellPosition}/>}
+        style={{opacity: 0.5}}
     >
         <polygon
             points={formatSvgPointsArray(getRectPoints(customCellRect))}
