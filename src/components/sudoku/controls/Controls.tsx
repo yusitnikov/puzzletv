@@ -9,7 +9,6 @@ import {
     FullscreenExit,
     Redo,
     Settings,
-    SettingsOverscan,
     Undo
 } from "@emotion-icons/material";
 import {CellWriteMode, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
@@ -297,7 +296,18 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             left={isHorizontal ? 4 : 3}
             top={isHorizontal ? 3 : 4}
             cellWriteMode={CellWriteMode.move}
-            data={() => <SettingsOverscan/>}
+            data={(size) => <AutoSvg
+                width={size}
+                height={size}
+                viewBox={"-1.1 -1.1 2.2 2.2"}
+            >
+                <line x1={-1} y1={0} x2={1} y2={0} stroke={textColor} strokeWidth={0.15}/>
+                <polyline points={"-0.7,0.3 -1,0 -0.7,-0.3"} stroke={textColor} strokeWidth={0.15}/>
+                <polyline points={"0.7,0.3 1,0 0.7,-0.3"} stroke={textColor} strokeWidth={0.15}/>
+                <line x1={0} y1={-1} x2={0} y2={1} stroke={textColor} strokeWidth={0.15}/>
+                <polyline points={"0.3,-0.7 0,-1 -0.3,-0.7"} stroke={textColor} strokeWidth={0.15}/>
+                <polyline points={"0.3,0.7 0,1 -0.3,0.7"} stroke={textColor} strokeWidth={0.15}/>
+            </AutoSvg>}
             noBorders={true}
             title={`${translate("Move the grid")} (${translate("shortcut")}: Alt+Shift)`}
             onStateChange={onStateChange}
