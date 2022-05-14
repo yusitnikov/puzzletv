@@ -23,6 +23,8 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
+import {getRegionBoundingBox} from "../../utils/regions";
+import {getRectCenter} from "../../types/layout/Rect";
 
 export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> = {
     slug: "africa",
@@ -59,6 +61,30 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
                 left: x,
                 top: y,
             };
+        },
+        processArrowDirection({left: cell}, xDirection, yDirection, {puzzle: {customCellBounds}}): Position | undefined {
+            const getCountryCenter = (cell: number) => getRectCenter(getRegionBoundingBox(customCellBounds![0][cell].borders.flat()));
+            const {left, top} = getCountryCenter(cell);
+
+            let bestDist = 1000;
+            let bestCell: number | undefined = undefined;
+
+            for (const cell2Str of Object.keys(AfricaCountriesNeighborsGraph[cell as AfricaCountriesEnum] || {})) {
+                const cell2 = Number(cell2Str);
+                const {left: left2, top: top2} = getCountryCenter(cell2);
+
+                const straightDist = (left2 - left) * xDirection + (top - top2) * yDirection;
+                const errorDist = Math.abs((left2 - left) * yDirection) + Math.abs((top - top2) * xDirection);
+                const dist = Math.abs(Math.atan2(errorDist, straightDist));
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestCell = cell2;
+                }
+            }
+
+            return bestCell === undefined
+                ? undefined
+                : {top: 0, left: bestCell};
         },
     },
     fieldWrapperComponent: GoogleMapsFieldWrapper({
