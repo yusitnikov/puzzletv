@@ -24,13 +24,6 @@ import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedLi
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
 
-const bounds: google.maps.LatLngBoundsLiteral = {
-    west: -17,
-    east: 52,
-    south: -36,
-    north: 38,
-};
-
 export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> = {
     slug: "africa",
     title: {
@@ -40,8 +33,7 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
     rules: () => <>
         <RulesParagraph>Put digits from 1 to 5 to each country of Africa, except for the islands.</RulesParagraph>
         <RulesParagraph>Neighbors (2 countries that share a border) can't contain the same digit.</RulesParagraph>
-        <RulesParagraph>All neighbors that have consecutive digits or digits in a ratio of 1:2 have a dot between them.</RulesParagraph>
-        <RulesParagraph>There are exactly 9 dots on the map.</RulesParagraph>
+        <RulesParagraph>There are exactly 9 pairs of neighbors that have either consecutive digits or digits in a 1:2 ratio (or both).</RulesParagraph>
         <RulesParagraph>The product of all digits on the map (i.e. all digits multiplied together) ends with nine zeros.</RulesParagraph>
         <RulesParagraph>Countries that end with a consonant letter have an odd digit.</RulesParagraph>
         <RulesParagraph>Clarifications about neighborhood:</RulesParagraph>
@@ -69,7 +61,12 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
             };
         },
     },
-    fieldWrapperComponent: GoogleMapsFieldWrapper(bounds),
+    fieldWrapperComponent: GoogleMapsFieldWrapper({
+        west: -7.5,
+        east: 41.5,
+        south: -25,
+        north: 27,
+    }),
     fieldFitsWrapper: true,
     fieldSize: {
         fieldSize: 9,
