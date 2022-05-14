@@ -1,5 +1,3 @@
-import {Rect} from "./Rect";
-
 export interface Position {
     left: number;
     top: number;
@@ -87,10 +85,3 @@ export const normalizeVector = (vector: Position, length = getVectorLength(vecto
     left: vector.left / length,
     top: vector.top / length,
 });
-
-export const getRectPoints = ({left, top, width, height}: Rect): Position[] => [
-    {left, top},
-    {left: left + width, top},
-    {left: left + width, top: top + height},
-    {left, top: top + height},
-];

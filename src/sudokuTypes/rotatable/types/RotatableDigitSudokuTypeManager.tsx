@@ -155,21 +155,20 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         currentCell,
         xDirection,
         yDirection,
-        fieldSize,
-        isMainKeyboard,
-        gameState
+        context,
+        isMainKeyboard
     ) {
         if (!isMainKeyboard) {
             return undefined;
         }
 
-        const coeff = isUpsideDownAngle(gameState.angle || 0) ? -1 : 1;
+        const coeff = isUpsideDownAngle(context.state.angle || 0) ? -1 : 1;
 
         return defaultProcessArrowDirection(
             currentCell,
             coeff * xDirection,
             coeff * yDirection,
-            fieldSize
+            context
         );
     },
 

@@ -155,7 +155,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         const isAnyKeyDown = ctrlKey || shiftKey;
 
         const handleArrow = (xDirection: number, yDirection: number, isMainKeyboard = true) => (isMainKeyboard || !ctrlKey) && onStateChange(
-            gameState => gameStateApplyArrowToSelectedCells(puzzle, gameState, xDirection, yDirection, isAnyKeyDown, isMainKeyboard)
+            state => gameStateApplyArrowToSelectedCells({...context, state}, xDirection, yDirection, isAnyKeyDown, isMainKeyboard)
         );
 
         switch (code) {

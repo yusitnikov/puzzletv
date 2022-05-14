@@ -3,7 +3,9 @@ import {RegularDigitComponentType} from "../../../components/sudoku/digit/Regula
 import {DigitCellDataComponentType} from "../components/DigitCellData";
 import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponentType";
 
-export const DigitSudokuTypeManager = (digitComponentType: DigitComponentType = RegularDigitComponentType): SudokuTypeManager<number> => ({
+export const DigitSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    digitComponentType: DigitComponentType = RegularDigitComponentType
+): SudokuTypeManager<number, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
     areSameCellData(digit1: number, digit2: number): boolean {
         return digit1 === digit2;
     },

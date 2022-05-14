@@ -3,25 +3,10 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState} from "./RotatablePuzzleBoxGameState";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
 import {RotatablePuzzleBoxMainControls} from "../components/RotatablePuzzleBoxMainControls";
 
-const {
-    cellDataComponentType,
-    mainControlsComponent,
-    isValidCell,
-    transformDigit,
-    transformCoords,
-    getRegionsWithSameCoordsTransformation,
-    getCellSelectionType,
-    processCellDataPosition,
-    getRegionsForRowsAndColumns,
-    ...otherRegularImplementation
-} = DigitSudokuTypeManager();
-
 export const RotatablePuzzleBoxSudokuTypeManager: SudokuTypeManager<number, RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState> = {
-    cellDataComponentType: cellDataComponentType as CellDataComponentType<number, any>,
-    ...otherRegularImplementation,
+    ...DigitSudokuTypeManager(),
 
     initialGameStateExtension: {
         angle: 0,

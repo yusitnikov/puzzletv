@@ -13,7 +13,7 @@ export const DigitCellData = (DigitComponent: ComponentType<DigitProps> = Regula
         color={!isValid ? errorColor : (isInitial ? undefined : userDigitColor)}
     />;
 
-export const DigitCellDataComponentType = (DigitComponent: ComponentType<DigitProps> = RegularDigit): CellDataComponentType<number> => ({
+export const DigitCellDataComponentType = <ProcessedGameStateExtensionType,>(DigitComponent: ComponentType<DigitProps> = RegularDigit): CellDataComponentType<number, ProcessedGameStateExtensionType> => ({
     component: DigitCellData(DigitComponent),
     widthCoeff: RegularDigitComponentType.widthCoeff,
 });

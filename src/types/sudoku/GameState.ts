@@ -14,6 +14,7 @@ import {isSamePosition, Position} from "../layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap} from "./GivenDigitsMap";
+import {PuzzleContext} from "./PuzzleContext";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -147,21 +148,22 @@ export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensio
 } as any);
 
 export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     xDirection: number,
     yDirection: number,
     isMultiSelection: boolean,
     isMainKeyboard: boolean
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
-    if (isNoSelectionWriteMode(gameState.cellWriteMode)) {
-        return gameState;
+    const {puzzle, state} = context;
+
+    if (isNoSelectionWriteMode(state.cellWriteMode)) {
+        return state;
     }
 
-    const currentCell = gameState.selectedCells.last();
+    const currentCell = state.selectedCells.last();
     // Nothing to do when there's no selection
     if (!currentCell) {
-        return gameState;
+        return state;
     }
 
     const {
@@ -171,15 +173,15 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
         loopVertically,
     } = puzzle;
 
-    const newCell = processArrowDirection(currentCell, xDirection, yDirection, fieldSize, isMainKeyboard, gameState);
+    const newCell = processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard);
     if (!newCell) {
-        return gameState;
+        return state;
     }
 
     const result: Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> = isMultiSelection
-        ? gameStateAddSelectedCell(gameState, newCell)
-        : gameStateSetSelectedCells(gameState, [newCell]);
-    let {loopOffset} = gameState;
+        ? gameStateAddSelectedCell(state, newCell)
+        : gameStateSetSelectedCells(state, [newCell]);
+    let {loopOffset} = state;
 
     if (loopHorizontally) {
         const left = (newCell.left + loopOffset.left) % fieldSize.columnsCount;

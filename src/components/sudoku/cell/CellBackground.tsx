@@ -1,13 +1,13 @@
 import {Set} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {formatSvgPointsArray, getRectPoints, Position} from "../../../types/layout/Position";
+import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {CellColor, cellColors} from "../../../types/sudoku/CellColor";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {useMemo} from "react";
 import {transformRectToUserAreaCoords} from "../../../types/sudoku/CustomCellBounds";
 import {getRegionBoundingBox} from "../../../utils/regions";
-import {Rect} from "../../../types/layout/Rect";
+import {getRectPoints, Rect} from "../../../types/layout/Rect";
 
 export interface CellBackgroundProps {
     context?: PuzzleContext<any, any, any>;

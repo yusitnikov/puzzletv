@@ -6,11 +6,11 @@ import {GameState, ProcessedGameState} from "./GameState";
 import {ComponentType} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
-import {FieldSize} from "./FieldSize";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {Rect} from "../layout/Rect";
 import {Constraint} from "./Constraint";
+import {PuzzleContext} from "./PuzzleContext";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(
@@ -80,9 +80,8 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         currentCell: Position,
         xDirection: number,
         yDirection: number,
-        fieldSize: FieldSize,
-        isMainKeyboard: boolean,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        isMainKeyboard: boolean
     ): Position | undefined;
 
     transformCoords?(
@@ -121,7 +120,7 @@ export const defaultProcessArrowDirection = (
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {rowsCount, columnsCount}: FieldSize
+    {puzzle: {fieldSize: {rowsCount, columnsCount}}}: PuzzleContext<any, any, any>
 ): Position => ({
     left: (left + xDirection + columnsCount) % columnsCount,
     top: (top + yDirection + rowsCount) % rowsCount,
