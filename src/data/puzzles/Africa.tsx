@@ -40,8 +40,8 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         <RulesParagraph>Countries that end with a consonant letter have an odd digit.</RulesParagraph>
         <RulesParagraph>Clarifications about neighborhood:</RulesParagraph>
         <RulesUnorderedList>
-            <li>Namibia and Zimbabwe <u>are not</u> neighbors (they share only one corner, not a border).</li>
-            <li>Zambia and Botswana <u>are not</u> neighbors (same).</li>
+            <li>Zambia and Botswana <u>are</u> neighbors.</li>
+            <li>Namibia and Zimbabwe <u>are not</u> neighbors.</li>
             <li>Republic of the Congo and Angola <u>are</u> neighbors (Angola has one small "extra piece").</li>
             <li>Enlarge the map if in doubt of any other neighborhood.</li>
         </RulesUnorderedList>
