@@ -12,9 +12,11 @@ import {useTranslate} from "../../../contexts/LanguageCodeContext";
 
 export const ChessMainControls = (
     {
-        cellSize,
-        state: {cellWriteMode, selectedColor},
-        onStateChange,
+        context: {
+            cellSize,
+            state: {cellWriteMode, selectedColor},
+            onStateChange,
+        },
     }: ControlsProps<ChessPiece, ChessGameState, ChessGameState>
 ) => {
     const translate = useTranslate();

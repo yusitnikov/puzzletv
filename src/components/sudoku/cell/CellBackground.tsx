@@ -10,7 +10,7 @@ import {getRegionBoundingBox} from "../../../utils/regions";
 import {getRectPoints, Rect} from "../../../types/layout/Rect";
 
 export interface CellBackgroundProps {
-    context?: PuzzleContext<any, any, any>;
+    context: PuzzleContext<any, any, any>;
     cellPosition?: Position;
     colors: Set<CellColor>;
     size?: number;
@@ -19,7 +19,7 @@ export interface CellBackgroundProps {
 export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBackgroundProps) => {
     colors = colors.sorted();
 
-    const customCellBounds = context && cellPosition && context.puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
+    const customCellBounds = cellPosition && context.puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
     const customCellRect = useMemo<Rect>(
         () => customCellBounds
             ? transformRectToUserAreaCoords(
@@ -49,7 +49,7 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
         width={size}
         height={size}
         clip={(colors.size > 1 || !!customCellBounds) && <FieldCellShape context={context} cellPosition={cellPosition}/>}
-        style={{opacity: 0.5}}
+        style={{opacity: context.state.backgroundOpacity}}
     >
         <polygon
             points={formatSvgPointsArray(getRectPoints(customCellRect))}

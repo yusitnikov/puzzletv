@@ -29,6 +29,7 @@ export interface GameState<CellType> {
 
     enableConflictChecker: boolean;
     autoCheckOnFinish: boolean;
+    backgroundOpacity: number;
 }
 
 export interface ProcessedGameState<CellType> extends GameState<CellType> {

@@ -7,9 +7,8 @@ import {RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState} from 
 
 export const RotatablePuzzleBoxMainControls = (
     {
-        cellSize,
+        context: {cellSize, onStateChange},
         isHorizontal,
-        onStateChange,
     }: ControlsProps<number, RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState>
 ) => {
     const translate = useTranslate();

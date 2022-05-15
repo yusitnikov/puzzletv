@@ -4,7 +4,7 @@ import {Size} from "../../../types/layout/Size";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
 import {SidePanel} from "../side-panel/SidePanel";
-import {globalPaddingCoeff, textColor} from "../../app/globals";
+import {globalPaddingCoeff} from "../../app/globals";
 import {controlsWidthCoeff} from "../controls/Controls";
 import styled from "@emotion/styled";
 import {useWindowSize} from "../../../hooks/useWindowSize";
@@ -116,17 +116,14 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
                     />
 
                     <SidePanel
-                        puzzle={puzzle}
+                        context={context}
                         rect={{
                             left: isHorizontal ? controlsOffset : padding,
                             top: isHorizontal ? padding : controlsOffset,
                             width: isHorizontal ? controlsSize : sudokuSize,
                             height: isHorizontal ? sudokuSize : controlsSize,
                         }}
-                        cellSize={cellSize}
                         isHorizontal={isHorizontal}
-                        state={gameState}
-                        onStateChange={mergeGameState}
                     />
                 </Absolute>
             </PuzzleContainerContext.Provider>

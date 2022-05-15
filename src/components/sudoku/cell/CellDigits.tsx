@@ -1,9 +1,8 @@
 import {CellState, isEmptyCellState} from "../../../types/sudoku/CellState";
 import {emptyPositionWithAngle, Position, PositionWithAngle} from "../../../types/layout/Position";
 import {Set} from "../../../types/struct/Set";
-import {ProcessedGameState} from "../../../types/sudoku/GameState";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 const centerDigitCoeff = 0.35;
 
@@ -21,12 +20,11 @@ const corners: Position[] = [
 ];
 
 export interface CellDigitsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     data: Partial<CellState<CellType>>;
     initialData?: CellType;
     size: number;
     cellPosition?: Position;
-    state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     mainColor?: boolean;
     isValidUserDigit?: boolean;
 }
@@ -35,11 +33,15 @@ export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefine
     initialData === undefined && isEmptyCellState(data, true);
 
 export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle, data, initialData, size, cellPosition, state, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {context, data, initialData, size, cellPosition, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     if (shouldSkipCellDigits(initialData, data)) {
         return null;
     }
+
+    const state = cellPosition ? context.state : undefined;
+
+    const {puzzle} = context;
 
     const {
         typeManager: {

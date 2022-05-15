@@ -8,7 +8,7 @@ import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useEventListener} from "../useEventListener";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
-import {loadBoolFromLocalStorage} from "../../utils/localStorage";
+import {loadBoolFromLocalStorage, loadNumberFromLocalStorage} from "../../utils/localStorage";
 import {emptyPosition} from "../../types/layout/Position";
 
 export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -43,6 +43,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 
         enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
         autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
+        backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
 
         ...(initialGameStateExtension as any),
     }));

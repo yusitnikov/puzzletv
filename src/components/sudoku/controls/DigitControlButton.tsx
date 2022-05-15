@@ -1,6 +1,4 @@
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {gameStateHandleDigit, ProcessedGameState} from "../../../types/sudoku/GameState";
-import {MergeStateAction} from "../../../types/react/MergeStateAction";
+import {gameStateHandleDigit} from "../../../types/sudoku/GameState";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {CellWriteMode, isDigitWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useCallback} from "react";
@@ -8,20 +6,19 @@ import {useEventListener} from "../../../hooks/useEventListener";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
 import {Set} from "../../../types/struct/Set";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export interface DigitControlButtonProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     index: number;
-
-    cellSize: number;
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
-    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }
 
 export const DigitControlButton = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {index, cellSize, puzzle, state, onStateChange}: DigitControlButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {index, context}: DigitControlButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const translate = useTranslate();
+
+    const {puzzle, state, onStateChange, cellSize} = context;
 
     const {
         typeManager,
@@ -79,7 +76,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
         title={title}
     >
         <CellContent
-            puzzle={puzzle}
+            context={context}
             data={{
                 usersDigit: cellWriteMode === CellWriteMode.main ? cellData : undefined,
                 cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [cellData] : []),

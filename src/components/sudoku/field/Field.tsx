@@ -334,12 +334,11 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     const initialData = initialDigits?.[cell.top]?.[cell.left];
 
                     return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
-                        puzzle={puzzle}
+                        context={context}
                         data={cellState}
                         initialData={initialData}
                         size={1}
                         cellPosition={cell}
-                        state={state}
                         isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
                     />;
                 }, true)}

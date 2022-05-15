@@ -133,6 +133,9 @@ export const translationsExactType = {
     "Auto-check on finish": {
         [LanguageCode.ru]: "Авто-проверка при завершении",
     },
+    "Background color's opacity": {
+        [LanguageCode.ru]: "Прорачность цвета фона",
+    },
     // endregion
 };
 

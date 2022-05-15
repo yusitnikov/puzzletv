@@ -12,9 +12,11 @@ import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/Anim
 
 export const RotatableMainControls = (
     {
-        cellSize,
-        state: {isReady, isStickyMode, animationSpeed},
-        onStateChange,
+        context: {
+            cellSize,
+            state: {isReady, isStickyMode, animationSpeed},
+            onStateChange,
+        },
     }: ControlsProps<RotatableDigit, RotatableGameState, RotatableProcessedGameState>
 ) => {
     const translate = useTranslate();

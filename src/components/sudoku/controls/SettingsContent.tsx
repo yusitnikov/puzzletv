@@ -5,8 +5,9 @@ import {ProcessedGameState} from "../../../types/sudoku/GameState";
 import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {textHeightCoeff} from "../../app/globals";
-import {saveBoolToLocalStorage} from "../../../utils/localStorage";
+import {saveBoolToLocalStorage, saveNumberToLocalStorage} from "../../../utils/localStorage";
 import {LocalStorageKeys} from "../../../data/LocalStorageKeys";
+import InputSlider from "react-input-slider";
 
 interface SizeProps {
     cellSize: number;
@@ -18,7 +19,7 @@ export interface SettingsContentProps<CellType, ProcessedGameStateExtensionType 
 }
 
 export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
-    {cellSize, state: {enableConflictChecker, autoCheckOnFinish}, onStateChange}: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
+    {cellSize, state: {enableConflictChecker, autoCheckOnFinish, backgroundOpacity}, onStateChange}: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
 ) => {
     const translate = useTranslate();
 
@@ -32,6 +33,11 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
     const handleChangeAutoCheckOnFinish = (value: boolean) => {
         onStateChange({autoCheckOnFinish: value} as any);
         saveBoolToLocalStorage(LocalStorageKeys.autoCheckOnFinish, value);
+    };
+
+    const handleChangeBackgroundOpacity = (value: number) => {
+        onStateChange({backgroundOpacity: value} as any);
+        saveNumberToLocalStorage(LocalStorageKeys.backgroundOpacity, value);
     };
 
     return <div>
@@ -58,6 +64,19 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
                 cellSize={cellSize}
                 checked={autoCheckOnFinish}
                 onChange={(ev) => handleChangeAutoCheckOnFinish(ev.target.checked)}
+            />
+        </SettingsItem>
+
+        <SettingsItem>
+            {translate("Background color's opacity")}:<br/>
+
+            <InputSlider
+                axis={"x"}
+                x={backgroundOpacity}
+                xmin={0.1}
+                xmax={1}
+                xstep={0.1}
+                onChange={({x}) => handleChangeBackgroundOpacity(x)}
             />
         </SettingsItem>
     </div>;

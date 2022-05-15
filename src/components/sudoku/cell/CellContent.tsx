@@ -6,9 +6,9 @@ export interface CellContentProps<CellType, GameStateExtensionType = {}, Process
 }
 
 export const CellContent = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {data, size, ...otherProps}: CellContentProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {context, data, size, ...otherProps}: CellContentProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => <>
-    {!!data.colors?.size && <CellBackground colors={data.colors} size={size}/>}
+    {!!data.colors?.size && <CellBackground context={context} colors={data.colors} size={size}/>}
 
-    <CellDigits data={data} size={size} {...otherProps}/>
+    <CellDigits context={context} data={data} size={size} {...otherProps}/>
 </>;

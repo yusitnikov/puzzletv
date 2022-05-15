@@ -15,8 +15,10 @@ export interface SidePanelProps<CellType, GameStateExtensionType = {}, Processed
 }
 
 export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle, rect, cellSize, isHorizontal, ...controlsProps}: SidePanelProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {context, rect, isHorizontal}: SidePanelProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    const {puzzle, cellSize} = context;
+
     const hasBottomRowControls = isPuzzleHasBottomRowControls(puzzle);
 
     const padding = cellSize * globalPaddingCoeff;
@@ -49,11 +51,9 @@ export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameSt
         />
 
         <Controls
-            puzzle={puzzle}
+            context={context}
             rect={{...controlsPosition, ...controlsSize}}
-            cellSize={cellSize}
             isHorizontal={isHorizontal || hasBottomRowControls}
-            {...controlsProps}
         />
     </Absolute>;
 };

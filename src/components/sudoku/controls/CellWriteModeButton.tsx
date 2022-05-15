@@ -1,11 +1,9 @@
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellState} from "../../../types/sudoku/CellState";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {ProcessedGameState} from "../../../types/sudoku/GameState";
-import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {ReactNode, useCallback} from "react";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export interface CellWriteModeButtonProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     cellWriteMode: CellWriteMode;
@@ -14,10 +12,8 @@ export interface CellWriteModeButtonProps<CellType, GameStateExtensionType = {},
     data: Partial<CellState<CellType>> | ((contentSize: number) => ReactNode);
     title?: string;
 
-    cellSize: number;
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
-    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+
     noBorders?: boolean;
     childrenOnTopOfBorders?: boolean;
 }
@@ -29,14 +25,13 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         left = 3,
         data,
         title,
-        cellSize,
-        puzzle,
-        state,
-        onStateChange,
+        context,
         noBorders,
         childrenOnTopOfBorders,
     }: CellWriteModeButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    const {state, onStateChange, cellSize} = context;
+
     const handleSetCellWriteMode = useCallback(
         () => onStateChange({persistentCellWriteMode: cellWriteMode} as any),
         [onStateChange, cellWriteMode]
@@ -56,7 +51,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
             typeof data === "function"
                 ? data
                 : contentSize => <CellContent
-                    puzzle={puzzle}
+                    context={context}
                     data={data}
                     size={contentSize}
                     mainColor={true}

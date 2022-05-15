@@ -16,14 +16,11 @@ import {Set} from "../../../types/struct/Set";
 import {
     gameStateClearSelectedCellsContent,
     gameStateRedo,
-    gameStateUndo,
-    ProcessedGameState
+    gameStateUndo
 } from "../../../types/sudoku/GameState";
-import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
@@ -35,28 +32,25 @@ import {CellWriteModeButton} from "./CellWriteModeButton";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {UserLinesByData} from "../constraints/user-lines/UserLines";
 import {useAllowLmd} from "../../../contexts/AllowLmdContext";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
 export interface ControlsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     rect: Rect;
-    cellSize: number;
     isHorizontal: boolean;
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
-    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }
 
 export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {rect, ...otherProps}: ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {rect, isHorizontal, context}: ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {
         cellSize,
-        isHorizontal,
         puzzle,
         state,
         onStateChange,
-    } = otherProps;
+    } = context;
 
     const {
         typeManager,
@@ -177,10 +171,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             {indexes(digitsCountInCurrentMode).map(index => <DigitControlButton
                 key={`digit-${index}`}
                 index={index}
-                puzzle={puzzle}
-                state={state}
-                onStateChange={onStateChange}
-                cellSize={cellSize}
+                context={context}
             />)}
 
             <ControlButton
@@ -214,17 +205,14 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             </ControlButton>
         </>}
 
-        {MainControls && <MainControls rect={emptyRect} {...otherProps}/>}
+        {MainControls && <MainControls context={context} rect={emptyRect} isHorizontal={isHorizontal}/>}
 
         {/*region: Cell write mode*/}
         <CellWriteModeButton
             top={0}
             cellWriteMode={CellWriteMode.main}
             data={{usersDigit: createCellDataByDisplayDigit(digitsCount, state)}}
-            onStateChange={onStateChange}
-            puzzle={puzzle}
-            state={state}
-            cellSize={cellSize}
+            context={context}
         />
 
         <CellWriteModeButton
@@ -232,10 +220,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             cellWriteMode={CellWriteMode.corner}
             data={{cornerDigits: new Set([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}
-            onStateChange={onStateChange}
-            puzzle={puzzle}
-            state={state}
-            cellSize={cellSize}
+            context={context}
         />
 
         <CellWriteModeButton
@@ -243,10 +228,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             cellWriteMode={CellWriteMode.center}
             data={{centerDigits: new Set([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Center")} (${translate("shortcut")}: Ctrl)`}
-            onStateChange={onStateChange}
-            puzzle={puzzle}
-            state={state}
-            cellSize={cellSize}
+            context={context}
         />
 
         <CellWriteModeButton
@@ -254,10 +236,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             cellWriteMode={CellWriteMode.color}
             data={{colors: new Set(indexes(9))}}
             title={`${translate("Colors")} (${translate("shortcut")}: Ctrl+Shift)`}
-            onStateChange={onStateChange}
-            puzzle={puzzle}
-            state={state}
-            cellSize={cellSize}
+            context={context}
         />
 
         {allowDrawingBorders && <CellWriteModeButton
@@ -286,10 +265,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             }}
             childrenOnTopOfBorders={true}
             title={`${translate("Lines")} (${translate("shortcut")}: Alt)`}
-            onStateChange={onStateChange}
-            puzzle={puzzle}
-            state={state}
-            cellSize={cellSize}
+            context={context}
         />}
 
         {allowDragging && <CellWriteModeButton
@@ -310,10 +286,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             </AutoSvg>}
             noBorders={true}
             title={`${translate("Move the grid")} (${translate("shortcut")}: Alt+Shift)`}
-            onStateChange={onStateChange}
-            puzzle={puzzle}
-            state={state}
-            cellSize={cellSize}
+            context={context}
         />}
         {/*endregion*/}
 
