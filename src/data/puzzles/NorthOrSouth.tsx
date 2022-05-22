@@ -17,18 +17,22 @@ import {Chameleon} from "../authors";
 import {
     antiKnightRulesApply,
     antiKnightRulesExplained,
-    arrows,
     blackKropkiDotsExplained,
     conventionalNotationsApply,
-    germanWhispers,
-    killerCagesTitle, killerCagesExplained,
+    killerCagesTitle,
+    killerCagesExplained,
     kropkiDotsTitle,
     noBifurcation,
     normalSudokuRulesApply,
     ruleWithTitle,
     thermometersExplained,
     thermometersTitle,
-    xExplained, cannotRepeatInCage
+    xExplained,
+    cannotRepeatInCage,
+    arrowsExplained,
+    arrowsTitle,
+    germanWhispersTitle,
+    germanWhispersExplained, antiKnight
 } from "../ruleSnippets";
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
@@ -48,11 +52,11 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
         <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
         <RulesUnorderedList>
             <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
-            <li>{translate(arrows)}.</li>
+            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>
             <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
             <li>{ruleWithTitle(translate(kropkiDotsTitle), translate(blackKropkiDotsExplained))}.</li>
             <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
-            <li>{translate(germanWhispers)}.</li>
+            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained))}.</li>
         </RulesUnorderedList>
         <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
     </>,
@@ -86,4 +90,64 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
         XMarkConstraint("R7C8", "R7C9"),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
+};
+
+export const NorthOrSouth2: typeof NorthOrSouth = {
+    ...NorthOrSouth,
+    title: {
+        [LanguageCode.en]: "North or South? (v2)",
+        [LanguageCode.ru]: "Север или юг? (v2)",
+    },
+    slug: "north-or-south2",
+    rules: translate => <>
+        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
+        <RulesParagraph>{ruleWithTitle(translate(antiKnightRulesApply), translate(antiKnightRulesExplained))}.</RulesParagraph>
+        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+        <RulesUnorderedList>
+            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
+            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>
+            <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
+            <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
+            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained))}.</li>
+        </RulesUnorderedList>
+    </>,
+    initialDigits: {
+        2: {
+            4: {digit: 1},
+        },
+        4: {
+            2: {digit: 6},
+        },
+        5: {
+            0: {digit: 9},
+        },
+        6: {
+            3: {digit: 5},
+            4: {digit: 2},
+        },
+        8: {
+            8: {digit: 2},
+        },
+    },
+    items: [
+        AntiKnightConstraint,
+        ThermometerConstraint(["R1C3", "R2C3", "R2C4", "R1C5", "R1C4"]),
+        GermanWhispersConstraint("R3C7", "R3C6", "R2C6", "R1C7", "R2C8"),
+        ArrowConstraint("R5C9", ["R5C7", "R4C7"]),
+        KillerCageConstraint(["R5C1", "R5C2", "R6C1"], 12, true),
+        KillerCageConstraint(["R7C4", "R7C5", "R7C6", "R8C6"], 22, true),
+        XMarkConstraint("R7C6", "R7C7"),
+    ],
+};
+
+export const NorthOrSouth2ShortRules: typeof NorthOrSouth = {
+    ...NorthOrSouth2,
+    noIndex: true,
+    slug: "north-or-south2-sr",
+    rules: translate => <>
+        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
+        <RulesParagraph>{translate(antiKnight)}, {translate(killerCagesTitle).toLowerCase()}, {translate(arrowsTitle).toLowerCase()}, {translate(thermometersTitle).toLowerCase()}, XV, {translate(germanWhispersTitle).toLowerCase()}.</RulesParagraph>
+    </>,
 };

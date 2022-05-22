@@ -29,9 +29,14 @@ export const moveButtonTip: Translatable = {
     [LanguageCode.ru]: "Используйте кнопку «двигать» или стрелки, чтобы двигать поле",
 };
 
+export const antiKnight: Translatable = {
+    [LanguageCode.en]: "Anti-knight",
+    [LanguageCode.ru]: '"Анти-конь"',
+};
+
 export const antiKnightRulesApply: Translatable = {
     [LanguageCode.en]: "Anti-knight sudoku rules apply",
-    [LanguageCode.ru]: "Правила судоку \"анти-конь\"",
+    [LanguageCode.ru]: 'Правила судоку "анти-конь"',
 };
 
 export const antiKnightRulesExplained: Translatable = {
@@ -64,9 +69,14 @@ export const cannotRepeatInCage: Translatable = {
     [LanguageCode.ru]: "Цифры не могут повторяться внутри клетки",
 };
 
-export const arrows: Translatable = {
-    [LanguageCode.en]: "Arrows: digits along arrows sum to the numbers in the circles",
-    [LanguageCode.ru]: "Стрелки: сумма цифр, расположенных вдоль стрелок, равняется цифре в кружке",
+export const arrowsTitle: Translatable = {
+    [LanguageCode.en]: "Arrows",
+    [LanguageCode.ru]: "Стрелки",
+};
+
+export const arrowsExplained: Translatable = {
+    [LanguageCode.en]: "Digits along arrows sum to the numbers in the circles",
+    [LanguageCode.ru]: "Сумма цифр, расположенных вдоль стрелок, равняется цифре в кружке",
 };
 
 export const thermometersTitle: Translatable = {
@@ -109,9 +119,14 @@ export const vExplained: Translatable = {
     [LanguageCode.ru]: "Сумма цифр, разделённых знаком V, равна 5",
 };
 
-export const germanWhispers: Translatable = {
-    [LanguageCode.en]: "German whispers: consecutive digits along the green line must have difference of 5 or more",
-    [LanguageCode.ru]: "\"Немецкий шёпот\": последовательные цифры вдоль зеленой линии должны различаться на 5 или более",
+export const germanWhispersTitle: Translatable = {
+    [LanguageCode.en]: "German whispers",
+    [LanguageCode.ru]: '"Немецкий шёпот"',
+};
+
+export const germanWhispersExplained: Translatable = {
+    [LanguageCode.en]: "Consecutive digits along the green line must have difference of 5 or more",
+    [LanguageCode.ru]: "Последовательные цифры вдоль зеленой линии должны различаться на 5 или более",
 };
 
 export const noBifurcation: Translatable<ReactNode> = {

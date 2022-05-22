@@ -1,5 +1,5 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {NorthOrSouth} from "./NorthOrSouth";
+import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
 import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {RealChessPuzzleRubberBlando} from "./RealChessPuzzleRubberBlando";
 import {EmptyChaosConstruction, EmptyChess, EmptyCubedoku, EmptyRegular, EmptyRotatable, EmptyToroidal} from "./Empty";
@@ -18,6 +18,8 @@ export default [
     EmptyToroidal,
 
     NorthOrSouth,
+    NorthOrSouth2,
+	NorthOrSouth2ShortRules,
 
     RealChessPuzzle,
     RealChessPuzzleCompatibilitySlug,
