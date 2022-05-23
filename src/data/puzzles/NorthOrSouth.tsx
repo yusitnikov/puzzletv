@@ -152,6 +152,7 @@ export const NorthOrSouth2ShortRules: typeof NorthOrSouth = {
     rules: translate => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
-        <RulesParagraph>{translate(antiKnight)}, {translate(killerCagesTitle).toLowerCase()}, {translate(arrowsTitle).toLowerCase()}, {translate(thermometersTitle).toLowerCase()}, XV, {translate(germanWhispersTitle).toLowerCase()}.</RulesParagraph>
+        <RulesParagraph>{translate(antiKnight)}, {translate(killerCagesTitle).toLowerCase()}, {translate(arrowsTitle).toLowerCase()}, {translate(thermometersTitle).toLowerCase()}, XV (no negative constraint), {translate(germanWhispersTitle).toLowerCase()}.</RulesParagraph>
+        <RulesParagraph>Please note that killer cage clues also do rotate.</RulesParagraph>
     </>,
 };
