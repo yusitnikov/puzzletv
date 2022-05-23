@@ -32,13 +32,15 @@ import {
     arrowsExplained,
     arrowsTitle,
     germanWhispersTitle,
-    germanWhispersExplained, antiKnight
+    germanWhispersExplained,
+    antiKnight
 } from "../ruleSnippets";
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
+    noIndex: true,
     title: {
         [LanguageCode.en]: "North or South?",
         [LanguageCode.ru]: "Север или юг?",
@@ -94,6 +96,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
 
 export const NorthOrSouth2: typeof NorthOrSouth = {
     ...NorthOrSouth,
+    noIndex: false,
     title: {
         [LanguageCode.en]: "North or South? (v2)",
         [LanguageCode.ru]: "Север или юг? (v2)",
@@ -111,6 +114,7 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
             <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
             <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained))}.</li>
         </RulesUnorderedList>
+        <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
     </>,
     initialDigits: {
         2: {
