@@ -75,3 +75,9 @@ export const createGivenDigitsMapFromArray = <CellType>(array: CellType[][]): Gi
 
     return map;
 };
+
+export const serializeGivenDigitsMap = <CellType>(map: GivenDigitsMap<CellType>, serializer: (item: CellType) => any): any =>
+    processGivenDigitsMaps(([cell]) => serializer(cell), [map]);
+
+export const unserializeGivenDigitsMap = <CellType>(map: any, unserializer: (item: any) => CellType): GivenDigitsMap<CellType> =>
+    processGivenDigitsMaps(([cell]) => unserializer(cell), [map]);

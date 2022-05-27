@@ -89,10 +89,12 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         cellWriteMode,
         enableConflictChecker,
         loopOffset,
+        initialDigits: stateInitialDigits,
+        excludedDigits,
     } = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
-    const userDigits = useMemo(() => prepareGivenDigitsMapForConstraints(puzzle, cells), [puzzle, cells]);
+    const userDigits = useMemo(() => prepareGivenDigitsMapForConstraints(context, cells), [context, cells]);
 
     const {isAnyKeyDown} = useControlKeysState();
 
@@ -326,12 +328,14 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 </FieldSvg>
 
                 {renderCellsLayer("digits", (cellState, cell) => {
-                    const initialData = initialDigits?.[cell.top]?.[cell.left];
+                    const initialData = initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left];
+                    const cellExcludedDigits = excludedDigits[cell.top][cell.left];
 
-                    return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
+                    return !shouldSkipCellDigits(initialData, cellExcludedDigits, cellState) && <CellDigits
                         context={readOnlySafeContext}
                         data={cellState}
                         initialData={initialData}
+                        excludedDigits={cellExcludedDigits}
                         size={1}
                         cellPosition={cell}
                         isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}

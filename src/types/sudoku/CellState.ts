@@ -9,7 +9,12 @@ export interface CellState<CellType> {
     colors: Set<CellColor>;
 }
 
-const getCellDataComparer = <CellType>(areSameCellData: SudokuTypeManager<CellType>["areSameCellData"]) =>
+export interface CellStateEx<CellType> extends CellState<CellType> {
+    initialDigit?: CellType;
+    excludedDigits: Set<CellType>;
+}
+
+export const getCellDataComparer = <CellType>(areSameCellData: SudokuTypeManager<CellType>["areSameCellData"]) =>
     (a: CellType, b: CellType) => areSameCellData(a, b, undefined, false);
 
 const cellColorComparer = (i1: CellColor, i2: CellColor) => i1 === i2;

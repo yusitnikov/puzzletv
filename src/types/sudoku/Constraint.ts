@@ -8,6 +8,7 @@ import {RegionConstraint} from "../../components/sudoku/constraints/region/Regio
 import {indexes} from "../../utils/indexes";
 import {CellState} from "./CellState";
 import {UserLinesConstraint} from "../../components/sudoku/constraints/user-lines/UserLines";
+import {PuzzleContext} from "./PuzzleContext";
 
 export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> = {
     name: string;
@@ -78,9 +79,9 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
 };
 
 export const prepareGivenDigitsMapForConstraints = <CellType>(
-    {initialDigits = {}}: PuzzleDefinition<CellType, any, any>,
+    {puzzle: {initialDigits = {}}, state: {initialDigits: stateInitialDigits = {}}}: PuzzleContext<CellType, any, any>,
     cells: CellState<CellType>[][]
-) => mergeGivenDigitsMaps(gameStateGetCurrentGivenDigitsByCells(cells), initialDigits);
+) => mergeGivenDigitsMaps(gameStateGetCurrentGivenDigitsByCells(cells), initialDigits, stateInitialDigits);
 
 export const normalizeConstraintCell = (
     {left, top}: Position,
@@ -126,13 +127,13 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
 };
 
 export const isValidFinishedPuzzleByConstraints = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    const {puzzle, state} = context;
     const {typeManager: {isValidCell = () => true}} = puzzle;
     const constraints = getAllPuzzleConstraintsAndComponents(puzzle, state).filter(isConstraint).map(asConstraint);
     const {cells} = gameStateGetCurrentFieldState(state);
-    const userDigits = prepareGivenDigitsMapForConstraints(puzzle, cells);
+    const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
 
     return cells.every((row, top) => row.every((cell, left) => {
         const position: Position = {left, top};

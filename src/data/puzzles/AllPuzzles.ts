@@ -10,6 +10,7 @@ import {MultiColorMadness} from "./MultiColorMadness";
 import {Africa} from "./Africa";
 import {generateRandomPuzzle} from "./Random";
 import {getDailyRandomGenerator} from "../../utils/random";
+import {generateGuess} from "./Guess";
 
 export default [
     // region Empty & random
@@ -21,6 +22,7 @@ export default [
     EmptyToroidal,
 
     generateRandomPuzzle("random", 9, 3, getDailyRandomGenerator()),
+    generateGuess("quad-masters", 9, 3, getDailyRandomGenerator()),
     // endregion
 
     // region Other authors

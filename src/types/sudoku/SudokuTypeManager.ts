@@ -11,6 +11,7 @@ import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {Rect} from "../layout/Rect";
 import {Constraint} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
+import {CellStateEx} from "./CellState";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(
@@ -69,6 +70,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         cellPosition?: Position,
         state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): PositionWithAngle | undefined;
+
+    handleMainDigit?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
+    handleCenterDigit?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
+    handleCornerDigit?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
+    handleColor?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
 
     digitComponentType?: DigitComponentType;
 

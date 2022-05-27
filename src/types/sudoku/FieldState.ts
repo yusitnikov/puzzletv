@@ -85,10 +85,11 @@ export const cloneFieldState = <CellType>(
 export const processFieldStateCells = <CellType>(
     fieldState: FieldState<CellType>,
     affectedCells: Position[],
-    processor: (cellState: CellState<CellType>) => CellState<CellType>
+    processor: (cellState: CellState<CellType>, position: Position) => CellState<CellType>
 ) => {
-    for (const {left: columnIndex, top: rowIndex} of affectedCells) {
-        fieldState.cells[rowIndex][columnIndex] = processor(fieldState.cells[rowIndex][columnIndex]);
+    for (const position of affectedCells) {
+        const {left: columnIndex, top: rowIndex} = position;
+        fieldState.cells[rowIndex][columnIndex] = processor(fieldState.cells[rowIndex][columnIndex], position);
     }
 
     return fieldState;

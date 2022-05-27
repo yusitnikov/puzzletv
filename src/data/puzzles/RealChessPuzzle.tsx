@@ -87,17 +87,19 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
         "c2": {color: ChessColor.white, type: ChessPieceType.pawn},
         "a3": {color: ChessColor.white, type: ChessPieceType.pawn},
     }),
-    resultChecker: (puzzle, gameState) => {
-        const currentGivenDigits = gameStateGetCurrentGivenDigits(gameState);
+    resultChecker: ({puzzle, state}) => {
+        const currentGivenDigits = gameStateGetCurrentGivenDigits(state);
 
         const currentFinalDigits = mergeGivenDigitsMaps(
             puzzle.initialDigits!,
+            state.initialDigits || {},
             currentGivenDigits,
             optionalSolutionPieces
         );
 
         const correctFinalDigits = mergeGivenDigitsMaps(
             puzzle.initialDigits!,
+            state.initialDigits || {},
             mandatorySolutionPieces,
             optionalSolutionPieces
         );

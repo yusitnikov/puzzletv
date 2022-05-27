@@ -81,7 +81,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     } = state;
 
     const [isShowingResult, setIsShowingResult] = useState(false);
-    const isCorrectResult = useMemo(() => resultChecker?.(puzzle, state), [resultChecker, puzzle, state]);
+    const isCorrectResult = useMemo(() => resultChecker?.(context), [resultChecker, context]);
     const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
 
     const isLmdAllowed = useAllowLmd();

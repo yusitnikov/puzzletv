@@ -157,12 +157,12 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         OddConstraint({top: 0, left: AfricaCountriesEnum.SouthSudan}, false),
         OddConstraint({top: 0, left: AfricaCountriesEnum.Gabon}, false),
     ] as Constraint<number, {}, GoogleMapsState, GoogleMapsState>[],
-    resultChecker: (puzzle, gameState) => {
-        if (!isValidFinishedPuzzleByConstraints(puzzle, gameState)) {
+    resultChecker: (context) => {
+        if (!isValidFinishedPuzzleByConstraints(context)) {
             return false;
         }
 
-        const digits = gameStateGetCurrentFieldState(gameState).cells[0].map(({usersDigit}) => usersDigit!);
+        const digits = gameStateGetCurrentFieldState(context.state).cells[0].map(({usersDigit}) => usersDigit!);
 
         let product = 1;
         let dots = 0;

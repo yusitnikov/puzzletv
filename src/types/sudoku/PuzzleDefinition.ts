@@ -7,7 +7,7 @@ import {useTranslate} from "../../contexts/LanguageCodeContext";
 import {ProcessedGameState} from "./GameState";
 import {ConstraintOrComponent} from "./Constraint";
 import {CellColor} from "./CellColor";
-import {PuzzleContextProps} from "./PuzzleContext";
+import {PuzzleContext, PuzzleContextProps} from "./PuzzleContext";
 import {CustomCellBounds} from "./CustomCellBounds";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
@@ -25,10 +25,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     initialDigits?: GivenDigitsMap<CellType>;
     initialColors?: GivenDigitsMap<CellColor[]>;
     allowOverridingInitialColors?: boolean;
-    resultChecker?: (
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
-    ) => boolean,
+    resultChecker?: (context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => boolean,
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
     borderColor?: string;

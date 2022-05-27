@@ -14,8 +14,12 @@ import {
     unserializeFromLocalStorage
 } from "../../utils/localStorage";
 import {emptyPosition} from "../../types/layout/Position";
+import {Set} from "../../types/struct/Set";
+import {serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
+import {getCellDataComparer} from "../../types/sudoku/CellState";
+import {indexes} from "../../utils/indexes";
 
-type SavedGameStates = [slug: string, field: any, state: any][];
+type SavedGameStates = [slug: string, field: any, state: any, initialDigits: any, excludedDigits: any][];
 const gameStateStorageKey = "savedGameState";
 const gameStateSerializerVersion = 1;
 const maxSavedPuzzles = 10;
@@ -58,6 +62,21 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             },
             persistentCellWriteMode: CellWriteMode.main,
             selectedCells: noSelectedCells,
+            initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
+            excludedDigits: savedGameState?.[4]
+                ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) => Set.unserialize(
+                    excludedDigits,
+                    getCellDataComparer(puzzle.typeManager.areSameCellData),
+                    puzzle.typeManager.cloneCellData,
+                    puzzle.typeManager.serializeCellData,
+                    puzzle.typeManager.unserializeCellData,
+                ))
+                : indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => new Set(
+                    [],
+                    getCellDataComparer(puzzle.typeManager.areSameCellData),
+                    puzzle.typeManager.cloneCellData,
+                    puzzle.typeManager.serializeCellData
+                ))),
 
             currentMultiLine: [],
             isAddingLine: false,
@@ -83,6 +102,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                             slug,
                             serializeFieldState(gameStateGetCurrentFieldState(gameState), typeManager),
                             serializeGameState(gameState),
+                            serializeGivenDigitsMap(gameState.initialDigits, typeManager.serializeCellData),
+                            serializeGivenDigitsMap(gameState.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
                         ],
                         ...getSavedGameStates().filter(([itemSlug]) => itemSlug !== slug),
                     ] as SavedGameStates).slice(0, maxSavedPuzzles),

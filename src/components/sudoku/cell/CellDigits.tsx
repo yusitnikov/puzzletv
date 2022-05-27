@@ -23,19 +23,20 @@ export interface CellDigitsProps<CellType, GameStateExtensionType = {}, Processe
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     data: Partial<CellState<CellType>>;
     initialData?: CellType;
+    excludedDigits?: Set<CellType>;
     size: number;
     cellPosition?: Position;
     mainColor?: boolean;
     isValidUserDigit?: boolean;
 }
 
-export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, data: Partial<CellState<CellType>>) =>
-    initialData === undefined && isEmptyCellState(data, true);
+export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, excludedDigits: Set<CellType> | undefined, data: Partial<CellState<CellType>>) =>
+    initialData === undefined && !excludedDigits?.size && isEmptyCellState(data, true);
 
 export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {context, data, initialData, size, cellPosition, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {context, data, initialData, excludedDigits, size, cellPosition, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    if (shouldSkipCellDigits(initialData, data)) {
+    if (shouldSkipCellDigits(initialData, excludedDigits, data)) {
         return null;
     }
 
@@ -61,7 +62,9 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         cornerDigits
     } = data;
 
-    const centerDigitsCoeff = centerDigitCoeff / Math.max(1, centerDigitCoeff * widthCoeff * ((centerDigits?.size || 0) + 1));
+    const allCenterDigits = Set.merge(...[centerDigits, excludedDigits].filter(set => set).map(set => set!));
+
+    const centerDigitsCoeff = centerDigitCoeff / Math.max(1, centerDigitCoeff * widthCoeff * (allCenterDigits.size + 1));
 
     const renderAnimatedDigitsSet = (
         keyPrefix: string,
@@ -69,7 +72,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         digitSize: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         isInitial = false,
-        isValid = true
+        isValid: boolean | ((cellData: CellType) => boolean) = true
     ) => {
         const straightIndexes = getCellDataSortIndexes(digits, (a, b) => compareCellData(a, b, undefined, false));
 
@@ -93,7 +96,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 {...position}
                 state={state}
                 isInitial={isInitial || mainColor}
-                isValid={isValid}
+                isValid={typeof isValid === "function" ? isValid(cellData) : isValid}
             />;
         });
     };
@@ -125,15 +128,17 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 isValidUserDigit
             )}
 
-            {centerDigits?.size && renderAnimatedDigitsSet(
+            {!!allCenterDigits.size && renderAnimatedDigitsSet(
                 "center",
-                centerDigits,
+                allCenterDigits,
                 size * centerDigitsCoeff,
                 (index) => ({
-                    left: size * centerDigitsCoeff * widthCoeff * (index - (centerDigits.size - 1) / 2),
+                    left: size * centerDigitsCoeff * widthCoeff * (index - (allCenterDigits.size - 1) / 2),
                     top: 0,
                     angle: 0,
-                })
+                }),
+                false,
+                (cellData) => !excludedDigits?.contains(cellData)
             )}
 
             {cornerDigits?.size && renderAnimatedDigitsSet(

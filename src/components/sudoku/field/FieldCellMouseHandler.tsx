@@ -34,8 +34,10 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 ) => {
     const {puzzle, state, onStateChange} = context;
 
-    const isSelecting = !isNoSelectionWriteMode(state.cellWriteMode);
-    const isDrawing = state.cellWriteMode === CellWriteMode.lines;
+    const {cellWriteMode, selectedCells, currentMultiLine, initialDigits: stateInitialDigits} = state;
+
+    const isSelecting = !isNoSelectionWriteMode(cellWriteMode);
+    const isDrawing = cellWriteMode === CellWriteMode.lines;
 
     const customCellBounds = puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
     let customCellBorders: Position[][] | undefined = undefined;
@@ -54,7 +56,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     const handleCellClick = ({ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
         const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
 
-        onIsDeleteSelectedCellsStrokeChange(isMultiSelection && state.selectedCells.contains(cellPosition));
+        onIsDeleteSelectedCellsStrokeChange(isMultiSelection && selectedCells.contains(cellPosition));
         onStateChange(
             gameState => isMultiSelection
                 ? gameStateToggleSelectedCells(gameState, [cellPosition])
@@ -67,7 +69,9 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
         const {cells} = gameStateGetCurrentFieldState(state);
 
         const {usersDigit, colors, centerDigits, cornerDigits} = cells[cellPosition.top][cellPosition.left];
-        const mainDigit = initialDigits?.[cellPosition.top]?.[cellPosition.left] || usersDigit;
+        const mainDigit = initialDigits?.[cellPosition.top]?.[cellPosition.left]
+            || stateInitialDigits?.[cellPosition.top]?.[cellPosition.left]
+            || usersDigit;
 
         let filter: (cell: CellState<CellType>, initialDigit?: CellType) => boolean;
         if (mainDigit) {
@@ -89,7 +93,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
             .flatMap((row, top) => row.map((cellState, left) => ({
                 position: {top, left},
                 cellState,
-                initialDigit: initialDigits?.[top]?.[left],
+                initialDigit: initialDigits?.[top]?.[left] || stateInitialDigits?.[top]?.[left],
             })))
             .filter(({cellState, initialDigit}) => filter(cellState, initialDigit))
             .map(({position}) => position);
@@ -102,7 +106,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     };
 
     const handleContinueCellSelection = () => {
-        if (!state.currentMultiLine.length) {
+        if (!currentMultiLine.length) {
             onStateChange(gameState => gameStateToggleSelectedCells(gameState, [cellPosition], !isDeleteSelectedCellsStroke));
         }
     };

@@ -96,6 +96,14 @@ export class Set<ItemT> {
         return this.items.map(this.serializer);
     }
 
+    public static merge<ItemT>(...sets: Set<ItemT>[]): Set<ItemT> {
+        if (!sets.length) {
+            return new Set();
+        }
+
+        return sets.reduce((previousValue, currentValue) => previousValue.toggleAll(currentValue.items, true));
+    }
+
     public static unserialize<ItemT>(
         value: any,
         comparer: Comparer<ItemT> = defaultComparer,
