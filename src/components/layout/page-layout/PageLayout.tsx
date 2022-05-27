@@ -70,11 +70,9 @@ export const PageLayout = ({addPadding = true, scrollable, title, children}: Pag
             padding: addPadding ? headerPadding : 0,
             overflow: scrollable ? "auto" : "hidden",
         }}>
-            <div style={{position: "relative"}}>
-                {title && <h1 style={{marginTop: 0}}>{title}</h1>}
+            {title && <h1 style={{marginTop: 0}}>{title}</h1>}
 
-                {children}
-            </div>
+            {children}
         </div>
     </div>;
 };
