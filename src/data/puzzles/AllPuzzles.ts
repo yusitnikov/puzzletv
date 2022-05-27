@@ -20,7 +20,7 @@ export default [
     EmptyCubedoku,
     EmptyToroidal,
 
-    generateRandomPuzzle(9, 3, getDailyRandomGenerator()),
+    generateRandomPuzzle("random", 9, 3, getDailyRandomGenerator()),
     // endregion
 
     // region Other authors

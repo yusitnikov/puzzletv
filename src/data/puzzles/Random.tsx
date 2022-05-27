@@ -5,13 +5,13 @@ import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudok
 import {generateRandomPuzzleDigits, RandomGenerator} from "../../utils/random";
 import {normalSudokuRulesApply} from "../ruleSnippets";
 
-export const generateRandomPuzzle = (fieldSize: number, regionWidth: number, randomOrSeed?: RandomGenerator | number): PuzzleDefinition<number> => ({
+export const generateRandomPuzzle = (slug: string, fieldSize: number, regionWidth: number, randomOrSeed?: RandomGenerator | number): PuzzleDefinition<number> => ({
     noIndex: true,
     title: {
         [LanguageCode.en]: `Random Sudoku ${fieldSize}x${fieldSize}`,
         [LanguageCode.ru]: `Случайный судоку ${fieldSize}x${fieldSize}`,
     },
-    slug: `random-${fieldSize}-${regionWidth}`,
+    slug,
     typeManager: DigitSudokuTypeManager(),
     fieldSize: createRegularFieldSize(fieldSize, regionWidth),
     initialDigits: generateRandomPuzzleDigits(fieldSize, regionWidth, randomOrSeed),
