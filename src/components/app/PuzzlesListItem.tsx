@@ -37,10 +37,11 @@ export const PuzzlesListItem = <CellType, GameStateExtensionType = {}, Processed
         style={{
             background: lighterGreyColor,
             flex: "1 1 100%",
-            padding: padding,
+            padding,
             borderRadius: padding / 2,
             color: "inherit",
             textDecoration: "none",
+            overflow: "hidden",
         }}
         title={translate("Play %1").replace("%1", '"' + translate(puzzle.title) + '"')}
     >
