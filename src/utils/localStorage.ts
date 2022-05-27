@@ -7,3 +7,21 @@ export const loadNumberFromLocalStorage = (key: string, defaultValue = 0) =>
     typeof window.localStorage[key] === "string" ? Number(window.localStorage[key]) : defaultValue;
 
 export const saveNumberToLocalStorage = (key: string, value: number) => window.localStorage[key] = value.toString();
+
+export const serializeToLocalStorage = (key: string, value: any, version = 1) => {
+    localStorage[key] = version + ":" + JSON.stringify(value);
+};
+
+export const unserializeFromLocalStorage = (key: string, version = 1): any | undefined => {
+    const serialized = window.localStorage[key];
+    if (typeof serialized !== "string") {
+        return undefined;
+    }
+
+    const [savedVersion, ...jsonParts] = serialized.split(":");
+    if (savedVersion !== version.toString()) {
+        return undefined;
+    }
+
+    return JSON.parse(jsonParts.join(":"));
+};

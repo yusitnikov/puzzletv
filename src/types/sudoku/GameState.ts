@@ -38,7 +38,7 @@ export interface ProcessedGameState<CellType> extends GameState<CellType> {
 }
 
 // region History
-export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: ProcessedGameState<CellType>) =>
+export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: GameState<CellType>) =>
     fieldStateHistoryGetCurrent(fieldStateHistory);
 
 export const gameStateGetCurrentGivenDigitsByCells = <CellType>(cells: CellState<CellType>[][]) => {

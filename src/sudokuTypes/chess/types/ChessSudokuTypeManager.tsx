@@ -33,6 +33,22 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
         return {...digit};
     },
 
+    serializeCellData(data: ChessPiece): any {
+        return data;
+    },
+
+    unserializeCellData(data: any): ChessPiece {
+        return data as ChessPiece;
+    },
+
+    serializeGameState({selectedColor}) {
+        return {selectedColor};
+    },
+
+    unserializeGameState({selectedColor}) {
+        return {selectedColor};
+    },
+
     createCellDataByDisplayDigit(digit, {selectedColor}): ChessPiece {
         return {
             type: digit,

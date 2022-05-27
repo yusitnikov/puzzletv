@@ -1,6 +1,6 @@
-import {createEmptyFieldState} from "../../types/sudoku/FieldState";
-import {Dispatch, useCallback, useMemo, useState} from "react";
-import {GameState, ProcessedGameState} from "../../types/sudoku/GameState";
+import {createEmptyFieldState, serializeFieldState, unserializeFieldState} from "../../types/sudoku/FieldState";
+import {Dispatch, useCallback, useEffect, useMemo, useState} from "react";
+import {GameState, gameStateGetCurrentFieldState, ProcessedGameState} from "../../types/sudoku/GameState";
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
 import {noSelectedCells} from "../../types/sudoku/SelectedCells";
 import {MergeStateAction} from "../../types/react/MergeStateAction";
@@ -8,45 +8,83 @@ import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useEventListener} from "../useEventListener";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
-import {loadBoolFromLocalStorage, loadNumberFromLocalStorage} from "../../utils/localStorage";
+import {
+    loadBoolFromLocalStorage,
+    loadNumberFromLocalStorage, serializeToLocalStorage,
+    unserializeFromLocalStorage
+} from "../../utils/localStorage";
 import {emptyPosition} from "../../types/layout/Position";
+
+type SavedGameStates = [slug: string, field: any, state: any][];
+const gameStateStorageKey = "savedGameState";
+const gameStateSerializerVersion = 1;
+const maxSavedPuzzles = 10;
 
 export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ): [ProcessedGameState<CellType> & ProcessedGameStateExtensionType, Dispatch<MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>>] => {
     const {
-        typeManager: {
-            initialGameStateExtension,
-            isReady: isReadyFn = () => true,
-            useProcessedGameStateExtension = () => ({} as any)
-        },
+        slug,
+        typeManager,
         allowDrawingBorders = false,
         loopHorizontally = false,
         loopVertically = false,
         enableDragMode = false,
     } = puzzle;
 
-    const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => ({
-        fieldStateHistory: {
-            states: [
-                createEmptyFieldState(puzzle)
-            ],
-            currentIndex: 0,
-        },
-        persistentCellWriteMode: CellWriteMode.main,
-        selectedCells: noSelectedCells,
+    const {
+        initialGameStateExtension,
+        isReady: isReadyFn = () => true,
+        useProcessedGameStateExtension = () => ({} as any),
+        serializeGameState,
+        unserializeGameState,
+    } = typeManager;
 
-        currentMultiLine: [],
-        isAddingLine: false,
+    const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(gameStateStorageKey, gameStateSerializerVersion) || [];
+    const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => {
+        const savedGameState = getSavedGameStates().find(([itemSlug]) => itemSlug === slug);
 
-        loopOffset: emptyPosition,
+        return {
+            fieldStateHistory: {
+                states: [
+                    savedGameState
+                        ? unserializeFieldState(savedGameState[1], puzzle)
+                        : createEmptyFieldState(puzzle)
+                ],
+                currentIndex: 0,
+            },
+            persistentCellWriteMode: CellWriteMode.main,
+            selectedCells: noSelectedCells,
 
-        enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
-        autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
-        backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
+            currentMultiLine: [],
+            isAddingLine: false,
 
-        ...(initialGameStateExtension as any),
-    }));
+            loopOffset: emptyPosition,
+
+            enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
+            autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
+            backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
+
+            ...(initialGameStateExtension as any),
+            ...(savedGameState && unserializeGameState(savedGameState[2]))
+        };
+    });
+
+    useEffect(
+        () => serializeToLocalStorage(
+            gameStateStorageKey,
+            ([
+                [
+                    slug,
+                    serializeFieldState(gameStateGetCurrentFieldState(gameState), typeManager),
+                    serializeGameState(gameState),
+                ],
+                ...getSavedGameStates().filter(([itemSlug]) => itemSlug !== slug),
+            ] as SavedGameStates).slice(0, maxSavedPuzzles),
+            gameStateSerializerVersion
+        ),
+        [gameState]
+    );
 
     const cellWriteMode = useFinalCellWriteMode(
         gameState.persistentCellWriteMode,

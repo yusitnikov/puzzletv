@@ -67,6 +67,22 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         return {...digit};
     },
 
+    serializeCellData(data: RotatableDigit): any {
+        return data;
+    },
+
+    unserializeCellData(data: any): RotatableDigit {
+        return data as RotatableDigit;
+    },
+
+    serializeGameState({angle}) {
+        return {angle};
+    },
+
+    unserializeGameState({angle}) {
+        return {angle};
+    },
+
     createCellDataByDisplayDigit(digit: number, {isStickyMode}: RotatableGameState): RotatableDigit {
         return {
             digit,

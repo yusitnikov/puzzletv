@@ -9,10 +9,36 @@ export interface CellState<CellType> {
     colors: Set<CellColor>;
 }
 
-export const createEmptyCellState = <CellType>({areSameCellData, cloneCellData}: SudokuTypeManager<CellType>): CellState<CellType> => ({
-    centerDigits: new Set([], (a, b) => areSameCellData(a, b, undefined, false), cloneCellData),
-    cornerDigits: new Set([], (a, b) => areSameCellData(a, b, undefined, false), cloneCellData),
-    colors: new Set<CellColor>([], (i1, i2) => i1 === i2, i => i),
+const getCellDataComparer = <CellType>(areSameCellData: SudokuTypeManager<CellType>["areSameCellData"]) =>
+    (a: CellType, b: CellType) => areSameCellData(a, b, undefined, false);
+
+const cellColorComparer = (i1: CellColor, i2: CellColor) => i1 === i2;
+const cellColorCloner = (i: CellColor) => i;
+
+export const createEmptyCellState = <CellType>({areSameCellData, cloneCellData, serializeCellData}: SudokuTypeManager<CellType>): CellState<CellType> => ({
+    centerDigits: new Set([], getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
+    cornerDigits: new Set([], getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
+    colors: new Set<CellColor>([], cellColorComparer, cellColorCloner),
+});
+
+export const serializeCellState = <CellType>(
+    {usersDigit, centerDigits, cornerDigits, colors}: CellState<CellType>,
+    {serializeCellData}: SudokuTypeManager<CellType>
+) => ({
+    usersDigit: usersDigit ? serializeCellData(usersDigit) : undefined,
+    centerDigits: centerDigits.serialize(),
+    cornerDigits: cornerDigits.serialize(),
+    colors: colors.serialize(),
+});
+
+export const unserializeCellState = <CellType>(
+    {usersDigit, centerDigits, cornerDigits, colors}: any,
+    {areSameCellData, cloneCellData, serializeCellData, unserializeCellData}: SudokuTypeManager<CellType>
+): CellState<CellType> => ({
+    usersDigit: usersDigit ? unserializeCellData(usersDigit) : undefined,
+    centerDigits: Set.unserialize(centerDigits, getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
+    cornerDigits: Set.unserialize(cornerDigits, getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
+    colors: Set.unserialize(colors, cellColorComparer, cellColorCloner),
 });
 
 export const isEmptyCellState = ({usersDigit, centerDigits, cornerDigits, colors}: Partial<CellState<any>>, ignoreColors = false) =>

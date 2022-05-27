@@ -4,9 +4,14 @@ import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState} from "./RotatablePuzzleBoxGameState";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {RotatablePuzzleBoxMainControls} from "../components/RotatablePuzzleBoxMainControls";
+import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 
 export const RotatablePuzzleBoxSudokuTypeManager: SudokuTypeManager<number, RotatablePuzzleBoxGameState, RotatablePuzzleBoxProcessedGameState> = {
-    ...DigitSudokuTypeManager(),
+    ...DigitSudokuTypeManager(
+        RegularDigitComponentType,
+        ({angle}) => ({angle}),
+        ({angle}) => ({angle}),
+    ),
 
     initialGameStateExtension: {
         angle: 0,

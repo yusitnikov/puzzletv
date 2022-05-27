@@ -1,10 +1,21 @@
+type Comparer<ItemT> = (item1: ItemT, item2: ItemT) => boolean;
+type Cloner<ItemT> = (item: ItemT) => ItemT;
+type Serializer<ItemT> = (item: ItemT) => any;
+type Unserializer<ItemT> = (object: any) => ItemT;
+
+const defaultComparer: Comparer<any> = (item1, item2) => JSON.stringify(item1) === JSON.stringify(item2);
+const defaultCloner: Cloner<any> = item => JSON.parse(JSON.stringify(item));
+const defaultSerializer: Serializer<any> = item => item;
+const defaultUnserializer: Unserializer<any> = item => item;
+
 export class Set<ItemT> {
     private cache: Record<string, any> = {};
 
     constructor(
         public readonly items: ItemT[] = [],
-        private comparer: (item1: ItemT, item2: ItemT) => boolean = (item1, item2) => JSON.stringify(item1) === JSON.stringify(item2),
-        private cloner: (item: ItemT) => ItemT = item => JSON.parse(JSON.stringify(item))
+        private comparer: Comparer<ItemT> = defaultComparer,
+        private cloner: Cloner<ItemT> = defaultCloner,
+        private serializer: Serializer<ItemT> = defaultSerializer
     ) {
     }
 
@@ -49,7 +60,7 @@ export class Set<ItemT> {
     }
 
     public set(items: ItemT[]) {
-        return new Set(items, this.comparer);
+        return new Set(items, this.comparer, this.cloner, this.serializer);
     }
 
     public clear() {
@@ -79,5 +90,24 @@ export class Set<ItemT> {
             result = result.toggle(item, forcedEnable);
         }
         return result;
+    }
+
+    public serialize() {
+        return this.items.map(this.serializer);
+    }
+
+    public static unserialize<ItemT>(
+        value: any,
+        comparer: Comparer<ItemT> = defaultComparer,
+        cloner: Cloner<ItemT> = defaultCloner,
+        serializer: Serializer<ItemT> = defaultSerializer,
+        unserializer: Unserializer<ItemT> = defaultUnserializer
+    ) {
+        return new Set(
+            (value as any[]).map(unserializer),
+            comparer,
+            cloner,
+            serializer
+        );
     }
 }

@@ -1,4 +1,11 @@
-import {areCellStatesEqual, CellState, cloneCellState, createEmptyCellState} from "./CellState";
+import {
+    areCellStatesEqual,
+    CellState,
+    cloneCellState,
+    createEmptyCellState,
+    serializeCellState,
+    unserializeCellState
+} from "./CellState";
 import {indexes} from "../../utils/indexes";
 import {
     getLineVector,
@@ -17,41 +24,58 @@ export interface FieldState<CellType> {
     lines: Set<Line>;
 }
 
-export const createEmptyFieldState = <CellType>(
-    {typeManager, fieldSize: {rowsCount, columnsCount}, loopHorizontally, loopVertically}: PuzzleDefinition<CellType, any, any>
-): FieldState<CellType> => ({
-    cells: indexes(rowsCount).map(() => indexes(columnsCount).map(() => createEmptyCellState(typeManager))),
-    lines: new Set<Line>(
-        [],
-        (line1, line2) => {
-            const vector1 = getLineVector(line1);
-            const vector2 = getLineVector(line2);
+const getLineComparer = (
+    {fieldSize: {rowsCount, columnsCount}, loopHorizontally, loopVertically}: PuzzleDefinition<any, any, any>
+) => (line1: Line, line2: Line) => {
+    const vector1 = getLineVector(line1);
+    const vector2 = getLineVector(line2);
 
-            if (!isSamePosition(vector1, vector2)) {
-                if (!isSamePosition(vector1, invertPosition(vector2))) {
-                    return false;
-                }
-
-                line2 = invertLine(line2);
-            }
-
-            let {left, top} = getLineVector({start: line1.start, end: line2.start});
-
-            if (loopVertically) {
-                top %= rowsCount;
-            }
-
-            if (loopHorizontally) {
-                left %= columnsCount;
-            }
-
-            return !left && !top;
+    if (!isSamePosition(vector1, vector2)) {
+        if (!isSamePosition(vector1, invertPosition(vector2))) {
+            return false;
         }
-    ),
+
+        line2 = invertLine(line2);
+    }
+
+    let {left, top} = getLineVector({start: line1.start, end: line2.start});
+
+    if (loopVertically) {
+        top %= rowsCount;
+    }
+
+    if (loopHorizontally) {
+        left %= columnsCount;
+    }
+
+    return !left && !top;
+};
+
+export const createEmptyFieldState = <CellType>(
+    puzzle: PuzzleDefinition<CellType, any, any>
+): FieldState<CellType> => ({
+    cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle.typeManager))),
+    lines: new Set<Line>([], getLineComparer(puzzle)),
+});
+
+export const serializeFieldState = <CellType>(
+    {cells, lines}: FieldState<CellType>,
+    typeManager: SudokuTypeManager<CellType, any, any>
+) => ({
+    cells: cells.map(row => row.map(cell => serializeCellState(cell, typeManager))),
+    lines: lines.serialize(),
+});
+
+export const unserializeFieldState = <CellType>(
+    {cells, lines}: any,
+    puzzle: PuzzleDefinition<CellType, any, any>
+) => ({
+    cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle.typeManager))),
+    lines: Set.unserialize(lines, getLineComparer(puzzle)),
 });
 
 export const cloneFieldState = <CellType>(
-    typeManager: SudokuTypeManager<CellType>,
+    typeManager: SudokuTypeManager<CellType, any, any>,
     {cells, lines}: FieldState<CellType>
 ): FieldState<CellType> => ({
     cells: cells.map(row => row.map(cellState => cloneCellState(typeManager, cellState))),
@@ -95,7 +119,7 @@ export const isAnyFieldStateCell = <CellType>(
     affectedCells.some(({left: columnIndex, top: rowIndex}) => predicate(fieldState.cells[rowIndex][columnIndex]));
 
 export const areFieldStatesEqual = <CellType>(
-    typeManager: SudokuTypeManager<CellType>,
+    typeManager: SudokuTypeManager<CellType, any, any>,
     {cells, lines}: FieldState<CellType>,
     {cells: cells2, lines: lines2}: FieldState<CellType>
 ) =>

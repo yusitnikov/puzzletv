@@ -31,6 +31,14 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     cloneCellData(data: CellType): CellType;
 
+    serializeCellData(data: CellType): any;
+
+    unserializeCellData(data: any): CellType;
+
+    serializeGameState(data: GameState<CellType> & GameStateExtensionType): any;
+
+    unserializeGameState(data: any): Partial<GameStateExtensionType>;
+
     createCellDataByDisplayDigit(
         digit: number,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
