@@ -314,8 +314,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             <div>
                 <SettingsContent
                     cellSize={cellSize}
-                    state={state}
-                    onStateChange={onStateChange}
+                    context={context}
                 />
             </div>
             <div>

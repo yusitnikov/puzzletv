@@ -1,25 +1,23 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
 import {FC} from "react";
-import {ProcessedGameState} from "../../../types/sudoku/GameState";
-import {MergeStateAction} from "../../../types/react/MergeStateAction";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {textHeightCoeff} from "../../app/globals";
 import {saveBoolToLocalStorage, saveNumberToLocalStorage} from "../../../utils/localStorage";
 import {LocalStorageKeys} from "../../../data/LocalStorageKeys";
 import InputSlider from "react-input-slider";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 interface SizeProps {
     cellSize: number;
 }
 
 export interface SettingsContentProps<CellType, ProcessedGameStateExtensionType = {}> extends SizeProps {
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
-    onStateChange: (state: MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>) => void;
+    context: PuzzleContext<CellType, any, ProcessedGameStateExtensionType>;
 }
 
 export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
-    {cellSize, state: {enableConflictChecker, autoCheckOnFinish, backgroundOpacity}, onStateChange}: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
+    {cellSize, context: {puzzle: {resultChecker}, state: {enableConflictChecker, autoCheckOnFinish, backgroundOpacity}, onStateChange}}: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
 ) => {
     const translate = useTranslate();
 
@@ -56,7 +54,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             />
         </SettingsItem>
 
-        <SettingsItem>
+        {resultChecker && <SettingsItem>
             {translate("Auto-check on finish")}:
 
             <SettingsCheckbox
@@ -65,7 +63,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
                 checked={autoCheckOnFinish}
                 onChange={(ev) => handleChangeAutoCheckOnFinish(ev.target.checked)}
             />
-        </SettingsItem>
+        </SettingsItem>}
 
         <SettingsItem>
             {translate("Background color's opacity")}:<br/>
