@@ -8,15 +8,19 @@ import {Miraculous} from "./Miraculous";
 import {MeteorShower} from "./MeteorShower";
 import {MultiColorMadness} from "./MultiColorMadness";
 import {Africa} from "./Africa";
+import {generateRandomPuzzle} from "./Random";
+import {getDailyRandomGenerator} from "../../utils/random";
 
 export default [
-    // region Empty
+    // region Empty & random
     EmptyRegular,
     EmptyChaosConstruction,
     EmptyRotatable,
     EmptyChess,
     EmptyCubedoku,
     EmptyToroidal,
+
+    generateRandomPuzzle(9, 3, getDailyRandomGenerator()),
     // endregion
 
     // region Other authors
