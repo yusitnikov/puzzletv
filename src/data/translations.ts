@@ -18,6 +18,9 @@ export const translationsExactType = {
     "OFF": {
         [LanguageCode.ru]: "ВЫКЛ",
     },
+    "Play %1": {
+        [LanguageCode.ru]: "Играть %1",
+    },
     // endregion
     // region App
     "Sudoku Puzzles": {
@@ -27,6 +30,11 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Ой, судоку не найден!",
     },
     "Check out the puzzles list": {
+        [LanguageCode.ru]: "Перейти к списку судоку",
+    },
+    // endregion
+    // region PageLayout
+    "See all puzzles": {
         [LanguageCode.ru]: "Перейти к списку судоку",
     },
     // endregion

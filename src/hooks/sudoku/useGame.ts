@@ -21,7 +21,8 @@ const gameStateSerializerVersion = 1;
 const maxSavedPuzzles = 10;
 
 export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    readOnly = false
 ): [ProcessedGameState<CellType> & ProcessedGameStateExtensionType, Dispatch<MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>>] => {
     const {
         slug,
@@ -42,7 +43,9 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 
     const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(gameStateStorageKey, gameStateSerializerVersion) || [];
     const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => {
-        const savedGameState = getSavedGameStates().find(([itemSlug]) => itemSlug === slug);
+        const savedGameState = readOnly
+            ? undefined
+            : getSavedGameStates().find(([itemSlug]) => itemSlug === slug);
 
         return {
             fieldStateHistory: {
@@ -71,27 +74,32 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
     });
 
     useEffect(
-        () => serializeToLocalStorage(
-            gameStateStorageKey,
-            ([
-                [
-                    slug,
-                    serializeFieldState(gameStateGetCurrentFieldState(gameState), typeManager),
-                    serializeGameState(gameState),
-                ],
-                ...getSavedGameStates().filter(([itemSlug]) => itemSlug !== slug),
-            ] as SavedGameStates).slice(0, maxSavedPuzzles),
-            gameStateSerializerVersion
-        ),
-        [gameState]
+        () => {
+            if (!readOnly) {
+                serializeToLocalStorage(
+                    gameStateStorageKey,
+                    ([
+                        [
+                            slug,
+                            serializeFieldState(gameStateGetCurrentFieldState(gameState), typeManager),
+                            serializeGameState(gameState),
+                        ],
+                        ...getSavedGameStates().filter(([itemSlug]) => itemSlug !== slug),
+                    ] as SavedGameStates).slice(0, maxSavedPuzzles),
+                    gameStateSerializerVersion
+                );
+            }
+        },
+        [readOnly, gameState]
     );
 
     const cellWriteMode = useFinalCellWriteMode(
         gameState.persistentCellWriteMode,
         allowDrawingBorders,
-        loopHorizontally || loopVertically || enableDragMode
+        loopHorizontally || loopVertically || enableDragMode,
+        readOnly
     );
-    const isReady = isReadyFn(gameState);
+    const isReady = !readOnly && isReadyFn(gameState);
     const processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType> = useProcessedGameStateExtension(gameState);
     const processedGameStateExtensionDep = JSON.stringify(processedGameStateExtension);
 

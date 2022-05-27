@@ -1,8 +1,17 @@
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
 import {useControlKeysState} from "../useControlKeysState";
 
-export const useFinalCellWriteMode = (persistentCellWriteMode: CellWriteMode, allowDrawing?: boolean, allowDragging?: boolean) => {
+export const useFinalCellWriteMode = (
+    persistentCellWriteMode: CellWriteMode,
+    allowDrawing?: boolean,
+    allowDragging?: boolean,
+    readOnly?: boolean
+) => {
     const {keysStr} = useControlKeysState();
+
+    if (readOnly) {
+        return persistentCellWriteMode;
+    }
 
     switch (keysStr) {
         case "Ctrl": return CellWriteMode.center;

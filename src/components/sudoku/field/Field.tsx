@@ -36,6 +36,7 @@ import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellW
 import {Set} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -48,15 +49,9 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         rect,
     }: FieldProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    context = useMemo(
-        () => ({
-            ...context,
-            onStateChange: context.state.isReady ? context.onStateChange : () => {}
-        }),
-        [context]
-    );
+    const readOnlySafeContext = useReadOnlySafeContext(context);
 
-    const {puzzle, state, onStateChange, cellSize} = context;
+    const {puzzle, state, onStateChange, cellSize} = readOnlySafeContext;
 
     const {
         typeManager,
@@ -83,7 +78,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle);
 
     const itemsProps: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
-        context,
+        context: readOnlySafeContext,
         items,
         regionsWithSameCoordsTransformation,
     };
@@ -155,7 +150,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         const isAnyKeyDown = ctrlKey || shiftKey;
 
         const handleArrow = (xDirection: number, yDirection: number, isMainKeyboard = true) => (isMainKeyboard || !ctrlKey) && onStateChange(
-            state => gameStateApplyArrowToSelectedCells({...context, state}, xDirection, yDirection, isAnyKeyDown, isMainKeyboard)
+            state => gameStateApplyArrowToSelectedCells({...readOnlySafeContext, state}, xDirection, yDirection, isAnyKeyDown, isMainKeyboard)
         );
 
         switch (code) {
@@ -201,7 +196,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
         useShadow = false
     ) =>
-        <FieldSvg context={context} useShadow={useShadow}>
+        <FieldSvg context={readOnlySafeContext} useShadow={useShadow}>
             {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
                 if (!fieldFitsWrapper && !customCellBounds) {
                     const finalTop = topOffset + loopOffset.top + rowIndex;
@@ -228,7 +223,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
                 return content && <FieldRect
                     key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
-                    context={context}
+                    context={readOnlySafeContext}
                     {...cellPosition}
                 >
                     {content}
@@ -250,7 +245,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 top={loopOffset.top * cellSize}
                 fitParent={fieldFitsWrapper}
             >
-                <FieldSvg context={context}>
+                <FieldSvg context={readOnlySafeContext}>
                     <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
@@ -263,13 +258,13 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                         : (initialCellColors ? new Set(initialCellColors) : colors);
 
                     return !!finalColors?.size && <CellBackground
-                        context={context}
+                        context={readOnlySafeContext}
                         cellPosition={cellPosition}
                         colors={finalColors}
                     />;
                 })}
 
-                <FieldSvg context={context}>
+                <FieldSvg context={readOnlySafeContext}>
                     <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
@@ -292,7 +287,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     }
 
                     return !!color && <CellSelection
-                        context={context}
+                        context={readOnlySafeContext}
                         cellPosition={cellPosition}
                         size={cellSize}
                         color={color}
@@ -300,31 +295,31 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     />;
                 })}
 
-                <FieldSvg context={context}>
+                <FieldSvg context={readOnlySafeContext}>
                     <FieldLayerContext.Provider value={FieldLayer.regular}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
                 </FieldSvg>
 
-                <FieldSvg context={context} useShadow={false}>
+                <FieldSvg context={readOnlySafeContext} useShadow={false}>
                     <FieldLayerContext.Provider value={FieldLayer.lines}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
                 </FieldSvg>
 
-                <FieldSvg context={context} useShadow={false}>
+                <FieldSvg context={readOnlySafeContext} useShadow={false}>
                     <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
                 </FieldSvg>
 
-                <FieldSvg context={context} useShadow={false}>
+                <FieldSvg context={readOnlySafeContext} useShadow={false}>
                     <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
                 </FieldSvg>
 
-                <FieldSvg context={context} useShadow={false}>
+                <FieldSvg context={readOnlySafeContext} useShadow={false}>
                     <FieldLayerContext.Provider value={FieldLayer.top}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
@@ -334,7 +329,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     const initialData = initialDigits?.[cell.top]?.[cell.left];
 
                     return !shouldSkipCellDigits(initialData, cellState) && <CellDigits
-                        context={context}
+                        context={readOnlySafeContext}
                         data={cellState}
                         initialData={initialData}
                         size={1}
@@ -344,7 +339,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 }, true)}
 
                 {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
-                    context={context}
+                    context={readOnlySafeContext}
                     cellPosition={cellPosition}
                     isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
                     onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}

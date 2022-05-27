@@ -10,28 +10,35 @@ import {MultiColorMadness} from "./MultiColorMadness";
 import {Africa} from "./Africa";
 
 export default [
+    // region Empty
     EmptyRegular,
     EmptyChaosConstruction,
     EmptyRotatable,
     EmptyChess,
     EmptyCubedoku,
     EmptyToroidal,
+    // endregion
 
-    NorthOrSouth,
-    NorthOrSouth2,
-	NorthOrSouth2ShortRules,
-
-    RealChessPuzzle,
-    RealChessPuzzleCompatibilitySlug,
-    RealChessPuzzleRubberBlando,
+    // region Other authors
+    MultiColorMadness,
+    Miraculous,
+    MeteorShower(true),
+    MeteorShower(false),
 
     IntroToCubedoku,
     CubeIt,
 
-    Miraculous,
-    MultiColorMadness,
-    MeteorShower(true),
-    MeteorShower(false),
+    RealChessPuzzleRubberBlando,
+    // endregion
+
+    // region My puzzles
+    NorthOrSouth,
+    NorthOrSouth2,
+    NorthOrSouth2ShortRules,
+
+    RealChessPuzzle,
+    RealChessPuzzleCompatibilitySlug,
 
     Africa,
+    // endregion
 ] as PuzzleDefinition<any, any, any>[];

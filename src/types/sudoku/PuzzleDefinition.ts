@@ -11,7 +11,7 @@ import {PuzzleContextProps} from "./PuzzleContext";
 import {CustomCellBounds} from "./CustomCellBounds";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    title: PartiallyTranslatable<ReactNode>;
+    title: PartiallyTranslatable;
     slug: string;
     author?: PartiallyTranslatable<ReactNode>;
     rules?: (translate: ReturnType<typeof useTranslate>) => ReactNode;

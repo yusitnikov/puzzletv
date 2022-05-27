@@ -14,7 +14,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
         {
             context: {
                 puzzle: {fieldSize: {fieldSize}},
-                state: {cellWriteMode, map, overlay},
+                state: {cellWriteMode, map, overlay, isReady},
                 onStateChange,
                 cellSize,
             },
@@ -28,6 +28,10 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
         const isDragMode = cellWriteMode === CellWriteMode.move;
 
         useEventListener(window, "keydown", ({key}: KeyboardEvent) => {
+            if (!isReady) {
+                return;
+            }
+
             switch (key) {
                 case "+":
                     map.setZoom(map.getZoom() + 1);
@@ -56,7 +60,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                     panControl={isDragMode}
                     gestureHandling={isDragMode ? "auto" : "none"}
                     onReady={(map) => {
-                        map.fitBounds(initialBounds);
+                        map.fitBounds(initialBounds, 0);
                         onStateChange(() => ({map} as Partial<GoogleMapsState> as any));
                     }}
                     onOverlayReady={(overlay) => onStateChange({overlay} as Partial<GoogleMapsState> as any)}
