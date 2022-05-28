@@ -12,8 +12,9 @@ import {Set} from "../../../types/struct/Set";
 import {QuadMastersControls} from "../components/QuadMastersControls";
 import {ProcessedGameState} from "../../../types/sudoku/GameState";
 import {QuadConstraint, QuadConstraintBySolution} from "../../../components/sudoku/constraints/quad/Quad";
-import {Position} from "../../../types/layout/Position";
+import {isSamePosition, Position} from "../../../types/layout/Position";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {QuadMastersQuad} from "./QuadMastersQuad";
 
 const onCornerClick = ({onStateChange}: PuzzleContext<number, QuadMastersGameState, QuadMastersGameState>, position: Position) => onStateChange(
     ({isQuadTurn}) => isQuadTurn ? {currentQuad: {position, digits: new Set()}} : {}
@@ -73,18 +74,31 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
                 case CellWriteMode.custom:
                     if (isQuadTurn && currentQuad) {
                         const newDigits = currentQuad.digits.toggle(cellData);
-                        const newQuad = {
-                            ...currentQuad,
-                            digits: newDigits,
-                        };
 
                         if (newDigits.size < 4) {
-                            return {currentQuad: newQuad};
+                            return {
+                                currentQuad: {
+                                    ...currentQuad,
+                                    digits: newDigits,
+                                },
+                            };
                         } else {
+                            // Got enough digits - merging the new quad to the existing quad and finalizing the quad entering step.
+                            const isSameQuadPosition = ({position}: QuadMastersQuad) => isSamePosition(position, currentQuad.position);
+
                             return {
                                 isQuadTurn: false,
                                 currentQuad: undefined,
-                                allQuads: [...allQuads, newQuad],
+                                allQuads: [
+                                    ...allQuads.filter(quad => !isSameQuadPosition(quad)),
+                                    {
+                                        ...currentQuad,
+                                        digits: Set.merge(
+                                            ...allQuads.filter(isSameQuadPosition).map(quad => quad.digits),
+                                            newDigits
+                                        ),
+                                    }
+                                ],
                                 persistentCellWriteMode: CellWriteMode.main,
                             }
                         }
