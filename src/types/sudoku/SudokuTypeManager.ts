@@ -9,9 +9,10 @@ import {Translatable} from "../translations/Translatable";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {Rect} from "../layout/Rect";
-import {Constraint} from "./Constraint";
+import {Constraint, ConstraintOrComponent} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
+import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(
@@ -71,10 +72,23 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): PositionWithAngle | undefined;
 
-    handleMainDigit?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
-    handleCenterDigit?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
-    handleCornerDigit?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
-    handleColor?(cellState: CellStateEx<CellType>, cellData: CellType, position: Position, defaultUpdatedCellState: Partial<CellStateEx<CellType>>): Partial<CellStateEx<CellType>>;
+    handleDigitGlobally?(
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        cellData: CellType,
+        defaultResult: Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>
+    ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+
+    handleDigitInCell?(
+        cellWriteMode: CellWriteMode,
+        cellState: CellStateEx<CellType>,
+        cellData: CellType,
+        position: Position,
+        defaultResult: Partial<CellStateEx<CellType>>
+    ): Partial<CellStateEx<CellType>>;
+
+    extraCellWriteModes?: CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[];
+
+    initialCellWriteMode?: CellWriteMode;
 
     digitComponentType?: DigitComponentType;
 
@@ -106,6 +120,9 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     getRegionsWithSameCoordsTransformation?(puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Rect[];
 
+    items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
+        | ((context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
+
     getRegionsForRowsAndColumns?(
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
@@ -128,6 +145,8 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     digitShortcuts?: string[];
 
     digitShortcutTips?: (Translatable|undefined)[];
+
+    disableConflictChecker?: boolean;
 }
 
 export const defaultProcessArrowDirection = (

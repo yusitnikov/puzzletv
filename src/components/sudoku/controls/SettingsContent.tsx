@@ -17,7 +17,7 @@ export interface SettingsContentProps<CellType, ProcessedGameStateExtensionType 
 }
 
 export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
-    {cellSize, context: {puzzle: {resultChecker}, state: {enableConflictChecker, autoCheckOnFinish, backgroundOpacity}, onStateChange}}: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
+    {cellSize, context: {puzzle: {resultChecker, typeManager: {disableConflictChecker}}, state: {enableConflictChecker, autoCheckOnFinish, backgroundOpacity}, onStateChange}}: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
 ) => {
     const translate = useTranslate();
 
@@ -43,7 +43,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             <strong>{translate("Settings")}</strong>
         </div>
 
-        <SettingsItem>
+        {!disableConflictChecker && <SettingsItem>
             {translate("Highlight conflicts")}:
 
             <SettingsCheckbox
@@ -52,7 +52,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
                 checked={enableConflictChecker}
                 onChange={(ev) => handleChangeEnableConflictChecker(ev.target.checked)}
             />
-        </SettingsItem>
+        </SettingsItem>}
 
         {resultChecker && <SettingsItem>
             {translate("Auto-check on finish")}:

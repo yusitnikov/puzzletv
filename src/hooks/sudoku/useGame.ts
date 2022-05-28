@@ -1,7 +1,7 @@
 import {createEmptyFieldState, serializeFieldState, unserializeFieldState} from "../../types/sudoku/FieldState";
 import {Dispatch, useCallback, useEffect, useMemo, useState} from "react";
 import {GameState, gameStateGetCurrentFieldState, ProcessedGameState} from "../../types/sudoku/GameState";
-import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
+import {CellWriteMode, getAllowedCellWriteModeInfos} from "../../types/sudoku/CellWriteMode";
 import {noSelectedCells} from "../../types/sudoku/SelectedCells";
 import {MergeStateAction} from "../../types/react/MergeStateAction";
 import {useFinalCellWriteMode} from "./useFinalCellWriteMode";
@@ -19,7 +19,7 @@ import {serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../types/su
 import {getCellDataComparer} from "../../types/sudoku/CellState";
 import {indexes} from "../../utils/indexes";
 
-type SavedGameStates = [slug: string, field: any, state: any, initialDigits: any, excludedDigits: any][];
+type SavedGameStates = [slug: string, field: any, state: any, initialDigits: any, excludedDigits: any, cellWriteMode: any][];
 const gameStateStorageKey = "savedGameState";
 const gameStateSerializerVersion = 1;
 const maxSavedPuzzles = 10;
@@ -43,6 +43,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         useProcessedGameStateExtension = () => ({} as any),
         serializeGameState,
         unserializeGameState,
+        extraCellWriteModes = [],
+        initialCellWriteMode = CellWriteMode.main,
     } = typeManager;
 
     const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(gameStateStorageKey, gameStateSerializerVersion) || [];
@@ -60,7 +62,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 ],
                 currentIndex: 0,
             },
-            persistentCellWriteMode: CellWriteMode.main,
+            persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode,
             selectedCells: noSelectedCells,
             initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
             excludedDigits: savedGameState?.[4]
@@ -104,6 +106,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                             serializeGameState(gameState),
                             serializeGivenDigitsMap(gameState.initialDigits, typeManager.serializeCellData),
                             serializeGivenDigitsMap(gameState.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
+                            gameState.persistentCellWriteMode,
                         ],
                         ...getSavedGameStates().filter(([itemSlug]) => itemSlug !== slug),
                     ] as SavedGameStates).slice(0, maxSavedPuzzles),
@@ -114,12 +117,12 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         [readOnly, gameState]
     );
 
-    const cellWriteMode = useFinalCellWriteMode(
-        gameState.persistentCellWriteMode,
-        allowDrawingBorders,
-        loopHorizontally || loopVertically || enableDragMode,
-        readOnly
-    );
+    const allowedCellWriteModes = [
+        ...getAllowedCellWriteModeInfos(allowDrawingBorders, loopHorizontally || loopVertically || enableDragMode),
+        ...extraCellWriteModes,
+    ];
+    const cellWriteMode = useFinalCellWriteMode(gameState.persistentCellWriteMode, allowedCellWriteModes, readOnly);
+    const cellWriteModeInfo = allowedCellWriteModes.find(({mode}) => mode === cellWriteMode)!;
     const isReady = !readOnly && isReadyFn(gameState);
     const processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType> = useProcessedGameStateExtension(gameState);
     const processedGameStateExtensionDep = JSON.stringify(processedGameStateExtension);
@@ -128,11 +131,12 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         (gameState: GameState<CellType> & GameStateExtensionType): ProcessedGameState<CellType> & ProcessedGameStateExtensionType => ({
             ...gameState,
             cellWriteMode,
+            cellWriteModeInfo,
             isReady,
             ...(processedGameStateExtension as any),
         }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [cellWriteMode, isReady, processedGameStateExtensionDep]
+        [cellWriteMode, cellWriteModeInfo, isReady, processedGameStateExtensionDep]
     );
 
     const processedGameState = useMemo(() => calculateProcessedGameState(gameState), [gameState, calculateProcessedGameState]);

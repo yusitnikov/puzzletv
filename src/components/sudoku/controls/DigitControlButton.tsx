@@ -1,11 +1,10 @@
 import {gameStateHandleDigit} from "../../../types/sudoku/GameState";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
-import {CellWriteMode, isDigitWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useCallback} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
-import {Set} from "../../../types/struct/Set";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export interface DigitControlButtonProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
@@ -32,11 +31,11 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
     const {
         cellWriteMode,
+        cellWriteModeInfo: {isDigitMode, buttonContent: ButtonContent},
     } = state;
 
     const digit = index + 1;
     const cellData = createCellDataByDisplayDigit(digit, state);
-    const isDigitMode = isDigitWriteMode(cellWriteMode);
     const shortcut = isDigitMode && digitShortcuts[index];
     const shortcutTip = isDigitMode && digitShortcutTips[index];
 
@@ -49,7 +48,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
     }
 
     const handleDigit = useCallback(
-        () => onStateChange(gameState => gameStateHandleDigit(typeManager, gameState, digit)),
+        () => onStateChange(state => gameStateHandleDigit({...context, state}, digit)),
         [onStateChange, typeManager, digit]
     );
 
@@ -75,15 +74,10 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
         onClick={handleDigit}
         title={title}
     >
-        <CellContent
+        {ButtonContent?.(context, cellData, cellSize, index) || <CellContent
             context={context}
-            data={{
-                usersDigit: cellWriteMode === CellWriteMode.main ? cellData : undefined,
-                cornerDigits: new Set(cellWriteMode === CellWriteMode.corner ? [cellData] : []),
-                centerDigits: new Set(cellWriteMode === CellWriteMode.center ? [cellData] : []),
-                colors: new Set(cellWriteMode === CellWriteMode.color ? [index] : []),
-            }}
+            data={{usersDigit: cellData}}
             size={cellSize}
-        />
+        />}
     </ControlButton>;
 };

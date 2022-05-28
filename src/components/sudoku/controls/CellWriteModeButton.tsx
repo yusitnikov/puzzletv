@@ -16,6 +16,7 @@ export interface CellWriteModeButtonProps<CellType, GameStateExtensionType = {},
 
     noBorders?: boolean;
     childrenOnTopOfBorders?: boolean;
+    fullSize?: boolean;
 }
 
 export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -28,6 +29,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         context,
         noBorders,
         childrenOnTopOfBorders,
+        fullSize,
     }: CellWriteModeButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {state, onStateChange, cellSize} = context;
@@ -46,6 +48,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         onClick={handleSetCellWriteMode}
         title={title}
         childrenOnTopOfBorders={childrenOnTopOfBorders}
+        fullSize={fullSize}
     >
         {
             typeof data === "function"

@@ -42,13 +42,15 @@ export const asConstraint = <CellType, DataT = {}, GameStateExtensionType = any,
 ) => item as Constraint<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>;
 
 export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ): ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[] => {
+    const {puzzle, state} = context;
+
     const {
         fieldSize,
-        items: itemsOrFn = [],
+        items: puzzleItemsOrFn = [],
         typeManager: {
+            items: stateItemsOrFn = [],
             getRegionsForRowsAndColumns = () => [
                 ...indexes(fieldSize.rowsCount).map(top => RegionConstraint(
                     indexes(fieldSize.columnsCount).map(left => ({left, top})),
@@ -71,9 +73,14 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
         ...fieldSize.regions.map(region => RegionConstraint(region)),
         UserLinesConstraint,
         ...(
-            typeof itemsOrFn === "function"
-                ? itemsOrFn(state)
-                : itemsOrFn as ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
+            typeof puzzleItemsOrFn === "function"
+                ? puzzleItemsOrFn(state)
+                : puzzleItemsOrFn as ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
+        ),
+        ...(
+            typeof stateItemsOrFn === "function"
+                ? stateItemsOrFn(context)
+                : stateItemsOrFn as ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         ),
     ].filter(v => v);
 };
@@ -131,7 +138,7 @@ export const isValidFinishedPuzzleByConstraints = <CellType, GameStateExtensionT
 ) => {
     const {puzzle, state} = context;
     const {typeManager: {isValidCell = () => true}} = puzzle;
-    const constraints = getAllPuzzleConstraintsAndComponents(puzzle, state).filter(isConstraint).map(asConstraint);
+    const constraints = getAllPuzzleConstraintsAndComponents(context).filter(isConstraint).map(asConstraint);
     const {cells} = gameStateGetCurrentFieldState(state);
     const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
 

@@ -2,12 +2,32 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {CellStateEx} from "../../../types/sudoku/CellState";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 
-export const GuessSudokuTypeManager = (solution: GivenDigitsMap<number>): SudokuTypeManager<number> => ({
-    ...DigitSudokuTypeManager(),
+export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    solution: GivenDigitsMap<number>,
+    serializeGameState?: SudokuTypeManager<number, GameStateExtensionType, any>["serializeGameState"],
+    unserializeGameState?: SudokuTypeManager<number, GameStateExtensionType, any>["unserializeGameState"]
+): SudokuTypeManager<number, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+    ...DigitSudokuTypeManager<GameStateExtensionType, ProcessedGameStateExtensionType>(
+        RegularDigitComponentType,
+        serializeGameState,
+        unserializeGameState
+    ),
 
     // TODO: use the default behavior when it's not player's turn to enter the digit
-    handleMainDigit(cellState, cellData, {top, left}): Partial<CellStateEx<number>> {
+    handleDigitInCell(
+        cellWriteMode,
+        cellState,
+        cellData,
+        {top, left},
+        defaultResult
+    ): Partial<CellStateEx<number>> {
+        if (cellWriteMode !== CellWriteMode.main) {
+            return defaultResult;
+        }
+
         if (cellState.initialDigit) {
             return {};
         }
@@ -26,4 +46,6 @@ export const GuessSudokuTypeManager = (solution: GivenDigitsMap<number>): Sudoku
             excludedDigits: cellState.excludedDigits.clear(),
         }
     },
+
+    disableConflictChecker: true,
 });

@@ -3,8 +3,8 @@ type Cloner<ItemT> = (item: ItemT) => ItemT;
 type Serializer<ItemT> = (item: ItemT) => any;
 type Unserializer<ItemT> = (object: any) => ItemT;
 
-const defaultComparer: Comparer<any> = (item1, item2) => JSON.stringify(item1) === JSON.stringify(item2);
-const defaultCloner: Cloner<any> = item => JSON.parse(JSON.stringify(item));
+const defaultComparer: Comparer<any> = (item1, item2) => typeof item1 === "object" ? JSON.stringify(item1) === JSON.stringify(item2) : item1 === item2;
+const defaultCloner: Cloner<any> = item => typeof item === "object" ? JSON.parse(JSON.stringify(item)) : item;
 const defaultSerializer: Serializer<any> = item => item;
 const defaultUnserializer: Unserializer<any> = item => item;
 

@@ -1,8 +1,6 @@
 import {
-    gameStateContinueMultiLine,
     gameStateGetCurrentFieldState,
     gameStateSetSelectedCells,
-    gameStateStartMultiLine,
     gameStateToggleSelectedCells
 } from "../../../types/sudoku/GameState";
 import {Position} from "../../../types/layout/Position";
@@ -10,7 +8,6 @@ import {MouseEvent, PointerEvent} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {globalPaddingCoeff} from "../../app/globals";
 import {indexes} from "../../../utils/indexes";
-import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellState} from "../../../types/sudoku/CellState";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "./FieldCellShape";
@@ -34,10 +31,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 ) => {
     const {puzzle, state, onStateChange} = context;
 
-    const {cellWriteMode, selectedCells, currentMultiLine, initialDigits: stateInitialDigits} = state;
-
-    const isSelecting = !isNoSelectionWriteMode(cellWriteMode);
-    const isDrawing = cellWriteMode === CellWriteMode.lines;
+    const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLine, initialDigits: stateInitialDigits} = state;
 
     const customCellBounds = puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
     let customCellBorders: Position[][] | undefined = undefined;
@@ -112,7 +106,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     };
 
     return <>
-        {isDrawing && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
+        {(onCornerClick || onCornerEnter) && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
             const cornerPosition: Position = {
                 left: cellPosition.left + leftOffset,
                 top: cellPosition.top + topOffset,
@@ -126,12 +120,12 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
                 top={topOffset * 0.5}
                 width={0.5}
                 height={0.5}
-                onClick={() => onStateChange(gameState => gameStateStartMultiLine(gameState, cornerPosition))}
-                onEnter={() => onStateChange(gameState => gameStateContinueMultiLine(puzzle, gameState, cornerPosition))}
+                onClick={() => onCornerClick?.(context, cornerPosition)}
+                onEnter={() => onCornerEnter?.(context, cornerPosition)}
             />;
         }))}
 
-        {!isDrawing && isSelecting && <>
+        {!isNoSelectionMode && <>
             <MouseHandlerRect
                 key={"cell-selection"}
                 context={context}

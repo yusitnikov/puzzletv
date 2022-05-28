@@ -32,7 +32,7 @@ import {
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
-import {CellWriteMode, isNoSelectionWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
@@ -71,9 +71,10 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         isValidCell = () => true,
         getRegionsWithSameCoordsTransformation,
         getCellSelectionType,
+        disableConflictChecker,
     } = typeManager;
 
-    const items = useMemo(() => getAllPuzzleConstraintsAndComponents(puzzle, state), [puzzle, state]);
+    const items = useMemo(() => getAllPuzzleConstraintsAndComponents(context), [context]);
 
     const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle);
 
@@ -87,6 +88,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         selectedCells,
         isReady,
         cellWriteMode,
+        cellWriteModeInfo: {isNoSelectionMode},
         enableConflictChecker,
         loopOffset,
         initialDigits: stateInitialDigits,
@@ -272,7 +274,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     </FieldLayerContext.Provider>
                 </FieldSvg>
 
-                {!isNoSelectionWriteMode(cellWriteMode) && renderCellsLayer("selection", (cellState, cellPosition) => {
+                {!isNoSelectionMode && renderCellsLayer("selection", (cellState, cellPosition) => {
                     let color = "";
                     let width = 1;
 
@@ -338,7 +340,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                         excludedDigits={cellExcludedDigits}
                         size={1}
                         cellPosition={cell}
-                        isValidUserDigit={!enableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
+                        isValidUserDigit={!enableConflictChecker || disableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
                     />;
                 }, true)}
 

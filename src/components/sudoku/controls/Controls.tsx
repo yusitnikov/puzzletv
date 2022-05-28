@@ -11,7 +11,7 @@ import {
     Settings,
     Undo
 } from "@emotion-icons/material";
-import {CellWriteMode, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode, getAllowedCellWriteModeInfos, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
 import {
     gameStateClearSelectedCellsContent,
@@ -71,12 +71,13 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const {
         createCellDataByDisplayDigit,
         mainControlsComponent: MainControls,
+        extraCellWriteModes = [],
     } = typeManager;
 
     const {
         isReady,
         persistentCellWriteMode,
-        cellWriteMode,
+        cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
         autoCheckOnFinish,
     } = state;
 
@@ -92,16 +93,10 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         }
     }, [autoCheckOnFinish, resultChecker, isCorrectResult, setIsShowingResult]);
 
-    let digitsCountInCurrentMode = digitsCount;
-    switch (cellWriteMode) {
-        case CellWriteMode.color:
-            digitsCountInCurrentMode = 9;
-            break;
-        case CellWriteMode.lines:
-        case CellWriteMode.move:
-            digitsCountInCurrentMode = 0;
-            break;
-    }
+    const allowedCellWriteModes = [
+        ...getAllowedCellWriteModeInfos(allowDrawingBorders, allowDragging),
+        ...extraCellWriteModes,
+    ];
 
     const isFullScreen = useIsFullScreen();
 
@@ -156,11 +151,11 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 }
                 break;
             case "PageUp":
-                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, -1, allowDrawingBorders, allowDragging));
+                handleSetCellWriteMode(incrementCellWriteMode(allowedCellWriteModes, persistentCellWriteMode, -1));
                 ev.preventDefault();
                 break;
             case "PageDown":
-                handleSetCellWriteMode(incrementCellWriteMode(persistentCellWriteMode, +1, allowDrawingBorders, allowDragging));
+                handleSetCellWriteMode(incrementCellWriteMode(allowedCellWriteModes, persistentCellWriteMode, +1));
                 ev.preventDefault();
                 break;
         }

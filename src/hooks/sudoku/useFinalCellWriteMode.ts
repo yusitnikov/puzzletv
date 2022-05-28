@@ -1,10 +1,9 @@
-import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
+import {CellWriteMode, CellWriteModeInfo} from "../../types/sudoku/CellWriteMode";
 import {useControlKeysState} from "../useControlKeysState";
 
 export const useFinalCellWriteMode = (
     persistentCellWriteMode: CellWriteMode,
-    allowDrawing?: boolean,
-    allowDragging?: boolean,
+    allowedModes: CellWriteModeInfo<any, any, any>[],
     readOnly?: boolean
 ) => {
     const {keysStr} = useControlKeysState();
@@ -13,12 +12,11 @@ export const useFinalCellWriteMode = (
         return persistentCellWriteMode;
     }
 
-    switch (keysStr) {
-        case "Ctrl": return CellWriteMode.center;
-        case "Ctrl+Shift": return CellWriteMode.color;
-        case "Shift": return CellWriteMode.corner;
-        case "Alt": return allowDrawing ? CellWriteMode.lines : persistentCellWriteMode;
-        case "Alt+Shift": return allowDragging ? CellWriteMode.move : persistentCellWriteMode;
-        default: return persistentCellWriteMode;
+    for (const {mode, hotKeyStr} of allowedModes) {
+        if (keysStr === hotKeyStr) {
+            return mode;
+        }
     }
+
+    return persistentCellWriteMode;
 };
