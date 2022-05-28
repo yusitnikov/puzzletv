@@ -38,6 +38,8 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ) => string;
     noIndex?: boolean;
+    saveState?: boolean;
+    saveStateKey?: string;
 }
 
 export const isPuzzleHasBottomRowControls = (

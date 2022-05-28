@@ -9,7 +9,7 @@ import {MeteorShower} from "./MeteorShower";
 import {MultiColorMadness} from "./MultiColorMadness";
 import {Africa} from "./Africa";
 import {generateRandomPuzzle} from "./Random";
-import {getDailyRandomGenerator} from "../../utils/random";
+import {getDailyRandomGeneratorSeed} from "../../utils/random";
 import {generateQuadMasters} from "./QuadMasters";
 
 export default [
@@ -21,8 +21,10 @@ export default [
     EmptyCubedoku,
     EmptyToroidal,
 
-    generateRandomPuzzle("random", 9, 3, getDailyRandomGenerator()),
-    generateQuadMasters("quad-masters", 9, 3, getDailyRandomGenerator()),
+    generateRandomPuzzle("random", 9, 3),
+    generateRandomPuzzle("daily-random", 9, 3, getDailyRandomGeneratorSeed()),
+    generateQuadMasters("quad-masters", 9, 3),
+    generateQuadMasters("daily-quad-masters", 9, 3, getDailyRandomGeneratorSeed()),
     // endregion
 
     // region Other authors

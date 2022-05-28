@@ -9,13 +9,15 @@ export const generateQuadMasters = (
     slug: string,
     fieldSize: number,
     regionWidth: number,
-    randomOrSeed?: RandomGenerator | number
+    randomSeed?: number
 ): PuzzleDefinition<number, QuadMastersGameState, QuadMastersGameState> => ({
     noIndex: true,
     title: {
         [LanguageCode.en]: `Quad Masters`,
     },
     slug,
-    typeManager: QuadMastersSudokuTypeManager(generateRandomPuzzleDigits(fieldSize, regionWidth, randomOrSeed)),
+    saveState: randomSeed !== undefined,
+    saveStateKey: `${slug}-${randomSeed}`,
+    typeManager: QuadMastersSudokuTypeManager(generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed)),
     fieldSize: createRegularFieldSize(fieldSize, regionWidth),
 });

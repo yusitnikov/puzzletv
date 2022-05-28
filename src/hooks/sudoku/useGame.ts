@@ -10,7 +10,8 @@ import {useEventListener} from "../useEventListener";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
 import {
     loadBoolFromLocalStorage,
-    loadNumberFromLocalStorage, serializeToLocalStorage,
+    loadNumberFromLocalStorage,
+    serializeToLocalStorage,
     unserializeFromLocalStorage
 } from "../../utils/localStorage";
 import {emptyPosition} from "../../types/layout/Position";
@@ -19,7 +20,7 @@ import {serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../types/su
 import {getCellDataComparer} from "../../types/sudoku/CellState";
 import {indexes} from "../../utils/indexes";
 
-type SavedGameStates = [slug: string, field: any, state: any, initialDigits: any, excludedDigits: any, cellWriteMode: any][];
+type SavedGameStates = [key: string, field: any, state: any, initialDigits: any, excludedDigits: any, cellWriteMode: any][];
 const gameStateStorageKey = "savedGameState";
 const gameStateSerializerVersion = 1;
 const maxSavedPuzzles = 10;
@@ -35,6 +36,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         loopHorizontally = false,
         loopVertically = false,
         enableDragMode = false,
+        saveState = true,
+        saveStateKey = slug,
     } = puzzle;
 
     const {
@@ -49,9 +52,9 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 
     const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(gameStateStorageKey, gameStateSerializerVersion) || [];
     const [gameState, setGameState] = useState<GameState<CellType> & GameStateExtensionType>(() => {
-        const savedGameState = readOnly
+        const savedGameState = (readOnly || !saveState)
             ? undefined
-            : getSavedGameStates().find(([itemSlug]) => itemSlug === slug);
+            : getSavedGameStates().find(([key]) => key === saveStateKey);
 
         return {
             fieldStateHistory: {
@@ -96,19 +99,19 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 
     useEffect(
         () => {
-            if (!readOnly) {
+            if (!readOnly && saveState) {
                 serializeToLocalStorage(
                     gameStateStorageKey,
                     ([
                         [
-                            slug,
+                            saveStateKey,
                             serializeFieldState(gameStateGetCurrentFieldState(gameState), typeManager),
                             serializeGameState(gameState),
                             serializeGivenDigitsMap(gameState.initialDigits, typeManager.serializeCellData),
                             serializeGivenDigitsMap(gameState.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
                             gameState.persistentCellWriteMode,
                         ],
-                        ...getSavedGameStates().filter(([itemSlug]) => itemSlug !== slug),
+                        ...getSavedGameStates().filter(([key]) => key !== saveStateKey),
                     ] as SavedGameStates).slice(0, maxSavedPuzzles),
                     gameStateSerializerVersion
                 );

@@ -12,10 +12,10 @@ export const createRandomGenerator = (seed: number): RandomGenerator => () => {
     return value - Math.floor(value);
 };
 
-export const getDailyRandomGenerator = () => {
+export const getDailyRandomGeneratorSeed = () => {
     const date = new Date();
 
-    return createRandomGenerator(date.getUTCFullYear() * 10000 + date.getUTCMonth() * 100 + date.getUTCDate());
+    return date.getUTCFullYear() * 10000 + date.getUTCMonth() * 100 + date.getUTCDate();
 };
 
 export const generateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, randomOrSeed: RandomGenerator | number = Math.random): GivenDigitsMap<number> => {
