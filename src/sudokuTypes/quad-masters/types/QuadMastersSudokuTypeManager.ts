@@ -16,6 +16,7 @@ import {isSamePosition, Position} from "../../../types/layout/Position";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {QuadMastersQuad, serializeQuad, unserializeQuad} from "./QuadMastersQuad";
 import {enterDigitActionType, GameStateAction, GameStateActionType} from "../../../types/sudoku/GameStateAction";
+import {QuadsHintConstraint} from "../components/QuadsHint";
 
 export const setQuadPositionActionType: GameStateActionType<Position, number, QuadMastersGameState, QuadMastersGameState> = ({
     key: "set-quad-position",
@@ -61,6 +62,7 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
             const {state: {allQuads, currentQuad}} = context;
 
             return [
+                QuadsHintConstraint,
                 ...allQuads.map(({position, digits}) => QuadConstraintBySolution(context, position, digits.items, solution)),
                 currentQuad && QuadConstraint(currentQuad.position, currentQuad.digits.items),
             ].filter(item => item).map(item => item!);
