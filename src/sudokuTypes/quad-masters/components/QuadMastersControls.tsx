@@ -15,6 +15,10 @@ export const QuadMastersControls = (
     const translate = useTranslate();
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (context.state.isShowingSettings) {
+            return;
+        }
+
         if (ev.ctrlKey || ev.shiftKey || ev.altKey) {
             return;
         }

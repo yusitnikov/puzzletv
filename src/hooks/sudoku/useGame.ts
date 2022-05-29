@@ -9,7 +9,7 @@ import {useEventListener} from "../useEventListener";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
 import {
     loadBoolFromLocalStorage,
-    loadNumberFromLocalStorage,
+    loadNumberFromLocalStorage, loadStringFromLocalStorage,
     serializeToLocalStorage,
     unserializeFromLocalStorage
 } from "../../utils/localStorage";
@@ -117,9 +117,11 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 
             currentPlayer: savedGameState?.[6] || params.host,
 
+            isShowingSettings: false,
             enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
             autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
             backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
+            nickname: loadStringFromLocalStorage(LocalStorageKeys.nickname, ""),
 
             ...(initialGameStateExtension as any),
             ...(savedGameState && unserializeGameState(savedGameState[2]))
@@ -147,52 +149,60 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         `puzzle:${saveStateKey}`,
         params.host,
         params.room,
+        myGameState.nickname,
         sharedGameState,
-        (message, clientId) => {
-            const {
-                type,
-                params,
-                state: {
-                    mode,
-                    selected,
-                    line,
-                    addingLine,
-                    ...otherState
-                },
-            } = message;
-
-            const actionType: GameStateActionType<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = [
+        (messages) => {
+            const allActionTypes: GameStateActionType<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] = [
                 ...coreGameStateActionTypes,
                 ...supportedActionTypes,
-            ].find(({key}) => key === type)!;
+            ];
 
             setGameState(myState => {
-                const state = mergeMyGameState(myState, multiPlayer);
+                let state = mergeMyGameState(myState, multiPlayer);
 
-                const processedGameState: typeof context.state = {
-                    ...context.state,
-                    persistentCellWriteMode: mode,
-                    cellWriteMode: mode,
-                    cellWriteModeInfo: allowedCellWriteModes.find((item) => item.mode === mode)!,
-                    selectedCells: Set.unserialize(selected, isSamePosition),
-                    currentMultiLine: line,
-                    isAddingLine: addingLine,
-                    ...unserializeInternalState?.(puzzle, otherState)
-                };
+                for (const {data: message, clientId} of messages) {
+                    const {
+                        type,
+                        params,
+                        state: {
+                            mode,
+                            selected,
+                            line,
+                            addingLine,
+                            ...otherState
+                        },
+                    } = message;
 
-                const callback = actionType.callback(
-                    params,
-                    {
-                        ...context,
-                        state: processedGameState,
-                    },
-                    clientId
-                );
+                    const actionType = allActionTypes.find(({key}) => key === type)!;
 
-                return {
-                    ...state,
-                    ...(typeof callback === "function" ? callback(processedGameState) : callback),
-                };
+                    const processedGameState: typeof context.state = {
+                        ...context.state,
+                        ...state,
+                        persistentCellWriteMode: mode,
+                        cellWriteMode: mode,
+                        cellWriteModeInfo: allowedCellWriteModes.find((item) => item.mode === mode)!,
+                        selectedCells: Set.unserialize(selected, isSamePosition),
+                        currentMultiLine: line,
+                        isAddingLine: addingLine,
+                        ...unserializeInternalState?.(puzzle, otherState)
+                    };
+
+                    const callback = actionType.callback(
+                        params,
+                        {
+                            ...context,
+                            state: processedGameState,
+                        },
+                        clientId
+                    );
+
+                    state = {
+                        ...state,
+                        ...(typeof callback === "function" ? callback(processedGameState) : callback),
+                    };
+                }
+
+                return state;
             });
         }
     );
@@ -256,56 +266,58 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         (
             actionsOrCallbacks: GameStateActionOrCallback<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
                 | GameStateActionOrCallback<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[]
-        ) => setGameState(myState => {
-            let state = mergeMyGameState(myState, multiPlayer);
+        ) => {
+            return setGameState(myState => {
+                let state = mergeMyGameState(myState, multiPlayer);
 
-            const {isEnabled, isHost, sendMessage} = multiPlayer;
+                const {isEnabled, isHost, sendMessage} = multiPlayer;
 
-            actionsOrCallbacks = actionsOrCallbacks instanceof Array ? actionsOrCallbacks : [actionsOrCallbacks];
+                actionsOrCallbacks = actionsOrCallbacks instanceof Array ? actionsOrCallbacks : [actionsOrCallbacks];
 
-            for (const actionOrCallback of actionsOrCallbacks) {
-                const processedGameState = calculateProcessedGameState(state);
-                const context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
-                    puzzle,
-                    cellSize,
-                    multiPlayer,
-                    state: {
-                        ...processedGameState,
-                        ...state,
-                    },
-                    onStateChange: () => {},
-                };
-
-                const asAction = actionOrCallback as GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-                const isAction = typeof asAction.type === "object";
-
-                if (!isAction || !isEnabled || isHost || !puzzle.typeManager.isGlobalAction?.(asAction, context)) {
-                    const callback = isAction
-                        ? asAction.type.callback(asAction.params, context, myClientId)
-                        : actionOrCallback as GameStateActionCallback<CellType, ProcessedGameStateExtensionType>;
-
-                    state = {
-                        ...state,
-                        ...(typeof callback === "function" ? callback(processedGameState) : callback),
-                    };
-                } else {
-                    // TODO: understand which actions are local
-                    sendMessage({
-                        type: asAction.type.key,
-                        params: asAction.params,
+                for (const actionOrCallback of actionsOrCallbacks) {
+                    const processedGameState = calculateProcessedGameState(state);
+                    const context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
+                        puzzle,
+                        cellSize,
+                        multiPlayer,
                         state: {
-                            mode: processedGameState.cellWriteMode,
-                            selected: state.selectedCells.serialize(),
-                            line: state.currentMultiLine,
-                            addingLine: state.isAddingLine,
-                            ...puzzle.typeManager.getInternalState?.(puzzle, state),
+                            ...processedGameState,
+                            ...state,
                         },
-                    });
-                }
-            }
+                        onStateChange: () => {
+                        },
+                    };
 
-            return state;
-        }),
+                    const asAction = actionOrCallback as GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+                    const isAction = typeof asAction.type === "object";
+
+                    if (!isAction || !isEnabled || isHost || !puzzle.typeManager.isGlobalAction?.(asAction, context)) {
+                        const callback = isAction
+                            ? asAction.type.callback(asAction.params, context, myClientId)
+                            : actionOrCallback as GameStateActionCallback<CellType, ProcessedGameStateExtensionType>;
+
+                        state = {
+                            ...state,
+                            ...(typeof callback === "function" ? callback(processedGameState) : callback),
+                        };
+                    } else {
+                        sendMessage({
+                            type: asAction.type.key,
+                            params: asAction.params,
+                            state: {
+                                mode: processedGameState.cellWriteMode,
+                                selected: state.selectedCells.serialize(),
+                                line: state.currentMultiLine,
+                                addingLine: state.isAddingLine,
+                                ...puzzle.typeManager.getInternalState?.(puzzle, state),
+                            },
+                        });
+                    }
+                }
+
+                return state;
+            });
+        },
         [puzzle, setGameState, mergeMyGameState, calculateProcessedGameState, cellSize, multiPlayer]
     );
 

@@ -14,7 +14,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
         {
             context: {
                 puzzle: {fieldSize: {fieldSize}},
-                state: {cellWriteMode, map, overlay, isReady},
+                state: {cellWriteMode, map, overlay, isReady, isShowingSettings},
                 onStateChange,
                 cellSize,
             },
@@ -28,7 +28,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
         const isDragMode = cellWriteMode === CellWriteMode.move;
 
         useEventListener(window, "keydown", ({key}: KeyboardEvent) => {
-            if (!isReady) {
+            if (isShowingSettings || !isReady) {
                 return;
             }
 

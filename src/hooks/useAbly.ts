@@ -3,6 +3,7 @@ import {useSingleton} from "./useSingleton";
 import {useEffect, useRef} from "react";
 import {usePureState} from "./usePureState";
 import {Chain} from "../utils/chain";
+import {useThrottleData} from "./useThrottle";
 
 export const useAbly = (options: Types.ClientOptions, enabled = true) => useSingleton(
     "ably",
@@ -88,8 +89,10 @@ export const useSetMyAblyChannelPresence = (
 
     const chain = useSingleton(`ably-set-my-presence-chain-${channelName}`, () => new Chain())!;
 
-    const myPresenceDataRef = useRef(myPresenceData);
-    myPresenceDataRef.current = myPresenceData;
+    const myThrottledPresenceData = useThrottleData(200, myPresenceData);
+
+    const myPresenceDataRef = useRef(myThrottledPresenceData);
+    myPresenceDataRef.current = myThrottledPresenceData;
 
     useEffect(() => {
         if (!enabled || !channel) {
@@ -108,6 +111,6 @@ export const useSetMyAblyChannelPresence = (
             return;
         }
 
-        chain.then(() => channel.presence.update(myPresenceData));
-    }, [channel, enabled, chain, myPresenceData]);
+        chain.then(() => channel.presence.update(myThrottledPresenceData));
+    }, [channel, enabled, chain, myThrottledPresenceData]);
 };

@@ -33,9 +33,11 @@ export interface GameState<CellType> {
 
     currentPlayer?: string;
 
+    isShowingSettings: boolean;
     enableConflictChecker: boolean;
     autoCheckOnFinish: boolean;
     backgroundOpacity: number;
+    nickname: string;
 }
 
 export interface ProcessedGameState<CellType> extends GameState<CellType> {

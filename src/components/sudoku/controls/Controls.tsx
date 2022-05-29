@@ -29,6 +29,7 @@ import {UserLinesByData} from "../constraints/user-lines/UserLines";
 import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
+import {GameState} from "../../../types/sudoku/GameState";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -75,6 +76,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         persistentCellWriteMode,
         cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
         autoCheckOnFinish,
+        isShowingSettings,
     } = state;
 
     const [isShowingResult, setIsShowingResult] = useState(false);
@@ -96,8 +98,6 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     const isFullScreen = useIsFullScreen();
 
-    const [isShowingSettings, setIsShowingSettings] = useState(false);
-
     // region Event handlers
     const handleSetCellWriteMode = useCallback(
         (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode} as any),
@@ -116,11 +116,21 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const handleCheckResult = useCallback(() => setIsShowingResult(true), [setIsShowingResult]);
     const handleCloseCheckResult = useCallback(() => setIsShowingResult(false), [setIsShowingResult]);
 
-    const handleOpenSettings = useCallback(() => setIsShowingSettings(true), [setIsShowingSettings]);
-    const handleCloseSettings = useCallback(() => setIsShowingSettings(false), [setIsShowingSettings]);
+    const handleOpenSettings = useCallback(
+        () => onStateChange({isShowingSettings: true} as Partial<GameState<CellType>> as any),
+        [onStateChange]
+    );
+    const handleCloseSettings = useCallback(
+        () => onStateChange({isShowingSettings: false} as Partial<GameState<CellType>> as any),
+        [onStateChange]
+    );
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (isShowingSettings) {
+            return;
+        }
+
         const {code, ctrlKey, shiftKey} = ev;
 
         switch (code) {
@@ -302,25 +312,33 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             <Settings/>
         </ControlButton>
         {isShowingSettings && <Modal cellSize={cellSize} onClose={handleCloseSettings}>
-            <div>
-                <SettingsContent
-                    cellSize={cellSize}
-                    context={context}
-                />
-            </div>
-            <div>
-                <Button
-                    type={"button"}
-                    cellSize={cellSize}
-                    onClick={handleCloseSettings}
-                    style={{
-                        marginTop: cellSize * globalPaddingCoeff,
-                        padding: "0.5em 1em",
-                    }}
-                >
-                    OK
-                </Button>
-            </div>
+            <form
+                onSubmit={(ev) => {
+                    handleCloseSettings();
+                    ev.preventDefault();
+                    return false;
+                }}
+            >
+                <div>
+                    <SettingsContent
+                        cellSize={cellSize}
+                        context={context}
+                    />
+                </div>
+                <div>
+                    <Button
+                        type={"submit"}
+                        cellSize={cellSize}
+                        onClick={handleCloseSettings}
+                        style={{
+                            marginTop: cellSize * globalPaddingCoeff,
+                            padding: "0.5em 1em",
+                        }}
+                    >
+                        OK
+                    </Button>
+                </div>
+            </form>
         </Modal>}
 
         {resultChecker && <ControlButton

@@ -2,6 +2,7 @@ import {Types} from "ably/promises";
 import {useAblyChannelPresence, useSetMyAblyChannelPresence} from "./useAbly";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {usePureMemo} from "./usePureMemo";
+import {useTranslate} from "../contexts/LanguageCodeContext";
 
 export const myClientId = (window.localStorage.clientId = window.localStorage.clientId || Math.random().toString().substring(2));
 
@@ -21,6 +22,11 @@ interface Message {
     data: any;
 }
 
+interface MessageWithClientId {
+    data: any;
+    clientId: string;
+}
+
 export interface UseMultiPlayerResult {
     isLoaded: boolean;
     isEnabled: boolean;
@@ -28,8 +34,10 @@ export interface UseMultiPlayerResult {
     isHost: boolean;
     isDoubledConnected: boolean;
     allPlayerIds: string[];
+    playerNicknames: Record<string, string>;
     playersDataMap: Record<string, PlayerPresenceData>;
     hostData?: any;
+    myPendingMessages: Message[];
     sendMessage: (message: any) => void;
 }
 
@@ -37,9 +45,12 @@ export const useMultiPlayer = (
     gameId: string,
     hostId: string,
     roomId: string,
+    myNickname: string,
     myHostData: any,
-    onMessage: (message: any, clientId: string) => void
+    onMessages: (messages: MessageWithClientId[]) => void
 ): UseMultiPlayerResult => {
+    const translate = useTranslate();
+
     const channelName = `game:${gameId}:${hostId}:${roomId}`;
     const isEnabled = !!hostId;
     const isHost = hostId === myClientId;
@@ -61,19 +72,29 @@ export const useMultiPlayer = (
 
     const allPlayerIds = useMemo(() => Object.keys(playersDataMap).sort(), [playersDataMap]);
 
+    const hostStr = translate("host");
+    const guestStr = translate("guest");
+    const playerNicknames = useMemo(
+        () => Object.fromEntries(Object.values(playersDataMap).map(({clientId, data}) => [
+            clientId,
+            (clientId === myClientId ? myNickname : data?.nickname || "") || (clientId === hostId ? hostStr : `${guestStr}#${clientId.substring(0, 4)}`),
+        ])),
+        [playersDataMap, myNickname, hostId, hostStr, guestStr]
+    );
+
     const {data: hostData, processed: hostProcessedMessageIds} = playersDataMap[hostId]?.data || {};
     const myProcessedMessageId = hostProcessedMessageIds?.[myClientId] || 0;
 
     const [myMessages, setMyMessages] = useState<Message[]>([]);
     const sendMessage = useCallback(
-        (data: any) => setMyMessages(messages => [...messages, {id: Date.now(), data}]),
+        (data: any) => setTimeout(() => setMyMessages(messages => [...messages, {id: Date.now(), data}])),
         [setMyMessages]
     );
 
     const [processedMessageIds, setProcessedMessageIds] = useState<Record<string, number>>({});
 
-    const onMessageRef = useRef(onMessage);
-    onMessageRef.current = onMessage;
+    const onMessagesRef = useRef(onMessages);
+    onMessagesRef.current = onMessages;
     useEffect(() => {
         if (!isHost) {
             return;
@@ -81,42 +102,64 @@ export const useMultiPlayer = (
 
         setProcessedMessageIds(processedMessageIds => {
             const newProcessedMessageIds = {...processedMessageIds};
-            let changed = false;
+            const messagesToProcess: MessageWithClientId[] = [];
 
-            for (const {clientId, data: messages} of Object.values(playersDataMap)) {
+            for (const {clientId, data: presenceData} of Object.values(playersDataMap)) {
                 if (clientId === myClientId) {
                     continue;
                 }
 
                 const processedMessageId = processedMessageIds[clientId] || 0;
 
-                for (const {id, data} of messages as Message[]) {
+                for (const {id, data} of presenceData?.messages || [] as Message[]) {
                     if (id <= processedMessageId) {
                         continue;
                     }
 
-                    try {
-                        onMessageRef.current(data, clientId);
-                    } catch (err) {
-                        console.error(err);
-                    }
+                    messagesToProcess.push({data, clientId});
                     newProcessedMessageIds[clientId] = id;
-                    changed = true;
                 }
             }
 
-            return changed ? newProcessedMessageIds : processedMessageIds;
+            if (messagesToProcess.length) {
+                try {
+                    onMessagesRef.current(messagesToProcess);
+                } catch (err) {
+                    console.error(err);
+                }
+
+                return newProcessedMessageIds;
+            } else {
+                return processedMessageIds;
+            }
         });
-    }, [isHost, setProcessedMessageIds, playersDataMap, onMessageRef]);
+    }, [isHost, setProcessedMessageIds, playersDataMap, onMessagesRef]);
+
+    const myPendingMessages = useMemo(
+        () => myMessages.filter(({id}) => id > myProcessedMessageId),
+        [myMessages, myProcessedMessageId]
+    );
+    const myPendingMessagesSliced = useMemo(
+        () => myPendingMessages.slice(0, 50),
+        [myPendingMessages]
+    );
 
     const dataToSend = useMemo(() => {
+        const sharedData = {
+            nickname: myNickname,
+        };
+
         return isHost
             ? {
+                ...sharedData,
                 data: myHostData,
                 processed: processedMessageIds,
             }
-            : myMessages.filter(({id}) => id > myProcessedMessageId);
-    }, [isHost, myHostData, myMessages, processedMessageIds, myProcessedMessageId]);
+            : {
+                ...sharedData,
+                messages: myPendingMessagesSliced
+            };
+    }, [isHost, myNickname, myHostData, myPendingMessagesSliced, processedMessageIds]);
     useSetMyAblyChannelPresence(ablyOptions, channelName, dataToSend, isEnabled);
 
     return usePureMemo({
@@ -126,8 +169,10 @@ export const useMultiPlayer = (
         isHost,
         isDoubledConnected: playersDataMap[myClientId]?.connectionsCount > 1,
         allPlayerIds,
+        playerNicknames,
         playersDataMap,
         hostData,
+        myPendingMessages,
         sendMessage,
     });
 };

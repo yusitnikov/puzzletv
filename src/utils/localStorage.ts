@@ -1,3 +1,8 @@
+export const loadStringFromLocalStorage = (key: string, defaultValue = "") =>
+    typeof window.localStorage[key] === "string" ? window.localStorage[key] : defaultValue;
+
+export const saveStringToLocalStorage = (key: string, value: string) => window.localStorage[key] = value;
+
 export const loadBoolFromLocalStorage = (key: string, defaultValue = false) =>
     typeof window.localStorage[key] === "string" ? window.localStorage[key] === "1" : defaultValue;
 

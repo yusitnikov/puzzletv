@@ -161,6 +161,17 @@ export const translationsExactType = {
     "Background color's opacity": {
         [LanguageCode.ru]: "Прорачность цвета фона",
     },
+    "Nickname": {
+        [LanguageCode.ru]: "Никнейм",
+    },
+    // endregion
+    // region useMultiPlayer
+    "host": {
+        [LanguageCode.ru]: "хост",
+    },
+    "guest": {
+        [LanguageCode.ru]: "гость",
+    },
     // endregion
 };
 

@@ -14,7 +14,7 @@ export const RotatableMainControls = (
     {
         context: {
             cellSize,
-            state: {isReady, isStickyMode, animationSpeed},
+            state: {isReady, isStickyMode, animationSpeed, isShowingSettings},
             onStateChange,
         },
     }: ControlsProps<RotatableDigit, RotatableGameState, RotatableProcessedGameState>
@@ -41,6 +41,10 @@ export const RotatableMainControls = (
     };
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (isShowingSettings) {
+            return;
+        }
+
         const {code} = ev;
 
         switch (code) {

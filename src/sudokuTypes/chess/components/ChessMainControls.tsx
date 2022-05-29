@@ -14,7 +14,7 @@ export const ChessMainControls = (
     {
         context: {
             cellSize,
-            state: {cellWriteMode, selectedColor},
+            state: {cellWriteMode, selectedColor, isShowingSettings},
             onStateChange,
         },
     }: ControlsProps<ChessPiece, ChessGameState, ChessGameState>
@@ -32,6 +32,10 @@ export const ChessMainControls = (
     }, [onStateChange, setUsedColorSelectionOnce]);
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (isShowingSettings) {
+            return;
+        }
+
         const {code, ctrlKey, metaKey} = ev;
 
         switch (code) {

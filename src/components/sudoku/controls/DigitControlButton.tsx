@@ -32,6 +32,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
     const {
         cellWriteMode,
         cellWriteModeInfo: {isDigitMode, buttonContent: ButtonContent},
+        isShowingSettings,
     } = state;
 
     const digit = index + 1;
@@ -53,6 +54,10 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
     );
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (isShowingSettings) {
+            return;
+        }
+
         const {code} = ev;
 
         if (

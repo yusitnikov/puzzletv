@@ -93,6 +93,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         loopOffset,
         initialDigits: stateInitialDigits,
         excludedDigits,
+        isShowingSettings,
     } = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
@@ -148,6 +149,10 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
     // Handle arrows
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (isShowingSettings) {
+            return;
+        }
+
         const {code, ctrlKey, shiftKey} = ev;
 
         // Use the key modifiers from the event - they are always up-to-date

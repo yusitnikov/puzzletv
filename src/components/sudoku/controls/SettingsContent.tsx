@@ -2,8 +2,8 @@
 import styled from "@emotion/styled";
 import {FC} from "react";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
-import {textHeightCoeff} from "../../app/globals";
-import {saveBoolToLocalStorage, saveNumberToLocalStorage} from "../../../utils/localStorage";
+import {textColor, textHeightCoeff} from "../../app/globals";
+import {saveBoolToLocalStorage, saveNumberToLocalStorage, saveStringToLocalStorage} from "../../../utils/localStorage";
 import {LocalStorageKeys} from "../../../data/LocalStorageKeys";
 import InputSlider from "react-input-slider";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
@@ -17,7 +17,23 @@ export interface SettingsContentProps<CellType, ProcessedGameStateExtensionType 
 }
 
 export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
-    {cellSize, context: {puzzle: {resultChecker, typeManager: {disableConflictChecker}}, state: {enableConflictChecker, autoCheckOnFinish, backgroundOpacity}, onStateChange}}: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
+    {
+        cellSize,
+        context: {
+            puzzle: {
+                resultChecker,
+                typeManager: {disableConflictChecker},
+            },
+            state: {
+                enableConflictChecker,
+                autoCheckOnFinish,
+                backgroundOpacity,
+                nickname,
+            },
+            onStateChange,
+            multiPlayer: {isEnabled},
+        },
+    }: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
 ) => {
     const translate = useTranslate();
 
@@ -38,10 +54,27 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
         saveNumberToLocalStorage(LocalStorageKeys.backgroundOpacity, value);
     };
 
+    const handleChangeNickname = (value: string) => {
+        onStateChange({nickname: value} as any);
+        saveStringToLocalStorage(LocalStorageKeys.nickname, value);
+    };
+
     return <div>
         <div style={{fontSize: textSize * 1.5, marginBottom: textSize}}>
             <strong>{translate("Settings")}</strong>
         </div>
+
+        {isEnabled && <SettingsItem>
+            {translate("Nickname")}:
+
+            <SettingsTextBox
+                ref={(ref) => ref?.focus()}
+                type={"text"}
+                cellSize={cellSize}
+                value={nickname}
+                onChange={(ev) => handleChangeNickname(ev.target.value)}
+            />
+        </SettingsItem>}
 
         {!disableConflictChecker && <SettingsItem>
             {translate("Highlight conflicts")}:
@@ -103,4 +136,23 @@ const SettingsCheckbox = styled("input", {
     marginLeft: cellSize * textHeightCoeff,
     width: cellSize * textHeightCoeff * 0.8,
     height: cellSize * textHeightCoeff * 0.8,
-}))
+}));
+
+const SettingsTextBox = styled("input", {
+    shouldForwardProp(propName) {
+        return propName !== "cellSize";
+    }
+})(({cellSize}: SizeProps) => ({
+    padding: "0.25em",
+    margin: 0,
+    marginLeft: cellSize * textHeightCoeff,
+    width: cellSize * 2,
+    height: cellSize * textHeightCoeff,
+    border: `1px solid ${textColor}`,
+    outline: "none",
+    cursor: "default",
+    fontSize: "inherit",
+    lineHeight: "inherit",
+    fontWeight: "inherit",
+    fontFamily: "inherit",
+}));
