@@ -70,7 +70,14 @@ export const useMultiPlayer = (
         return map;
     }, [presenceData]);
 
-    const allPlayerIds = useMemo(() => Object.keys(playersDataMap).sort(), [playersDataMap]);
+    const allPlayerIds = useMemo(() => {
+        const allIds = Object.keys(playersDataMap);
+
+        return [
+            ...allIds.filter(id => id >= hostId).sort(),
+            ...allIds.filter(id => id < hostId).sort(),
+        ];
+    }, [playersDataMap, hostId]);
 
     const hostStr = translate("host");
     const guestStr = translate("guest");
