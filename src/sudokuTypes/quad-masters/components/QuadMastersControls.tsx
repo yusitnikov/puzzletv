@@ -7,11 +7,38 @@ import {Quads} from "../data/translations";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {QuadByData} from "../../../components/sudoku/constraints/quad/Quad";
 import {textColor} from "../../../components/app/globals";
+import {useEventListener} from "../../../hooks/useEventListener";
 
 export const QuadMastersControls = (
     {context, isHorizontal}: ControlsProps<number, QuadMastersGameState, QuadMastersGameState>
 ) => {
     const translate = useTranslate();
+
+    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (ev.ctrlKey || ev.shiftKey || ev.altKey) {
+            return;
+        }
+
+        switch (ev.code) {
+            case "KeyC":
+            case "Space":
+            case "Enter":
+            case "Tab":
+                context.onStateChange(({persistentCellWriteMode}) => ({
+                    persistentCellWriteMode: persistentCellWriteMode === CellWriteMode.custom ? CellWriteMode.main : CellWriteMode.custom
+                }));
+                ev.preventDefault();
+                break;
+            case "Home":
+                context.onStateChange({persistentCellWriteMode: CellWriteMode.main});
+                ev.preventDefault();
+                break;
+            case "End":
+                context.onStateChange({persistentCellWriteMode: CellWriteMode.custom});
+                ev.preventDefault();
+                break;
+        }
+    });
 
     return <CellWriteModeButton
         top={isHorizontal ? 3 : 4}
@@ -47,7 +74,7 @@ export const QuadMastersControls = (
             />
         </AutoSvg>}
         fullSize={true}
-        title={translate(Quads)}
+        title={`${translate(Quads)} (${translate("shortcut")}: C / End)`}
         context={context}
     />;
 };
