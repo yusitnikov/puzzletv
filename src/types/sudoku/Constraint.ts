@@ -26,9 +26,7 @@ export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, Proce
 
 export type ConstraintProps<CellType = any, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> =
     Omit<Constraint<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>, "component"> & {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
-    cellSize: number;
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }
 
 export type ConstraintOrComponent<CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> =

@@ -41,7 +41,7 @@ export const QuadMastersControls = (
             />
 
             <QuadByData
-                puzzle={context.puzzle}
+                context={context}
                 cells={[{top: 0.5, left: 0.5}]}
                 expectedDigits={[1, 2, 3, 4]}
             />

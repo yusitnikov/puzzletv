@@ -17,13 +17,13 @@ export const Quad = withFieldLayer(
     FieldLayer.top,
     (
         {
-            puzzle,
+            context,
             cells,
             expectedDigits,
             forbiddenDigits,
         }: ConstraintProps<any, QuadProps<any>>
     ) => <QuadByData
-        puzzle={puzzle}
+        context={context}
         cells={cells}
         expectedDigits={expectedDigits}
         forbiddenDigits={forbiddenDigits}
@@ -32,11 +32,11 @@ export const Quad = withFieldLayer(
 
 export const QuadByData = <CellType,>(
     {
-        puzzle: {typeManager: {cellDataComponentType: {component: CellData}}},
+        context: {puzzle: {typeManager: {cellDataComponentType: {component: CellData}}}},
         cells: [{top, left}],
         expectedDigits = [],
         forbiddenDigits = [],
-    }: Pick<ConstraintProps<CellType, QuadProps<CellType>>, "puzzle" | "cells" | "expectedDigits" | "forbiddenDigits">
+    }: Pick<ConstraintProps<CellType, QuadProps<CellType>>, "context" | "cells" | "expectedDigits" | "forbiddenDigits">
 ) => {
     const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: CellType, valid?: boolean}[] = [
         ...expectedDigits.map(digit => ({digit, valid: true})),

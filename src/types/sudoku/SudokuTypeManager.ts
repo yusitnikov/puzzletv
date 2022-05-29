@@ -181,6 +181,12 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         action: GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
     ): boolean;
+
+    applyStateDiffEffect?(
+        state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+        prevState: (ProcessedGameState<CellType> & ProcessedGameStateExtensionType) | undefined,
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    ): void;
 }
 
 export const defaultProcessArrowDirection = (

@@ -12,23 +12,25 @@ const removingBorderColor = "#e00";
 
 export const UserLines = memo((
     {
-        cellSize,
-        puzzle: {
-            fieldSize: {
-                rowsCount,
-                columnsCount,
+        context: {
+            cellSize,
+            puzzle: {
+                fieldSize: {
+                    rowsCount,
+                    columnsCount,
+                },
+                loopHorizontally,
+                loopVertically,
             },
-            loopHorizontally,
-            loopVertically,
+            state,
         },
-        gameState,
     }: ConstraintProps
 ) => {
     const layer = useFieldLayer();
 
-    const {currentMultiLine, isAddingLine} = gameState;
+    const {currentMultiLine, isAddingLine} = state;
 
-    const {lines} = gameStateGetCurrentFieldState(gameState);
+    const {lines} = gameStateGetCurrentFieldState(state);
 
     const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
 

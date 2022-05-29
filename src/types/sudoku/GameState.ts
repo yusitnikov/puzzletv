@@ -42,6 +42,7 @@ export interface ProcessedGameState<CellType> extends GameState<CellType> {
     cellWriteMode: CellWriteMode;
     cellWriteModeInfo: CellWriteModeInfo<CellType, any, any>;
     isReady: boolean;
+    isMyTurn: boolean;
 }
 
 // region History

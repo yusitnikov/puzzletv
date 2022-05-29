@@ -401,8 +401,6 @@ interface ItemsInOneRegionProps<CellType, GameStateExtensionType = {}, Processed
 const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {context, items}: ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const {puzzle, state, cellSize} = context;
-
     return <>
         {items.map((item, index) => {
             if (isConstraint(item)) {
@@ -410,9 +408,7 @@ const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameSt
 
                 return Component && <Component
                     key={index}
-                    puzzle={puzzle}
-                    gameState={state}
-                    cellSize={cellSize}
+                    context={context}
                     {...otherData}
                 />;
             } else {

@@ -112,13 +112,13 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         {
             name: "countries",
             cells: [],
-            component: withFieldLayer(FieldLayer.lines, ({puzzle, gameState}) => <>
+            component: withFieldLayer(FieldLayer.lines, ({context: {puzzle, state}}) => <>
                 {Object.values(puzzle.customCellBounds![0]).map(
                     ({borders}, countryIndex) => borders.map(
                         (border, partIndex) => <polygon
                             key={`${countryIndex}-${partIndex}`}
                             points={formatSvgPointsArray(border.map(
-                                (point) => puzzle.typeManager.transformCoords!(point, puzzle, gameState)
+                                (point) => puzzle.typeManager.transformCoords!(point, puzzle, state)
                             ))}
                             fill={"none"}
                             stroke={textColor}

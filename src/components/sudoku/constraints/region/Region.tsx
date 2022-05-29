@@ -1,5 +1,5 @@
 import {useMemo} from "react";
-import {getRegionBorderWidth, textColor} from "../../../app/globals";
+import {darkGreyColor, getRegionBorderWidth, textColor} from "../../../app/globals";
 import {
     isSamePosition,
     parsePositionLiterals,
@@ -15,12 +15,12 @@ import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
 import {ProcessedGameState} from "../../../../types/sudoku/GameState";
 
-export const Region = withFieldLayer(FieldLayer.lines, ({cells, cellSize}: ConstraintProps) => {
+export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSize, state: {isMyTurn}}}: ConstraintProps) => {
     const points = useMemo(() => getRegionBorders(cells, true), [cells]);
 
     return <RoundedPolyLine
         points={points}
-        stroke={textColor}
+        stroke={isMyTurn ? textColor : darkGreyColor}
         strokeWidth={getRegionBorderWidth(cellSize)}
     />;
 });

@@ -27,6 +27,7 @@ import {
     GameStateActionOrCallback, GameStateActionType
 } from "../../types/sudoku/GameStateAction";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
+import {useDiffEffect} from "../useDiffEffect";
 
 type SavedGameStates = [
     key: string,
@@ -70,6 +71,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         setSharedState,
         unserializeInternalState,
         supportedActionTypes = [],
+        applyStateDiffEffect,
     } = typeManager;
 
     const isHost = params.host === myClientId;
@@ -241,10 +243,11 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             cellWriteMode,
             cellWriteModeInfo,
             isReady,
+            isMyTurn: !isEnabled || gameState.currentPlayer === myClientId,
             ...(processedGameStateExtension as any),
         }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [cellWriteMode, cellWriteModeInfo, isReady, processedGameStateExtensionDep]
+        [cellWriteMode, cellWriteModeInfo, isReady, processedGameStateExtensionDep, isEnabled]
     );
 
     const processedGameState = useMemo(() => calculateProcessedGameState(gameState), [gameState, calculateProcessedGameState]);
@@ -316,6 +319,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         }),
         [puzzle, processedGameState, cellSize, multiPlayer, mergeGameState]
     );
+
+    useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);
 
     useEventListener(window, "beforeunload", (ev: BeforeUnloadEvent) => {
         if (gameState.fieldStateHistory.states.length > 1) {
