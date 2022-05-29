@@ -23,21 +23,16 @@ export const generateQuadMasters = (
     saveStateKey: `${slug}-${fieldSize}-${regionWidth}-${randomSeed}`,
     typeManager: QuadMastersSudokuTypeManager(generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed)),
     fieldSize: createRegularFieldSize(fieldSize, regionWidth),
-    rules: (_, {state: {isQuadTurn, isMyTurn, nickname}, multiPlayer}) => <>
+    rules: (_, {multiPlayer}) => <>
         <RulesParagraph>Debug data:</RulesParagraph>
         <RulesUnorderedList>
             <li>Random seed: {randomSeed}</li>
-            {multiPlayer?.isEnabled && <>
+            {multiPlayer.isEnabled && <>
                 <li>My network ID: {myClientId}</li>
-                <li>My nickname: {nickname || "-"}</li>
                 <li>Host's network ID: {multiPlayer.hostId}</li>
                 <li>Host's nickname: {multiPlayer.playerNicknames[multiPlayer.hostId]}</li>
                 <li>I am the host: {multiPlayer.isHost ? "yes" : "no"}</li>
-                <li>Host connected: {multiPlayer.hostData ? "yes" : "no"}</li>
-                <li>Active players: {multiPlayer.allPlayerIds.map(id => multiPlayer.playerNicknames[id]).join(", ")}</li>
                 <li>Pending messages count: {multiPlayer.myPendingMessages.length}</li>
-                <li>Is my turn: {isMyTurn ? "yes" : "no"}</li>
-                <li>Is placing a quad: {isQuadTurn ? "yes" : "no"}</li>
             </>}
         </RulesUnorderedList>
     </>,
