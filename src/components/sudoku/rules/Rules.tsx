@@ -12,6 +12,7 @@ import {
 } from "../../app/globals";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {Fragment} from "react";
 
 const StyledContainer = styled(Absolute)({
     display: "flex",
@@ -26,7 +27,12 @@ export interface RulesProps<CellType> {
 export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const translate = useTranslate();
 
-    const {puzzle: {title, author, rules}, cellSize} = context;
+    const {
+        puzzle: {title, author, rules},
+        state: {currentPlayer},
+        cellSize,
+        multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
+    } = context;
 
     return <StyledContainer {...rect} pointerEvents={true}>
         <div
@@ -40,6 +46,13 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             <h1 style={{fontSize: cellSize * h1HeightCoeff, margin: 0}}>{translate(title)}</h1>
 
             {author && <div style={{fontSize: cellSize * h2HeightCoeff}}>{translate("by")} {translate(author)}</div>}
+
+            {isEnabled && <>
+                {allPlayerIds.map((playerId, index) => <Fragment key={playerId}>
+                    {index > 0 && " vs "}
+                    <span style={{fontWeight: playerId === currentPlayer ? 700 : 400}}>{playerNicknames[playerId]}</span>
+                </Fragment>)}
+            </>}
         </div>
 
         <div
