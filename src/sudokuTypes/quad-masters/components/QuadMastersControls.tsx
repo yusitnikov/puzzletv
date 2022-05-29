@@ -9,13 +9,13 @@ import {QuadByData} from "../../../components/sudoku/constraints/quad/Quad";
 import {textColor} from "../../../components/app/globals";
 
 export const QuadMastersControls = (
-    {context}: ControlsProps<number, QuadMastersGameState, QuadMastersGameState>
+    {context, isHorizontal}: ControlsProps<number, QuadMastersGameState, QuadMastersGameState>
 ) => {
     const translate = useTranslate();
 
     return <CellWriteModeButton
-        top={3}
-        left={4}
+        top={isHorizontal ? 3 : 4}
+        left={isHorizontal ? 4 : 3}
         cellWriteMode={CellWriteMode.custom}
         data={cellSize => <AutoSvg
             width={cellSize}

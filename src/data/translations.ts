@@ -21,6 +21,9 @@ export const translationsExactType = {
     "Play %1": {
         [LanguageCode.ru]: "Играть %1",
     },
+    "Loading": {
+        [LanguageCode.ru]: "Подключение",
+    },
     // endregion
     // region App
     "Sudoku Puzzles": {
@@ -47,6 +50,20 @@ export const translationsExactType = {
     },
     "click to toggle": {
         [LanguageCode.ru]: "нажмите, чтобы переключить",
+    },
+    // endregion
+    // region Puzzle
+    "You opened this puzzle in more than one tab": {
+        [LanguageCode.ru]: "Вы открыли эту игру на более чем одной вкладке",
+    },
+    "Please leave only one active tab": {
+        [LanguageCode.ru]: "Пожалуйста, оставьте только одну активную вкладку",
+    },
+    "The host of the game is not connected": {
+        [LanguageCode.ru]: "Хост не подключен",
+    },
+    "Please wait for them to join": {
+        [LanguageCode.ru]: "Пожалуйста, подождите когда он присоединится",
     },
     // endregion
     // region Controls

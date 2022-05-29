@@ -1,12 +1,12 @@
 import {createPortal} from "react-dom";
 import {CSSProperties, ReactNode} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {globalPaddingCoeff, textColor, textHeightCoeff} from "../../app/globals";
+import {globalPaddingCoeff, headerHeight, textColor, textHeightCoeff} from "../../app/globals";
 import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
 
 export interface ModalProps {
     cellSize: number;
-    onClose: () => void;
+    onClose?: () => void;
     textAlign?: CSSProperties["textAlign"];
     children: ReactNode;
 }
@@ -18,7 +18,7 @@ export const Modal = ({cellSize, onClose, textAlign = "center", children}: Modal
 
     useEventListener(window, "keydown", ({code}: KeyboardEvent) => {
         if (code === "Escape") {
-            onClose();
+            onClose?.();
         }
     });
 
@@ -28,6 +28,7 @@ export const Modal = ({cellSize, onClose, textAlign = "center", children}: Modal
                 zIndex: 1,
                 position: "absolute",
                 inset: 0,
+                top: puzzleContainer ? 0 : headerHeight,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -57,6 +58,6 @@ export const Modal = ({cellSize, onClose, textAlign = "center", children}: Modal
                 {children}
             </div>
         </div>,
-        puzzleContainer
+        puzzleContainer || document.body
     );
 };

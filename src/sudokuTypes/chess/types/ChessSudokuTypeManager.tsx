@@ -5,6 +5,7 @@ import {ChessColor} from "./ChessColor";
 import {ChessPieceCellDataComponentType} from "../components/ChessPieceCellData";
 import {ChessMainControls} from "../components/ChessMainControls";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {GameState} from "../../../types/sudoku/GameState";
 
 export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState, ChessGameState> = {
     areSameCellData(
@@ -86,4 +87,15 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
             [LanguageCode.ru]: "Ctrl+N может не работать",
         },
     ],
+
+    getInternalState(puzzle, {selectedColor}): any {
+        return {selectedColor};
+    },
+
+    unserializeInternalState(
+        puzzle,
+        {selectedColor}
+    ): Partial<GameState<ChessPiece> & ChessGameState> {
+        return {selectedColor};
+    }
 };

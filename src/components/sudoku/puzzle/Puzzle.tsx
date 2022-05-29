@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, {useMemo, useRef} from "react";
+import React, {useRef} from "react";
 import {Size} from "../../../types/layout/Size";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
@@ -16,7 +16,7 @@ import {RegularDigitComponentType} from "../digit/RegularDigit";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {Modal} from "../../layout/modal/Modal";
 
 const StyledContainer = styled("div", {
     shouldForwardProp(propName) {
@@ -74,17 +74,11 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     const controlsOffset = sudokuSize + padding * 2;
     // endregion
 
-    const [gameState, mergeGameState] = useGame(puzzle);
+    const context = useGame(puzzle, cellSize);
 
-    const context = useMemo<PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>(
-        () => ({
-            puzzle,
-            state: gameState,
-            onStateChange: mergeGameState,
-            cellSize,
-        }),
-        [puzzle, gameState, mergeGameState, cellSize]
-    );
+    const {state: gameState, multiPlayer} = context;
+
+    const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -126,6 +120,24 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
                         isHorizontal={isHorizontal}
                     />
                 </Absolute>
+
+                {isEnabled && <>
+                    {!isLoaded && <Modal cellSize={cellSize}>
+                        <div>{translate("Loading")}...</div>
+                    </Modal>}
+
+                    {isLoaded && <>
+                        {isDoubledConnected && <Modal cellSize={cellSize}>
+                            <div>{translate("You opened this puzzle in more than one tab")}!</div>
+                            <div>{translate("Please leave only one active tab")}.</div>
+                        </Modal>}
+
+                        {!hostData && <Modal cellSize={cellSize}>
+                            <div>{translate("The host of the game is not connected")}!</div>
+                            <div>{translate("Please wait for them to join")}.</div>
+                        </Modal>}
+                    </>}
+                </>}
             </PuzzleContainerContext.Provider>
         </StyledContainer>
     </DigitComponentTypeContext.Provider>;

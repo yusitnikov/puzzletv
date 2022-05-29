@@ -13,11 +13,6 @@ import {
 } from "@emotion-icons/material";
 import {CellWriteMode, getAllowedCellWriteModeInfos, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
-import {
-    gameStateClearSelectedCellsContent,
-    gameStateRedo,
-    gameStateUndo
-} from "../../../types/sudoku/GameState";
 import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
@@ -33,6 +28,7 @@ import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {UserLinesByData} from "../constraints/user-lines/UserLines";
 import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -109,13 +105,13 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     );
 
     const handleClear = useCallback(
-        () => onStateChange(gameState => gameStateClearSelectedCellsContent(typeManager, gameState)),
-        [onStateChange, typeManager]
+        () => onStateChange(clearSelectionAction()),
+        [onStateChange]
     );
 
-    const handleUndo = useCallback(() => onStateChange(gameStateUndo), [onStateChange]);
+    const handleUndo = useCallback(() => onStateChange(undoAction()), [onStateChange]);
 
-    const handleRedo = useCallback(() => onStateChange(gameStateRedo), [onStateChange]);
+    const handleRedo = useCallback(() => onStateChange(redoAction()), [onStateChange]);
 
     const handleCheckResult = useCallback(() => setIsShowingResult(true), [setIsShowingResult]);
     const handleCloseCheckResult = useCallback(() => setIsShowingResult(false), [setIsShowingResult]);

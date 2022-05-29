@@ -9,6 +9,7 @@ import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {CalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
+import {GameState} from "../../../types/sudoku/GameState";
 
 const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);
@@ -191,4 +192,18 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
     hasBottomRowControls: true,
 
     mainControlsComponent: RotatableMainControls,
+
+    getInternalState(
+        puzzle,
+        {angle, isStickyMode}
+    ): any {
+        return {angle, isStickyMode};
+    },
+
+    unserializeInternalState(
+        puzzle,
+        {angle, isStickyMode}: any
+    ): Partial<GameState<RotatableDigit> & RotatableGameState> {
+        return {angle, isStickyMode};
+    }
 };

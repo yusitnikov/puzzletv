@@ -13,6 +13,7 @@ import {Constraint, ConstraintOrComponent} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
 import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
+import {GameStateAction, GameStateActionType} from "./GameStateAction";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(
@@ -73,16 +74,21 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     ): PositionWithAngle | undefined;
 
     handleDigitGlobally?(
+        isGlobal: boolean,
+        clientId: string,
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         cellData: CellType,
         defaultResult: Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>
     ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
 
     handleDigitInCell?(
+        isGlobal: boolean,
+        clientId: string,
         cellWriteMode: CellWriteMode,
         cellState: CellStateEx<CellType>,
         cellData: CellType,
         position: Position,
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         defaultResult: Partial<CellStateEx<CellType>>
     ): Partial<CellStateEx<CellType>>;
 
@@ -147,6 +153,34 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     digitShortcutTips?: (Translatable|undefined)[];
 
     disableConflictChecker?: boolean;
+
+    getSharedState?(
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        state: GameState<CellType> & GameStateExtensionType
+    ): any;
+
+    setSharedState?(
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        state: GameState<CellType> & GameStateExtensionType,
+        newState: any
+    ): GameState<CellType> & GameStateExtensionType;
+
+    getInternalState?(
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        state: GameState<CellType> & GameStateExtensionType
+    ): any;
+
+    unserializeInternalState?(
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        newState: any
+    ): Partial<GameState<CellType> & GameStateExtensionType>;
+
+    supportedActionTypes?: GameStateActionType<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[];
+
+    isGlobalAction?(
+        action: GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    ): boolean;
 }
 
 export const defaultProcessArrowDirection = (

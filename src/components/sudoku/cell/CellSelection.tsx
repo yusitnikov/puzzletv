@@ -1,9 +1,8 @@
-import {blueColor, lighterBlueColor, textColor, yellowColor} from "../../app/globals";
+import {blueColor, lighterBlueColor, yellowColor} from "../../app/globals";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getVectorLength, Position} from "../../../types/layout/Position";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {getRegionBoundingBox} from "../../../utils/regions";
 import {getFieldRectTransform} from "../field/FieldRect";
 
 export const CellSelectionColor = {

@@ -13,8 +13,12 @@ import {CustomCellBounds} from "./CustomCellBounds";
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     title: PartiallyTranslatable;
     slug: string;
+    params?: any;
     author?: PartiallyTranslatable<ReactNode>;
-    rules?: (translate: ReturnType<typeof useTranslate>) => ReactNode;
+    rules?: (
+        translate: ReturnType<typeof useTranslate>,
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    ) => ReactNode;
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     fieldSize: FieldSize;
     fieldMargin?: number;
@@ -40,6 +44,12 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     noIndex?: boolean;
     saveState?: boolean;
     saveStateKey?: string;
+}
+
+export interface PuzzleDefinitionLoader<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+    slug: string;
+    fulfillParams: (params: any) => any;
+    loadPuzzle: (params: any) => PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }
 
 export const isPuzzleHasBottomRowControls = (

@@ -52,23 +52,35 @@ export const GoogleMap: FC<GoogleMapProps> = (
         }
     }());
 
-    useLayoutEffect(() => {
-        if (!ref.current) {
-            return;
-        }
+    useLayoutEffect(
+        () => {
+            if (!ref.current) {
+                return;
+            }
 
-        const map = new google.maps.Map(ref.current, mapOptions);
-        setMap(map);
-        onReady?.(map);
-    }, [ref.current, setMap]);
+            const map = new google.maps.Map(ref.current, mapOptions);
+            setMap(map);
+            onReady?.(map);
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [ref.current, setMap]
+    );
 
-    useEffect(() => {
-        if (isOverlayReady) {
-            onOverlayReady?.(overlay);
-        }
-    }, [overlay, isOverlayReady]);
+    useEffect(
+        () => {
+            if (isOverlayReady) {
+                onOverlayReady?.(overlay);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [overlay, isOverlayReady]
+    );
 
-    useEffect(() => onRender?.(renderVersion), [renderVersion]);
+    useEffect(
+        () => onRender?.(renderVersion),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [renderVersion]
+    );
 
     // region All map options
     const {
@@ -112,6 +124,7 @@ export const GoogleMap: FC<GoogleMapProps> = (
     // endregion
     useEffect(
         () => map?.setOptions(mapOptions),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [
             map,
             draggable,

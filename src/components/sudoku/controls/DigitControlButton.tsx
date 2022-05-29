@@ -1,4 +1,3 @@
-import {gameStateHandleDigit} from "../../../types/sudoku/GameState";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useCallback} from "react";
@@ -6,6 +5,7 @@ import {useEventListener} from "../../../hooks/useEventListener";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {enterDigitAction} from "../../../types/sudoku/GameStateAction";
 
 export interface DigitControlButtonProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     index: number;
@@ -48,8 +48,8 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
     }
 
     const handleDigit = useCallback(
-        () => onStateChange(state => gameStateHandleDigit({...context, state}, digit)),
-        [onStateChange, typeManager, digit]
+        () => onStateChange(enterDigitAction(digit, context)),
+        [onStateChange, digit, context]
     );
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {

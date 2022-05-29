@@ -31,6 +31,8 @@ export interface GameState<CellType> {
 
     loopOffset: Position;
 
+    currentPlayer?: string;
+
     enableConflictChecker: boolean;
     autoCheckOnFinish: boolean;
     backgroundOpacity: number;
@@ -304,40 +306,43 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
     digit: number,
+    isGlobal: boolean,
     cellData: CellType
 ): (cellState: CellStateEx<CellType>) => Partial<CellStateEx<CellType>> => {
-    switch (gameState.cellWriteMode) {
-        case CellWriteMode.main:
-            return ({centerDigits, cornerDigits}) => ({
-                usersDigit: cellData,
-                centerDigits: centerDigits.clear(),
-                cornerDigits: cornerDigits.clear(),
-            });
+    if (isGlobal) {
+        switch (gameState.cellWriteMode) {
+            case CellWriteMode.main:
+                return ({centerDigits, cornerDigits}) => ({
+                    usersDigit: cellData,
+                    centerDigits: centerDigits.clear(),
+                    cornerDigits: cornerDigits.clear(),
+                });
 
-        case CellWriteMode.center:
-            const areAllCentersEnabled = gameStateAreAllSelectedCells(
-                gameState,
-                ({centerDigits}) => centerDigits.contains(cellData)
-            );
+            case CellWriteMode.center:
+                const areAllCentersEnabled = gameStateAreAllSelectedCells(
+                    gameState,
+                    ({centerDigits}) => centerDigits.contains(cellData)
+                );
 
-            return ({centerDigits}) => ({
-                centerDigits: centerDigits.toggle(cellData, !areAllCentersEnabled)
-            });
+                return ({centerDigits}) => ({
+                    centerDigits: centerDigits.toggle(cellData, !areAllCentersEnabled)
+                });
 
-        case CellWriteMode.corner:
-            const areAllCornersEnabled = gameStateAreAllSelectedCells(
-                gameState,
-                ({cornerDigits}) => cornerDigits.contains(cellData)
-            );
+            case CellWriteMode.corner:
+                const areAllCornersEnabled = gameStateAreAllSelectedCells(
+                    gameState,
+                    ({cornerDigits}) => cornerDigits.contains(cellData)
+                );
 
-            return ({cornerDigits}) => ({
-                cornerDigits: cornerDigits.toggle(cellData, !areAllCornersEnabled)
-            });
+                return ({cornerDigits}) => ({
+                    cornerDigits: cornerDigits.toggle(cellData, !areAllCornersEnabled)
+                });
 
-        case CellWriteMode.color:
-            return ({colors}) => ({
-                colors: colors.toggle(digit - 1)
-            });
+            case CellWriteMode.color:
+                return ({colors}) => ({
+                    colors: colors.toggle(digit - 1)
+                });
+        }
     }
 
     return () => ({});
@@ -345,7 +350,9 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
 
 export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    digit: number
+    digit: number,
+    clientId: string,
+    isGlobal: boolean
 ) => {
     const {puzzle: {typeManager}, state} = context;
 
@@ -353,21 +360,21 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
 
     const {
         handleDigitGlobally,
-        handleDigitInCell = (cellWriteMode, cell, data, position, defaultValue) => defaultValue,
+        handleDigitInCell = (isGlobal, clientId, cellWriteMode, cell, data, position, context, defaultValue) => defaultValue,
     } = typeManager;
 
-    const defaultHandler = getDefaultDigitHandler(typeManager, state, digit, cellData);
+    const defaultHandler = getDefaultDigitHandler(typeManager, state, digit, isGlobal, cellData);
 
     let result = gameStateProcessSelectedCells(
         typeManager,
         state,
         (cell, position) => handleDigitInCell(
-            state.cellWriteMode, cell, cellData, position, defaultHandler(cell)
+            isGlobal, clientId, state.cellWriteMode, cell, cellData, position, context, defaultHandler(cell)
         )
     );
 
     if (handleDigitGlobally) {
-        result = handleDigitGlobally(context, cellData, result);
+        result = handleDigitGlobally(isGlobal, clientId, context, cellData, result);
     }
 
     return result;
@@ -446,11 +453,10 @@ export const gameStateResetCurrentMultiLine = <CellType, ProcessedGameStateExten
     currentMultiLine: [],
 } as any);
 
-export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const gameStateApplyCurrentMultiLineGlobally = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     gameState: ProcessedGameState<CellType>
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    currentMultiLine: [],
     fieldStateHistory: fieldStateHistoryAddState(
         typeManager,
         gameState.fieldStateHistory,
@@ -468,6 +474,10 @@ export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType 
         })
     ),
 } as any);
+
+export const gameStateApplyCurrentMultiLineLocally = () => ({
+    currentMultiLine: [],
+} as Partial<GameState<any>> as any);
 
 export const gameStateDeleteAllLines = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,

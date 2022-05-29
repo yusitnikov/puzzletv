@@ -36,7 +36,7 @@ export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameSt
 
     return <Absolute {...rect}>
         <Rules
-            puzzle={puzzle}
+            context={context}
             rect={{
                 left: 0,
                 top: 0,
@@ -47,7 +47,6 @@ export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameSt
                     ? controlsPosition.top - padding
                     : rect.height,
             }}
-            cellSize={cellSize}
         />
 
         <Controls

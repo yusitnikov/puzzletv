@@ -1,4 +1,4 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
 import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {RealChessPuzzleRubberBlando} from "./RealChessPuzzleRubberBlando";
@@ -12,7 +12,7 @@ import {generateRandomPuzzle} from "./Random";
 import {getDailyRandomGeneratorSeed} from "../../utils/random";
 import {generateQuadMasters} from "./QuadMasters";
 
-export default [
+export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty & random
     EmptyRegular,
     EmptyChaosConstruction,
@@ -23,7 +23,11 @@ export default [
 
     generateRandomPuzzle("random", 9, 3),
     generateRandomPuzzle("daily-random", 9, 3, getDailyRandomGeneratorSeed()),
-    generateQuadMasters("quad-masters", 9, 3),
+    {
+        slug: "quad-masters",
+        fulfillParams: ({size = 9, regionWidth = 3, seed = Math.round(Math.random() * 1000000), ...other}) => ({size, regionWidth, seed, ...other}),
+        loadPuzzle: ({size, regionWidth, seed}) => generateQuadMasters("quad-masters", size, regionWidth, seed)
+    },
     generateQuadMasters("daily-quad-masters", 9, 3, getDailyRandomGeneratorSeed()),
     // endregion
 
@@ -49,4 +53,12 @@ export default [
 
     Africa,
     // endregion
-] as PuzzleDefinition<any, any, any>[];
+];
+
+export const AllPuzzlesWithDefaultParams = AllPuzzles.map((puzzleOrLoader) => {
+    const loader = puzzleOrLoader as PuzzleDefinitionLoader<any, any, any>;
+
+    return typeof loader.loadPuzzle === "function"
+        ? loader.loadPuzzle(loader.fulfillParams({}))
+        : puzzleOrLoader as PuzzleDefinition<any, any, any>;
+});

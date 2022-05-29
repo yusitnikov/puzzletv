@@ -1,6 +1,6 @@
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {headerPadding} from "./globals";
-import AllPuzzles from "../../data/puzzles/AllPuzzles";
+import {AllPuzzlesWithDefaultParams} from "../../data/puzzles/AllPuzzles";
 import React from "react";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {indexes} from "../../utils/indexes";
@@ -15,7 +15,7 @@ export const PuzzlesList = () => {
     const itemWidth = (innerWidth - (columnsCount - 1) * gridGap) / columnsCount;
 
     return <>
-        {splitArrayIntoChunks(AllPuzzles.filter(({noIndex}) => !noIndex), columnsCount).map((row, rowIndex) => <div
+        {splitArrayIntoChunks(AllPuzzlesWithDefaultParams.filter(({noIndex}) => !noIndex), columnsCount).map((row, rowIndex) => <div
             key={rowIndex}
             style={{
                 display: "flex",

@@ -10,8 +10,8 @@ import {
     h2HeightCoeff,
     textHeightCoeff
 } from "../../app/globals";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 const StyledContainer = styled(Absolute)({
     display: "flex",
@@ -19,13 +19,14 @@ const StyledContainer = styled(Absolute)({
 });
 
 export interface RulesProps<CellType> {
-    puzzle: PuzzleDefinition<CellType, any, any>;
+    context: PuzzleContext<CellType, any, any>;
     rect: Rect;
-    cellSize: number;
 }
 
-export const Rules = <CellType,>({puzzle: {title, author, rules}, rect, cellSize}: RulesProps<CellType>) => {
+export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const translate = useTranslate();
+
+    const {puzzle: {title, author, rules}, cellSize} = context;
 
     return <StyledContainer {...rect} pointerEvents={true}>
         <div
@@ -57,7 +58,7 @@ export const Rules = <CellType,>({puzzle: {title, author, rules}, rect, cellSize
                     fontSize: cellSize * textHeightCoeff,
                 }}
             >
-                {rules?.(translate)}
+                {rules?.(translate, context)}
             </div>
         </div>
     </StyledContainer>;

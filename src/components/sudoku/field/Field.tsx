@@ -11,7 +11,6 @@ import {CellDigits, shouldSkipCellDigits} from "../cell/CellDigits";
 import {FieldSvg} from "./FieldSvg";
 import {
     gameStateApplyArrowToSelectedCells,
-    gameStateApplyCurrentMultiLine,
     gameStateClearSelectedCells,
     gameStateGetCurrentFieldState,
     gameStateNormalizeLoopOffset,
@@ -37,6 +36,7 @@ import {Set} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
+import {applyCurrentMultiLineAction} from "../../../types/sudoku/GameStateAction";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -116,7 +116,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     });
 
     useEventListener(window, "pointerup", () => {
-        onStateChange(gameState => gameStateApplyCurrentMultiLine(typeManager, gameState));
+        onStateChange(applyCurrentMultiLineAction());
 
         setDragStart(undefined);
     });
