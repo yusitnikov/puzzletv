@@ -6,6 +6,9 @@ export const translationsExactType = {
     "by": {
         [LanguageCode.ru]: "от",
     },
+    "you": {
+        [LanguageCode.ru]: "Вы",
+    },
     "or": {
         [LanguageCode.ru]: "или",
     },
@@ -116,6 +119,11 @@ export const translationsExactType = {
     },
     "Click to show": {
         [LanguageCode.ru]: "Нажмите, чтоб показать",
+    },
+    // endregion
+    // region Rules
+    "Waiting for people to connect": {
+        [LanguageCode.ru]: "Ждём, когда люди подключатся",
     },
     // endregion
     // region ChessMainControls

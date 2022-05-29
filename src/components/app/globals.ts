@@ -13,11 +13,15 @@ export const darkGreyColor = "#afafaf";
 export const blueColor = "#7eb7f8";
 export const lighterBlueColor = "#aec7fc";
 export const greenColor = "#a3e048";
+export const purpleColor = "#d23be7";
 export const redColor = "#e6261f";
 export const yellowColor = "#f7d038";
 
 export const textColor = blackColor;
 export const errorColor = redColor;
+export const recentInfoColor = yellowColor;
+export const currentPlayerColor = greenColor;
+export const otherPlayerColor = purpleColor;
 
 export const userDigitColor = "#00f";
 

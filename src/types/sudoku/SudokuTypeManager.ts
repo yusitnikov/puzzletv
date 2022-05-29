@@ -89,7 +89,8 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         cellData: CellType,
         position: Position,
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        defaultResult: Partial<CellStateEx<CellType>>
+        defaultResult: Partial<CellStateEx<CellType>>,
+        cache: any
     ): Partial<CellStateEx<CellType>>;
 
     extraCellWriteModes?: CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[];

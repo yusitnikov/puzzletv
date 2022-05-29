@@ -1,4 +1,12 @@
-import {blackColor, blueColor, greenColor, lightGreyColor, redColor, yellowColor} from "../../components/app/globals";
+import {
+    blackColor,
+    blueColor,
+    greenColor,
+    lightGreyColor,
+    purpleColor,
+    redColor,
+    yellowColor
+} from "../../components/app/globals";
 
 export enum CellColor {
     lightGrey,
@@ -17,7 +25,7 @@ export const cellColors: Record<CellColor, string> = {
     [CellColor.darkGrey]: "#5f5f5f",
     [CellColor.black]: blackColor,
     [CellColor.green]: greenColor,
-    [CellColor.purple]: "#d23be7",
+    [CellColor.purple]: purpleColor,
     [CellColor.orange]: "#eb7532",
     [CellColor.red]: redColor,
     [CellColor.yellow]: yellowColor,

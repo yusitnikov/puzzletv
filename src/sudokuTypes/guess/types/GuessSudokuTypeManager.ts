@@ -6,6 +6,7 @@ import {RegularDigitComponentType} from "../../../components/sudoku/digit/Regula
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {GameState} from "../../../types/sudoku/GameState";
 import {Set} from "../../../types/struct/Set";
+import {CellOwnershipConstraint} from "../components/CellOwnership";
 
 export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     solution: GivenDigitsMap<number>,
@@ -18,6 +19,8 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         unserializeGameState
     ),
 
+    items: [CellOwnershipConstraint],
+
     handleDigitInCell(
         isGlobal,
         clientId,
@@ -25,8 +28,9 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         cellState,
         cellData,
         {top, left},
-        {state: {currentPlayer}, multiPlayer: {isEnabled}},
-        defaultResult
+        {state: {currentPlayer, selectedCells}, multiPlayer: {isEnabled}},
+        defaultResult,
+        cache
     ): Partial<CellStateEx<number>> {
         const isMyTurn = !isEnabled || currentPlayer === clientId;
 
@@ -46,6 +50,10 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
             return {};
         }
 
+        const areAllCorrect: boolean = (cache.areAllPositive = cache.areAllPositive ?? selectedCells.items.every(
+            ({top, left}) => solution[top][left] === cellData)
+        );
+
         if (solution[top][left] !== cellData) {
             return {
                 excludedDigits: cellState.excludedDigits.add(cellData),
@@ -58,8 +66,30 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
             centerDigits: cellState.centerDigits.clear(),
             cornerDigits: cellState.cornerDigits.clear(),
             excludedDigits: cellState.excludedDigits.clear(),
+            ignoreOwnership: !areAllCorrect,
         }
     },
+
+    // handleDigitGlobally(
+    //     isGlobal,
+    //     clientId,
+    //     {state},
+    //     cellData,
+    //     defaultResult
+    // ): Partial<ProcessedGameState<number> & ProcessedGameStateExtensionType> {
+    //     if (!isGlobal) {
+    //         return defaultResult;
+    //     }
+    //
+    //     const {cellWriteMode, selectedCells} = state;
+    //     const newState = {...state, ...defaultResult};
+    //
+    //     if (cellWriteMode !== CellWriteMode.main || !selectedCells.size) {
+    //         return defaultResult;
+    //     }
+    //
+    //     return defaultResult;
+    // },
 
     disableConflictChecker: true,
 

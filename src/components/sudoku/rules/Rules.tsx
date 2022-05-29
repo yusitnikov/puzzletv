@@ -3,16 +3,18 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import styled from "@emotion/styled";
 import {
-    blueColor,
+    blueColor, currentPlayerColor,
     globalPaddingCoeff,
     greenColor,
     h1HeightCoeff,
-    h2HeightCoeff,
+    h2HeightCoeff, otherPlayerColor, textColor,
     textHeightCoeff
 } from "../../app/globals";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Fragment} from "react";
+import {myClientId} from "../../../hooks/useMultiPlayer";
+import {GameState} from "../../../types/sudoku/GameState";
 
 const StyledContainer = styled(Absolute)({
     display: "flex",
@@ -48,10 +50,31 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             {author && <div style={{fontSize: cellSize * h2HeightCoeff}}>{translate("by")} {translate(author)}</div>}
 
             {isEnabled && <>
-                {allPlayerIds.map((playerId, index) => <Fragment key={playerId}>
-                    {index > 0 && " vs "}
-                    <span style={{fontWeight: playerId === currentPlayer ? 700 : 400}}>{playerNicknames[playerId]}</span>
+                {allPlayerIds.length > 1 && allPlayerIds.map((playerId, index) => <Fragment key={playerId}>
+                    {index > 0 && <strong> vs </strong>}
+                    <span
+                        style={{cursor: playerId === myClientId ? "pointer" : undefined}}
+                        onClick={() => {
+                            if (playerId === myClientId) {
+                                context.onStateChange({isShowingSettings: true} as Partial<GameState<CellType>>);
+                            }
+                        }}
+                    >
+                        <span style={{
+                            display: "inline-block",
+                            width: "0.7em",
+                            height: "0.7em",
+                            padding: 0,
+                            backgroundColor: playerId === myClientId ? currentPlayerColor : otherPlayerColor,
+                            border: `1px solid ${textColor}`,
+                        }}/>
+                        &nbsp;
+                        <span style={{fontWeight: playerId === currentPlayer ? 700 : 400}}>{playerNicknames[playerId]}</span>
+                        {playerId === myClientId && <>&nbsp;({translate("you")})</>}
+                    </span>
                 </Fragment>)}
+
+                {allPlayerIds.length <= 1 && `${translate("Waiting for people to connect")}...`}
             </>}
         </div>
 

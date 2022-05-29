@@ -16,6 +16,7 @@ import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap} from "./GivenDigitsMap";
 import {PuzzleContext} from "./PuzzleContext";
 import {Set} from "../struct/Set";
+import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../utils/playerDataHash";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -32,6 +33,7 @@ export interface GameState<CellType> {
     loopOffset: Position;
 
     currentPlayer?: string;
+    playerObjects: Record<string, string>;
 
     isShowingSettings: boolean;
     enableConflictChecker: boolean;
@@ -235,14 +237,16 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
 };
 
 export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    clientId: string,
     fieldStateProcessor: (cellState: CellStateEx<CellType>, position: Position) => Partial<CellStateEx<CellType>>
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
-    const currentState = gameStateGetCurrentFieldState(gameState);
+    const {puzzle: {typeManager}, state} = context;
 
-    const selectedCells = gameState.selectedCells.items;
-    let {initialDigits = {}, excludedDigits = {}} = gameState;
+    const currentState = gameStateGetCurrentFieldState(state);
+
+    const selectedCells = state.selectedCells.items;
+    let {fieldStateHistory, initialDigits = {}, excludedDigits = {}, playerObjects} = state;
 
     for (const position of selectedCells) {
         const {top, left} = position;
@@ -253,7 +257,7 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
             excludedDigits: excludedDigits[top][left],
         }, position);
 
-        if (newState.initialDigit) {
+        if (newState.initialDigit && !initialDigits?.[top]?.[left]) {
             initialDigits = {
                 ...initialDigits,
                 [top]: {
@@ -261,6 +265,13 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
                     [left]: newState.initialDigit,
                 }
             };
+
+            if (!newState.ignoreOwnership) {
+                playerObjects = {
+                    ...playerObjects,
+                    [getMainDigitDataHash({top, left})]: clientId,
+                };
+            }
         } else if ("initialDigit" in newState && initialDigits?.[top]?.[left]) {
             // The key is present, but the value is undefined - remove the value
             delete initialDigits[top][left];
@@ -274,34 +285,47 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
                     [left]: newState.excludedDigits,
                 }
             };
+
+            if (!newState.ignoreOwnership) {
+                const newDigits = newState.excludedDigits.toggleAll(state.excludedDigits[top]?.[left]?.items || [], false);
+                for (const digit of newDigits.items) {
+                    playerObjects = {
+                        ...playerObjects,
+                        [getExcludedDigitDataHash({top, left}, digit, context)]: clientId,
+                    };
+                }
+            }
         }
     }
 
-    return {
-        fieldStateHistory: gameState.cellWriteModeInfo.isNoSelectionMode
-            ? gameState.fieldStateHistory
-            : fieldStateHistoryAddState(
-                typeManager,
-                gameState.fieldStateHistory,
-                state => processFieldStateCells(
-                    state,
-                    selectedCells,
-                    (cellState, position) => {
-                        const {initialDigit, excludedDigits, ...cellStateUpdates} = fieldStateProcessor({
-                            ...cellState,
-                            initialDigit: gameState.initialDigits?.[position.top]?.[position.left],
-                            excludedDigits: gameState.excludedDigits[position.top][position.left],
-                        }, position);
+    if (!state.cellWriteModeInfo.isNoSelectionMode) {
+        fieldStateHistory = fieldStateHistoryAddState(
+            typeManager,
+            fieldStateHistory,
+            state => processFieldStateCells(
+                state,
+                selectedCells,
+                (cellState, position) => {
+                    const {initialDigit, excludedDigits, ...cellStateUpdates} = fieldStateProcessor({
+                        ...cellState,
+                        initialDigit: context.state.initialDigits?.[position.top]?.[position.left],
+                        excludedDigits: context.state.excludedDigits[position.top][position.left],
+                    }, position);
 
-                        return {
-                            ...cellState,
-                            ...cellStateUpdates,
-                        };
-                    }
-                )
-            ),
+                    return {
+                        ...cellState,
+                        ...cellStateUpdates,
+                    };
+                }
+            )
+        );
+    }
+
+    return {
+        fieldStateHistory,
         initialDigits,
         excludedDigits,
+        playerObjects,
     } as Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
 };
 
@@ -368,11 +392,12 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
 
     const defaultHandler = getDefaultDigitHandler(typeManager, state, digit, isGlobal, cellData);
 
+    const cache: any = {};
     let result = gameStateProcessSelectedCells(
-        typeManager,
-        state,
+        context,
+        clientId,
         (cell, position) => handleDigitInCell(
-            isGlobal, clientId, state.cellWriteMode, cell, cellData, position, context, defaultHandler(cell)
+            isGlobal, clientId, state.cellWriteMode, cell, cellData, position, context, defaultHandler(cell), cache
         )
     );
 
@@ -384,41 +409,43 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
 };
 
 export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    clientId: string
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
-    const clearCenter = () => gameStateProcessSelectedCells(typeManager, gameState, cell => ({
+    const {puzzle: {typeManager}, state} = context;
+
+    const clearCenter = () => gameStateProcessSelectedCells(context, clientId, cell => ({
         ...cell,
         centerDigits: cell.centerDigits.clear()
     }));
-    const clearCorner = () => gameStateProcessSelectedCells(typeManager, gameState, cell => ({
+    const clearCorner = () => gameStateProcessSelectedCells(context, clientId, cell => ({
         ...cell,
         cornerDigits: cell.cornerDigits.clear()
     }));
-    const clearColor = () => gameStateProcessSelectedCells(typeManager, gameState, cell => ({
+    const clearColor = () => gameStateProcessSelectedCells(context, clientId, cell => ({
         ...cell,
         colors: cell.colors.clear()
     }));
-    const clearLines = () => gameStateDeleteAllLines(typeManager, gameState);
+    const clearLines = () => gameStateDeleteAllLines(typeManager, state);
 
-    switch (gameState.cellWriteMode) {
+    switch (state.cellWriteMode) {
         case CellWriteMode.main:
-            if (gameStateIsAnySelectedCell(gameState, cell => !!cell.usersDigit)) {
-                return gameStateProcessSelectedCells(typeManager, gameState, cell => ({
+            if (gameStateIsAnySelectedCell(state, cell => !!cell.usersDigit)) {
+                return gameStateProcessSelectedCells(context, clientId, cell => ({
                     ...cell,
                     usersDigit: undefined
                 }));
             }
 
-            if (gameStateIsAnySelectedCell(gameState, cell => !!cell.centerDigits.size)) {
+            if (gameStateIsAnySelectedCell(state, cell => !!cell.centerDigits.size)) {
                 return clearCenter();
             }
 
-            if (gameStateIsAnySelectedCell(gameState, cell => !!cell.cornerDigits.size)) {
+            if (gameStateIsAnySelectedCell(state, cell => !!cell.cornerDigits.size)) {
                 return clearCorner();
             }
 
-            if (gameStateIsAnySelectedCell(gameState, cell => !!cell.colors.size)) {
+            if (gameStateIsAnySelectedCell(state, cell => !!cell.colors.size)) {
                 return clearColor();
             }
 

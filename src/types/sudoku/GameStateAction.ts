@@ -57,8 +57,8 @@ export const redoAction = <CellType, GameStateExtensionType, ProcessedGameStateE
 export const clearSelectionActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
     : GameStateActionType<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
     key: "clear-selection",
-    callback: (_, {puzzle: {typeManager}}) =>
-        state => gameStateClearSelectedCellsContent(typeManager, state),
+    callback: (_, context, clientId) =>
+        state => gameStateClearSelectedCellsContent({...context, state}, clientId),
 });
 export const clearSelectionAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
     : GameStateAction<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({

@@ -37,6 +37,7 @@ type SavedGameStates = [
     excludedDigits: any,
     cellWriteMode: any,
     currentPlayer: any,
+    playerObjects: any,
 ][];
 const gameStateStorageKey = "savedGameState";
 const gameStateSerializerVersion = 1;
@@ -116,6 +117,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             loopOffset: emptyPosition,
 
             currentPlayer: savedGameState?.[6] || params.host,
+            playerObjects: savedGameState?.[7] || {},
 
             isShowingSettings: false,
             enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
@@ -137,12 +139,14 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             ...myGameState,
             ...setSharedState(puzzle, myGameState, multiPlayer.hostData),
             currentPlayer: multiPlayer.hostData.currentPlayer,
+            playerObjects: multiPlayer.hostData.playerObjects,
         };
     }, [puzzle, setSharedState]);
 
     const sharedGameState = usePureMemo(() => ({
         ...(isHost && getSharedState?.(puzzle, myGameState)),
         currentPlayer: myGameState.currentPlayer,
+        playerObjects: myGameState.playerObjects,
     }), [isHost, getSharedState, myGameState]);
 
     const multiPlayer = useMultiPlayer(
@@ -224,6 +228,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                             serializeGivenDigitsMap(gameState.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
                             gameState.persistentCellWriteMode,
                             gameState.currentPlayer || "",
+                            gameState.playerObjects,
                         ],
                         ...getSavedGameStates().filter(([key]) => key !== fullSaveStateKey),
                     ] as SavedGameStates).slice(0, maxSavedPuzzles),

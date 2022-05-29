@@ -60,25 +60,42 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
         mainControlsComponent: QuadMastersControls,
 
         items: (context) => {
-            const {state: {allQuads, currentQuad}} = context;
+            const {state: {allQuads, currentQuad}, multiPlayer: {isEnabled}} = context;
 
             return [
+                ...((parent.items instanceof Array && parent.items) || []),
+                ...((typeof parent.items === "function" && parent.items(context)) || []),
                 QuadsHintConstraint,
-                ...allQuads.map(({position, digits}) => QuadConstraintBySolution(context, position, digits.items, solution)),
-                currentQuad && QuadConstraint(currentQuad.position, currentQuad.digits.items),
+                ...allQuads.map(
+                    ({position, digits}, index) => QuadConstraintBySolution(
+                        context,
+                        position,
+                        digits.items,
+                        solution,
+                        isEnabled && index === allQuads.length - 1 && !currentQuad
+                    )
+                ),
+                currentQuad && QuadConstraint(currentQuad.position, currentQuad.digits.items, [], isEnabled),
             ].filter(item => item).map(item => item!);
         },
 
         handleDigitGlobally(
             isGlobal,
             clientId,
-            {state, multiPlayer: {isEnabled, allPlayerIds}},
+            context,
             cellData,
             defaultResult
         ): Partial<ProcessedGameState<number> & QuadMastersGameState> {
+            defaultResult = parent.handleDigitGlobally?.(isGlobal, clientId, context, cellData, defaultResult) || defaultResult;
+
             if (!isGlobal) {
                 return defaultResult;
             }
+
+            const {
+                state,
+                multiPlayer: {isEnabled, allPlayerIds},
+            } = context;
 
             const {
                 cellWriteMode,
