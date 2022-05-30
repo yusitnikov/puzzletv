@@ -421,15 +421,12 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
     const {puzzle: {typeManager}, state} = context;
 
     const clearCenter = () => gameStateProcessSelectedCells(context, clientId, cell => ({
-        ...cell,
         centerDigits: cell.centerDigits.clear()
     }));
     const clearCorner = () => gameStateProcessSelectedCells(context, clientId, cell => ({
-        ...cell,
         cornerDigits: cell.cornerDigits.clear()
     }));
     const clearColor = () => gameStateProcessSelectedCells(context, clientId, cell => ({
-        ...cell,
         colors: cell.colors.clear()
     }));
     const clearLines = () => gameStateDeleteAllLines(typeManager, state);
@@ -438,7 +435,6 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
         case CellWriteMode.main:
             if (gameStateIsAnySelectedCell(state, cell => !!cell.usersDigit)) {
                 return gameStateProcessSelectedCells(context, clientId, cell => ({
-                    ...cell,
                     usersDigit: undefined
                 }));
             }
