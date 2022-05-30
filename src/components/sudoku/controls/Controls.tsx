@@ -30,6 +30,7 @@ import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
 import {GameState} from "../../../types/sudoku/GameState";
+import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -53,8 +54,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         typeManager,
         resultChecker,
         getLmdSolutionCode,
-        fieldSize: {fieldSize},
-        digitsCount = Math.min(typeManager.maxDigitsCount || fieldSize, fieldSize),
+        digitsCount = getDefaultDigitsCount(puzzle),
         allowDrawingBorders = false,
         loopHorizontally = false,
         loopVertically = false,

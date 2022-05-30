@@ -30,7 +30,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const translate = useTranslate();
 
     const {
-        puzzle: {title, author, rules},
+        puzzle: {title, author, rules, typeManager: {getPlayerScore}},
         state: {currentPlayer},
         cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
@@ -60,17 +60,22 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                             }
                         }}
                     >
-                        <span style={{
-                            display: "inline-block",
-                            width: "0.7em",
-                            height: "0.7em",
-                            padding: 0,
-                            backgroundColor: playerId === myClientId ? currentPlayerColor : otherPlayerColor,
-                            border: `1px solid ${textColor}`,
-                        }}/>
-                        &nbsp;
                         <span style={{fontWeight: playerId === currentPlayer ? 700 : 400}}>{playerNicknames[playerId]}</span>
                         {playerId === myClientId && <>&nbsp;({translate("you")})</>}
+                        &nbsp;
+                        <span
+                            style={{
+                                display: "inline-block",
+                                width: getPlayerScore ? undefined : "0.7em",
+                                height: getPlayerScore ? undefined : "0.7em",
+                                padding: getPlayerScore ? "0 0.25em" : 0,
+                                backgroundColor: playerId === myClientId ? currentPlayerColor : otherPlayerColor,
+                                border: `1px solid ${textColor}`,
+                            }}
+                            title={getPlayerScore ? translate("Score") : undefined}
+                        >
+                            {getPlayerScore?.(context, playerId)}
+                        </span>
                     </span>
                 </Fragment>)}
 

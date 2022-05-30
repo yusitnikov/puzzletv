@@ -188,6 +188,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         prevState: (ProcessedGameState<CellType> & ProcessedGameStateExtensionType) | undefined,
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
     ): void;
+
+    getPlayerScore?(
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        clientId: string
+    ): string | number;
 }
 
 export const defaultProcessArrowDirection = (

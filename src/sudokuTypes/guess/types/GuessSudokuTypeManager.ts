@@ -7,6 +7,10 @@ import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {GameState} from "../../../types/sudoku/GameState";
 import {Set} from "../../../types/struct/Set";
 import {CellOwnershipConstraint} from "../components/CellOwnership";
+import {indexes, indexesFromTo} from "../../../utils/indexes";
+import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
+import {Position} from "../../../types/layout/Position";
+import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 
 export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     solution: GivenDigitsMap<number>,
@@ -118,5 +122,45 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
                 unserializeCellData
             )),
         };
+    },
+
+    getPlayerScore(context, clientId) {
+        const {
+            puzzle,
+            state,
+            multiPlayer: {isEnabled},
+        } = context;
+
+        const {
+            typeManager: {createCellDataByDisplayDigit},
+            fieldSize: {rowsCount, columnsCount},
+            digitsCount = getDefaultDigitsCount(puzzle),
+        } = puzzle;
+
+        const {playerObjects} = state;
+
+        let score = 0;
+
+        for (const top of indexes(rowsCount)) {
+            for (const left of indexes(columnsCount)) {
+                const position: Position = {top, left};
+
+                if (isEnabled) {
+                    if (playerObjects[getMainDigitDataHash(position)] === clientId) {
+                        score++;
+                    }
+                } else {
+                    for (const digit of indexesFromTo(1, digitsCount, true)) {
+                        const cellData = createCellDataByDisplayDigit(digit, state);
+
+                        if (playerObjects[getExcludedDigitDataHash(position, cellData, context)] === clientId) {
+                            score++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return score;
     },
 });

@@ -125,6 +125,9 @@ export const translationsExactType = {
     "Waiting for people to connect": {
         [LanguageCode.ru]: "Ждём, когда люди подключатся",
     },
+    "Score": {
+        [LanguageCode.ru]: "Счёт",
+    },
     // endregion
     // region ChessMainControls
     "Chess piece color": {

@@ -63,3 +63,6 @@ export const isPuzzleHasBottomRowControls = (
         enableDragMode = false,
     }: PuzzleDefinition<any, any, any>
 ) => hasBottomRowControls || (allowDrawingBorders && (loopHorizontally || loopVertically || enableDragMode));
+
+export const getDefaultDigitsCount = ({typeManager: {maxDigitsCount}, fieldSize: {fieldSize}}: PuzzleDefinition<any, any, any>) =>
+    Math.min(maxDigitsCount || fieldSize, fieldSize);
