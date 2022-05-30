@@ -1,5 +1,6 @@
 import {GivenDigitsMap} from "../types/sudoku/GivenDigitsMap";
 import {indexes, indexesFromTo} from "./indexes";
+import {Position} from "../types/layout/Position";
 
 export type RandomGenerator = () => number;
 
@@ -17,10 +18,8 @@ export const getDailyRandomGeneratorSeed = () => {
     return date.getUTCFullYear() * 10000 + date.getUTCMonth() * 100 + date.getUTCDate();
 };
 
-export const generateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, randomOrSeed: RandomGenerator | number = Math.random): GivenDigitsMap<number> => {
-    const random = typeof randomOrSeed === "function"
-        ? randomOrSeed
-        : createRandomGenerator(randomOrSeed);
+export const generateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, randomOrSeed: number): GivenDigitsMap<number> => {
+    const random = createRandomGenerator(randomOrSeed);
 
     while (true) {
         const initialDigits = tryGenerateRandomPuzzleDigits(fieldSize, regionWidth, random);
@@ -47,7 +46,7 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
         }
     }
 
-    const putRandomDigit = (rowIndex: number, columnIndex: number) => {
+    const putRandomDigit = (rowIndex: number, columnIndex: number): boolean => {
         if (initialDigits[rowIndex][columnIndex]) {
             return true;
         }
@@ -61,30 +60,29 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
 
         const boxRowIndex = rowIndex - rowIndex % regionHeight;
         const boxColumnIndex = columnIndex - columnIndex % regionWidth;
-        for (const index of indexes(fieldSize)) {
-            if (!removeCandidates(
-                [
-                    [rowIndex, index],
-                    [index, columnIndex],
-                    [boxRowIndex + index % regionHeight, boxColumnIndex + Math.floor(index / regionHeight)],
-                ],
-                digit
-            )) {
-                return false;
-            }
+
+        const candidatesToRemove: Position[] = indexes(fieldSize).flatMap(index => [
+            {
+                top: rowIndex,
+                left: index,
+            },
+            {
+                top: index,
+                left: columnIndex,
+            },
+            {
+                top: boxRowIndex + index % regionHeight,
+                left: boxColumnIndex + Math.floor(index / regionHeight),
+            },
+        ]);
+
+        for (const {top, left} of candidatesToRemove) {
+            digitOptions[top][left].delete(digit);
         }
 
-        return true;
-    };
-
-    const removeCandidates = (candidates: [rowIndex: number, columnIndex: number][], digit: number) => {
-        for (const [rowIndex, columnIndex] of candidates) {
-            digitOptions[rowIndex][columnIndex].delete(digit);
-        }
-
-        for (const [rowIndex, columnIndex] of candidates) {
-            if (digitOptions[rowIndex][columnIndex].size <= 1) {
-                return putRandomDigit(rowIndex, columnIndex);
+        for (const {top, left} of candidatesToRemove) {
+            if (digitOptions[top][left].size <= 1) {
+                return putRandomDigit(top, left);
             }
         }
 

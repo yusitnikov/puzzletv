@@ -16,6 +16,6 @@ export const generateRandomPuzzle = (slug: string, fieldSize: number, regionWidt
     saveStateKey: `${slug}-${randomSeed}`,
     typeManager: DigitSudokuTypeManager(),
     fieldSize: createRegularFieldSize(fieldSize, regionWidth),
-    initialDigits: generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed),
+    initialDigits: generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed || Math.round(Math.random() * 1000000)),
     rules: translate => `${translate(normalSudokuRulesApply)}.`,
 });
