@@ -6,7 +6,8 @@ import {DigitProps} from "../../../components/sudoku/digit/DigitProps";
 
 export const DigitCellData = (DigitComponent: ComponentType<DigitProps> = RegularDigit) =>
     (props: CellDataProps<number>) => {
-        const {data: digit, size, state, isInitial, isValid = true, ...absoluteProps} = props;
+        const {data: digit, size, state, isInitial, isValid, ...absoluteProps} = props;
+
         return <DigitComponent
             {...absoluteProps}
             digit={digit}

@@ -8,7 +8,7 @@ import {RotatableProcessedGameState} from "../types/RotatableGameState";
 export const RotatableDigitCellData = (
     props: CellDataProps<RotatableDigit, RotatableProcessedGameState>
 ) => {
-    const {data, size, state, isInitial, isValid = true, ...absoluteProps} = props;
+    const {data, size, state, isInitial, isValid, ...absoluteProps} = props;
 
     return <CalculatorDigit
         {...absoluteProps}
