@@ -39,6 +39,7 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
             fieldSize: createRegularFieldSize(fieldSize, regionWidth),
             resultChecker: isValidFinishedPuzzleByConstraints,
             forceAutoCheckOnFinish: true,
+            fieldMargin: Math.max(0, (7 - fieldSize) / 2),
         };
     },
 });
