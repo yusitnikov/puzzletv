@@ -51,7 +51,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 ];
 
-export const AllPuzzlesWithDefaultParams = AllPuzzles.map((puzzleOrLoader) => {
+export const getAllPuzzlesWithDefaultParams = () => AllPuzzles.map((puzzleOrLoader) => {
     const loader = puzzleOrLoader as PuzzleDefinitionLoader<any, any, any>;
 
     return typeof loader.loadPuzzle === "function"
