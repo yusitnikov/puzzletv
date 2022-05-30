@@ -1,6 +1,11 @@
 import {Translatable} from "../../../types/translations/Translatable";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 
+export const multiPlayerTurnsRules: Translatable = {
+    [LanguageCode.en]: "Players take turns to first place a quad onto the grid then input a digit into a cell",
+    [LanguageCode.ru]: "Игроки по очереди сначала помещают квадрант, а затем вводят цифру в клетку",
+};
+
 export const twoPhasesGame: Translatable = {
     [LanguageCode.en]: "The game is played in 2 phases",
     [LanguageCode.ru]: "Игра состоит из двух фаз",
@@ -47,34 +52,11 @@ export const incorrectGuessSinglePlayerRules: Translatable = {
 };
 
 export const multiPlayerScoreRules: Translatable = {
-    [LanguageCode.en]: "1 point is added to your score for every correct guess of a digit",
-    [LanguageCode.ru]: "За каждое правильное предположение цифры к вашему счету добавляется 1 очко",
+    [LanguageCode.en]: "The player who gets the most digits within the grid wins",
+    [LanguageCode.ru]: "Побеждает игрок, поместивший наибольшее количество верных цифр на поле",
 };
 
 export const singlePlayerScoreRules: Translatable = {
-    [LanguageCode.en]: "1 point is added to your score for every incorrect guess of a digit",
-    [LanguageCode.ru]: "За каждое неверное предположение цифры к вашему счету добавляется 1 очко",
+    [LanguageCode.en]: "1 point is added to your score for every incorrect guess of a digit. Try to achieve the lowest score possible",
+    [LanguageCode.ru]: "За каждое неверное предположение цифры к вашему счету добавляется 1 очко. Постарайтесь набрать как можно меньше очков",
 };
-
-export const targetHighestScoreRules: Translatable = {
-    [LanguageCode.en]: "Try to achieve the highest score possible",
-    [LanguageCode.ru]: "Постарайтесь набрать как можно больше очков",
-};
-
-export const targetLowestScoreRules: Translatable = {
-    [LanguageCode.en]: "Try to achieve the lowest score possible",
-    [LanguageCode.ru]: "Постарайтесь набрать как можно меньше очков",
-};
-/*
-The game is played in 2 phases
-Phase 1
-- Place a quad clue anywhere in the grid on an intersection between 4 cells and input 4 numbers.
-- Numbers that turn red are not found within the 4 cells
-- Numbers that turn back must be found within the 4 cells
-Phase 2
-- Guess a digit in any cell within the grid a correct guess allows you to guess again
-- An incorrect guess will become a red central pencil mark to keep track of what has been guessed within each cell.
-- 1 point is added to your score for every red pencil mark that is created within the grid.
-- When an incorrect guess is made that ends the round and you begin again with phase 1 (placing a quad)
-Try to achieve the lowest score possible.
- */

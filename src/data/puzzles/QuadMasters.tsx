@@ -9,11 +9,17 @@ import {getAutoRegionWidth} from "../../utils/regions";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {normalSudokuRulesApply} from "../ruleSnippets";
 import {
-    correctGuessRules, incorrectGuessMultiPlayerRules, incorrectGuessSinglePlayerRules, multiPlayerScoreRules,
-    phase, placeDigitRules,
+    correctGuessRules,
+    incorrectGuessMultiPlayerRules,
+    incorrectGuessSinglePlayerRules,
+    multiPlayerScoreRules,
+    multiPlayerTurnsRules,
+    phase,
+    placeDigitRules,
     placeQuadRules,
     quadBlackDigits,
-    quadRedDigits, singlePlayerScoreRules, targetHighestScoreRules, targetLowestScoreRules,
+    quadRedDigits,
+    singlePlayerScoreRules,
     twoPhasesGame
 } from "../../sudokuTypes/quad-masters/data/ruleSnippets";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
@@ -53,7 +59,7 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
             fieldMargin: Math.max(0, (7 - fieldSize) / 2),
             rules: translate => <>
                 <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-                <RulesParagraph>{translate(twoPhasesGame)}.</RulesParagraph>
+                <RulesParagraph>{translate(host ? multiPlayerTurnsRules : twoPhasesGame)}.</RulesParagraph>
                 <RulesParagraph>{translate(phase)} 1:</RulesParagraph>
                 <RulesUnorderedList>
                     <li>{translate(placeQuadRules)}.</li>
@@ -66,10 +72,7 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
                     <li>{translate(correctGuessRules)}.</li>
                     <li>{translate(host ? incorrectGuessMultiPlayerRules : incorrectGuessSinglePlayerRules)}.</li>
                 </RulesUnorderedList>
-                <RulesParagraph>
-                    {translate(host ? multiPlayerScoreRules : singlePlayerScoreRules)}.{" "}
-                    {translate(host ? targetHighestScoreRules : targetLowestScoreRules)}.
-                </RulesParagraph>
+                <RulesParagraph>{translate(host ? multiPlayerScoreRules : singlePlayerScoreRules)}.</RulesParagraph>
             </>,
         };
     },
