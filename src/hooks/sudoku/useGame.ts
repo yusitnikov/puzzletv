@@ -272,8 +272,6 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 }
             }
 
-            console.log(lastPlayerObjects);
-
             return {
                 ...gameState,
                 cellWriteMode,
