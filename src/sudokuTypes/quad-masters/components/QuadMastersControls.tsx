@@ -25,8 +25,6 @@ export const QuadMastersControls = (
 
         switch (ev.code) {
             case "KeyC":
-            case "Space":
-            case "Enter":
             case "Tab":
                 context.onStateChange(({persistentCellWriteMode}) => ({
                     persistentCellWriteMode: persistentCellWriteMode === CellWriteMode.custom ? CellWriteMode.main : CellWriteMode.custom
