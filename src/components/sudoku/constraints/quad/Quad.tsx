@@ -105,8 +105,12 @@ export const QuadConstraint = <CellType,>(
         isValidCell({top, left}, digitsMap, cells, {typeManager: {areSameCellData}}, state) {
             const data = digitsMap[top][left];
 
-            return expectedDigits.some(expectedData => areSameCellData(data, expectedData, state, true))
-                && !forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, state, true));
+            return !forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, state, true)) && (
+                cells.some(({top, left}) => digitsMap[top]?.[left] === undefined) ||
+                expectedDigits.every(expectedData => cells.some(
+                    ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, state, true)
+                ))
+            );
         },
     });
 };

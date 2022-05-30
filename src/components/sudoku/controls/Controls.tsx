@@ -53,6 +53,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const {
         typeManager,
         resultChecker,
+        forceAutoCheckOnFinish = false,
         getLmdSolutionCode,
         digitsCount = getDefaultDigitsCount(puzzle),
         allowDrawingBorders = false,
@@ -75,9 +76,10 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         isReady,
         persistentCellWriteMode,
         cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
-        autoCheckOnFinish,
         isShowingSettings,
     } = state;
+
+    const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;
 
     const [isShowingResult, setIsShowingResult] = useState(false);
     const isCorrectResult = useMemo(() => resultChecker?.(context), [resultChecker, context]);
@@ -341,7 +343,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             </form>
         </Modal>}
 
-        {resultChecker && <ControlButton
+        {resultChecker && !forceAutoCheckOnFinish && <ControlButton
             left={isHorizontal ? 4 : 2}
             top={isHorizontal ? 2 : 4}
             cellSize={cellSize}

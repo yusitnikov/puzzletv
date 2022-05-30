@@ -22,6 +22,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
         context: {
             puzzle: {
                 resultChecker,
+                forceAutoCheckOnFinish,
                 typeManager: {disableConflictChecker},
             },
             state: {
@@ -87,7 +88,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             />
         </SettingsItem>}
 
-        {resultChecker && <SettingsItem>
+        {resultChecker && !forceAutoCheckOnFinish && <SettingsItem>
             {translate("Auto-check on finish")}:
 
             <SettingsCheckbox

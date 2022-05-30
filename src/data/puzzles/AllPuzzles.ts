@@ -23,12 +23,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
 
     generateRandomPuzzle("random", 9, 3),
     generateRandomPuzzle("daily-random", 9, 3, getDailyRandomGeneratorSeed()),
-    {
-        slug: "quad-masters",
-        fulfillParams: ({size = 9, regionWidth = 3, seed = Math.round(Math.random() * 1000000), ...other}) => ({size, regionWidth, seed, ...other}),
-        loadPuzzle: ({size, regionWidth, seed}) => generateQuadMasters("quad-masters", size, regionWidth, seed)
-    },
-    generateQuadMasters("daily-quad-masters", 9, 3, getDailyRandomGeneratorSeed()),
+    generateQuadMasters("quad-masters", false),
+    generateQuadMasters("daily-quad-masters", true),
     // endregion
 
     // region Other authors

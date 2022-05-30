@@ -104,3 +104,15 @@ export const getRegionBorders = (cells: Position[], includeLoopedCell = false): 
 
     return borderPoints;
 };
+
+export const getAutoRegionWidth = (fieldSize: number) => {
+    let result = fieldSize;
+
+    for (let i = 2; i * i <= fieldSize; i++) {
+        if (fieldSize % i === 0) {
+            result = fieldSize / i;
+        }
+    }
+
+    return result;
+};

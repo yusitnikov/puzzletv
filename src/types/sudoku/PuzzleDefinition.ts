@@ -30,6 +30,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     initialColors?: GivenDigitsMap<CellColor[]>;
     allowOverridingInitialColors?: boolean;
     resultChecker?: (context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => boolean,
+    forceAutoCheckOnFinish?: boolean;
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
     borderColor?: string;
