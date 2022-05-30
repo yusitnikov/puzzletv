@@ -49,7 +49,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
 
             {author && <div style={{fontSize: cellSize * h2HeightCoeff}}>{translate("by")} {translate(author)}</div>}
 
-            {isEnabled && <>
+            {isEnabled && <div>
                 {allPlayerIds.length > 1 && allPlayerIds.map((playerId, index) => <Fragment key={playerId}>
                     {index > 0 && <strong> vs </strong>}
                     <span
@@ -80,7 +80,11 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                 </Fragment>)}
 
                 {allPlayerIds.length <= 1 && `${translate("Waiting for people to connect")}...`}
-            </>}
+            </div>}
+
+            {!isEnabled && getPlayerScore && <div>
+                {translate("Score")}: {getPlayerScore(context, myClientId)}
+            </div>}
         </div>
 
         <div
