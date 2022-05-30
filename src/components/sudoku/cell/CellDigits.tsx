@@ -3,6 +3,7 @@ import {emptyPositionWithAngle, Position, PositionWithAngle} from "../../../type
 import {Set} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
 
 const centerDigitCoeff = 0.35;
 
@@ -42,7 +43,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
 
     const state = cellPosition ? context.state : undefined;
 
-    const {puzzle} = context;
+    const {puzzle, multiPlayer: {isEnabled}} = context;
 
     const {
         typeManager: {
@@ -72,7 +73,8 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         digitSize: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         isInitial = false,
-        isValid: boolean | ((cellData: CellType) => boolean) = true
+        isValid: boolean | ((cellData: CellType) => boolean) = true,
+        isRecent: boolean | ((cellData: CellType) => boolean) = false
     ) => {
         const straightIndexes = getCellDataSortIndexes(digits, (a, b) => compareCellData(a, b, undefined, false));
 
@@ -97,6 +99,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 state={state}
                 isInitial={isInitial || mainColor}
                 isValid={typeof isValid === "function" ? isValid(cellData) : isValid}
+                isRecent={isEnabled && (typeof isRecent === "function" ? isRecent(cellData) : isRecent)}
             />;
         });
     };
@@ -116,7 +119,9 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 new Set([initialData]),
                 size * 0.7,
                 () => emptyPositionWithAngle,
-                true
+                true,
+                true,
+                cellPosition && context.state.lastPlayerObjects[getMainDigitDataHash(cellPosition)]
             )}
 
             {initialData === undefined && usersDigit !== undefined && renderAnimatedDigitsSet(
@@ -138,7 +143,8 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                     angle: 0,
                 }),
                 false,
-                (cellData) => !excludedDigits?.contains(cellData)
+                (cellData) => !excludedDigits?.contains(cellData),
+                (cellData) => !!cellPosition && context.state.lastPlayerObjects[getExcludedDigitDataHash(cellPosition, cellData, context)]
             )}
 
             {cornerDigits?.size && renderAnimatedDigitsSet(

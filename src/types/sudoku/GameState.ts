@@ -17,6 +17,7 @@ import {GivenDigitsMap} from "./GivenDigitsMap";
 import {PuzzleContext} from "./PuzzleContext";
 import {Set} from "../struct/Set";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../utils/playerDataHash";
+import {PlayerObjectInfo} from "./PlayerObjectInfo";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -33,7 +34,7 @@ export interface GameState<CellType> {
     loopOffset: Position;
 
     currentPlayer?: string;
-    playerObjects: Record<string, string>;
+    playerObjects: Record<string, PlayerObjectInfo>;
 
     isShowingSettings: boolean;
     enableConflictChecker: boolean;
@@ -47,6 +48,7 @@ export interface ProcessedGameState<CellType> extends GameState<CellType> {
     cellWriteModeInfo: CellWriteModeInfo<CellType, any, any>;
     isReady: boolean;
     isMyTurn: boolean;
+    lastPlayerObjects: Record<string, boolean>;
 }
 
 // region History
@@ -266,12 +268,14 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
                 }
             };
 
-            if (!newState.ignoreOwnership) {
-                playerObjects = {
-                    ...playerObjects,
-                    [getMainDigitDataHash({top, left})]: clientId,
-                };
-            }
+            playerObjects = {
+                ...playerObjects,
+                [getMainDigitDataHash({top, left})]: {
+                    clientId,
+                    isValid: !newState.isInvalid,
+                    index: Object.keys(playerObjects).length,
+                },
+            };
         } else if ("initialDigit" in newState && initialDigits?.[top]?.[left]) {
             // The key is present, but the value is undefined - remove the value
             delete initialDigits[top][left];
@@ -286,14 +290,16 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
                 }
             };
 
-            if (!newState.ignoreOwnership) {
-                const newDigits = newState.excludedDigits.toggleAll(state.excludedDigits[top]?.[left]?.items || [], false);
-                for (const digit of newDigits.items) {
-                    playerObjects = {
-                        ...playerObjects,
-                        [getExcludedDigitDataHash({top, left}, digit, context)]: clientId,
-                    };
-                }
+            const newDigits = newState.excludedDigits.toggleAll(state.excludedDigits[top]?.[left]?.items || [], false);
+            for (const digit of newDigits.items) {
+                playerObjects = {
+                    ...playerObjects,
+                    [getExcludedDigitDataHash({top, left}, digit, context)]: {
+                        clientId,
+                        isValid: !newState.isInvalid,
+                        index: Object.keys(playerObjects).length,
+                    },
+                };
             }
         }
     }

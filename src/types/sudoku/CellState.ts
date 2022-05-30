@@ -12,7 +12,7 @@ export interface CellState<CellType> {
 export interface CellStateEx<CellType> extends CellState<CellType> {
     initialDigit?: CellType;
     excludedDigits: Set<CellType>;
-    ignoreOwnership?: boolean;
+    isInvalid?: boolean;
 }
 
 export const getCellDataComparer = <CellType>(areSameCellData: SudokuTypeManager<CellType>["areSameCellData"]) =>

@@ -23,17 +23,17 @@ export const CellOwnership = withFieldLayer(
         }: ConstraintProps
     ) => isEnabled ? <>
         {indexes(rowsCount).flatMap(top => indexes(columnsCount).map(left => {
-            const ownerId = playerObjects[getMainDigitDataHash({top, left})];
+            const playerObject = playerObjects[getMainDigitDataHash({top, left})];
 
-            return ownerId && <circle
+            return playerObject?.isValid && <circle
                 key={`ownership-${top}-${left}`}
                 cx={left + 0.5}
                 cy={top + 0.5}
                 r={0.35}
-                fill={ownerId === myClientId ? currentPlayerColor : otherPlayerColor}
-                fillOpacity={0.7}
-                stroke={"none"}
-                strokeWidth={0}
+                fill={"none"}
+                stroke={playerObject.clientId === myClientId ? currentPlayerColor : otherPlayerColor}
+                strokeWidth={0.05}
+                strokeOpacity={0.7}
             />;
         }))}
     </> : null

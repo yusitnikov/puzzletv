@@ -1,5 +1,4 @@
-import {CellDataProps} from "../../../components/sudoku/cell/CellDataProps";
-import {errorColor, textColor, userDigitColor} from "../../../components/app/globals";
+import {CellDataProps, getDefaultCellDataColor} from "../../../components/sudoku/cell/CellDataProps";
 import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
 import {ChessPiece} from "../types/ChessPiece";
 import {ChessGameState} from "../types/ChessGameState";
@@ -44,28 +43,32 @@ export const ChessPieceCellData = (
 </>;
 
 export const ChessPieceCellDataBase = (
-    {data: {type, color}, inverted, size, isInitial, isValid = true, left = 0, top = 0}: CellDataProps<ChessPiece, ChessGameState> & {inverted?: boolean}
-) => <AutoSvg
-    left={left}
-    top={top}
-    width={size}
-    height={size}
-    style={{
-        color: inverted ? "#fff" : (!isValid ? errorColor : (isInitial ? textColor : userDigitColor)),
-    }}
->
-    <text
-        textAnchor={"middle"}
-        alignmentBaseline={"central"}
+    {inverted, ...props}: CellDataProps<ChessPiece, ChessGameState> & {inverted?: boolean}
+) => {
+    const {data: {type, color}, size, left = 0, top = 0} = props;
+
+    return <AutoSvg
+        left={left}
+        top={top}
+        width={size}
+        height={size}
         style={{
-            fontSize: `${size}px`,
-            lineHeight: `${size}px`,
+            color: inverted ? "#fff" : getDefaultCellDataColor(props),
         }}
-        fill={"currentColor"}
     >
-        {map[color][type]}
-    </text>
-</AutoSvg>;
+        <text
+            textAnchor={"middle"}
+            alignmentBaseline={"central"}
+            style={{
+                fontSize: `${size}px`,
+                lineHeight: `${size}px`,
+            }}
+            fill={"currentColor"}
+        >
+            {map[color][type]}
+        </text>
+    </AutoSvg>;
+};
 
 export const ChessPieceCellDataComponentType: CellDataComponentType<ChessPiece, ChessGameState> = {
     component: ChessPieceCellData,

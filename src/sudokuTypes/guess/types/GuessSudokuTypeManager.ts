@@ -70,30 +70,9 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
             centerDigits: cellState.centerDigits.clear(),
             cornerDigits: cellState.cornerDigits.clear(),
             excludedDigits: cellState.excludedDigits.clear(),
-            ignoreOwnership: !areAllCorrect,
-        }
+            isInvalid: !areAllCorrect,
+        };
     },
-
-    // handleDigitGlobally(
-    //     isGlobal,
-    //     clientId,
-    //     {state},
-    //     cellData,
-    //     defaultResult
-    // ): Partial<ProcessedGameState<number> & ProcessedGameStateExtensionType> {
-    //     if (!isGlobal) {
-    //         return defaultResult;
-    //     }
-    //
-    //     const {cellWriteMode, selectedCells} = state;
-    //     const newState = {...state, ...defaultResult};
-    //
-    //     if (cellWriteMode !== CellWriteMode.main || !selectedCells.size) {
-    //         return defaultResult;
-    //     }
-    //
-    //     return defaultResult;
-    // },
 
     disableConflictChecker: true,
 
@@ -146,14 +125,17 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
                 const position: Position = {top, left};
 
                 if (isEnabled) {
-                    if (playerObjects[getMainDigitDataHash(position)] === clientId) {
+                    const playerObject = playerObjects[getMainDigitDataHash(position)];
+
+                    if (playerObject?.isValid && playerObject?.clientId === clientId) {
                         score++;
                     }
                 } else {
                     for (const digit of indexesFromTo(1, digitsCount, true)) {
                         const cellData = createCellDataByDisplayDigit(digit, state);
+                        const playerObject = playerObjects[getExcludedDigitDataHash(position, cellData, context)];
 
-                        if (playerObjects[getExcludedDigitDataHash(position, cellData, context)] === clientId) {
+                        if (playerObject?.isValid && playerObject?.clientId === clientId) {
                             score++;
                         }
                     }

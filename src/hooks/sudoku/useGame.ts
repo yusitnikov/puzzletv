@@ -37,6 +37,7 @@ type SavedGameStates = [
     excludedDigits: any,
     cellWriteMode: any,
     currentPlayer: any,
+    ignore1: any, // ignore previous format for compatibility
     playerObjects: any,
 ][];
 const gameStateStorageKey = "savedGameState";
@@ -117,7 +118,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             loopOffset: emptyPosition,
 
             currentPlayer: savedGameState?.[6] || params.host,
-            playerObjects: savedGameState?.[7] || {},
+            playerObjects: savedGameState?.[8] || {},
 
             isShowingSettings: false,
             enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
@@ -228,6 +229,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                             serializeGivenDigitsMap(gameState.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
                             gameState.persistentCellWriteMode,
                             gameState.currentPlayer || "",
+                            "",
                             gameState.playerObjects,
                         ],
                         ...getSavedGameStates().filter(([key]) => key !== fullSaveStateKey),
@@ -253,14 +255,35 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
     const processedGameStateExtensionDep = JSON.stringify(processedGameStateExtension);
 
     const calculateProcessedGameState = useCallback(
-        (gameState: GameState<CellType> & GameStateExtensionType): ProcessedGameState<CellType> & ProcessedGameStateExtensionType => ({
-            ...gameState,
-            cellWriteMode,
-            cellWriteModeInfo,
-            isReady,
-            isMyTurn: !isEnabled || gameState.currentPlayer === myClientId,
-            ...(processedGameStateExtension as any),
-        }),
+        (gameState: GameState<CellType> & GameStateExtensionType): ProcessedGameState<CellType> & ProcessedGameStateExtensionType => {
+            let lastPlayerObjects: Record<string, boolean> = {};
+            if (isEnabled) {
+                let sortedPlayerObjects = Object.entries(gameState.playerObjects)
+                    .sort(([, a], [, b]) => b.index - a.index);
+                if (sortedPlayerObjects.length) {
+                    const [, {clientId: lastClientId}] = sortedPlayerObjects[0];
+                    const lastPrevClientIdIndex = sortedPlayerObjects.findIndex(([, {clientId}]) => clientId !== lastClientId);
+                    if (lastPrevClientIdIndex >= 0) {
+                        sortedPlayerObjects = sortedPlayerObjects.slice(0, lastPrevClientIdIndex);
+                    }
+                    lastPlayerObjects = Object.fromEntries(
+                        sortedPlayerObjects.map(([key]) => [key, true])
+                    )
+                }
+            }
+
+            console.log(lastPlayerObjects);
+
+            return {
+                ...gameState,
+                cellWriteMode,
+                cellWriteModeInfo,
+                isReady,
+                isMyTurn: !isEnabled || gameState.currentPlayer === myClientId,
+                lastPlayerObjects,
+                ...(processedGameStateExtension as any),
+            };
+        },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [cellWriteMode, cellWriteModeInfo, isReady, processedGameStateExtensionDep, isEnabled]
     );
