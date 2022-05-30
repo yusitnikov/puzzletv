@@ -1,7 +1,7 @@
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
-import {indexes} from "../../../utils/indexes";
+import {indexesFromTo} from "../../../utils/indexes";
 import {lightGreyColor} from "../../../components/app/globals";
 
 export const QuadsHint = withFieldLayer(
@@ -19,7 +19,7 @@ export const QuadsHint = withFieldLayer(
             },
         }: ConstraintProps
     ) => isMyTurn && isQuadTurn && <>
-        {indexes(rowsCount, true).flatMap(y => indexes(columnsCount, true).map(x => <circle
+        {indexesFromTo(1, rowsCount).flatMap(y => indexesFromTo(1, columnsCount).map(x => <circle
             key={`circle-${y}-${x}`}
             cx={x}
             cy={y}

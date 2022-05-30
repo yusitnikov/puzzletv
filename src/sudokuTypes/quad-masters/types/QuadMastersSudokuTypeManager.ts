@@ -29,8 +29,11 @@ export const setQuadPositionAction = (position: Position)
     params: position,
 });
 
-const onCornerClick = ({onStateChange}: PuzzleContext<number, QuadMastersGameState, QuadMastersGameState>, position: Position) =>
-    onStateChange(setQuadPositionAction(position));
+const onCornerClick = ({puzzle: {fieldSize: {rowsCount, columnsCount}}, onStateChange}: PuzzleContext<number, QuadMastersGameState, QuadMastersGameState>, position: Position) => {
+    if (position.top > 0 && position.top < rowsCount && position.left > 0 && position.left < columnsCount) {
+        onStateChange(setQuadPositionAction(position));
+    }
+};
 
 export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): SudokuTypeManager<number, QuadMastersGameState, QuadMastersGameState> => {
     const parent = GuessSudokuTypeManager<QuadMastersGameState, QuadMastersGameState>(
