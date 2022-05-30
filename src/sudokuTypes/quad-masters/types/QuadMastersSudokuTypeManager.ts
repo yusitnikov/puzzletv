@@ -17,6 +17,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {QuadMastersQuad, serializeQuad, unserializeQuad} from "./QuadMastersQuad";
 import {enterDigitActionType, GameStateAction, GameStateActionType} from "../../../types/sudoku/GameStateAction";
 import {QuadsHintConstraint} from "../components/QuadsHint";
+import {indexes} from "../../../utils/indexes";
 
 export const setQuadPositionActionType: GameStateActionType<Position, number, QuadMastersGameState, QuadMastersGameState> = ({
     key: "set-quad-position",
@@ -96,6 +97,7 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
             }
 
             const {
+                puzzle: {fieldSize: {rowsCount, columnsCount}},
                 state,
                 multiPlayer: {isEnabled, allPlayerIds},
             } = context;
@@ -150,15 +152,24 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
                     }
                     break;
                 case CellWriteMode.main:
-                    if (selectedCells.size && selectedCells.items.some(({top, left}) => !newState.initialDigits?.[top]?.[left])) {
-                        return {
-                            ...defaultResult,
-                            isQuadTurn: true,
-                            currentQuad: undefined,
-                            currentPlayer: allPlayerIds.find(value => value > currentPlayer) || allPlayerIds[0],
-                        };
+                    if (selectedCells.size) {
+                        if (selectedCells.items.some(({top, left}) => !newState.initialDigits?.[top]?.[left])) {
+                            return {
+                                ...defaultResult,
+                                isQuadTurn: true,
+                                currentQuad: undefined,
+                                currentPlayer: allPlayerIds.find(value => value > currentPlayer) || allPlayerIds[0],
+                            };
+                        } else if (indexes(rowsCount).every(top => indexes(columnsCount).every(
+                            left => newState.initialDigits?.[top]?.[left] !== undefined
+                        ))) {
+                            return {
+                                ...defaultResult,
+                                isQuadTurn: false,
+                                currentQuad: undefined,
+                            }
+                        }
                     }
-
                     break;
             }
 
