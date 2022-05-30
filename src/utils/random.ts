@@ -60,14 +60,14 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
 
         initialDigits[rowIndex][columnIndex] = digit;
 
-        const boxRowIndex = rowIndex - rowIndex % regionWidth;
-        const boxColumnIndex = columnIndex - columnIndex % regionHeight;
+        const boxRowIndex = rowIndex - rowIndex % regionHeight;
+        const boxColumnIndex = columnIndex - columnIndex % regionWidth;
         for (const index of indexes(fieldSize)) {
             if (!removeCandidates(
                 [
                     [rowIndex, index],
                     [index, columnIndex],
-                    [boxRowIndex + Math.floor(index / regionHeight), boxColumnIndex + index % regionHeight],
+                    [boxRowIndex + index % regionHeight, boxColumnIndex + Math.floor(index / regionHeight)],
                 ],
                 digit
             )) {
@@ -92,16 +92,16 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
         return true;
     };
 
-    for (const boxLeft of indexes(fieldSize / regionWidth)) {
-        const boxRowOffset = boxLeft * regionWidth;
+    for (const boxLeft of indexes(fieldSize / regionHeight)) {
+        const boxRowOffset = boxLeft * regionHeight;
 
-        for (const boxTop of indexes(fieldSize / regionHeight)) {
-            const boxColumnOffset = (boxTop + boxLeft) * regionHeight % fieldSize;
+        for (const boxTop of indexes(fieldSize / regionWidth)) {
+            const boxColumnOffset = (boxTop + boxLeft) * regionWidth % fieldSize;
 
             for (const index of indexes(fieldSize)) {
                 if (!putRandomDigit(
-                    boxRowOffset + Math.floor(index / regionHeight),
-                    boxColumnOffset + index % regionHeight
+                    boxRowOffset + index % regionHeight,
+                    boxColumnOffset + Math.floor(index / regionHeight)
                 )) {
                     return undefined;
                 }
