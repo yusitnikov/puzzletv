@@ -3,7 +3,7 @@ import {CellWriteModeButton} from "../../../components/sudoku/controls/CellWrite
 import {ControlsProps} from "../../../components/sudoku/controls/Controls";
 import {QuadMastersGameState} from "../types/QuadMastersGameState";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
-import {Quads} from "../data/translations";
+import {quads} from "../data/translations";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {QuadByData} from "../../../components/sudoku/constraints/quad/Quad";
 import {textColor} from "../../../components/app/globals";
@@ -76,7 +76,7 @@ export const QuadMastersControls = (
             />
         </AutoSvg>}
         fullSize={true}
-        title={`${translate(Quads)} (${translate("shortcut")}: C / End)`}
+        title={`${translate(quads)} (${translate("shortcut")}: C / End)`}
         context={context}
     />;
 };
