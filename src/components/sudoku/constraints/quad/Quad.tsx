@@ -66,7 +66,7 @@ export const QuadByData = <CellType,>(
             }
 
             const angle = 2 * Math.PI * (index + 0.5) / digits.length;
-            const fontSize = radius * 3.5 / digits.length;
+            const fontSize = radius * 1.75 / Math.sqrt(digits.length);
             const offset = radius - fontSize / 2;
 
             return <CellData
