@@ -8,6 +8,10 @@ import {PageLayout} from "../layout/page-layout/PageLayout";
 import {PuzzlesList} from "./PuzzlesList";
 import {buildLink, parseLink} from "../../utils/link";
 import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {useAblyChannelPresence, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
+import {ablyOptions} from "../../hooks/useMultiPlayer";
+
+const analyticsChannelName = "analytics";
 
 export const App = () => {
     let hash = useHash();
@@ -32,6 +36,9 @@ const AppContent = ({hash = ""}: AppContentProps) => {
     const translate = useTranslate();
 
     const {slug, params} = useMemo(() => parseLink(hash), [hash]);
+
+    const [analytics] = useAblyChannelPresence(ablyOptions, analyticsChannelName);
+    useSetMyAblyChannelPresence(ablyOptions, analyticsChannelName, hash);
 
     const puzzle = useMemo(() => {
         for (const puzzleOrLoader of AllPuzzles) {
@@ -63,6 +70,16 @@ const AppContent = ({hash = ""}: AppContentProps) => {
     if (!slug || slug === "list") {
         return <PageLayout scrollable={true}>
             <PuzzlesList/>
+        </PageLayout>;
+    }
+
+    if (slug === "analytics") {
+        return <PageLayout title={"Analytics"} scrollable={true}>
+            <ul>
+                {analytics.map(({clientId, data}, index) => <li key={index}>
+                    {clientId}: {data}
+                </li>)}
+            </ul>
         </PageLayout>;
     }
 
