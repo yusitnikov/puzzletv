@@ -1,4 +1,4 @@
-# Sudoku
+# Puzzle TV
 
 A web application for creating and solving different types of sudoku.
 
