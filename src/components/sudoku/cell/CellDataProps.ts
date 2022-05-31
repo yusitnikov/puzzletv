@@ -10,9 +10,10 @@ export interface CellDataProps<CellType, ProcessedGameStateExtensionType = {}> e
     isInitial?: boolean;
     isValid?: boolean;
     isRecent?: boolean;
+    customColor?: string;
 }
 
 export const getDefaultCellDataColor = <CellType, ProcessedGameStateExtensionType = {}>(
-    {data, state, isInitial, isValid, isRecent}: CellDataProps<CellType, ProcessedGameStateExtensionType>,
+    {data, state, isInitial, isValid, isRecent, customColor}: CellDataProps<CellType, ProcessedGameStateExtensionType>,
     regularColor = userDigitColor
-) => isRecent ? recentInfoColor : (!isValid ? errorColor : (isInitial ? textColor : regularColor));
+) => customColor || (isRecent ? recentInfoColor : (!isValid ? errorColor : (isInitial ? textColor : regularColor)));

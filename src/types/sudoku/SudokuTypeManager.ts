@@ -178,6 +178,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     supportedActionTypes?: GameStateActionType<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[];
 
+    handleClearAction?(
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        clientId: string
+    ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+
     isGlobalAction?(
         action: GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>

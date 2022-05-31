@@ -23,8 +23,10 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
 
     generateRandomPuzzle("random", 9, 3),
     generateRandomPuzzle("daily-random", 9, 3, getDailyRandomGeneratorSeed()),
-    generateQuadMasters("quad-masters", false),
-    generateQuadMasters("daily-quad-masters", true),
+    generateQuadMasters("quad-masters", false, false),
+    generateQuadMasters("daily-quad-masters", true, false),
+    generateQuadMasters("quadle", false, true),
+    generateQuadMasters("daily-quadle", true, true),
     // endregion
 
     // region Other authors

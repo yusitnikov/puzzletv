@@ -17,14 +17,14 @@ import {
     phase,
     placeDigitRules,
     placeQuadRules, privatePencilmarksNote,
-    quadBlackDigits,
-    quadRedDigits,
+    quadBlackDigits, quadGreenDigits, quadGreyDigits,
+    quadRedDigits, quadYellowDigits,
     singlePlayerScoreRules,
     twoPhasesGame
 } from "../../sudokuTypes/quad-masters/data/ruleSnippets";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 
-export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinitionLoader<number, QuadMastersGameState, QuadMastersGameState> => ({
+export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<number, QuadMastersGameState, QuadMastersGameState> => ({
     slug,
     fulfillParams: (
         {
@@ -48,7 +48,7 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
         return {
             noIndex: true,
             title: {
-                [LanguageCode.en]: `Quad Masters`,
+                [LanguageCode.en]: isQuadle ? "Quadle" : "Quad Masters",
             },
             slug,
             saveState: !isRandom,
@@ -59,7 +59,7 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
                 seed: daily ? undefined : randomSeed,
                 ...otherParams,
             }),
-            typeManager: QuadMastersSudokuTypeManager(generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed)),
+            typeManager: QuadMastersSudokuTypeManager(generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed), isQuadle),
             fieldSize: createRegularFieldSize(fieldSize, regionWidth),
             resultChecker: isValidFinishedPuzzleByConstraints,
             forceAutoCheckOnFinish: true,
@@ -70,8 +70,15 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
                 <RulesParagraph>{translate(phase)} 1:</RulesParagraph>
                 <RulesUnorderedList>
                     <li>{translate(placeQuadRules)}.</li>
-                    <li>{translate(quadRedDigits)}.</li>
-                    <li>{translate(quadBlackDigits)}.</li>
+                    {isQuadle && <>
+                        <li>{translate(quadGreenDigits)}.</li>
+                        <li>{translate(quadYellowDigits)}.</li>
+                        <li>{translate(quadGreyDigits)}.</li>
+                    </>}
+                    {!isQuadle && <>
+                        <li>{translate(quadBlackDigits)}.</li>
+                        <li>{translate(quadRedDigits)}.</li>
+                    </>}
                 </RulesUnorderedList>
                 <RulesParagraph>{translate(phase)} 2:</RulesParagraph>
                 <RulesUnorderedList>

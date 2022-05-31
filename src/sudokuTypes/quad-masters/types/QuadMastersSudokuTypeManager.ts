@@ -1,29 +1,28 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {GuessSudokuTypeManager} from "../../guess/types/GuessSudokuTypeManager";
-import {
-    initialQuadMastersGameState,
-    QuadMastersGameState,
-    serializeQuadMastersGameState,
-    unserializeQuadMastersGameState
-} from "./QuadMastersGameState";
+import {initialQuadMastersGameState, QuadMastersGameState} from "./QuadMastersGameState";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {Set} from "../../../types/struct/Set";
 import {QuadMastersControls} from "../components/QuadMastersControls";
 import {GameState, ProcessedGameState} from "../../../types/sudoku/GameState";
 import {QuadConstraint, QuadConstraintBySolution} from "../../../components/sudoku/constraints/quad/Quad";
 import {isSamePosition, Position} from "../../../types/layout/Position";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {QuadMastersQuad, serializeQuad, unserializeQuad} from "./QuadMastersQuad";
+import {QuadMastersQuad} from "./QuadMastersQuad";
 import {enterDigitActionType, GameStateAction, GameStateActionType} from "../../../types/sudoku/GameStateAction";
 import {QuadsHintConstraint} from "../components/QuadsHint";
 import {indexes} from "../../../utils/indexes";
 import {getNextPlayerId} from "../../../hooks/useMultiPlayer";
+import {
+    QuadleConstraint,
+    QuadleConstraintBySolution,
+    QuadleDigitType
+} from "../../../components/sudoku/constraints/quadle/Quadle";
 
 export const setQuadPositionActionType: GameStateActionType<Position | undefined, number, QuadMastersGameState, QuadMastersGameState> = ({
     key: "set-quad-position",
     callback: (position, {state: {currentPlayer}, multiPlayer: {isEnabled}}, clientId) =>
-        ({isQuadTurn}) => (!isEnabled || currentPlayer === clientId) && isQuadTurn ? {currentQuad: position && {position, digits: new Set()}} : {},
+        ({isQuadTurn}) => (!isEnabled || currentPlayer === clientId) && isQuadTurn ? {currentQuad: position && {position, digits: []}} : {},
 });
 export const setQuadPositionAction = (position: Position | undefined)
     : GameStateAction<Position | undefined, number, QuadMastersGameState, QuadMastersGameState> => ({
@@ -37,12 +36,8 @@ const onCornerClick = ({puzzle: {fieldSize: {rowsCount, columnsCount}}, onStateC
     }
 };
 
-export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): SudokuTypeManager<number, QuadMastersGameState, QuadMastersGameState> => {
-    const parent = GuessSudokuTypeManager<QuadMastersGameState, QuadMastersGameState>(
-        solution,
-        serializeQuadMastersGameState,
-        unserializeQuadMastersGameState
-    );
+export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, isQuadle: boolean): SudokuTypeManager<number, QuadMastersGameState, QuadMastersGameState> => {
+    const parent = GuessSudokuTypeManager<QuadMastersGameState, QuadMastersGameState>(solution);
 
     // TODO: call parent in every method
     return ({
@@ -62,7 +57,7 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
 
         initialCellWriteMode: CellWriteMode.custom,
 
-        mainControlsComponent: QuadMastersControls,
+        mainControlsComponent: QuadMastersControls(isQuadle),
 
         items: (context) => {
             const {state: {allQuads, currentQuad}, multiPlayer: {isEnabled}} = context;
@@ -72,15 +67,25 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
                 ...((typeof parent.items === "function" && parent.items(context)) || []),
                 QuadsHintConstraint,
                 ...allQuads.map(
-                    ({position, digits}, index) => QuadConstraintBySolution(
-                        context,
-                        position,
-                        digits.items,
-                        solution,
-                        isEnabled && index === allQuads.length - 1 && !currentQuad
-                    )
+                    ({position, digits}, index) => {
+                        const isRecent = isEnabled && index === allQuads.length - 1 && !currentQuad;
+
+                        return isQuadle
+                            ? QuadleConstraintBySolution(context, position, digits, solution, isRecent)
+                            : QuadConstraintBySolution(context, position, digits, solution, isRecent);
+                    }
                 ),
-                currentQuad && QuadConstraint(currentQuad.position, currentQuad.digits.items, [], isEnabled),
+                currentQuad && isQuadle && QuadleConstraint(
+                    currentQuad.position,
+                    currentQuad.digits.map((digit) => ({digit, type: QuadleDigitType.unknown})),
+                    isEnabled
+                ),
+                currentQuad && !isQuadle && QuadConstraint(
+                    currentQuad.position,
+                    currentQuad.digits,
+                    [],
+                    isEnabled
+                ),
             ].filter(item => item).map(item => item!);
         },
 
@@ -122,9 +127,11 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
             switch (cellWriteMode) {
                 case CellWriteMode.custom:
                     if (isQuadTurn && currentQuad) {
-                        const newDigits = currentQuad.digits.toggle(cellData);
+                        const newDigits = isQuadle || !currentQuad.digits.includes(cellData)
+                            ? [...currentQuad.digits, cellData]
+                            : currentQuad.digits.filter(digit => digit !== cellData);
 
-                        if (newDigits.size < 4) {
+                        if (newDigits.length < 4) {
                             return {
                                 currentQuad: {
                                     ...currentQuad,
@@ -142,10 +149,12 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
                                     ...allQuads.filter(quad => !isSameQuadPosition(quad)),
                                     {
                                         ...currentQuad,
-                                        digits: Set.merge(
-                                            ...allQuads.filter(isSameQuadPosition).map(quad => quad.digits),
-                                            newDigits
-                                        ),
+                                        digits: isQuadle
+                                            ? newDigits
+                                            : [...new Set([
+                                                ...allQuads.filter(isSameQuadPosition).flatMap(quad => quad.digits),
+                                                ...newDigits,
+                                            ])],
                                     }
                                 ],
                             };
@@ -187,8 +196,8 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
             return {
                 ...parent.getSharedState?.(puzzle, state),
                 isQuadTurn,
-                currentQuad: currentQuad && serializeQuad(currentQuad),
-                allQuads: allQuads.map(serializeQuad),
+                currentQuad,
+                allQuads,
             };
         },
 
@@ -207,8 +216,8 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
                 ...state,
                 ...parent.setSharedState?.(puzzle, state, newState),
                 isQuadTurn,
-                currentQuad: currentQuad && unserializeQuad(currentQuad),
-                allQuads: (allQuads as any[]).map(unserializeQuad),
+                currentQuad,
+                allQuads,
             };
         },
 
@@ -245,6 +254,19 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
                     onStateChange({persistentCellWriteMode: CellWriteMode.custom});
                 }
             }
+        },
+
+        handleClearAction({state: {cellWriteMode, isMyTurn, isQuadTurn, currentQuad}}): Partial<ProcessedGameState<number> & QuadMastersGameState> {
+            if (cellWriteMode === CellWriteMode.custom && isMyTurn && isQuadTurn && currentQuad?.digits?.length) {
+                return {
+                    currentQuad: {
+                        ...currentQuad,
+                        digits: currentQuad.digits.slice(0, currentQuad.digits.length - 1),
+                    },
+                };
+            }
+
+            return {};
         },
     });
 };

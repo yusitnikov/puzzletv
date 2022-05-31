@@ -32,6 +32,21 @@ export const quadBlackDigits: Translatable = {
     [LanguageCode.ru]: "Цифры, которые становятся черными, присутствуют в 4 клетках",
 };
 
+export const quadGreenDigits: Translatable = {
+    [LanguageCode.en]: "Digits on a green background are present in the same exact position of the circle",
+    [LanguageCode.ru]: "Цифры на зеленом фоне находятся на том же месте относительно круга",
+};
+
+export const quadYellowDigits: Translatable = {
+    [LanguageCode.en]: "Digits on a yellow background must be found within the 4 cells, but not in the same exact position",
+    [LanguageCode.ru]: "Цифры на желтом фоне присутствуют в 4 клетках, но не на той же позиции",
+};
+
+export const quadGreyDigits: Translatable = {
+    [LanguageCode.en]: "Digits on a grey background are not found within the 4 cells",
+    [LanguageCode.ru]: "Цифры на сером фоне отсутствуют в 4 клетках",
+};
+
 export const placeDigitRules: Translatable = {
     [LanguageCode.en]: "Guess a digit in any cell within the grid",
     [LanguageCode.ru]: "Угадайте цифру в любой ячейке сетки",

@@ -466,7 +466,7 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
             return clearLines();
     }
 
-    return {};
+    return typeManager.handleClearAction?.(context, clientId) || {};
 };
 
 // endregion

@@ -9,10 +9,11 @@ import {QuadByData} from "../../../components/sudoku/constraints/quad/Quad";
 import {textColor} from "../../../components/app/globals";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {setQuadPositionAction} from "../types/QuadMastersSudokuTypeManager";
+import {QuadleByData, QuadleDigitType} from "../../../components/sudoku/constraints/quadle/Quadle";
 
-export const QuadMastersControls = (
+export const QuadMastersControls = (isQuadle: boolean) => function QuadMastersControlsComponent(
     {context, isHorizontal}: ControlsProps<number, QuadMastersGameState, QuadMastersGameState>
-) => {
+) {
     const translate = useTranslate();
 
     const {
@@ -80,11 +81,21 @@ export const QuadMastersControls = (
                 strokeWidth={1 / cellSize}
             />
 
-            <QuadByData
+            {isQuadle && <QuadleByData
+                context={context}
+                cells={[{top: 0.5, left: 0.5}]}
+                digits={[
+                    {digit: 1, type: QuadleDigitType.here},
+                    {digit: 2, type: QuadleDigitType.elsewhere},
+                    {digit: 3, type: QuadleDigitType.nowhere},
+                    {digit: 4, type: QuadleDigitType.unknown},
+                ]}
+            />}
+            {!isQuadle && <QuadByData
                 context={context}
                 cells={[{top: 0.5, left: 0.5}]}
                 expectedDigits={[1, 2, 3, 4]}
-            />
+            />}
         </AutoSvg>}
         fullSize={true}
         title={`${translate(quads)} (${translate("shortcut")}: Q / End)`}

@@ -42,7 +42,7 @@ type SavedGameStates = [
     playerObjects: any,
 ][];
 const gameStateStorageKey = "savedGameState";
-const gameStateSerializerVersion = 1;
+const gameStateSerializerVersion = 2;
 const maxSavedPuzzles = 10;
 
 const emptyObject: any = {};
