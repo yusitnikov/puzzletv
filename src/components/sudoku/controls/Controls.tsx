@@ -49,7 +49,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         puzzle,
         state,
         onStateChange,
-        multiPlayer: {isEnabled, allPlayerIds},
+        multiPlayer: {isEnabled, allPlayerIds, myPendingMessages},
     } = context;
 
     const {
@@ -371,7 +371,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         >
             <Check/>
         </ControlButton>}
-        {isShowingResult && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
+        {/* The score could be mis-calculated before getting confirmation from the host, so don't display the results until then */}
+        {isShowingResult && myPendingMessages.length === 0 && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
             <div>
                 {
                     getPlayerScore
