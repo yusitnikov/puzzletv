@@ -18,6 +18,7 @@ import {QuadMastersQuad, serializeQuad, unserializeQuad} from "./QuadMastersQuad
 import {enterDigitActionType, GameStateAction, GameStateActionType} from "../../../types/sudoku/GameStateAction";
 import {QuadsHintConstraint} from "../components/QuadsHint";
 import {indexes} from "../../../utils/indexes";
+import {getNextPlayerId} from "../../../hooks/useMultiPlayer";
 
 export const setQuadPositionActionType: GameStateActionType<Position, number, QuadMastersGameState, QuadMastersGameState> = ({
     key: "set-quad-position",
@@ -158,7 +159,7 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>): 
                                 ...defaultResult,
                                 isQuadTurn: true,
                                 currentQuad: undefined,
-                                currentPlayer: allPlayerIds.find(value => value > currentPlayer) || allPlayerIds[0],
+                                currentPlayer: getNextPlayerId(currentPlayer, allPlayerIds),
                             };
                         } else if (indexes(rowsCount).every(top => indexes(columnsCount).every(
                             left => newState.initialDigits?.[top]?.[left] !== undefined

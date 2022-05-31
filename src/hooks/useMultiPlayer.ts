@@ -22,7 +22,7 @@ interface Message {
     data: any;
 }
 
-interface MessageWithClientId {
+export interface MessageWithClientId {
     data: any;
     clientId: string;
 }
@@ -74,8 +74,8 @@ export const useMultiPlayer = (
         const allIds = Object.keys(playersDataMap);
 
         return [
-            ...allIds.filter(id => id >= hostId).sort(),
-            ...allIds.filter(id => id < hostId).sort(),
+            ...allIds.filter(id => comparePlayerIds(id, hostId) >= 0).sort(comparePlayerIds),
+            ...allIds.filter(id => comparePlayerIds(id, hostId) < 0).sort(comparePlayerIds),
         ];
     }, [playersDataMap, hostId]);
 
@@ -182,4 +182,12 @@ export const useMultiPlayer = (
         myPendingMessages,
         sendMessage,
     });
+};
+
+export const comparePlayerIds = (a: string, b: string) => a.localeCompare(b);
+
+export const getNextPlayerId = (currentPlayerId: string, allPlayerIds: string[]) => {
+    const sortedPlayerIds = allPlayerIds.sort(comparePlayerIds);
+
+    return sortedPlayerIds.find(id => comparePlayerIds(id, currentPlayerId) > 0) ?? sortedPlayerIds[0];
 };

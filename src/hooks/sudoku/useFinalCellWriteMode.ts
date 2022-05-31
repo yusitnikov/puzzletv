@@ -1,13 +1,12 @@
 import {CellWriteMode, CellWriteModeInfo} from "../../types/sudoku/CellWriteMode";
-import {useControlKeysState} from "../useControlKeysState";
+import {ControlKeysState, useControlKeysState} from "../useControlKeysState";
 
-export const useFinalCellWriteMode = (
+export const getFinalCellWriteMode = (
+    {keysStr}: ControlKeysState,
     persistentCellWriteMode: CellWriteMode,
     allowedModes: CellWriteModeInfo<any, any, any>[],
     readOnly?: boolean
 ) => {
-    const {keysStr} = useControlKeysState();
-
     if (readOnly) {
         return persistentCellWriteMode;
     }
@@ -19,4 +18,14 @@ export const useFinalCellWriteMode = (
     }
 
     return persistentCellWriteMode;
+};
+
+export const useFinalCellWriteMode = (
+    persistentCellWriteMode: CellWriteMode,
+    allowedModes: CellWriteModeInfo<any, any, any>[],
+    readOnly?: boolean
+) => {
+    const keys = useControlKeysState();
+
+    return getFinalCellWriteMode(keys, persistentCellWriteMode, allowedModes, readOnly);
 };

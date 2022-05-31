@@ -10,6 +10,7 @@ import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/su
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {CalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 import {GameState} from "../../../types/sudoku/GameState";
+import {useMemo} from "react";
 
 const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);
@@ -161,7 +162,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
     useProcessedGameStateExtension({angle, animationSpeed}: RotatableGameState): Omit<RotatableProcessedGameState, keyof RotatableGameState> {
         const animatedAngle = useAnimatedValue(angle, animationSpeed);
 
-        return {animatedAngle};
+        return useMemo(() => ({animatedAngle}), [animatedAngle]);
     },
 
     getFieldAngle({animatedAngle}: RotatableProcessedGameState): number {
