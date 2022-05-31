@@ -1,5 +1,6 @@
 import {Translatable} from "../../../types/translations/Translatable";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {ReactNode} from "react";
 
 export const multiPlayerTurnsRules: Translatable = {
     [LanguageCode.en]: "Players take turns to first place a quad onto the grid then input a digit into a cell",
@@ -59,4 +60,9 @@ export const multiPlayerScoreRules: Translatable = {
 export const singlePlayerScoreRules: Translatable = {
     [LanguageCode.en]: "1 point is added to your score for every incorrect guess of a digit. Try to achieve the lowest score possible",
     [LanguageCode.ru]: "За каждое неверное предположение цифры к вашему счету добавляется 1 очко. Постарайтесь набрать как можно меньше очков",
+};
+
+export const privatePencilmarksNote: Translatable<ReactNode> = {
+    [LanguageCode.en]: <>Note: you can pencil mark the grid to make notes.<br/>Your opponents will only see the actual guesses</>,
+    [LanguageCode.ru]: <>Примечание: Вы можете ставить метки на поле.<br/>Ваши противники не будут их видеть</>,
 };

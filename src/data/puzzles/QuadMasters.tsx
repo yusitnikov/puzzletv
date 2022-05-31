@@ -16,7 +16,7 @@ import {
     multiPlayerTurnsRules,
     phase,
     placeDigitRules,
-    placeQuadRules,
+    placeQuadRules, privatePencilmarksNote,
     quadBlackDigits,
     quadRedDigits,
     singlePlayerScoreRules,
@@ -80,6 +80,7 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
                     <li>{translate(host ? incorrectGuessMultiPlayerRules : incorrectGuessSinglePlayerRules)}.</li>
                 </RulesUnorderedList>
                 <RulesParagraph>{translate(host ? multiPlayerScoreRules : singlePlayerScoreRules)}.</RulesParagraph>
+                {!!host && <RulesParagraph>{translate(privatePencilmarksNote)}.</RulesParagraph>}
             </>,
         };
     },
