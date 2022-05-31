@@ -32,7 +32,7 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         cellState,
         cellData,
         {top, left},
-        {state: {currentPlayer, selectedCells}, multiPlayer: {isEnabled}},
+        {state: {currentPlayer, selectedCells, initialDigits}, multiPlayer: {isEnabled}},
         defaultResult,
         cache
     ): Partial<CellStateEx<number>> {
@@ -55,7 +55,7 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         }
 
         const areAllCorrect: boolean = (cache.areAllPositive = cache.areAllPositive ?? selectedCells.items.every(
-            ({top, left}) => solution[top][left] === cellData)
+            ({top, left}) => solution[top][left] === cellData || initialDigits[top]?.[left] !== undefined)
         );
 
         if (solution[top][left] !== cellData) {
