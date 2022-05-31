@@ -4,6 +4,7 @@ import {useEffect, useRef} from "react";
 import {usePureState} from "./usePureState";
 import {Chain} from "../utils/chain";
 import {useThrottleData} from "./useThrottle";
+import {unzip, zip} from "../utils/zip";
 
 export const useAbly = (options: Types.ClientOptions, enabled = true) => useSingleton(
     "ably",
@@ -62,7 +63,13 @@ export const useAblyChannelPresence = (
 
         const chainUpdate = () => chain.then(async() => {
             try {
-                setPresenceMessages(JSON.parse(JSON.stringify(await channel.presence.get())));
+                let messages = await channel.presence.get();
+                messages = JSON.parse(JSON.stringify(messages));
+                messages = messages.map(({data, ...other}) => ({
+                    data: JSON.parse(unzip(data)),
+                    ...other,
+                }));
+                setPresenceMessages(messages);
             } catch (err) {
                 console.warn("Failed to get the presence", err);
             }
@@ -99,7 +106,7 @@ export const useSetMyAblyChannelPresence = (
             return;
         }
 
-        chain.then(() => channel.presence.enter(myPresenceDataRef.current))
+        chain.then(() => channel.presence.enter(zip(JSON.stringify(myPresenceDataRef.current))));
 
         return () => {
             chain.then(() => channel.presence.leave());
@@ -111,6 +118,6 @@ export const useSetMyAblyChannelPresence = (
             return;
         }
 
-        chain.then(() => channel.presence.update(myThrottledPresenceData));
+        chain.then(() => channel.presence.update(zip(JSON.stringify(myThrottledPresenceData))));
     }, [channel, enabled, chain, myThrottledPresenceData]);
 };
