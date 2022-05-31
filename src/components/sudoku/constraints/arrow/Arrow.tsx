@@ -3,6 +3,7 @@ import {darkGreyColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
+    getCircleConnectionPoint,
     parsePositionLiteral,
     parsePositionLiterals,
     PositionLiteral
@@ -21,16 +22,8 @@ export interface ArrowProps {
 export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCircle}: ConstraintProps<any, ArrowProps>) => {
     cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
-    const [{left: x1, top: y1}, {left: x2, top: y2}] = cells;
-    let dx = x2 - x1;
-    let dy = y2 - y1;
-    const dLength = Math.hypot(dx, dy);
-    dx /= dLength;
-    dy /= dLength;
-    cells[0] = {
-        left: x1 +circleRadius * dx,
-        top: y1 +circleRadius * dy,
-    };
+    const {left, top} = cells[0];
+    cells[0] = getCircleConnectionPoint(cells[0], cells[1], circleRadius);
 
     const {left: lastX, top: lastY} = cells[cells.length - 1];
     const {left: prevX, top: prevY} = cells[cells.length - 2];
@@ -67,8 +60,8 @@ export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCirc
         />
 
         <circle
-            cx={x1}
-            cy={y1}
+            cx={left}
+            cy={top}
             r={circleRadius}
             strokeWidth={lineWidth}
             stroke={darkGreyColor}

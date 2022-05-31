@@ -85,3 +85,15 @@ export const normalizeVector = (vector: Position, length = getVectorLength(vecto
     left: vector.left / length,
     top: vector.top / length,
 });
+
+export const getCircleConnectionPoint = ({left: x1, top: y1}: Position, {left: x2, top: y2}: Position, circleRadius: number): Position => {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    const dLength = Math.hypot(dx, dy);
+    dx /= dLength;
+    dy /= dLength;
+    return {
+        left: x1 + circleRadius * dx,
+        top: y1 + circleRadius * dy,
+    };
+};

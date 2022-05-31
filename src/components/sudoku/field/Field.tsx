@@ -37,6 +37,8 @@ import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
 import {applyCurrentMultiLineAction} from "../../../types/sudoku/GameStateAction";
+import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {CellColor} from "../../../types/sudoku/CellColor";
 
 export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -240,6 +242,10 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
             }))}
         </FieldSvg>;
 
+    const initialColorsResolved = typeof initialColors === "function"
+        ? initialColors(context)
+        : initialColors as GivenDigitsMap<CellColor[]>;
+
     return <Absolute
         {...rect}
         angle={typeManager.getFieldAngle?.(state)}
@@ -261,7 +267,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 </FieldSvg>
 
                 {renderCellsLayer("background", ({colors}, cellPosition) => {
-                    const initialCellColors = initialColors[cellPosition.top]?.[cellPosition.left];
+                    const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
                     const finalColors = allowOverridingInitialColors
                         ? (colors?.size ? colors : new Set(initialCellColors || []))
                         : (initialCellColors ? new Set(initialCellColors) : colors);

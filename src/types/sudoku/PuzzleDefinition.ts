@@ -28,7 +28,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
-    initialColors?: GivenDigitsMap<CellColor[]>;
+    initialColors?: GivenDigitsMap<CellColor[]> | ((context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => GivenDigitsMap<CellColor[]>);
     allowOverridingInitialColors?: boolean;
     resultChecker?: (context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => boolean,
     forceAutoCheckOnFinish?: boolean;

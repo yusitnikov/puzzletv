@@ -50,7 +50,7 @@ export const antiBishopFromCenterRulesExplained: Translatable = {
 };
 
 export const conventionalNotationsApply: Translatable = {
-    [LanguageCode.en]: "Conventional notations for common sudoku constraints apply",
+    [LanguageCode.en]: "Conventional notations for common constraints apply",
     [LanguageCode.ru]: "Традиционные знаки ограничений судоку",
 };
 
@@ -128,6 +128,37 @@ export const germanWhispersExplained: Translatable = {
     [LanguageCode.en]: "Consecutive digits along the green line must have difference of 5 or more",
     [LanguageCode.ru]: "Последовательные цифры вдоль зеленой линии должны различаться на 5 или более",
 };
+
+export const evenTitle: Translatable = {
+    [LanguageCode.en]: "Even digits",
+    [LanguageCode.ru]: "Четные цифры",
+};
+
+export const evenExplained: Translatable = {
+    [LanguageCode.en]: "Grey squares are even digits",
+    [LanguageCode.ru]: "Сумма цифр, расположенных вдоль стрелок, равняется цифре в кружке",
+};
+
+export const renbanTitle: Translatable = {
+    [LanguageCode.en]: "Renban lines",
+    [LanguageCode.ru]: 'Линии "Ренбан"',
+};
+
+export const renbanExplained: Translatable = {
+    [LanguageCode.en]: "Digits along the purple line must form a set of consecutive digits in any order",
+    [LanguageCode.ru]: "Цифры вдоль зеленой линии должны образовывать набор последовательных цифр в любом порядке",
+};
+
+export const inBetweenLineTitle: Translatable = {
+    [LanguageCode.en]: "Between lines",
+    [LanguageCode.ru]: "Серединные линии",
+};
+
+export const inBetweenLineExplained: Translatable = {
+    [LanguageCode.en]: "Digits along the grey line must be strictly in between of digits on the circles",
+    [LanguageCode.ru]: "Цифры на серой линии должны быть строго между цифрами на кружках",
+};
+
 
 export const noBifurcation: Translatable<ReactNode> = {
     [LanguageCode.en]: <>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</>,

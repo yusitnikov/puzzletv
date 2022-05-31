@@ -11,6 +11,7 @@ import {Africa} from "./Africa";
 import {generateRandomPuzzle} from "./Random";
 import {getDailyRandomGeneratorSeed} from "../../utils/random";
 import {generateQuadMasters} from "./QuadMasters";
+import {HiddenSetup} from "./HiddenSetup";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty & random
@@ -30,6 +31,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region Other authors
+    HiddenSetup,
+
     MultiColorMadness,
     Miraculous,
     MeteorShower(true),
