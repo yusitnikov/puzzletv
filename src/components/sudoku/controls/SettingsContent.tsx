@@ -1,12 +1,16 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {FC} from "react";
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {FC, useState} from "react";
+import {useLanguageCode, useTranslate} from "../../../contexts/LanguageCodeContext";
 import {textColor, textHeightCoeff} from "../../app/globals";
 import {saveBoolToLocalStorage, saveNumberToLocalStorage, saveStringToLocalStorage} from "../../../utils/localStorage";
 import {LocalStorageKeys} from "../../../data/LocalStorageKeys";
 import InputSlider from "react-input-slider";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {Button} from "../../layout/button/Button";
+import {myClientId} from "../../../hooks/useMultiPlayer";
+import {buildLink} from "../../../utils/link";
+import {Check} from "@emotion-icons/material";
 
 interface SizeProps {
     cellSize: number;
@@ -21,6 +25,8 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
         cellSize,
         context: {
             puzzle: {
+                slug,
+                getNewHostedGameParams,
                 resultChecker,
                 forceAutoCheckOnFinish,
                 typeManager: {disableConflictChecker},
@@ -36,9 +42,12 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
         },
     }: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
 ) => {
+    const language = useLanguageCode();
     const translate = useTranslate();
 
     const textSize = cellSize * textHeightCoeff;
+
+    const [isCopied, setIsCopied] = useState(false);
 
     const handleChangeEnableConflictChecker = (value: boolean) => {
         onStateChange({enableConflictChecker: value} as any);
@@ -65,11 +74,67 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             <strong>{translate("Settings")}</strong>
         </div>
 
+        {getNewHostedGameParams && <>
+            <SettingsItem noLabel={true}>
+                <i>{translate(isEnabled ? "Multi-player mode" : "Single-player mode")}.</i>
+
+                <SettingsButton
+                    type={"button"}
+                    cellSize={cellSize}
+                    onClick={() => {
+                        window.open(window.location.origin + window.location.pathname + buildLink(
+                            slug,
+                            language,
+                            {
+                                ...getNewHostedGameParams(),
+                                host: myClientId,
+                                room: Math.random().toString().substring(2),
+                            }
+                        ));
+                    }}
+                >
+                    {translate("Host new game")}
+                </SettingsButton>
+            </SettingsItem>
+
+            {isEnabled && <SettingsItem>
+                <div>
+                    {translate("Share the link to the game")}:
+                </div>
+                <div style={{marginTop: textSize * 0.25}}>
+                    <SettingsTextBox
+                        type={"text"}
+                        readOnly={true}
+                        cellSize={cellSize}
+                        value={window.location.href}
+                        onFocus={({target}) => target.select()}
+                    />
+
+                    <div style={{display: "inline-flex", alignItems: "center"}}>
+                        <SettingsButton
+                            type={"button"}
+                            cellSize={cellSize}
+                            onClick={async () => {
+                                await window.navigator.clipboard.writeText(window.location.href);
+                                setIsCopied(true);
+                                window.setTimeout(() => setIsCopied(false), 1000);
+                            }}
+                        >
+                            {translate("Copy")}
+                        </SettingsButton>
+
+                        <div style={{position: "relative", width: 1, height: textSize}}>
+                            {isCopied && <Check size={textSize} style={{position: "absolute"}}/>}
+                        </div>
+                    </div>
+                </div>
+            </SettingsItem>}
+        </>}
+
         {isEnabled && <SettingsItem>
-            {translate("Nickname")}:
+            <span>{translate("Nickname")}:</span>
 
             <SettingsTextBox
-                ref={(ref) => ref?.focus()}
                 type={"text"}
                 cellSize={cellSize}
                 value={nickname}
@@ -114,17 +179,23 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
     </div>;
 };
 
-const StyledSettingsItem = styled("div")({
+interface SettingsItemProps {
+    noLabel?: boolean;
+}
+
+const StyledSettingsItem = styled("div", {
+    shouldForwardProp(propName) {
+        return propName !== "noLabel";
+    },
+})(({noLabel}: SettingsItemProps) => ({
     marginBottom: "0.5em",
     "*": {
-        cursor: "pointer",
+        cursor: noLabel ? undefined : "pointer",
     },
-});
+}));
 
-const SettingsItem: FC = ({children}) => <StyledSettingsItem>
-    <label>
-        {children}
-    </label>
+const SettingsItem: FC<SettingsItemProps> = ({noLabel, children}) => <StyledSettingsItem noLabel={noLabel}>
+    {noLabel ? children : <label>{children}</label>}
 </StyledSettingsItem>;
 
 const SettingsCheckbox = styled("input", {
@@ -146,12 +217,24 @@ const SettingsTextBox = styled("input", {
 })(({cellSize}: SizeProps) => ({
     padding: "0.25em",
     margin: 0,
-    marginLeft: cellSize * textHeightCoeff,
     width: cellSize * 2,
     height: cellSize * textHeightCoeff,
     border: `1px solid ${textColor}`,
     outline: "none",
-    cursor: "default",
+    cursor: "text",
+    fontSize: "inherit",
+    lineHeight: "inherit",
+    fontWeight: "inherit",
+    fontFamily: "inherit",
+    "* + &": {
+        marginLeft: cellSize * textHeightCoeff,
+    },
+}));
+
+const SettingsButton = styled(Button)(({cellSize}: SizeProps) => ({
+    padding: "0.25em",
+    margin: 0,
+    marginLeft: cellSize * textHeightCoeff,
     fontSize: "inherit",
     lineHeight: "inherit",
     fontWeight: "inherit",

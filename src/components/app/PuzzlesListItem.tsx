@@ -4,7 +4,7 @@ import {useLanguageCode, useTranslate} from "../../contexts/LanguageCodeContext"
 import {Field} from "../sudoku/field/Field";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useGame} from "../../hooks/sudoku/useGame";
-import {addLanguageToLink} from "../../utils/link";
+import {buildLink} from "../../utils/link";
 
 const padding = headerPadding;
 
@@ -25,7 +25,7 @@ export const PuzzlesListItem = <CellType, GameStateExtensionType = {}, Processed
     const context = useGame(puzzle, thumbnailCellSize, true);
 
     return <a
-        href={addLanguageToLink(`#${puzzle.slug}`, language)}
+        href={buildLink(puzzle.slug, language)}
         style={{
             background: lighterGreyColor,
             flex: "1 1 100%",

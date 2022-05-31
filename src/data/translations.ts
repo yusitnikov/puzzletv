@@ -175,6 +175,21 @@ export const translationsExactType = {
     "Nickname": {
         [LanguageCode.ru]: "Никнейм",
     },
+    "Share the link to the game": {
+        [LanguageCode.ru]: "Поделиться ссылкой на эту игру",
+    },
+    "Copy": {
+        [LanguageCode.ru]: "Копировать",
+    },
+    "Single-player mode": {
+        [LanguageCode.ru]: "Режим одиночной игры",
+    },
+    "Multi-player mode": {
+        [LanguageCode.ru]: "Многопользовательский режим",
+    },
+    "Host new game": {
+        [LanguageCode.ru]: "Хостить новую игру",
+    },
     // endregion
     // region useMultiPlayer
     "host": {

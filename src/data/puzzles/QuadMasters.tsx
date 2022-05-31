@@ -40,7 +40,7 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
         isRandom: !seed && !daily,
         ...other
     }),
-    loadPuzzle: ({size: sizeStr, regionWidth: regionWidthStr, seed: seedStr, isRandom, host}) => {
+    loadPuzzle: ({size: sizeStr, regionWidth: regionWidthStr, seed: seedStr, isRandom, host, ...otherParams}) => {
         const fieldSize = Number(sizeStr);
         const regionWidth = Number(regionWidthStr);
         const randomSeed = daily ? getDailyRandomGeneratorSeed() : Number(seedStr);
@@ -53,6 +53,12 @@ export const generateQuadMasters = (slug: string, daily: boolean): PuzzleDefinit
             slug,
             saveState: !isRandom,
             saveStateKey: `${slug}-${fieldSize}-${regionWidth}-${randomSeed}`,
+            getNewHostedGameParams: () => ({
+                size: fieldSize === 9 ? undefined : fieldSize,
+                regionWidth: regionWidth === getAutoRegionWidth(fieldSize) ? undefined : regionWidth,
+                seed: daily ? undefined : randomSeed,
+                ...otherParams,
+            }),
             typeManager: QuadMastersSudokuTypeManager(generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed)),
             fieldSize: createRegularFieldSize(fieldSize, regionWidth),
             resultChecker: isValidFinishedPuzzleByConstraints,

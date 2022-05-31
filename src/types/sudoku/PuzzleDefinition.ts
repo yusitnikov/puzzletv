@@ -14,6 +14,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     title: PartiallyTranslatable;
     slug: string;
     params?: any;
+    getNewHostedGameParams?: () => any;
     author?: PartiallyTranslatable<ReactNode>;
     rules?: (
         translate: ReturnType<typeof useTranslate>,

@@ -21,7 +21,7 @@ const StyledButton = styled("button", {
     fontSize: cellSize * textHeightCoeff,
 }));
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     cellSize: number;
     autoFocus?: boolean;
 }

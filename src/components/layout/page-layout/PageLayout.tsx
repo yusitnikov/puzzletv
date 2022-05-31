@@ -1,7 +1,7 @@
 import React, {ReactNode} from "react";
 import {headerHeight, headerPadding, lightGreyColor, textColor} from "../../app/globals";
 import {useLanguageCode, useTranslate} from "../../../contexts/LanguageCodeContext";
-import {addLanguageToLink} from "../../../utils/link";
+import {buildLink} from "../../../utils/link";
 
 export interface PageLayoutProps {
     addPadding?: boolean;
@@ -38,7 +38,7 @@ export const PageLayout = ({addPadding = true, scrollable, title, children}: Pag
             padding: `0 ${headerPadding}px`,
         }}>
             <a
-                href={addLanguageToLink("#list", language)}
+                href={buildLink("list", language)}
                 style={{
                     display: "flex",
                     alignItems: "center",
