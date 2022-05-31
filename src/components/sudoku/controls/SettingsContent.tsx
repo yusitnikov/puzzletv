@@ -10,7 +10,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Button} from "../../layout/button/Button";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {buildLink} from "../../../utils/link";
-import {Check} from "@emotion-icons/material";
+import {Check, Share} from "@emotion-icons/material";
 
 interface SizeProps {
     cellSize: number;
@@ -98,8 +98,10 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             </SettingsItem>
 
             {isEnabled && <SettingsItem>
-                <div>
-                    {translate("Share the link to the game")}:
+                <div style={{display: "inline-flex", alignItems: "center"}}>
+                    <span>{translate("Share the link to the game")}:</span>
+
+                    <Share size={"1em"} style={{marginLeft: "0.5em"}}/>
                 </div>
                 <div style={{marginTop: textSize * 0.25}}>
                     <SettingsTextBox

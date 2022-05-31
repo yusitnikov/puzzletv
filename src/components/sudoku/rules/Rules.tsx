@@ -15,6 +15,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Fragment} from "react";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {GameState} from "../../../types/sudoku/GameState";
+import {Share} from "@emotion-icons/material";
 
 const StyledContainer = styled(Absolute)({
     display: "flex",
@@ -79,7 +80,18 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                     </span>
                 </Fragment>)}
 
-                {allPlayerIds.length <= 1 && `${translate("Waiting for people to connect")}...`}
+                {allPlayerIds.length <= 1 && <div
+                    style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                    }}
+                    onClick={() => context.onStateChange({isShowingSettings: true} as Partial<GameState<CellType>>)}
+                >
+                    <span>{translate("Waiting for people to connect")}...</span>
+
+                    <Share size={"1em"} style={{marginLeft: "0.5em"}}/>
+                </div>}
             </div>}
 
             {!isEnabled && getPlayerScore && <div>
