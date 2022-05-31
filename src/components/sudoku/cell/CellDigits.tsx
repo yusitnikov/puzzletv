@@ -133,7 +133,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 isValidUserDigit
             )}
 
-            {!!allCenterDigits.size && renderAnimatedDigitsSet(
+            {initialData === undefined && !!allCenterDigits.size && renderAnimatedDigitsSet(
                 "center",
                 allCenterDigits,
                 size * centerDigitsCoeff,
@@ -147,7 +147,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 (cellData) => !!cellPosition && context.state.lastPlayerObjects[getExcludedDigitDataHash(cellPosition, cellData, context)]
             )}
 
-            {cornerDigits?.size && renderAnimatedDigitsSet(
+            {initialData === undefined && cornerDigits?.size && renderAnimatedDigitsSet(
                 "corner",
                 cornerDigits,
                 size * cornerDigitCoeff,
