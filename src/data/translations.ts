@@ -103,6 +103,12 @@ export const translationsExactType = {
     "Something's wrong here": {
         [LanguageCode.ru]: "Что-то тут не так",
     },
+    "You win": {
+        [LanguageCode.ru]: "Вы выиграли",
+    },
+    "You lose": {
+        [LanguageCode.ru]: "Вы проиграли",
+    },
     "Solution code": {
         [LanguageCode.ru]: "Код решения",
     },

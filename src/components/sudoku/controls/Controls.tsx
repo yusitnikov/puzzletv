@@ -31,6 +31,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
 import {GameState} from "../../../types/sudoku/GameState";
 import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
+import {myClientId} from "../../../hooks/useMultiPlayer";
 
 export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
 
@@ -48,6 +49,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         puzzle,
         state,
         onStateChange,
+        multiPlayer: {isEnabled, allPlayerIds},
     } = context;
 
     const {
@@ -70,6 +72,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         createCellDataByDisplayDigit,
         mainControlsComponent: MainControls,
         extraCellWriteModes = [],
+        getPlayerScore,
     } = typeManager;
 
     const {
@@ -84,6 +87,21 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const [isShowingResult, setIsShowingResult] = useState(false);
     const isCorrectResult = useMemo(() => resultChecker?.(context), [resultChecker, context]);
     const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
+
+    const playerScores = useMemo(
+        () => allPlayerIds
+            .map(clientId => ({
+                clientId,
+                score: getPlayerScore?.(context, clientId) || 0,
+            }))
+            .sort((a, b) => a.score < b.score ? 1 : -1),
+        [context, allPlayerIds, getPlayerScore]
+    );
+    const bestScore = playerScores[0]?.score || 0;
+    const myScore = useMemo(
+        () => playerScores.find(({clientId}) => clientId === myClientId)!.score,
+        [playerScores]
+    );
 
     const isLmdAllowed = useAllowLmd();
 
@@ -354,7 +372,15 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         </ControlButton>}
         {isShowingResult && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
             <div>
-                {isCorrectResult ? `${translate("Absolutely right")}!` : `${translate("Something's wrong here")}...`}
+                {
+                    isEnabled && getPlayerScore
+                        ? `${translate(myScore === bestScore ? "You win" : "You lose")}!`
+                        : (
+                            isCorrectResult
+                                ? `${translate("Absolutely right")}!`
+                                : `${translate("Something's wrong here")}...`
+                        )
+                }
             </div>
 
             {isLmdAllowed && isCorrectResult && lmdSolutionCode !== undefined && <>
