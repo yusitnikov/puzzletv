@@ -226,7 +226,7 @@ export const HiddenSetup: PuzzleDefinition<number> = {
             );
         }
 
-        if (stage >= 4) {
+        if (stage >= 5) {
             result.push(
                 ArrowConstraint("R3C4", ["R3C3", "R4C3"]),
                 ArrowConstraint("R7C6", ["R7C7", "R6C7"]),
