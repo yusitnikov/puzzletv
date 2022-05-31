@@ -24,7 +24,7 @@ export const QuadMastersControls = (
         }
 
         switch (ev.code) {
-            case "KeyC":
+            case "KeyQ":
             case "Tab":
                 context.onStateChange(({persistentCellWriteMode}) => ({
                     persistentCellWriteMode: persistentCellWriteMode === CellWriteMode.custom ? CellWriteMode.main : CellWriteMode.custom
@@ -76,7 +76,7 @@ export const QuadMastersControls = (
             />
         </AutoSvg>}
         fullSize={true}
-        title={`${translate(quads)} (${translate("shortcut")}: C / End)`}
+        title={`${translate(quads)} (${translate("shortcut")}: Q / End)`}
         context={context}
     />;
 };
