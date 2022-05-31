@@ -20,13 +20,13 @@ import {QuadsHintConstraint} from "../components/QuadsHint";
 import {indexes} from "../../../utils/indexes";
 import {getNextPlayerId} from "../../../hooks/useMultiPlayer";
 
-export const setQuadPositionActionType: GameStateActionType<Position, number, QuadMastersGameState, QuadMastersGameState> = ({
+export const setQuadPositionActionType: GameStateActionType<Position | undefined, number, QuadMastersGameState, QuadMastersGameState> = ({
     key: "set-quad-position",
     callback: (position, {state: {currentPlayer}, multiPlayer: {isEnabled}}, clientId) =>
-        ({isQuadTurn}) => (!isEnabled || currentPlayer === clientId) && isQuadTurn ? {currentQuad: {position, digits: new Set()}} : {},
+        ({isQuadTurn}) => (!isEnabled || currentPlayer === clientId) && isQuadTurn ? {currentQuad: position && {position, digits: new Set()}} : {},
 });
-export const setQuadPositionAction = (position: Position)
-    : GameStateAction<Position, number, QuadMastersGameState, QuadMastersGameState> => ({
+export const setQuadPositionAction = (position: Position | undefined)
+    : GameStateAction<Position | undefined, number, QuadMastersGameState, QuadMastersGameState> => ({
     type: setQuadPositionActionType,
     params: position,
 });

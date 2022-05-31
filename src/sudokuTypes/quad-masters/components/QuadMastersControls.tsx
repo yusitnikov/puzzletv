@@ -8,14 +8,20 @@ import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {QuadByData} from "../../../components/sudoku/constraints/quad/Quad";
 import {textColor} from "../../../components/app/globals";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {setQuadPositionAction} from "../types/QuadMastersSudokuTypeManager";
 
 export const QuadMastersControls = (
     {context, isHorizontal}: ControlsProps<number, QuadMastersGameState, QuadMastersGameState>
 ) => {
     const translate = useTranslate();
 
+    const {
+        state: {isShowingSettings, isMyTurn, isQuadTurn, cellWriteMode},
+        onStateChange,
+    } = context;
+
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
-        if (context.state.isShowingSettings) {
+        if (isShowingSettings) {
             return;
         }
 
@@ -26,18 +32,23 @@ export const QuadMastersControls = (
         switch (ev.code) {
             case "KeyQ":
             case "Tab":
-                context.onStateChange(({persistentCellWriteMode}) => ({
+                onStateChange(({persistentCellWriteMode}) => ({
                     persistentCellWriteMode: persistentCellWriteMode === CellWriteMode.custom ? CellWriteMode.main : CellWriteMode.custom
                 }));
                 ev.preventDefault();
                 break;
             case "Home":
-                context.onStateChange({persistentCellWriteMode: CellWriteMode.main});
+                onStateChange({persistentCellWriteMode: CellWriteMode.main});
                 ev.preventDefault();
                 break;
             case "End":
-                context.onStateChange({persistentCellWriteMode: CellWriteMode.custom});
+                onStateChange({persistentCellWriteMode: CellWriteMode.custom});
                 ev.preventDefault();
+                break;
+            case "Escape":
+                if (isMyTurn && isQuadTurn && cellWriteMode === CellWriteMode.custom) {
+                    onStateChange(setQuadPositionAction(undefined));
+                }
                 break;
         }
     });
