@@ -1,7 +1,12 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {GuessSudokuTypeManager} from "../../guess/types/GuessSudokuTypeManager";
-import {initialQuadMastersGameState, QuadMastersGameState} from "./QuadMastersGameState";
+import {
+    initialQuadMastersGameState,
+    QuadMastersGameState,
+    serializeQuadMastersGameState,
+    unserializeQuadMastersGameState
+} from "./QuadMastersGameState";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {QuadMastersControls} from "../components/QuadMastersControls";
 import {GameState, ProcessedGameState} from "../../../types/sudoku/GameState";
@@ -37,7 +42,11 @@ const onCornerClick = ({puzzle: {fieldSize: {rowsCount, columnsCount}}, onStateC
 };
 
 export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, isQuadle: boolean): SudokuTypeManager<number, QuadMastersGameState, QuadMastersGameState> => {
-    const parent = GuessSudokuTypeManager<QuadMastersGameState, QuadMastersGameState>(solution);
+    const parent = GuessSudokuTypeManager<QuadMastersGameState, QuadMastersGameState>(
+        solution,
+        serializeQuadMastersGameState,
+        unserializeQuadMastersGameState
+    );
 
     // TODO: call parent in every method
     return ({

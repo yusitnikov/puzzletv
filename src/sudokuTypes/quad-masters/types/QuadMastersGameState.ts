@@ -10,3 +10,15 @@ export const initialQuadMastersGameState: QuadMastersGameState = {
     isQuadTurn: true,
     allQuads: [],
 };
+
+export const serializeQuadMastersGameState = ({isQuadTurn, currentQuad, allQuads}: QuadMastersGameState): any => ({
+    isQuadTurn,
+    currentQuad,
+    allQuads,
+});
+
+export const unserializeQuadMastersGameState = ({isQuadTurn, currentQuad, allQuads}: any): QuadMastersGameState => ({
+    isQuadTurn,
+    currentQuad,
+    allQuads,
+});
