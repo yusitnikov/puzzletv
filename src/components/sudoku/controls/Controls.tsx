@@ -98,6 +98,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         [context, allPlayerIds, getPlayerScore]
     );
     const bestScore = playerScores[0]?.score || 0;
+    const worstScore = playerScores[playerScores.length - 1]?.score || 0;
     const myScore = useMemo(
         () => playerScores.find(({clientId}) => clientId === myClientId)!.score,
         [playerScores]
@@ -373,8 +374,15 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         {isShowingResult && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
             <div>
                 {
-                    isEnabled && getPlayerScore
-                        ? `${translate(myScore === bestScore ? "You win" : "You lose")}!`
+                    getPlayerScore
+                        ? (
+                            isEnabled
+                                ? `${translate(bestScore === worstScore ? "It's a draw" : (myScore === bestScore ? "You win" : "You lose"))}!`
+                                : <>
+                                    <div>{translate("Congratulations")}!</div>
+                                    <div>{translate("Your score is %1").replace("%1", myScore.toString())}.</div>
+                                </>
+                        )
                         : (
                             isCorrectResult
                                 ? `${translate("Absolutely right")}!`
