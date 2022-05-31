@@ -434,7 +434,7 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
     switch (state.cellWriteMode) {
         case CellWriteMode.main:
             if (gameStateIsAnySelectedCell(state, cell => !!cell.usersDigit)) {
-                return gameStateProcessSelectedCells(context, clientId, cell => ({
+                return gameStateProcessSelectedCells(context, clientId, () => ({
                     usersDigit: undefined
                 }));
             }
