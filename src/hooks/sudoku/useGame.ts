@@ -72,7 +72,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         (
             multiPlayer: UseMultiPlayerResult,
             gameState: GameState<CellType> & GameStateExtensionType,
-            processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType>
+            processedGameStateExtension: Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType>,
+            applyKeys = true
         ): ProcessedGameState<CellType> & ProcessedGameStateExtensionType => {
             const {
                 isReady: isReadyFn = () => true,
@@ -87,7 +88,9 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 ),
                 ...(puzzle.typeManager.extraCellWriteModes || []),
             ];
-            const cellWriteMode = getFinalCellWriteMode(keys, gameState.persistentCellWriteMode, allowedCellWriteModes, readOnly);
+            const cellWriteMode = applyKeys
+                ? getFinalCellWriteMode(keys, gameState.persistentCellWriteMode, allowedCellWriteModes, readOnly)
+                : gameState.persistentCellWriteMode;
             const cellWriteModeInfo = allowedCellWriteModes.find(({mode}) => mode === cellWriteMode)!;
             const isReady = !readOnly
                 && !isDoubledConnected
@@ -158,7 +161,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     isAddingLine: addingLine,
                     ...puzzle.typeManager.unserializeInternalState?.(puzzle, otherState)
                 },
-                emptyObject
+                emptyObject,
+                false
             );
 
             const callback = actionType.callback(
