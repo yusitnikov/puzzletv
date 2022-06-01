@@ -142,6 +142,12 @@ export const translationsExactType = {
     "All progress will be lost": {
         [LanguageCode.ru]: "Весь прогресс будет потерян",
     },
+    "You can't restart the game because you're not hosting it": {
+        [LanguageCode.ru]: "Вы не можете начать игру заново, потому что вы не являетесь организатором игры",
+    },
+    "If you want to restart the game, please ask the game host to do it": {
+        [LanguageCode.ru]: "Если вы хотите перезапустить игру, попросите об этом организатора",
+    },
     "Open settings": {
         [LanguageCode.ru]: "Открыть настройки",
     },
