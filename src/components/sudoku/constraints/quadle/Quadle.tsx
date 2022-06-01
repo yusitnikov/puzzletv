@@ -102,7 +102,7 @@ export const QuadleByData = <CellType,>(
                     <CellData
                         data={digit}
                         size={fontSize}
-                        top={top + offset * topOffset - 0.01}
+                        top={top + offset * topOffset}
                         left={left + offset * leftOffset}
                         customColor={type === QuadleDigitType.unknown ? "black" : "white"}
                     />

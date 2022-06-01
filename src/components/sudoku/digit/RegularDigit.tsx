@@ -20,6 +20,7 @@ export const RegularDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, 
     x={left}
     y={top}
     textAnchor={"middle"}
+    dominantBaseline={"middle"}
     alignmentBaseline={"central"}
     style={{
         fontSize: `${size}px`,

@@ -58,6 +58,7 @@ export const ChessPieceCellDataBase = (
     >
         <text
             textAnchor={"middle"}
+            dominantBaseline={"middle"}
             alignmentBaseline={"central"}
             style={{
                 fontSize: `${size}px`,

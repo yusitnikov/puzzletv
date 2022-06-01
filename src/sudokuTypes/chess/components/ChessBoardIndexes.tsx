@@ -10,6 +10,7 @@ const chessBoardIndexesFontSize = chessBoardIndexesMargin * 0.8;
 
 const commonProps: SVGAttributes<SVGTextElement> = {
     textAnchor: "middle",
+    dominantBaseline: "middle",
     alignmentBaseline: "central",
     style: {
         fontSize: `${chessBoardIndexesFontSize}px`,
