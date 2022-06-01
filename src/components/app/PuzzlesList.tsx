@@ -15,7 +15,7 @@ export const PuzzlesList = () => {
     const itemWidth = (innerWidth - (columnsCount - 1) * gridGap) / columnsCount;
 
     return <>
-        {splitArrayIntoChunks(getAllPuzzlesWithDefaultParams().filter(({noIndex}) => !noIndex), columnsCount).map((row, rowIndex) => <div
+        {splitArrayIntoChunks(getAllPuzzlesWithDefaultParams(), columnsCount).map((row, rowIndex) => <div
             key={rowIndex}
             style={{
                 display: "flex",

@@ -55,6 +55,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
 
 export interface PuzzleDefinitionLoader<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     slug: string;
+    noIndex?: boolean;
     fulfillParams: (params: any) => any;
     loadPuzzle: (params: any) => PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
 }

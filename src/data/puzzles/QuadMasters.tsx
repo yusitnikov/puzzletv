@@ -26,6 +26,7 @@ import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedLi
 
 export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<number, QuadMastersGameState, QuadMastersGameState> => ({
     slug,
+    noIndex: true,
     fulfillParams: (
         {
             size = 9,
