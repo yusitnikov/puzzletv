@@ -3,22 +3,20 @@
 A web application for creating and solving different types of sudoku.
 
 ## TODO/TOFIX
-| Type | Easy? |  Important?  | Task                                                                               |
-|:----:|:-----:|:------------:|------------------------------------------------------------------------------------|
-| Feat | Easy  |  Must have   | Letters.                                                                           |
-| Feat |  Mid  |  Must have   | Put X on a border.                                                                 |
-| Feat |  Mid  |  Must have   | Draw lines between the cells.                                                      |
-| Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders and/or colors.               |
-| Feat | Easy  |  Important   | Torus support for the anti-knight constraint.                                      |
-| Feat | Easy  |  Important   | Timer.                                                                             |
-| Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).                       |
-| Feat | Hard  |  Must have   | Setter mode.                                                                       |
-| Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                           |
-| Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.          |
-| Bug  |  Mid  | Nice to have | Warn about the progress when navigating to another hash (possibly by history API). |
-| Feat |  Mid  | Nice to have | Multiple color palettes that could be used simultaneously.                         |
-| Bug  |  Mid  |   Won't do   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?).          |
-| Bug  |  Mid  |   Won't do   | 2-color solid chess pieces with a normal font.                                     |
+| Type | Easy? |  Important?  | Task                                                                      |
+|:----:|:-----:|:------------:|---------------------------------------------------------------------------|
+| Feat | Easy  |  Must have   | Letters.                                                                  |
+| Feat |  Mid  |  Must have   | Put X on a border.                                                        |
+| Feat |  Mid  |  Must have   | Draw lines between the cells.                                             |
+| Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders and/or colors.      |
+| Feat | Easy  |  Important   | Torus support for the anti-knight constraint.                             |
+| Feat | Easy  |  Important   | Timer.                                                                    |
+| Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).              |
+| Feat | Hard  |  Must have   | Setter mode.                                                              |
+| Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                  |
+| Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules. |
+| Feat |  Mid  | Nice to have | Multiple color palettes that could be used simultaneously.                |
+| Bug  |  Mid  |   Won't do   | Do something with the Ctrl+N bug for the knight (maybe use Alt instead?). |
 
 ## Available Scripts
 
