@@ -27,9 +27,15 @@ import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
 import {CellColor} from "../../types/sudoku/CellColor";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import React from "react";
+import React, {useCallback} from "react";
+import {Modal} from "../../components/layout/modal/Modal";
+import {withFieldLayer} from "../../contexts/FieldLayerContext";
+import {FieldLayer} from "../../types/sudoku/FieldLayer";
+import {Button} from "../../components/layout/button/Button";
+import {globalPaddingCoeff} from "../../components/app/globals";
+import {useTranslate} from "../../contexts/LanguageCodeContext";
 
 const getStage = (state: ProcessedGameState<number>) => {
     const {cells} = gameStateGetCurrentFieldState(state);
@@ -80,7 +86,53 @@ const getStage = (state: ProcessedGameState<number>) => {
     return 5;
 };
 
-export const HiddenSetup: PuzzleDefinition<number> = {
+interface HiddenSetupState {
+    showCongratulations: boolean;
+}
+
+const Congratulations = withFieldLayer(FieldLayer.regular, ({context: {state: {showCongratulations}, onStateChange, cellSize}}: ConstraintProps) => {
+    const translate = useTranslate();
+
+    const handleClose = useCallback(() => onStateChange({showCongratulations: false}), [onStateChange]);
+
+    if (!showCongratulations) {
+        return null;
+    }
+
+    return <Modal
+        cellSize={cellSize}
+        onClose={handleClose}
+    >
+        <div>{translate("Congratulations")}!</div>
+        <div>{translate({
+            [LanguageCode.en]: "You completed the stage",
+            [LanguageCode.ru]: "Вы завершили этап",
+        })}.</div>
+
+        <div>
+            <Button
+                type={"button"}
+                cellSize={cellSize}
+                onClick={handleClose}
+                autoFocus={true}
+                style={{
+                    marginTop: cellSize * globalPaddingCoeff,
+                    padding: "0.5em 1em",
+                }}
+            >
+                OK
+            </Button>
+        </div>
+    </Modal>
+}, false);
+
+const CongratulationsConstraint: Constraint<any> = {
+    name: "congratulations",
+    cells: [],
+    component: Congratulations,
+};
+
+export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetupState> = {
     noIndex: true,
     author: {
         [LanguageCode.en]: "Raumplaner",
@@ -90,7 +142,21 @@ export const HiddenSetup: PuzzleDefinition<number> = {
         [LanguageCode.ru]: "Скрытая установка",
     },
     slug: "hidden-setup",
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: {
+        ...DigitSudokuTypeManager<HiddenSetupState, HiddenSetupState>(),
+        applyStateDiffEffect(state, prevState, {onStateChange}) {
+            if (prevState === undefined) {
+                return;
+            }
+
+            const prevStage = getStage(prevState);
+            const stage = getStage(state);
+
+            if (stage > prevStage) {
+                onStateChange({showCongratulations: true});
+            }
+        },
+    },
     fieldSize: FieldSize9,
     rules: (translate, {state}) => {
         const stage = getStage(state);
@@ -184,6 +250,7 @@ export const HiddenSetup: PuzzleDefinition<number> = {
         const stage = getStage(state);
 
         const result = [
+            CongratulationsConstraint,
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
             RenbanConstraint("R1C6", "R4C6", "R4C9"),
