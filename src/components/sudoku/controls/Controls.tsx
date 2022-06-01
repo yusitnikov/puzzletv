@@ -2,15 +2,13 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {emptyRect, Rect} from "../../../types/layout/Rect";
 import {ControlButton, controlButtonPaddingCoeff} from "./ControlButton";
 import {indexes} from "../../../utils/indexes";
+import {Check, Clear, Redo, Replay, Settings, Undo} from "@emotion-icons/material";
 import {
-    Check,
-    Clear,
-    Redo,
-    Replay,
-    Settings,
-    Undo
-} from "@emotion-icons/material";
-import {CellWriteMode, getAllowedCellWriteModeInfos, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
+    CellWriteMode,
+    CellWriteModeInfo,
+    getAllowedCellWriteModeInfos,
+    incrementCellWriteMode
+} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
@@ -114,7 +112,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         }
     }, [autoCheckOnFinish, resultChecker, isCorrectResult, setIsShowingResult]);
 
-    const allowedCellWriteModes = [
+    const allowedCellWriteModes: CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] = [
         ...getAllowedCellWriteModeInfos(allowDrawingBorders, allowDragging),
         ...extraCellWriteModes,
     ];
@@ -162,7 +160,16 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             return;
         }
 
-        const {code, ctrlKey, shiftKey} = ev;
+        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
+        const ctrlKey = winCtrlKey || macCtrlKey;
+        const anyKey = ctrlKey || shiftKey;
+
+        for (const [index, {mode}] of allowedCellWriteModes.entries()) {
+            if (code === ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"][index] && !anyKey) {
+                handleSetCellWriteMode(mode);
+                ev.preventDefault();
+            }
+        }
 
         switch (code) {
             case "Delete":

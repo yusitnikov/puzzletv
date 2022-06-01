@@ -36,11 +36,11 @@ export const ChessMainControls = (
             return;
         }
 
-        const {code, ctrlKey, metaKey} = ev;
+        const {code, ctrlKey, metaKey, shiftKey} = ev;
 
         switch (code) {
             case "KeyC":
-                if (!ctrlKey && !metaKey) {
+                if (!ctrlKey && !metaKey && shiftKey) {
                     handleToggleColor();
                     ev.preventDefault();
                 }
@@ -88,7 +88,7 @@ export const ChessMainControls = (
             top={2}
             cellSize={cellSize}
             onClick={handleToggleColor}
-            title={`${translate("Chess piece color")} (${translate("click to toggle")}, ${translate("shortcut")}: C)`}
+            title={`${translate("Chess piece color")} (${translate("click to toggle")}, ${translate("shortcut")}: Shift+C)`}
         >
             {(contentSize) => <Absolute
                 width={contentSize}
