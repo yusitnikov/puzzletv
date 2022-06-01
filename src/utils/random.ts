@@ -30,6 +30,23 @@ export const generateRandomPuzzleDigits = (fieldSize: number, regionWidth: numbe
     }
 };
 
+export const shuffleArray = <T>(array: T[], random: RandomGenerator): T[] => {
+    const shuffled = [...array];
+
+    for (let i = 0; i < array.length; i++) {
+        const i2 = i + Math.floor((array.length - i) * random());
+
+        // Check just for safety
+        if (i2 < array.length) {
+            const t = shuffled[i];
+            shuffled[i] = shuffled[i2];
+            shuffled[i2] = t;
+        }
+    }
+
+    return shuffled;
+};
+
 const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, random: RandomGenerator): GivenDigitsMap<number> | undefined => {
     const regionHeight = fieldSize / regionWidth;
 
@@ -41,7 +58,7 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
 
         for (const columnIndex of indexes(fieldSize)) {
             digitOptions[rowIndex][columnIndex] = new Set(
-                indexesFromTo(1, fieldSize, true).sort(() => random() < 0.5 ? 1 : -1)
+                shuffleArray(indexesFromTo(1, fieldSize, true), random)
             );
         }
     }
