@@ -6,18 +6,30 @@ import {
     fieldStateHistoryUndo
 } from "./FieldStateHistory";
 import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
-import {SelectedCells} from "./SelectedCells";
-import {CellState, CellStateEx} from "./CellState";
-import {areAllFieldStateCells, isAnyFieldStateCell, processFieldStateCells, processFieldStateLines} from "./FieldState";
+import {noSelectedCells, SelectedCells} from "./SelectedCells";
+import {CellState, CellStateEx, getCellDataComparer} from "./CellState";
+import {
+    areAllFieldStateCells, createEmptyFieldState,
+    isAnyFieldStateCell,
+    processFieldStateCells,
+    processFieldStateLines, serializeFieldState,
+    unserializeFieldState
+} from "./FieldState";
 import {indexes} from "../../utils/indexes";
-import {isSamePosition, Position} from "../layout/Position";
+import {emptyPosition, isSamePosition, Position} from "../layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
-import {GivenDigitsMap} from "./GivenDigitsMap";
+import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "./GivenDigitsMap";
 import {PuzzleContext} from "./PuzzleContext";
 import {Set} from "../struct/Set";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../utils/playerDataHash";
 import {PlayerObjectInfo} from "./PlayerObjectInfo";
+import {
+    loadBoolFromLocalStorage,
+    loadNumberFromLocalStorage, loadStringFromLocalStorage, serializeToLocalStorage,
+    unserializeFromLocalStorage
+} from "../../utils/localStorage";
+import {LocalStorageKeys} from "../../data/LocalStorageKeys";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -50,6 +62,132 @@ export interface ProcessedGameState<CellType> extends GameState<CellType> {
     isMyTurn: boolean;
     lastPlayerObjects: Record<string, boolean>;
 }
+
+// region Serialization & empty state
+type SavedGameStates = [
+    key: string,
+    field: any,
+    state: any,
+    initialDigits: any,
+    excludedDigits: any,
+    cellWriteMode: any,
+    currentPlayer: any,
+    ignore1: any, // ignore previous format for compatibility
+    playerObjects: any,
+][];
+const gameStateStorageKey = "savedGameState";
+const gameStateSerializerVersion = 2;
+const maxSavedPuzzles = 10;
+
+const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(gameStateStorageKey, gameStateSerializerVersion) || [];
+
+const getPuzzleFullSaveStateKey = ({slug, params = {}, saveStateKey = slug}: PuzzleDefinition<any, any, any>): string =>
+    `${saveStateKey}-${params.host || ""}-${params.room || ""}`;
+
+export const getEmptyGameState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    useLocalStorage: boolean,
+    readOnly = false
+): GameState<CellType> & GameStateExtensionType => {
+    const {
+        params = {},
+        typeManager,
+        saveState = true,
+    } = puzzle;
+
+    const {
+        initialGameStateExtension,
+        unserializeGameState,
+        initialCellWriteMode = CellWriteMode.main,
+    } = typeManager;
+
+    const fullSaveStateKey = getPuzzleFullSaveStateKey(puzzle);
+
+    const savedGameState = (readOnly || !saveState || !useLocalStorage)
+        ? undefined
+        : getSavedGameStates().find(([key]) => key === fullSaveStateKey);
+
+    return {
+        fieldStateHistory: {
+            states: [
+                savedGameState
+                    ? unserializeFieldState(savedGameState[1], puzzle)
+                    : createEmptyFieldState(puzzle)
+            ],
+            currentIndex: 0,
+        },
+        persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode,
+        selectedCells: noSelectedCells,
+        initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
+        excludedDigits: savedGameState?.[4]
+            ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) => Set.unserialize(
+                excludedDigits,
+                getCellDataComparer(puzzle.typeManager.areSameCellData),
+                puzzle.typeManager.cloneCellData,
+                puzzle.typeManager.serializeCellData,
+                puzzle.typeManager.unserializeCellData,
+            ))
+            : indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => new Set(
+                [],
+                getCellDataComparer(puzzle.typeManager.areSameCellData),
+                puzzle.typeManager.cloneCellData,
+                puzzle.typeManager.serializeCellData
+            ))),
+
+        currentMultiLine: [],
+        isAddingLine: false,
+
+        loopOffset: emptyPosition,
+
+        currentPlayer: savedGameState?.[6] || params.host,
+        playerObjects: savedGameState?.[8] || {},
+
+        isShowingSettings: false,
+        enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
+        autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
+        backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
+        nickname: loadStringFromLocalStorage(LocalStorageKeys.nickname, ""),
+
+        ...(initialGameStateExtension as any),
+        ...(savedGameState && unserializeGameState(savedGameState[2]))
+    };
+};
+
+export const saveGameState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    state: GameState<CellType> & GameStateExtensionType
+): void => {
+    const {
+        typeManager,
+        saveState = true,
+    } = puzzle;
+
+    if (!saveState) {
+        return;
+    }
+
+    const fullSaveStateKey = getPuzzleFullSaveStateKey(puzzle);
+
+    serializeToLocalStorage(
+        gameStateStorageKey,
+        ([
+            [
+                fullSaveStateKey,
+                serializeFieldState(gameStateGetCurrentFieldState(state), typeManager),
+                typeManager.serializeGameState(state),
+                serializeGivenDigitsMap(state.initialDigits, typeManager.serializeCellData),
+                serializeGivenDigitsMap(state.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
+                state.persistentCellWriteMode,
+                state.currentPlayer || "",
+                "",
+                state.playerObjects,
+            ],
+            ...getSavedGameStates().filter(([key]) => key !== fullSaveStateKey),
+        ] as SavedGameStates).slice(0, maxSavedPuzzles),
+        gameStateSerializerVersion
+    );
+};
+// endregion
 
 // region History
 export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: GameState<CellType>) =>

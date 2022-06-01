@@ -15,7 +15,12 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Fragment} from "react";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {GameState} from "../../../types/sudoku/GameState";
-import {Share} from "@emotion-icons/material";
+import {Fullscreen, FullscreenExit, Share} from "@emotion-icons/material";
+import {ControlButton} from "../controls/ControlButton";
+import {toggleFullScreen} from "../../../utils/fullScreen";
+import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
+
+const rulesHeaderPaddingCoeff = 1 / 8;
 
 const StyledContainer = styled(Absolute)({
     display: "flex",
@@ -30,6 +35,8 @@ export interface RulesProps<CellType> {
 export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const translate = useTranslate();
 
+    const isFullScreen = useIsFullScreen();
+
     const {
         puzzle: {title, author, rules, typeManager: {getPlayerScore}},
         state: {currentPlayer},
@@ -40,13 +47,39 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     return <StyledContainer {...rect} pointerEvents={true}>
         <div
             style={{
-                padding: cellSize / 8,
+                padding: cellSize * rulesHeaderPaddingCoeff,
                 textAlign: "center",
                 marginBottom: cellSize * globalPaddingCoeff / 2,
                 backgroundColor: blueColor,
             }}
         >
-            <h1 style={{fontSize: cellSize * h1HeightCoeff, margin: 0}}>{translate(title)}</h1>
+            <h1 style={{
+                position: "relative",
+                fontSize: cellSize * h1HeightCoeff,
+                margin: 0,
+                padding: `0 ${cellSize * h1HeightCoeff}px`
+            }}>
+                {translate(title)}
+            </h1>
+
+            <div style={{
+                position: "absolute",
+                top: cellSize * rulesHeaderPaddingCoeff / 2,
+                right: cellSize * rulesHeaderPaddingCoeff / 2,
+                width: cellSize * (h1HeightCoeff + rulesHeaderPaddingCoeff),
+                height: cellSize * (h1HeightCoeff + rulesHeaderPaddingCoeff),
+            }}>
+                <ControlButton
+                    left={0}
+                    top={0}
+                    cellSize={cellSize * (h1HeightCoeff + rulesHeaderPaddingCoeff)}
+                    onClick={toggleFullScreen}
+                    fullSize={true}
+                    title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
+                >
+                    {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
+                </ControlButton>
+            </div>
 
             {author && <div style={{fontSize: cellSize * h2HeightCoeff}}>{translate("by")} {translate(author)}</div>}
 

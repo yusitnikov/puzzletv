@@ -103,6 +103,8 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     initialGameStateExtension?: GameStateExtensionType;
 
+    keepStateOnRestart?(gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType): Partial<GameState<CellType> & GameStateExtensionType>;
+
     isReady?(gameState: GameState<CellType> & GameStateExtensionType): boolean;
 
     useProcessedGameStateExtension?(gameState: GameState<CellType> & GameStateExtensionType): Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType>;

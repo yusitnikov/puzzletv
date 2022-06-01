@@ -12,7 +12,6 @@ A web application for creating and solving different types of sudoku.
 | Feat | Easy  |  Important   | Torus support for the anti-knight constraint.                                      |
 | Feat | Easy  |  Important   | Timer.                                                                             |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).                       |
-| Mix  | Hard  |  Must have   | Restart button.                                                                    |
 | Feat | Hard  |  Must have   | Setter mode.                                                                       |
 | Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                           |
 | Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules.          |

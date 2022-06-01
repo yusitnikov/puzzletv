@@ -21,7 +21,7 @@ import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
 import {textColor} from "../../components/app/globals";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
+import {GameState, gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
 import {getRegionBoundingBox} from "../../utils/regions";
 import {getRectCenter} from "../../types/layout/Rect";
@@ -49,6 +49,9 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
     typeManager: {
         ...(DigitSudokuTypeManager() as SudokuTypeManager<number, any, any>),
         initialGameStateExtension: {zoom: 0, center: emptyPosition, map: undefined as any, overlay: undefined as any, renderVersion: 0},
+        keepStateOnRestart({zoom, center, map, overlay, renderVersion}): Partial<GameState<number> & GoogleMapsState> {
+            return {zoom, center, map, overlay, renderVersion};
+        },
         getRegionsForRowsAndColumns: () => [],
         transformCoords(coords, puzzle, {overlay}): Position {
             const projection = overlay?.getProjection();

@@ -27,6 +27,12 @@ export const translationsExactType = {
     "Loading": {
         [LanguageCode.ru]: "Подключение",
     },
+    "Yes": {
+        [LanguageCode.ru]: "Да",
+    },
+    "Cancel": {
+        [LanguageCode.ru]: "Отмена",
+    },
     // endregion
     // region App
     "Sudoku Puzzles": {
@@ -126,6 +132,18 @@ export const translationsExactType = {
     },
     "Enter full screen mode": {
         [LanguageCode.ru]: "Войти в полноэкранный режим",
+    },
+    "Clear the progress and restart": {
+        [LanguageCode.ru]: "Очистить прогресс и начать заново",
+    },
+    "Are you sure that you want to restart": {
+        [LanguageCode.ru]: "Вы уверены, что хотите начать заново",
+    },
+    "All progress will be lost": {
+        [LanguageCode.ru]: "Весь прогресс будет потерян",
+    },
+    "Open settings": {
+        [LanguageCode.ru]: "Открыть настройки",
     },
     // endregion
     // region RulesSpoiler

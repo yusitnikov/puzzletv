@@ -5,22 +5,19 @@ import {indexes} from "../../../utils/indexes";
 import {
     Check,
     Clear,
-    Fullscreen,
-    FullscreenExit,
     Redo,
+    Replay,
     Settings,
     Undo
 } from "@emotion-icons/material";
 import {CellWriteMode, getAllowedCellWriteModeInfos, incrementCellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Set} from "../../../types/struct/Set";
-import {toggleFullScreen} from "../../../utils/fullScreen";
-import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
-import {globalPaddingCoeff, textColor} from "../../app/globals";
+import {globalPaddingCoeff, textColor, textHeightCoeff} from "../../app/globals";
 import {SettingsContent} from "./SettingsContent";
 import {DigitControlButton} from "./DigitControlButton";
 import {CellWriteModeButton} from "./CellWriteModeButton";
@@ -29,7 +26,7 @@ import {UserLinesByData} from "../constraints/user-lines/UserLines";
 import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
-import {GameState} from "../../../types/sudoku/GameState";
+import {GameState, getEmptyGameState} from "../../../types/sudoku/GameState";
 import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 
@@ -69,6 +66,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const translate = useTranslate();
 
     const {
+        keepStateOnRestart,
         createCellDataByDisplayDigit,
         mainControlsComponent: MainControls,
         extraCellWriteModes = [],
@@ -87,6 +85,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const [isShowingResult, setIsShowingResult] = useState(false);
     const isCorrectResult = useMemo(() => resultChecker?.(context), [resultChecker, context]);
     const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
+
+    const [isShowingRestartConfirmation, setIsShowingRestartConfirmation] = useState(false);
 
     const playerScores = useMemo(
         () => allPlayerIds
@@ -117,8 +117,6 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         ...extraCellWriteModes,
     ];
 
-    const isFullScreen = useIsFullScreen();
-
     // region Event handlers
     const handleSetCellWriteMode = useCallback(
         (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode} as any),
@@ -136,6 +134,16 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     const handleCheckResult = useCallback(() => setIsShowingResult(true), [setIsShowingResult]);
     const handleCloseCheckResult = useCallback(() => setIsShowingResult(false), [setIsShowingResult]);
+
+    const handleMaybeRestart = useCallback(() => setIsShowingRestartConfirmation(true), [setIsShowingRestartConfirmation]);
+    const handleCloseRestart = useCallback(() => setIsShowingRestartConfirmation(false), [setIsShowingRestartConfirmation]);
+    const handleSureRestart = useCallback(() => {
+        handleCloseRestart();
+        onStateChange((state) => ({
+            ...getEmptyGameState(puzzle, false),
+            ...keepStateOnRestart?.(state),
+        }));
+    }, [handleCloseRestart, onStateChange, puzzle, keepStateOnRestart]);
 
     const handleOpenSettings = useCallback(
         () => onStateChange({isShowingSettings: true} as Partial<GameState<CellType>> as any),
@@ -316,19 +324,64 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             left={isHorizontal ? 4 : 0}
             top={isHorizontal ? 0 : 4}
             cellSize={cellSize}
-            onClick={toggleFullScreen}
-            fullSize={true}
-            title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
+            onClick={handleMaybeRestart}
+            title={translate("Clear the progress and restart")}
         >
-            {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}
+            {contentSize => <>
+                <div style={{
+                    fontSize: contentSize * 0.4,
+                    marginTop: contentSize * 0.05,
+                    marginLeft: contentSize * 0.1,
+                    fontWeight: 700,
+                }}>
+                    !
+                </div>
+                <Absolute
+                    width={contentSize}
+                    height={contentSize}
+                    angle={-30}
+                >
+                    <Replay/>
+                </Absolute>
+            </>}
         </ControlButton>
+        {isShowingRestartConfirmation && <Modal cellSize={cellSize} onClose={handleCloseRestart}>
+            <div>{translate("Are you sure that you want to restart")}?</div>
+            <div>{translate("All progress will be lost")}.</div>
+
+            <div style={{marginTop: cellSize * globalPaddingCoeff}}>
+                <Button
+                    type={"button"}
+                    cellSize={cellSize}
+                    onClick={handleSureRestart}
+                    autoFocus={true}
+                    style={{
+                        padding: "0.5em 1em",
+                    }}
+                >
+                    {translate("Yes")}
+                </Button>
+
+                <Button
+                    type={"button"}
+                    cellSize={cellSize}
+                    onClick={handleCloseRestart}
+                    style={{
+                        marginLeft: cellSize * textHeightCoeff,
+                        padding: "0.5em 1em",
+                    }}
+                >
+                    {translate("Cancel")}
+                </Button>
+            </div>
+        </Modal>}
 
         <ControlButton
             left={isHorizontal ? 4 : 1}
             top={isHorizontal ? 1 : 4}
             cellSize={cellSize}
             onClick={handleOpenSettings}
-            title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
+            title={translate("Open settings")}
         >
             <Settings/>
         </ControlButton>

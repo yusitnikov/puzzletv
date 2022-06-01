@@ -8,6 +8,7 @@ export interface QuadMastersGameState {
 
 export const initialQuadMastersGameState: QuadMastersGameState = {
     isQuadTurn: true,
+    currentQuad: undefined,
     allQuads: [],
 };
 
