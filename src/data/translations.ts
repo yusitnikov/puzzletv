@@ -229,6 +229,9 @@ export const translationsExactType = {
     "Host new game": {
         [LanguageCode.ru]: "Хостить новую игру",
     },
+    "Start collective solve": {
+        [LanguageCode.ru]: "Решать коллективно",
+    },
     // endregion
     // region useMultiPlayer
     "host": {

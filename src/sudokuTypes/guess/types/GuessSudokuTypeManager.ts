@@ -32,11 +32,11 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         cellState,
         cellData,
         {top, left},
-        {state: {currentPlayer, selectedCells, initialDigits}, multiPlayer: {isEnabled}},
+        {puzzle: {params = {}}, state: {currentPlayer, selectedCells, initialDigits}, multiPlayer: {isEnabled}},
         defaultResult,
         cache
     ): Partial<CellStateEx<number>> {
-        const isMyTurn = !isEnabled || currentPlayer === clientId;
+        const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
 
         if (!isGlobal) {
             return defaultResult;
@@ -111,6 +111,7 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         } = context;
 
         const {
+            params = {},
             typeManager: {createCellDataByDisplayDigit},
             fieldSize: {rowsCount, columnsCount},
             digitsCount = getDefaultDigitsCount(puzzle),
@@ -118,13 +119,15 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
 
         const {playerObjects} = state;
 
+        const isCompetitive = isEnabled && !params.share;
+
         let score = 0;
 
         for (const top of indexes(rowsCount)) {
             for (const left of indexes(columnsCount)) {
                 const position: Position = {top, left};
 
-                if (isEnabled) {
+                if (isCompetitive) {
                     const playerObject = playerObjects[getMainDigitDataHash(position)];
 
                     if (playerObject?.isValid && playerObject?.clientId === clientId) {

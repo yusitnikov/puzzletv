@@ -187,6 +187,50 @@ export const saveGameState = <CellType, GameStateExtensionType = {}, ProcessedGa
         gameStateSerializerVersion
     );
 };
+
+export const getAllShareState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    state: GameState<CellType> & GameStateExtensionType
+): any => {
+    const {typeManager} = puzzle;
+    const {getSharedState, serializeCellData} = typeManager;
+    const {initialDigits, excludedDigits} = state;
+
+    return {
+        field: serializeFieldState(gameStateGetCurrentFieldState(state), typeManager),
+        extension: typeManager.serializeGameState(state),
+        initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
+        excludedDigits: serializeGivenDigitsMap(excludedDigits, item => item.serialize()),
+        ...getSharedState?.(puzzle, state),
+    };
+}
+export const setAllShareState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    state: GameState<CellType> & GameStateExtensionType,
+    newState: any
+): GameState<CellType> & GameStateExtensionType => {
+    const {typeManager} = puzzle;
+    const {setSharedState, unserializeGameState, areSameCellData, cloneCellData, serializeCellData, unserializeCellData} = typeManager;
+    const {field, extension, initialDigits, excludedDigits} = newState;
+
+    const compareCellData = getCellDataComparer(areSameCellData);
+
+    const result: GameState<CellType> & GameStateExtensionType = {
+        ...state,
+        fieldStateHistory: fieldStateHistoryAddState(typeManager, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
+        ...unserializeGameState(extension),
+        initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
+        excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => Set.unserialize(
+            item,
+            compareCellData,
+            cloneCellData,
+            serializeCellData,
+            unserializeCellData
+        )),
+    };
+
+    return setSharedState?.(puzzle, result, newState) ?? result;
+};
 // endregion
 
 // region History

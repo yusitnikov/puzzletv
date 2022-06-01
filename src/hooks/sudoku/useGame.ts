@@ -1,8 +1,8 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {
-    GameState,
+    GameState, getAllShareState,
     getEmptyGameState,
-    ProcessedGameState, saveGameState
+    ProcessedGameState, saveGameState, setAllShareState
 } from "../../types/sudoku/GameState";
 import {getAllowedCellWriteModeInfos} from "../../types/sudoku/CellWriteMode";
 import {getFinalCellWriteMode} from "./useFinalCellWriteMode";
@@ -31,7 +31,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 ): PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => {
     const {
         slug,
-        params = {},
+        params = emptyObject,
         typeManager,
         saveStateKey = slug,
     } = puzzle;
@@ -50,23 +50,25 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
     const [myGameState, setGameState] = useState(() => getEmptyGameState(puzzle, true, readOnly));
 
     const mergeMyGameState = useCallback((myGameState: GameState<CellType> & GameStateExtensionType, multiPlayer: UseMultiPlayerResult) => {
-        if (multiPlayer.isHost || !multiPlayer.isEnabled || !multiPlayer.isLoaded || !multiPlayer.hostData || !setSharedState) {
+        const finalSetSharedState = puzzle.params?.share ? setAllShareState : setSharedState;
+
+        if (multiPlayer.isHost || !multiPlayer.isEnabled || !multiPlayer.isLoaded || !multiPlayer.hostData || !finalSetSharedState) {
             return myGameState;
         }
 
         return {
             ...myGameState,
-            ...setSharedState(puzzle, myGameState, multiPlayer.hostData),
+            ...finalSetSharedState(puzzle, myGameState, multiPlayer.hostData),
             currentPlayer: multiPlayer.hostData.currentPlayer,
             playerObjects: multiPlayer.hostData.playerObjects,
         };
     }, [puzzle, setSharedState]);
 
     const sharedGameState = usePureMemo(() => ({
-        ...(isHost && getSharedState?.(puzzle, myGameState)),
+        ...(isHost && (params.share ? getAllShareState(puzzle, myGameState) : getSharedState?.(puzzle, myGameState))),
         currentPlayer: myGameState.currentPlayer,
         playerObjects: myGameState.playerObjects,
-    }), [isHost, getSharedState, myGameState]);
+    }), [isHost, params, getSharedState, myGameState]);
 
     const calculateProcessedGameState = useCallback(
         (
@@ -118,7 +120,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 cellWriteMode,
                 cellWriteModeInfo,
                 isReady,
-                isMyTurn: !isEnabled || gameState.currentPlayer === myClientId,
+                isMyTurn: !isEnabled || gameState.currentPlayer === myClientId || !!puzzle.params?.share,
                 lastPlayerObjects,
                 ...(processedGameStateExtension as any),
             };
@@ -254,7 +256,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     const asAction = actionOrCallback as GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
                     const isAction = typeof asAction.type === "object";
 
-                    if (!isAction || !isEnabled || isHost || !puzzle.typeManager.isGlobalAction?.(asAction, context)) {
+                    if (!isAction || !isEnabled || isHost || (!puzzle.params?.share && !puzzle.typeManager.isGlobalAction?.(asAction, context))) {
                         const callback = isAction
                             ? asAction.type.callback(asAction.params, context, myClientId)
                             : actionOrCallback as GameStateActionCallback<CellType, ProcessedGameStateExtensionType>;

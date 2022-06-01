@@ -74,64 +74,82 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             <strong>{translate("Settings")}</strong>
         </div>
 
-        {getNewHostedGameParams && <>
-            <SettingsItem noLabel={true}>
-                <i>{translate(isEnabled ? "Multi-player mode" : "Single-player mode")}.</i>
+        <SettingsItem noLabel={true}>
+            <i>{translate(isEnabled ? "Multi-player mode" : "Single-player mode")}.</i>
 
-                <SettingsButton
-                    type={"button"}
+            {getNewHostedGameParams && <SettingsButton
+                type={"button"}
+                cellSize={cellSize}
+                onClick={() => {
+                    window.open(window.location.origin + window.location.pathname + buildLink(
+                        slug,
+                        language,
+                        {
+                            ...getNewHostedGameParams(),
+                            host: myClientId,
+                            room: Math.random().toString().substring(2),
+                            share: false,
+                        }
+                    ));
+                }}
+            >
+                {translate("Host new game")}
+            </SettingsButton>}
+
+            {!getNewHostedGameParams && <SettingsButton
+                type={"button"}
+                cellSize={cellSize}
+                onClick={() => {
+                    window.open(window.location.origin + window.location.pathname + buildLink(
+                        slug,
+                        language,
+                        {
+                            // ...getNewHostedGameParams?.(),
+                            host: myClientId,
+                            room: Math.random().toString().substring(2),
+                            share: true,
+                        }
+                    ));
+                }}
+            >
+                {translate("Start collective solve")}
+            </SettingsButton>}
+        </SettingsItem>
+
+        {isEnabled && <SettingsItem>
+            <div style={{display: "inline-flex", alignItems: "center"}}>
+                <span>{translate("Share the link to the game")}:</span>
+
+                <Share size={"1em"} style={{marginLeft: "0.5em"}}/>
+            </div>
+            <div style={{marginTop: textSize * 0.25}}>
+                <SettingsTextBox
+                    type={"text"}
+                    readOnly={true}
                     cellSize={cellSize}
-                    onClick={() => {
-                        window.open(window.location.origin + window.location.pathname + buildLink(
-                            slug,
-                            language,
-                            {
-                                ...getNewHostedGameParams(),
-                                host: myClientId,
-                                room: Math.random().toString().substring(2),
-                            }
-                        ));
-                    }}
-                >
-                    {translate("Host new game")}
-                </SettingsButton>
-            </SettingsItem>
+                    value={window.location.href}
+                    onFocus={({target}) => target.select()}
+                />
 
-            {isEnabled && <SettingsItem>
                 <div style={{display: "inline-flex", alignItems: "center"}}>
-                    <span>{translate("Share the link to the game")}:</span>
-
-                    <Share size={"1em"} style={{marginLeft: "0.5em"}}/>
-                </div>
-                <div style={{marginTop: textSize * 0.25}}>
-                    <SettingsTextBox
-                        type={"text"}
-                        readOnly={true}
+                    <SettingsButton
+                        type={"button"}
                         cellSize={cellSize}
-                        value={window.location.href}
-                        onFocus={({target}) => target.select()}
-                    />
+                        onClick={async () => {
+                            await window.navigator.clipboard.writeText(window.location.href);
+                            setIsCopied(true);
+                            window.setTimeout(() => setIsCopied(false), 1000);
+                        }}
+                    >
+                        {translate("Copy")}
+                    </SettingsButton>
 
-                    <div style={{display: "inline-flex", alignItems: "center"}}>
-                        <SettingsButton
-                            type={"button"}
-                            cellSize={cellSize}
-                            onClick={async () => {
-                                await window.navigator.clipboard.writeText(window.location.href);
-                                setIsCopied(true);
-                                window.setTimeout(() => setIsCopied(false), 1000);
-                            }}
-                        >
-                            {translate("Copy")}
-                        </SettingsButton>
-
-                        <div style={{position: "relative", width: 1, height: textSize}}>
-                            {isCopied && <Check size={textSize} style={{position: "absolute"}}/>}
-                        </div>
+                    <div style={{position: "relative", width: 1, height: textSize}}>
+                        {isCopied && <Check size={textSize} style={{position: "absolute"}}/>}
                     </div>
                 </div>
-            </SettingsItem>}
-        </>}
+            </div>
+        </SettingsItem>}
 
         {isEnabled && <SettingsItem>
             <span>{translate("Nickname")}:</span>

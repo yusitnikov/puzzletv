@@ -26,8 +26,8 @@ import {
 
 export const setQuadPositionActionType: GameStateActionType<Position | undefined, number, QuadMastersGameState, QuadMastersGameState> = ({
     key: "set-quad-position",
-    callback: (position, {state: {currentPlayer}, multiPlayer: {isEnabled}}, clientId) =>
-        ({isQuadTurn}) => (!isEnabled || currentPlayer === clientId) && isQuadTurn ? {currentQuad: position && {position, digits: []}} : {},
+    callback: (position, {puzzle: {params = {}}, state: {currentPlayer}, multiPlayer: {isEnabled}}, clientId) =>
+        ({isQuadTurn}) => (!isEnabled || currentPlayer === clientId || !!params.share) && isQuadTurn ? {currentQuad: position && {position, digits: []}} : {},
 });
 export const setQuadPositionAction = (position: Position | undefined)
     : GameStateAction<Position | undefined, number, QuadMastersGameState, QuadMastersGameState> => ({
@@ -112,7 +112,10 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, i
             }
 
             const {
-                puzzle: {fieldSize: {rowsCount, columnsCount}},
+                puzzle: {
+                    params = {},
+                    fieldSize: {rowsCount, columnsCount},
+                },
                 state,
                 multiPlayer: {isEnabled, allPlayerIds},
             } = context;
@@ -126,7 +129,7 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, i
                 currentPlayer = "",
             } = state;
 
-            const isMyTurn = !isEnabled || currentPlayer === clientId;
+            const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
             if (!isMyTurn) {
                 return defaultResult;
             }
@@ -248,13 +251,13 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, i
             parent.applyStateDiffEffect?.(state, prevState, context);
 
             const {persistentCellWriteMode, isQuadTurn, isMyTurn} = state;
-            const {onStateChange, multiPlayer: {isEnabled}} = context;
+            const {puzzle: {params = {}}, onStateChange, multiPlayer: {isEnabled}} = context;
 
             if (isMyTurn && prevState?.isQuadTurn && !isQuadTurn && persistentCellWriteMode === CellWriteMode.custom) {
                 onStateChange({persistentCellWriteMode: CellWriteMode.main});
             }
 
-            if (isEnabled) {
+            if (isEnabled && !params.share) {
                 if (!prevState?.isMyTurn && isMyTurn && isQuadTurn) {
                     onStateChange({persistentCellWriteMode: CellWriteMode.custom});
                 }

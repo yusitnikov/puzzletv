@@ -13,7 +13,12 @@ import {CustomCellBounds} from "./CustomCellBounds";
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     title: PartiallyTranslatable;
     slug: string;
-    params?: any;
+    params?: {
+        host?: string;
+        room?: string;
+        share?: boolean;
+        [key: string]: any;
+    };
     getNewHostedGameParams?: () => any;
     author?: PartiallyTranslatable<ReactNode>;
     rules?: (

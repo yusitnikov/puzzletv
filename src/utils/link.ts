@@ -47,4 +47,4 @@ export const parseLink = (hash: string) => {
     params.lang = params.lang || LanguageCode.en;
 
     return {slug, params};
-}
+};

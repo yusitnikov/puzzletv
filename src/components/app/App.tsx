@@ -27,11 +27,9 @@ interface AppContentProps {
     params: any;
 }
 
-const AppContent = ({hash = ""}: AppContentProps) => {
+const AppContent = ({hash = "", slug, params}: AppContentProps) => {
     const language = useLanguageCode();
     const translate = useTranslate();
-
-    const {slug, params} = useMemo(() => parseLink(hash), [hash]);
 
     const puzzle = useMemo(() => {
         for (const puzzleOrLoader of AllPuzzles) {
@@ -45,6 +43,10 @@ const AppContent = ({hash = ""}: AppContentProps) => {
                 const puzzle = typeof loader.loadPuzzle === "function"
                     ? loader.loadPuzzle(fulfilledParams)
                     : puzzleOrLoader as PuzzleDefinition<any, any, any>;
+
+                if (!puzzle.getNewHostedGameParams && params.host && !params.share) {
+                    continue;
+                }
 
                 return {
                     ...puzzle,

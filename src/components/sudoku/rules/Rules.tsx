@@ -38,11 +38,13 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const isFullScreen = useIsFullScreen();
 
     const {
-        puzzle: {title, author, rules, typeManager: {getPlayerScore}},
+        puzzle: {params = {}, title, author, rules, typeManager: {getPlayerScore}},
         state: {currentPlayer},
         cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
     } = context;
+
+    const isCompetitive = isEnabled && !params.share;
 
     return <StyledContainer {...rect} pointerEvents={true}>
         <div
@@ -85,7 +87,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
 
             {isEnabled && <div>
                 {allPlayerIds.length > 1 && allPlayerIds.map((playerId, index) => <Fragment key={playerId}>
-                    {index > 0 && <strong> vs </strong>}
+                    {index > 0 && (params.share ? ", " : <strong> vs </strong>)}
                     <span
                         style={{cursor: playerId === myClientId ? "pointer" : undefined}}
                         onClick={() => {
@@ -94,22 +96,24 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                             }
                         }}
                     >
-                        <span style={{fontWeight: playerId === currentPlayer ? 700 : 400}}>{playerNicknames[playerId]}</span>
+                        <span style={{fontWeight: playerId === currentPlayer || params.share ? 700 : 400}}>{playerNicknames[playerId]}</span>
                         {playerId === myClientId && <>&nbsp;({translate("you")})</>}
-                        &nbsp;
-                        <span
-                            style={{
-                                display: "inline-block",
-                                width: getPlayerScore ? undefined : "0.7em",
-                                height: getPlayerScore ? undefined : "0.7em",
-                                padding: getPlayerScore ? "0 0.25em" : 0,
-                                backgroundColor: playerId === myClientId ? currentPlayerColor : otherPlayerColor,
-                                border: `1px solid ${textColor}`,
-                            }}
-                            title={getPlayerScore ? translate("Score") : undefined}
-                        >
-                            {getPlayerScore?.(context, playerId)}
-                        </span>
+                        {!params.share && <>
+                            &nbsp;
+                            <span
+                                style={{
+                                    display: "inline-block",
+                                    width: getPlayerScore ? undefined : "0.7em",
+                                    height: getPlayerScore ? undefined : "0.7em",
+                                    padding: getPlayerScore ? "0 0.25em" : 0,
+                                    backgroundColor: playerId === myClientId ? currentPlayerColor : otherPlayerColor,
+                                    border: `1px solid ${textColor}`,
+                                }}
+                                title={getPlayerScore ? translate("Score") : undefined}
+                            >
+                                {getPlayerScore?.(context, playerId)}
+                            </span>
+                        </>}
                     </span>
                 </Fragment>)}
 
@@ -127,7 +131,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                 </div>}
             </div>}
 
-            {!isEnabled && getPlayerScore && <div>
+            {!isCompetitive && getPlayerScore && <div>
                 {translate("Score")}: {getPlayerScore(context, myClientId)}
             </div>}
         </div>

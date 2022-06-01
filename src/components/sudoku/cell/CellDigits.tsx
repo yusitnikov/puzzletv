@@ -46,6 +46,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
     const {puzzle, multiPlayer: {isEnabled}} = context;
 
     const {
+        params,
         typeManager: {
             cellDataComponentType: {
                 component: CellData,
@@ -99,7 +100,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 state={state}
                 isInitial={isInitial || mainColor}
                 isValid={typeof isValid === "function" ? isValid(cellData) : isValid}
-                isRecent={isEnabled && (typeof isRecent === "function" ? isRecent(cellData) : isRecent)}
+                isRecent={isEnabled && !params?.share && (typeof isRecent === "function" ? isRecent(cellData) : isRecent)}
             />;
         });
     };
