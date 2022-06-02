@@ -189,10 +189,7 @@ const shadedRow = {
     6: [CellColor.lightGrey],
 };
 
-interface MyGameState extends QuadInputGameState<number> {
-}
-
-export const SonataSemplice: PuzzleDefinition<number, MyGameState, MyGameState> = {
+export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>, QuadInputGameState<number>> = {
     noIndex: true,
     slug: "rockratzero-sonata-semplice",
     title: {
@@ -201,7 +198,7 @@ export const SonataSemplice: PuzzleDefinition<number, MyGameState, MyGameState> 
     author: {
         [LanguageCode.en]: "rockratzero"
     },
-    typeManager: QuadInputSudokuTypeManager<number, MyGameState, MyGameState>({
+    typeManager: QuadInputSudokuTypeManager({
         parent: DigitSudokuTypeManager(),
         allowRepeat: true,
         allowOverflow: false,
