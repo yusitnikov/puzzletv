@@ -13,15 +13,9 @@ import {Position} from "../../../types/layout/Position";
 import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 
 export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    solution: GivenDigitsMap<number>,
-    serializeGameState?: SudokuTypeManager<number, GameStateExtensionType, any>["serializeGameState"],
-    unserializeGameState?: SudokuTypeManager<number, GameStateExtensionType, any>["unserializeGameState"]
+    solution: GivenDigitsMap<number>
 ): SudokuTypeManager<number, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
-    ...DigitSudokuTypeManager<GameStateExtensionType, ProcessedGameStateExtensionType>(
-        RegularDigitComponentType,
-        serializeGameState,
-        unserializeGameState
-    ),
+    ...DigitSudokuTypeManager<GameStateExtensionType, ProcessedGameStateExtensionType>(),
 
     items: [CellOwnershipConstraint],
 

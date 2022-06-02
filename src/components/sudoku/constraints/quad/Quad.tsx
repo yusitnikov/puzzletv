@@ -6,12 +6,11 @@ import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 
-const radius = 0.3;
-
 export interface QuadProps<CellType> {
     expectedDigits?: CellType[];
     forbiddenDigits?: CellType[];
     isRecent?: boolean;
+    radius?: number;
 }
 
 export const Quad = withFieldLayer(
@@ -23,6 +22,7 @@ export const Quad = withFieldLayer(
             expectedDigits,
             forbiddenDigits,
             isRecent,
+            radius,
         }: ConstraintProps<any, QuadProps<any>>
     ) => <QuadByData
         context={context}
@@ -30,6 +30,7 @@ export const Quad = withFieldLayer(
         expectedDigits={expectedDigits}
         forbiddenDigits={forbiddenDigits}
         isRecent={isRecent}
+        radius={radius}
     />
 );
 
@@ -40,7 +41,8 @@ export const QuadByData = <CellType,>(
         expectedDigits = [],
         forbiddenDigits = [],
         isRecent,
-    }: Pick<ConstraintProps<CellType, QuadProps<CellType>>, "context" | "cells" | "expectedDigits" | "forbiddenDigits" | "isRecent">
+        radius = 0.3,
+    }: Pick<ConstraintProps<CellType, QuadProps<CellType>>, "context" | "cells" | "expectedDigits" | "forbiddenDigits" | "isRecent" | "radius">
 ) => {
     const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: CellType, valid?: boolean}[] = [
         ...expectedDigits.map(digit => ({digit, valid: true})),
@@ -93,7 +95,8 @@ export const QuadConstraint = <CellType,>(
     cellLiteral: PositionLiteral,
     expectedDigits: CellType[],
     forbiddenDigits: CellType[] = [],
-    isRecent = false
+    isRecent = false,
+    radius = 0.3
 ): Constraint<CellType, QuadProps<CellType>> => {
     return ({
         name: "quad",
@@ -101,16 +104,37 @@ export const QuadConstraint = <CellType,>(
         expectedDigits,
         forbiddenDigits,
         isRecent,
+        radius,
         component: Quad,
         isValidCell({top, left}, digitsMap, cells, {typeManager: {areSameCellData}}, state) {
             const data = digitsMap[top][left];
 
-            return !forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, state, true)) && (
-                cells.some(({top, left}) => digitsMap[top]?.[left] === undefined) ||
-                expectedDigits.every(expectedData => cells.some(
-                    ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, state, true)
-                ))
-            );
+            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, state, true))) {
+                return false;
+            }
+
+            if (expectedDigits.length === 4) {
+                let remainingExpectedDigits = [...expectedDigits];
+
+                for (const {top, left} of cells) {
+                    const cellData = digitsMap[top]?.[left];
+                    if (cellData === undefined) {
+                        continue;
+                    }
+
+                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, state, true));
+                    if (matchingIndex < 0) {
+                        return false;
+                    }
+
+                    remainingExpectedDigits.splice(matchingIndex, 1);
+                }
+            }
+
+            return cells.some(({top, left}) => digitsMap[top]?.[left] === undefined)
+                || expectedDigits.every(expectedData => cells.some(
+                ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, state, true)
+            ));
         },
     });
 };
@@ -123,7 +147,8 @@ export const QuadConstraintBySolution = <CellType, GameStateExtensionType, Proce
     cellLiteral: PositionLiteral,
     digits: CellType[],
     solution: GivenDigitsMap<CellType>,
-    isRecent = false
+    isRecent = false,
+    radius = 0.3
 ): Constraint<CellType, QuadProps<CellType>> => {
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
         .map(({top, left}) => solution[top]?.[left])
@@ -136,6 +161,7 @@ export const QuadConstraintBySolution = <CellType, GameStateExtensionType, Proce
         cellLiteral,
         digits.filter(isGoodDigit),
         digits.filter(digit => !isGoodDigit(digit)),
-        isRecent
+        isRecent,
+        radius
     );
 };

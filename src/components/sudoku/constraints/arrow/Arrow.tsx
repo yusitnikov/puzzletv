@@ -4,12 +4,14 @@ import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     getCircleConnectionPoint,
+    getLineVector,
     parsePositionLiteral,
     parsePositionLiterals,
     PositionLiteral
 } from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
+import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 
 const lineWidth = 0.1;
 const arrowSize = 0.35;
@@ -25,13 +27,8 @@ export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCirc
     const {left, top} = cells[0];
     cells[0] = getCircleConnectionPoint(cells[0], cells[1], circleRadius);
 
-    const {left: lastX, top: lastY} = cells[cells.length - 1];
-    const {left: prevX, top: prevY} = cells[cells.length - 2];
-    let dirX = lastX - prevX;
-    let dirY = lastY - prevY;
-    const dirLength = Math.hypot(dirX, dirY);
-    dirX /= dirLength;
-    dirY /= dirLength;
+    const last = cells[cells.length - 1];
+    const prev = cells[cells.length - 2];
 
     return <>
         <RoundedPolyLine
@@ -40,23 +37,12 @@ export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCirc
             stroke={darkGreyColor}
         />
 
-        <RoundedPolyLine
-            strokeWidth={lineWidth}
-            stroke={darkGreyColor}
-            points={[
-                {
-                    left: lastX + arrowSize * (-dirX + dirY),
-                    top: lastY + arrowSize * (-dirY - dirX)
-                },
-                {
-                    left: lastX,
-                    top: lastY
-                },
-                {
-                    left: lastX + arrowSize * (-dirX - dirY),
-                    top: lastY + arrowSize * (-dirY + dirX)
-                },
-            ]}
+        <ArrowEnd
+            position={last}
+            direction={getLineVector({start: prev, end: last})}
+            arrowSize={arrowSize}
+            lineWidth={lineWidth}
+            color={darkGreyColor}
         />
 
         <circle

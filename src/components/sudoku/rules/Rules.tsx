@@ -85,7 +85,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
 
             {author && <div style={{fontSize: cellSize * h2HeightCoeff}}>{translate("by")} {translate(author)}</div>}
 
-            {isEnabled && <div>
+            {isEnabled && <div style={{fontSize: cellSize * h2HeightCoeff}}>
                 {allPlayerIds.length > 1 && allPlayerIds.map((playerId, index) => <Fragment key={playerId}>
                     {index > 0 && (params.share ? ", " : <strong> vs </strong>)}
                     <span

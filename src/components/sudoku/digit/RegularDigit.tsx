@@ -3,6 +3,7 @@ import {textColor} from "../../app/globals";
 import {DigitProps} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {CenteredText} from "../../svg/centered-text/CenteredText";
 
 export const RegularDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
     width={size}
@@ -16,20 +17,13 @@ export const RegularDigit = memo<DigitProps>(({digit, size, color = textColor, .
     />
 </AutoSvg>);
 
-export const RegularDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, top = 0}: DigitProps) => <text
-    x={left}
-    y={top}
-    textAnchor={"middle"}
-    dominantBaseline={"middle"}
-    alignmentBaseline={"central"}
-    style={{
-        fontSize: `${size}px`,
-        lineHeight: `${size}px`,
-    }}
-    fill={"currentColor"}
+export const RegularDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, top = 0}: DigitProps) => <CenteredText
+    left={left}
+    top={top}
+    size={size}
 >
     {digit}
-</text>);
+</CenteredText>);
 
 export const RegularDigitComponentType: DigitComponentType = {
     component: RegularDigit,

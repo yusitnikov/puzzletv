@@ -13,6 +13,7 @@ export enum CellWriteMode {
     color,
     lines,
     move,
+    quads,
     custom,
 }
 

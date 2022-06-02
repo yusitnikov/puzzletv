@@ -4,9 +4,7 @@ import {DigitCellDataComponentType} from "../components/DigitCellData";
 import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponentType";
 
 export const DigitSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    digitComponentType: DigitComponentType = RegularDigitComponentType,
-    serializeGameState: SudokuTypeManager<number, GameStateExtensionType, any>["serializeGameState"] = () => {},
-    unserializeGameState: SudokuTypeManager<number, GameStateExtensionType, any>["unserializeGameState"] = data => data as GameStateExtensionType
+    digitComponentType: DigitComponentType = RegularDigitComponentType
 ): SudokuTypeManager<number, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
     areSameCellData(digit1: number, digit2: number): boolean {
         return digit1 === digit2;
@@ -32,8 +30,13 @@ export const DigitSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         return digit as number;
     },
 
-    serializeGameState,
-    unserializeGameState,
+    serializeGameState(): any {
+        return {};
+    },
+
+    unserializeGameState(): Partial<GameStateExtensionType> {
+        return {};
+    },
 
     createCellDataByDisplayDigit(digit: number): number {
         return digit;

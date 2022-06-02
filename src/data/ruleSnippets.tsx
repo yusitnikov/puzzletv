@@ -159,6 +159,16 @@ export const inBetweenLineExplained: Translatable = {
     [LanguageCode.ru]: "Цифры на серой линии должны быть строго между цифрами на кружках",
 };
 
+export const littleKillerTitle: Translatable = {
+    [LanguageCode.en]: "Little killer",
+    [LanguageCode.ru]: "Диагонали",
+};
+
+export const littleKillerExplained: Translatable = {
+    [LanguageCode.en]: "Digits along indicated diagonals must sum to the given total",
+    [LanguageCode.ru]: "Цифры на указанных диагоналях должны иметь обозначенную сумму",
+};
+
 
 export const noBifurcation: Translatable<ReactNode> = {
     [LanguageCode.en]: <>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</>,

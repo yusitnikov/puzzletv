@@ -10,6 +10,7 @@ import {MultiColorMadness} from "./MultiColorMadness";
 import {Africa} from "./Africa";
 import {generateQuadMasters} from "./QuadMasters";
 import {HiddenSetup} from "./HiddenSetup";
+import {SonataSemplice} from "./SonataSemplice";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty & random
@@ -27,6 +28,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region Other authors
+    SonataSemplice,
     HiddenSetup,
 
     MultiColorMadness,

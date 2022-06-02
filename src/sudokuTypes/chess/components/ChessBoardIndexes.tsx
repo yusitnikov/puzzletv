@@ -1,62 +1,55 @@
-import {SVGAttributes} from "react";
 import {indexes} from "../../../utils/indexes";
 import {textColor} from "../../../components/app/globals";
 import {chessColumnNameFromIndex, chessRowNameFromIndex} from "../utils/chessCoords";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
+import {CenteredText} from "../../../components/svg/centered-text/CenteredText";
 
 export const chessBoardIndexesMargin = 0.5;
 const chessBoardIndexesFontSize = chessBoardIndexesMargin * 0.8;
-
-const commonProps: SVGAttributes<SVGTextElement> = {
-    textAnchor: "middle",
-    dominantBaseline: "middle",
-    alignmentBaseline: "central",
-    style: {
-        fontSize: `${chessBoardIndexesFontSize}px`,
-        lineHeight: `${chessBoardIndexesFontSize}px`,
-    },
-    fill: textColor,
-};
 
 export interface ChessBoardIndexesProps {
     shifted?: boolean;
 }
 
 export const ChessBoardIndexes = withFieldLayer(FieldLayer.regular, ({shifted}: ChessBoardIndexesProps) => <>
-    {indexes(8).map(index => <text
+    {indexes(8).map(index => <CenteredText
         key={`top-${index}`}
-        x={index + 0.5}
-        y={-chessBoardIndexesMargin / 2}
-        {...commonProps}
+        left={index + 0.5}
+        top={-chessBoardIndexesMargin / 2}
+        fill={textColor}
+        size={chessBoardIndexesFontSize}
     >
         {chessColumnNameFromIndex(index)}
-    </text>)}
+    </CenteredText>)}
 
-    {indexes(8).map(index => <text
+    {indexes(8).map(index => <CenteredText
         key={`bottom-${index}`}
-        x={index + (shifted ? 1 : 0) + 0.5}
-        y={8 + (shifted ? 1 : 0) + chessBoardIndexesMargin / 2}
-        {...commonProps}
+        left={index + (shifted ? 1 : 0) + 0.5}
+        top={8 + (shifted ? 1 : 0) + chessBoardIndexesMargin / 2}
+        fill={textColor}
+        size={chessBoardIndexesFontSize}
     >
         {chessColumnNameFromIndex(index)}
-    </text>)}
+    </CenteredText>)}
 
-    {indexes(8).map(index => <text
+    {indexes(8).map(index => <CenteredText
         key={`left-${index}`}
-        x={-chessBoardIndexesMargin / 2}
-        y={index + (shifted ? 1 : 0) + 0.5}
-        {...commonProps}
+        left={-chessBoardIndexesMargin / 2}
+        top={index + (shifted ? 1 : 0) + 0.5}
+        fill={textColor}
+        size={chessBoardIndexesFontSize}
     >
         {chessRowNameFromIndex(index)}
-    </text>)}
+    </CenteredText>)}
 
-    {indexes(8).map(index => <text
+    {indexes(8).map(index => <CenteredText
         key={`right-${index}`}
-        x={8 + (shifted ? 1 : 0) + chessBoardIndexesMargin / 2}
-        y={index + 0.5}
-        {...commonProps}
+        left={8 + (shifted ? 1 : 0) + chessBoardIndexesMargin / 2}
+        top={index + 0.5}
+        fill={textColor}
+        size={chessBoardIndexesFontSize}
     >
         {chessRowNameFromIndex(index)}
-    </text>)}
+    </CenteredText>)}
 </>);
