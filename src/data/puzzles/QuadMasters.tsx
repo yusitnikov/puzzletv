@@ -49,7 +49,11 @@ export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: bool
         return {
             noIndex: true,
             title: {
-                [LanguageCode.en]: isQuadle ? "Quadle" : "Quad Masters",
+                [LanguageCode.en]: (daily ? "Daily " : "") + (isQuadle ? "Quadle" : "Quad Masters"),
+            },
+            author: {
+                [LanguageCode.en]: isQuadle ? "Maff and Chameleon" : "Maff",
+                [LanguageCode.ru]: isQuadle ? "Maff и Хамелеона" : "Maff",
             },
             slug,
             saveState: !isRandom,
