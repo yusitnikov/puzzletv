@@ -133,7 +133,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                 </div>}
             </div>}
 
-            {!isCompetitive && getPlayerScore && <div>
+            {!isCompetitive && getPlayerScore && <div style={{fontSize: cellSize * h2HeightCoeff}}>
                 {translate("Score")}: {getPlayerScore(context, myClientId)}
             </div>}
         </div>
