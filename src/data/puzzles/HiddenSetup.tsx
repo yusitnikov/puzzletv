@@ -92,7 +92,6 @@ interface HiddenSetupState {
 }
 
 export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetupState> = {
-    noIndex: true,
     author: {
         [LanguageCode.en]: "Raumplaner",
     },
