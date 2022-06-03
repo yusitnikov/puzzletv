@@ -34,7 +34,7 @@ import {Button} from "../../components/layout/button/Button";
 import {
     h2HeightCoeff,
     rulesHeaderPaddingCoeff,
-    rulesMarginCoeff, textHeightCoeff,
+    rulesMarginCoeff,
     yellowColor
 } from "../../components/app/globals";
 
