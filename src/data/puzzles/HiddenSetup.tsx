@@ -101,6 +101,7 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
         [LanguageCode.ru]: "Скрытая установка",
     },
     slug: "hidden-setup",
+    saveStateKey: "hidden-setup-v2",
     typeManager: {
         ...DigitSudokuTypeManager<HiddenSetupState, HiddenSetupState>(),
         initialGameStateExtension: {
