@@ -27,15 +27,16 @@ import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
 import {CellColor} from "../../types/sudoku/CellColor";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {Constraint, ConstraintProps, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import React, {useCallback} from "react";
-import {Modal} from "../../components/layout/modal/Modal";
-import {withFieldLayer} from "../../contexts/FieldLayerContext";
-import {FieldLayer} from "../../types/sudoku/FieldLayer";
+import React from "react";
 import {Button} from "../../components/layout/button/Button";
-import {globalPaddingCoeff} from "../../components/app/globals";
-import {useTranslate} from "../../contexts/LanguageCodeContext";
+import {
+    h2HeightCoeff,
+    rulesHeaderPaddingCoeff,
+    rulesMarginCoeff,
+    yellowColor
+} from "../../components/app/globals";
 
 const getStage = (state: ProcessedGameState<number>) => {
     const {cells} = gameStateGetCurrentFieldState(state);
@@ -87,50 +88,9 @@ const getStage = (state: ProcessedGameState<number>) => {
 };
 
 interface HiddenSetupState {
+    stage: number;
     showCongratulations: boolean;
 }
-
-const Congratulations = withFieldLayer(FieldLayer.regular, ({context: {state: {showCongratulations}, onStateChange, cellSize}}: ConstraintProps) => {
-    const translate = useTranslate();
-
-    const handleClose = useCallback(() => onStateChange({showCongratulations: false}), [onStateChange]);
-
-    if (!showCongratulations) {
-        return null;
-    }
-
-    return <Modal
-        cellSize={cellSize}
-        onClose={handleClose}
-    >
-        <div>{translate("Congratulations")}!</div>
-        <div>{translate({
-            [LanguageCode.en]: "You completed the stage",
-            [LanguageCode.ru]: "Вы завершили этап",
-        })}.</div>
-
-        <div>
-            <Button
-                type={"button"}
-                cellSize={cellSize}
-                onClick={handleClose}
-                autoFocus={true}
-                style={{
-                    marginTop: cellSize * globalPaddingCoeff,
-                    padding: "0.5em 1em",
-                }}
-            >
-                OK
-            </Button>
-        </div>
-    </Modal>
-}, false);
-
-const CongratulationsConstraint: Constraint<any> = {
-    name: "congratulations",
-    cells: [],
-    component: Congratulations,
-};
 
 export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetupState> = {
     noIndex: true,
@@ -144,23 +104,67 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
     slug: "hidden-setup",
     typeManager: {
         ...DigitSudokuTypeManager<HiddenSetupState, HiddenSetupState>(),
+        initialGameStateExtension: {
+            stage: 1,
+            showCongratulations: false,
+        },
+        serializeGameState({stage}): any {
+            return {stage};
+        },
+        unserializeGameState({stage = 1}: any): Partial<HiddenSetupState> {
+            return {stage};
+        },
         applyStateDiffEffect(state, prevState, {onStateChange}) {
             if (prevState === undefined) {
                 return;
             }
 
-            const prevStage = getStage(prevState);
-            const stage = getStage(state);
-
-            if (stage > prevStage) {
+            if (state.stage > prevState.stage) {
                 onStateChange({showCongratulations: true});
             }
         },
     },
     fieldSize: FieldSize9,
-    rules: (translate, {state}) => {
+    aboveRules: (
+        translate,
+        {state, onStateChange, cellSize}
+    ) => {
         const stage = getStage(state);
+        const isNext = stage > state.stage;
+        const coeff = isNext ? 1 : 0;
 
+        return <div style={{
+            background: yellowColor,
+            marginBottom: cellSize * rulesMarginCoeff * coeff,
+            padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
+            fontSize: cellSize * h2HeightCoeff,
+            lineHeight: `${cellSize * h2HeightCoeff}px`,
+            height: (cellSize * h2HeightCoeff * 1.5 + 2) * coeff,
+            overflow: "hidden",
+            transition: "0.3s all linear",
+        }}>
+            {translate("Congratulations")}!
+
+            <Button
+                type={"button"}
+                cellSize={cellSize}
+                style={{
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
+                    lineHeight: "inherit",
+                    padding: "0.25em",
+                    marginLeft: "0.5em",
+                }}
+                onClick={() => onStateChange({stage})}
+            >
+                {translate({
+                    [LanguageCode.en]: "Go to the next stage",
+                    [LanguageCode.ru]: "Перейти на следующий этап",
+                })}
+            </Button>
+        </div>;
+    },
+    rules: (translate, {state: {stage}}) => {
         return <>
             <RulesParagraph>{translate({
                 [LanguageCode.en]: "This puzzle does reveal its clues in stages",
@@ -185,8 +189,8 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
             })}.</RulesParagraph>}
         </>;
     },
-    initialColors: ({state}) => {
-        switch (getStage(state)) {
+    initialColors: ({state: {stage}}) => {
+        switch (stage) {
             case 1:
                 return {
                     3: {
@@ -246,11 +250,8 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
 
         return {} as GivenDigitsMap<CellColor[]>;
     },
-    items: (state) => {
-        const stage = getStage(state);
-
+    items: ({stage}) => {
         const result = [
-            CongratulationsConstraint,
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
             RenbanConstraint("R1C6", "R4C6", "R4C9"),
