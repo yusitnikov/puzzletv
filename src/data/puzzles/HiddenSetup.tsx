@@ -309,5 +309,11 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
 
         return result;
     },
-    resultChecker: isValidFinishedPuzzleByConstraints,
+    resultChecker: (context) => isValidFinishedPuzzleByConstraints({
+        ...context,
+        state: {
+            ...context.state,
+            stage: 5,
+        }
+    }),
 };
