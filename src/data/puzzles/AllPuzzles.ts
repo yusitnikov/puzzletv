@@ -11,6 +11,7 @@ import {Africa} from "./Africa";
 import {generateQuadMasters} from "./QuadMasters";
 import {HiddenSetup} from "./HiddenSetup";
 import {SonataSemplice} from "./SonataSemplice";
+import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty & random
@@ -39,6 +40,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     IntroToCubedoku,
     CubeIt,
 
+    RealChessPuzzleCJK,
     RealChessPuzzleRubberBlando,
     // endregion
 
