@@ -12,7 +12,7 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {ChessPieceCellData} from "../../sudokuTypes/chess/components/ChessPieceCellData";
 import {ChessPieceType} from "../../sudokuTypes/chess/types/ChessPieceType";
 import {ChessColor} from "../../sudokuTypes/chess/types/ChessColor";
-import {gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
 import {areSameGivenDigitsMaps, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 
 interface MarkProps {
@@ -211,4 +211,9 @@ export const RealChessPuzzleCJK: PuzzleDefinition<number> = {
             },
         }
     ),
+    getLmdSolutionCode: (puzzle, state) => {
+        const {cells} = gameStateGetCurrentFieldState(state);
+
+        return cells.map(row => row[0].usersDigit).join("") + cells[5].map(cell => cell.usersDigit).join("");
+    }
 };
