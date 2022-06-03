@@ -57,6 +57,7 @@ const Mark = withFieldLayer(FieldLayer.regular, ({cell, children}: MarkProps) =>
 });
 
 export const RealChessPuzzleCJK: PuzzleDefinition<number> = {
+    noIndex: true,
     title: {
         [LanguageCode.en]: "Real Chess Sudoku",
         [LanguageCode.ru]: "Настоящий шахматный судоку",
