@@ -24,7 +24,6 @@ import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/ki
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
 import {InBetweenLineConstraint} from "../../components/sudoku/constraints/in-between-line/InBetweenLine";
 import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
-import {CellColor} from "../../types/sudoku/CellColor";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
@@ -37,6 +36,69 @@ import {
     rulesMarginCoeff,
     yellowColor
 } from "../../components/app/globals";
+import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
+
+const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
+    switch (stage) {
+        case 1:
+            return {
+                3: {
+                    3: true,
+                    4: true,
+                },
+                5: {
+                    4: true,
+                    5: true,
+                },
+            };
+        case 2:
+            return {
+                2: {
+                    4: true,
+                },
+                4: {
+                    2: true,
+                    4: true,
+                    6: true,
+                },
+                6: {
+                    4: true,
+                },
+            };
+        case 3:
+            return {
+                0: {
+                    0: true,
+                    4: true,
+                    8: true,
+                },
+                8: {
+                    0: true,
+                    4: true,
+                    8: true,
+                },
+            };
+        case 4:
+            return {
+                0: {
+                    6: true,
+                    7: true,
+                },
+                4: {
+                    0: true,
+                    1: true,
+                    7: true,
+                    8: true,
+                },
+                8: {
+                    1: true,
+                    2: true,
+                },
+            };
+    }
+
+    return {};
+};
 
 const getStage = (state: ProcessedGameState<number>) => {
     const {cells} = gameStateGetCurrentFieldState(state);
@@ -112,6 +174,18 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
         unserializeGameState({stage = 1}: any): Partial<HiddenSetupState> {
             return {stage};
         },
+        getCellSelectionType(
+            {top, left},
+            puzzle,
+            state
+        ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined {
+            const colors = getStageCellsMap(state.stage);
+
+            return colors[top]?.[left] === undefined ? undefined : {
+                color: CellSelectionColor.secondary,
+                strokeWidth: 1,
+            };
+        },
     },
     fieldSize: FieldSize9,
     aboveRules: (
@@ -181,67 +255,6 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
                 [LanguageCode.ru]: "На более поздних этапах будут дополнительные подсказки",
             })}.</RulesParagraph>}
         </>;
-    },
-    initialColors: ({state: {stage}}) => {
-        switch (stage) {
-            case 1:
-                return {
-                    3: {
-                        3: [CellColor.green],
-                        4: [CellColor.green],
-                    },
-                    5: {
-                        4: [CellColor.green],
-                        5: [CellColor.green],
-                    },
-                } as GivenDigitsMap<CellColor[]>;
-            case 2:
-                return {
-                    2: {
-                        4: [CellColor.green],
-                    },
-                    4: {
-                        2: [CellColor.green],
-                        4: [CellColor.green],
-                        6: [CellColor.green],
-                    },
-                    6: {
-                        4: [CellColor.green],
-                    },
-                } as GivenDigitsMap<CellColor[]>;
-            case 3:
-                return {
-                    0: {
-                        0: [CellColor.green],
-                        4: [CellColor.green],
-                        8: [CellColor.green],
-                    },
-                    8: {
-                        0: [CellColor.green],
-                        4: [CellColor.green],
-                        8: [CellColor.green],
-                    },
-                } as GivenDigitsMap<CellColor[]>;
-            case 4:
-                return {
-                    0: {
-                        6: [CellColor.green],
-                        7: [CellColor.green],
-                    },
-                    4: {
-                        0: [CellColor.green],
-                        1: [CellColor.green],
-                        7: [CellColor.green],
-                        8: [CellColor.green],
-                    },
-                    8: {
-                        1: [CellColor.green],
-                        2: [CellColor.green],
-                    },
-                } as GivenDigitsMap<CellColor[]>;
-        }
-
-        return {} as GivenDigitsMap<CellColor[]>;
     },
     items: ({stage}) => {
         const result = [
