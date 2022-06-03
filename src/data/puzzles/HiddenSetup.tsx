@@ -34,7 +34,7 @@ import {Button} from "../../components/layout/button/Button";
 import {
     h2HeightCoeff,
     rulesHeaderPaddingCoeff,
-    rulesMarginCoeff,
+    rulesMarginCoeff, textHeightCoeff,
     yellowColor
 } from "../../components/app/globals";
 
@@ -128,12 +128,16 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
             marginBottom: cellSize * rulesMarginCoeff * coeff,
             padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
             fontSize: cellSize * h2HeightCoeff,
-            lineHeight: `${cellSize * h2HeightCoeff}px`,
-            height: (cellSize * h2HeightCoeff * 1.5 + 2) * coeff,
+            lineHeight: `${cellSize * h2HeightCoeff * 1.5}px`,
+            height: (cellSize * h2HeightCoeff * 3) * coeff,
             overflow: "hidden",
             transition: "0.3s all linear",
+            textAlign: "center",
         }}>
-            {translate("Congratulations")}!
+            {translate("Congratulations")}, {translate({
+                [LanguageCode.en]: <>you completed the&nbsp;stage</>,
+                [LanguageCode.ru]: <>Вы завершили этап</>,
+            })}! &nbsp;
 
             <Button
                 type={"button"}
@@ -141,9 +145,9 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
                 style={{
                     fontFamily: "inherit",
                     fontSize: "inherit",
-                    lineHeight: "inherit",
-                    padding: "0.25em",
-                    marginLeft: "0.5em",
+                    lineHeight: `${cellSize * h2HeightCoeff * 1.5 - 2}px`,
+                    paddingTop: 0,
+                    paddingBottom: 0,
                 }}
                 onClick={() => onStateChange({stage})}
             >
