@@ -14,18 +14,20 @@ import {SonataSemplice} from "./SonataSemplice";
 import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
-    // region Empty & random
+    // region Empty
     EmptyRegular,
     EmptyChaosConstruction,
     EmptyRotatable,
     EmptyChess,
     EmptyCubedoku,
     EmptyToroidal,
+    // endregion
 
-    generateQuadMasters("quad-masters", false, false),
-    generateQuadMasters("daily-quad-masters", true, false),
+    // Games
     generateQuadMasters("quadle", false, true),
     generateQuadMasters("daily-quadle", true, true),
+    generateQuadMasters("quad-masters", false, false),
+    generateQuadMasters("daily-quad-masters", true, false),
     // endregion
 
     // region Other authors
