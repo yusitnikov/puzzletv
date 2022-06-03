@@ -71,7 +71,7 @@ export const serializeFieldState = <CellType>(
 });
 
 export const unserializeFieldState = <CellType>(
-    {cells, lines, marks}: any,
+    {cells = [], lines = [], marks = []}: any,
     puzzle: PuzzleDefinition<CellType, any, any>
 ) => ({
     cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle.typeManager))),
