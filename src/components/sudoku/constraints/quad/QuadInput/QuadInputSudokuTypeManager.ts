@@ -8,7 +8,7 @@ import {QuadInputState} from "./QuadInputState";
 import {QuadInputGameState} from "./QuadInputGameState";
 import {QuadleConstraint, QuadleDigitType} from "../Quadle";
 import {QuadConstraint} from "../Quad";
-import {CellWriteMode} from "../../../../../types/sudoku/CellWriteMode";
+import {CellExactPosition, CellWriteMode} from "../../../../../types/sudoku/CellWriteMode";
 import {setQuadPositionAction, setQuadPositionActionType, setQuadPositionActionTypeKey} from "./setQuadPositionAction";
 import {QuadInputControls} from "./QuadInputControls";
 
@@ -52,8 +52,8 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             QuadConstraint(position, digits, [], isRecent, radius),
     } = options;
 
-    const onCornerClick = ({onStateChange}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>, position: Position) => {
-        onStateChange(setQuadPositionAction(position, options));
+    const onCornerClick = ({onStateChange}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>, {corner}: CellExactPosition) => {
+        onStateChange(setQuadPositionAction(corner, options));
     };
 
     return {

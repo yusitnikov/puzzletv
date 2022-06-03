@@ -85,7 +85,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 
             const allowedCellWriteModes = [
                 ...getAllowedCellWriteModeInfos(
-                    puzzle.allowDrawingBorders,
+                    puzzle.allowDrawing && puzzle.allowDrawing.length !== 0,
                     puzzle.loopHorizontally || puzzle.loopVertically || puzzle.enableDragMode
                 ),
                 ...(puzzle.typeManager.extraCellWriteModes || []),
@@ -146,6 +146,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     mode,
                     selected,
                     line,
+                    dragStart,
                     addingLine,
                     ...otherState
                 },
@@ -160,6 +161,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     persistentCellWriteMode: mode,
                     selectedCells: Set.unserialize(selected, isSamePosition),
                     currentMultiLine: line,
+                    dragStartPoint: dragStart,
                     isAddingLine: addingLine,
                     ...puzzle.typeManager.unserializeInternalState?.(puzzle, otherState)
                 },
@@ -273,6 +275,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                                 mode: processedGameState.cellWriteMode,
                                 selected: state.selectedCells.serialize(),
                                 line: state.currentMultiLine,
+                                dragStart: state.dragStartPoint,
                                 addingLine: state.isAddingLine,
                                 ...puzzle.typeManager.getInternalState?.(puzzle, state),
                             },

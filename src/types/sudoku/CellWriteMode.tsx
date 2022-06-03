@@ -17,6 +17,13 @@ export enum CellWriteMode {
     custom,
 }
 
+export interface CellExactPosition {
+    center: Position;
+    corner: Position;
+    round: Position;
+    type: "center" | "corner" | "border";
+}
+
 export interface CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
     mode: CellWriteMode | number;
     hotKeyStr?: string;
@@ -31,11 +38,11 @@ export interface CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGa
     ) => ReactNode;
     onCornerClick?: (
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        position: Position
+        position: CellExactPosition
     ) => void;
     onCornerEnter?: (
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        position: Position
+        position: CellExactPosition
     ) => void;
 }
 
@@ -78,10 +85,13 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         mode: CellWriteMode.lines,
         hotKeyStr: "Alt",
         isNoSelectionMode: true,
-        onCornerClick: ({onStateChange}, position) =>
-            onStateChange(state => gameStateStartMultiLine(state, position)),
-        onCornerEnter: ({puzzle, onStateChange}, position) =>
-            onStateChange(state => gameStateContinueMultiLine(puzzle, state, position)),
+        onCornerClick: (context, position) =>
+            context.onStateChange(state => gameStateStartMultiLine({...context, state}, position)),
+        onCornerEnter: (context, position) =>
+            context.onStateChange(state => gameStateContinueMultiLine(
+                {...context, state},
+                position
+            )),
         digitsCount: 0,
     },
     {

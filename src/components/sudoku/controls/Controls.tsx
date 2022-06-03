@@ -20,7 +20,7 @@ import {SettingsContent} from "./SettingsContent";
 import {DigitControlButton} from "./DigitControlButton";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {UserLinesByData} from "../constraints/user-lines/UserLines";
+import {UserLinesByData, UserMarkByData} from "../constraints/user-lines/UserLines";
 import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
@@ -53,7 +53,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         forceAutoCheckOnFinish = false,
         getLmdSolutionCode,
         digitsCount = getDefaultDigitsCount(puzzle),
-        allowDrawingBorders = false,
+        allowDrawing = [],
         loopHorizontally = false,
         loopVertically = false,
         enableDragMode = false,
@@ -113,7 +113,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     }, [autoCheckOnFinish, resultChecker, isCorrectResult, setIsShowingResult]);
 
     const allowedCellWriteModes: CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] = [
-        ...getAllowedCellWriteModeInfos(allowDrawingBorders, allowDragging),
+        ...getAllowedCellWriteModeInfos(allowDrawing.length !== 0, allowDragging),
         ...extraCellWriteModes,
     ];
 
@@ -278,7 +278,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             context={context}
         />
 
-        {allowDrawingBorders && <CellWriteModeButton
+        {allowDrawing.length !== 0 && <CellWriteModeButton
             left={(isHorizontal !== allowDragging) ? 4 : 3}
             top={(isHorizontal !== allowDragging) ? 3 : 4}
             cellWriteMode={CellWriteMode.lines}
@@ -292,14 +292,39 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                     height={cellSize}
                     viewBox={`${-offset / contentSize} ${-offset / contentSize} ${cellSize / contentSize} ${cellSize / contentSize}`}
                 >
-                    <UserLinesByData
+                    {allowDrawing.includes("border-line") && <UserLinesByData
                         cellSize={contentSize}
                         currentMultiLine={[
-                            {left: 0, top: 1},
                             {left: 0, top: 0},
-                            {left: 1, top: 0},
+                            {left: 0, top: 1},
                         ]}
-                    />
+                    />}
+
+                    {allowDrawing.includes("center-line") && <UserLinesByData
+                        cellSize={contentSize}
+                        currentMultiLine={[
+                            {left: 0.5, top: 0.5},
+                            {left: 1.5, top: 0.5},
+                        ]}
+                    />}
+
+                    {allowDrawing.includes("center-mark") && <UserMarkByData
+                        cellSize={contentSize}
+                        position={{left: 0.5, top: 0.5}}
+                        isCircle={true}
+                    />}
+
+                    {allowDrawing.includes("border-mark") && <UserMarkByData
+                        cellSize={contentSize}
+                        position={{left: 0.5, top: 1}}
+                        isCircle={false}
+                    />}
+
+                    {allowDrawing.includes("corner-mark") && <UserMarkByData
+                        cellSize={contentSize}
+                        position={{left: 1, top: 0}}
+                        isCircle={false}
+                    />}
                 </AutoSvg>;
             }}
             childrenOnTopOfBorders={true}

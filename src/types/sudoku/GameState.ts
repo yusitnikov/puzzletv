@@ -5,14 +5,14 @@ import {
     fieldStateHistoryRedo,
     fieldStateHistoryUndo
 } from "./FieldStateHistory";
-import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
+import {CellExactPosition, CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
 import {noSelectedCells, SelectedCells} from "./SelectedCells";
 import {CellState, CellStateEx, getCellDataComparer} from "./CellState";
 import {
     areAllFieldStateCells, createEmptyFieldState,
     isAnyFieldStateCell,
     processFieldStateCells,
-    processFieldStateLines, serializeFieldState,
+    serializeFieldState,
     unserializeFieldState
 } from "./FieldState";
 import {indexes} from "../../utils/indexes";
@@ -30,6 +30,7 @@ import {
     unserializeFromLocalStorage
 } from "../../utils/localStorage";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
+import {CellMark} from "./CellMark";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -41,6 +42,7 @@ export interface GameState<CellType> {
     selectedCells: SelectedCells;
 
     currentMultiLine: Position[];
+    dragStartPoint?: CellExactPosition;
     isAddingLine: boolean;
 
     loopOffset: Position;
@@ -135,6 +137,7 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
             ))),
 
         currentMultiLine: [],
+        dragStartPoint: undefined,
         isAddingLine: false,
 
         loopOffset: emptyPosition,
@@ -665,33 +668,60 @@ export const gameStateNormalizeLoopOffset = <CellType, GameStateExtensionType = 
 export const gameStateResetCurrentMultiLine = <CellType, ProcessedGameStateExtensionType = {}>()
     : Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
     currentMultiLine: [],
-} as any);
+    dragStartPoint: undefined,
+} as Partial<ProcessedGameState<CellType>> as any);
 
-export const gameStateApplyCurrentMultiLineGlobally = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType>
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    fieldStateHistory: fieldStateHistoryAddState(
-        typeManager,
-        gameState.fieldStateHistory,
-        state => processFieldStateLines(state, (lines) => {
-            gameState.currentMultiLine.forEach((start, index) => {
-                const end = gameState.currentMultiLine[index + 1];
-                if (!end) {
-                    return;
+export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+    const {puzzle: {typeManager, allowDrawing = []}, state: gameState} = context;
+
+    return {
+        fieldStateHistory: fieldStateHistoryAddState(
+            typeManager,
+            gameState.fieldStateHistory,
+            state => {
+                let {lines, marks} = state;
+
+                gameState.currentMultiLine.forEach((start, index) => {
+                    const end = gameState.currentMultiLine[index + 1];
+                    if (!end) {
+                        return;
+                    }
+
+                    lines = lines.toggle({start, end}, gameState.isAddingLine);
+                });
+
+                if (gameState.dragStartPoint) {
+                    const {type, round} = gameState.dragStartPoint;
+
+                    if (allowDrawing.includes(`${type}-mark`)) {
+                        const xMark: CellMark = {position: round, isCircle: false};
+                        const circleMark: CellMark = {position: round, isCircle: true};
+
+                        if (type !== "center") {
+                            marks = marks.toggle(xMark);
+                        } else if (marks.contains(circleMark)) {
+                            marks = marks.remove(circleMark).add(xMark);
+                        } else if (marks.contains(xMark)) {
+                            marks = marks.remove(xMark);
+                        } else {
+                            marks = marks.add(circleMark);
+                        }
+                    }
                 }
 
-                lines = lines.toggle({start, end}, gameState.isAddingLine);
-            });
-
-            return lines;
-        })
-    ),
-} as any);
-
-export const gameStateApplyCurrentMultiLineLocally = () => ({
-    currentMultiLine: [],
-} as Partial<GameState<any>> as any);
+                return {
+                    ...state,
+                    lines,
+                    marks,
+                };
+            }
+        ),
+        currentMultiLine: [],
+        dragStartPoint: undefined,
+    } as Partial<ProcessedGameState<CellType>> as any;
+};
 
 export const gameStateDeleteAllLines = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
@@ -700,41 +730,73 @@ export const gameStateDeleteAllLines = <CellType, GameStateExtensionType = {}, P
     fieldStateHistory: fieldStateHistoryAddState(
         typeManager,
         gameState.fieldStateHistory,
-        state => processFieldStateLines(state, lines => lines.clear())
+        state => ({
+            ...state,
+            lines: state.lines.clear(),
+            marks: state.marks.clear(),
+        })
     ),
 } as any);
 
-export const gameStateStartMultiLine = <CellType, ProcessedGameStateExtensionType = {}>(
-    gameState: ProcessedGameState<CellType>,
-    point: Position
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    currentMultiLine: [point],
-    ...gameStateClearSelectedCells(gameState),
-} as any);
+export const gameStateStartMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    {puzzle: {allowDrawing = []}, state}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    exactPosition: CellExactPosition
+): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+    const {center, corner, type} = exactPosition;
+
+    const isCenterLine: boolean | undefined = [
+        type === "center",
+        type !== "center",
+    ]
+        .filter(isCenter => allowDrawing.includes(isCenter ? "center-line" : "border-line"))
+        [0];
+
+    return ({
+        currentMultiLine: isCenterLine !== undefined
+            ? [isCenterLine ? center : corner]
+            : [],
+        dragStartPoint: exactPosition,
+        ...gameStateClearSelectedCells(state),
+    });
+};
 
 export const gameStateContinueMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {loopHorizontally, loopVertically, fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType>,
-    point: Position
+    {
+        puzzle: {
+            loopHorizontally,
+            loopVertically,
+            fieldSize: {rowsCount, columnsCount},
+        },
+        state,
+    }: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    exactPosition: CellExactPosition
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
-    const lastPoint = gameState.currentMultiLine[gameState.currentMultiLine.length - 1];
+    const result = {
+        dragStartPoint: state.dragStartPoint && JSON.stringify(state.dragStartPoint) === JSON.stringify(exactPosition)
+            ? state.dragStartPoint
+            : undefined,
+    } as Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+
+    const lastPoint = state.currentMultiLine[state.currentMultiLine.length - 1];
     if (!lastPoint) {
-        return {};
+        return result;
     }
 
-    if (isSamePosition(lastPoint, point)) {
-        return {};
+    const position = lastPoint.left % 1 === 0 ? exactPosition.corner : exactPosition.center;
+
+    if (isSamePosition(lastPoint, position)) {
+        return result;
     }
 
     let {left, top} = lastPoint;
-    let fullDx = point.left - lastPoint.left;
+    let fullDx = position.left - lastPoint.left;
     if (loopHorizontally) {
         fullDx = ((fullDx % columnsCount) + columnsCount) % columnsCount;
         if (fullDx * 2 > columnsCount) {
             fullDx -= columnsCount;
         }
     }
-    let fullDy = point.top - lastPoint.top;
+    let fullDy = position.top - lastPoint.top;
     if (loopVertically) {
         fullDy = ((fullDy % rowsCount) + rowsCount) % rowsCount;
         if (fullDy * 2 > rowsCount) {
@@ -746,27 +808,28 @@ export const gameStateContinueMultiLine = <CellType, GameStateExtensionType = {}
     const length = Math.max(Math.abs(fullDx), Math.abs(fullDy));
 
     if (length === 0) {
-        return {};
+        return result;
     }
 
     const newPoints: Position[] = [];
     for (let i = 0; i < length; i++) {
-        if ((left - point.left) % columnsCount !== 0) {
+        if ((left - position.left) % columnsCount !== 0) {
             left += dx;
             newPoints.push({left, top});
         }
 
-        if ((top - point.top) % rowsCount !== 0) {
+        if ((top - position.top) % rowsCount !== 0) {
             top += dy;
             newPoints.push({left, top});
         }
     }
 
     return {
-        currentMultiLine: [...gameState.currentMultiLine, ...newPoints],
-        isAddingLine: gameState.currentMultiLine.length === 1
-            ? !gameStateGetCurrentFieldState(gameState).lines.contains({start: lastPoint, end: newPoints[0]})
-            : gameState.isAddingLine,
-    } as any;
+        ...result,
+        currentMultiLine: [...state.currentMultiLine, ...newPoints],
+        isAddingLine: state.currentMultiLine.length === 1
+            ? !gameStateGetCurrentFieldState(state).lines.contains({start: lastPoint, end: newPoints[0]})
+            : state.isAddingLine,
+    } as Partial<ProcessedGameState<CellType>> as any;
 };
 // endregion

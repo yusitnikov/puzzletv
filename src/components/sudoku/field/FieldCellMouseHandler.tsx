@@ -11,6 +11,7 @@ import {indexes} from "../../../utils/indexes";
 import {CellState} from "../../../types/sudoku/CellState";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "./FieldCellShape";
+import {CellExactPosition} from "../../../types/sudoku/CellWriteMode";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
@@ -106,22 +107,36 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     };
 
     return <>
-        {(onCornerClick || onCornerEnter) && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
-            const cornerPosition: Position = {
-                left: cellPosition.left + leftOffset,
-                top: cellPosition.top + topOffset,
+        {(onCornerClick || onCornerEnter) && indexes(4).flatMap(topOffset => indexes(4).map(leftOffset => {
+            const isTopCenter = [1, 2].includes(topOffset);
+            const isLeftCenter = [1, 2].includes(leftOffset);
+
+            const exactPosition: CellExactPosition = {
+                center: {
+                    left: cellPosition.left + 0.5,
+                    top: cellPosition.top + 0.5,
+                },
+                corner: {
+                    left: cellPosition.left + (leftOffset >> 1),
+                    top: cellPosition.top + (topOffset >> 1),
+                },
+                round: {
+                    left: cellPosition.left + (isLeftCenter ? 0.5 : (leftOffset ? 1 : 0)),
+                    top: cellPosition.top + (isTopCenter ? 0.5 : (topOffset ? 1 : 0)),
+                },
+                type: isTopCenter && isLeftCenter ? "center" : (!isTopCenter && !isLeftCenter ? "corner" : "border"),
             };
 
             return <MouseHandlerRect
                 key={`draw-corner-${topOffset}-${leftOffset}`}
                 context={context}
                 cellPosition={cellPosition}
-                left={leftOffset * 0.5}
-                top={topOffset * 0.5}
-                width={0.5}
-                height={0.5}
-                onClick={() => onCornerClick?.(context, cornerPosition)}
-                onEnter={() => onCornerEnter?.(context, cornerPosition)}
+                left={leftOffset * 0.25}
+                top={topOffset * 0.25}
+                width={0.25}
+                height={0.25}
+                onClick={() => onCornerClick?.(context, exactPosition)}
+                onEnter={() => onCornerEnter?.(context, exactPosition)}
             />;
         }))}
 

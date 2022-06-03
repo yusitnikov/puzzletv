@@ -44,7 +44,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
     borderColor?: string;
-    allowDrawingBorders?: boolean;
+    allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
     loopHorizontally?: boolean;
     loopVertically?: boolean;
     enableDragMode?: boolean;
@@ -69,12 +69,12 @@ export const isPuzzleHasBottomRowControls = (
         typeManager: {
             hasBottomRowControls = false,
         },
-        allowDrawingBorders = false,
+        allowDrawing = [],
         loopHorizontally = false,
         loopVertically = false,
         enableDragMode = false,
     }: PuzzleDefinition<any, any, any>
-) => hasBottomRowControls || (allowDrawingBorders && (loopHorizontally || loopVertically || enableDragMode));
+): boolean => hasBottomRowControls || (allowDrawing.length !== 0 && (loopHorizontally || loopVertically || enableDragMode));
 
 export const getDefaultDigitsCount = ({typeManager: {maxDigitsCount}, fieldSize: {fieldSize}}: PuzzleDefinition<any, any, any>) =>
     Math.min(maxDigitsCount || fieldSize, fieldSize);

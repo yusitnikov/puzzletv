@@ -17,7 +17,9 @@ import {
 } from "../ruleSnippets";
 
 export const Miraculous: PuzzleDefinition<number> = {
+    noIndex: true,
     slug: "miraculous",
+    saveStateKey: "miraculous-v2",
     title: {
         [LanguageCode.en]: "Miraculous",
     },
@@ -76,7 +78,7 @@ export const Miraculous: PuzzleDefinition<number> = {
         ThermometerConstraint(["R5C2", "R4C1"]),
         KropkiDotConstraint("R1C7", "R1C8", true),
     ],
-    allowDrawingBorders: true,
+    allowDrawing: ["center-line", "border-line", "border-mark", "center-mark", "corner-mark"],
     loopHorizontally: true,
     loopVertically: true,
     fieldMargin: 0.99,

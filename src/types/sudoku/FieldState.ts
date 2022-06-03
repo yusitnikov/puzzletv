@@ -18,10 +18,12 @@ import {
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {Set} from "../struct/Set";
+import {CellMark, getMarkComparer} from "./CellMark";
 
 export interface FieldState<CellType> {
     cells: CellState<CellType>[][];
     lines: Set<Line>;
+    marks: Set<CellMark>;
 }
 
 const getLineComparer = (
@@ -56,30 +58,34 @@ export const createEmptyFieldState = <CellType>(
 ): FieldState<CellType> => ({
     cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle.typeManager))),
     lines: new Set<Line>([], getLineComparer(puzzle)),
+    marks: new Set<CellMark>([], getMarkComparer(puzzle)),
 });
 
 export const serializeFieldState = <CellType>(
-    {cells, lines}: FieldState<CellType>,
+    {cells, lines, marks}: FieldState<CellType>,
     typeManager: SudokuTypeManager<CellType, any, any>
 ) => ({
     cells: cells.map(row => row.map(cell => serializeCellState(cell, typeManager))),
     lines: lines.serialize(),
+    marks: marks.serialize(),
 });
 
 export const unserializeFieldState = <CellType>(
-    {cells, lines}: any,
+    {cells, lines, marks}: any,
     puzzle: PuzzleDefinition<CellType, any, any>
 ) => ({
     cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle.typeManager))),
     lines: Set.unserialize(lines, getLineComparer(puzzle)),
+    marks: Set.unserialize(marks, getMarkComparer(puzzle)),
 });
 
 export const cloneFieldState = <CellType>(
     typeManager: SudokuTypeManager<CellType, any, any>,
-    {cells, lines}: FieldState<CellType>
+    {cells, lines, marks}: FieldState<CellType>
 ): FieldState<CellType> => ({
     cells: cells.map(row => row.map(cellState => cloneCellState(typeManager, cellState))),
     lines: lines.clone(),
+    marks: marks.clone(),
 });
 
 export const processFieldStateCells = <CellType>(
@@ -93,16 +99,6 @@ export const processFieldStateCells = <CellType>(
     }
 
     return fieldState;
-};
-
-export const processFieldStateLines = <CellType>(
-    fieldState: FieldState<CellType>,
-    processor: (lines: Set<Line>) => Set<Line>
-) => {
-    return {
-        ...fieldState,
-        lines: processor(fieldState.lines),
-    };
 };
 
 export const areAllFieldStateCells = <CellType>(
@@ -121,12 +117,13 @@ export const isAnyFieldStateCell = <CellType>(
 
 export const areFieldStatesEqual = <CellType>(
     typeManager: SudokuTypeManager<CellType, any, any>,
-    {cells, lines}: FieldState<CellType>,
-    {cells: cells2, lines: lines2}: FieldState<CellType>
+    {cells, lines, marks}: FieldState<CellType>,
+    {cells: cells2, lines: lines2, marks: marks2}: FieldState<CellType>
 ) =>
     cells.every(
         (row, rowIndex) => row.every(
             (cell, columnIndex) => areCellStatesEqual(typeManager, cell, cells2[rowIndex][columnIndex])
         )
     ) &&
-    lines.equals(lines2);
+    lines.equals(lines2) &&
+    marks.equals(marks2);

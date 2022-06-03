@@ -1,6 +1,6 @@
 import {MergeStateAction} from "../react/MergeStateAction";
 import {
-    gameStateApplyCurrentMultiLineGlobally, gameStateApplyCurrentMultiLineLocally,
+    gameStateApplyCurrentMultiLine,
     gameStateClearSelectedCellsContent,
     gameStateHandleDigit,
     gameStateRedo,
@@ -86,17 +86,14 @@ export const enterDigitAction = <CellType, GameStateExtensionType, ProcessedGame
 export const applyCurrentMultiLineActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
     : GameStateActionType<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
     key: "apply-current-multiline",
-    callback: (_, {puzzle: {typeManager}}) =>
-        state => gameStateApplyCurrentMultiLineGlobally(typeManager, state),
+    callback: (_, context) =>
+        state => gameStateApplyCurrentMultiLine({...context, state}),
 });
 export const applyCurrentMultiLineAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateActionOrCallback<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] => [
-    {
-        type: applyCurrentMultiLineActionType(),
-        params: undefined,
-    },
-    () => gameStateApplyCurrentMultiLineLocally(),
-];
+    : GameStateActionOrCallback<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+    type: applyCurrentMultiLineActionType(),
+    params: undefined,
+});
 // endregion
 
 export const coreGameStateActionTypes: GameStateActionType<any, any, any, any>[] = [
