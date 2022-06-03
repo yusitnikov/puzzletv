@@ -25,6 +25,10 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
         translate: ReturnType<typeof useTranslate>,
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
     ) => ReactNode;
+    aboveRules?: (
+        translate: ReturnType<typeof useTranslate>,
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    ) => ReactNode;
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     fieldSize: FieldSize;
     fieldMargin?: number;

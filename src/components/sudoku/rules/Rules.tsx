@@ -3,11 +3,15 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import styled from "@emotion/styled";
 import {
-    blueColor, currentPlayerColor,
-    globalPaddingCoeff,
+    blueColor,
+    currentPlayerColor,
     greenColor,
     h1HeightCoeff,
-    h2HeightCoeff, otherPlayerColor, textColor,
+    h2HeightCoeff,
+    otherPlayerColor,
+    rulesHeaderPaddingCoeff,
+    rulesMarginCoeff,
+    textColor,
     textHeightCoeff
 } from "../../app/globals";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
@@ -19,8 +23,6 @@ import {Fullscreen, FullscreenExit, Share} from "@emotion-icons/material";
 import {ControlButton} from "../controls/ControlButton";
 import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
-
-const rulesHeaderPaddingCoeff = 1 / 8;
 
 const StyledContainer = styled(Absolute)({
     display: "flex",
@@ -38,7 +40,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const isFullScreen = useIsFullScreen();
 
     const {
-        puzzle: {params = {}, title, author, rules, typeManager: {getPlayerScore}},
+        puzzle: {params = {}, title, author, rules, aboveRules, typeManager: {getPlayerScore}},
         state: {currentPlayer},
         cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
@@ -51,7 +53,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             style={{
                 padding: cellSize * rulesHeaderPaddingCoeff,
                 textAlign: "center",
-                marginBottom: cellSize * globalPaddingCoeff / 2,
+                marginBottom: cellSize * rulesMarginCoeff,
                 backgroundColor: blueColor,
             }}
         >
@@ -136,6 +138,8 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             </div>}
         </div>
 
+        {aboveRules?.(translate, context)}
+
         <div
             style={{
                 flexGrow: 1,
@@ -148,7 +152,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
         >
             <div
                 style={{
-                    padding: cellSize / 8,
+                    padding: cellSize * rulesHeaderPaddingCoeff,
                     fontSize: cellSize * textHeightCoeff,
                 }}
             >
