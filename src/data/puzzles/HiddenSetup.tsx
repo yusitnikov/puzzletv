@@ -89,7 +89,6 @@ const getStage = (state: ProcessedGameState<number>) => {
 
 interface HiddenSetupState {
     stage: number;
-    showCongratulations: boolean;
 }
 
 export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetupState> = {
@@ -106,22 +105,12 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
         ...DigitSudokuTypeManager<HiddenSetupState, HiddenSetupState>(),
         initialGameStateExtension: {
             stage: 1,
-            showCongratulations: false,
         },
         serializeGameState({stage}): any {
             return {stage};
         },
         unserializeGameState({stage = 1}: any): Partial<HiddenSetupState> {
             return {stage};
-        },
-        applyStateDiffEffect(state, prevState, {onStateChange}) {
-            if (prevState === undefined) {
-                return;
-            }
-
-            if (state.stage > prevState.stage) {
-                onStateChange({showCongratulations: true});
-            }
         },
     },
     fieldSize: FieldSize9,
