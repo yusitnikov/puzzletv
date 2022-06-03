@@ -57,7 +57,6 @@ const Mark = withFieldLayer(FieldLayer.regular, ({cell, children}: MarkProps) =>
 });
 
 export const RealChessPuzzleCJK: PuzzleDefinition<number> = {
-    noIndex: true,
     title: {
         [LanguageCode.en]: "Real Chess Sudoku",
         [LanguageCode.ru]: "Настоящий шахматный судоку",
@@ -211,6 +210,7 @@ export const RealChessPuzzleCJK: PuzzleDefinition<number> = {
             },
         }
     ),
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=0007DV",
     getLmdSolutionCode: (puzzle, state) => {
         const {cells} = gameStateGetCurrentFieldState(state);
 

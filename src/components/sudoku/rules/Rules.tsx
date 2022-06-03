@@ -19,7 +19,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Fragment} from "react";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {GameState} from "../../../types/sudoku/GameState";
-import {Fullscreen, FullscreenExit, Share} from "@emotion-icons/material";
+import {Fullscreen, FullscreenExit, OpenInNew, Share} from "@emotion-icons/material";
 import {ControlButton} from "../controls/ControlButton";
 import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
@@ -40,7 +40,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const isFullScreen = useIsFullScreen();
 
     const {
-        puzzle: {params = {}, title, author, rules, aboveRules, typeManager: {getPlayerScore}},
+        puzzle: {params = {}, title, author, rules, aboveRules, typeManager: {getPlayerScore}, lmdLink},
         state: {currentPlayer},
         cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
@@ -85,7 +85,29 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                 </ControlButton>
             </div>
 
-            {author && <div style={{fontSize: cellSize * h2HeightCoeff}}>{translate("by")} {translate(author)}</div>}
+            {(author || lmdLink) && <div style={{fontSize: cellSize * h2HeightCoeff}}>
+                {author && <span>{translate("by")} {translate(author)}</span>}
+
+                {lmdLink && <span>
+                    {author && " ("}
+
+                    <a
+                        href={lmdLink}
+                        target={"_blank"}
+                        onClick={() => context.onStateChange({openedLmdOnce: true} as Partial<GameState<CellType>>)}
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            color: "#00c",
+                            textDecoration: "none",
+                        }}
+                    >
+                        <span>{translate("open in LMD")}&nbsp;</span><OpenInNew size={"1em"}/>
+                    </a>
+
+                    {author && ")"}
+                </span>}
+            </div>}
 
             {isEnabled && <div style={{fontSize: cellSize * h2HeightCoeff}}>
                 {allPlayerIds.length > 1 && allPlayerIds.map((playerId, index) => <Fragment key={playerId}>

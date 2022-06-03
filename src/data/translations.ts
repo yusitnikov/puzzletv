@@ -167,6 +167,9 @@ export const translationsExactType = {
     "Score": {
         [LanguageCode.ru]: "Счёт",
     },
+    "open in LMD": {
+        [LanguageCode.ru]: "открыть в LMD",
+    },
     // endregion
     // region ChessMainControls
     "Chess piece color": {

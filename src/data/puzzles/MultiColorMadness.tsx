@@ -57,6 +57,7 @@ export const MultiColorMadness: PuzzleDefinition<number> = {
     loopVertically: true,
     fieldMargin: 0.99,
     resultChecker: isValidFinishedPuzzleByConstraints,
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=0008A2",
     getLmdSolutionCode: (puzzle, state) => {
         const {cells} = gameStateGetCurrentFieldState(state);
         return cells[0].map(cell => cell.usersDigit).join("") + cells[8].map(cell => cell.usersDigit).join("");

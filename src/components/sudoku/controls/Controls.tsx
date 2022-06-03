@@ -76,6 +76,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         persistentCellWriteMode,
         cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
         isShowingSettings,
+        openedLmdOnce,
     } = state;
 
     const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;
@@ -499,7 +500,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 }
             </div>
 
-            {isLmdAllowed && isCorrectResult && lmdSolutionCode !== undefined && <>
+            {(isLmdAllowed || openedLmdOnce) && isCorrectResult && lmdSolutionCode !== undefined && <>
                 <div style={{marginTop: cellSize * globalPaddingCoeff}}>
                     {translate("Solution code")}:
                 </div>

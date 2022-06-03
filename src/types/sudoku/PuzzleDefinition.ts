@@ -48,6 +48,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     loopHorizontally?: boolean;
     loopVertically?: boolean;
     enableDragMode?: boolean;
+    lmdLink?: string;
     getLmdSolutionCode?: (
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType

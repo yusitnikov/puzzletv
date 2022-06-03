@@ -47,6 +47,8 @@ export interface GameState<CellType> {
 
     loopOffset: Position;
 
+    openedLmdOnce?: boolean;
+
     currentPlayer?: string;
     playerObjects: Record<string, PlayerObjectInfo>;
 
