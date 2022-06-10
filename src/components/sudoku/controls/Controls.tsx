@@ -304,6 +304,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                         cellSize={contentSize}
                         position={{left: 0.5, top: 0.5}}
                         isCircle={true}
+                        isCenter={true}
                     />}
 
                     {allowDrawing.includes("border-mark") && <UserMarkByData

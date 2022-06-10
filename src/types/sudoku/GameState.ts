@@ -699,8 +699,8 @@ export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType 
                     const {type, round} = gameState.dragStartPoint;
 
                     if (allowDrawing.includes(`${type}-mark`)) {
-                        const xMark: CellMark = {position: round, isCircle: false};
-                        const circleMark: CellMark = {position: round, isCircle: true};
+                        const xMark: CellMark = {position: round, isCircle: false, isCenter: type === "center"};
+                        const circleMark: CellMark = {position: round, isCircle: true, isCenter: type === "center"};
 
                         if (type !== "center") {
                             marks = marks.toggle(xMark);

@@ -82,6 +82,8 @@ export const UserMarkByData = (
         cellSize,
         position: {top, left},
         isCircle,
+        // Leaving the defaults only for compatibility
+        isCenter = left % 1 !== 0 && top % 1 !== 0,
     }: UserMarkByDataProps
 ) => {
     const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
@@ -107,7 +109,6 @@ export const UserMarkByData = (
         }
     }
 
-    const isCenter = left % 1 !== 0 && top % 1 !== 0;
     const radius = isCenter ? 0.3 : 0.15;
     const lineWidth = isCenter ? borderWidth : borderWidth / 2;
 
