@@ -111,6 +111,7 @@ export const UserMarkByData = (
 
     const radius = isCenter ? 0.3 : 0.15;
     const lineWidth = isCenter ? borderWidth : borderWidth / 2;
+    const opacity = isCenter ? 0.5 : 1;
 
     return <AutoSvg
         top={top}
@@ -125,9 +126,10 @@ export const UserMarkByData = (
             stroke={regularBorderColor}
             strokeWidth={lineWidth}
             fill={"none"}
+            opacity={opacity}
         />}
 
-        {!isCircle && <>
+        {!isCircle && <g opacity={opacity}>
             <line
                 x1={-radius}
                 y1={-radius}
@@ -145,7 +147,7 @@ export const UserMarkByData = (
                 stroke={regularBorderColor}
                 strokeWidth={lineWidth}
             />
-        </>}
+        </g>}
     </AutoSvg>;
 };
 
