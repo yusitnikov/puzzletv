@@ -31,7 +31,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
         onIsDeleteSelectedCellsStrokeChange,
     }: FieldCellMouseHandlerProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const {puzzle, state, onStateChange} = context;
+    const {puzzle, cellsIndex, state, onStateChange} = context;
 
     const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLineEnd, initialDigits: stateInitialDigits} = state;
 
@@ -113,10 +113,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
             const isLeftCenter = [1, 2].includes(leftOffset);
 
             const exactPosition: CellExactPosition = {
-                center: {
-                    left: cellPosition.left + 0.5,
-                    top: cellPosition.top + 0.5,
-                },
+                center: cellsIndex.allCells[cellPosition.top][cellPosition.left].center,
                 corner: {
                     left: cellPosition.left + (leftOffset >> 1),
                     top: cellPosition.top + (topOffset >> 1),

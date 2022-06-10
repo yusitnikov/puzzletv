@@ -14,7 +14,7 @@ import {CellPart} from "./CellPart";
 import {HashSet, SetInterface} from "../struct/Set";
 
 export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
-    private readonly allCells: CellInfo[][];
+    public readonly allCells: CellInfo[][];
 
     private readonly realCellPointMap: Record<string, SudokuCellPointInfo> = {};
     private readonly borderLineMap: Record<string, Record<string, SudokuCellBorderInfo>> = {};
