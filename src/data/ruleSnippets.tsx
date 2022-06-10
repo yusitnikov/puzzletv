@@ -169,6 +169,16 @@ export const littleKillerExplained: Translatable = {
     [LanguageCode.ru]: "Цифры на указанных диагоналях должны иметь обозначенную сумму",
 };
 
+export const loopRulesApply: Translatable = {
+    [LanguageCode.en]: "Draw a non-intersecting loop through the centers of some empty cells",
+    [LanguageCode.ru]: "Нарисуйте непересекающуюся петлю через центры некоторых пустых ячеек",
+};
+
+export const tapCluesApply = (maxNeighborsCount = 8): Translatable => ({
+    [LanguageCode.en]: `Clues represent the numbers of consecutive cells occupied by the loop each time it enters the (up to) ${maxNeighborsCount} cells surrounding the clue`,
+    [LanguageCode.ru]: `Подсказки указывают на количество последовательных ячеек, занимаемых петлей каждый раз, когда она проходит через (до) ${maxNeighborsCount} ячеек, окружающих подсказку`,
+});
+
 
 export const noBifurcation: Translatable<ReactNode> = {
     [LanguageCode.en]: <>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</>,

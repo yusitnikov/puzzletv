@@ -8,6 +8,8 @@ import {indexes} from "../../utils/indexes";
 import {Position} from "../../types/layout/Position";
 import {LoopLineConstraint} from "../../components/sudoku/constraints/loop-line/LoopLine";
 import {TapaCellConstraint} from "../../components/sudoku/constraints/tapa-cell/TapaCell";
+import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import {loopRulesApply, tapCluesApply} from "../ruleSnippets";
 
 const fieldSize = 6.7;
 const scale = 1;
@@ -169,15 +171,20 @@ const bounds: CustomCellBounds[] = [
     ]),
 ];
 
-export const TapaLikeLoop: PuzzleDefinition<number> = {
+export const HeptapagonLikeLoop: PuzzleDefinition<number> = {
     noIndex: true,
-    slug: "tapa-like-loop",
+    slug: "heptapagon-like-loop",
     title: {
-        [LanguageCode.en]: "Tapa-like loop",
+        [LanguageCode.en]: "Heptapagon-like Loop",
+        [LanguageCode.ru]: "Петля-гептапагон",
     },
     author: {
         [LanguageCode.en]: "BenceJoful",
     },
+    rules: translate => <>
+        <RulesParagraph>{translate(loopRulesApply)}.</RulesParagraph>
+        <RulesParagraph>{translate(tapCluesApply(7))}.</RulesParagraph>
+    </>,
     typeManager: DigitSudokuTypeManager(),
     fieldSize: {
         fieldSize,

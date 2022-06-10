@@ -20,7 +20,7 @@ import {generateQuadMasters} from "./QuadMasters";
 import {HiddenSetup} from "./HiddenSetup";
 import {SonataSemplice} from "./SonataSemplice";
 import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
-import {TapaLikeLoop} from "./TapaLikeLoop";
+import {HeptapagonLikeLoop} from "./HeptapagonLikeLoop";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -41,7 +41,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region Other authors
-    TapaLikeLoop,
+    HeptapagonLikeLoop,
     SonataSemplice,
     HiddenSetup,
 
