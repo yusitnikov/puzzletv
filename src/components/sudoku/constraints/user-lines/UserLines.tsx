@@ -80,13 +80,17 @@ export const UserMarkByData = (
     {
         context,
         cellSize,
-        position: {top, left},
+        position,
         isCircle,
         // Leaving the defaults only for compatibility
-        isCenter = left % 1 !== 0 && top % 1 !== 0,
+        isCenter = position.left % 1 !== 0 && position.top % 1 !== 0,
     }: UserMarkByDataProps
 ) => {
+    let {top, left} = position;
+
     const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
+
+    let userAreaSize = 1;
 
     if (context) {
         const {
@@ -98,7 +102,16 @@ export const UserMarkByData = (
                 loopHorizontally,
                 loopVertically,
             },
+            cellsIndex,
         } = context;
+
+        if (isCenter) {
+            const cellPosition = cellsIndex.getPointInfo(position)?.cells.first();
+            if (cellPosition) {
+                const {bounds: {userArea}} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
+                userAreaSize = (userArea.width + userArea.height) / 2;
+            }
+        }
 
         if (loopVertically) {
             top = ((top % rowsCount) + rowsCount) % rowsCount;
@@ -109,8 +122,8 @@ export const UserMarkByData = (
         }
     }
 
-    const radius = isCenter ? 0.3 : 0.15;
-    const lineWidth = isCenter ? borderWidth : borderWidth / 2;
+    const radius = isCenter ? 0.3 * userAreaSize : 0.15;
+    const lineWidth = isCenter ? borderWidth * userAreaSize : borderWidth / 2;
     const opacity = isCenter ? 0.5 : 1;
 
     return <AutoSvg

@@ -175,6 +175,10 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
         }
     }
 
+    getPointInfo(point: Position): SudokuCellPointInfo | undefined {
+        return this.realCellPointMap[this.getPositionHash(point)];
+    }
+
     getPath({start, end}: Line): Line[] {
         const startKey = this.getPositionHash(start);
         const endKey = this.getPositionHash(end);

@@ -40,7 +40,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     const centerExactPosition: CellExactPosition = {
         center,
         corner: cellPosition,
-        round: cellPosition,
+        round: center,
         type: CellPart.center,
     };
 
