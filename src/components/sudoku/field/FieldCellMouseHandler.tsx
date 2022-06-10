@@ -35,6 +35,15 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 
     const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLineEnd, initialDigits: stateInitialDigits} = state;
 
+    const cellInfo = cellsIndex.allCells[cellPosition.top][cellPosition.left];
+
+    const centerExactPosition: CellExactPosition = {
+        center: cellInfo.center,
+        corner: cellPosition,
+        round: cellPosition,
+        type: CellPart.center,
+    };
+
     const customCellBounds = puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
     let customCellBorders: Position[][] | undefined = undefined;
     if (customCellBounds) {
@@ -108,35 +117,47 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     };
 
     return <>
-        {(onCornerClick || onCornerEnter) && indexes(4).flatMap(topOffset => indexes(4).map(leftOffset => {
-            const isTopCenter = [1, 2].includes(topOffset);
-            const isLeftCenter = [1, 2].includes(leftOffset);
+        {(onCornerClick || onCornerEnter) && <>
+            {!customCellBounds && indexes(4).flatMap(topOffset => indexes(4).map(leftOffset => {
+                const isTopCenter = [1, 2].includes(topOffset);
+                const isLeftCenter = [1, 2].includes(leftOffset);
 
-            const exactPosition: CellExactPosition = {
-                center: cellsIndex.allCells[cellPosition.top][cellPosition.left].center,
-                corner: {
-                    left: cellPosition.left + (leftOffset >> 1),
-                    top: cellPosition.top + (topOffset >> 1),
-                },
-                round: {
-                    left: cellPosition.left + (isLeftCenter ? 0.5 : (leftOffset ? 1 : 0)),
-                    top: cellPosition.top + (isTopCenter ? 0.5 : (topOffset ? 1 : 0)),
-                },
-                type: isTopCenter && isLeftCenter ? CellPart.center : (!isTopCenter && !isLeftCenter ? CellPart.corner : CellPart.border),
-            };
+                const exactPosition: CellExactPosition = {
+                    center: cellInfo.center,
+                    corner: {
+                        left: cellPosition.left + (leftOffset >> 1),
+                        top: cellPosition.top + (topOffset >> 1),
+                    },
+                    round: {
+                        left: cellPosition.left + (isLeftCenter ? 0.5 : (leftOffset ? 1 : 0)),
+                        top: cellPosition.top + (isTopCenter ? 0.5 : (topOffset ? 1 : 0)),
+                    },
+                    type: isTopCenter && isLeftCenter ? CellPart.center : (!isTopCenter && !isLeftCenter ? CellPart.corner : CellPart.border),
+                };
 
-            return <MouseHandlerRect
-                key={`draw-corner-${topOffset}-${leftOffset}`}
-                context={context}
-                cellPosition={cellPosition}
-                left={leftOffset * 0.25}
-                top={topOffset * 0.25}
-                width={0.25}
-                height={0.25}
-                onClick={() => onCornerClick?.(context, exactPosition)}
-                onEnter={() => onCornerEnter?.(context, exactPosition)}
-            />;
-        }))}
+                return <MouseHandlerRect
+                    key={`draw-corner-${topOffset}-${leftOffset}`}
+                    context={context}
+                    cellPosition={cellPosition}
+                    left={leftOffset * 0.25}
+                    top={topOffset * 0.25}
+                    width={0.25}
+                    height={0.25}
+                    onClick={() => onCornerClick?.(context, exactPosition)}
+                    onEnter={() => onCornerEnter?.(context, exactPosition)}
+                />;
+            }))}
+
+            {customCellBounds && <>
+                <MouseHandlerRect
+                    key={"draw-center"}
+                    context={context}
+                    cellPosition={cellPosition}
+                    onClick={() => onCornerClick?.(context, centerExactPosition)}
+                    onEnter={() => onCornerEnter?.(context, centerExactPosition)}
+                />
+            </>}
+        </>}
 
         {!isNoSelectionMode && <>
             <MouseHandlerRect
