@@ -177,6 +177,9 @@ export const TapaLikeLoop: PuzzleDefinition<number> = {
     title: {
         [LanguageCode.en]: "Tapa-like loop",
     },
+    author: {
+        [LanguageCode.en]: "BenceJoful",
+    },
     typeManager: {
         ...DigitSudokuTypeManager(),
         initialCellWriteMode: CellWriteMode.lines,
