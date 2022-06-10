@@ -21,6 +21,7 @@ import {
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {useDiffEffect} from "../useDiffEffect";
 import {useControlKeysState} from "../useControlKeysState";
+import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
 
 const emptyObject: any = {};
 
@@ -42,6 +43,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         setSharedState,
         applyStateDiffEffect,
     } = typeManager;
+
+    const cellsIndex = useMemo(() => new SudokuCellsIndex(puzzle), [puzzle]);
 
     const isHost = params.host === myClientId;
 
@@ -167,6 +170,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 params,
                 {
                     puzzle,
+                    cellsIndex,
                     cellSize,
                     multiPlayer,
                     state: processedGameState,
@@ -182,7 +186,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         }
 
         return state;
-    }, [puzzle, cellSize, calculateProcessedGameState]);
+    }, [puzzle, cellsIndex, cellSize, calculateProcessedGameState]);
 
     const multiPlayer = useMultiPlayer(
         `puzzle:${saveStateKey}`,
@@ -239,14 +243,14 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     const processedGameState = calculateProcessedGameState(multiPlayer, state, processedGameStateExtension);
                     const context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
                         puzzle,
+                        cellsIndex,
                         cellSize,
                         multiPlayer,
                         state: {
                             ...processedGameState,
                             ...state,
                         },
-                        onStateChange: () => {
-                        },
+                        onStateChange: () => {},
                     };
 
                     const asAction = actionOrCallback as GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
@@ -280,18 +284,19 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 return state;
             });
         },
-        [puzzle, setGameState, mergeMyGameState, calculateProcessedGameState, processedGameStateExtension, cellSize, multiPlayer]
+        [puzzle, cellsIndex, setGameState, mergeMyGameState, calculateProcessedGameState, processedGameStateExtension, cellSize, multiPlayer]
     );
 
     const context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = useMemo(
         () => ({
             puzzle,
+            cellsIndex,
             state: processedGameState,
             cellSize,
             multiPlayer,
             onStateChange: mergeGameState,
         }),
-        [puzzle, processedGameState, cellSize, multiPlayer, mergeGameState]
+        [puzzle, cellsIndex, processedGameState, cellSize, multiPlayer, mergeGameState]
     );
 
     useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);

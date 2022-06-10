@@ -3,10 +3,12 @@ import {ProcessedGameState} from "./GameState";
 import {UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
 import {Dispatch} from "react";
 import {GameStateActionOrCallback} from "./GameStateAction";
+import {SudokuCellsIndex} from "./SudokuCellsIndex";
 
 // It's not a React context! Just a regular type.
 export interface PuzzleContext<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    cellsIndex: SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     onStateChange: Dispatch<
         GameStateActionOrCallback<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> |
