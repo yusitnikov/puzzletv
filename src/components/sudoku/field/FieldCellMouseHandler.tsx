@@ -35,7 +35,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 
     const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLineEnd, initialDigits: stateInitialDigits} = state;
 
-    const {areCustomBounds, center} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
+    const {areCustomBounds, center, borderSegments} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
 
     const centerExactPosition: CellExactPosition = {
         center,
@@ -142,6 +142,24 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
                     onClick={() => onCornerClick?.(context, centerExactPosition)}
                     onEnter={() => onCornerEnter?.(context, centerExactPosition)}
                 />
+
+                {Object.entries(borderSegments).map(([key, {line, center: borderCenter}]) => {
+                    const exactPosition: CellExactPosition = {
+                        center,
+                        corner: cellPosition,
+                        round: borderCenter,
+                        type: CellPart.border,
+                    };
+
+                    return <MouseHandlerRect
+                        key={`draw-border-${key}`}
+                        context={context}
+                        cellPosition={cellPosition}
+                        line={line}
+                        onClick={() => onCornerClick?.(context, exactPosition)}
+                        onEnter={() => onCornerEnter?.(context, exactPosition)}
+                    />
+                })}
             </>}
         </>}
 
@@ -175,14 +193,16 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 interface MouseHandlerRectProps extends Partial<Rect> {
     context: PuzzleContext<any, any, any>;
     cellPosition: Position;
+    line?: Position[];
     onClick?: (ev: PointerEvent<any>) => void;
     onDoubleClick?: (ev: MouseEvent<any>) => void;
     onEnter?: (ev: PointerEvent<any>) => void;
 }
 
-export const MouseHandlerRect = ({context, cellPosition, onClick, onDoubleClick, onEnter, ...rect}: MouseHandlerRectProps) => <FieldCellShape
+export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDoubleClick, onEnter, ...rect}: MouseHandlerRectProps) => <FieldCellShape
     context={context}
     cellPosition={cellPosition}
+    line={line}
     style={{
         cursor: "pointer",
         pointerEvents: "all",

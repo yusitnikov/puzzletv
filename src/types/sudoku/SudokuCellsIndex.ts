@@ -1,6 +1,5 @@
-import {Line, Position, stringifyPosition} from "../layout/Position";
+import {getLineVector, getVectorLength, Line, Position, stringifyPosition} from "../layout/Position";
 import {
-    getIsSamePuzzleLine,
     getIsSamePuzzlePosition,
     getPuzzleLineHasher,
     getPuzzlePositionHasher,
@@ -27,7 +26,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
             customCellBounds = {},
         } = puzzle;
 
-        // Init all cell infos (neighbors are empty at this point)
+        // Init all cell infos (neighbors and border segments are empty at this point)
         this.allCells = indexes(rowsCount).map(top => indexes(columnsCount).map(left => {
             const naiveRect: Rect = {
                 top,
@@ -64,6 +63,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
                     left: bounds.userArea.left + bounds.userArea.width / 2,
                 },
                 neighbors: new HashSet<Position>([], this.positionHasher),
+                borderSegments: {},
             };
         }));
 
@@ -138,7 +138,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
             );
         }));
 
-        // Calculate neighbors for corners
+        // Calculate neighbors for corners and cell border segments
         for (const [startKey, info] of Object.entries(this.realCellPointMap)) {
             const {type, position: start} = info;
 
@@ -168,6 +168,55 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
 
                 if (next) {
                     info.neighbors = info.neighbors.add(next);
+
+                    const multiLine = indexes(line.length - 1).map(index => {
+                        const linePart: Line = {
+                            start: line[index],
+                            end: line[index + 1],
+                        };
+
+                        const lineVector = getLineVector(linePart);
+
+                        return {
+                            lineStart: linePart.start,
+                            lineVector,
+                            lineLength: getVectorLength(lineVector),
+                        };
+                    });
+
+                    let length = 0;
+                    for (const {lineLength} of multiLine) {
+                        length += lineLength;
+                    }
+
+                    let remainingLength = length / 2;
+                    let center = start;
+                    for (const {lineStart, lineVector, lineLength} of multiLine) {
+                        if (!lineLength) {
+                            continue;
+                        }
+
+                        if (remainingLength > lineLength) {
+                            remainingLength -= lineLength;
+                            continue;
+                        }
+
+                        const coeff = remainingLength / lineLength;
+                        center = {
+                            top: lineStart.top + coeff * lineVector.top,
+                            left: lineStart.left + coeff * lineVector.left,
+                        };
+                        break;
+                    }
+
+                    const lineKey = this.getLineHash({start, end: next});
+
+                    for (const cell of cells.items) {
+                        this.allCells[cell.top][cell.left].borderSegments[lineKey] = {
+                            line,
+                            center,
+                        };
+                    }
                 } else {
                     console.warn(`Failed to finish border: ${stringifyPosition(start)}->${stringifyPosition(branch)}`);
                 }
@@ -228,16 +277,12 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
         return getIsSamePuzzlePosition(this.puzzle);
     }
 
-    private get lineHasher() {
+    private get lineHasher(): (line: Line) => string {
         return getPuzzleLineHasher(this.puzzle);
     }
 
     private getLineHash(line: Line) {
         return this.lineHasher(line);
-    }
-
-    private get isSameLine() {
-        return getIsSamePuzzleLine(this.puzzle);
     }
     //endregion
 }
@@ -254,6 +299,11 @@ export interface SudokuCellBorderInfo {
     cells: SetInterface<Position>;
 }
 
+export interface SudokuCellBorderSegmentInfo {
+    line: Position[];
+    center: Position;
+}
+
 export interface CellInfo {
     position: Position;
     bounds: CustomCellBounds;
@@ -261,4 +311,5 @@ export interface CellInfo {
     areCustomBounds: boolean;
     center: Position;
     neighbors: SetInterface<Position>;
+    borderSegments: Record<string, SudokuCellBorderSegmentInfo>;
 }
