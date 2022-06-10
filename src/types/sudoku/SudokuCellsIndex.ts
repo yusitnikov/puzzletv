@@ -11,7 +11,7 @@ import {getRectPoints, Rect, transformRect} from "../layout/Rect";
 import {CustomCellBounds, TransformedCustomCellBounds} from "./CustomCellBounds";
 import {CellPart} from "./CellPart";
 import {HashSet, SetInterface} from "../struct/Set";
-import {ProcessedGameState} from "./GameState";
+import {gameStateGetCurrentFieldState, ProcessedGameState} from "./GameState";
 
 export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
     public readonly allCells: CellInfo[][];
@@ -215,6 +215,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
                         this.allCells[cell.top][cell.left].borderSegments[lineKey] = {
                             line,
                             center,
+                            neighbors: cells.remove(cell),
                         };
                     }
                 } else {
@@ -264,6 +265,77 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
         }, this.puzzle));
     }
 
+    // region Custom regions
+    getCustomRegionsByBorderLines(state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) {
+        const map: SudokuCustomRegionsMap = {
+            regions: [],
+            map: {},
+        };
+
+        const {lines} = gameStateGetCurrentFieldState(state);
+
+        for (const [top, row] of this.allCells.entries()) {
+            for (const left of row.keys()) {
+                const cell: Position = {top, left};
+
+                if (map.map[this.getPositionHash(cell)] === undefined) {
+                    this.getCustomRegionByBorderLinesAtInternal(lines, cell, map);
+                }
+            }
+        }
+
+        return {
+            regions: map.regions,
+            getRegionByCell: (cell: Position) => {
+                return map.map[this.getPositionHash(cell)];
+            },
+        };
+    }
+
+    getCustomRegionByBorderLinesAt(state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType, cell: Position) {
+        const map: SudokuCustomRegionsMap = {
+            regions: [],
+            map: {},
+        };
+
+        const {lines} = gameStateGetCurrentFieldState(state);
+
+        return this.getCustomRegionByBorderLinesAtInternal(lines, cell, map);
+    }
+
+    private getCustomRegionByBorderLinesAtInternal(
+        lines: SetInterface<Line>,
+        cell: Position,
+        {regions, map}: SudokuCustomRegionsMap
+    ) {
+        const newRegion: Position[] = [];
+        const newRegionIndex = regions.length;
+        regions.push(newRegion);
+
+        let queue = new HashSet([cell], this.positionHasher);
+        while (queue.size) {
+            const currentCell = queue.first()!;
+            queue = queue.remove(currentCell);
+
+            newRegion.push(currentCell);
+            map[this.getPositionHash(currentCell)] = newRegionIndex;
+
+            const cellInfo = this.allCells[currentCell.top][currentCell.left];
+            let connectedNeighbors = cellInfo.neighbors;
+
+            for (const {line, neighbors} of Object.values(cellInfo.borderSegments)) {
+                if (lines.contains({start: line[0], end: line[line.length - 1]})) {
+                    connectedNeighbors = connectedNeighbors.toggleAll(neighbors.items, false);
+                }
+            }
+
+            queue = queue.toggleAll(connectedNeighbors.items.filter(neighbor => map[this.getPositionHash(neighbor)] === undefined), true);
+        }
+
+        return newRegion;
+    }
+    // endregion
+
     // region Internals
     private get positionHasher(): (position: Position) => string {
         return getPuzzlePositionHasher(this.puzzle);
@@ -302,6 +374,7 @@ export interface SudokuCellBorderInfo {
 export interface SudokuCellBorderSegmentInfo {
     line: Position[];
     center: Position;
+    neighbors: SetInterface<Position>;
 }
 
 export interface CellInfo {
@@ -312,4 +385,9 @@ export interface CellInfo {
     center: Position;
     neighbors: SetInterface<Position>;
     borderSegments: Record<string, SudokuCellBorderSegmentInfo>;
+}
+
+interface SudokuCustomRegionsMap {
+    regions: Position[][];
+    map: Record<string, number>;
 }

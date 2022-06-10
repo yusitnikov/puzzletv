@@ -10,6 +10,8 @@ import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuT
 import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
 import {ChessGameState} from "../../sudokuTypes/chess/types/ChessGameState";
 import {createCubedokuFieldSize, CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
+import {AutoRegionConstraint} from "../../components/sudoku/constraints/auto-region/AutoRegion";
+import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
@@ -31,7 +33,9 @@ export const EmptyChaosConstruction: PuzzleDefinition<number> = {
     saveStateKey: "empty-chaos-construction-v2",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: {...FieldSize9, regions: []},
+    items: [AutoRegionConstraint()],
     allowDrawing: ["center-line", "border-line", "border-mark", "center-mark", "corner-mark"],
+    resultChecker: isValidFinishedPuzzleByConstraints,
 };
 
 export const EmptyChaosConstructionLoop: PuzzleDefinition<number> = {

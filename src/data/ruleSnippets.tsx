@@ -15,8 +15,8 @@ export const almostNormalSudokuRulesApply: Translatable = {
 };
 
 export const chaosConstructionRulesApply: Translatable = {
-    [LanguageCode.en]: "Regions must be connected and determined by the solver",
-    [LanguageCode.ru]: "Области должны быть связаны и определены Вами",
+    [LanguageCode.en]: "Regions must be connected and determined by the solver (draw the region borders to complete the puzzle)",
+    [LanguageCode.ru]: "Области должны быть связаны и определены Вами (нарисуйте границы регионов, чтобы завершить судоку)",
 };
 
 export const toroidalRulesApply: Translatable = {
