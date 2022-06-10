@@ -610,7 +610,11 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     clientId: string
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
-    const {puzzle: {typeManager}, state} = context;
+    const {puzzle: {typeManager, hideDeleteButton}, state} = context;
+
+    if (hideDeleteButton) {
+        return {};
+    }
 
     const clearCenter = () => gameStateProcessSelectedCells(context, clientId, cell => ({
         centerDigits: cell.centerDigits.clear()

@@ -73,6 +73,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         getLmdSolutionCode,
         digitsCount = getDefaultDigitsCount(puzzle),
         allowDrawing = [],
+        hideDeleteButton,
     } = puzzle;
 
     const translate = useTranslate();
@@ -143,8 +144,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     );
 
     const handleClear = useCallback(
-        () => onStateChange(clearSelectionAction()),
-        [onStateChange]
+        () => onStateChange(hideDeleteButton ? undoAction() : clearSelectionAction()),
+        [onStateChange, hideDeleteButton]
     );
 
     const handleUndo = useCallback(() => onStateChange(undoAction()), [onStateChange]);
@@ -252,7 +253,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 <Redo/>
             </ControlButton>
 
-            <ControlButton
+            {!hideDeleteButton && <ControlButton
                 left={isRevertedUndo ? undoRow : 2}
                 top={isRevertedUndo ? 2 : undoRow}
                 cellSize={cellSize}
@@ -260,7 +261,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 title={`${translate("Clear the cell contents")} (${translate("shortcut")}: Delete ${translate("or")} Backspace)`}
             >
                 <Clear/>
-            </ControlButton>
+            </ControlButton>}
         </>}
 
         {MainControls && <MainControls context={context} rect={emptyRect} isHorizontal={isHorizontal}/>}

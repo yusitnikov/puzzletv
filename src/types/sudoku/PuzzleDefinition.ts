@@ -57,6 +57,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
     borderColor?: string;
     allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
+    hideDeleteButton?: boolean;
     loopHorizontally?: boolean;
     loopVertically?: boolean;
     enableDragMode?: boolean;

@@ -186,6 +186,7 @@ export const TapaLikeLoop: PuzzleDefinition<number> = {
     ignoreRowsColumnCountInTheWrapper: true,
     digitsCount: 0,
     disableColoring: true,
+    hideDeleteButton: true,
     customCellBounds: {
         0: Object.fromEntries(bounds.entries()),
     },
