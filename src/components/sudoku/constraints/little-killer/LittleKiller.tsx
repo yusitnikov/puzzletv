@@ -1,4 +1,3 @@
-import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {textColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
@@ -82,7 +81,7 @@ export const LittleKillerConstraint = <CellType,>(
         cells,
         sum,
         component: LittleKiller,
-        isValidCell(cell, digits, cells, {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             let actualSum = 0;
 
             for (const {top, left} of cells) {

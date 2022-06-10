@@ -4,27 +4,20 @@ import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudok
 import {Chameleon} from "../authors";
 import {GoogleMapsFieldWrapper} from "../../sudokuTypes/google-maps/components/GoogleMapsFieldWrapper";
 import {GoogleMapsState} from "../../sudokuTypes/google-maps/types/GoogleMapsState";
-import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
-import {emptyPosition, formatSvgPointsArray, Position} from "../../types/layout/Position";
 import {
     AfricaCountriesAreas,
     AfricaCountriesBounds,
-    AfricaCountriesEnum,
-    AfricaCountriesNeighborsGraph
+    AfricaCountriesEnum
 } from "./africa-data/AfricaCountries";
-import {withFieldLayer} from "../../contexts/FieldLayerContext";
-import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {processGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
-import {latLngLiteralToPosition, positionToLatLngLiteral} from "../../sudokuTypes/google-maps/utils/googleMapsCoords";
+import {latLngLiteralToPosition} from "../../sudokuTypes/google-maps/utils/googleMapsCoords";
 import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
-import {textColor} from "../../components/app/globals";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import {GameState, gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
-import {getRegionBoundingBox} from "../../utils/regions";
-import {getRectCenter} from "../../types/layout/Rect";
+import {GoogleMapsTypeManager} from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
 
 export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> = {
     slug: "africa",
@@ -46,50 +39,7 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
             <li>Enlarge the map if in doubt of any other neighborhood.</li>
         </RulesUnorderedList>
     </>,
-    typeManager: {
-        ...(DigitSudokuTypeManager() as SudokuTypeManager<number, any, any>),
-        initialGameStateExtension: {zoom: 0, center: emptyPosition, map: undefined as any, overlay: undefined as any, renderVersion: 0},
-        keepStateOnRestart({zoom, center, map, overlay, renderVersion}): Partial<GameState<number> & GoogleMapsState> {
-            return {zoom, center, map, overlay, renderVersion};
-        },
-        getRegionsForRowsAndColumns: () => [],
-        transformCoords(coords, puzzle, {overlay}): Position {
-            const projection = overlay?.getProjection();
-            if (!projection) {
-                return coords;
-            }
-
-            const {x, y} = projection.fromLatLngToContainerPixel(new google.maps.LatLng(positionToLatLngLiteral(coords)));
-            return {
-                left: x,
-                top: y,
-            };
-        },
-        processArrowDirection({left: cell}, xDirection, yDirection, {puzzle: {customCellBounds}}): Position | undefined {
-            const getCountryCenter = (cell: number) => getRectCenter(getRegionBoundingBox(customCellBounds![0][cell].borders.flat()));
-            const {left, top} = getCountryCenter(cell);
-
-            let bestDist = 1000;
-            let bestCell: number | undefined = undefined;
-
-            for (const cell2Str of Object.keys(AfricaCountriesNeighborsGraph[cell as AfricaCountriesEnum] || {})) {
-                const cell2 = Number(cell2Str);
-                const {left: left2, top: top2} = getCountryCenter(cell2);
-
-                const straightDist = (left2 - left) * xDirection + (top - top2) * yDirection;
-                const errorDist = Math.abs((left2 - left) * yDirection) + Math.abs((top - top2) * xDirection);
-                const dist = Math.abs(Math.atan2(errorDist, straightDist));
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    bestCell = cell2;
-                }
-            }
-
-            return bestCell === undefined
-                ? undefined
-                : {top: 0, left: bestCell};
-        },
-    },
+    typeManager: GoogleMapsTypeManager(DigitSudokuTypeManager()),
     fieldWrapperComponent: GoogleMapsFieldWrapper({
         west: -7.5,
         east: 41.5,
@@ -113,35 +63,17 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
     ),
     items: [
         {
-            name: "countries",
-            cells: [],
-            component: withFieldLayer(FieldLayer.lines, ({context: {puzzle, state}}) => <>
-                {Object.values(puzzle.customCellBounds![0]).map(
-                    ({borders}, countryIndex) => borders.map(
-                        (border, partIndex) => <polygon
-                            key={`${countryIndex}-${partIndex}`}
-                            points={formatSvgPointsArray(border.map(
-                                (point) => puzzle.typeManager.transformCoords!(point, puzzle, state)
-                            ))}
-                            fill={"none"}
-                            stroke={textColor}
-                            strokeWidth={1}
-                        />
-                    )
-                )}
-            </>),
-        },
-        {
             name: "neighbors",
             cells: [],
-            isValidCell({left: cell}, digits, regionCells, puzzle, gameState): boolean {
-                const digit = digits[0]?.[cell];
+            isValidCell({top, left}, digits, regionCells, {puzzle, cellsIndex, state}): boolean {
+                const digit = digits[top][left]!;
 
-                for (const cell2Str of Object.keys(AfricaCountriesNeighborsGraph[cell as AfricaCountriesEnum] || {})) {
-                    const cell2 = Number(cell2Str);
-                    const digit2 = digits[0]?.[cell2];
+                const {neighbors} = cellsIndex.allCells[top][left];
 
-                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, gameState, true)) {
+                for (const neighbor of neighbors.items) {
+                    const digit2 = digits[neighbor.top]?.[neighbor.left];
+
+                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, state, true)) {
                         return false;
                     }
                 }
@@ -166,6 +98,7 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         }
 
         const digits = gameStateGetCurrentFieldState(context.state).cells[0].map(({usersDigit}) => usersDigit!);
+        const cellInfos = context.cellsIndex.allCells[0];
 
         let product = 1;
         let dots = 0;
@@ -173,8 +106,8 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         for (const [index, digit] of digits.entries()) {
             product = (product * digit) % 1000000000;
 
-            for (const index2Str of Object.keys(AfricaCountriesNeighborsGraph[index as AfricaCountriesEnum] || {})) {
-                const digit2 = digits[Number(index2Str)];
+            for (const neighbor of cellInfos[index].neighbors.items) {
+                const digit2 = digits[neighbor.left];
 
                 if (Math.abs(digit - digit2) === 1 || digit === digit2 * 2 || digit2 === digit * 2) {
                     dots++;
@@ -186,4 +119,5 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         return product === 0 && dots === 18;
     },
     enableDragMode: true,
+    // TODO: allowDrawing: ["border-mark"],
 };

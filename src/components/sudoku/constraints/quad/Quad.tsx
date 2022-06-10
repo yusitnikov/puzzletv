@@ -106,7 +106,7 @@ export const QuadConstraint = <CellType,>(
         isRecent,
         radius,
         component: Quad,
-        isValidCell({top, left}, digitsMap, cells, {typeManager: {areSameCellData}}, state) {
+        isValidCell({top, left}, digitsMap, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
             const data = digitsMap[top][left];
 
             if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, state, true))) {

@@ -56,7 +56,7 @@ export const RegionConstraint = <CellType,>(cellLiterals: PositionLiteral[], sho
         name,
         cells,
         component: showBorders ? Region : undefined,
-        isValidCell(cell, digits, cells, puzzle, state) {
+        isValidCell(cell, digits, cells, {puzzle, state}) {
             return isValidCellForRegion(cells, cell, digits, puzzle, state);
         },
     });

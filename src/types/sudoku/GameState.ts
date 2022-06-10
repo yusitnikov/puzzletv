@@ -5,7 +5,7 @@ import {
     fieldStateHistoryRedo,
     fieldStateHistoryUndo
 } from "./FieldStateHistory";
-import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
+import {CellWriteMode, CellWriteModeInfo, getAllowedCellWriteModeInfos} from "./CellWriteMode";
 import {noSelectedCells, SelectedCells} from "./SelectedCells";
 import {CellState, CellStateEx, getCellDataComparer} from "./CellState";
 import {
@@ -105,7 +105,7 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
     const {
         initialGameStateExtension,
         unserializeGameState,
-        initialCellWriteMode = CellWriteMode.main,
+        initialCellWriteMode,
     } = typeManager;
 
     const fullSaveStateKey = getPuzzleFullSaveStateKey(puzzle);
@@ -123,7 +123,7 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
             ],
             currentIndex: 0,
         },
-        persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode,
+        persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode ?? getAllowedCellWriteModeInfos(puzzle)[0].mode,
         selectedCells: noSelectedCells,
         initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
         excludedDigits: savedGameState?.[4]

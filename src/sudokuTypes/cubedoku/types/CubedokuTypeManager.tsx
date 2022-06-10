@@ -23,7 +23,7 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
     ) {
         const realFieldSize = context.puzzle.fieldSize.fieldSize / 2;
 
-        cell = defaultProcessArrowDirection(cell, xDirection, yDirection, context);
+        cell = defaultProcessArrowDirection(cell, xDirection, yDirection, context)!;
 
         if (cell.left >= realFieldSize && cell.top < realFieldSize) {
             if (xDirection) {

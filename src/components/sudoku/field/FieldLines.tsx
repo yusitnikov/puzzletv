@@ -3,7 +3,7 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {darkGreyColor, textColor} from "../../app/globals";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
-import {myClientId} from "../../../hooks/useMultiPlayer";
+import {formatSvgPointsArray} from "../../../types/layout/Position";
 
 export const FieldLines = withFieldLayer(FieldLayer.lines, (
     {
@@ -14,13 +14,35 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
                 },
                 fieldSize: {columnsCount, rowsCount},
                 borderColor: puzzleBorderColor,
+                customCellBounds,
+                fieldFitsWrapper,
             },
+            cellsIndex,
             cellSize,
-            state: {isMyTurn},
-        },
+            state,
+        }
     }: ConstraintProps
 ) => {
-    const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
+    const borderColor = state.isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
+    const borderWidth = fieldFitsWrapper ? 1 : 1 / cellSize;
+
+    if (customCellBounds) {
+        return <>
+            {cellsIndex.allCells.flatMap(
+                (row, top) => row.flatMap(
+                    ({getTransformedBounds}, left) => getTransformedBounds(state).borders.map(
+                        (border, partIndex) => <polygon
+                            key={`${top}-${left}-${partIndex}`}
+                            points={formatSvgPointsArray(border)}
+                            fill={"none"}
+                            stroke={borderColor}
+                            strokeWidth={borderWidth}
+                        />
+                    )
+                )
+            )}
+        </>;
+    }
 
     return <>
         {indexes(rowsCount, true).map(rowIndex => {
@@ -31,7 +53,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
                 x2={columnsCount}
                 y2={rowIndex}
                 stroke={borderColor}
-                strokeWidth={1 / cellSize}
+                strokeWidth={borderWidth}
             />;
         })}
 

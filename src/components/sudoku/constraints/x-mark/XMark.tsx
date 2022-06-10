@@ -40,7 +40,7 @@ export const XMarkConstraint = <CellType,>(cellLiteral1: PositionLiteral, cellLi
         name: "X",
         cells: [cell1, cell2],
         component: XMark,
-        isValidCell(cell, digits, [cell1, cell2], {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit1 = digits[cell1.top]?.[cell1.left];
             const digit2 = digits[cell2.top]?.[cell2.left];
 

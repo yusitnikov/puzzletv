@@ -113,7 +113,7 @@ export const KillerCageConstraint = <CellType,>(cellLiterals: PositionLiteral[],
         sum,
         showBottomSum,
         component: KillerCage,
-        isValidCell(cell, digits, cells, puzzle, state) {
+        isValidCell(cell, digits, cells, {puzzle, state}) {
             if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
                 return false;
             }

@@ -8,8 +8,15 @@ export const AntiBishopFromCenterConstraint = (regionSize: number): Constraint<a
         {left, top},
         digits,
         _,
-        {typeManager: {areSameCellData}, loopHorizontally, loopVertically, fieldSize: {rowsCount, columnsCount, fieldSize}},
-        state
+        {
+            puzzle: {
+                typeManager: {areSameCellData},
+                loopHorizontally,
+                loopVertically,
+                fieldSize: {rowsCount, columnsCount, fieldSize},
+            },
+            state,
+        }
     ) {
         const digit = digits[top][left]!;
 

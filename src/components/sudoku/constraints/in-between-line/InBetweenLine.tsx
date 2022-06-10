@@ -58,7 +58,7 @@ export const InBetweenLineConstraint = <CellType,>(...cellLiterals: PositionLite
         name: "in-between line",
         cells,
         component: InBetweenLine,
-        isValidCell(cell, digits, cells, {typeManager: {areSameCellData, compareCellData}}, state) {
+        isValidCell(cell, digits, cells, {puzzle: {typeManager: {areSameCellData, compareCellData}}, state}) {
             const digit = digits[cell.top][cell.left]!;
 
             const edgeCells = [cells[0], cells[cells.length - 1]];

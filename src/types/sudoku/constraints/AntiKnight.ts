@@ -7,8 +7,15 @@ export const AntiKnightConstraint: Constraint<any> = {
         {left, top},
         digits,
         _,
-        {typeManager: {areSameCellData}, loopHorizontally, loopVertically, fieldSize: {rowsCount, columnsCount}},
-        state
+        {
+            puzzle: {
+                typeManager: {areSameCellData},
+                loopHorizontally,
+                loopVertically,
+                fieldSize: {rowsCount, columnsCount},
+            },
+            state,
+        }
     ) {
         const digit = digits[top][left]!;
 

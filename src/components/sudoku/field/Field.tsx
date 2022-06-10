@@ -351,7 +351,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                         excludedDigits={cellExcludedDigits}
                         size={1}
                         cellPosition={cell}
-                        isValidUserDigit={!enableConflictChecker || disableConflictChecker || isValidUserDigit(cell, userDigits, items, puzzle, state)}
+                        isValidUserDigit={!enableConflictChecker || disableConflictChecker || isValidUserDigit(cell, userDigits, items, readOnlySafeContext)}
                     />;
                 }, true)}
 

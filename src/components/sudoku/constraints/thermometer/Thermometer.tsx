@@ -33,7 +33,7 @@ export const ThermometerConstraint = <CellType,>(cellLiterals: PositionLiteral[]
         cells,
         component: Thermometer,
         color,
-        isValidCell(cell, digits, cells, {typeManager: {compareCellData}}, state) {
+        isValidCell(cell, digits, cells, {puzzle: {typeManager: {compareCellData}}, state}) {
             const digit = digits[cell.top][cell.left]!;
 
             let isBeforeCurrentCell = true;

@@ -1,15 +1,11 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
 import {Rect} from "../../types/layout/Rect";
 import {indexes} from "../../utils/indexes";
-import {formatSvgPointsArray, Position} from "../../types/layout/Position";
-import {withFieldLayer} from "../../contexts/FieldLayerContext";
-import {FieldLayer} from "../../types/sudoku/FieldLayer";
-import {textColor} from "../../components/app/globals";
-import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
+import {Position} from "../../types/layout/Position";
 
 const fieldSize = 6.7;
 const scale = 1;
@@ -180,14 +176,7 @@ export const TapaLikeLoop: PuzzleDefinition<number> = {
     author: {
         [LanguageCode.en]: "BenceJoful",
     },
-    typeManager: {
-        ...DigitSudokuTypeManager(),
-        initialCellWriteMode: CellWriteMode.lines,
-        getRegionsForRowsAndColumns: () => [],
-        processArrowDirection() {
-            return undefined;
-        },
-    },
+    typeManager: DigitSudokuTypeManager(),
     fieldSize: {
         fieldSize,
         rowsCount: 1,
@@ -200,28 +189,6 @@ export const TapaLikeLoop: PuzzleDefinition<number> = {
     customCellBounds: {
         0: Object.fromEntries(bounds.entries()),
     },
-    items: [
-        // TODO: extract as a generic component
-        {
-            name: "borders",
-            cells: [],
-            component: withFieldLayer(FieldLayer.lines, ({context: {puzzle, state, cellSize}}) => <>
-                {Object.values(puzzle.customCellBounds![0]).map(
-                    ({borders}, countryIndex) => borders.map(
-                        (border, partIndex) => <polygon
-                            key={`${countryIndex}-${partIndex}`}
-                            points={formatSvgPointsArray(border.map(
-                                (point) => puzzle.typeManager.transformCoords?.(point, puzzle, state) || point
-                            ))}
-                            fill={"none"}
-                            stroke={textColor}
-                            strokeWidth={1.5 / cellSize}
-                        />
-                    )
-                )}
-            </>),
-        } as Constraint<number>,
-    ],
     allowDrawing: [
         "center-mark",
         "center-line",

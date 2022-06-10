@@ -30,7 +30,7 @@ export const KropkiDotConstraint = <CellType,>(
         cells: [cell1, cell2],
         isFilled,
         component: KropkiDot,
-        isValidCell(cell, digits, [cell1, cell2], {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const data1 = digits[cell1.top]?.[cell1.left];
             const data2 = digits[cell2.top]?.[cell2.left];
 

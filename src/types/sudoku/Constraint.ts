@@ -1,6 +1,6 @@
 import {ComponentType, ReactNode} from "react";
 import {isSamePosition, Position} from "../layout/Position";
-import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells, ProcessedGameState} from "./GameState";
+import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "./GameState";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
 import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
@@ -19,8 +19,8 @@ export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, Proce
         cell: Position,
         digits: GivenDigitsMap<CellType>,
         regionCells: Position[],
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        isFinalCheck?: boolean
     ): boolean;
 } & DataT;
 
@@ -47,9 +47,10 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
     const {
         fieldSize,
         items: puzzleItemsOrFn = [],
+        customCellBounds,
         typeManager: {
             items: stateItemsOrFn = [],
-            getRegionsForRowsAndColumns = () => [
+            getRegionsForRowsAndColumns = () => customCellBounds ? [] : [
                 ...indexes(fieldSize.rowsCount).map(top => RegionConstraint(
                     indexes(fieldSize.columnsCount).map(left => ({left, top})),
                     false,
@@ -62,11 +63,10 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
                 )),
             ],
         },
-        customCellBounds,
     } = puzzle;
 
     return [
-        customCellBounds ? undefined : FieldLinesConstraint,
+        FieldLinesConstraint,
         ...getRegionsForRowsAndColumns(puzzle, state),
         ...fieldSize.regions.map(region => RegionConstraint(region)),
         UserLinesConstraint,
@@ -103,8 +103,8 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
     cell: Position,
     userDigits: GivenDigitsMap<CellType>,
     constraints: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[],
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    isFinalCheck = false
 ) => {
     const userDigit = userDigits[cell.top]?.[cell.left];
     if (userDigit === undefined) {
@@ -118,12 +118,12 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
 
         const constraint = asConstraint(item);
 
-        const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, puzzle);
+        const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
         if (normalizedConstraintCells.length && !normalizedConstraintCells.some((constraintCell: Position) => isSamePosition(constraintCell, cell))) {
             continue;
         }
 
-        if (constraint.isValidCell && !constraint.isValidCell(cell, userDigits, normalizedConstraintCells, puzzle, state)) {
+        if (constraint.isValidCell && !constraint.isValidCell(cell, userDigits, normalizedConstraintCells, context, isFinalCheck)) {
             return false;
         }
     }
@@ -145,7 +145,7 @@ export const isValidFinishedPuzzleByConstraints = <CellType, GameStateExtensionT
         const digit = userDigits[top]?.[left];
 
         return !isValidCell(position, puzzle)
-            || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, puzzle, state));
+            || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
     }));
 };
 // endregion

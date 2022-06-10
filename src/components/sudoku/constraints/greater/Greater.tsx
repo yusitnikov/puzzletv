@@ -38,7 +38,7 @@ export const GreaterConstraint = <CellType,>(greaterCellLiteral: PositionLiteral
         name: "inequality",
         cells: [parsePositionLiteral(greaterCellLiteral), parsePositionLiteral(lessCellLiteral)],
         component: Greater,
-        isValidCell(cell, digits, [greaterCell, lessCell], {typeManager: {compareCellData}}, state) {
+        isValidCell(cell, digits, [greaterCell, lessCell], {puzzle: {typeManager: {compareCellData}}, state}) {
             const greaterDigit = digits[greaterCell.top]?.[greaterCell.left];
             const lessDigit = digits[lessCell.top]?.[lessCell.left];
 

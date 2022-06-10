@@ -157,7 +157,7 @@ export const QuadleConstraint = <CellType,>(
         digits,
         isRecent,
         component: Quadle,
-        isValidCell(cell, digitsMap, cells, {typeManager: {areSameCellData}}, state) {
+        isValidCell(cell, digitsMap, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
             const data = digitsMap[cell.top][cell.left];
 
             const digitIndex = cells.findIndex(constraintCell => isSamePosition(constraintCell, cell));

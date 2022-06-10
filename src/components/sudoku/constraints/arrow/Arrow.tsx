@@ -69,7 +69,7 @@ export const ArrowConstraint = <CellType,>(
         cells,
         transparentCircle,
         component: Arrow,
-        isValidCell(cell, digits, [circleCell, ...arrowCells], {typeManager: {getDigitByCellData}}, state) {
+        isValidCell(cell, digits, [circleCell, ...arrowCells], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const sumData = digits[circleCell.top]?.[circleCell.left];
             if (sumData === undefined) {
                 return true;

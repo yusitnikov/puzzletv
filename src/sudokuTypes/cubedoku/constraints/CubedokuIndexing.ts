@@ -4,7 +4,7 @@ import {isSamePosition, Position, Position3D} from "../../../types/layout/Positi
 export const CubedokuIndexingConstraint = <CellType,>(): Constraint<CellType> => ({
     name: "cubedoku indexing",
     cells: [],
-    isValidCell(cell, digits, _, {fieldSize: {fieldSize}, typeManager: {getDigitByCellData}}, state): boolean {
+    isValidCell(cell, digits, _, {puzzle: {fieldSize: {fieldSize}, typeManager: {getDigitByCellData}}, state}): boolean {
         const realFieldSize = fieldSize / 2;
 
         // x and y are like in the left face of the cube

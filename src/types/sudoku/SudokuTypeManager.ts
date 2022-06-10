@@ -1,6 +1,6 @@
 import {DigitComponentType} from "../../components/sudoku/digit/DigitComponentType";
 import {CellDataComponentType} from "../../components/sudoku/cell/CellDataComponentType";
-import {Position, PositionWithAngle} from "../layout/Position";
+import {getLineVector, Position, PositionWithAngle} from "../layout/Position";
 import {SetInterface} from "../struct/Set";
 import {GameState, ProcessedGameState} from "./GameState";
 import {ComponentType} from "react";
@@ -206,8 +206,32 @@ export const defaultProcessArrowDirection = (
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {puzzle: {fieldSize: {rowsCount, columnsCount}}}: PuzzleContext<any, any, any>
-): Position => ({
-    left: (left + xDirection + columnsCount) % columnsCount,
-    top: (top + yDirection + rowsCount) % rowsCount,
-});
+    {puzzle: {fieldSize: {rowsCount, columnsCount}, customCellBounds}, cellsIndex}: PuzzleContext<any, any, any>
+): Position | undefined => {
+    if (!customCellBounds) {
+        return {
+            left: (left + xDirection + columnsCount) % columnsCount,
+            top: (top + yDirection + rowsCount) % rowsCount,
+        };
+    }
+
+    const {center, neighbors} = cellsIndex.allCells[top][left];
+
+    let bestDist: number | undefined = undefined;
+    let bestCell: Position | undefined = undefined;
+
+    for (const neighbor of neighbors.items) {
+        const center2 = cellsIndex.allCells[neighbor.top][neighbor.left].center;
+        const vector = getLineVector({start: center, end: center2});
+
+        const straightDist = vector.left * xDirection + vector.top * yDirection;
+        const errorDist = Math.abs(vector.left * yDirection) + Math.abs(vector.top * xDirection);
+        const dist = Math.abs(Math.atan2(errorDist, straightDist));
+        if (bestDist === undefined || dist < bestDist) {
+            bestDist = dist;
+            bestCell = neighbor;
+        }
+    }
+
+    return bestCell;
+};
