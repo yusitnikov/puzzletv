@@ -28,8 +28,12 @@ export const CellSelection = ({context, cellPosition, size, color = CellSelectio
         const {rightVector, bottomVector} = getTransformedBounds(context.state).userArea;
         const cellTransformedSize = (getVectorLength(rightVector) + getVectorLength(bottomVector)) / 2;
 
-        selectionBorderWidth = Math.max(selectionBorderWidth * cellTransformedSize, 7);
-        selectionBorderWidth2 = 2;
+        const sizeCoeff = context.puzzle.fieldFitsWrapper
+            ? 1
+            : 1 / size;
+
+        selectionBorderWidth = Math.max(selectionBorderWidth * cellTransformedSize, 7 * sizeCoeff);
+        selectionBorderWidth2 = 2 * sizeCoeff;
 
         return <AutoSvg
             clip={<FieldCellShape
