@@ -143,6 +143,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     mode,
                     selected,
                     line,
+                    lineEnd,
+                    lineCenters,
                     dragStart,
                     addingLine,
                     ...otherState
@@ -158,6 +160,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     persistentCellWriteMode: mode,
                     selectedCells: HashSet.unserialize(selected, stringifyPosition),
                     currentMultiLine: line,
+                    currentMultiLineEnd: lineEnd,
+                    isCurrentMultiLineCenters: lineCenters,
                     dragStartPoint: dragStart,
                     isAddingLine: addingLine,
                     ...puzzle.typeManager.unserializeInternalState?.(puzzle, otherState)
@@ -273,6 +277,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                                 mode: processedGameState.cellWriteMode,
                                 selected: state.selectedCells.serialize(),
                                 line: state.currentMultiLine,
+                                lineEnd: state.currentMultiLineEnd,
+                                lineCenters: state.isCurrentMultiLineCenters,
                                 dragStart: state.dragStartPoint,
                                 addingLine: state.isAddingLine,
                                 ...puzzle.typeManager.getInternalState?.(puzzle, state),

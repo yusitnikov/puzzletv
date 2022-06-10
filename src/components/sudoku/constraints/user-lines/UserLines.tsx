@@ -5,7 +5,7 @@ import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {gameStateGetCurrentFieldState} from "../../../../types/sudoku/GameState";
-import {getLineVector, Position} from "../../../../types/layout/Position";
+import {getLineVector, Line} from "../../../../types/layout/Position";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {CellMark} from "../../../../types/sudoku/CellMark";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
@@ -151,7 +151,7 @@ export const UserMarkByData = (
 
 export interface UserLinesByDataProps {
     cellSize: number;
-    currentMultiLine: Position[];
+    currentMultiLine: Line[];
     isAdding?: boolean;
 }
 
@@ -159,12 +159,12 @@ export const UserLinesByData = ({cellSize, currentMultiLine, isAdding = true}: U
     const borderWidth = getRegionBorderWidth(cellSize) * 2;
 
     return <>
-        {currentMultiLine.length > 1 && <RoundedPolyLine
-            key={"current"}
-            points={currentMultiLine}
+        {currentMultiLine.map(({start, end}, index) => <RoundedPolyLine
+            key={index}
+            points={[start, end]}
             stroke={isAdding ? regularBorderColor : removingBorderColor}
             strokeWidth={borderWidth}
-        />}
+        />)}
     </>;
 };
 

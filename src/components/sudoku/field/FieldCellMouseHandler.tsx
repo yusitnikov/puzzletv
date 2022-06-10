@@ -33,7 +33,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 ) => {
     const {puzzle, state, onStateChange} = context;
 
-    const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLine, initialDigits: stateInitialDigits} = state;
+    const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLineEnd, initialDigits: stateInitialDigits} = state;
 
     const customCellBounds = puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
     let customCellBorders: Position[][] | undefined = undefined;
@@ -102,7 +102,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
     };
 
     const handleContinueCellSelection = () => {
-        if (!currentMultiLine.length) {
+        if (!currentMultiLineEnd) {
             onStateChange(gameState => gameStateToggleSelectedCells(gameState, [cellPosition], !isDeleteSelectedCellsStroke));
         }
     };
