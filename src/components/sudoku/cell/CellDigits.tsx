@@ -4,6 +4,7 @@ import {Set, SetInterface, ComparableSet} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
+import {FieldCellUserArea} from "../field/FieldCellUserArea";
 
 const centerDigitCoeff = 0.35;
 
@@ -109,56 +110,61 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         width={size}
         height={size}
     >
-        <AutoSvg
-            left={size / 2}
-            top={size / 2}
-            width={size}
-            height={size}
+        <FieldCellUserArea
+            context={context}
+            cellPosition={cellPosition}
         >
-            {initialData !== undefined && renderAnimatedDigitsSet(
-                "initial",
-                new ComparableSet([initialData]),
-                size * 0.7,
-                () => emptyPositionWithAngle,
-                true,
-                true,
-                cellPosition && context.state.lastPlayerObjects[getMainDigitDataHash(cellPosition)]
-            )}
+            <AutoSvg
+                left={size / 2}
+                top={size / 2}
+                width={size}
+                height={size}
+            >
+                {initialData !== undefined && renderAnimatedDigitsSet(
+                    "initial",
+                    new ComparableSet([initialData]),
+                    size * 0.7,
+                    () => emptyPositionWithAngle,
+                    true,
+                    true,
+                    cellPosition && context.state.lastPlayerObjects[getMainDigitDataHash(cellPosition)]
+                )}
 
-            {initialData === undefined && usersDigit !== undefined && renderAnimatedDigitsSet(
-                "users",
-                new ComparableSet([usersDigit]),
-                size * 0.7,
-                () => emptyPositionWithAngle,
-                false,
-                isValidUserDigit
-            )}
+                {initialData === undefined && usersDigit !== undefined && renderAnimatedDigitsSet(
+                    "users",
+                    new ComparableSet([usersDigit]),
+                    size * 0.7,
+                    () => emptyPositionWithAngle,
+                    false,
+                    isValidUserDigit
+                )}
 
-            {initialData === undefined && !!allCenterDigits.size && renderAnimatedDigitsSet(
-                "center",
-                allCenterDigits,
-                size * centerDigitsCoeff,
-                (index) => ({
-                    left: size * centerDigitsCoeff * widthCoeff * (index - (allCenterDigits.size - 1) / 2),
-                    top: 0,
-                    angle: 0,
-                }),
-                false,
-                (cellData) => !excludedDigits?.contains(cellData),
-                (cellData) => !!cellPosition && context.state.lastPlayerObjects[getExcludedDigitDataHash(cellPosition, cellData, context)]
-            )}
+                {initialData === undefined && !!allCenterDigits.size && renderAnimatedDigitsSet(
+                    "center",
+                    allCenterDigits,
+                    size * centerDigitsCoeff,
+                    (index) => ({
+                        left: size * centerDigitsCoeff * widthCoeff * (index - (allCenterDigits.size - 1) / 2),
+                        top: 0,
+                        angle: 0,
+                    }),
+                    false,
+                    (cellData) => !excludedDigits?.contains(cellData),
+                    (cellData) => !!cellPosition && context.state.lastPlayerObjects[getExcludedDigitDataHash(cellPosition, cellData, context)]
+                )}
 
-            {initialData === undefined && cornerDigits?.size && renderAnimatedDigitsSet(
-                "corner",
-                cornerDigits,
-                size * cornerDigitCoeff,
-                (index) => (corners[index] && {
-                    left: size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5),
-                    top: size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5),
-                    angle: 0,
-                })
-            )}
-        </AutoSvg>
+                {initialData === undefined && cornerDigits?.size && renderAnimatedDigitsSet(
+                    "corner",
+                    cornerDigits,
+                    size * cornerDigitCoeff,
+                    (index) => (corners[index] && {
+                        left: size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5),
+                        top: size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5),
+                        angle: 0,
+                    })
+                )}
+            </AutoSvg>
+        </FieldCellUserArea>
     </AutoSvg>;
 };
 

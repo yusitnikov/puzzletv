@@ -4,10 +4,8 @@ import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {CellColor, cellColors} from "../../../types/sudoku/CellColor";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "../field/FieldCellShape";
-import {useMemo} from "react";
-import {transformRectToUserAreaCoords} from "../../../types/sudoku/CustomCellBounds";
 import {getRegionBoundingBox} from "../../../utils/regions";
-import {getRectPoints, Rect} from "../../../types/layout/Rect";
+import {getTransformedRectCenter, Rect} from "../../../types/layout/Rect";
 
 export interface CellBackgroundProps {
     context: PuzzleContext<any, any, any>;
@@ -19,26 +17,29 @@ export interface CellBackgroundProps {
 export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBackgroundProps) => {
     colors = colors.sorted();
 
-    const customCellBounds = cellPosition && context.puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
-    const customCellRect = useMemo<Rect>(
-        () => customCellBounds
-            ? transformRectToUserAreaCoords(
-                getRegionBoundingBox(customCellBounds.borders.flat()),
-                customCellBounds.userArea
-            )
-            : {
-                left: 0,
-                top: 0,
-                width: size,
-                height: size,
-            },
-        [customCellBounds, size]
-    );
+    const cellInfo = cellPosition && context.cellsIndex.allCells[cellPosition.top][cellPosition.left];
+    const customBounds = cellInfo?.getTransformedBounds?.(context.state);
+    const areCustomBounds = cellInfo?.areCustomBounds && !!customBounds;
+
+    const customCellRect: Rect = areCustomBounds
+        ? getRegionBoundingBox(customBounds.borders.flat())
+        : {
+            left: 0,
+            top: 0,
+            width: size,
+            height: size,
+        };
+    const customCellCenter: Position = areCustomBounds
+        ? getTransformedRectCenter(customBounds.userArea)
+        : {
+            left: size / 2,
+            top: size / 2,
+        };
     const customCellRadius = Math.max(
-        size / 2 - customCellRect.left,
-        customCellRect.left + customCellRect.width - size / 2,
-        size / 2 - customCellRect.top,
-        customCellRect.top + customCellRect.height - size / 2,
+        customCellCenter.left - customCellRect.left,
+        customCellRect.left + customCellRect.width - customCellCenter.left,
+        customCellCenter.top - customCellRect.top,
+        customCellRect.top + customCellRect.height - customCellCenter.top,
     );
 
     if (!colors.size) {
@@ -48,11 +49,14 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
     return <AutoSvg
         width={size}
         height={size}
-        clip={(colors.size > 1 || !!customCellBounds) && <FieldCellShape context={context} cellPosition={cellPosition}/>}
+        clip={(colors.size > 1 || !!cellInfo?.areCustomBounds) && <FieldCellShape context={context} cellPosition={cellPosition}/>}
         style={{opacity: context.state.backgroundOpacity}}
     >
-        <polygon
-            points={formatSvgPointsArray(getRectPoints(customCellRect))}
+        <rect
+            x={customCellRect.left}
+            y={customCellRect.top}
+            width={customCellRect.width}
+            height={customCellRect.height}
             fill={cellColors[colors.first()!]}
             stroke={"none"}
             strokeWidth={0}
@@ -70,8 +74,8 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
                     ]
                         .map(([y, i]) => [y * customCellRadius * 4, Math.PI * (2 * i / colors.size - 0.25)])
                         .map(([y, a]) => ({
-                            left: size / 2 + y * Math.cos(a),
-                            top: size / 2 + y * Math.sin(a),
+                            left: customCellCenter.left + y * Math.cos(a),
+                            top: customCellCenter.top + y * Math.sin(a),
                         }))
                 )}
                 fill={cellColors[color]}

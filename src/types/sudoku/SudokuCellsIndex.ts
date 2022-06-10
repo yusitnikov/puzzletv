@@ -8,10 +8,11 @@ import {
     PuzzleDefinition
 } from "./PuzzleDefinition";
 import {indexes} from "../../utils/indexes";
-import {getRectPoints, Rect} from "../layout/Rect";
-import {CustomCellBounds} from "./CustomCellBounds";
+import {getRectPoints, Rect, transformRect} from "../layout/Rect";
+import {CustomCellBounds, TransformedCustomCellBounds} from "./CustomCellBounds";
 import {CellPart} from "./CellPart";
 import {HashSet, SetInterface} from "../struct/Set";
+import {ProcessedGameState} from "./GameState";
 
 export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
     public readonly allCells: CellInfo[][];
@@ -21,6 +22,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
 
     constructor(private readonly puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) {
         const {
+            typeManager: {transformCoords = coords => coords},
             fieldSize: {rowsCount, columnsCount},
             customCellBounds = {},
         } = puzzle;
@@ -48,6 +50,14 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
             return {
                 position: {top, left},
                 bounds,
+                getTransformedBounds: (state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => {
+                    const transformCoordsBound = (point: Position) => transformCoords(point, puzzle, state);
+
+                    return {
+                        borders: bounds.borders.map(border => border.map(transformCoordsBound)),
+                        userArea: transformRect(bounds.userArea, transformCoordsBound),
+                    };
+                },
                 areCustomBounds: customBounds !== undefined,
                 center: {
                     top: bounds.userArea.top + bounds.userArea.height / 2,
@@ -243,6 +253,7 @@ export interface SudokuCellBorderInfo {
 export interface CellInfo {
     position: Position;
     bounds: CustomCellBounds;
+    getTransformedBounds: (state: any) => TransformedCustomCellBounds;
     areCustomBounds: boolean;
     center: Position;
     neighbors: SetInterface<Position>;

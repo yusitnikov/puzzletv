@@ -35,28 +35,14 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 
     const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLineEnd, initialDigits: stateInitialDigits} = state;
 
-    const cellInfo = cellsIndex.allCells[cellPosition.top][cellPosition.left];
+    const {areCustomBounds, center} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
 
     const centerExactPosition: CellExactPosition = {
-        center: cellInfo.center,
+        center,
         corner: cellPosition,
         round: cellPosition,
         type: CellPart.center,
     };
-
-    const customCellBounds = puzzle.customCellBounds?.[cellPosition.top]?.[cellPosition.left];
-    let customCellBorders: Position[][] | undefined = undefined;
-    if (customCellBounds) {
-        const {left, top, width, height} = customCellBounds.userArea;
-        customCellBorders = customCellBounds.borders.map(
-            (border) => border.map(
-                (point) => ({
-                    left: (point.left - left) / width,
-                    top: (point.top - top) / height,
-                })
-            )
-        );
-    }
 
     const handleCellClick = ({ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
         const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
@@ -118,12 +104,12 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 
     return <>
         {(onCornerClick || onCornerEnter) && <>
-            {!customCellBounds && indexes(4).flatMap(topOffset => indexes(4).map(leftOffset => {
+            {!areCustomBounds && indexes(4).flatMap(topOffset => indexes(4).map(leftOffset => {
                 const isTopCenter = [1, 2].includes(topOffset);
                 const isLeftCenter = [1, 2].includes(leftOffset);
 
                 const exactPosition: CellExactPosition = {
-                    center: cellInfo.center,
+                    center,
                     corner: {
                         left: cellPosition.left + (leftOffset >> 1),
                         top: cellPosition.top + (topOffset >> 1),
@@ -148,7 +134,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
                 />;
             }))}
 
-            {customCellBounds && <>
+            {areCustomBounds && <>
                 <MouseHandlerRect
                     key={"draw-center"}
                     context={context}
@@ -164,13 +150,12 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
                 key={"cell-selection"}
                 context={context}
                 cellPosition={cellPosition}
-                customCellBorders={customCellBorders}
                 onClick={handleCellClick}
                 onDoubleClick={handleCellDoubleClick}
                 onEnter={handleContinueCellSelection}
             />
 
-            {!customCellBounds && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
+            {!areCustomBounds && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
                 return <MouseHandlerRect
                     key={`no-interaction-corner-${topOffset}-${leftOffset}`}
                     context={context}
@@ -190,13 +175,12 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
 interface MouseHandlerRectProps extends Partial<Rect> {
     context: PuzzleContext<any, any, any>;
     cellPosition: Position;
-    customCellBorders?: Position[][];
     onClick?: (ev: PointerEvent<any>) => void;
     onDoubleClick?: (ev: MouseEvent<any>) => void;
     onEnter?: (ev: PointerEvent<any>) => void;
 }
 
-export const MouseHandlerRect = ({context, cellPosition, customCellBorders, onClick, onDoubleClick, onEnter, ...rect}: MouseHandlerRectProps) => <FieldCellShape
+export const MouseHandlerRect = ({context, cellPosition, onClick, onDoubleClick, onEnter, ...rect}: MouseHandlerRectProps) => <FieldCellShape
     context={context}
     cellPosition={cellPosition}
     style={{
