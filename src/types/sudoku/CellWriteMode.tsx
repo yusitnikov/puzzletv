@@ -1,5 +1,6 @@
 import {ReactNode} from "react";
 import {PuzzleContext} from "./PuzzleContext";
+import {PuzzleDefinition} from "./PuzzleDefinition";
 import {ComparableSet} from "../struct/Set";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
@@ -95,16 +96,35 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
 ];
 
-export const getAllowedCellWriteModeInfos = (allowDrawing?: boolean, allowDragging?: boolean): CellWriteModeInfo<any, any, any>[] => allCellWriteModeInfos.filter(({mode}) => {
-    switch (mode) {
-        case CellWriteMode.lines:
-            return allowDrawing;
-        case CellWriteMode.move:
-            return allowDragging;
-        default:
-            return true;
-    }
-});
+export const getAllowedCellWriteModeInfos = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+    {
+        allowDrawing = [],
+        loopHorizontally = false,
+        loopVertically = false,
+        enableDragMode = false,
+        disableColoring = false,
+        digitsCount,
+        typeManager: {extraCellWriteModes = []},
+    }: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+): CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] => [
+    ...allCellWriteModeInfos.filter(({mode, isDigitMode}) => {
+        if (isDigitMode) {
+            return digitsCount !== 0;
+        }
+
+        switch (mode) {
+            case CellWriteMode.color:
+                return !disableColoring;
+            case CellWriteMode.lines:
+                return allowDrawing.length !== 0;
+            case CellWriteMode.move:
+                return loopHorizontally || loopVertically || enableDragMode;
+            default:
+                return true;
+        }
+    }),
+    ...extraCellWriteModes,
+];
 
 export const incrementCellWriteMode = (allowedModes: CellWriteModeInfo<any, any, any>[], mode: CellWriteMode, increment: number): CellWriteMode => {
     const currentModeIndex = allowedModes.findIndex(item => item.mode === mode);

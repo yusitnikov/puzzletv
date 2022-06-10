@@ -5,7 +5,6 @@ import {indexes} from "../../../utils/indexes";
 import {Check, Clear, Redo, Replay, Settings, Undo} from "@emotion-icons/material";
 import {
     CellWriteMode,
-    CellWriteModeInfo,
     getAllowedCellWriteModeInfos,
     incrementCellWriteMode
 } from "../../../types/sudoku/CellWriteMode";
@@ -54,12 +53,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         getLmdSolutionCode,
         digitsCount = getDefaultDigitsCount(puzzle),
         allowDrawing = [],
-        loopHorizontally = false,
-        loopVertically = false,
-        enableDragMode = false,
     } = puzzle;
-
-    const allowDragging = loopHorizontally || loopVertically || enableDragMode;
 
     const translate = useTranslate();
 
@@ -67,7 +61,6 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         keepStateOnRestart,
         createCellDataByDisplayDigit,
         mainControlsComponent: MainControls,
-        extraCellWriteModes = [],
         getPlayerScore,
     } = typeManager;
 
@@ -113,10 +106,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         }
     }, [autoCheckOnFinish, resultChecker, isCorrectResult, setIsShowingResult]);
 
-    const allowedCellWriteModes: CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] = [
-        ...getAllowedCellWriteModeInfos(allowDrawing.length !== 0, allowDragging),
-        ...extraCellWriteModes,
-    ];
+    const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
+    const allowDragging = allowedCellWriteModes.some(({mode}) => mode === CellWriteMode.move);
 
     // region Event handlers
     const handleSetCellWriteMode = useCallback(
@@ -279,7 +270,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             context={context}
         />
 
-        {allowDrawing.length !== 0 && <CellWriteModeButton
+        <CellWriteModeButton
             left={(isHorizontal !== allowDragging) ? 4 : 3}
             top={(isHorizontal !== allowDragging) ? 3 : 4}
             cellWriteMode={CellWriteMode.lines}
@@ -331,9 +322,9 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             childrenOnTopOfBorders={true}
             title={`${translate("Lines")} (${translate("shortcut")}: Alt)`}
             context={context}
-        />}
+        />
 
-        {allowDragging && <CellWriteModeButton
+        <CellWriteModeButton
             left={isHorizontal ? 4 : 3}
             top={isHorizontal ? 3 : 4}
             cellWriteMode={CellWriteMode.move}
@@ -352,7 +343,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             noBorders={true}
             title={`${translate("Move the grid")} (${translate("shortcut")}: Alt+Shift)`}
             context={context}
-        />}
+        />
         {/*endregion*/}
 
         <ControlButton

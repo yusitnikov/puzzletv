@@ -83,13 +83,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
 
             const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
 
-            const allowedCellWriteModes = [
-                ...getAllowedCellWriteModeInfos(
-                    puzzle.allowDrawing && puzzle.allowDrawing.length !== 0,
-                    puzzle.loopHorizontally || puzzle.loopVertically || puzzle.enableDragMode
-                ),
-                ...(puzzle.typeManager.extraCellWriteModes || []),
-            ];
+            const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
             const cellWriteMode = applyKeys
                 ? getFinalCellWriteMode(keys, gameState.persistentCellWriteMode, allowedCellWriteModes, readOnly)
                 : gameState.persistentCellWriteMode;
