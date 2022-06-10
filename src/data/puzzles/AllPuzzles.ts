@@ -2,7 +2,15 @@ import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/Puzzl
 import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
 import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {RealChessPuzzleRubberBlando} from "./RealChessPuzzleRubberBlando";
-import {EmptyChaosConstruction, EmptyChess, EmptyCubedoku, EmptyRegular, EmptyRotatable, EmptyToroidal} from "./Empty";
+import {
+    EmptyChaosConstruction,
+    EmptyChaosConstructionLoop,
+    EmptyChess,
+    EmptyCubedoku,
+    EmptyRegular,
+    EmptyRotatable,
+    EmptyToroidal
+} from "./Empty";
 import {CubeIt, IntroToCubedoku} from "./Cubedoku";
 import {Miraculous} from "./Miraculous";
 import {MeteorShower} from "./MeteorShower";
@@ -18,6 +26,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // region Empty
     EmptyRegular,
     EmptyChaosConstruction,
+    EmptyChaosConstructionLoop,
     EmptyRotatable,
     EmptyChess,
     EmptyCubedoku,

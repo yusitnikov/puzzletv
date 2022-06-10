@@ -32,6 +32,12 @@ export const EmptyChaosConstruction: PuzzleDefinition<number> = {
     typeManager: DigitSudokuTypeManager(),
     fieldSize: {...FieldSize9, regions: []},
     allowDrawing: ["center-line", "border-line", "border-mark", "center-mark", "corner-mark"],
+};
+
+export const EmptyChaosConstructionLoop: PuzzleDefinition<number> = {
+    ...EmptyChaosConstruction,
+    slug: "empty-chaos-construction-loop",
+    saveStateKey: undefined,
     loopHorizontally: true,
     loopVertically: true,
     fieldMargin: 0.99,
