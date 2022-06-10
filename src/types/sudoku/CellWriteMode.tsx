@@ -1,6 +1,6 @@
 import {ReactNode} from "react";
 import {PuzzleContext} from "./PuzzleContext";
-import {Set} from "../struct/Set";
+import {ComparableSet} from "../struct/Set";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
 import {Position} from "../layout/Position";
@@ -57,7 +57,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
-            data={{cornerDigits: new Set([cellData])}}
+            data={{cornerDigits: new ComparableSet([cellData])}}
             size={cellSize}
         />,
     },
@@ -67,7 +67,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
-            data={{centerDigits: new Set([cellData])}}
+            data={{centerDigits: new ComparableSet([cellData])}}
             size={cellSize}
         />,
     },
@@ -77,7 +77,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         digitsCount: 9,
         buttonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
-            colors={new Set([index])}
+            colors={new ComparableSet([index])}
             size={cellSize}
         />,
     },

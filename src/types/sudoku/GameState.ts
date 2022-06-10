@@ -21,7 +21,7 @@ import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManag
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "./GivenDigitsMap";
 import {PuzzleContext} from "./PuzzleContext";
-import {Set} from "../struct/Set";
+import {ComparableSet, SetInterface} from "../struct/Set";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../utils/playerDataHash";
 import {PlayerObjectInfo} from "./PlayerObjectInfo";
 import {
@@ -37,7 +37,7 @@ export interface GameState<CellType> {
     persistentCellWriteMode: CellWriteMode;
 
     initialDigits: GivenDigitsMap<CellType>;
-    excludedDigits: GivenDigitsMap<Set<CellType>>;
+    excludedDigits: GivenDigitsMap<SetInterface<CellType>>;
 
     selectedCells: SelectedCells;
 
@@ -124,14 +124,14 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
         selectedCells: noSelectedCells,
         initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
         excludedDigits: savedGameState?.[4]
-            ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) => Set.unserialize(
+            ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) => ComparableSet.unserialize(
                 excludedDigits,
                 getCellDataComparer(puzzle.typeManager.areSameCellData),
                 puzzle.typeManager.cloneCellData,
                 puzzle.typeManager.serializeCellData,
                 puzzle.typeManager.unserializeCellData,
             ))
-            : indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => new Set(
+            : indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => new ComparableSet(
                 [],
                 getCellDataComparer(puzzle.typeManager.areSameCellData),
                 puzzle.typeManager.cloneCellData,
@@ -225,7 +225,7 @@ export const setAllShareState = <CellType, GameStateExtensionType = {}, Processe
         fieldStateHistory: fieldStateHistoryAddState(typeManager, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
         ...unserializeGameState(extension),
         initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
-        excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => Set.unserialize(
+        excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => ComparableSet.unserialize(
             item,
             compareCellData,
             cloneCellData,

@@ -97,3 +97,5 @@ export const getCircleConnectionPoint = ({left: x1, top: y1}: Position, {left: x
         top: y1 + circleRadius * dy,
     };
 };
+
+export const stringifyLine = ({start, end}: Line) => `${stringifyPosition(start)}>${stringifyPosition(end)}`;

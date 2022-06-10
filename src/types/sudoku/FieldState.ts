@@ -7,58 +7,24 @@ import {
     unserializeCellState
 } from "./CellState";
 import {indexes} from "../../utils/indexes";
-import {
-    getLineVector,
-    invertLine,
-    invertPosition,
-    isSamePosition,
-    Line,
-    Position
-} from "../layout/Position";
+import {Line, Position} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
-import {PuzzleDefinition} from "./PuzzleDefinition";
-import {Set} from "../struct/Set";
-import {CellMark, getMarkComparer} from "./CellMark";
+import {getPuzzleLineHasher, PuzzleDefinition} from "./PuzzleDefinition";
+import {HashSet, SetInterface} from "../struct/Set";
+import {CellMark, getMarkHasher} from "./CellMark";
 
 export interface FieldState<CellType> {
     cells: CellState<CellType>[][];
-    lines: Set<Line>;
-    marks: Set<CellMark>;
+    lines: SetInterface<Line>;
+    marks: SetInterface<CellMark>;
 }
-
-const getLineComparer = (
-    {fieldSize: {rowsCount, columnsCount}, loopHorizontally, loopVertically}: PuzzleDefinition<any, any, any>
-) => (line1: Line, line2: Line) => {
-    const vector1 = getLineVector(line1);
-    const vector2 = getLineVector(line2);
-
-    if (!isSamePosition(vector1, vector2)) {
-        if (!isSamePosition(vector1, invertPosition(vector2))) {
-            return false;
-        }
-
-        line2 = invertLine(line2);
-    }
-
-    let {left, top} = getLineVector({start: line1.start, end: line2.start});
-
-    if (loopVertically) {
-        top %= rowsCount;
-    }
-
-    if (loopHorizontally) {
-        left %= columnsCount;
-    }
-
-    return !left && !top;
-};
 
 export const createEmptyFieldState = <CellType>(
     puzzle: PuzzleDefinition<CellType, any, any>
 ): FieldState<CellType> => ({
     cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle.typeManager))),
-    lines: new Set<Line>([], getLineComparer(puzzle)),
-    marks: new Set<CellMark>([], getMarkComparer(puzzle)),
+    lines: new HashSet<Line>([], getPuzzleLineHasher(puzzle)),
+    marks: new HashSet<CellMark>([], getMarkHasher(puzzle)),
 });
 
 export const serializeFieldState = <CellType>(
@@ -75,8 +41,8 @@ export const unserializeFieldState = <CellType>(
     puzzle: PuzzleDefinition<CellType, any, any>
 ) => ({
     cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle.typeManager))),
-    lines: Set.unserialize(lines, getLineComparer(puzzle)),
-    marks: Set.unserialize(marks, getMarkComparer(puzzle)),
+    lines: HashSet.unserialize(lines, getPuzzleLineHasher(puzzle)),
+    marks: HashSet.unserialize(marks, getMarkHasher(puzzle)),
 });
 
 export const cloneFieldState = <CellType>(

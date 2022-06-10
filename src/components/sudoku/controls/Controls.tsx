@@ -9,7 +9,7 @@ import {
     getAllowedCellWriteModeInfos,
     incrementCellWriteMode
 } from "../../../types/sudoku/CellWriteMode";
-import {Set} from "../../../types/struct/Set";
+import {ComparableSet} from "../../../types/struct/Set";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {useCallback, useEffect, useMemo, useState} from "react";
@@ -258,7 +258,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         <CellWriteModeButton
             top={1}
             cellWriteMode={CellWriteMode.corner}
-            data={{cornerDigits: new Set([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
+            data={{cornerDigits: new ComparableSet([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}
             context={context}
         />
@@ -266,7 +266,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         <CellWriteModeButton
             top={2}
             cellWriteMode={CellWriteMode.center}
-            data={{centerDigits: new Set([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
+            data={{centerDigits: new ComparableSet([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Center")} (${translate("shortcut")}: Ctrl)`}
             context={context}
         />
@@ -274,7 +274,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         <CellWriteModeButton
             top={3}
             cellWriteMode={CellWriteMode.color}
-            data={{colors: new Set(indexes(9))}}
+            data={{colors: new ComparableSet(indexes(9))}}
             title={`${translate("Colors")} (${translate("shortcut")}: Ctrl+Shift)`}
             context={context}
         />

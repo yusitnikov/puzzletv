@@ -1,6 +1,6 @@
 import {CellState, isEmptyCellState} from "../../../types/sudoku/CellState";
 import {emptyPositionWithAngle, Position, PositionWithAngle} from "../../../types/layout/Position";
-import {Set} from "../../../types/struct/Set";
+import {Set, SetInterface, ComparableSet} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
@@ -24,14 +24,14 @@ export interface CellDigitsProps<CellType, GameStateExtensionType = {}, Processe
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     data: Partial<CellState<CellType>>;
     initialData?: CellType;
-    excludedDigits?: Set<CellType>;
+    excludedDigits?: SetInterface<CellType>;
     size: number;
     cellPosition?: Position;
     mainColor?: boolean;
     isValidUserDigit?: boolean;
 }
 
-export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, excludedDigits: Set<CellType> | undefined, data: Partial<CellState<CellType>>) =>
+export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, excludedDigits: SetInterface<CellType> | undefined, data: Partial<CellState<CellType>>) =>
     initialData === undefined && !excludedDigits?.size && isEmptyCellState(data, true);
 
 export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
@@ -70,7 +70,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
 
     const renderAnimatedDigitsSet = (
         keyPrefix: string,
-        digits: Set<CellType>,
+        digits: SetInterface<CellType>,
         digitSize: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         isInitial = false,
@@ -117,7 +117,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
         >
             {initialData !== undefined && renderAnimatedDigitsSet(
                 "initial",
-                new Set([initialData]),
+                new ComparableSet([initialData]),
                 size * 0.7,
                 () => emptyPositionWithAngle,
                 true,
@@ -127,7 +127,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
 
             {initialData === undefined && usersDigit !== undefined && renderAnimatedDigitsSet(
                 "users",
-                new Set([usersDigit]),
+                new ComparableSet([usersDigit]),
                 size * 0.7,
                 () => emptyPositionWithAngle,
                 false,
@@ -163,7 +163,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
 };
 
 export const getCellDataSortIndexes = <CellType,>(
-    digits: Set<CellType>,
+    digits: SetInterface<CellType>,
     compareFn: (a: CellType, b: CellType) => number,
     cacheKey: string = "sortIndexes"
 ) => {

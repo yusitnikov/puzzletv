@@ -1,6 +1,6 @@
-import {isSamePosition, Position} from "../layout/Position";
-import {Set} from "../struct/Set";
+import {Position, stringifyPosition} from "../layout/Position";
+import {HashSet, SetInterface} from "../struct/Set";
 
-export type SelectedCells = Set<Position>;
+export type SelectedCells = SetInterface<Position>;
 
-export const noSelectedCells = new Set<Position>([], isSamePosition);
+export const noSelectedCells = new HashSet<Position>([], stringifyPosition);

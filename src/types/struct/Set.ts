@@ -2,52 +2,93 @@ type Comparer<ItemT> = (item1: ItemT, item2: ItemT) => boolean;
 type Cloner<ItemT> = (item: ItemT) => ItemT;
 type Serializer<ItemT> = (item: ItemT) => any;
 type Unserializer<ItemT> = (object: any) => ItemT;
+type Hasher<ItemT> = (item: ItemT) => string;
 
 const defaultComparer: Comparer<any> = (item1, item2) => typeof item1 === "object" ? JSON.stringify(item1) === JSON.stringify(item2) : item1 === item2;
 const defaultCloner: Cloner<any> = item => typeof item === "object" ? JSON.parse(JSON.stringify(item)) : item;
 const defaultSerializer: Serializer<any> = item => item;
 const defaultUnserializer: Unserializer<any> = item => item;
+const defaultHasher = (serializer: Serializer<any>): Hasher<any> => item => serializer(item).toString();
 
-export class Set<ItemT> {
+export interface SetInterface<ItemT, AlternativeItemsArrayT = never> {
+    readonly items: ItemT[];
+    readonly size: number;
+
+    contains(item: ItemT): boolean;
+
+    containsOneOf(items: ItemT[]): boolean;
+
+    equals(set: SetInterface<ItemT>): boolean;
+
+    at(index: number): ItemT | undefined;
+
+    first(): ItemT | undefined;
+
+    last(): ItemT | undefined;
+
+    cached<T>(key: string, getter: () => T): T;
+
+    sorted(): this;
+
+    set(items: ItemT[] | AlternativeItemsArrayT): this;
+
+    clear(): this;
+
+    clone(): this;
+
+    remove(item: ItemT): this;
+
+    add(item: ItemT): this;
+
+    toggle(item: ItemT, forcedEnable?: boolean): this;
+
+    toggleAll(items: ItemT[], forcedEnable?: boolean): this;
+
+    serialize(): any;
+}
+
+export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetInterface<ItemT, AlternativeItemsArrayT> {
     private cache: Record<string, any> = {};
 
-    constructor(
-        public readonly items: ItemT[] = [],
-        private comparer: Comparer<ItemT> = defaultComparer,
-        private cloner: Cloner<ItemT> = defaultCloner,
-        private serializer: Serializer<ItemT> = defaultSerializer
+    protected constructor(
+        protected readonly cloner: Cloner<ItemT> = defaultCloner,
+        protected readonly serializer: Serializer<ItemT> = defaultSerializer
     ) {
     }
 
-    public get size() {
+    abstract get items(): ItemT[];
+
+    get size() {
         return this.items.length;
     }
 
-    public contains(item: ItemT) {
-        return this.items.some(i => this.comparer(i, item));
-    }
+    abstract contains(item: ItemT): boolean;
 
-    public containsOneOf(items: ItemT[]) {
+    abstract set(items: ItemT[] | AlternativeItemsArrayT): this;
+
+    abstract remove(item: ItemT): this;
+
+    containsOneOf(items: ItemT[]) {
         return items.some(item => this.contains(item));
     }
 
-    public equals(set: Set<ItemT>) {
+    equals(set: SetInterface<ItemT>) {
         return this.size === set.size && this.items.every(item => set.contains(item));
     }
 
-    public at(index: number) {
+    at(index: number) {
         return this.items[index < 0 ? this.size + index : index];
     }
 
-    public first() {
-        return this.items[0];
+    first() {
+        return this.at(0);
     }
 
-    public last() {
-        return this.items.length ? this.items[this.items.length - 1] : undefined;
+    last() {
+        return this.at(-1);
     }
 
-    public cached<T>(key: string, getter: () => T): T {
+    cached<T>(key: string, getter: () => T): T {
         if (!(key in this.cache)) {
             this.cache[key] = getter();
         }
@@ -55,65 +96,171 @@ export class Set<ItemT> {
         return this.cache[key];
     }
 
-    public sorted() {
+    sorted() {
         return this.cached("sorted", () => this.set([...this.items].sort()));
     }
 
-    public set(items: ItemT[]) {
-        return new Set(items, this.comparer, this.cloner, this.serializer);
-    }
-
-    public clear() {
+    clear() {
         return this.set([]);
     }
 
-    public clone() {
+    clone() {
         return this.set(this.items.map(this.cloner));
     }
 
-    public remove(item: ItemT) {
-        return this.set(this.items.filter(i => !this.comparer(i, item)));
-    }
-
-    public add(item: ItemT) {
+    add(item: ItemT) {
         return this.set([...this.remove(item).items, item]);
     }
 
-    public toggle(item: ItemT, forcedEnable?: boolean) {
+    toggle(item: ItemT, forcedEnable?: boolean) {
         const enable = forcedEnable ?? !this.contains(item);
         return enable ? this.add(item) : this.remove(item);
     }
 
-    public toggleAll(items: ItemT[], forcedEnable?: boolean) {
-        let result: Set<ItemT> = this;
+    toggleAll(items: ItemT[], forcedEnable?: boolean) {
+        let result = this;
         for (const item of items) {
             result = result.toggle(item, forcedEnable);
         }
         return result;
     }
 
-    public serialize() {
+    serialize() {
         return this.items.map(this.serializer);
     }
 
-    public static merge<ItemT>(...sets: Set<ItemT>[]): Set<ItemT> {
+    public static merge<ItemT>(...sets: SetInterface<ItemT>[]): SetInterface<ItemT> {
         if (!sets.length) {
-            return new Set();
+            return new HashSet<ItemT>();
         }
 
         return sets.reduce((previousValue, currentValue) => previousValue.toggleAll(currentValue.items, true));
     }
+}
+
+export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<ItemT> {
+    protected readonly comparer: Comparer<ItemT>;
+
+    constructor(
+        private readonly _items: ItemT[] = [],
+        comparer?: Comparer<ItemT>,
+        cloner?: Cloner<ItemT>,
+        serializer?: Serializer<ItemT>
+    ) {
+        super(cloner, serializer);
+
+        this.comparer = comparer || defaultComparer;
+    }
+
+    get items(): ItemT[] {
+        return this._items;
+    }
+
+    contains(item: ItemT) {
+        return this.items.some(i => this.comparer(i, item));
+    }
+
+    set(items: ItemT[]): this {
+        return new ComparableSet(items, this.comparer, this.cloner, this.serializer) as this;
+    }
+
+    remove(item: ItemT) {
+        return this.set(this.items.filter(i => !this.comparer(i, item)));
+    }
 
     public static unserialize<ItemT>(
         value: any,
-        comparer: Comparer<ItemT> = defaultComparer,
-        cloner: Cloner<ItemT> = defaultCloner,
-        serializer: Serializer<ItemT> = defaultSerializer,
+        comparer?: Comparer<ItemT>,
+        cloner?: Cloner<ItemT>,
+        serializer?: Serializer<ItemT>,
         unserializer: Unserializer<ItemT> = defaultUnserializer
     ) {
-        return new Set(
+        return new ComparableSet(
             (value as any[]).map(unserializer),
             comparer,
+            cloner,
+            serializer
+        );
+    }
+}
+
+export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements SetInterface<ItemT, Record<string, ItemT>> {
+    private readonly hasher: Hasher<ItemT>;
+
+    private readonly map: Record<string, ItemT> = {};
+
+    constructor(
+        private _items: ItemT[] | Record<string, ItemT> = [],
+        hasher?: Hasher<ItemT>,
+        cloner?: Cloner<ItemT>,
+        serializer?: Serializer<ItemT>
+    ) {
+        super(cloner, serializer);
+
+        this.hasher = hasher || defaultHasher(serializer || defaultSerializer);
+
+        if (_items instanceof Array) {
+            for (const item of _items) {
+                this.map[this.hasher(item)] = item;
+            }
+        } else {
+            this.map = _items;
+        }
+    }
+
+    get items() {
+        if (!(this._items instanceof Array)) {
+            this._items = Object.values(this.map);
+        }
+
+        return this._items;
+    }
+
+    contains(item: ItemT) {
+        return this.hasher(item) in this.map;
+    }
+
+    set(items: ItemT[] | Record<string, ItemT>): this {
+        return new HashSet(items, this.hasher, this.cloner, this.serializer) as this;
+    }
+
+    clone() {
+        return this.set(Object.fromEntries(Object.entries(this.map).map(([key, value]) => [key, this.cloner(value)])));
+    }
+
+    remove(item: ItemT) {
+        const hash = this.hasher(item);
+
+        const map = {...this.map};
+        if (hash in map) {
+            delete map[hash];
+        }
+
+        return this.set(map);
+    }
+
+    add(item: ItemT) {
+        const hash = this.hasher(item);
+
+        const map = {...this.map};
+        if (hash in map) {
+            delete map[hash];
+        }
+        map[hash] = item;
+
+        return this.set(map);
+    }
+
+    public static unserialize<ItemT>(
+        value: any,
+        hasher?: Hasher<ItemT>,
+        cloner?: Cloner<ItemT>,
+        serializer?: Serializer<ItemT>,
+        unserializer: Unserializer<ItemT> = defaultUnserializer
+    ) {
+        return new HashSet(
+            (value as any[]).map(unserializer),
+            hasher,
             cloner,
             serializer
         );

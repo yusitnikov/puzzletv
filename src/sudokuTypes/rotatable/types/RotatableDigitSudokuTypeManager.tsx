@@ -141,7 +141,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
             left: getAnimatedValue(basePosition.left, -upsideDownPosition.left),
             top: getAnimatedValue(basePosition.top, -upsideDownPosition.top),
             angle: getAnimatedValue(basePosition.angle, -upsideDownPosition.angle)
-                + (isStickyRotatableDigit(dataSet.at(dataIndex)) ? -(state?.animatedAngle || 0) : 0),
+                + (isStickyRotatableDigit(dataSet.at(dataIndex)!) ? -(state?.animatedAngle || 0) : 0),
         }
     },
 

@@ -1,7 +1,7 @@
 import {DigitComponentType} from "../../components/sudoku/digit/DigitComponentType";
 import {CellDataComponentType} from "../../components/sudoku/cell/CellDataComponentType";
 import {Position, PositionWithAngle} from "../layout/Position";
-import {Set} from "../struct/Set";
+import {SetInterface} from "../struct/Set";
 import {GameState, ProcessedGameState} from "./GameState";
 import {ComponentType} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
@@ -66,7 +66,7 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     processCellDataPosition?(
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         basePosition: PositionWithAngle,
-        dataSet: Set<CellType>,
+        dataSet: SetInterface<CellType>,
         dataIndex: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         cellPosition?: Position,

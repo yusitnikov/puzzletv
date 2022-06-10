@@ -1,4 +1,4 @@
-import {Set} from "../../../types/struct/Set";
+import {SetInterface} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {CellColor, cellColors} from "../../../types/sudoku/CellColor";
@@ -12,7 +12,7 @@ import {getRectPoints, Rect} from "../../../types/layout/Rect";
 export interface CellBackgroundProps {
     context: PuzzleContext<any, any, any>;
     cellPosition?: Position;
-    colors: Set<CellColor>;
+    colors: SetInterface<CellColor>;
     size?: number;
 }
 
@@ -53,7 +53,7 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
     >
         <polygon
             points={formatSvgPointsArray(getRectPoints(customCellRect))}
-            fill={cellColors[colors.first()]}
+            fill={cellColors[colors.first()!]}
             stroke={"none"}
             strokeWidth={0}
         />

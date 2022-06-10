@@ -32,7 +32,7 @@ import {
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {Set} from "../../../types/struct/Set";
+import {ComparableSet} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
@@ -269,8 +269,8 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 {renderCellsLayer("background", ({colors}, cellPosition) => {
                     const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
                     const finalColors = allowOverridingInitialColors
-                        ? (colors?.size ? colors : new Set(initialCellColors || []))
-                        : (initialCellColors ? new Set(initialCellColors) : colors);
+                        ? (colors?.size ? colors : new ComparableSet(initialCellColors || []))
+                        : (initialCellColors ? new ComparableSet(initialCellColors) : colors);
 
                     return !!finalColors?.size && <CellBackground
                         context={readOnlySafeContext}

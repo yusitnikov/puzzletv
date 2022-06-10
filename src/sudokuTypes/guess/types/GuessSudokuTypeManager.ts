@@ -5,7 +5,7 @@ import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {GameState} from "../../../types/sudoku/GameState";
-import {Set} from "../../../types/struct/Set";
+import {ComparableSet} from "../../../types/struct/Set";
 import {CellOwnershipConstraint} from "../components/CellOwnership";
 import {indexes, indexesFromTo} from "../../../utils/indexes";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
@@ -87,7 +87,7 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         return {
             ...state,
             initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
-            excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => Set.unserialize(
+            excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => ComparableSet.unserialize(
                 item,
                 compareCellData,
                 cloneCellData,
