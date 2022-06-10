@@ -61,7 +61,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                 position: "relative",
                 fontSize: cellSize * h1HeightCoeff,
                 margin: 0,
-                padding: `0 ${cellSize * h1HeightCoeff}px`
+                padding: `0 ${cellSize * (h1HeightCoeff + rulesHeaderPaddingCoeff)}px`
             }}>
                 {translate(title)}
             </h1>
