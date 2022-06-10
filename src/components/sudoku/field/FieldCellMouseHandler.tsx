@@ -11,7 +11,8 @@ import {indexes} from "../../../utils/indexes";
 import {CellState} from "../../../types/sudoku/CellState";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "./FieldCellShape";
-import {CellExactPosition} from "../../../types/sudoku/CellWriteMode";
+import {CellExactPosition} from "../../../types/sudoku/CellExactPosition";
+import {CellPart} from "../../../types/sudoku/CellPart";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
@@ -124,7 +125,7 @@ export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, Pro
                     left: cellPosition.left + (isLeftCenter ? 0.5 : (leftOffset ? 1 : 0)),
                     top: cellPosition.top + (isTopCenter ? 0.5 : (topOffset ? 1 : 0)),
                 },
-                type: isTopCenter && isLeftCenter ? "center" : (!isTopCenter && !isLeftCenter ? "corner" : "border"),
+                type: isTopCenter && isLeftCenter ? CellPart.center : (!isTopCenter && !isLeftCenter ? CellPart.corner : CellPart.border),
             };
 
             return <MouseHandlerRect

@@ -5,7 +5,7 @@ import {
     fieldStateHistoryRedo,
     fieldStateHistoryUndo
 } from "./FieldStateHistory";
-import {CellExactPosition, CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
+import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
 import {noSelectedCells, SelectedCells} from "./SelectedCells";
 import {CellState, CellStateEx, getCellDataComparer} from "./CellState";
 import {
@@ -31,6 +31,7 @@ import {
 } from "../../utils/localStorage";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
 import {CellMark} from "./CellMark";
+import {CellExactPosition} from "./CellExactPosition";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;

@@ -8,9 +8,10 @@ import {QuadInputState} from "./QuadInputState";
 import {QuadInputGameState} from "./QuadInputGameState";
 import {QuadleConstraint, QuadleDigitType} from "../Quadle";
 import {QuadConstraint} from "../Quad";
-import {CellExactPosition, CellWriteMode} from "../../../../../types/sudoku/CellWriteMode";
+import {CellWriteMode} from "../../../../../types/sudoku/CellWriteMode";
 import {setQuadPositionAction, setQuadPositionActionType, setQuadPositionActionTypeKey} from "./setQuadPositionAction";
 import {QuadInputControls} from "./QuadInputControls";
+import {CellExactPosition} from "../../../../../types/sudoku/CellExactPosition";
 
 // TODO: support CellType operations!
 

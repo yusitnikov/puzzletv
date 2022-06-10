@@ -3,8 +3,8 @@ import {PuzzleContext} from "./PuzzleContext";
 import {ComparableSet} from "../struct/Set";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
-import {Position} from "../layout/Position";
 import {gameStateContinueMultiLine, gameStateStartMultiLine} from "./GameState";
+import {CellExactPosition} from "./CellExactPosition";
 
 export enum CellWriteMode {
     main,
@@ -15,13 +15,6 @@ export enum CellWriteMode {
     move,
     quads,
     custom,
-}
-
-export interface CellExactPosition {
-    center: Position;
-    corner: Position;
-    round: Position;
-    type: "center" | "corner" | "border";
 }
 
 export interface CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
