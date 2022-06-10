@@ -5,7 +5,7 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
 import {SidePanel} from "../side-panel/SidePanel";
 import {globalPaddingCoeff} from "../../app/globals";
-import {controlsWidthCoeff} from "../controls/Controls";
+import {getControlsWidthCoeff} from "../controls/Controls";
 import styled from "@emotion/styled";
 import {useWindowSize} from "../../../hooks/useWindowSize";
 import {useGame} from "../../../hooks/sudoku/useGame";
@@ -55,7 +55,7 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     const minWindowSize = Math.min(windowSize.width, windowSize.height);
 
     const fieldSizeWithMargin = fieldSize + 2 * fieldMargin;
-    const panelCoeff = controlsWidthCoeff;
+    const panelCoeff = getControlsWidthCoeff(puzzle);
     const maxCoeff = fieldSizeWithMargin + panelCoeff + globalPaddingCoeff * 3;
     const minCoeff = fieldSizeWithMargin + globalPaddingCoeff * 2;
 

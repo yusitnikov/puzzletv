@@ -131,3 +131,8 @@ export const incrementCellWriteMode = (allowedModes: CellWriteModeInfo<any, any,
 
     return allowedModes[(currentModeIndex + allowedModes.length + increment) % allowedModes.length].mode;
 };
+
+export const isCompactControlsPanel = (allowedModeInfos: CellWriteModeInfo<any, any, any>[]): boolean =>
+    !allowedModeInfos.some(
+        ({mode, isDigitMode     }) => isDigitMode || mode === CellWriteMode.color
+    );

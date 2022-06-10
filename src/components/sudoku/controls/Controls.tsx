@@ -6,7 +6,8 @@ import {Check, Clear, Redo, Replay, Settings, Undo} from "@emotion-icons/materia
 import {
     CellWriteMode,
     getAllowedCellWriteModeInfos,
-    incrementCellWriteMode
+    incrementCellWriteMode,
+    isCompactControlsPanel
 } from "../../../types/sudoku/CellWriteMode";
 import {ComparableSet} from "../../../types/struct/Set";
 import {useEventListener} from "../../../hooks/useEventListener";
@@ -24,10 +25,29 @@ import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
 import {GameState, getEmptyGameState} from "../../../types/sudoku/GameState";
-import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
+import {
+    getDefaultDigitsCount,
+    isPuzzleHasBottomRowControls,
+    PuzzleDefinition
+} from "../../../types/sudoku/PuzzleDefinition";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 
-export const controlsWidthCoeff = 5 + controlButtonPaddingCoeff * 4;
+export const getControlsWidthCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
+    const allowedModes = getAllowedCellWriteModeInfos(puzzle);
+    const isCompact = isCompactControlsPanel(allowedModes);
+    const width = isCompact ? 3 : 5;
+
+    return width + controlButtonPaddingCoeff * (width - 1);
+};
+
+export const getControlsHeightCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
+    const allowedModes = getAllowedCellWriteModeInfos(puzzle);
+    const isCompact = isCompactControlsPanel(allowedModes);
+    const hasBottomRowControls = isPuzzleHasBottomRowControls(puzzle);
+    const height = (isCompact ? 2 : 4) + (hasBottomRowControls ? 1 : 0);
+
+    return height + controlButtonPaddingCoeff * (height - 1);
+};
 
 export interface ControlsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     rect: Rect;
@@ -108,6 +128,13 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
     const allowDragging = allowedCellWriteModes.some(({mode}) => mode === CellWriteMode.move);
+    const isCompact = isCompactControlsPanel(allowedCellWriteModes);
+
+    const isRevertedUndo = isCompact && !isHorizontal;
+    const undoRow = isCompact ? 0 : 3;
+
+    const isRevertedMisc = isCompact !== isHorizontal;
+    const miscRow = isCompact ? 1 : 4;
 
     // region Event handlers
     const handleSetCellWriteMode = useCallback(
@@ -206,8 +233,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             />)}
 
             <ControlButton
-                left={0}
-                top={3}
+                left={isRevertedUndo ? undoRow : 0}
+                top={isRevertedUndo ? 0 : undoRow}
                 cellSize={cellSize}
                 onClick={handleUndo}
                 title={`${translate("Undo the last action")} (${translate("shortcut")}: Ctrl+Z)`}
@@ -216,8 +243,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             </ControlButton>
 
             <ControlButton
-                left={1}
-                top={3}
+                left={isRevertedUndo ? undoRow : 1}
+                top={isRevertedUndo ? 1 : undoRow}
                 cellSize={cellSize}
                 onClick={handleRedo}
                 title={`${translate("Redo the last action")} (${translate("shortcut")}: Ctrl+Y)`}
@@ -226,8 +253,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             </ControlButton>
 
             <ControlButton
-                left={2}
-                top={3}
+                left={isRevertedUndo ? undoRow : 2}
+                top={isRevertedUndo ? 2 : undoRow}
                 cellSize={cellSize}
                 onClick={handleClear}
                 title={`${translate("Clear the cell contents")} (${translate("shortcut")}: Delete ${translate("or")} Backspace)`}
@@ -348,8 +375,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         {/*endregion*/}
 
         <ControlButton
-            left={isHorizontal ? 4 : 0}
-            top={isHorizontal ? 0 : 4}
+            left={isRevertedMisc ? miscRow : 0}
+            top={isRevertedMisc ? 0 : miscRow}
             cellSize={cellSize}
             onClick={handleMaybeRestart}
             title={translate("Clear the progress and restart")}
@@ -424,8 +451,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         </Modal>}
 
         <ControlButton
-            left={isHorizontal ? 4 : 1}
-            top={isHorizontal ? 1 : 4}
+            left={isRevertedMisc ? miscRow : 1}
+            top={isRevertedMisc ? 1 : miscRow}
             cellSize={cellSize}
             onClick={handleOpenSettings}
             title={translate("Open settings")}
@@ -463,8 +490,8 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         </Modal>}
 
         {resultChecker && !forceAutoCheckOnFinish && <ControlButton
-            left={isHorizontal ? 4 : 2}
-            top={isHorizontal ? 2 : 4}
+            left={isRevertedMisc ? miscRow : 2}
+            top={isRevertedMisc ? 2 : miscRow}
             cellSize={cellSize}
             onClick={handleCheckResult}
             title={`${translate("Check the result")}`}
