@@ -267,7 +267,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 </FieldSvg>
 
                 {renderCellsLayer("background", ({colors}, cellPosition) => {
-                    const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
+                    const initialCellColors: CellColor[] = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
                     const finalColors = allowOverridingInitialColors
                         ? (colors?.size ? colors : new ComparableSet(initialCellColors || []))
                         : (initialCellColors ? new ComparableSet(initialCellColors) : colors);

@@ -2,7 +2,6 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {CellStateEx, getCellDataComparer} from "../../../types/sudoku/CellState";
 import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
-import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {GameState} from "../../../types/sudoku/GameState";
 import {ComparableSet} from "../../../types/struct/Set";
