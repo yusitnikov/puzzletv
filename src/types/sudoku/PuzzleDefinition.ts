@@ -45,6 +45,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     fieldMargin?: number;
     fieldWrapperComponent?: ComponentType<PuzzleContextProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
     fieldFitsWrapper?: boolean;
+    ignoreRowsColumnCountInTheWrapper?: boolean;
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;

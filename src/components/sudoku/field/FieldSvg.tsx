@@ -11,13 +11,19 @@ export interface FieldSvgProps extends PuzzleContextProps<any, any, any> {
 }
 
 export const FieldSvg = ({context: {puzzle, cellSize}, useShadow = true, children}: FieldSvgProps) => {
-    const {
+    let {
         fieldSize: {fieldSize, rowsCount, columnsCount},
         fieldMargin: initialFieldMargin = 0,
         fieldFitsWrapper,
+        ignoreRowsColumnCountInTheWrapper,
         loopHorizontally,
         loopVertically,
     } = puzzle;
+
+    if (ignoreRowsColumnCountInTheWrapper) {
+        rowsCount = fieldSize;
+        columnsCount = fieldSize;
+    }
 
     const extraMargin = fieldSize;
 
