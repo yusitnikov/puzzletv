@@ -3,7 +3,7 @@ import {
     getIsSamePuzzlePosition,
     getPuzzleLineHasher,
     getPuzzlePositionHasher,
-    normalizePuzzleLine,
+    normalizePuzzleLine, normalizePuzzlePosition,
     PuzzleDefinition
 } from "./PuzzleDefinition";
 import {indexes} from "../../utils/indexes";
@@ -265,6 +265,82 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
         }, this.puzzle));
     }
 
+    getCenterLineSegments(lines: Line[]): SudokuMultiLine[] {
+        const map: Record<string, SetInterface<Position>> = {};
+        let remainingPoints: SetInterface<Position> = new HashSet([], this.positionHasher);
+
+        for (const {start, end} of lines) {
+            if (this.getPointInfo(start)?.type !== CellPart.center) {
+                continue;
+            }
+
+            const startKey = this.getPositionHash(start);
+            const endKey = this.getPositionHash(end);
+
+            map[startKey] = (map[startKey] || new HashSet<Position>([], this.positionHasher)).add(end);
+            map[endKey] = (map[endKey] || new HashSet<Position>([], this.positionHasher)).add(start);
+
+            remainingPoints = remainingPoints.add(start).add(end);
+        }
+
+        remainingPoints = remainingPoints.set(
+            remainingPoints.items
+                .map((position) => ({
+                    position,
+                    count: map[this.getPositionHash(position)].size,
+                }))
+                .sort((a, b) => a.count - b.count)
+                .map(({position}) => position)
+        );
+
+        const result: SudokuMultiLine[] = [];
+
+        while (remainingPoints.size) {
+            let position = remainingPoints.last()!;
+            const isBranching = map[this.getPositionHash(position)].size > 2;
+            let isLoop = false;
+            if (!isBranching) {
+                position = remainingPoints.first()!;
+                isLoop = map[this.getPositionHash(position)].size === 2;
+            }
+            remainingPoints = remainingPoints.remove(position);
+
+            let lines: SetInterface<Line> = new HashSet([], this.lineHasher);
+            const points = [position];
+
+            if (!isBranching) {
+                const next = map[this.getPositionHash(position)].first()!;
+                lines = lines.add({start: position, end: next});
+                points.push(next);
+                remainingPoints = remainingPoints.remove(next);
+                position = next;
+            }
+
+            const queue = [position];
+            while (queue.length) {
+                const current = queue.shift()!;
+
+                for (const next of map[this.getPositionHash(current)].items) {
+                    lines = lines.add({start: current, end: next});
+                    if (remainingPoints.contains(next)) {
+                        points.push(next);
+                        remainingPoints = remainingPoints.remove(next);
+                        queue.push(next);
+                    }
+                }
+            }
+
+            result.push({
+                lines: lines.items.map(line => normalizePuzzleLine(line, this.puzzle)),
+                points: points.map(point => normalizePuzzlePosition(point, this.puzzle)),
+                isLoop,
+                isBranching,
+            });
+        }
+
+        return result;
+    }
+
     // region Custom regions
     getCustomRegionsByBorderLines(state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) {
         const map: SudokuCustomRegionsMap = {
@@ -390,4 +466,11 @@ export interface CellInfo {
 interface SudokuCustomRegionsMap {
     regions: Position[][];
     map: Record<string, number>;
+}
+
+export interface SudokuMultiLine {
+    lines: Line[];
+    points: Position[];
+    isLoop: boolean;
+    isBranching: boolean;
 }

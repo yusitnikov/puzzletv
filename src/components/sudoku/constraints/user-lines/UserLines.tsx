@@ -1,56 +1,52 @@
-import {memo} from "react";
-import {getRegionBorderWidth} from "../../../app/globals";
+import {memo, useMemo} from "react";
+import {getRegionBorderWidth, lightGreyColor} from "../../../app/globals";
 import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    asConstraint,
+    Constraint,
+    ConstraintProps, getAllPuzzleConstraintsAndComponents,
+    getInvalidUserLines, isConstraint,
+    prepareGivenDigitsMapForConstraints
+} from "../../../../types/sudoku/Constraint";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {gameStateGetCurrentFieldState} from "../../../../types/sudoku/GameState";
-import {getLineVector, Line} from "../../../../types/layout/Position";
+import {gameStateGetCurrentFieldState, ProcessedGameState} from "../../../../types/sudoku/GameState";
+import {Line} from "../../../../types/layout/Position";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {CellMark} from "../../../../types/sudoku/CellMark";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {normalizePuzzleLine} from "../../../../types/sudoku/PuzzleDefinition";
 
 const regularBorderColor = "#080";
-const removingBorderColor = "#e00";
+const errorBorderColor = "#e00";
+const removingBorderColor = lightGreyColor;
 
 export const UserLines = memo(({context}: ConstraintProps) => {
     const layer = useFieldLayer();
 
-    const {
-        cellSize,
-        puzzle: {
-            fieldSize: {
-                rowsCount,
-                columnsCount,
-            },
-            loopHorizontally,
-            loopVertically,
-        },
-        state,
-    } = context;
+    const {cellSize, puzzle, state} = context;
 
-    const {currentMultiLine, isAddingLine} = state;
+    const {currentMultiLine, isAddingLine} = state as ProcessedGameState<any>;
 
-    const {lines, marks} = gameStateGetCurrentFieldState(state);
+    const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
 
     const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
 
+    const invalidLines = useMemo(() => getInvalidUserLines(
+        lines,
+        prepareGivenDigitsMapForConstraints(context, cells),
+        getAllPuzzleConstraintsAndComponents(context).filter(isConstraint).map(asConstraint),
+        context
+    ), [context, lines, cells]);
+
     return <>
         {layer === FieldLayer.givenUserLines && lines.items.map((line, index) => {
-            const vector = getLineVector(line);
-
-            let {start: {left, top}} = line;
-            if (loopVertically) {
-                top = ((top % rowsCount) + rowsCount) % rowsCount;
-            }
-            if (loopHorizontally) {
-                left = ((left % columnsCount) + columnsCount) % columnsCount;
-            }
+            line = normalizePuzzleLine(line, puzzle);
 
             return <RoundedPolyLine
                 key={`existing-line-${index}`}
-                points={[{left, top}, {left: left + vector.left, top: top + vector.top}]}
-                stroke={regularBorderColor}
+                points={[line.start, line.end]}
+                stroke={invalidLines.contains(line) ? errorBorderColor : regularBorderColor}
                 strokeWidth={borderWidth}
             />;
         })}
@@ -62,12 +58,12 @@ export const UserLines = memo(({context}: ConstraintProps) => {
             {...mark}
         />)}
 
-        {layer === FieldLayer.newUserLines && <UserLinesByData
-            key={"new-line"}
+        {layer === FieldLayer.newUserLines && currentMultiLine.map((line, index) => <UserLinesByData
+            key={`new-line-${index}`}
             cellSize={cellSize}
-            currentMultiLine={currentMultiLine}
+            {...line}
             isAdding={isAddingLine}
-        />}
+        />)}
     </>;
 });
 
@@ -164,23 +160,19 @@ export const UserMarkByData = (
     </AutoSvg>;
 };
 
-export interface UserLinesByDataProps {
+export interface UserLinesByDataProps extends Line {
     cellSize: number;
-    currentMultiLine: Line[];
     isAdding?: boolean;
 }
 
-export const UserLinesByData = ({cellSize, currentMultiLine, isAdding = true}: UserLinesByDataProps) => {
+export const UserLinesByData = ({cellSize, start, end, isAdding = true}: UserLinesByDataProps) => {
     const borderWidth = getRegionBorderWidth(cellSize) * 2;
 
-    return <>
-        {currentMultiLine.map(({start, end}, index) => <RoundedPolyLine
-            key={index}
-            points={[start, end]}
-            stroke={isAdding ? regularBorderColor : removingBorderColor}
-            strokeWidth={borderWidth}
-        />)}
-    </>;
+    return <RoundedPolyLine
+        points={[start, end]}
+        stroke={isAdding ? regularBorderColor : removingBorderColor}
+        strokeWidth={borderWidth}
+    />;
 };
 
 export const UserLinesConstraint: Constraint<any> = {

@@ -314,18 +314,14 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 >
                     {allowDrawing.includes("border-line") && <UserLinesByData
                         cellSize={contentSize}
-                        currentMultiLine={[{
-                            start: {left: 0, top: 0},
-                            end: {left: 0, top: 1},
-                        }]}
+                        start={{left: 0, top: 0}}
+                        end={{left: 0, top: 1}}
                     />}
 
                     {allowDrawing.includes("center-line") && <UserLinesByData
                         cellSize={contentSize}
-                        currentMultiLine={[{
-                            start: {left: 0.5, top: 0.5},
-                            end: {left: 1.5, top: 0.5},
-                        }]}
+                        start={{left: 0.5, top: 0.5}}
+                        end={{left: 1.5, top: 0.5}}
                     />}
 
                     {allowDrawing.includes("center-mark") && <UserMarkByData

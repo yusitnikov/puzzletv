@@ -44,6 +44,10 @@ export interface SetInterface<ItemT, AlternativeItemsArrayT = never> {
 
     toggleAll(items: ItemT[], forcedEnable?: boolean): this;
 
+    filter(callback: (item: ItemT) => boolean): this;
+
+    map(callback: (item: ItemT) => ItemT): this;
+
     serialize(): any;
 }
 
@@ -105,7 +109,7 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     }
 
     clone() {
-        return this.set(this.items.map(this.cloner));
+        return this.map(this.cloner);
     }
 
     add(item: ItemT) {
@@ -123,6 +127,14 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
             result = result.toggle(item, forcedEnable);
         }
         return result;
+    }
+
+    filter(callback: (item: ItemT) => boolean): this {
+        return this.set(this.items.filter(callback));
+    }
+
+    map(callback: (item: ItemT) => ItemT): this {
+        return this.set(this.items.map(callback));
     }
 
     serialize() {
@@ -165,7 +177,7 @@ export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<Ite
     }
 
     remove(item: ItemT) {
-        return this.set(this.items.filter(i => !this.comparer(i, item)));
+        return this.filter(i => !this.comparer(i, item));
     }
 
     public static unserialize<ItemT>(
@@ -187,7 +199,7 @@ export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<Ite
 export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements SetInterface<ItemT, Record<string, ItemT>> {
     private readonly hasher: Hasher<ItemT>;
 
-    private readonly map: Record<string, ItemT> = {};
+    private readonly _map: Record<string, ItemT> = {};
 
     constructor(
         private _items: ItemT[] | Record<string, ItemT> = [],
@@ -201,23 +213,23 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
 
         if (_items instanceof Array) {
             for (const item of _items) {
-                this.map[this.hasher(item)] = item;
+                this._map[this.hasher(item)] = item;
             }
         } else {
-            this.map = _items;
+            this._map = _items;
         }
     }
 
     get items() {
         if (!(this._items instanceof Array)) {
-            this._items = Object.values(this.map);
+            this._items = Object.values(this._map);
         }
 
         return this._items;
     }
 
     contains(item: ItemT) {
-        return this.hasher(item) in this.map;
+        return this.hasher(item) in this._map;
     }
 
     set(items: ItemT[] | Record<string, ItemT>): this {
@@ -225,13 +237,13 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     }
 
     clone() {
-        return this.set(Object.fromEntries(Object.entries(this.map).map(([key, value]) => [key, this.cloner(value)])));
+        return this.set(Object.fromEntries(Object.entries(this._map).map(([key, value]) => [key, this.cloner(value)])));
     }
 
     remove(item: ItemT) {
         const hash = this.hasher(item);
 
-        const map = {...this.map};
+        const map = {...this._map};
         if (hash in map) {
             delete map[hash];
         }
@@ -242,13 +254,17 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     add(item: ItemT) {
         const hash = this.hasher(item);
 
-        const map = {...this.map};
+        const map = {...this._map};
         if (hash in map) {
             delete map[hash];
         }
         map[hash] = item;
 
         return this.set(map);
+    }
+
+    filter(callback: (item: ItemT) => boolean): this {
+        return this.set(Object.fromEntries(Object.entries(this._map).filter(([, item]) => callback(item))));
     }
 
     public static unserialize<ItemT>(

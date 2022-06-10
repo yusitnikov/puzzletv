@@ -1,5 +1,5 @@
 import {ComponentType, ReactNode} from "react";
-import {isSamePosition, Position} from "../layout/Position";
+import {isSamePosition, Line, Position} from "../layout/Position";
 import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "./GameState";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
@@ -9,6 +9,7 @@ import {indexes} from "../../utils/indexes";
 import {CellState} from "./CellState";
 import {UserLinesConstraint} from "../../components/sudoku/constraints/user-lines/UserLines";
 import {PuzzleContext} from "./PuzzleContext";
+import {SetInterface} from "../struct/Set";
 
 export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> = {
     name: string;
@@ -22,6 +23,19 @@ export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, Proce
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         isFinalCheck?: boolean
     ): boolean;
+    isValidPuzzle?(
+        lines: SetInterface<Line>,
+        digits: GivenDigitsMap<CellType>,
+        regionCells: Position[],
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    ): boolean;
+    getInvalidUserLines?(
+        lines: SetInterface<Line>,
+        digits: GivenDigitsMap<CellType>,
+        regionCells: Position[],
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        isFinalCheck?: boolean
+    ): Line[];
 } & DataT;
 
 export type ConstraintProps<CellType = any, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> =
@@ -131,21 +145,61 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
     return true;
 };
 
+export const getInvalidUserLines = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
+    lines: SetInterface<Line>,
+    userDigits: GivenDigitsMap<CellType>,
+    constraints: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[],
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    isFinalCheck = false
+): SetInterface<Line> => {
+    let result = lines.clear();
+
+    for (const item of constraints) {
+        if (!isConstraint(item)) {
+            continue;
+        }
+
+        const constraint = asConstraint(item);
+
+        const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
+
+        if (constraint.getInvalidUserLines) {
+            result = result.toggleAll(
+                constraint.getInvalidUserLines(lines, userDigits, normalizedConstraintCells, context, isFinalCheck),
+                true
+            )
+        }
+    }
+
+    return result;
+};
+
 export const isValidFinishedPuzzleByConstraints = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
     context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {puzzle, state} = context;
-    const {typeManager: {isValidCell = () => true}} = puzzle;
+    const {typeManager: {isValidCell = () => true}, digitsCount} = puzzle;
     const constraints = getAllPuzzleConstraintsAndComponents(context).filter(isConstraint).map(asConstraint);
-    const {cells} = gameStateGetCurrentFieldState(state);
+    const {cells, lines} = gameStateGetCurrentFieldState(state);
     const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
 
-    return cells.every((row, top) => row.every((cell, left) => {
-        const position: Position = {left, top};
-        const digit = userDigits[top]?.[left];
+    for (const constraint of constraints) {
+        const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
 
-        return !isValidCell(position, puzzle)
-            || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
-    }));
+        if (constraint.isValidPuzzle && !constraint.isValidPuzzle(lines, userDigits, normalizedConstraintCells, context)) {
+            return false;
+        }
+    }
+
+    return (
+        digitsCount === 0 ||
+        cells.every((row, top) => row.every((cell, left) => {
+            const position: Position = {left, top};
+            const digit = userDigits[top]?.[left];
+
+            return !isValidCell(position, puzzle)
+                || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
+        }))
+    ) && getInvalidUserLines(lines, userDigits, constraints, context, true).size === 0;
 };
 // endregion

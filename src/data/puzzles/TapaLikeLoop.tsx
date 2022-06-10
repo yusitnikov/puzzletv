@@ -6,6 +6,8 @@ import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
 import {Rect} from "../../types/layout/Rect";
 import {indexes} from "../../utils/indexes";
 import {Position} from "../../types/layout/Position";
+import {LoopLineConstraint} from "../../components/sudoku/constraints/loop-line/LoopLine";
+import {TapaCellConstraint} from "../../components/sudoku/constraints/tapa-cell/TapaCell";
 
 const fieldSize = 6.7;
 const scale = 1;
@@ -194,6 +196,18 @@ export const TapaLikeLoop: PuzzleDefinition<number> = {
         "center-mark",
         "center-line",
         "border-mark",
+    ],
+    items: [
+        LoopLineConstraint(),
+        TapaCellConstraint("R1C9", 7),
+        TapaCellConstraint("R1C12", 5, undefined),
+        TapaCellConstraint("R1C15", 3, 3),
+        TapaCellConstraint("R1C18", 1, 1, 1),
+        TapaCellConstraint("R1C21", 2, 2),
+        TapaCellConstraint("R1C24", 4, undefined),
+        TapaCellConstraint("R1C27", 6),
+        TapaCellConstraint("R1C51", undefined),
+        TapaCellConstraint("R1C74", undefined),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
 };
