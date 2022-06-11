@@ -1,11 +1,11 @@
 import {ReactNode} from "react";
 import {PuzzleContext} from "./PuzzleContext";
 import {PuzzleDefinition} from "./PuzzleDefinition";
-import {ComparableSet} from "../struct/Set";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
 import {gameStateContinueMultiLine, gameStateStartMultiLine} from "./GameState";
 import {CellExactPosition} from "./CellExactPosition";
+import {CellDataSet} from "./CellDataSet";
 
 export enum CellWriteMode {
     main,
@@ -51,7 +51,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
-            data={{cornerDigits: new ComparableSet([cellData])}}
+            data={{cornerDigits: new CellDataSet(context.puzzle, [cellData])}}
             size={cellSize}
         />,
     },
@@ -61,7 +61,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
-            data={{centerDigits: new ComparableSet([cellData])}}
+            data={{centerDigits: new CellDataSet(context.puzzle, [cellData])}}
             size={cellSize}
         />,
     },
@@ -71,7 +71,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         digitsCount: 9,
         buttonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
-            colors={new ComparableSet([index])}
+            colors={new CellDataSet(context.puzzle, [index])}
             size={cellSize}
         />,
     },

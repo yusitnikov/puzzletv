@@ -5,15 +5,16 @@ import {
     Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {HashSet, SetInterface} from "../../../../types/struct/Set";
+import {SetInterface} from "../../../../types/struct/Set";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
-import {getIsSamePuzzlePosition, getPuzzleLineHasher} from "../../../../types/sudoku/PuzzleDefinition";
+import {getIsSamePuzzlePosition} from "../../../../types/sudoku/PuzzleDefinition";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {textColor} from "../../../app/globals";
 import {FieldRect} from "../../field/FieldRect";
 import {FieldCellUserArea} from "../../field/FieldCellUserArea";
+import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 
 export interface TapaCellProps {
     clues: (number | undefined)[];
@@ -94,13 +95,12 @@ export const TapaCellConstraint = <CellType,>(cellLiteral: PositionLiteral, ...c
             const lineSegments = getLineSegments(lines, context);
 
             const isSamePosition = getIsSamePuzzlePosition(context.puzzle);
-            const lineHasher = getPuzzleLineHasher(context.puzzle);
 
-            let result: SetInterface<Line> = new HashSet(
+            let result = new PuzzleLineSet(
+                context.puzzle,
                 lineSegments
                     .flatMap(({lines}) => lines)
-                    .filter(({start, end}) => isSamePosition(start, center) || isSamePosition(end, center)),
-                lineHasher
+                    .filter(({start, end}) => isSamePosition(start, center) || isSamePosition(end, center))
             );
 
             interface ClueSegment {

@@ -6,22 +6,22 @@ import {
     fieldStateHistoryUndo
 } from "./FieldStateHistory";
 import {CellWriteMode, CellWriteModeInfo, getAllowedCellWriteModeInfos} from "./CellWriteMode";
-import {noSelectedCells, SelectedCells} from "./SelectedCells";
-import {CellState, CellStateEx, getCellDataComparer} from "./CellState";
+import {CellState, CellStateEx} from "./CellState";
 import {
-    areAllFieldStateCells, createEmptyFieldState,
+    areAllFieldStateCells,
+    createEmptyFieldState,
     isAnyFieldStateCell,
     processFieldStateCells,
     serializeFieldState,
     unserializeFieldState
 } from "./FieldState";
 import {indexes} from "../../utils/indexes";
-import {emptyPosition, Line, Position} from "../layout/Position";
+import {emptyPosition, Line, Position, PositionSet} from "../layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "./GivenDigitsMap";
 import {PuzzleContext} from "./PuzzleContext";
-import {ComparableSet, SetInterface} from "../struct/Set";
+import {SetInterface} from "../struct/Set";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../utils/playerDataHash";
 import {PlayerObjectInfo} from "./PlayerObjectInfo";
 import {
@@ -32,6 +32,7 @@ import {
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
 import {CellMark} from "./CellMark";
 import {CellExactPosition} from "./CellExactPosition";
+import {CellDataSet} from "./CellDataSet";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -40,7 +41,7 @@ export interface GameState<CellType> {
     initialDigits: GivenDigitsMap<CellType>;
     excludedDigits: GivenDigitsMap<SetInterface<CellType>>;
 
-    selectedCells: SelectedCells;
+    selectedCells: SetInterface<Position>;
 
     currentMultiLine: Line[];
     currentMultiLineEnd?: Position;
@@ -124,22 +125,11 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
             currentIndex: 0,
         },
         persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode ?? getAllowedCellWriteModeInfos(puzzle)[0].mode,
-        selectedCells: noSelectedCells,
+        selectedCells: new PositionSet(),
         initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
         excludedDigits: savedGameState?.[4]
-            ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) => ComparableSet.unserialize(
-                excludedDigits,
-                getCellDataComparer(puzzle.typeManager.areSameCellData),
-                puzzle.typeManager.cloneCellData,
-                puzzle.typeManager.serializeCellData,
-                puzzle.typeManager.unserializeCellData,
-            ))
-            : indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => new ComparableSet(
-                [],
-                getCellDataComparer(puzzle.typeManager.areSameCellData),
-                puzzle.typeManager.cloneCellData,
-                puzzle.typeManager.serializeCellData
-            ))),
+            ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) => CellDataSet.unserialize(puzzle, excludedDigits))
+            : indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => new CellDataSet(puzzle))),
 
         currentMultiLine: [],
         currentMultiLineEnd: undefined,
@@ -220,23 +210,15 @@ export const setAllShareState = <CellType, GameStateExtensionType = {}, Processe
     newState: any
 ): GameState<CellType> & GameStateExtensionType => {
     const {typeManager} = puzzle;
-    const {setSharedState, unserializeGameState, areSameCellData, cloneCellData, serializeCellData, unserializeCellData} = typeManager;
+    const {setSharedState, unserializeGameState, unserializeCellData} = typeManager;
     const {field, extension, initialDigits, excludedDigits} = newState;
-
-    const compareCellData = getCellDataComparer(areSameCellData);
 
     const result: GameState<CellType> & GameStateExtensionType = {
         ...state,
         fieldStateHistory: fieldStateHistoryAddState(typeManager, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
         ...unserializeGameState(extension),
         initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
-        excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => ComparableSet.unserialize(
-            item,
-            compareCellData,
-            cloneCellData,
-            serializeCellData,
-            unserializeCellData
-        )),
+        excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
     };
 
     return setSharedState?.(puzzle, result, newState) ?? result;

@@ -1,10 +1,11 @@
 import {CellState, isEmptyCellState} from "../../../types/sudoku/CellState";
 import {emptyPositionWithAngle, Position, PositionWithAngle} from "../../../types/layout/Position";
-import {Set, SetInterface, ComparableSet} from "../../../types/struct/Set";
+import {Set, SetInterface} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
 import {FieldCellUserArea} from "../field/FieldCellUserArea";
+import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 
 const centerDigitCoeff = 0.35;
 
@@ -122,7 +123,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
             >
                 {initialData !== undefined && renderAnimatedDigitsSet(
                     "initial",
-                    new ComparableSet([initialData]),
+                    new CellDataSet(puzzle, [initialData]),
                     size * 0.7,
                     () => emptyPositionWithAngle,
                     true,
@@ -132,7 +133,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
 
                 {initialData === undefined && usersDigit !== undefined && renderAnimatedDigitsSet(
                     "users",
-                    new ComparableSet([usersDigit]),
+                    new CellDataSet(puzzle, [usersDigit]),
                     size * 0.7,
                     () => emptyPositionWithAngle,
                     false,

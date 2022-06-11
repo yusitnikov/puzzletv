@@ -1,3 +1,5 @@
+import {HashSet} from "../struct/Set";
+
 export interface Position {
     left: number;
     top: number;
@@ -99,3 +101,13 @@ export const getCircleConnectionPoint = ({left: x1, top: y1}: Position, {left: x
 };
 
 export const stringifyLine = ({start, end}: Line) => `${stringifyPosition(start)}>${stringifyPosition(end)}`;
+
+export class PositionSet extends HashSet<Position> {
+    constructor(items: Position[] = []) {
+        super(items, stringifyPosition);
+    }
+
+    static unserialize(items: any) {
+        return new PositionSet(items);
+    }
+}

@@ -9,9 +9,10 @@ import {
 import {indexes} from "../../utils/indexes";
 import {Line, Position} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
-import {getPuzzleLineHasher, PuzzleDefinition} from "./PuzzleDefinition";
-import {HashSet, SetInterface} from "../struct/Set";
-import {CellMark, getMarkHasher} from "./CellMark";
+import {PuzzleDefinition} from "./PuzzleDefinition";
+import {SetInterface} from "../struct/Set";
+import {CellMark, CellMarkSet} from "./CellMark";
+import {PuzzleLineSet} from "./PuzzleLineSet";
 
 export interface FieldState<CellType> {
     cells: CellState<CellType>[][];
@@ -22,9 +23,9 @@ export interface FieldState<CellType> {
 export const createEmptyFieldState = <CellType>(
     puzzle: PuzzleDefinition<CellType, any, any>
 ): FieldState<CellType> => ({
-    cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle.typeManager))),
-    lines: new HashSet<Line>([], getPuzzleLineHasher(puzzle)),
-    marks: new HashSet<CellMark>([], getMarkHasher(puzzle)),
+    cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle))),
+    lines: new PuzzleLineSet(puzzle),
+    marks: new CellMarkSet(puzzle),
 });
 
 export const serializeFieldState = <CellType>(
@@ -40,9 +41,9 @@ export const unserializeFieldState = <CellType>(
     {cells = [], lines = [], marks = []}: any,
     puzzle: PuzzleDefinition<CellType, any, any>
 ) => ({
-    cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle.typeManager))),
-    lines: HashSet.unserialize(lines, getPuzzleLineHasher(puzzle)),
-    marks: HashSet.unserialize(marks, getMarkHasher(puzzle)),
+    cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle))),
+    lines: PuzzleLineSet.unserialize(puzzle, lines),
+    marks: CellMarkSet.unserialize(puzzle, marks),
 });
 
 export const cloneFieldState = <CellType>(

@@ -1,6 +1,8 @@
-import {ComparableSet, HashSet, SetInterface} from "../struct/Set";
+import {PlainValueSet, SetInterface} from "../struct/Set";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {CellColor} from "./CellColor";
+import {PuzzleDefinition} from "./PuzzleDefinition";
+import {CellDataSet} from "./CellDataSet";
 
 export interface CellState<CellType> {
     usersDigit?: CellType;
@@ -15,18 +17,17 @@ export interface CellStateEx<CellType> extends CellState<CellType> {
     isInvalid?: boolean;
 }
 
-export const getCellDataComparer = <CellType>(areSameCellData: SudokuTypeManager<CellType>["areSameCellData"]) =>
-    (a: CellType, b: CellType) => areSameCellData(a, b, undefined, false);
-
-export const createEmptyCellState = <CellType>({areSameCellData, cloneCellData, serializeCellData}: SudokuTypeManager<CellType>): CellState<CellType> => ({
-    centerDigits: new ComparableSet([], getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
-    cornerDigits: new ComparableSet([], getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
-    colors: new HashSet<CellColor>(),
+export const createEmptyCellState = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+): CellState<CellType> => ({
+    centerDigits: new CellDataSet(puzzle),
+    cornerDigits: new CellDataSet(puzzle),
+    colors: new PlainValueSet<CellColor>(),
 });
 
-export const serializeCellState = <CellType>(
+export const serializeCellState = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
     {usersDigit, centerDigits, cornerDigits, colors}: CellState<CellType>,
-    {serializeCellData}: SudokuTypeManager<CellType>
+    {serializeCellData}: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => ({
     usersDigit: usersDigit ? serializeCellData(usersDigit) : undefined,
     centerDigits: centerDigits.serialize(),
@@ -34,14 +35,14 @@ export const serializeCellState = <CellType>(
     colors: colors.serialize(),
 });
 
-export const unserializeCellState = <CellType>(
+export const unserializeCellState = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
     {usersDigit, centerDigits, cornerDigits, colors}: any,
-    {areSameCellData, cloneCellData, serializeCellData, unserializeCellData}: SudokuTypeManager<CellType>
+    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ): CellState<CellType> => ({
-    usersDigit: usersDigit ? unserializeCellData(usersDigit) : undefined,
-    centerDigits: ComparableSet.unserialize(centerDigits, getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
-    cornerDigits: ComparableSet.unserialize(cornerDigits, getCellDataComparer(areSameCellData), cloneCellData, serializeCellData),
-    colors: HashSet.unserialize<CellColor>(colors),
+    usersDigit: usersDigit ? puzzle.typeManager.unserializeCellData(usersDigit) : undefined,
+    centerDigits: CellDataSet.unserialize(puzzle, centerDigits),
+    cornerDigits: CellDataSet.unserialize(puzzle, cornerDigits),
+    colors: PlainValueSet.unserialize<CellColor>(colors),
 });
 
 export const isEmptyCellState = ({usersDigit, centerDigits, cornerDigits, colors}: Partial<CellState<any>>, ignoreColors = false) =>

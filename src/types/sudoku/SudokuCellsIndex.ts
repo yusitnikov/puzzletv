@@ -10,8 +10,10 @@ import {indexes} from "../../utils/indexes";
 import {getRectPoints, Rect, transformRect} from "../layout/Rect";
 import {CustomCellBounds, TransformedCustomCellBounds} from "./CustomCellBounds";
 import {CellPart} from "./CellPart";
-import {HashSet, SetInterface} from "../struct/Set";
+import {PlainValueSet, SetInterface} from "../struct/Set";
 import {gameStateGetCurrentFieldState, ProcessedGameState} from "./GameState";
+import {PuzzlePositionSet} from "./PuzzlePositionSet";
+import {PuzzleLineSet} from "./PuzzleLineSet";
 
 export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
     public readonly allCells: CellInfo[][];
@@ -62,7 +64,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
                     top: bounds.userArea.top + bounds.userArea.height / 2,
                     left: bounds.userArea.left + bounds.userArea.width / 2,
                 },
-                neighbors: new HashSet<Position>([], this.positionHasher),
+                neighbors: new PuzzlePositionSet(puzzle),
                 borderSegments: {},
             };
         }));
@@ -78,9 +80,9 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
 
             this.realCellPointMap[this.getPositionHash(center)] = {
                 position: center,
-                cells: new HashSet<Position>([cellPosition], this.positionHasher),
+                cells: new PuzzlePositionSet(puzzle, [cellPosition]),
                 type: CellPart.center,
-                neighbors: new HashSet<Position>([], this.positionHasher),
+                neighbors: new PuzzlePositionSet(puzzle),
             };
 
             borders.forEach((border) => border.forEach((point, index) => {
@@ -94,16 +96,16 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
                     const endKey = this.getPositionHash(end);
                     const borderLineInfo = (borderLineStartMap[endKey] = borderLineStartMap[endKey] || {
                         line: {start: point, end},
-                        cells: new HashSet<Position>([], this.positionHasher),
+                        cells: new PuzzlePositionSet(puzzle),
                     });
                     borderLineInfo.cells = borderLineInfo.cells.add(cellPosition);
                 }
 
                 const pointInfo = (this.realCellPointMap[pointKey] = this.realCellPointMap[pointKey] || {
                     position: point,
-                    cells: new HashSet<Position>([], this.positionHasher),
+                    cells: new PuzzlePositionSet(puzzle),
                     type: areCustomBounds ? CellPart.border : CellPart.corner,
-                    neighbors: new HashSet<Position>([], this.positionHasher),
+                    neighbors: new PuzzlePositionSet(puzzle),
                 });
                 pointInfo.cells = pointInfo.cells.add(cellPosition);
                 if (Object.keys(borderLineStartMap).length > 2) {
@@ -154,7 +156,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
 
                 while (nextKey !== undefined && this.realCellPointMap[nextKey].type === CellPart.border) {
                     const nextBorders: Record<string, SudokuCellBorderInfo> = this.borderLineMap[nextKey];
-                    nextKey = new HashSet(Object.keys(nextBorders))
+                    nextKey = new PlainValueSet(Object.keys(nextBorders))
                         .toggleAll(lineKeys, false)
                         .first();
                     if (nextKey === undefined) {
@@ -267,7 +269,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
 
     getCenterLineSegments(lines: Line[]): SudokuMultiLine[] {
         const map: Record<string, SetInterface<Position>> = {};
-        let remainingPoints: SetInterface<Position> = new HashSet([], this.positionHasher);
+        let remainingPoints: SetInterface<Position> = new PuzzlePositionSet(this.puzzle);
 
         for (const {start, end} of lines) {
             if (this.getPointInfo(start)?.type !== CellPart.center) {
@@ -277,8 +279,8 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
             const startKey = this.getPositionHash(start);
             const endKey = this.getPositionHash(end);
 
-            map[startKey] = (map[startKey] || new HashSet<Position>([], this.positionHasher)).add(end);
-            map[endKey] = (map[endKey] || new HashSet<Position>([], this.positionHasher)).add(start);
+            map[startKey] = (map[startKey] || new PuzzlePositionSet(this.puzzle)).add(end);
+            map[endKey] = (map[endKey] || new PuzzlePositionSet(this.puzzle)).add(start);
 
             remainingPoints = remainingPoints.add(start).add(end);
         }
@@ -305,7 +307,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
             }
             remainingPoints = remainingPoints.remove(position);
 
-            let lines: SetInterface<Line> = new HashSet([], this.lineHasher);
+            let lines = new PuzzleLineSet(this.puzzle);
             const points = [position];
 
             if (!isBranching) {
@@ -388,7 +390,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
         const newRegionIndex = regions.length;
         regions.push(newRegion);
 
-        let queue = new HashSet([cell], this.positionHasher);
+        let queue = new PuzzlePositionSet(this.puzzle, [cell]);
         while (queue.size) {
             const currentCell = queue.first()!;
             queue = queue.remove(currentCell);

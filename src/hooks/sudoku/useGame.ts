@@ -8,8 +8,7 @@ import {getAllowedCellWriteModeInfos} from "../../types/sudoku/CellWriteMode";
 import {getFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useEventListener} from "../useEventListener";
-import {stringifyPosition} from "../../types/layout/Position";
-import {HashSet} from "../../types/struct/Set";
+import {PositionSet} from "../../types/layout/Position";
 import {MessageWithClientId, myClientId, useMultiPlayer, UseMultiPlayerResult} from "../useMultiPlayer";
 import {usePureMemo} from "../usePureMemo";
 import {
@@ -158,7 +157,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 {
                     ...state,
                     persistentCellWriteMode: mode,
-                    selectedCells: HashSet.unserialize(selected, stringifyPosition),
+                    selectedCells: PositionSet.unserialize(selected),
                     currentMultiLine: line,
                     currentMultiLineEnd: lineEnd,
                     isCurrentMultiLineCenters: lineCenters,

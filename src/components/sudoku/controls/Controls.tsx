@@ -9,7 +9,7 @@ import {
     incrementCellWriteMode,
     isCompactControlsPanel
 } from "../../../types/sudoku/CellWriteMode";
-import {ComparableSet} from "../../../types/struct/Set";
+import {PlainValueSet} from "../../../types/struct/Set";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useTranslate} from "../../../contexts/LanguageCodeContext";
 import {useCallback, useEffect, useMemo, useState} from "react";
@@ -31,6 +31,7 @@ import {
     PuzzleDefinition
 } from "../../../types/sudoku/PuzzleDefinition";
 import {myClientId} from "../../../hooks/useMultiPlayer";
+import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 
 export const getControlsWidthCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
     const allowedModes = getAllowedCellWriteModeInfos(puzzle);
@@ -277,7 +278,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         <CellWriteModeButton
             top={1}
             cellWriteMode={CellWriteMode.corner}
-            data={{cornerDigits: new ComparableSet([1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
+            data={{cornerDigits: new CellDataSet(puzzle, [1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}
             context={context}
         />
@@ -285,7 +286,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         <CellWriteModeButton
             top={2}
             cellWriteMode={CellWriteMode.center}
-            data={{centerDigits: new ComparableSet([1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
+            data={{centerDigits: new CellDataSet(puzzle, [1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
             title={`${translate("Center")} (${translate("shortcut")}: Ctrl)`}
             context={context}
         />
@@ -293,7 +294,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         <CellWriteModeButton
             top={3}
             cellWriteMode={CellWriteMode.color}
-            data={{colors: new ComparableSet(indexes(9))}}
+            data={{colors: new PlainValueSet(indexes(9))}}
             title={`${translate("Colors")} (${translate("shortcut")}: Ctrl+Shift)`}
             context={context}
         />

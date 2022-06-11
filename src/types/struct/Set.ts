@@ -1,13 +1,11 @@
 type Comparer<ItemT> = (item1: ItemT, item2: ItemT) => boolean;
 type Cloner<ItemT> = (item: ItemT) => ItemT;
 type Serializer<ItemT> = (item: ItemT) => any;
-type Unserializer<ItemT> = (object: any) => ItemT;
 type Hasher<ItemT> = (item: ItemT) => string;
 
 const defaultComparer: Comparer<any> = (item1, item2) => typeof item1 === "object" ? JSON.stringify(item1) === JSON.stringify(item2) : item1 === item2;
 const defaultCloner: Cloner<any> = item => typeof item === "object" ? JSON.parse(JSON.stringify(item)) : item;
 const defaultSerializer: Serializer<any> = item => item;
-const defaultUnserializer: Unserializer<any> = item => item;
 const defaultHasher = (serializer: Serializer<any>): Hasher<any> => item => serializer(item).toString();
 
 export interface SetInterface<ItemT, AlternativeItemsArrayT = never> {
@@ -179,21 +177,6 @@ export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<Ite
     remove(item: ItemT) {
         return this.filter(i => !this.comparer(i, item));
     }
-
-    public static unserialize<ItemT>(
-        value: any,
-        comparer?: Comparer<ItemT>,
-        cloner?: Cloner<ItemT>,
-        serializer?: Serializer<ItemT>,
-        unserializer: Unserializer<ItemT> = defaultUnserializer
-    ) {
-        return new ComparableSet(
-            (value as any[]).map(unserializer),
-            comparer,
-            cloner,
-            serializer
-        );
-    }
 }
 
 export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements SetInterface<ItemT, Record<string, ItemT>> {
@@ -266,19 +249,10 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     filter(callback: (item: ItemT) => boolean): this {
         return this.set(Object.fromEntries(Object.entries(this._map).filter(([, item]) => callback(item))));
     }
+}
 
-    public static unserialize<ItemT>(
-        value: any,
-        hasher?: Hasher<ItemT>,
-        cloner?: Cloner<ItemT>,
-        serializer?: Serializer<ItemT>,
-        unserializer: Unserializer<ItemT> = defaultUnserializer
-    ) {
-        return new HashSet(
-            (value as any[]).map(unserializer),
-            hasher,
-            cloner,
-            serializer
-        );
+export class PlainValueSet<ItemT extends string | number> extends HashSet<ItemT> {
+    static unserialize<ItemT extends string | number>(items: any) {
+        return new PlainValueSet<ItemT>(items as ItemT[]);
     }
 }

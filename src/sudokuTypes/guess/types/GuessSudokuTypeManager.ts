@@ -1,15 +1,15 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {CellStateEx, getCellDataComparer} from "../../../types/sudoku/CellState";
+import {CellStateEx} from "../../../types/sudoku/CellState";
 import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {GameState} from "../../../types/sudoku/GameState";
-import {ComparableSet} from "../../../types/struct/Set";
 import {CellOwnershipConstraint} from "../components/CellOwnership";
 import {indexes, indexesFromTo} from "../../../utils/indexes";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
 import {Position} from "../../../types/layout/Position";
 import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
+import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 
 export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     solution: GivenDigitsMap<number>
@@ -77,22 +77,14 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
     },
 
     setSharedState(
-        {typeManager: {areSameCellData, cloneCellData, serializeCellData, unserializeCellData}},
+        puzzle,
         state,
         {initialDigits, excludedDigits}
     ): GameState<number> & GameStateExtensionType {
-        const compareCellData = getCellDataComparer(areSameCellData);
-
         return {
             ...state,
-            initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
-            excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => ComparableSet.unserialize(
-                item,
-                compareCellData,
-                cloneCellData,
-                serializeCellData,
-                unserializeCellData
-            )),
+            initialDigits: unserializeGivenDigitsMap(initialDigits, puzzle.typeManager.unserializeCellData),
+            excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
         };
     },
 
