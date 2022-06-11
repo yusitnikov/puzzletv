@@ -91,6 +91,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                 {lmdLink && <span>
                     {author && " ("}
 
+                    {/*eslint-disable-next-line react/jsx-no-target-blank*/}
                     <a
                         href={lmdLink}
                         target={"_blank"}
