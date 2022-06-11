@@ -1,7 +1,7 @@
 import {Constraint} from "../../../../types/sudoku/Constraint";
 import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
 
-export const ConsecutiveNeighborsConstraint = <CellType>(allowLoop = false): Constraint<CellType> => {
+const BaseConsecutiveNeighborsConstraint = <CellType>(invert: boolean, allowLoop = false): Constraint<CellType> => {
     return ({
         name: "consecutive neighbors",
         cells: [],
@@ -26,8 +26,16 @@ export const ConsecutiveNeighborsConstraint = <CellType>(allowLoop = false): Con
                 }
 
                 const diff = Math.abs(getDigitByCellData(digit2, state) - digit);
-                return diff === 1 || (allowLoop && diff === digitsCount - 1);
+                const isConsecutive = diff === 1 || (allowLoop && diff === digitsCount - 1);
+                return invert ? !isConsecutive : isConsecutive;
             });
         },
     });
 };
+
+export const ConsecutiveNeighborsConstraint = <CellType>(allowLoop = false) =>
+    BaseConsecutiveNeighborsConstraint<CellType>(false, allowLoop);
+
+// TODO: support kropki dots being exclusions to this constraint
+export const NonConsecutiveNeighborsConstraint = <CellType>(allowLoop = false) =>
+    BaseConsecutiveNeighborsConstraint<CellType>(true, allowLoop);

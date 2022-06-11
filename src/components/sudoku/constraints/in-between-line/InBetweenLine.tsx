@@ -51,7 +51,7 @@ export const InBetweenLine = withFieldLayer(FieldLayer.regular, ({cells}: Constr
     </>;
 });
 
-export const InBetweenLineConstraint = <CellType,>(...cellLiterals: PositionLiteral[]): Constraint<CellType> => {
+export const InBetweenLineConstraint = <CellType,>(cellLiterals: PositionLiteral[]): Constraint<CellType> => {
     const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
 
     return ({

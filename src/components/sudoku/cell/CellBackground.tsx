@@ -1,7 +1,7 @@
 import {SetInterface} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
-import {CellColor, cellColors} from "../../../types/sudoku/CellColor";
+import {CellColorValue, resolveCellColorValue} from "../../../types/sudoku/CellColor";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {getRegionBoundingBox} from "../../../utils/regions";
@@ -10,7 +10,7 @@ import {getTransformedRectCenter, Rect} from "../../../types/layout/Rect";
 export interface CellBackgroundProps {
     context: PuzzleContext<any, any, any>;
     cellPosition?: Position;
-    colors: SetInterface<CellColor>;
+    colors: SetInterface<CellColorValue>;
     size?: number;
 }
 
@@ -57,7 +57,7 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
             y={customCellRect.top}
             width={customCellRect.width}
             height={customCellRect.height}
-            fill={cellColors[colors.first()!]}
+            fill={resolveCellColorValue(colors.first()!)}
             stroke={"none"}
             strokeWidth={0}
         />
@@ -78,7 +78,7 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
                             top: customCellCenter.top + y * Math.sin(a),
                         }))
                 )}
-                fill={cellColors[color]}
+                fill={resolveCellColorValue(color)}
             />)}
         </>}
     </AutoSvg>;

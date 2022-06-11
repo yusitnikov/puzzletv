@@ -1,23 +1,16 @@
-import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
+import {LineComponent, LineProps} from "../line/Line";
 
-export const GermanWhispers = withFieldLayer(FieldLayer.regular, ({cells}: ConstraintProps) => <RoundedPolyLine
-    points={cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}))}
-    strokeWidth={0.15}
-    stroke={"#0f0"}
-/>);
-
-export const GermanWhispersConstraint = <CellType,>(...cellLiterals: PositionLiteral[]): Constraint<CellType> => {
+export const GermanWhispersConstraint = <CellType,>(cellLiterals: PositionLiteral[], display = true): Constraint<CellType, LineProps> => {
     const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
 
     return ({
         name: "german whispers",
         cells,
-        component: GermanWhispers,
+        color: "#0f0",
+        component: display ? LineComponent : undefined,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 

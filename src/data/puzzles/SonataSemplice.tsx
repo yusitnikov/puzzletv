@@ -189,6 +189,8 @@ const shadedRow = {
     6: [CellColor.lightGrey],
 };
 
+const fieldSize = createRegularFieldSize(7, 7);
+
 export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>, QuadInputGameState<number>> = {
     noIndex: true,
     slug: "rockratzero-sonata-semplice",
@@ -204,7 +206,7 @@ export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>
         allowOverflow: false,
         radius: noteRadius + noteLineWidth / 2,
     }),
-    fieldSize: createRegularFieldSize(7, 7),
+    fieldSize,
     fieldMargin: 1,
     initialDigits: {
         0: {
@@ -232,13 +234,13 @@ export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>
     },
     items: [
         <Extras/>,
-        LittleKillerConstraint("R1C3", "R3C1", 7),
-        LittleKillerConstraint("R1C6", "R2C7", 7),
-        LittleKillerConstraint("R1C6", "R6C1", 16),
-        LittleKillerConstraint("R4C7", "R7C4", 16),
-        LittleKillerConstraint("R5C7", "R7C5", 7),
-        LittleKillerConstraint("R7C3", "R5C1", 16),
-        LittleKillerConstraint("R7C5", "R3C1", 16),
+        LittleKillerConstraint("R1C3", "DL", fieldSize, 7),
+        LittleKillerConstraint("R1C6", "DR", fieldSize, 7),
+        LittleKillerConstraint("R1C6", "DL", fieldSize, 16),
+        LittleKillerConstraint("R4C7", "DL", fieldSize, 16),
+        LittleKillerConstraint("R5C7", "DL", fieldSize, 7),
+        LittleKillerConstraint("R7C3", "UL", fieldSize, 16),
+        LittleKillerConstraint("R7C5", "UL", fieldSize, 16),
     ],
     rules: translate => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>

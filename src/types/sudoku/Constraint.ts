@@ -16,6 +16,7 @@ export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, Proce
     cells: Position[];
     component?: ComponentType<ConstraintProps<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>>;
     color?: string;
+    angle?: number;
     isValidCell?(
         cell: Position,
         digits: GivenDigitsMap<CellType>,

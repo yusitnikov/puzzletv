@@ -93,30 +93,32 @@ export const CalculatorDigit = memo<DigitProps>(({digit, size, color = textColor
     width={size}
     height={size}
     {...containerProps}
-    style={{color}}
 >
     <CalculatorDigitSvgContent
         digit={digit}
         size={size}
+        color={color}
     />
 </AutoSvg>);
 
-export const CalculatorDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, top = 0}: DigitProps) => <>
+export const CalculatorDigitSvgContent = memo<DigitProps>(({digit, size, color, left = 0, top = 0}: DigitProps) => <>
     {matrices[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
         key={`${rowIndex}-${columnIndex}`}
         left={left + size * (columnIndex - 1) * squareSizeCoeff / 2}
         top={top + size * (rowIndex - 2) * squareSizeCoeff / 2}
         size={size}
         vertical={!!(rowIndex % 2)}
+        color={color}
     />))}
 </>);
 
 interface DigitLineProps extends Position {
     size: number;
     vertical: boolean;
+    color?: string;
 }
 
-const DigitLine = memo(({left, top, size, vertical}: DigitLineProps) => <polygon
+const DigitLine = memo(({left, top, size, vertical, color = "currentColor"}: DigitLineProps) => <polygon
     points={formatSvgPointsArray(
         [
             {
@@ -150,7 +152,7 @@ const DigitLine = memo(({left, top, size, vertical}: DigitLineProps) => <polygon
                 top: top + size * (y - (vertical ? digitWidthCoeff : lineWidthCoeff) / 2)
             }))
     )}
-    fill={"currentColor"}
+    fill={color}
 />);
 
 export const CalculatorDigitComponentType: DigitComponentType = {

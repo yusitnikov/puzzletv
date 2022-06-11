@@ -1,33 +1,26 @@
 import {textColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {
-    getLineVector,
-    Line,
-    parsePositionLiterals,
-    PositionLiteral
-} from "../../../../types/layout/Position";
+import {Line, parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
-import {splitMultiLine} from "../../../../utils/lines";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
+import {FieldSize} from "../../../../types/sudoku/FieldSize";
 
 const lineWidth = 0.03;
 
 export interface LittleKillerProps {
-    sum: number;
+    direction: Position;
+    sum?: number;
 }
 
-export const LittleKiller = withFieldLayer(FieldLayer.regular, ({cells, sum}: ConstraintProps<any, LittleKillerProps>) => {
+export const LittleKiller = withFieldLayer(FieldLayer.regular, ({cells: [{top, left}], direction, sum}: ConstraintProps<any, LittleKillerProps>) => {
     const {
         svgContentComponent: DigitSvgContent,
     } = useDigitComponentType();
 
-    cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
-
-    const direction = getLineVector({start: cells[0], end: cells[1]});
-
-    let {top, left} = cells[0];
+    top += 0.5;
+    left += 0.5;
     top -= 0.5 * direction.top;
     left -= 0.5 * direction.left;
 
@@ -60,28 +53,40 @@ export const LittleKiller = withFieldLayer(FieldLayer.regular, ({cells, sum}: Co
             color={textColor}
         />
 
-        <DigitSvgContent
+        {sum !== undefined && <DigitSvgContent
             digit={sum}
             size={0.5}
             left={left - 0.5 * direction.left}
             top={top - 0.5 * direction.top}
-        />
+        />}
     </>;
 });
 
 export const LittleKillerConstraint = <CellType,>(
-    cell1Literal: PositionLiteral,
-    cell2Literal: PositionLiteral,
-    sum: number
+    startCellLiteral: PositionLiteral,
+    directionLiteral: PositionLiteral,
+    {rowsCount, columnsCount}: FieldSize,
+    sum?: number
 ): Constraint<CellType, LittleKillerProps> => {
-    const cells = splitMultiLine(parsePositionLiterals([cell1Literal, cell2Literal]));
+    const startCell = parsePositionLiteral(startCellLiteral);
+    const direction = parsePositionLiteral(directionLiteral);
+
+    const cells: Position[] = [];
+    for (let {top, left} = startCell; top >= 0 && top < rowsCount && left >= 0 && left < columnsCount; top += direction.top, left += direction.left) {
+        cells.push({top, left});
+    }
 
     return ({
         name: "arrow",
         cells,
+        direction,
         sum,
         component: LittleKiller,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
+            if (sum === undefined) {
+                return true;
+            }
+
             let actualSum = 0;
 
             for (const {top, left} of cells) {

@@ -31,3 +31,7 @@ export const cellColors: Record<CellColor, string> = {
     [CellColor.yellow]: yellowColor,
     [CellColor.blue]: blueColor,
 };
+
+export type CellColorValue = CellColor | string;
+
+export const resolveCellColorValue = (value: CellColorValue) => typeof value === "string" ? value : cellColors[value as CellColor];

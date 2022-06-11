@@ -21,6 +21,7 @@ import {HiddenSetup} from "./HiddenSetup";
 import {SonataSemplice} from "./SonataSemplice";
 import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
 import {HeptapagonLikeLoop} from "./HeptapagonLikeLoop";
+import {FPuzzles} from "./FPuzzles";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -32,6 +33,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     EmptyCubedoku,
     EmptyToroidal,
     // endregion
+
+    FPuzzles,
 
     // Games
     generateQuadMasters("quadle", false, true),

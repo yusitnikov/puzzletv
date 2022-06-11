@@ -14,16 +14,21 @@ import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions";
 import {isValidCellForRegion} from "../region/Region";
 import {indexes} from "../../../../utils/indexes";
+import {CenteredText} from "../../../svg/centered-text/CenteredText";
 
 const borderPadding = 0.1;
 const sumDigitSize = 0.15;
 
 export interface KillerCageProps {
-    sum?: number;
+    sum?: string | number;
     showBottomSum?: boolean;
+    lineColor?: string;
+    fontColor?: string;
 }
 
-export const KillerCage = withFieldLayer(FieldLayer.regular, ({cells, sum, showBottomSum}: ConstraintProps<any, KillerCageProps>) => {
+export const KillerCage = withFieldLayer(FieldLayer.regular, (
+    {cells, sum, showBottomSum, lineColor = blackColor, fontColor = blackColor}: ConstraintProps<any, KillerCageProps>
+) => {
     const {widthCoeff} = useDigitComponentType();
 
     const points = useMemo(() => getRegionBorders(cells), [cells]);
@@ -55,7 +60,7 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, ({cells, sum, showB
             )}
             strokeWidth={0.02}
             strokeDasharray={0.15}
-            stroke={blackColor}
+            stroke={lineColor}
             fill={"none"}
         />
 
@@ -64,22 +69,25 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, ({cells, sum, showB
                 sum={sum}
                 left={points[0].left + borderPadding - sumDigitSize * widthCoeff / 2}
                 top={points[0].top + borderPadding}
+                color={fontColor}
             />
 
             {showBottomSum && <KillerCageSum
                 sum={sum}
                 left={right - borderPadding - sumDigitSize * widthCoeff * (sum.toString().length - 0.5)}
                 top={bottom - borderPadding}
+                color={fontColor}
             />}
         </>}
     </>;
 });
 
 interface KillerCageSumProps extends Position {
-    sum: number;
+    sum: string | number;
+    color?: string;
 }
 
-const KillerCageSum = ({sum, left, top}: KillerCageSumProps) => {
+const KillerCageSum = ({sum, color = blackColor, left, top}: KillerCageSumProps) => {
     const {
         svgContentComponent: DigitSvgContent,
         widthCoeff,
@@ -94,54 +102,80 @@ const KillerCageSum = ({sum, left, top}: KillerCageSumProps) => {
             fill={"white"}
         />
 
-        {sum.toString().split("").map((digit, index) => <DigitSvgContent
+        {typeof sum === "number" && sum.toString().split("").map((digit, index) => <DigitSvgContent
             key={`digit-${index}`}
             digit={Number(digit)}
             size={sumDigitSize}
             left={left + sumDigitSize * widthCoeff * (index + 0.5)}
             top={top}
+            color={color}
         />)}
+
+        {typeof sum === "string" && sum.split("").map((character, index) => <CenteredText
+            key={`character-${index}`}
+            size={sumDigitSize}
+            left={left + sumDigitSize * widthCoeff * (index + 0.5)}
+            top={top}
+            fill={color}
+        >
+            {character}
+        </CenteredText>)}
     </>;
 };
 
-export const KillerCageConstraint = <CellType,>(cellLiterals: PositionLiteral[], sum?: number, showBottomSum?: boolean): Constraint<CellType, KillerCageProps> => {
-    const cells = parsePositionLiterals(cellLiterals);
+export const DecorativeCageConstraint = <CellType,>(
+    cellLiterals: PositionLiteral[],
+    sum?: string | number,
+    showBottomSum?: boolean,
+    lineColor?: string,
+    fontColor?: string
+): Constraint<CellType, KillerCageProps> => ({
+    name: "cage",
+    cells: parsePositionLiterals(cellLiterals),
+    sum,
+    showBottomSum,
+    lineColor,
+    fontColor,
+    component: KillerCage,
+});
 
-    return ({
-        name: "killer cage",
-        cells,
-        sum,
-        showBottomSum,
-        component: KillerCage,
-        isValidCell(cell, digits, cells, {puzzle, state}) {
-            if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
-                return false;
-            }
+export const KillerCageConstraint = <CellType,>(
+    cellLiterals: PositionLiteral[],
+    sum?: number,
+    showBottomSum?: boolean,
+    lineColor?: string,
+    fontColor?: string
+): Constraint<CellType, KillerCageProps> => ({
+    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, lineColor, fontColor),
+    name: "killer cage",
+    isValidCell(cell, digits, cells, {puzzle, state}) {
+        if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
+            return false;
+        }
 
-            if (sum === undefined) {
+        if (sum === undefined) {
+            return true;
+        }
+
+        let realSum = 0;
+
+        for (const constraintCell of cells) {
+            const constraintDigit = digits[constraintCell.top]?.[constraintCell.left];
+
+            if (constraintDigit === undefined) {
                 return true;
             }
 
-            let realSum = 0;
+            realSum += puzzle.typeManager.getDigitByCellData(constraintDigit, state);
+        }
 
-            for (const constraintCell of cells) {
-                const constraintDigit = digits[constraintCell.top]?.[constraintCell.left];
+        const expectedSum = puzzle.typeManager.transformDigit
+            ? puzzle.typeManager.transformDigit(sum, puzzle, state)
+            : sum;
 
-                if (constraintDigit === undefined) {
-                    return true;
-                }
-
-                realSum += puzzle.typeManager.getDigitByCellData(constraintDigit, state);
-            }
-
-            const expectedSum = puzzle.typeManager.transformDigit
-                ? puzzle.typeManager.transformDigit(sum, puzzle, state)
-                : sum;
-
-            return realSum === expectedSum;
-        },
-    });
-};
+        return realSum === expectedSum;
+    },
+});
 
 export const KillerCageConstraintByRect = <CellType,>(topLeft: PositionLiteral, width: number, height: number, sum?: number, showBottomSum?: boolean) => {
     const {top, left} = parsePositionLiteral(topLeft);

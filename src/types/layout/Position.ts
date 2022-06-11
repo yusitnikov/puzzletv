@@ -40,6 +40,28 @@ export const stringifyCellCoords = ({left, top}: Position) => `R${top + 1}C${lef
 export const parsePositionLiteral = (position: PositionLiteral): Position => {
     if (typeof position !== "string") {
         return position;
+    } else if (/^[UDLR]+$/.test(position)) {
+        // Direction string, compatible with FPuzzlesLittleKillerSumDirection
+        const result: Position = {top: 0, left: 0};
+
+        for (const direction of position.split("")) {
+            switch (direction) {
+                case "U":
+                    result.top--;
+                    break;
+                case "D":
+                    result.top++;
+                    break;
+                case "L":
+                    result.left--;
+                    break;
+                case "R":
+                    result.left++;
+                    break;
+            }
+        }
+
+        return result;
     } else if (position[0] === "R") {
         const [top, left] = position.substring(1).split("C");
 
@@ -59,7 +81,6 @@ export const parsePositionLiteral = (position: PositionLiteral): Position => {
 
 export const parsePositionLiterals = (positions: PositionLiteral[]): Position[] => positions.map(parsePositionLiteral);
 export const parsePositionLiterals2 = (positions: PositionLiteral[][]): Position[][] => positions.map(parsePositionLiterals);
-export const parsePositionLiterals3 = (positions: PositionLiteral[][][]): Position[][][] => positions.map(parsePositionLiterals2);
 
 export const isSamePosition = (p1: Position, p2: Position) => p1.left === p2.left && p1.top === p2.top;
 export const isSameLine = (line1: Line, line2: Line) =>
@@ -101,6 +122,24 @@ export const getCircleConnectionPoint = ({left: x1, top: y1}: Position, {left: x
 };
 
 export const stringifyLine = ({start, end}: Line) => `${stringifyPosition(start)}>${stringifyPosition(end)}`;
+
+export const getAveragePosition = (positions: Position[]): Position => {
+    if (!positions.length) {
+        return emptyPosition;
+    }
+
+    let top = 0, left = 0;
+
+    for (const position of positions) {
+        top += position.top;
+        left += position.left;
+    }
+
+    return {
+        top: top / positions.length,
+        left: left / positions.length,
+    };
+};
 
 export class PositionSet extends HashSet<Position> {
     constructor(items: Position[] = []) {

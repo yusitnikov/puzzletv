@@ -9,18 +9,19 @@ export const RegularDigit = memo<DigitProps>(({digit, size, color = textColor, .
     width={size}
     height={size}
     {...containerProps}
-    style={{color}}
 >
     <RegularDigitSvgContent
         digit={digit}
         size={size}
+        color={color}
     />
 </AutoSvg>);
 
-export const RegularDigitSvgContent = memo<DigitProps>(({digit, size, left = 0, top = 0}: DigitProps) => <CenteredText
+export const RegularDigitSvgContent = memo<DigitProps>(({digit, size, color, left = 0, top = 0}: DigitProps) => <CenteredText
     left={left}
     top={top}
     size={size}
+    fill={color}
 >
     {digit}
 </CenteredText>);

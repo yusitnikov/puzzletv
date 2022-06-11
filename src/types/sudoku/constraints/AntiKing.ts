@@ -1,8 +1,8 @@
 import {Constraint} from "../Constraint";
 import {normalizePuzzlePosition} from "../PuzzleDefinition";
 
-export const AntiKnightConstraint: Constraint<any> = {
-    name: "anti-knight",
+export const AntiKingConstraint: Constraint<any> = {
+    name: "anti-king",
     cells: [],
     isValidCell(
         {left, top},
@@ -12,9 +12,9 @@ export const AntiKnightConstraint: Constraint<any> = {
     ) {
         const digit = digits[top][left]!;
 
-        for (let dx = -2; dx <= 2; dx++) {
-            for (let dy = -2; dy <= 2; dy++) {
-                if (Math.abs(dx * dy) === 2) {
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                if (dx || dy) {
                     const otherCell = normalizePuzzlePosition({top: top + dy, left: left + dx}, puzzle);
                     const digit2 = digits[otherCell.top]?.[otherCell.left];
                     if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit2, digit, state, true)) {

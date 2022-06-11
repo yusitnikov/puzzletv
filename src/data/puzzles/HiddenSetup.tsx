@@ -260,9 +260,9 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
         const result = [
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
-            RenbanConstraint("R1C6", "R4C6", "R4C9"),
-            RenbanConstraint("R5C1", "R5C5", "R9C5"),
-            InBetweenLineConstraint("R6C1", "R6C4", "R9C4"),
+            RenbanConstraint(["R1C6", "R4C6", "R4C9"]),
+            RenbanConstraint(["R5C1", "R5C5", "R9C5"]),
+            InBetweenLineConstraint(["R6C1", "R6C4", "R9C4"]),
             EvenConstraint("R1C6"),
             EvenConstraint("R3C6"),
             EvenConstraint("R4C7"),

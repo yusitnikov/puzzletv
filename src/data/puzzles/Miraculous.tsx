@@ -2,7 +2,7 @@ import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {CellColor} from "../../types/sudoku/CellColor";
+import {CellColor, CellColorValue} from "../../types/sudoku/CellColor";
 import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
 import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
@@ -22,7 +22,7 @@ import {
     ConsecutiveNeighborsConstraint
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 
-const initialColors: GivenDigitsMap<CellColor> = {
+const initialColors: GivenDigitsMap<CellColorValue> = {
     1: {
         8: CellColor.darkGrey,
     },
