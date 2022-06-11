@@ -1,5 +1,4 @@
 import {formatSvgPointsArray, normalizeVector, Position} from "../../../types/layout/Position";
-import {RoundedPolyLine} from "../rounded-poly-line/RoundedPolyLine";
 
 export interface ArrowEndProps {
     position: Position;
