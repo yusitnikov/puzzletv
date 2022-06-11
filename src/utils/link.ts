@@ -25,7 +25,7 @@ export const parseLink = (hash: string) => {
 
     for (const encodedParam of encodedParams) {
         const [key, ...valueParts] = encodedParam.split("=");
-        const value = valueParts.join();
+        const value = valueParts.join("=");
         params[key] = valueParts.length ? value : true;
     }
 
