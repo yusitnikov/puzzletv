@@ -61,7 +61,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             throw new Error("Failed to decode");
         }
         const puzzleJson = JSON.parse(jsonStr) as FPuzzlesPuzzle;
-        console.log(puzzleJson);
+        console.log("Importing from f-puzzles:", puzzleJson);
 
         const initialDigits: GivenDigitsMap<number> = {};
         const initialColors: GivenDigitsMap<CellColorValue[]> = {};
@@ -78,6 +78,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                 columnsCount: 9,
                 regions: [],
             },
+            allowDrawing: ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"],
             initialDigits,
             initialColors,
             items,
