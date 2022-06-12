@@ -26,6 +26,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
         context: {
             puzzle: {
                 slug,
+                params,
                 getNewHostedGameParams,
                 resultChecker,
                 forceAutoCheckOnFinish,
@@ -104,6 +105,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
                         slug,
                         language,
                         {
+                            ...params,
                             // ...getNewHostedGameParams?.(),
                             host: myClientId,
                             room: Math.random().toString().substring(2),
