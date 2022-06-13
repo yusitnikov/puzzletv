@@ -44,6 +44,7 @@ export interface FPuzzlesPuzzle {
     clone?: FPuzzlesClone[];
     quadruple?: FPuzzlesQuadruple[];
     betweenline?: FPuzzlesLineCoords[];
+    // Undocumented
     lockout?: any;
     minimum?: FPuzzlesCellCoords[];
     maximum?: FPuzzlesCellCoords[];

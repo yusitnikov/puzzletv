@@ -330,15 +330,6 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     }));
                 }
             },
-            // lockout: (lockout) => {
-            //     if (lockout instanceof Array) {
-            //         items.push(...lockout.map(({...other}) => {
-            //             ObjectParser.empty.parse(other, "f-puzzles lockout");
-            //
-            //             return LockoutConstraint();
-            //         }));
-            //     }
-            // },
             minimum: (minimum) => {
                 if (minimum instanceof Array) {
                     items.push(...minimum.map(({cell, ...other}) => {
