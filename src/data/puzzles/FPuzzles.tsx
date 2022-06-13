@@ -6,7 +6,7 @@ import {sha1} from "hash.js";
 import {FPuzzlesPuzzle} from "../../types/sudoku/f-puzzles/FPuzzlesPuzzle";
 import {indexes} from "../../utils/indexes";
 import {FPuzzlesGridCell} from "../../types/sudoku/f-puzzles/FPuzzlesGridCell";
-import {Position, stringifyCellCoords} from "../../types/layout/Position";
+import {parsePositionLiterals, Position, PositionSet, stringifyCellCoords} from "../../types/layout/Position";
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
@@ -47,6 +47,7 @@ import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-do
 import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
+import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
@@ -296,15 +297,20 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     }));
                 }
             },
-            // clone: (clone) => {
-            //     if (clone instanceof Array) {
-            //         items.push(...clone.map(({...other}) => {
-            //             ObjectParser.empty.parse(other, "f-puzzles clone");
-            //
-            //             return CloneConstraint();
-            //         }));
-            //     }
-            // },
+            clone: (clone) => {
+                if (clone instanceof Array) {
+                    items.push(...clone.flatMap(({cells, cloneCells, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles clone");
+
+                        const uniqueCells = new PositionSet([
+                            ...parsePositionLiterals(cells),
+                            ...parsePositionLiterals(cloneCells),
+                        ]).items;
+
+                        return uniqueCells.length > 1 ? [CloneConstraint(uniqueCells)] : [];
+                    }));
+                }
+            },
             quadruple: (quadruple) => {
                 if (quadruple instanceof Array) {
                     items.push(...quadruple.map(({cells, values, ...other}) => {

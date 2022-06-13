@@ -12,6 +12,7 @@ import {FPuzzlesKropkiDot} from "./constraints/FPuzzlesKropkiDot";
 import {FPuzzlesText} from "./constraints/FPuzzlesText";
 import {FPuzzlesShape} from "./constraints/FPuzzlesShape";
 import {FPuzzlesSandwichSum} from "./constraints/FPuzzlesSandwichSum";
+import {FPuzzlesClone} from "./constraints/FPuzzlesClone";
 
 export interface FPuzzlesPuzzle {
     // region Core fields
@@ -40,7 +41,7 @@ export interface FPuzzlesPuzzle {
     even?: FPuzzlesCellCoords[];
     odd?: FPuzzlesCellCoords[];
     extraregion?: FPuzzlesCellsCoords[];
-    clone?: any;
+    clone?: FPuzzlesClone[];
     quadruple?: FPuzzlesQuadruple[];
     betweenline?: FPuzzlesLineCoords[];
     lockout?: any;
