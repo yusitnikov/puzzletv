@@ -46,6 +46,7 @@ import {MaxConstraint, MinConstraint} from "../../components/sudoku/constraints/
 import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
 import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
@@ -255,15 +256,19 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     }));
                 }
             },
-            // sandwichsum: (sandwichsum) => {
-            //     if (sandwichsum instanceof Array) {
-            //         items.push(...sandwichsum.map(({...other}) => {
-            //             ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
-            //
-            //             return SandwichSumConstraint();
-            //         }));
-            //     }
-            // },
+            sandwichsum: (sandwichsum, {size}) => {
+                if (sandwichsum instanceof Array) {
+                    puzzle.fieldMargin = puzzle.fieldMargin || 1;
+
+                    const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size, regions: []};
+
+                    items.push(...sandwichsum.flatMap(({cell, value, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
+
+                        return value ? [SandwichSumConstraint(cell, fieldSize, Number(value))] : [];
+                    }));
+                }
+            },
             even: (even) => {
                 if (even instanceof Array) {
                     items.push(...even.map(({cell, ...other}) => {

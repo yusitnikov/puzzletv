@@ -11,6 +11,7 @@ import {FPuzzlesXV} from "./constraints/FPuzzlesXV";
 import {FPuzzlesKropkiDot} from "./constraints/FPuzzlesKropkiDot";
 import {FPuzzlesText} from "./constraints/FPuzzlesText";
 import {FPuzzlesShape} from "./constraints/FPuzzlesShape";
+import {FPuzzlesSandwichSum} from "./constraints/FPuzzlesSandwichSum";
 
 export interface FPuzzlesPuzzle {
     // region Core fields
@@ -35,7 +36,7 @@ export interface FPuzzlesPuzzle {
     xv?: FPuzzlesXV[];
     thermometer?: FPuzzlesLineCoords[];
     palindrome?: FPuzzlesLineCoords[];
-    sandwichsum?: any;
+    sandwichsum?: FPuzzlesSandwichSum[];
     even?: FPuzzlesCellCoords[];
     odd?: FPuzzlesCellCoords[];
     extraregion?: FPuzzlesCellsCoords[];
