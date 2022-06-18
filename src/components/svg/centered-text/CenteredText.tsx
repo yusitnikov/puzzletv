@@ -19,5 +19,5 @@ export const CenteredText = ({left = 0, top = 0, size, fill = "currentColor", st
     fill={fill}
     {...otherProps}
 >
-    {children}
+    {typeof children === "string" ? children.replace(/ /g, "\xa0") : children}
 </text>;
