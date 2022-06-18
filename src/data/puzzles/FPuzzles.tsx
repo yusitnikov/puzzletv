@@ -88,6 +88,19 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
         const parseOptionalNumber = (value?: string | number) => value === undefined ? undefined : Number(value);
 
+        const checkForOutsideCells = (cellLiterals: string[], fieldSize: number) => {
+            const margin = Math.max(0, ...parsePositionLiterals(cellLiterals).flatMap(({top, left}) => [
+                -top,
+                -left,
+                top + 1 - fieldSize,
+                left + 1 - fieldSize,
+            ]));
+
+            if (margin > 0) {
+                puzzle.fieldMargin = Math.max(puzzle.fieldMargin || 0, margin);
+            }
+        };
+
         // TODO: go over rangsk solver and populate constraints from there
         new ObjectParser<FPuzzlesPuzzle>({
             // region Core fields
@@ -377,39 +390,53 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     }));
                 }
             },
-            line: (lineData) => {
+            line: (lineData, {size}) => {
                 if (lineData instanceof Array) {
                     items.push(...lineData.flatMap(({lines, outlineC, width, isNewConstraint, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles line");
 
-                        return lines.map((line) => LineConstraint(line, outlineC, width === undefined ? undefined : width / 2));
+                        return lines.map((line) => {
+                            checkForOutsideCells(line, size);
+
+                            return LineConstraint(line, outlineC, width === undefined ? undefined : width / 2);
+                        });
                     }));
                 }
             },
-            rectangle: (rectangle) => {
+            rectangle: (rectangle, {size}) => {
                 if (rectangle instanceof Array) {
                     items.push(...rectangle.map(({cells, width, height, baseC, outlineC, value, fontC, angle, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles rect");
+
+                        checkForOutsideCells(cells, size);
 
                         return RectConstraint(cells, {width, height}, baseC, outlineC, value, fontC, angle);
                     }));
                 }
             },
-            circle: (circle) => {
+            circle: (circle, {size}) => {
                 if (circle instanceof Array) {
                     items.push(...circle.map(({cells, width, height, baseC, outlineC, value, fontC, angle, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles circle");
+
+                        checkForOutsideCells(cells, size);
 
                         return EllipseConstraint(cells, {width, height}, baseC, outlineC, value, fontC, angle);
                     }));
                 }
             },
-            text: (text) => {
+            text: (text, {size: fieldSize}) => {
                 if (text instanceof Array) {
                     items.push(...text.flatMap(({cells, value, fontC, size, angle, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles text");
 
-                        return value ? [TextConstraint(cells, value, fontC, size, angle)] : [];
+                        if (!value) {
+                            return [];
+                        }
+
+                        checkForOutsideCells(cells, fieldSize);
+
+                        return [TextConstraint(cells, value, fontC, size, angle)];
                     }));
                 }
             },
