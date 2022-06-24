@@ -17,7 +17,7 @@ export const GamesListItem = ({name, imageUrl, imageSize = 300, author, playLink
         <h2>{name}</h2>
 
         <img
-            src={imageUrl}
+            src={`${process.env.PUBLIC_URL}${imageUrl}`}
             alt={name}
             style={{
                 display: "inline-block",
