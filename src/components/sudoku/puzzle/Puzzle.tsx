@@ -13,7 +13,7 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitComponentTypeContext} from "../../../contexts/DigitComponentTypeContext";
 import {Title} from "../../layout/title/Title";
 import {RegularDigitComponentType} from "../digit/RegularDigit";
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../../hooks/useTranslate";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Modal} from "../../layout/modal/Modal";

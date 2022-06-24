@@ -3,7 +3,7 @@ import {ComponentType, ReactNode} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
 import {PartiallyTranslatable} from "../translations/Translatable";
-import {useTranslate} from "../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../hooks/useTranslate";
 import {ProcessedGameState} from "./GameState";
 import {ConstraintOrComponent} from "./Constraint";
 import {CellColorValue} from "./CellColor";

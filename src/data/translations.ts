@@ -21,6 +21,9 @@ export const translationsExactType = {
     "OFF": {
         [LanguageCode.ru]: "ВЫКЛ",
     },
+    "Play": {
+        [LanguageCode.ru]: "Играть",
+    },
     "Play %1": {
         [LanguageCode.ru]: "Играть %1",
     },
@@ -35,19 +38,42 @@ export const translationsExactType = {
     },
     // endregion
     // region App
-    "Sudoku Puzzles": {
-        [LanguageCode.ru]: "Судоку",
+    "Welcome to Puzzle TV!": {
+        [LanguageCode.ru]: "Добро пожаловать на Puzzle TV!",
     },
     "Oops, the puzzle not found!": {
         [LanguageCode.ru]: "Ой, судоку не найден!",
     },
-    "Check out the puzzles list": {
-        [LanguageCode.ru]: "Перейти к списку судоку",
+    "Go to the home page": {
+        [LanguageCode.ru]: "Перейти на домашнюю страницу",
+    },
+    // endregion
+    // region GamesList
+    "Game idea": {
+        [LanguageCode.ru]: "Идея игры",
+    },
+    "external link": {
+        [LanguageCode.ru]: "внешняя ссылка",
     },
     // endregion
     // region PageLayout
     "See all puzzles": {
         [LanguageCode.ru]: "Перейти к списку судоку",
+    },
+    "Home page": {
+        [LanguageCode.ru]: "Домашняя страница",
+    },
+    "Puzzles": {
+        [LanguageCode.ru]: "Судоку",
+    },
+    "Games": {
+        [LanguageCode.ru]: "Игры",
+    },
+    "For Setters": {
+        [LanguageCode.ru]: "Для авторов головоломок",
+    },
+    "Contacts": {
+        [LanguageCode.ru]: "Контакты",
     },
     // endregion
     // region Common for controls

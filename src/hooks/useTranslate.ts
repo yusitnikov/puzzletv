@@ -1,10 +1,8 @@
-import {createContext, useContext} from "react";
+import {useRoute} from "./useRoute";
 import {LanguageCode} from "../types/translations/LanguageCode";
 import {bindTranslate} from "../utils/translate";
 
-export const LanguageCodeContext = createContext<LanguageCode>(LanguageCode.en);
-
-export const useLanguageCode = () => useContext(LanguageCodeContext);
+export const useLanguageCode = () => useRoute().params.lang as LanguageCode;
 
 export const useTranslate = () => {
     const language = useLanguageCode();

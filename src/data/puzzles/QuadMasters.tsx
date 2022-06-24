@@ -23,6 +23,12 @@ import {
     twoPhasesGame
 } from "../../sudokuTypes/quad-masters/data/ruleSnippets";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
+import {PartiallyTranslatable} from "../../types/translations/Translatable";
+
+export const getQuadMastersTitle = (daily: boolean, isQuadle: boolean, includeRandomWord?: boolean): PartiallyTranslatable => ({
+    [LanguageCode.en]: (daily ? "Daily " : (includeRandomWord ? "Random " : "")) + (isQuadle ? "Quadle" : "Quad Masters"),
+    [LanguageCode.ru]: (!daily && includeRandomWord ? "Случайный " : "") + (isQuadle ? "Quadle" : "Quad Masters") + (daily ? " дня" : ""),
+});
 
 export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<number, QuadMastersGameState, QuadMastersGameState> => ({
     slug,
@@ -48,9 +54,7 @@ export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: bool
 
         return {
             noIndex: true,
-            title: {
-                [LanguageCode.en]: (daily ? "Daily " : "") + (isQuadle ? "Quadle" : "Quad Masters"),
-            },
+            title: getQuadMastersTitle(daily, isQuadle),
             author: {
                 [LanguageCode.en]: isQuadle ? "Maff and Chameleon" : "Maff",
                 [LanguageCode.ru]: isQuadle ? "Maff и Хамелеона" : "Maff",

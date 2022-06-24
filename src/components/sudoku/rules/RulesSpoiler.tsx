@@ -1,5 +1,5 @@
 import {ReactNode, useState} from "react";
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../../hooks/useTranslate";
 
 export interface RulesSpoilerProps {
     children: ReactNode;

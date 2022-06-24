@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
 import {FC, useState} from "react";
-import {useLanguageCode, useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useLanguageCode, useTranslate} from "../../../hooks/useTranslate";
 import {textColor, textHeightCoeff} from "../../app/globals";
 import {saveBoolToLocalStorage, saveNumberToLocalStorage, saveStringToLocalStorage} from "../../../utils/localStorage";
 import {LocalStorageKeys} from "../../../data/LocalStorageKeys";

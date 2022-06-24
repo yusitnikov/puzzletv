@@ -8,7 +8,7 @@ import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowLeft} from "@emotion-icons/fluentui-system-filled";
 import {useCallback, useState} from "react";
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../../hooks/useTranslate";
 
 export const ChessMainControls = (
     {

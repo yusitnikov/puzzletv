@@ -1,4 +1,4 @@
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../../hooks/useTranslate";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useCallback} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";

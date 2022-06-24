@@ -3,12 +3,14 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@emotion-icons/boxicons-logos": "^3.19.0",
         "@emotion-icons/fluentui-system-filled": "^3.15.0",
         "@emotion-icons/material": "^3.14.0",
         "@emotion/styled": "^11.8.1",
         "@googlemaps/react-wrapper": "^1.1.32",
         "@types/pako": "^2.0.0",
         "ably": "^1.2.22",
+        "focus-trap-react": "^9.0.2",
         "hash.js": "^1.1.7",
         "lz-string": "^1.4.4",
         "pako": "^2.0.4",
@@ -36,7 +38,10 @@
     "eslintConfig": {
         "extends": [
             "react-app"
-        ]
+        ],
+        "rules": {
+            "react/jsx-no-target-blank": "off"
+        }
     },
     "browserslist": {
         "production": [

@@ -7,7 +7,7 @@ import {rotateClockwise} from "../utils/rotation";
 import {RotatableDigit} from "../types/RotatableDigit";
 import {RotatableGameState, RotatableProcessedGameState} from "../types/RotatableGameState";
 import {ControlsProps} from "../../../components/sudoku/controls/Controls";
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../../hooks/useTranslate";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 
 export const RotatableMainControls = (

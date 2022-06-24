@@ -14,7 +14,7 @@ import {
     textColor,
     textHeightCoeff
 } from "../../app/globals";
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../../hooks/useTranslate";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Fragment} from "react";
 import {myClientId} from "../../../hooks/useMultiPlayer";

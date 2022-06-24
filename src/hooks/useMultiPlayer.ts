@@ -2,7 +2,7 @@ import {Types} from "ably/promises";
 import {useAblyChannelPresence, useSetMyAblyChannelPresence} from "./useAbly";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {usePureMemo} from "./usePureMemo";
-import {useTranslate} from "../contexts/LanguageCodeContext";
+import {useTranslate} from "./useTranslate";
 
 export const myClientId = (window.localStorage.clientId = window.localStorage.clientId || Math.random().toString().substring(2));
 

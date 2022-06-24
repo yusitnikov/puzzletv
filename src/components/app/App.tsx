@@ -1,33 +1,20 @@
 import React, {useMemo} from "react";
 import {Puzzle} from "../sudoku/puzzle/Puzzle";
-import {useHash} from "../../hooks/useHash";
+import {useRoute} from "../../hooks/useRoute";
 import {AllPuzzles} from "../../data/puzzles/AllPuzzles";
-import {LanguageCodeContext, useLanguageCode, useTranslate} from "../../contexts/LanguageCodeContext";
-import {AllowLmdContext} from "../../contexts/AllowLmdContext";
+import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {PageLayout} from "../layout/page-layout/PageLayout";
 import {PuzzlesList} from "./PuzzlesList";
-import {buildLink, parseLink} from "../../utils/link";
+import {buildLink} from "../../utils/link";
 import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {GamesList} from "./GamesList";
+import {HomePage} from "./HomePage";
+import {ContactMe} from "./ContactMe";
+import {ForSetters} from "./ForSetters";
 
 export const App = () => {
-    let hash = useHash();
+    const {hash = "", slug, params} = useRoute();
 
-    const {slug, params} = useMemo(() => parseLink(hash), [hash]);
-
-    return <LanguageCodeContext.Provider value={params.lang}>
-        <AllowLmdContext.Provider value={!!params.lmd}>
-            <AppContent hash={hash} slug={slug} params={params}/>
-        </AllowLmdContext.Provider>
-    </LanguageCodeContext.Provider>;
-};
-
-interface AppContentProps {
-    hash: string;
-    slug: string;
-    params: any;
-}
-
-const AppContent = ({hash = "", slug, params}: AppContentProps) => {
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -62,10 +49,44 @@ const AppContent = ({hash = "", slug, params}: AppContentProps) => {
         return undefined;
     }, [slug, params]);
 
-    if (!slug || slug === "list") {
-        return <PageLayout scrollable={true}>
-            <PuzzlesList/>
-        </PageLayout>;
+    switch (slug) {
+        case "":
+        case "home":
+            return <PageLayout
+                scrollable={true}
+                title={translate("Welcome to Puzzle TV!")}
+            >
+                <HomePage/>
+            </PageLayout>;
+        case "puzzles":
+        case "list":
+            return <PageLayout
+                scrollable={true}
+                title={translate("Puzzles")}
+            >
+                <PuzzlesList/>
+            </PageLayout>;
+        case "games":
+            return <PageLayout
+                scrollable={true}
+                title={translate("Games")}
+            >
+                <GamesList/>
+            </PageLayout>;
+        case "for-setters":
+            return <PageLayout
+                scrollable={true}
+                title={translate("For Setters")}
+            >
+                <ForSetters/>
+            </PageLayout>;
+        case "contacts":
+            return <PageLayout
+                scrollable={true}
+                title={translate("Contacts")}
+            >
+                <ContactMe/>
+            </PageLayout>;
     }
 
     if (puzzle) {
@@ -78,6 +99,6 @@ const AppContent = ({hash = "", slug, params}: AppContentProps) => {
         scrollable={true}
         title={translate("Oops, the puzzle not found!")}
     >
-        <a href={buildLink("list", language)}>{translate("Check out the puzzles list")}</a>
+        <a href={buildLink("", language)}>{translate("Go to the home page")}</a>
     </PageLayout>;
 };

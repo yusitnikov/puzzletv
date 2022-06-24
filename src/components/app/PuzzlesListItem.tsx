@@ -1,6 +1,6 @@
 import {headerPadding, lighterGreyColor} from "./globals";
 import React from "react";
-import {useLanguageCode, useTranslate} from "../../contexts/LanguageCodeContext";
+import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {Field} from "../sudoku/field/Field";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useGame} from "../../hooks/sudoku/useGame";

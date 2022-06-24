@@ -11,7 +11,7 @@ import {
 } from "../../../types/sudoku/CellWriteMode";
 import {PlainValueSet} from "../../../types/struct/Set";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {useTranslate} from "../../../contexts/LanguageCodeContext";
+import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
@@ -21,7 +21,6 @@ import {DigitControlButton} from "./DigitControlButton";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {UserLinesByData, UserMarkByData} from "../constraints/user-lines/UserLines";
-import {useAllowLmd} from "../../../contexts/AllowLmdContext";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
 import {GameState, getEmptyGameState} from "../../../types/sudoku/GameState";
@@ -68,6 +67,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     } = context;
 
     const {
+        params,
         typeManager,
         resultChecker,
         forceAutoCheckOnFinish = false,
@@ -120,7 +120,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         [playerScores]
     );
 
-    const isLmdAllowed = useAllowLmd();
+    const isLmdAllowed = !!params?.lmd;
 
     useEffect(() => {
         if (autoCheckOnFinish && resultChecker && isCorrectResult) {
