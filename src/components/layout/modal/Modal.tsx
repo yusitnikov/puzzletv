@@ -8,10 +8,11 @@ export interface ModalProps {
     cellSize: number;
     onClose?: () => void;
     textAlign?: CSSProperties["textAlign"];
+    borderless?: boolean;
     children: ReactNode;
 }
 
-export const Modal = ({cellSize, onClose, textAlign = "center", children}: ModalProps) => {
+export const Modal = ({cellSize, onClose, textAlign = "center", borderless, children}: ModalProps) => {
     const padding = cellSize * globalPaddingCoeff;
 
     const puzzleContainer = usePuzzleContainer();
@@ -47,10 +48,10 @@ export const Modal = ({cellSize, onClose, textAlign = "center", children}: Modal
             <div
                 style={{
                     zIndex: 3,
-                    border: `3px solid ${textColor}`,
+                    border: borderless ? undefined : `3px solid ${textColor}`,
                     backgroundColor: "#fff",
-                    padding: `${padding}px ${padding * 2}px`,
-                    borderRadius: padding / 3,
+                    padding: borderless ? 0 : `${padding}px ${padding * 2}px`,
+                    borderRadius: borderless ? 0 : padding / 3,
                     fontSize: cellSize * textHeightCoeff,
                     textAlign,
                 }}

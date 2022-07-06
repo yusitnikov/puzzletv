@@ -15,6 +15,9 @@ import {
     QuadInputSudokuTypeManager
 } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
 import {QuadInputGameState} from "../../components/sudoku/constraints/quad/QuadInput/QuadInputGameState";
+import {CSSProperties, useState} from "react";
+import {Modal} from "../../components/layout/modal/Modal";
+import {headerHeight} from "../../components/app/globals";
 
 const noteRadius = 0.2;
 const noteLineWidth = 0.05;
@@ -242,17 +245,56 @@ export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>
         LittleKillerConstraint("R7C3", "UL", fieldSize, 16),
         LittleKillerConstraint("R7C5", "UL", fieldSize, 16),
     ],
-    rules: translate => <>
+    rules: (translate, {cellSize}) => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(littleKillerExplained)}.</RulesParagraph>
-        <div><img
-            src={`${process.env.PUBLIC_URL}/images/curtiscard.png`}
-            alt={"name"}
-            style={{
-                maxWidth: "100%",
-                boxShadow: "3px 3px 5px 0px rgba(0, 0, 0, 0.5)",
-            }}
-        /></div>
+        <CardLink cellSize={cellSize}/>
     </>,
     resultChecker: isValidFinishedPuzzleByConstraints,
+};
+
+interface CardImageProps {
+    onClick?: () => void;
+    style?: CSSProperties;
+}
+
+const CardImage = ({onClick, style}: CardImageProps) => <img
+    src={`${process.env.PUBLIC_URL}/images/curtiscard.png`}
+    alt={"Curtis Card"}
+    onClick={onClick}
+    style={{
+        ...style,
+        display: "block",
+        margin: 0,
+        boxShadow: "3px 3px 5px 0px rgba(0, 0, 0, 0.5)",
+        cursor: onClick ? "pointer" : undefined,
+    }}
+/>;
+
+interface CardLinkProps {
+    cellSize: number;
+}
+
+const CardLink = ({cellSize}: CardLinkProps) => {
+    const [showModal, setShowModal] = useState(false);
+
+    return <>
+        <CardImage
+            onClick={() => setShowModal(true)}
+            style={{maxWidth: "100%"}}
+        />
+
+        {showModal && <Modal
+            cellSize={cellSize}
+            borderless={true}
+            onClose={() => setShowModal(false)}
+        >
+            <CardImage
+                style={{
+                    maxWidth: "90vw",
+                    maxHeight: `calc(90vh - ${headerHeight}px)`,
+                }}
+            />
+        </Modal>}
+    </>;
 };
