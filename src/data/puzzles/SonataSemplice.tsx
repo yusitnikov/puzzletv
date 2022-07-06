@@ -245,6 +245,14 @@ export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>
     rules: translate => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(littleKillerExplained)}.</RulesParagraph>
+        <div><img
+            src={`${process.env.PUBLIC_URL}/images/curtiscard.png`}
+            alt={"name"}
+            style={{
+                maxWidth: "100%",
+                boxShadow: "3px 3px 5px 0px rgba(0, 0, 0, 0.5)",
+            }}
+        /></div>
     </>,
     resultChecker: isValidFinishedPuzzleByConstraints,
 };
