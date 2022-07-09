@@ -34,7 +34,7 @@ export const HeartsCube: PuzzleDefinition<number> = {
             [LanguageCode.ru]: "красной",
         }, "2:3"))}.</RulesParagraph>
         <RulesParagraph>{translate({
-            [LanguageCode.en]: "All black, red and green dots are given",
+            [LanguageCode.en]: "All black, green and red dots are given",
             [LanguageCode.ru]: "Все чёрные, зелёные и красные точки даны",
         })}.</RulesParagraph>
     </>,
