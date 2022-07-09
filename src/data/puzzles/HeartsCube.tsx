@@ -11,7 +11,6 @@ import {
 import {blackKropkiDotsExplained, ratioDotsExplained} from "../ruleSnippets";
 
 export const HeartsCube: PuzzleDefinition<number> = {
-    noIndex: true,
     title: {
         [LanguageCode.en]: "Rational Cube",
         [LanguageCode.ru]: "Рациональный куб",
