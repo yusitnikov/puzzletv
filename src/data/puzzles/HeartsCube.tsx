@@ -49,5 +49,4 @@ export const HeartsCube: PuzzleDefinition<number> = {
         NonRatioNeighborsConstraint([[1, 2], [1, 3], [2, 3]]),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
-    allowDrawing: ["center-mark"],
 };
