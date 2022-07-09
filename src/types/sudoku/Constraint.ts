@@ -13,6 +13,7 @@ import {SetInterface} from "../struct/Set";
 
 export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> = {
     name: string;
+    tags?: string[];
     cells: Position[];
     component?: ComponentType<ConstraintProps<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>>;
     color?: string;
@@ -22,7 +23,8 @@ export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, Proce
         digits: GivenDigitsMap<CellType>,
         regionCells: Position[],
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        isFinalCheck?: boolean
+        constraints: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[],
+        isFinalCheck?: boolean,
     ): boolean;
     isValidPuzzle?(
         lines: SetInterface<Line>,
@@ -138,7 +140,7 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
             continue;
         }
 
-        if (constraint.isValidCell && !constraint.isValidCell(cell, userDigits, normalizedConstraintCells, context, isFinalCheck)) {
+        if (constraint.isValidCell && !constraint.isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, isFinalCheck)) {
             return false;
         }
     }

@@ -40,7 +40,7 @@ export const SandwichSumConstraint = <CellType,>(
         clueCell,
         sum,
         component: SandwichSum,
-        isValidCell(cell, digits, cells, {puzzle, state}, isFinalCheck) {
+        isValidCell(cell, digits, cells, {puzzle, state}, constraints, isFinalCheck) {
             const {typeManager: {getDigitByCellData}, digitsCount: maxDigit = getDefaultDigitsCount(puzzle)} = puzzle;
 
             const currentDigit = getDigitByCellData(digits[cell.top][cell.left], state);

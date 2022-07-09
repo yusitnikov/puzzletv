@@ -6,6 +6,7 @@ import {
     EmptyChaosConstruction,
     EmptyChaosConstructionLoop,
     EmptyChess,
+    EmptyCube,
     EmptyCubedoku,
     EmptyRegular,
     EmptyRotatable,
@@ -22,6 +23,7 @@ import {SonataSemplice} from "./SonataSemplice";
 import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
 import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
 import {FPuzzles} from "./FPuzzles";
+import {HeartsCube} from "./HeartsCube";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -31,6 +33,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     EmptyRotatable,
     EmptyChess,
     EmptyCubedoku,
+    EmptyCube,
     EmptyToroidal,
     // endregion
 
@@ -62,6 +65,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region My puzzles
+    HeartsCube,
+
     NorthOrSouth,
     NorthOrSouth2,
     NorthOrSouth2ShortRules,

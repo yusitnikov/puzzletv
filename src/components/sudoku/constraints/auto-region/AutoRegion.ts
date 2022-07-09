@@ -6,7 +6,7 @@ export const AutoRegionConstraint = <CellType>(): Constraint<CellType> => {
     return ({
         name: "auto-region",
         cells: [],
-        isValidCell(cell, digits, cells, {puzzle, cellsIndex, state}, isFinalCheck) {
+        isValidCell(cell, digits, cells, {puzzle, cellsIndex, state}, constraints, isFinalCheck) {
             const region = cellsIndex.getCustomRegionByBorderLinesAt(state, cell);
 
             const expectedSize = puzzle.digitsCount ?? getDefaultDigitsCount(puzzle);

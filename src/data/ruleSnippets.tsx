@@ -1,6 +1,8 @@
 import {Translatable} from "../types/translations/Translatable";
 import {LanguageCode} from "../types/translations/LanguageCode";
 import React, {ReactNode} from "react";
+import {processTranslations} from "../utils/translate";
+import {TranslationItem} from "../types/translations/TranslationItem";
 
 export const ruleWithTitle = (title: ReactNode, ...explained: string[]) => <>{title}: {explained.map(s => s.toLowerCase()).join(", ")}</>;
 
@@ -99,9 +101,23 @@ export const kropkiDotsTitle: Translatable = {
     [LanguageCode.ru]: "Точки Кропки",
 };
 
-export const blackKropkiDotsExplained: Translatable = {
-    [LanguageCode.en]: "Cells separated by a black dot have a ratio of 1:2",
-    [LanguageCode.ru]: "Ячейки, разделенные чёрной точкой, имеют соотношение 1:2",
+export const ratioDotsExplained = (colorTranslation: TranslationItem, ratio: string): Translatable => processTranslations(
+    (phrase, color) => phrase.replace("%1", color),
+    {
+        [LanguageCode.en]: `Cells separated by a %1 dot have a ratio of ${ratio}`,
+        [LanguageCode.ru]: `Ячейки, разделенные %1 точкой, имеют соотношение ${ratio}`,
+    },
+    colorTranslation
+);
+
+export const blackKropkiDotsExplained: Translatable = ratioDotsExplained({
+    [LanguageCode.en]: "black",
+    [LanguageCode.ru]: "чёрной",
+}, "1:2");
+
+export const allDotsGiven: Translatable = {
+    [LanguageCode.en]: "All dots are given",
+    [LanguageCode.ru]: "Все точки даны",
 };
 
 export const notAllDotsGiven: Translatable = {

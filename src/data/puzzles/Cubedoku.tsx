@@ -1,6 +1,6 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {LanguageCode} from "../../types/translations/LanguageCode";
-import {createCubedokuFieldSize, CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
+import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
     cubedokuIndexingDetails,
@@ -12,9 +12,10 @@ import {thermometersExplained} from "../ruleSnippets";
 import {parsePositionLiterals2} from "../../types/layout/Position";
 import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {createCubeFieldSize} from "../../sudokuTypes/cube/types/CubeTypeManager";
 
-const regularFieldSize4 = createCubedokuFieldSize(4, 2);
-const regularFieldSize5 = createCubedokuFieldSize(5, 1);
+const regularFieldSize4 = createCubeFieldSize(4, 2);
+const regularFieldSize5 = createCubeFieldSize(5, 1);
 
 const Andrewsarchus = {
     [LanguageCode.en]: "Andrewsarchus",

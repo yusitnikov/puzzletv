@@ -9,7 +9,8 @@ import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudok
 import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
 import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
 import {ChessGameState} from "../../sudokuTypes/chess/types/ChessGameState";
-import {createCubedokuFieldSize, CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
+import {createCubeFieldSize, CubeTypeManager} from "../../sudokuTypes/cube/types/CubeTypeManager";
+import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {AutoRegionConstraint} from "../../components/sudoku/constraints/auto-region/AutoRegion";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 
@@ -63,12 +64,21 @@ export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameS
     fieldSize: FieldSize8,
 };
 
+export const EmptyCube: PuzzleDefinition<number> = {
+    noIndex: true,
+    title,
+    slug: "empty-cube",
+    typeManager: CubeTypeManager(true),
+    fieldSize: createCubeFieldSize(6, 3),
+    digitsCount: 6,
+};
+
 export const EmptyCubedoku: PuzzleDefinition<number> = {
     noIndex: true,
     title,
     slug: "empty-cubedoku",
     typeManager: CubedokuTypeManager,
-    fieldSize: createCubedokuFieldSize(6, 3),
+    fieldSize: createCubeFieldSize(6, 3),
     digitsCount: 6,
 };
 
