@@ -23,7 +23,7 @@ export const HeartsCube: PuzzleDefinition<number> = {
     fieldMargin: 1.2,
     rules: translate => <>
         <RulesParagraph>Each row, column, and 3x3 box (face of the cube) contains each number from 1 to 9 exactly once.</RulesParagraph>
-        <RulesParagraph>"Rows" and "columns" are 6 cells long - they take 2 faces of the cube.</RulesParagraph>
+        <RulesParagraph>"Rows" and "columns" are 6 cells long - they extend across the edge and take 2 faces of the cube.</RulesParagraph>
         <RulesParagraph>{translate(blackKropkiDotsExplained)}.</RulesParagraph>
         <RulesParagraph>{translate(ratioDotsExplained({
             [LanguageCode.en]: "green",
