@@ -178,7 +178,6 @@ export const BaseHeptapagonLikeLoop = (
     const bounds = boundsLayers.slice(0, layersCount).flat();
 
     return {
-        noIndex: true,
         author: {
             [LanguageCode.en]: "BenceJoful",
         },
