@@ -248,6 +248,7 @@ export const HeptapagonLikeLoopMini: PuzzleDefinition<number> = {
             TapaCellConstraint("R1C26", 1),
         ]
     ),
+    noIndex: true,
     slug: "heptapagon-like-loop-mini",
     title: {
         [LanguageCode.en]: "Heptapagon-like Loop Mini",
