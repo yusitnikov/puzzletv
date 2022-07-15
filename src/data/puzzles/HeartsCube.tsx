@@ -22,8 +22,11 @@ export const HeartsCube: PuzzleDefinition<number> = {
     digitsCount: 9,
     fieldMargin: 1.2,
     rules: translate => <>
-        <RulesParagraph>Each row, column, and 3x3 box (face of the cube) contains each number from 1 to 9 exactly once.</RulesParagraph>
-        <RulesParagraph>"Rows" and "columns" are 6 cells long - they extend across the edge and take 2 faces of the cube.</RulesParagraph>
+        <RulesParagraph>Put digits from 1 to 9 into every cell of all cube faces.</RulesParagraph>
+        <RulesParagraph>
+            Digits cannot repeat in a row, column or 3x3 box (face of the cube).{" "}
+            "Rows" and "columns" are 6 cells long - they extend across the edge and take 2 faces of the cube.
+        </RulesParagraph>
         <RulesParagraph>{translate(blackKropkiDotsExplained)}.</RulesParagraph>
         <RulesParagraph>{translate(ratioDotsExplained({
             [LanguageCode.en]: "green",
