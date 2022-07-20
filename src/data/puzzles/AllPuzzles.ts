@@ -65,7 +65,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region My puzzles
-    HeartsCube,
+    HeartsCube(false),
+    HeartsCube(true),
 
     NorthOrSouth,
     NorthOrSouth2,

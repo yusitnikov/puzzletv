@@ -86,5 +86,5 @@ export const KropkiDotConstraint = <CellType,>(
     });
 };
 
-export const HeartConstraint = <CellType,>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
-    KropkiDotConstraint<CellType>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", false);
+export const HeartConstraint = <CellType,>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, showValue = false) =>
+    KropkiDotConstraint<CellType>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", showValue);
