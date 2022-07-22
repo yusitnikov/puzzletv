@@ -137,6 +137,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): Constraint<any>[];
 
+    getAdditionalNeighbors?(
+        position: Position,
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    ): Position[];
+
     borderColor?: string;
 
     getCellSelectionType?(

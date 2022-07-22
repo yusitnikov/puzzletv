@@ -23,7 +23,10 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
 
     constructor(private readonly puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) {
         const {
-            typeManager: {transformCoords = coords => coords},
+            typeManager: {
+                transformCoords = coords => coords,
+                getAdditionalNeighbors = position => [],
+            },
             fieldSize: {rowsCount, columnsCount},
             customCellBounds = {},
         } = puzzle;
@@ -121,6 +124,11 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
                 center,
                 bounds: {borders},
             } = info;
+
+            info.neighbors = info.neighbors.toggleAll(
+                getAdditionalNeighbors(cellPosition, puzzle),
+                true
+            );
 
             borders.forEach((border) => border.forEach((point, index) => {
                 const next = border[(index + 1) % border.length];

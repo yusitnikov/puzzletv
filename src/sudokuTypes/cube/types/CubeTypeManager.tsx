@@ -135,6 +135,28 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         }
     },
 
+    getAdditionalNeighbors({top, left}, {fieldSize: {fieldSize}}) {
+        const realFieldSize = fieldSize / 2;
+
+        if (continuousRowColumnRegions) {
+            if (left === realFieldSize - 1 && top < realFieldSize) {
+                return [{
+                    top: realFieldSize,
+                    left: fieldSize - 1 - top,
+                }];
+            }
+
+            if (top === realFieldSize && left >= realFieldSize) {
+                return [{
+                    top: fieldSize - 1 - left,
+                    left: realFieldSize - 1,
+                }];
+            }
+        }
+
+        return [];
+    },
+
     borderColor: darkGreyColor,
 });
 
