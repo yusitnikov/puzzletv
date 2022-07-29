@@ -9,6 +9,7 @@ import {
     NonRatioNeighborsConstraint
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import {blackKropkiDotsExplained, ratioDotsExplained} from "../ruleSnippets";
+import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 
 export const HeartsCube = (showRatio: boolean): PuzzleDefinition<number> => ({
     noIndex: showRatio,
@@ -62,4 +63,16 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<number> => ({
         NonRatioNeighborsConstraint([[1, 2], [1, 3], [2, 3]]),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AJY",
+    getLmdSolutionCode: (puzzle, state) => {
+        const {cells} = gameStateGetCurrentFieldState(state);
+
+        return [
+            cells[3][0], cells[3][1], cells[3][2],
+            cells[4][0], cells[4][1], cells[4][2],
+            cells[5][0], cells[5][1], cells[5][2],
+        ]
+            .map(({usersDigit}) => usersDigit)
+            .join("");
+    },
 });

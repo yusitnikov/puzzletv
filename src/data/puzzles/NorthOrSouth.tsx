@@ -38,6 +38,7 @@ import {
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
     noIndex: true,
@@ -143,6 +144,14 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
         KillerCageConstraint(["R7C4", "R7C5", "R7C6", "R8C6"], 22, true),
         XMarkConstraint("R7C6", "R7C7"),
     ],
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AJB",
+    getLmdSolutionCode: ({initialDigits}, state) => {
+        const {cells} = gameStateGetCurrentFieldState(state);
+
+        return cells[8]
+            .map((cell, index) => (cell.usersDigit || initialDigits?.[8]?.[index])?.digit)
+            .join("");
+    },
 };
 
 export const NorthOrSouth2ShortRules: typeof NorthOrSouth = {

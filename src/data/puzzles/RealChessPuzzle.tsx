@@ -111,6 +111,8 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
         <ChessBoardIndexes/>,
         ValidChessPositionConstraint,
     ],
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AMM",
+    getLmdSolutionCode: () => "bishopf8c5",
 };
 
 export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {
