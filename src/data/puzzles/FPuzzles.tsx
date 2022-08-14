@@ -48,12 +48,13 @@ import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
 import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
+import {CellSelectionColor} from "../../components/sudoku/cell/CellSelection";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
     slug: "f-puzzles",
     fulfillParams: (params) => params,
-    loadPuzzle: ({load}) => {
+    loadPuzzle: ({load, tesseract}) => {
         if (typeof load !== "string") {
             throw new Error("Missing parameter");
         }
@@ -73,7 +74,35 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             slug: "f-puzzles",
             saveStateKey: `f-puzzles-${sha1().update(load).digest("hex").substring(0, 20)}`,
             title: {[LanguageCode.en]: "Untitled"},
-            typeManager: DigitSudokuTypeManager(),
+            typeManager: {
+                ...DigitSudokuTypeManager(),
+                getCellSelectionType: tesseract
+                    ? (cell, puzzle, {selectedCells}) => {
+                        if (selectedCells.size !== 1) {
+                            return undefined;
+                        }
+
+                        const getTesseractsCoords = ({top, left}: Position) => [
+                            top % 3,
+                            left % 3,
+                            Math.floor(top / 3),
+                            Math.floor(left / 3),
+                        ];
+
+                        const cell4D = getTesseractsCoords(cell);
+                        const selected4D = getTesseractsCoords(selectedCells.first()!);
+
+                        if (cell4D.some((value, index) => Math.abs(value - selected4D[index]) > 1)) {
+                            return undefined;
+                        }
+
+                        return {
+                            color: CellSelectionColor.secondary,
+                            strokeWidth: 1,
+                        };
+                    }
+                    : undefined
+            },
             fieldSize: {
                 fieldSize: 9,
                 rowsCount: 9,
