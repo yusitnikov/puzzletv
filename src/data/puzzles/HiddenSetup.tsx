@@ -1,7 +1,6 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
     arrowsExplained,
@@ -19,24 +18,21 @@ import {
     renbanTitle,
     ruleWithTitle
 } from "../ruleSnippets";
-import {gameStateGetCurrentFieldState, ProcessedGameState} from "../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
 import {InBetweenLineConstraint} from "../../components/sudoku/constraints/in-between-line/InBetweenLine";
 import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {isValidFinishedPuzzleByStageConstraints} from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import React from "react";
-import {Button} from "../../components/layout/button/Button";
-import {
-    h2HeightCoeff,
-    rulesHeaderPaddingCoeff,
-    rulesMarginCoeff,
-    yellowColor
-} from "../../components/app/globals";
 import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
+import {Raumplaner} from "../authors";
+import {MultiStageGameState} from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
+import {MultiStageSudokuTypeManager} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
+import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 
 const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     switch (stage) {
@@ -100,7 +96,7 @@ const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     return {};
 };
 
-const getStage = (state: ProcessedGameState<number>) => {
+const getStage = ({state}: PuzzleContext<number, MultiStageGameState, MultiStageGameState>) => {
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (
@@ -149,14 +145,8 @@ const getStage = (state: ProcessedGameState<number>) => {
     return 5;
 };
 
-interface HiddenSetupState {
-    stage: number;
-}
-
-export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetupState> = {
-    author: {
-        [LanguageCode.en]: "Raumplaner",
-    },
+export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+    author: Raumplaner,
     title: {
         [LanguageCode.en]: "Hidden Setup",
         [LanguageCode.ru]: "Скрытая установка",
@@ -164,16 +154,7 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
     slug: "hidden-setup",
     saveStateKey: "hidden-setup-v2",
     typeManager: {
-        ...DigitSudokuTypeManager<HiddenSetupState, HiddenSetupState>(),
-        initialGameStateExtension: {
-            stage: 1,
-        },
-        serializeGameState({stage}): any {
-            return {stage};
-        },
-        unserializeGameState({stage = 1}: any): Partial<HiddenSetupState> {
-            return {stage};
-        },
+        ...MultiStageSudokuTypeManager(getStage),
         getCellSelectionType(
             {top, left},
             puzzle,
@@ -188,49 +169,6 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
         },
     },
     fieldSize: FieldSize9,
-    aboveRules: (
-        translate,
-        {state, onStateChange, cellSize}
-    ) => {
-        const stage = getStage(state);
-        const isNext = stage > state.stage;
-        const coeff = isNext ? 1 : 0;
-
-        return <div style={{
-            background: yellowColor,
-            marginBottom: cellSize * rulesMarginCoeff * coeff,
-            padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
-            fontSize: cellSize * h2HeightCoeff,
-            lineHeight: `${cellSize * h2HeightCoeff * 1.5}px`,
-            height: (cellSize * h2HeightCoeff * 3) * coeff,
-            overflow: "hidden",
-            transition: "0.3s all linear",
-            textAlign: "center",
-        }}>
-            {translate("Congratulations")}, {translate({
-                [LanguageCode.en]: <>you completed the&nbsp;stage</>,
-                [LanguageCode.ru]: <>Вы завершили этап</>,
-            })}! &nbsp;
-
-            <Button
-                type={"button"}
-                cellSize={cellSize}
-                style={{
-                    fontFamily: "inherit",
-                    fontSize: "inherit",
-                    lineHeight: `${cellSize * h2HeightCoeff * 1.5 - 2}px`,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                }}
-                onClick={() => onStateChange({stage})}
-            >
-                {translate({
-                    [LanguageCode.en]: "Go to the next stage",
-                    [LanguageCode.ru]: "Перейти на следующий этап",
-                })}
-            </Button>
-        </div>;
-    },
     rules: (translate, {state: {stage}}) => {
         return <>
             <RulesParagraph>{translate({
@@ -309,11 +247,5 @@ export const HiddenSetup: PuzzleDefinition<number, HiddenSetupState, HiddenSetup
 
         return result;
     },
-    resultChecker: (context) => isValidFinishedPuzzleByConstraints({
-        ...context,
-        state: {
-            ...context.state,
-            stage: 5,
-        }
-    }),
+    resultChecker: isValidFinishedPuzzleByStageConstraints(5),
 };

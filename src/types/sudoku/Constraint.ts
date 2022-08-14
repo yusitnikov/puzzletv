@@ -5,11 +5,11 @@ import {PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
 import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
 import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
-import {indexes} from "../../utils/indexes";
 import {CellState} from "./CellState";
 import {UserLinesConstraint} from "../../components/sudoku/constraints/user-lines/UserLines";
 import {PuzzleContext} from "./PuzzleContext";
 import {SetInterface} from "../struct/Set";
+import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 
 export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> = {
     name: string;
@@ -64,21 +64,9 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
     const {
         fieldSize,
         items: puzzleItemsOrFn = [],
-        customCellBounds,
         typeManager: {
             items: stateItemsOrFn = [],
-            getRegionsForRowsAndColumns = () => customCellBounds ? [] : [
-                ...indexes(fieldSize.rowsCount).map(top => RegionConstraint(
-                    indexes(fieldSize.columnsCount).map(left => ({left, top})),
-                    false,
-                    "row"
-                )),
-                ...indexes(fieldSize.columnsCount).map(left => RegionConstraint(
-                    indexes(fieldSize.rowsCount).map(top => ({left, top})),
-                    false,
-                    "column"
-                )),
-            ],
+            getRegionsForRowsAndColumns = getDefaultRegionsForRowsAndColumns,
         },
     } = puzzle;
 

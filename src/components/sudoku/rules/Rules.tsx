@@ -40,7 +40,15 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
     const isFullScreen = useIsFullScreen();
 
     const {
-        puzzle: {params = {}, title, author, rules, aboveRules, typeManager: {getPlayerScore}, lmdLink},
+        puzzle: {
+            params = {},
+            title,
+            author,
+            rules,
+            aboveRules: puzzleAboveRules,
+            typeManager: {getPlayerScore, getAboveRules: typeAboveRules},
+            lmdLink,
+        },
         state: {currentPlayer},
         cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
@@ -161,7 +169,8 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             </div>}
         </div>
 
-        {aboveRules?.(translate, context)}
+        {puzzleAboveRules?.(translate, context)}
+        {typeAboveRules?.(translate, context)}
 
         <div
             style={{

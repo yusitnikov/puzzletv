@@ -24,6 +24,7 @@ import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
 import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
 import {FPuzzles} from "./FPuzzles";
 import {HeartsCube} from "./HeartsCube";
+import {AbstractKillerDots} from "./TenInOne";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -47,6 +48,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region Other authors
+    AbstractKillerDots,
+
     HeptapagonLikeLoop,
     HeptapagonLikeLoopMini,
     SonataSemplice,

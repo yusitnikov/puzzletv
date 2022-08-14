@@ -3,7 +3,7 @@ import {CellDataComponentType} from "../../components/sudoku/cell/CellDataCompon
 import {getLineVector, Position, PositionWithAngle} from "../layout/Position";
 import {SetInterface} from "../struct/Set";
 import {GameState, ProcessedGameState} from "./GameState";
-import {ComponentType} from "react";
+import {ComponentType, ReactNode} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
 import {PuzzleDefinition} from "./PuzzleDefinition";
@@ -14,6 +14,7 @@ import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
 import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
 import {GameStateAction, GameStateActionType} from "./GameStateAction";
+import {useTranslate} from "../../hooks/useTranslate";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(
@@ -205,6 +206,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         clientId: string
     ): string | number;
+
+    getAboveRules?(
+        translate: ReturnType<typeof useTranslate>,
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    ): ReactNode;
 }
 
 export const defaultProcessArrowDirection = (
