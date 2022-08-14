@@ -147,6 +147,8 @@ export const LegoHouse: PuzzleDefinition<number, MultiStageGameState, MultiStage
         [LanguageCode.ru]: "Лего-дом",
     },
     slug: "lego-house",
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AO9",
+    getLmdSolutionCode: () => "716571791716983254",
     typeManager: TenInOneSudokuTypeManager(
         ({top, left}) => {
             const topBoxIndex = Math.floor(top / 3);
@@ -216,6 +218,8 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState, MultiStage
         [LanguageCode.ru]: "Кукольный дом",
     },
     slug: "doll-house",
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AQX",
+    getLmdSolutionCode: () => "936261819318276945",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
     fieldSize,
     rules: translate => <>
