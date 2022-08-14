@@ -25,13 +25,15 @@ import {InBetweenLineConstraint} from "../../components/sudoku/constraints/in-be
 import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {isValidFinishedPuzzleByStageConstraints} from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import React from "react";
 import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {Raumplaner} from "../authors";
 import {MultiStageGameState} from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
-import {MultiStageSudokuTypeManager} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
+import {
+    isValidFinishedPuzzleByStageConstraints,
+    MultiStageSudokuTypeManager
+} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 
 const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
@@ -154,7 +156,7 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiSta
     slug: "hidden-setup",
     saveStateKey: "hidden-setup-v2",
     typeManager: {
-        ...MultiStageSudokuTypeManager(getStage),
+        ...MultiStageSudokuTypeManager({getStage}),
         getCellSelectionType(
             {top, left},
             puzzle,

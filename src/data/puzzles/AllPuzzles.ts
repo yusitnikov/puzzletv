@@ -24,7 +24,7 @@ import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
 import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
 import {FPuzzles} from "./FPuzzles";
 import {HeartsCube} from "./HeartsCube";
-import {AbstractKillerDots} from "./TenInOne";
+import {AbstractKillerDots, LegoHouse} from "./TenInOne";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -40,7 +40,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
 
     FPuzzles,
 
-    // Games
+    // region Games
     generateQuadMasters("quadle", false, true),
     generateQuadMasters("daily-quadle", true, true),
     generateQuadMasters("quad-masters", false, false),
@@ -49,6 +49,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
 
     // region Other authors
     AbstractKillerDots,
+    LegoHouse,
 
     HeptapagonLikeLoop,
     HeptapagonLikeLoopMini,

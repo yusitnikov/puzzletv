@@ -36,6 +36,9 @@ export const translationsExactType = {
     "Cancel": {
         [LanguageCode.ru]: "Отмена",
     },
+    "Stage %1": {
+        [LanguageCode.ru]: "Этап %1",
+    },
     // endregion
     // region App
     "Welcome to Puzzle TV!": {

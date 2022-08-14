@@ -7,11 +7,21 @@ import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
 import React from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
+import {PartiallyTranslatable} from "../../../types/translations/Translatable";
+
+interface MultiStageSudokuOptions {
+    getStage: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>) => number;
+    onStageChange?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>, stage: number)
+        => Partial<ProcessedGameState<number> & MultiStageGameState>;
+    getStageButtonText?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>)
+        => PartiallyTranslatable | undefined;
+}
+
+const aboveRulesTextHeightCoeff = h2HeightCoeff * 0.9;
 
 export const MultiStageSudokuTypeManager = (
-    getStage: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>) => number,
-    onStageChange?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>, stage: number)
-        => Partial<ProcessedGameState<number> & MultiStageGameState>
+    {getStage, onStageChange, getStageButtonText}: MultiStageSudokuOptions
 ): SudokuTypeManager<number, MultiStageGameState, MultiStageGameState> => ({
     ...DigitSudokuTypeManager<MultiStageGameState, MultiStageGameState>(),
 
@@ -38,9 +48,9 @@ export const MultiStageSudokuTypeManager = (
             background: yellowColor,
             marginBottom: cellSize * rulesMarginCoeff * coeff,
             padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
-            fontSize: cellSize * h2HeightCoeff,
-            lineHeight: `${cellSize * h2HeightCoeff * 1.5}px`,
-            height: (cellSize * h2HeightCoeff * 3) * coeff,
+            fontSize: cellSize * aboveRulesTextHeightCoeff,
+            lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
+            height: (cellSize * aboveRulesTextHeightCoeff * 3) * coeff,
             overflow: "hidden",
             transition: "0.3s all linear",
             textAlign: "center",
@@ -56,7 +66,7 @@ export const MultiStageSudokuTypeManager = (
                 style={{
                     fontFamily: "inherit",
                     fontSize: "inherit",
-                    lineHeight: `${cellSize * h2HeightCoeff * 1.5 - 2}px`,
+                    lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5 - 2}px`,
                     paddingTop: 0,
                     paddingBottom: 0,
                 }}
@@ -65,7 +75,7 @@ export const MultiStageSudokuTypeManager = (
                     ...onStageChange?.(context, stage),
                 })}
             >
-                {translate({
+                {translate(getStageButtonText?.(context) ?? {
                     [LanguageCode.en]: "Go to the next stage",
                     [LanguageCode.ru]: "Перейти на следующий этап",
                 })}
@@ -73,3 +83,12 @@ export const MultiStageSudokuTypeManager = (
         </div>;
     },
 });
+
+export const isValidFinishedPuzzleByStageConstraints = <CellType,>(stage: number) =>
+    (context: PuzzleContext<CellType, MultiStageGameState, MultiStageGameState>) => isValidFinishedPuzzleByConstraints({
+        ...context,
+        state: {
+            ...context.state,
+            stage,
+        }
+    });

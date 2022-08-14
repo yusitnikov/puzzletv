@@ -10,14 +10,17 @@ import {Position} from "../../../types/layout/Position";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 export const TenInOneSudokuTypeManager = (
     isRemainingCell: (cell: Position) => boolean,
 ): SudokuTypeManager<number, MultiStageGameState, MultiStageGameState> => ({
-    ...MultiStageSudokuTypeManager(
-        (context) => isValidFinishedPuzzleByStageConstraints<number>(1)(context) ? 2 : 1,
-        (context) => {
+    ...MultiStageSudokuTypeManager({
+        getStage: (context) =>
+            context.state.stage === 1
+                ? (isValidFinishedPuzzleByConstraints(context) ? 2 : 1)
+                : 3,
+        onStageChange: (context, stage) => {
             const {
                 puzzle: {
                     fieldSize: {rowsCount, columnsCount},
@@ -26,35 +29,48 @@ export const TenInOneSudokuTypeManager = (
                 state,
             } = context;
 
-            const {cells} = gameStateGetCurrentFieldState(state);
+            if (stage === 2) {
+                const {cells} = gameStateGetCurrentFieldState(state);
 
-            const allCells: Position[] = indexes(rowsCount).flatMap(top => indexes(columnsCount).map(left => ({top, left})));
-            const remainingCells = allCells.filter(isRemainingCell);
+                const allCells: Position[] = indexes(rowsCount).flatMap(top => indexes(columnsCount).map(left => ({top, left})));
+                const remainingCells = allCells.filter(isRemainingCell);
 
-            const initialDigits: GivenDigitsMap<number> = {};
-            for (const {top, left} of remainingCells) {
-                initialDigits[top] = initialDigits[top] || {};
-                initialDigits[top][left] = cells[top][left].usersDigit!;
+                const initialDigits: GivenDigitsMap<number> = {};
+                for (const {top, left} of remainingCells) {
+                    initialDigits[top] = initialDigits[top] || {};
+                    initialDigits[top][left] = cells[top][left].usersDigit!;
+                }
+
+                return {
+                    initialDigits: mergeGivenDigitsMaps(state.initialDigits, initialDigits),
+                };
             }
 
             return {
-                initialDigits: mergeGivenDigitsMaps(state.initialDigits, initialDigits),
                 fieldStateHistory: fieldStateHistoryAddState(
                     typeManager,
                     state.fieldStateHistory,
                     state => ({
                         ...state,
-                        cells: state.cells.map(cellsRow => cellsRow.map(cell => ({
-                            ...cell,
-                            usersDigit: undefined,
-                            cornerDigits: cell.cornerDigits.clear(),
-                            centerDigits: cell.centerDigits.clear(),
-                        }))),
+                        cells: state.cells.map(cellsRow => cellsRow.map(
+                            ({cornerDigits, centerDigits, colors}) => ({
+                                usersDigit: undefined,
+                                cornerDigits: cornerDigits.clear(),
+                                centerDigits: centerDigits.clear(),
+                                colors: colors.clear(),
+                            })
+                        )),
                     })
                 ),
             };
         },
-    ),
+        getStageButtonText: ({state: {stage}}) => stage === 2
+            ? {
+                [LanguageCode.en]: "Remove stage 1 digits",
+                [LanguageCode.ru]: "Убрать цифры этапа 1",
+            }
+            : undefined,
+    }),
 
     getRegionsForRowsAndColumns(
         puzzle,
@@ -110,12 +126,3 @@ export const TenInOneSudokuTypeManager = (
         ];
     },
 });
-
-export const isValidFinishedPuzzleByStageConstraints = <CellType>(stage: number) =>
-    (context: PuzzleContext<CellType, MultiStageGameState, MultiStageGameState>) => isValidFinishedPuzzleByConstraints({
-        ...context,
-        state: {
-            ...context.state,
-            stage,
-        }
-    });

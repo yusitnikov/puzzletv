@@ -1,6 +1,6 @@
 import {Translatable} from "../types/translations/Translatable";
 import {LanguageCode} from "../types/translations/LanguageCode";
-import React, {ReactNode} from "react";
+import {ReactNode} from "react";
 import {processTranslations} from "../utils/translate";
 import {TranslationItem} from "../types/translations/TranslationItem";
 
@@ -9,6 +9,11 @@ export const ruleWithTitle = (title: ReactNode, ...explained: string[]) => <>{ti
 export const normalSudokuRulesApply: Translatable = {
     [LanguageCode.en]: "Standard sudoku rules apply",
     [LanguageCode.ru]: "Стандартные правила судоку",
+};
+
+export const normalSudokuRulesDoNotApply: Translatable = {
+    [LanguageCode.en]: "Standard sudoku rules do NOT apply",
+    [LanguageCode.ru]: "Стандартные правила судоку НЕ в силе",
 };
 
 export const almostNormalSudokuRulesApply: Translatable = {
@@ -81,6 +86,11 @@ export const arrowsExplained: Translatable = {
     [LanguageCode.ru]: "Сумма цифр, расположенных вдоль стрелок, равняется цифре в кружке",
 };
 
+export const canRepeatOnArrows: Translatable = {
+    [LanguageCode.en]: "Digits can repeat along arrows if allowed by other rules",
+    [LanguageCode.ru]: "Цифры вдоль стрелок могут повторяться, если это разрешено остальными правилами",
+};
+
 export const thermometersTitle: Translatable = {
     [LanguageCode.en]: "Thermometers",
     [LanguageCode.ru]: "Термометры",
@@ -99,6 +109,11 @@ export const inequalitySignsExplained: Translatable = {
 export const kropkiDotsTitle: Translatable = {
     [LanguageCode.en]: "Kropki dots",
     [LanguageCode.ru]: "Точки Кропки",
+};
+
+export const whiteKropkiDotsExplained: Translatable = {
+    [LanguageCode.en]: "Cells separated by a white dot are consecutive",
+    [LanguageCode.ru]: "Ячейки, разделенные белой точкой, содержат последовательные цифры",
 };
 
 export const ratioDotsExplained = (colorTranslation: TranslationItem, ratio: string): Translatable => processTranslations(
@@ -121,8 +136,8 @@ export const allDotsGiven: Translatable = {
 };
 
 export const notAllDotsGiven: Translatable = {
-    [LanguageCode.en]: "Not all dots are given",
-    [LanguageCode.ru]: "Не все точки даны",
+    [LanguageCode.en]: "Not all possible dots are necessarily given (no negative constraint)",
+    [LanguageCode.ru]: "Не все возможные точки присутствуют на поле",
 };
 
 export const xExplained: Translatable = {

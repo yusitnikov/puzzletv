@@ -1,18 +1,49 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {MultiStageGameState} from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
-import {
-    isValidFinishedPuzzleByStageConstraints,
-    TenInOneSudokuTypeManager
-} from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
+import {TenInOneSudokuTypeManager} from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
 import {createRegularFieldSize} from "../../types/sudoku/FieldSize";
-import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import {
+    KillerCageConstraint,
+    KillerCageConstraintByRect
+} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import {AnalyticalNinja, Raumplaner} from "../authors";
+import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import {
+    arrowsExplained,
+    arrowsTitle,
+    blackKropkiDotsExplained,
+    cannotRepeatInCage, canRepeatOnArrows,
+    conventionalNotationsApply,
+    killerCagesExplained,
+    killerCagesTitle,
+    kropkiDotsTitle,
+    normalSudokuRulesApply,
+    normalSudokuRulesDoNotApply,
+    notAllDotsGiven,
+    ruleWithTitle,
+    whiteKropkiDotsExplained
+} from "../ruleSnippets";
+import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
+import React from "react";
+import {tenInOneStage1Rules} from "../../sudokuTypes/ten-in-one/data/ruleSnippets";
+import {isValidFinishedPuzzleByStageConstraints} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
+import {RulesIndentedBlock} from "../../components/sudoku/rules/RulesIndentedBlock";
+import {processTranslations} from "../../utils/translate";
+import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 
 const remainingIndexes = [0, 4, 8];
 
+const fieldSize = {
+    ...createRegularFieldSize(9, 3),
+    regions: [],
+};
+const resultChecker = isValidFinishedPuzzleByStageConstraints<number>(2);
+
 export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
     noIndex: true,
+    author: Raumplaner,
     title: {
         [LanguageCode.en]: "Abstract Killer Dots",
         [LanguageCode.ru]: "Абстрактные точки-клетки",
@@ -21,10 +52,39 @@ export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, M
     typeManager: TenInOneSudokuTypeManager(
         ({top, left}) => remainingIndexes.includes(top) && remainingIndexes.includes(left)
     ),
-    fieldSize: {
-        ...createRegularFieldSize(9, 3),
-        regions: [],
-    },
+    fieldSize,
+    rules: translate => <>
+        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+        <RulesUnorderedList>
+            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
+            <li>{ruleWithTitle(
+                translate(kropkiDotsTitle),
+                translate(whiteKropkiDotsExplained),
+                translate(blackKropkiDotsExplained)
+            )}. {translate(notAllDotsGiven)}.</li>
+        </RulesUnorderedList>
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+        </RulesIndentedBlock>
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate({
+                [LanguageCode.en]: "Keep the digit from stage 1 in each box that corresponds to their box position, clean up all other cells",
+                [LanguageCode.ru]: "Из этапа 1 сохраните в каждом квадрате цифру, которая соответствует положению её квадрата, очистите все остальные ячейки",
+            })}.</RulesParagraph>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        </RulesIndentedBlock>
+        <RulesParagraph>{translate(processTranslations(
+            (phrase, author) => phrase.replace("%1", author),
+            {
+                [LanguageCode.en]: "Many thanks to %1 for the help to make the 3x3 logic unique",
+                [LanguageCode.ru]: "Большое спасибо %1 за помощь в создании уникальной логики 3x3",
+            },
+            AnalyticalNinja
+        ))}.</RulesParagraph>
+    </>,
     items: [
         KillerCageConstraintByRect("R1C4", 3, 1, 13),
         KillerCageConstraintByRect("R2C2", 1, 2, 7),
@@ -63,5 +123,74 @@ export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, M
         KropkiDotConstraint("R8C6", "R9C6", true),
         KropkiDotConstraint("R8C7", "R9C7", true),
     ],
-    resultChecker: isValidFinishedPuzzleByStageConstraints(2),
+    resultChecker,
+};
+
+export const LegoHouse: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+    noIndex: true,
+    author: AnalyticalNinja,
+    title: {
+        [LanguageCode.en]: "Lego House",
+        [LanguageCode.ru]: "Лего-дом",
+    },
+    slug: "lego-house",
+    typeManager: TenInOneSudokuTypeManager(
+        ({top, left}) => {
+            const topBoxIndex = Math.floor(top / 3);
+            const leftBoxIndex = Math.floor(left / 3);
+            const boxIndex = topBoxIndex * 3 + leftBoxIndex;
+
+            return boxIndex === top;
+        }
+    ),
+    fieldSize,
+    rules: translate => <>
+        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+        <RulesUnorderedList>
+            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
+            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}. {translate(canRepeatOnArrows)}.</li>
+        </RulesUnorderedList>
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+        </RulesIndentedBlock>
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate({
+                [LanguageCode.en]: "Erase all digits within the grid whose box number does not match their row number " +
+                "(e.g. you'll keep the digits in r4c1c2c3 within box 4)",
+                [LanguageCode.ru]: "Сотрите все цифры на поле, номер квадрата которых не соответствует их номеру строки " +
+                "(например, вы сохраните цифры в r4c1c2c3 в квадрате 4)",
+            })}.</RulesParagraph>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        </RulesIndentedBlock>
+    </>,
+    items: [
+        ArrowConstraint("R1C2", ["R2C3", "R3C2"]),
+        ArrowConstraint("R2C7", ["R1C7", "R3C9"]),
+        ArrowConstraint("R3C4", ["R2C4", "R1C5"]),
+        ArrowConstraint("R4C3", ["R5C3", "R5C2", "R4C1"]),
+        ArrowConstraint("R4C9", ["R5C8", "R6C9"]),
+        ArrowConstraint("R5C4", ["R5C6"]),
+        ArrowConstraint("R8C4", ["R8C5", "R9C5", "R9C4"]),
+        ArrowConstraint("R8C9", ["R9C8", "R8C7", "R7C7"]),
+        ArrowConstraint("R9C3", ["R8C3", "R9C2"]),
+
+        KillerCageConstraintByRect("R1C2", 1, 3, 16),
+        KillerCageConstraintByRect("R2C4", 3, 1, 18),
+        KillerCageConstraintByRect("R3C4", 2, 1, 15),
+        KillerCageConstraintByRect("R3C7", 3, 1, 10),
+        KillerCageConstraint(["R4C3", "R5C2", "R5C3"], 14),
+        KillerCageConstraint(["R4C5", "R4C6", "R5C6"], 12),
+        KillerCageConstraintByRect("R4C7", 2, 1, 7),
+        KillerCageConstraintByRect("R5C4", 2, 1, 10),
+        KillerCageConstraintByRect("R6C2", 2, 1, 10),
+        KillerCageConstraintByRect("R6C8", 2, 1, 6),
+        KillerCageConstraintByRect("R7C1", 3, 1, 14),
+        KillerCageConstraintByRect("R8C1", 2, 1, 13),
+        KillerCageConstraintByRect("R8C4", 2, 1, 8),
+        KillerCageConstraintByRect("R9C8", 2, 1, 8),
+    ],
+    resultChecker,
 };
