@@ -91,6 +91,11 @@ export const canRepeatOnArrows: Translatable = {
     [LanguageCode.ru]: "Цифры вдоль стрелок могут повторяться, если это разрешено остальными правилами",
 };
 
+export const twoDigitArrowCirclesExplained: Translatable = {
+    [LanguageCode.en]: "Two-digit sums read from left to right or top to bottom",
+    [LanguageCode.ru]: "Двузначные числа суммы читаются слева направо и сверху вниз",
+};
+
 export const thermometersTitle: Translatable = {
     [LanguageCode.en]: "Thermometers",
     [LanguageCode.ru]: "Термометры",

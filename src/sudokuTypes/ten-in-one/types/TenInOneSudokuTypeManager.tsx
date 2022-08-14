@@ -64,10 +64,16 @@ export const TenInOneSudokuTypeManager = (
                 ),
             };
         },
+        getStageCompletionText: ({state: {stage}}) => stage === 2
+            ? {
+                [LanguageCode.en]: <>Now other digits from stage 1 can be&nbsp;removed.</>,
+                [LanguageCode.ru]: <>Теперь можно удалить остальные цифры с этапа 1.</>,
+            }
+            : undefined,
         getStageButtonText: ({state: {stage}}) => stage === 2
             ? {
-                [LanguageCode.en]: "Remove stage 1 digits",
-                [LanguageCode.ru]: "Убрать цифры этапа 1",
+                [LanguageCode.en]: "Clean up the grid",
+                [LanguageCode.ru]: "Очистить поле",
             }
             : undefined,
     }),

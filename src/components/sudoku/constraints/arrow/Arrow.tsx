@@ -5,7 +5,6 @@ import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     getCircleConnectionPoint,
     getLineVector,
-    parsePositionLiteral,
     parsePositionLiterals,
     PositionLiteral
 } from "../../../../types/layout/Position";
@@ -14,21 +13,33 @@ import {splitMultiLine} from "../../../../utils/lines";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 
 const lineWidth = 0.1;
-const arrowSize = 0.35;
-const circleRadius = 0.4;
+const arrowSize = 0.25;
+const arrowEndMargin = 0.07;
+const circleRadius = 0.35;
 
 export interface ArrowProps {
+    doubleCircle?: boolean;
     transparentCircle?: boolean;
 }
 
-export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCircle}: ConstraintProps<any, ArrowProps>) => {
+export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, doubleCircle, transparentCircle}: ConstraintProps<any, ArrowProps>) => {
     cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
+    const lastCircleIndex = doubleCircle ? 1 : 0;
     const {left, top} = cells[0];
+    const {left: left2, top: top2} = cells[lastCircleIndex];
+    if (doubleCircle) {
+        cells = cells.slice(1);
+    }
     cells[0] = getCircleConnectionPoint(cells[0], cells[1], circleRadius);
 
-    const last = cells[cells.length - 1];
+    let last = cells[cells.length - 1];
     const prev = cells[cells.length - 2];
+    const arrowDirection = getLineVector({start: prev, end: last});
+    last = cells[cells.length - 1] = {
+        top: last.top - arrowEndMargin * arrowDirection.top,
+        left: last.left - arrowEndMargin * arrowDirection.left,
+    };
 
     return <>
         <RoundedPolyLine
@@ -39,16 +50,19 @@ export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCirc
 
         <ArrowEnd
             position={last}
-            direction={getLineVector({start: prev, end: last})}
+            direction={arrowDirection}
             arrowSize={arrowSize}
             lineWidth={lineWidth}
             color={darkGreyColor}
         />
 
-        <circle
-            cx={left}
-            cy={top}
-            r={circleRadius}
+        <rect
+            x={Math.min(left, left2) - circleRadius}
+            y={Math.min(top, top2) - circleRadius}
+            width={Math.abs(left - left2) + 2 * circleRadius}
+            height={Math.abs(top - top2) + 2 * circleRadius}
+            rx={circleRadius}
+            ry={circleRadius}
             strokeWidth={lineWidth}
             stroke={darkGreyColor}
             fill={transparentCircle ? "none" : "#fff"}
@@ -57,24 +71,33 @@ export const Arrow = withFieldLayer(FieldLayer.regular, ({cells, transparentCirc
 });
 
 export const ArrowConstraint = <CellType,>(
-    circleCellLiteral: PositionLiteral,
+    circleCellLiterals: PositionLiteral | PositionLiteral[],
     arrowCellLiterals: PositionLiteral[],
     transparentCircle = false
 ): Constraint<CellType, ArrowProps> => {
-    const circleCell = parsePositionLiteral(circleCellLiteral);
-    const cells = splitMultiLine([circleCell, ...parsePositionLiterals(arrowCellLiterals)]);
+    circleCellLiterals = Array.isArray(circleCellLiterals) ? circleCellLiterals : [circleCellLiterals];
+    const circleCells = parsePositionLiterals(circleCellLiterals);
+    const circleCellsCount = circleCells.length;
+    const cells = splitMultiLine([...circleCells, ...parsePositionLiterals(arrowCellLiterals)]);
 
     return ({
         name: "arrow",
         cells,
+        doubleCircle: circleCellsCount > 1,
         transparentCircle,
         component: Arrow,
-        isValidCell(cell, digits, [circleCell, ...arrowCells], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
-            const sumData = digits[circleCell.top]?.[circleCell.left];
-            if (sumData === undefined) {
-                return true;
+        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
+            const circleCells = cells.slice(0, circleCellsCount).sort((a, b) => a.top - b.top || a.left - b.left);
+            const arrowCells = cells.slice(circleCellsCount);
+            let sum = 0;
+            for (const circleCell of circleCells) {
+                const sumData = digits[circleCell.top]?.[circleCell.left];
+                if (sumData === undefined) {
+                    return true;
+                }
+                sum *= 10;
+                sum += getDigitByCellData(sumData, state);
             }
-            let sum = getDigitByCellData(sumData, state);
 
             for (const arrowCell of arrowCells) {
                 const arrowDigit = digits[arrowCell.top]?.[arrowCell.left];

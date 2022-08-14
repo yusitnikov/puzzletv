@@ -9,3 +9,8 @@ export const tenInOneStage1Rules: Translatable = {
     "Поместите три различные цифры от 1 до 9 в каждую строку и столбец квадратов 3x3 таким образом, чтобы все ограничения в квадрате выполнялись. " +
     "Эти три цифры могут быть разными в каждом квадрате",
 };
+
+export const tenInOneMultiBoxLineRules: Translatable = {
+    [LanguageCode.en]: "Additionally, when solving individual boxes as abstract 3x3's, ignore line segments between cells in different boxes",
+    [LanguageCode.ru]: "Кроме того, при решении отдельных квадратов как абстрактных 3x3 игнорируйте сегменты линий между ячейками в разных квадратах",
+};

@@ -5,23 +5,26 @@ import {ProcessedGameState} from "../../../types/sudoku/GameState";
 import {h2HeightCoeff, rulesHeaderPaddingCoeff, rulesMarginCoeff, yellowColor} from "../../../components/app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
-import React from "react";
+import React, {ReactNode} from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {PartiallyTranslatable} from "../../../types/translations/Translatable";
+import {processTranslations} from "../../../utils/translate";
 
 interface MultiStageSudokuOptions {
     getStage: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>) => number;
     onStageChange?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>, stage: number)
         => Partial<ProcessedGameState<number> & MultiStageGameState>;
+    getStageCompletionText?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>)
+        => PartiallyTranslatable<ReactNode> | undefined;
     getStageButtonText?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>)
-        => PartiallyTranslatable | undefined;
+        => PartiallyTranslatable<ReactNode> | undefined;
 }
 
 const aboveRulesTextHeightCoeff = h2HeightCoeff * 0.9;
 
 export const MultiStageSudokuTypeManager = (
-    {getStage, onStageChange, getStageButtonText}: MultiStageSudokuOptions
+    {getStage, onStageChange, getStageCompletionText, getStageButtonText}: MultiStageSudokuOptions
 ): SudokuTypeManager<number, MultiStageGameState, MultiStageGameState> => ({
     ...DigitSudokuTypeManager<MultiStageGameState, MultiStageGameState>(),
 
@@ -55,10 +58,14 @@ export const MultiStageSudokuTypeManager = (
             transition: "0.3s all linear",
             textAlign: "center",
         }}>
-            {translate("Congratulations")}, {translate({
-            [LanguageCode.en]: <>you completed the&nbsp;stage</>,
-            [LanguageCode.ru]: <>Вы завершили этап</>,
-        })}! &nbsp;
+            {translate(getStageCompletionText?.(context) ?? processTranslations<ReactNode>(
+                (congratulations, youCompletedTheStage) => <>{congratulations}, {youCompletedTheStage}!</>,
+                "Congratulations",
+                {
+                    [LanguageCode.en]: <>you completed the&nbsp;stage</>,
+                    [LanguageCode.ru]: <>Вы завершили этап</>,
+                }
+            ))} &nbsp;
 
             <Button
                 type={"button"}

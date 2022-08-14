@@ -14,26 +14,44 @@ import {
     arrowsExplained,
     arrowsTitle,
     blackKropkiDotsExplained,
-    cannotRepeatInCage, canRepeatOnArrows,
+    cannotRepeatInCage,
+    canRepeatOnArrows,
     conventionalNotationsApply,
+    germanWhispersExplained,
+    germanWhispersTitle,
     killerCagesExplained,
     killerCagesTitle,
     kropkiDotsTitle,
     normalSudokuRulesApply,
     normalSudokuRulesDoNotApply,
     notAllDotsGiven,
+    renbanExplained,
+    renbanTitle,
     ruleWithTitle,
+    twoDigitArrowCirclesExplained,
     whiteKropkiDotsExplained
 } from "../ruleSnippets";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import React from "react";
-import {tenInOneStage1Rules} from "../../sudokuTypes/ten-in-one/data/ruleSnippets";
+import {tenInOneMultiBoxLineRules, tenInOneStage1Rules} from "../../sudokuTypes/ten-in-one/data/ruleSnippets";
 import {isValidFinishedPuzzleByStageConstraints} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
 import {RulesIndentedBlock} from "../../components/sudoku/rules/RulesIndentedBlock";
 import {processTranslations} from "../../utils/translate";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
+import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
+import {Constraint} from "../../types/sudoku/Constraint";
+import {GermanWhispersConstraint} from "../../components/sudoku/constraints/german-whispers/GermanWhispers";
+import {Position} from "../../types/layout/Position";
 
-const remainingIndexes = [0, 4, 8];
+const remainingBoxPositionIndexes = [0, 4, 8];
+const keepDigitsAccordingBoxPositionText = {
+    [LanguageCode.en]: "Keep the digit from stage 1 in each box that corresponds to their box position " +
+    "(e.g. keep r1r1 in box 1, r5c9 in box 6, and r9c5 in box 8), clean up all other cells",
+    [LanguageCode.ru]: "Из этапа 1 оставьте в каждом квадрате цифру, которая соответствует положению её квадрата " +
+    "(например, оставьте r1r1 в квадрате 1, r5c9 в квадрате 6, и r9c5 в квадрате 8), очистите все остальные ячейки",
+};
+const keepDigitsAccordingBoxPositionCallback = ({top, left}: Position) =>
+    remainingBoxPositionIndexes.includes(top) && remainingBoxPositionIndexes.includes(left);
 
 const fieldSize = {
     ...createRegularFieldSize(9, 3),
@@ -49,9 +67,7 @@ export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, M
         [LanguageCode.ru]: "Абстрактные точки-клетки",
     },
     slug: "abstract-killer-dots",
-    typeManager: TenInOneSudokuTypeManager(
-        ({top, left}) => remainingIndexes.includes(top) && remainingIndexes.includes(left)
-    ),
+    typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
     fieldSize,
     rules: translate => <>
         <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
@@ -70,10 +86,7 @@ export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, M
         </RulesIndentedBlock>
         <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
         <RulesIndentedBlock>
-            <RulesParagraph>{translate({
-                [LanguageCode.en]: "Keep the digit from stage 1 in each box that corresponds to their box position, clean up all other cells",
-                [LanguageCode.ru]: "Из этапа 1 сохраните в каждом квадрате цифру, которая соответствует положению её квадрата, очистите все остальные ячейки",
-            })}.</RulesParagraph>
+            <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         </RulesIndentedBlock>
         <RulesParagraph>{translate(processTranslations(
@@ -192,5 +205,140 @@ export const LegoHouse: PuzzleDefinition<number, MultiStageGameState, MultiStage
         KillerCageConstraintByRect("R8C4", 2, 1, 8),
         KillerCageConstraintByRect("R9C8", 2, 1, 8),
     ],
+    resultChecker,
+};
+
+export const DollHouse: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+    noIndex: true,
+    author: AnalyticalNinja,
+    title: {
+        [LanguageCode.en]: "Doll House",
+        [LanguageCode.ru]: "Кукольный дом",
+    },
+    slug: "doll-house",
+    typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
+    fieldSize,
+    rules: translate => <>
+        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+        <RulesUnorderedList>
+            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}. {translate(twoDigitArrowCirclesExplained)}. {translate(canRepeatOnArrows)}.</li>
+            <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained))}.</li>
+            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained))}.</li>
+        </RulesUnorderedList>
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)} ({translate({
+                [LanguageCode.en]: "in this stage, line segments in different boxes can be different line types",
+                [LanguageCode.ru]: "на этом этапе сегменты линий в разных квадратах могут быть линиями разных типов",
+            })}).</RulesParagraph>
+        </RulesIndentedBlock>
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        </RulesIndentedBlock>
+    </>,
+    items: ({stage}) => {
+        let lines: Constraint<number, unknown, MultiStageGameState, MultiStageGameState>[] = [
+            RenbanConstraint(["R3C3", "R2C3", "R1C4", "R2C5"]),
+            RenbanConstraint(["R5C6", "R6C6", "R6C7", "R5C8"]),
+            GermanWhispersConstraint(["R5C5", "R4C4", "R6C2", "R8C2", "R8C6"]),
+        ];
+        if (stage === 1) {
+            // Make the line constraints decorative (UI-only)
+            lines = lines.map(constraint => ({
+                ...constraint,
+                isValidCell: undefined,
+                isValidPuzzle: undefined,
+            }));
+
+            // Add parts of the lines in each box separately
+            lines.push(
+                RenbanConstraint(["R3C3", "R2C3"], false),
+                RenbanConstraint(["R1C4", "R2C5"], false),
+                RenbanConstraint(["R5C6", "R6C6"], false),
+                RenbanConstraint(["R6C7", "R5C8"], false),
+                GermanWhispersConstraint(["R5C5", "R4C4"], false),
+                GermanWhispersConstraint(["R5C3", "R6C2"], false),
+                GermanWhispersConstraint(["R7C2", "R8C2", "R8C3"], false),
+                GermanWhispersConstraint(["R8C4", "R8C6"], false),
+            );
+        }
+
+        return [
+            ...lines,
+
+            // these lines are always in one box
+            RenbanConstraint(["R4C1", "R4C2"]),
+            RenbanConstraint(["R8C8", "R8C9"]),
+            GermanWhispersConstraint(["R3C8", "R3C9"]),
+
+            ArrowConstraint(["R3C2", "R3C1"], ["R2C1", "R1C2"], true),
+            ArrowConstraint(["R1C6", "R1C5"], ["R1C4", "R3C6"], true),
+            ArrowConstraint("R1C9", ["R1C8", "R2C7"], true),
+            ArrowConstraint("R3C8", ["R3C7", "R2C7"], true),
+            ArrowConstraint("R4C3", ["R6C1"], true),
+            ArrowConstraint("R6C4", ["R6C5", "R5C4", "R4C5"], true),
+            ArrowConstraint(["R5C9", "R6C9"], ["R6C8", "R5C7"], true),
+            ArrowConstraint("R9C2", ["R9C1", "R7C3"], true),
+            ArrowConstraint(["R9C6", "R9C5"], ["R9C4", "R7C6"], true),
+            ArrowConstraint(["R9C9", "R9C8"], ["R9C7", "R7C7"], true),
+        ];
+    },
+    resultChecker,
+};
+
+export const MoodyLines: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+    noIndex: true,
+    author: AnalyticalNinja,
+    title: {
+        [LanguageCode.en]: "Moody Lines",
+        [LanguageCode.ru]: "Капризные линии",
+    },
+    slug: "moody-lines",
+    typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
+    fieldSize,
+    rules: translate => <>
+        <RulesParagraph>{translate(arrowsExplained)}. {translate(canRepeatOnArrows)}.</RulesParagraph>
+        <RulesParagraph>{translate(killerCagesExplained)}.</RulesParagraph>
+        {/*TODO: ambiguous lines*/}
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)}.</RulesParagraph>
+        </RulesIndentedBlock>
+        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
+        <RulesIndentedBlock>
+            <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        </RulesIndentedBlock>
+    </>,
+    items: ({stage}) => {
+        let lines: Constraint<number, unknown, MultiStageGameState, MultiStageGameState>[] = [
+            // TODO
+        ];
+        if (stage === 1) {
+            // Make the line constraints decorative (UI-only)
+            lines = lines.map(constraint => ({
+                ...constraint,
+                isValidCell: undefined,
+                isValidPuzzle: undefined,
+            }));
+
+            // Add parts of the lines in each box separately
+            lines.push(
+                // TODO
+            );
+        }
+
+        return [
+            ...lines,
+
+            // TODO
+        ];
+    },
     resultChecker,
 };
