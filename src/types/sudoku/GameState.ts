@@ -265,7 +265,7 @@ export const gameStateRedo = <CellType, ProcessedGameStateExtensionType = {}>(
 // region Selected cells
 export const gameStateAreAllSelectedCells = <CellType>(
     gameState: ProcessedGameState<CellType>,
-    predicate: (cellState: CellState<CellType>) => boolean
+    predicate: (cellState: CellState<CellType>, position: Position) => boolean
 ) =>
     areAllFieldStateCells(
         gameStateGetCurrentFieldState(gameState),
@@ -275,7 +275,7 @@ export const gameStateAreAllSelectedCells = <CellType>(
 
 export const gameStateIsAnySelectedCell = <CellType>(
     gameState: ProcessedGameState<CellType>,
-    predicate: (cellState: CellState<CellType>) => boolean
+    predicate: (cellState: CellState<CellType>, position: Position) => boolean
 ) =>
     isAnyFieldStateCell(
         gameStateGetCurrentFieldState(gameState),
@@ -510,44 +510,56 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
 };
 
 const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+    {
+        puzzle: {
+            typeManager,
+            initialDigits,
+        },
+        state,
+    }: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     digit: number,
     isGlobal: boolean,
     cellData: CellType
-): (cellState: CellStateEx<CellType>) => Partial<CellStateEx<CellType>> => {
+): (cellState: CellStateEx<CellType>, position: Position) => Partial<CellStateEx<CellType>> => {
     if (isGlobal) {
-        switch (gameState.cellWriteMode) {
+        const isInitialDigit = ({top, left}: Position): boolean =>
+            initialDigits?.[top]?.[left] !== undefined || state.initialDigits[top]?.[left] !== undefined;
+
+        switch (state.cellWriteMode) {
             case CellWriteMode.main:
-                return ({centerDigits, cornerDigits}) => ({
+                return ({centerDigits, cornerDigits}, position) => isInitialDigit(position) ? {} : {
                     usersDigit: cellData,
                     centerDigits: centerDigits.clear(),
                     cornerDigits: cornerDigits.clear(),
-                });
+                };
 
             case CellWriteMode.center:
                 const areAllCentersEnabled = gameStateAreAllSelectedCells(
-                    gameState,
-                    ({centerDigits}) => centerDigits.contains(cellData)
+                    state,
+                    ({usersDigit, centerDigits}, position) =>
+                        isInitialDigit(position) || usersDigit !== undefined || centerDigits.contains(cellData)
                 );
 
-                return ({centerDigits}) => ({
-                    centerDigits: centerDigits.toggle(cellData, !areAllCentersEnabled)
-                });
+                return ({usersDigit, centerDigits}, position) =>
+                    isInitialDigit(position) || usersDigit !== undefined ? {} : {
+                        centerDigits: centerDigits.toggle(cellData, !areAllCentersEnabled)
+                    };
 
             case CellWriteMode.corner:
                 const areAllCornersEnabled = gameStateAreAllSelectedCells(
-                    gameState,
-                    ({cornerDigits}) => cornerDigits.contains(cellData)
+                    state,
+                    ({usersDigit, cornerDigits}, position) =>
+                        isInitialDigit(position) || usersDigit !== undefined || cornerDigits.contains(cellData)
                 );
 
-                return ({cornerDigits}) => ({
-                    cornerDigits: cornerDigits.toggle(cellData, !areAllCornersEnabled)
-                });
+                return ({usersDigit, cornerDigits}, position) =>
+                    isInitialDigit(position) || usersDigit !== undefined ? {} : {
+                        cornerDigits: cornerDigits.toggle(cellData, !areAllCornersEnabled)
+                    };
 
             case CellWriteMode.color:
                 const areAllColorsEnabled = gameStateAreAllSelectedCells(
-                    gameState,
+                    state,
                     ({colors}) => colors.contains(digit - 1)
                 );
 
@@ -575,14 +587,14 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
         handleDigitInCell = (isGlobal, clientId, cellWriteMode, cell, data, position, context, defaultValue) => defaultValue,
     } = typeManager;
 
-    const defaultHandler = getDefaultDigitHandler(typeManager, state, digit, isGlobal, cellData);
+    const defaultHandler = getDefaultDigitHandler(context, digit, isGlobal, cellData);
 
     const cache: any = {};
     let result = gameStateProcessSelectedCells(
         context,
         clientId,
         (cell, position) => handleDigitInCell(
-            isGlobal, clientId, state.cellWriteMode, cell, cellData, position, context, defaultHandler(cell), cache
+            isGlobal, clientId, state.cellWriteMode, cell, cellData, position, context, defaultHandler(cell, position), cache
         )
     );
 

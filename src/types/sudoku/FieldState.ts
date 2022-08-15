@@ -71,16 +71,16 @@ export const processFieldStateCells = <CellType>(
 export const areAllFieldStateCells = <CellType>(
     fieldState: FieldState<CellType>,
     affectedCells: Position[],
-    predicate: (cellState: CellState<CellType>) => boolean
+    predicate: (cellState: CellState<CellType>, position: Position) => boolean
 ) =>
-    affectedCells.every(({left: columnIndex, top: rowIndex}) => predicate(fieldState.cells[rowIndex][columnIndex]));
+    affectedCells.every((position) => predicate(fieldState.cells[position.top][position.left], position));
 
 export const isAnyFieldStateCell = <CellType>(
     fieldState: FieldState<CellType>,
     affectedCells: Position[],
-    predicate: (cellState: CellState<CellType>) => boolean
+    predicate: (cellState: CellState<CellType>, position: Position) => boolean
 ) =>
-    affectedCells.some(({left: columnIndex, top: rowIndex}) => predicate(fieldState.cells[rowIndex][columnIndex]));
+    affectedCells.some((position) => predicate(fieldState.cells[position.top][position.left], position));
 
 export const areFieldStatesEqual = <CellType>(
     typeManager: SudokuTypeManager<CellType, any, any>,
