@@ -546,8 +546,13 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
                 });
 
             case CellWriteMode.color:
+                const areAllColorsEnabled = gameStateAreAllSelectedCells(
+                    gameState,
+                    ({colors}) => colors.contains(digit - 1)
+                );
+
                 return ({colors}) => ({
-                    colors: colors.toggle(digit - 1)
+                    colors: colors.toggle(digit - 1, !areAllColorsEnabled)
                 });
         }
     }
