@@ -49,11 +49,14 @@ export const MultiStageSudokuTypeManager = (
 
         return <div style={{
             background: yellowColor,
-            marginBottom: cellSize * rulesMarginCoeff * coeff,
+            marginTop: cellSize * rulesMarginCoeff * coeff,
+            marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
             padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
             fontSize: cellSize * aboveRulesTextHeightCoeff,
             lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
             height: (cellSize * aboveRulesTextHeightCoeff * 3) * coeff,
+            border: "2px solid #f00",
+            opacity: coeff,
             overflow: "hidden",
             transition: "0.3s all linear",
             textAlign: "center",
