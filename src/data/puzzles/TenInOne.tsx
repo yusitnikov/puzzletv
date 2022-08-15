@@ -60,7 +60,6 @@ const fieldSize = {
 const resultChecker = isValidFinishedPuzzleByStageConstraints<number>(2);
 
 export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
-    noIndex: true,
     author: Raumplaner,
     title: {
         [LanguageCode.en]: "Abstract Killer Dots",
