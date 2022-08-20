@@ -79,22 +79,18 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
             .map((row) => row.map(({colors}) => colors));
 
         // Check that cells with the same digit contain the same set of colors
-        const groupsColors: SetInterface<CellColor>[] = indexes(9).map(() => new PlainValueSet<CellColor>());
+        const groupsColors: (SetInterface<CellColor> | undefined)[] = indexes(9).map(() => undefined);
         for (const [top, row] of fieldColors.entries()) {
             for (const [left, cellColors] of row.entries()) {
-                // Check that all cells have a color
-                if (cellColors.size === 0) {
-                    return false;
-                }
-
                 const groupIndex = correctAnswer[top][left] - 1;
+                const groupColors = groupsColors[groupIndex];
 
-                if (groupsColors[groupIndex].size === 0) {
+                if (groupColors === undefined) {
                     groupsColors[groupIndex] = cellColors;
                     continue;
                 }
 
-                if (!groupsColors[groupIndex].equals(cellColors)) {
+                if (!groupColors.equals(cellColors)) {
                     return false;
                 }
             }
@@ -102,7 +98,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
 
         for (const [groupIndex1, groupColors1] of groupsColors.entries()) {
             for (const [groupIndex2, groupColors2] of groupsColors.entries()) {
-                if (groupIndex2 > groupIndex1 && Math.floor(groupIndex1 / 3) !== Math.floor(groupIndex2 / 3) && groupColors1.equals(groupColors2)) {
+                if (groupIndex2 > groupIndex1 && Math.floor(groupIndex1 / 3) !== Math.floor(groupIndex2 / 3) && groupColors1!.equals(groupColors2!)) {
                     return false;
                 }
             }
