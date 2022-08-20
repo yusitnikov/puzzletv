@@ -18,7 +18,7 @@ import {
 } from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
-import {PlainValueSet, SetInterface} from "../../types/struct/Set";
+import {SetInterface} from "../../types/struct/Set";
 import {CellColor} from "../../types/sudoku/CellColor";
 import {indexes} from "../../utils/indexes";
 
