@@ -25,6 +25,7 @@ import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
 import {FPuzzles} from "./FPuzzles";
 import {HeartsCube} from "./HeartsCube";
 import {AbstractKillerDots, DollHouse, LegoHouse, MoodyLines} from "./TenInOne";
+import {TheOnlyThingThatMatters} from "./TheOnlyThingThatMatters";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -71,6 +72,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region My puzzles
+    TheOnlyThingThatMatters,
+
     HeartsCube(false),
     HeartsCube(true),
 

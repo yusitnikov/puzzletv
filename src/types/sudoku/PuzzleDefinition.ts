@@ -20,6 +20,7 @@ import {
     stringifyLine,
     stringifyPosition
 } from "../layout/Position";
+import {PuzzleResultCheck} from "./PuzzleResultCheck";
 
 export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     title: PartiallyTranslatable;
@@ -51,7 +52,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     initialDigits?: GivenDigitsMap<CellType>;
     initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => GivenDigitsMap<CellColorValue[]>);
     allowOverridingInitialColors?: boolean;
-    resultChecker?: (context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => boolean,
+    resultChecker?: (context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
     forceAutoCheckOnFinish?: boolean;
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);

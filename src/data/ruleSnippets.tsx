@@ -67,8 +67,8 @@ export const killerCagesTitle: Translatable = {
 };
 
 export const killerCagesExplained: Translatable = {
-    [LanguageCode.en]: "Cells in cages must sum to the total given in the corner of each cage",
-    [LanguageCode.ru]: "Сумма цифр в клетках равняется числу в углу каждой клетки",
+    [LanguageCode.en]: "Cells in cages must sum to the total given in the corner of the cage",
+    [LanguageCode.ru]: "Сумма цифр в клетках равняется числу в углу клетки",
 };
 
 export const cannotRepeatInCage: Translatable = {

@@ -31,6 +31,7 @@ import {
 } from "../../../types/sudoku/PuzzleDefinition";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
+import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
 
 export const getControlsWidthCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
     const allowedModes = getAllowedCellWriteModeInfos(puzzle);
@@ -99,7 +100,23 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const canRestart = !isEnabled || isHost;
 
     const [isShowingResult, setIsShowingResult] = useState(false);
-    const isCorrectResult = useMemo(() => resultChecker?.(context), [resultChecker, context]);
+    const {isCorrectResult, resultPhrase} = useMemo(
+        (): PuzzleResultCheck<string> => {
+            const result = resultChecker?.(context) ?? false;
+            return typeof result === "boolean"
+                ? {
+                    isCorrectResult: result,
+                    resultPhrase: result
+                        ? `${translate("Absolutely right")}!`
+                        : `${translate("Something's wrong here")}...`
+                }
+                : {
+                    isCorrectResult: result.isCorrectResult,
+                    resultPhrase: translate(result.resultPhrase),
+                };
+        },
+        [resultChecker, context, translate]
+    );
     const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
 
     const [isShowingRestartConfirmation, setIsShowingRestartConfirmation] = useState(false);
@@ -126,7 +143,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         if (autoCheckOnFinish && resultChecker && isCorrectResult) {
             setIsShowingResult(true);
         }
-    }, [autoCheckOnFinish, resultChecker, isCorrectResult, setIsShowingResult]);
+    }, [autoCheckOnFinish, resultChecker, isCorrectResult, resultPhrase, setIsShowingResult]);
 
     const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
     const allowDragging = allowedCellWriteModes.some(({mode}) => mode === CellWriteMode.move);
@@ -509,11 +526,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                                     <div>{translate("Your score is %1").replace("%1", myScore.toString())}.</div>
                                 </>
                         )
-                        : (
-                            isCorrectResult
-                                ? `${translate("Absolutely right")}!`
-                                : `${translate("Something's wrong here")}...`
-                        )
+                        : resultPhrase.split("\n").map((line, lineIndex) => <div key={lineIndex}>{line}</div>)
                 }
             </div>
 
