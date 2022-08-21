@@ -41,6 +41,8 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
     },
     author: Chameleon,
     slug: "the-only-thing-that-matters",
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AX6",
+    getLmdSolutionCode: () => "colors",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     rules: translate => <>
