@@ -29,11 +29,9 @@ export const Modal = ({cellSize, onClose, textAlign = "center", borderless, chil
                 zIndex: 1,
                 position: "absolute",
                 inset: 0,
-                top: puzzleContainer ? 0 : headerHeight,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                top: headerHeight,
                 background: "rgba(0, 0, 0, 0.5)",
+                fontFamily: "Lato, sans-serif",
             }}
         >
             <div
@@ -47,18 +45,28 @@ export const Modal = ({cellSize, onClose, textAlign = "center", borderless, chil
 
             <div
                 style={{
-                    zIndex: 3,
-                    border: borderless ? undefined : `3px solid ${textColor}`,
-                    backgroundColor: "#fff",
-                    padding: borderless ? 0 : `${padding}px ${padding * 2}px`,
-                    borderRadius: borderless ? 0 : padding / 3,
-                    fontSize: cellSize * textHeightCoeff,
-                    textAlign,
+                    position: "absolute",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    ...(puzzleContainer ?? {inset: 0}),
                 }}
             >
-                {children}
+                <div
+                    style={{
+                        zIndex: 3,
+                        border: borderless ? undefined : `3px solid ${textColor}`,
+                        backgroundColor: "#fff",
+                        padding: borderless ? 0 : `${padding}px ${padding * 2}px`,
+                        borderRadius: borderless ? 0 : padding / 3,
+                        fontSize: cellSize * textHeightCoeff,
+                        textAlign,
+                    }}
+                >
+                    {children}
+                </div>
             </div>
         </div>,
-        puzzleContainer || document.body
+        document.body
     );
 };

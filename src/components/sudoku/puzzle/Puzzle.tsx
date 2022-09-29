@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import React, {useRef} from "react";
+import React, {useMemo} from "react";
 import {Size} from "../../../types/layout/Size";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
@@ -17,6 +17,7 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Modal} from "../../layout/modal/Modal";
+import {Rect} from "../../../types/layout/Rect";
 
 const StyledContainer = styled("div", {
     shouldForwardProp(propName) {
@@ -72,6 +73,18 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     };
 
     const controlsOffset = sudokuSize + padding * 2;
+
+    const containerLeft = (windowSize.width - containerSize.width) / 2;
+    const fieldInnerRect = useMemo<Rect>(() => ({
+        left: padding,
+        top: padding,
+        width: sudokuSize,
+        height: sudokuSize,
+    }), [padding, sudokuSize]);
+    const fieldOuterRect = useMemo<Rect>(() => ({
+        ...fieldInnerRect,
+        left: containerLeft + fieldInnerRect.left,
+    }), [containerLeft, fieldInnerRect]);
     // endregion
 
     const context = useGame(puzzle, cellSize);
@@ -79,8 +92,6 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     const {state: gameState, multiPlayer} = context;
 
     const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
-
-    const containerRef = useRef<HTMLDivElement>(null);
 
     return <DigitComponentTypeContext.Provider value={digitComponentType}>
         <Title>
@@ -90,23 +101,17 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
         </Title>
 
         <StyledContainer
-            ref={containerRef}
             isDragMode={gameState.cellWriteMode === CellWriteMode.move}
         >
-            <PuzzleContainerContext.Provider value={containerRef}>
+            <PuzzleContainerContext.Provider value={fieldOuterRect}>
                 <Absolute
-                    left={(windowSize.width - containerSize.width) / 2}
+                    left={containerLeft}
                     top={0}
                     {...containerSize}
                 >
                     <Field
                         context={context}
-                        rect={{
-                            left: padding,
-                            top: padding,
-                            width: sudokuSize,
-                            height: sudokuSize,
-                        }}
+                        rect={fieldInnerRect}
                     />
 
                     <SidePanel
