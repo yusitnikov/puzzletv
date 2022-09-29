@@ -14,7 +14,7 @@ import {CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {splitArrayIntoChunks} from "../../utils/array";
-import {ConstraintOrComponent} from "../../types/sudoku/Constraint";
+import {ConstraintOrComponent, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {LittleKillerConstraint} from "../../components/sudoku/constraints/little-killer/LittleKiller";
 import {FPuzzlesLittleKillerSum} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesLittleKillerSum";
 import {
@@ -49,12 +49,19 @@ import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constra
 import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
 import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
 import {CellSelectionColor} from "../../components/sudoku/cell/CellSelection";
+import {
+    RegularCalculatorDigitComponentType
+} from "../../components/sudoku/digit/CalculatorDigit";
+import {RegularDigitComponentType} from "../../components/sudoku/digit/RegularDigit";
+import {
+    FillableCalculatorDigitConstraint
+} from "../../components/sudoku/constraints/fillable-calculator-digit/FillableCalculatorDigit";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
     slug: "f-puzzles",
     fulfillParams: (params) => params,
-    loadPuzzle: ({load, tesseract}) => {
+    loadPuzzle: ({load, tesseract, fillableDigitalDisplay, noSpecialRules}) => {
         if (typeof load !== "string") {
             throw new Error("Missing parameter");
         }
@@ -75,7 +82,11 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             saveStateKey: `f-puzzles-${sha1().update(load).digest("hex").substring(0, 20)}`,
             title: {[LanguageCode.en]: "Untitled"},
             typeManager: {
-                ...DigitSudokuTypeManager(),
+                ...DigitSudokuTypeManager(
+                    fillableDigitalDisplay
+                        ? RegularCalculatorDigitComponentType
+                        : RegularDigitComponentType
+                ),
                 getCellSelectionType: tesseract
                     ? (cell, puzzle, {selectedCells}) => {
                         if (selectedCells.size !== 1) {
@@ -114,6 +125,10 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             initialColors,
             items,
         };
+
+        if (noSpecialRules && !puzzleJson.solution) {
+            puzzle.resultChecker = isValidFinishedPuzzleByConstraints;
+        }
 
         const parseOptionalNumber = (value?: string | number) => value === undefined ? undefined : Number(value);
 
@@ -169,8 +184,12 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         region: undefined,
                         value: (value, {given}) => {
                             if (typeof value === "number" && given) {
-                                initialDigits[top] = initialDigits[top] || {};
-                                initialDigits[top][left] = value;
+                                if (fillableDigitalDisplay) {
+                                    items.push(FillableCalculatorDigitConstraint({top, left}, value));
+                                } else {
+                                    initialDigits[top] = initialDigits[top] || {};
+                                    initialDigits[top][left] = value;
+                                }
                             }
                         },
                         given: undefined,

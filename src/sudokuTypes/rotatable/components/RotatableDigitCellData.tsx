@@ -1,6 +1,6 @@
 import {CellDataProps, getDefaultCellDataColor} from "../../../components/sudoku/cell/CellDataProps";
 import {RotatableDigit} from "../types/RotatableDigit";
-import {CalculatorDigit, CalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
+import {CenteredCalculatorDigit, CenteredCalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 import {userDigitColor} from "../../../components/app/globals";
 import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
 import {RotatableProcessedGameState} from "../types/RotatableGameState";
@@ -10,7 +10,7 @@ export const RotatableDigitCellData = (
 ) => {
     const {data, size, state, isInitial, isValid, ...absoluteProps} = props;
 
-    return <CalculatorDigit
+    return <CenteredCalculatorDigit
         {...absoluteProps}
         digit={data.digit}
         size={size}
@@ -20,5 +20,5 @@ export const RotatableDigitCellData = (
 
 export const RotatableDigitCellDataComponentType: CellDataComponentType<RotatableDigit, RotatableProcessedGameState> = {
     component: RotatableDigitCellData,
-    widthCoeff: CalculatorDigitComponentType.widthCoeff,
+    widthCoeff: CenteredCalculatorDigitComponentType.widthCoeff,
 };

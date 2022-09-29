@@ -7,17 +7,25 @@ import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
 const T = true;
 const F = false;
-const matrices = [
+const getMatrices = (centerOne: boolean): boolean[][][] => [
     // 0
     [],
     // 1
-    [
-        [F, F, F],
-        [F, T, F],
-        [F, F, F],
-        [F, T, F],
-        [F, F, F],
-    ],
+    centerOne
+        ? [
+            [F, F, F],
+            [F, T, F],
+            [F, F, F],
+            [F, T, F],
+            [F, F, F],
+        ]
+        : [
+            [F, F, F],
+            [F, F, T],
+            [F, F, F],
+            [F, F, T],
+            [F, F, F],
+        ],
     // 2
     [
         [F, T, F],
@@ -83,26 +91,39 @@ const matrices = [
         [F, T, F],
     ],
 ];
+const matricesCentered = getMatrices(true);
+const matricesRegular = getMatrices(false);
 
 const lineWidthCoeff = 0.1;
 const lineSpacingCoeff = lineWidthCoeff * 0.3;
 const squareSizeCoeff = (1 - lineWidthCoeff) / 2;
 const digitWidthCoeff = squareSizeCoeff + lineWidthCoeff;
 
-export const CalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+export const CenteredCalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
     width={size}
     height={size}
     {...containerProps}
 >
-    <CalculatorDigitSvgContent
+    <CenteredCalculatorDigitSvgContent
+        digit={digit}
+        size={size}
+        color={color}
+    />
+</AutoSvg>);
+export const RegularCalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+    width={size}
+    height={size}
+    {...containerProps}
+>
+    <RegularCalculatorDigitSvgContent
         digit={digit}
         size={size}
         color={color}
     />
 </AutoSvg>);
 
-export const CalculatorDigitSvgContent = memo<DigitProps>(({digit, size, color, left = 0, top = 0}: DigitProps) => <>
-    {matrices[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
+export const getCalculatorDigitSvgContent = (centerOne: boolean) => memo<DigitProps>(({digit, size, color, left = 0, top = 0}: DigitProps) => <>
+    {(centerOne ? matricesCentered : matricesRegular)[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
         key={`${rowIndex}-${columnIndex}`}
         left={left + size * (columnIndex - 1) * squareSizeCoeff / 2}
         top={top + size * (rowIndex - 2) * squareSizeCoeff / 2}
@@ -111,6 +132,8 @@ export const CalculatorDigitSvgContent = memo<DigitProps>(({digit, size, color, 
         color={color}
     />))}
 </>);
+const CenteredCalculatorDigitSvgContent = getCalculatorDigitSvgContent(true);
+const RegularCalculatorDigitSvgContent = getCalculatorDigitSvgContent(false);
 
 interface DigitLineProps extends Position {
     size: number;
@@ -155,8 +178,13 @@ const DigitLine = memo(({left, top, size, vertical, color = "currentColor"}: Dig
     fill={color}
 />);
 
-export const CalculatorDigitComponentType: DigitComponentType = {
-    component: CalculatorDigit,
-    svgContentComponent: CalculatorDigitSvgContent,
+export const CenteredCalculatorDigitComponentType: DigitComponentType = {
+    component: CenteredCalculatorDigit,
+    svgContentComponent: CenteredCalculatorDigitSvgContent,
+    widthCoeff: digitWidthCoeff + lineWidthCoeff,
+};
+export const RegularCalculatorDigitComponentType: DigitComponentType = {
+    component: RegularCalculatorDigit,
+    svgContentComponent: RegularCalculatorDigitSvgContent,
     widthCoeff: digitWidthCoeff + lineWidthCoeff,
 };

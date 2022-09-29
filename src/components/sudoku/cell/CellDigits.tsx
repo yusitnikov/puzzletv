@@ -7,6 +7,8 @@ import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/pla
 import {FieldCellUserArea} from "../field/FieldCellUserArea";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 
+export const mainDigitCoeff = 0.7;
+
 const centerDigitCoeff = 0.35;
 
 const cornerDigitCoeff = 0.3;
@@ -124,7 +126,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 {initialData !== undefined && renderAnimatedDigitsSet(
                     "initial",
                     new CellDataSet(puzzle, [initialData]),
-                    size * 0.7,
+                    size * mainDigitCoeff,
                     () => emptyPositionWithAngle,
                     true,
                     true,
@@ -135,7 +137,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                     {usersDigit !== undefined && renderAnimatedDigitsSet(
                         "users",
                         new CellDataSet(puzzle, [usersDigit]),
-                        size * 0.7,
+                        size * mainDigitCoeff,
                         () => emptyPositionWithAngle,
                         false,
                         isValidUserDigit

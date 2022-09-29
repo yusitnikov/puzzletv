@@ -8,7 +8,7 @@ import {PositionWithAngle} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
-import {CalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
+import {CenteredCalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 import {GameState} from "../../../types/sudoku/GameState";
 import {useMemo} from "react";
 
@@ -145,7 +145,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         }
     },
 
-    digitComponentType: CalculatorDigitComponentType,
+    digitComponentType: CenteredCalculatorDigitComponentType,
 
     cellDataComponentType: RotatableDigitCellDataComponentType,
 
