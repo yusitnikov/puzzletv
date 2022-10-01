@@ -20,7 +20,7 @@ import {
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {useDiffEffect} from "../useDiffEffect";
 import {useControlKeysState} from "../useControlKeysState";
-import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
+import {SudokuCellsIndex, SudokuCellsIndexForState} from "../../types/sudoku/SudokuCellsIndex";
 
 const emptyObject: any = {};
 
@@ -174,6 +174,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 {
                     puzzle,
                     cellsIndex,
+                    cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState),
                     cellSize,
                     multiPlayer,
                     state: processedGameState,
@@ -230,6 +231,11 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         [calculateProcessedGameState, multiPlayer, gameState, processedGameStateExtension]
     );
 
+    const cellsIndexForState = useMemo(
+        () => new SudokuCellsIndexForState(cellsIndex, processedGameState),
+        [cellsIndex, processedGameState]
+    );
+
     const mergeGameState = useCallback(
         (
             actionsOrCallbacks: GameStateActionOrCallback<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
@@ -247,6 +253,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     const context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
                         puzzle,
                         cellsIndex,
+                        cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState),
                         cellSize,
                         multiPlayer,
                         state: {
@@ -296,12 +303,13 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         () => ({
             puzzle,
             cellsIndex,
+            cellsIndexForState,
             state: processedGameState,
             cellSize,
             multiPlayer,
             onStateChange: mergeGameState,
         }),
-        [puzzle, cellsIndex, processedGameState, cellSize, multiPlayer, mergeGameState]
+        [puzzle, cellsIndex, cellsIndexForState, processedGameState, cellSize, multiPlayer, mergeGameState]
     );
 
     useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);

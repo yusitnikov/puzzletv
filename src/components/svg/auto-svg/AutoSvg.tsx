@@ -1,6 +1,7 @@
 import {createContext, ReactNode, useContext} from "react";
 import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
 import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
+import {profiler} from "../../../utils/profiler";
 
 const SvgParentExistsContext = createContext<boolean>(false);
 
@@ -11,6 +12,10 @@ export interface AutoSvgProps extends Omit<AbsoluteProps<"svg">, "tagName" | "cl
 }
 
 export const AutoSvg = ({children, clip, style, ...props}: AutoSvgProps) => {
+    profiler.track("AutoSvg").stop();
+    if (clip) {
+        profiler.track("AutoSvg.clip").stop();
+    }
     const svgParentExists = useSvgParentExists();
 
     const id = "cb" + useAutoIncrementId();

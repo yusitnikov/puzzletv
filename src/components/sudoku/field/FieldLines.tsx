@@ -17,7 +17,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
                 customCellBounds,
                 fieldFitsWrapper,
             },
-            cellsIndex,
+            cellsIndexForState,
             cellSize,
             state,
         }
@@ -28,9 +28,9 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
 
     if (customCellBounds) {
         return <>
-            {cellsIndex.allCells.flatMap(
+            {cellsIndexForState.getAllCells().flatMap(
                 (row, top) => row.flatMap(
-                    ({getTransformedBounds}, left) => getTransformedBounds(state).borders.map(
+                    ({transformedBounds: {borders}}, left) => borders.map(
                         (border, partIndex) => <polygon
                             key={`${top}-${left}-${partIndex}`}
                             points={formatSvgPointsArray(border)}

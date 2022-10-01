@@ -18,6 +18,7 @@ import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Modal} from "../../layout/modal/Modal";
 import {Rect} from "../../../types/layout/Rect";
+import {profiler} from "../../../utils/profiler";
 
 const StyledContainer = styled("div", {
     shouldForwardProp(propName) {
@@ -36,6 +37,8 @@ export interface PuzzleProps<CellType, GameStateExtensionType = {}, ProcessedGam
 export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {puzzle}: PuzzleProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
+    profiler.flush();
+
     const {
         title,
         author,

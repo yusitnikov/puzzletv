@@ -101,7 +101,6 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                 data={cellData}
                 size={digitSize}
                 {...position}
-                state={state}
                 isInitial={isInitial || mainColor}
                 isValid={typeof isValid === "function" ? isValid(cellData) : isValid}
                 isRecent={isEnabled && !params?.share && (typeof isRecent === "function" ? isRecent(cellData) : isRecent)}

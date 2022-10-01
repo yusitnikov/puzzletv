@@ -3,10 +3,11 @@ import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataCom
 import {RegularDigit, RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {ComponentType} from "react";
 import {DigitProps} from "../../../components/sudoku/digit/DigitProps";
+import {profiler} from "../../../utils/profiler";
 
 export const DigitCellData = (DigitComponent: ComponentType<DigitProps> = RegularDigit) =>
-    (props: CellDataProps<number>) => {
-        const {data: digit, size, state, isInitial, isValid, ...absoluteProps} = props;
+    profiler.memo("DigitCellData", (props: CellDataProps<number>) => {
+        const {data: digit, size, isInitial, isValid, ...absoluteProps} = props;
 
         return <DigitComponent
             {...absoluteProps}
@@ -14,7 +15,7 @@ export const DigitCellData = (DigitComponent: ComponentType<DigitProps> = Regula
             size={size}
             color={getDefaultCellDataColor(props)}
         />;
-    };
+    });
 
 export const DigitCellDataComponentType = <ProcessedGameStateExtensionType,>(DigitComponent: ComponentType<DigitProps> = RegularDigit): CellDataComponentType<number, ProcessedGameStateExtensionType> => ({
     component: DigitCellData(DigitComponent),

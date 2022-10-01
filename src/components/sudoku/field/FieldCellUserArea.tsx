@@ -15,9 +15,9 @@ export const FieldCellUserArea = ({context, cellPosition, children}: FieldCellUs
             return undefined;
         }
 
-        const {areCustomBounds, getTransformedBounds} = context.cellsIndex.allCells[cellPosition.top][cellPosition.left];
+        const {areCustomBounds, transformedBounds: {userArea}} = context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
 
-        return areCustomBounds ? getTransformedBounds(context.state).userArea : undefined;
+        return areCustomBounds ? userArea : undefined;
     }, [context, cellPosition]);
 
     return <>

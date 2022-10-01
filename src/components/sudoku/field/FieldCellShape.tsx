@@ -19,9 +19,9 @@ export const FieldCellShape = ({context, cellPosition, line, left = 0, top = 0, 
             return undefined;
         }
 
-        const {areCustomBounds, getTransformedBounds} = context.cellsIndex.allCells[cellPosition.top][cellPosition.left];
+        const {areCustomBounds, transformedBounds} = context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
 
-        return areCustomBounds ? getTransformedBounds(context.state) : undefined;
+        return areCustomBounds ? transformedBounds : undefined;
     }, [context, cellPosition]);
 
     if (!context || !cellPosition || !customCellBounds) {

@@ -5,7 +5,6 @@ import {
     Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {SetInterface} from "../../../../types/struct/Set";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {getIsSamePuzzlePosition} from "../../../../types/sudoku/PuzzleDefinition";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
@@ -70,8 +69,8 @@ export const TapaCellConstraint = <CellType,>(cellLiteral: PositionLiteral, ...c
         ({top, left}) => context.cellsIndex.allCells[top][left].center
     );
 
-    const getLineSegments = (lines: SetInterface<Line>, {cellsIndex}: PuzzleContext<CellType, any, any>) =>
-        cellsIndex.getCenterLineSegments(lines.items);
+    const getLineSegments = ({cellsIndexForState}: PuzzleContext<CellType, any, any>) =>
+        cellsIndexForState.getCenterLineSegments();
 
     return {
         name: "tapa cell",
@@ -81,7 +80,7 @@ export const TapaCellConstraint = <CellType,>(cellLiteral: PositionLiteral, ...c
         isValidPuzzle(lines, digits, cells, context) {
             const neighborCenters = getNeighborCenters(context);
 
-            return getLineSegments(lines, context).some(({points}) => neighborCenters.containsOneOf(points));
+            return getLineSegments(context).some(({points}) => neighborCenters.containsOneOf(points));
         },
         getInvalidUserLines(
             lines,
@@ -92,7 +91,7 @@ export const TapaCellConstraint = <CellType,>(cellLiteral: PositionLiteral, ...c
         ): Line[] {
             const {center} = getCellInfo(context);
             const neighborCenters = getNeighborCenters(context);
-            const lineSegments = getLineSegments(lines, context);
+            const lineSegments = getLineSegments(context);
 
             const isSamePosition = getIsSamePuzzlePosition(context.puzzle);
 

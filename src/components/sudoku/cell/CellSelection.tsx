@@ -22,10 +22,12 @@ export const CellSelection = ({context, cellPosition, size, color = CellSelectio
     let selectionBorderWidth = 0.1 * strokeWidth;
     let selectionBorderWidth2 = 2 / size;
 
-    const {areCustomBounds, getTransformedBounds} = context.cellsIndex.allCells[cellPosition.top][cellPosition.left];
+    const {
+        areCustomBounds,
+        transformedBounds: {userArea: {rightVector, bottomVector}},
+    } = context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
 
     if (areCustomBounds) {
-        const {rightVector, bottomVector} = getTransformedBounds(context.state).userArea;
         const cellTransformedSize = (getVectorLength(rightVector) + getVectorLength(bottomVector)) / 2;
 
         const sizeCoeff = context.puzzle.fieldFitsWrapper

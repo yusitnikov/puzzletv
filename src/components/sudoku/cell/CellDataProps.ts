@@ -6,7 +6,6 @@ import {errorColor, recentInfoColor, textColor, userDigitColor} from "../../app/
 export interface CellDataProps<CellType, ProcessedGameStateExtensionType = {}> extends Omit<AutoSvgProps, keyof Size> {
     data: CellType;
     size: number;
-    state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
     isInitial?: boolean;
     isValid?: boolean;
     isRecent?: boolean;
@@ -14,6 +13,6 @@ export interface CellDataProps<CellType, ProcessedGameStateExtensionType = {}> e
 }
 
 export const getDefaultCellDataColor = <CellType, ProcessedGameStateExtensionType = {}>(
-    {data, state, isInitial, isValid, isRecent, customColor}: CellDataProps<CellType, ProcessedGameStateExtensionType>,
+    {isInitial, isValid, isRecent, customColor}: CellDataProps<CellType, ProcessedGameStateExtensionType>,
     regularColor = userDigitColor
 ) => customColor || (isRecent ? recentInfoColor : (!isValid ? errorColor : (isInitial ? textColor : regularColor)));
