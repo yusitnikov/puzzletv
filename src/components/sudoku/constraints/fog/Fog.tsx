@@ -12,7 +12,6 @@ export interface FogProps<CellType> {
 }
 
 const shadeSize = 0.4;
-const fullShadePercent = 30;
 
 export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
     {
@@ -40,13 +39,11 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
         <defs>
             <linearGradient id={"fog-rect-gradient"}>
                 <stop offset={"0%"} stopColor={"#000"} stopOpacity={0}/>
-                <stop offset={`${fullShadePercent}%`} stopColor={"#000"} stopOpacity={0}/>
                 <stop offset={"100%"} stopColor={"#000"} stopOpacity={1}/>
             </linearGradient>
 
             <radialGradient id={"fog-circle-gradient"} cx={"100%"} cy={"100%"} r={"100%"}>
                 <stop offset={"0%"} stopColor={"#000"} stopOpacity={1}/>
-                <stop offset={`${100 - fullShadePercent}%`} stopColor={"#000"} stopOpacity={0}/>
                 <stop offset={"100%"} stopColor={"#000"} stopOpacity={0}/>
             </radialGradient>
 

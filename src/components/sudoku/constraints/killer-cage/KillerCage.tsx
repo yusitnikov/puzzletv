@@ -16,8 +16,6 @@ import {isValidCellForRegion} from "../region/Region";
 import {indexes} from "../../../../utils/indexes";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 
-const borderPadding = 0.1;
-
 export interface KillerCageProps {
     sum?: string | number;
     showBottomSum?: boolean;
@@ -48,6 +46,7 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
         [cells, bottom]
     );
 
+    const borderPadding = prioritizeSelection ? 0.15 : 0.1;
     const sumPadding = prioritizeSelection ? 0.3 : borderPadding;
     const sumDigitSize = prioritizeSelection ? 0.25 : 0.15;
 
