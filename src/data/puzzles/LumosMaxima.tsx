@@ -34,6 +34,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     title: {[LanguageCode.en]: "Lumos Maxima"},
     author: Chameleon,
     slug: "lumos-maxima",
+    saveStateKey: "lumos-maxima-v2",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     rules: (translate) => <>
@@ -68,13 +69,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
         KillerCageConstraint(["R4C7", "R5C7"], 10),
         FogConstraint(solution, ["R2C2", "R8C7"]),
     ],
-    resultChecker: ({puzzle, ...context}) => isValidFinishedPuzzleByConstraints({
-        ...context,
-        puzzle: {
-            ...puzzle,
-            initialDigits: {1: {8: 3}},
-        },
-    }),
+    resultChecker: isValidFinishedPuzzleByConstraints,
     forceEnableConflictChecker: true,
     prioritizeSelection: true,
 };
