@@ -30,6 +30,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
                 getNewHostedGameParams,
                 resultChecker,
                 forceAutoCheckOnFinish,
+                forceEnableConflictChecker,
                 typeManager: {disableConflictChecker},
             },
             state: {
@@ -164,7 +165,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             />
         </SettingsItem>}
 
-        {!disableConflictChecker && <SettingsItem>
+        {!disableConflictChecker && !forceEnableConflictChecker && <SettingsItem>
             {translate("Highlight conflicts")}:
 
             <SettingsCheckbox

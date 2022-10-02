@@ -11,7 +11,7 @@ export interface TextProps {
     size?: number;
 }
 
-export const TextComponent = withFieldLayer(FieldLayer.lines, (
+export const TextComponent = (layer = FieldLayer.lines) => withFieldLayer(layer, (
     {cells: [{top, left}], text, size = 0.5, angle = 0, color = textColor}: ConstraintProps<any, TextProps>
 ) => <AutoSvg
     top={top + 0.5}
@@ -26,7 +26,14 @@ export const TextComponent = withFieldLayer(FieldLayer.lines, (
     </CenteredText>
 </AutoSvg>);
 
-export const TextConstraint = <CellType,>(cellLiterals: PositionLiteral[], text: string, color?: string, size?: number, angle?: number): Constraint<CellType, TextProps> => {
+export const TextConstraint = <CellType,>(
+    cellLiterals: PositionLiteral[],
+    text: string,
+    color?: string,
+    size?: number,
+    angle?: number,
+    layer = FieldLayer.lines,
+): Constraint<CellType, TextProps> => {
     return ({
         name: `text: ${text}`,
         cells: [getAveragePosition(parsePositionLiterals(cellLiterals))],
@@ -34,6 +41,6 @@ export const TextConstraint = <CellType,>(cellLiterals: PositionLiteral[], text:
         color,
         size,
         angle,
-        component: TextComponent,
+        component: TextComponent(layer),
     });
 };

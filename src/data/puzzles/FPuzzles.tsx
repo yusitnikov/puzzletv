@@ -251,7 +251,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles killer cage");
 
-                        return KillerCageConstraint(cells, parseOptionalNumber(value), false, outlineC, fontC);
+                        return KillerCageConstraint(cells, parseOptionalNumber(value), false, undefined, outlineC, fontC);
                     }));
                 }
             },
@@ -493,7 +493,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles cage");
 
-                        return DecorativeCageConstraint(cells, value?.toString(), false, outlineC, fontC);
+                        return DecorativeCageConstraint(cells, value?.toString(), false, undefined, outlineC, fontC);
                     }));
                 }
             },

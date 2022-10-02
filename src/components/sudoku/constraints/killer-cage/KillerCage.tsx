@@ -17,17 +17,25 @@ import {indexes} from "../../../../utils/indexes";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 
 const borderPadding = 0.1;
-const sumDigitSize = 0.15;
 
 export interface KillerCageProps {
     sum?: string | number;
     showBottomSum?: boolean;
+    sumPointIndex?: number;
     lineColor?: string;
     fontColor?: string;
 }
 
 export const KillerCage = withFieldLayer(FieldLayer.regular, (
-    {cells, sum, showBottomSum, lineColor = blackColor, fontColor = blackColor}: ConstraintProps<any, KillerCageProps>
+    {
+        context: {puzzle: {prioritizeSelection}},
+        cells,
+        sum,
+        showBottomSum,
+        sumPointIndex = 0,
+        lineColor = blackColor,
+        fontColor = blackColor,
+    }: ConstraintProps<any, KillerCageProps>
 ) => {
     const {widthCoeff} = useDigitComponentType();
 
@@ -39,6 +47,9 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
         () => Math.max(...cells.filter(cell => cell.top === bottom - 1).map(cell => cell.left)) + 1,
         [cells, bottom]
     );
+
+    const sumPadding = prioritizeSelection ? 0.3 : borderPadding;
+    const sumDigitSize = prioritizeSelection ? 0.25 : 0.15;
 
     return <>
         <polygon
@@ -67,15 +78,17 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
         {sum && <>
             <KillerCageSum
                 sum={sum}
-                left={points[0].left + borderPadding - sumDigitSize * widthCoeff / 2}
-                top={points[0].top + borderPadding}
+                size={sumDigitSize}
+                left={points[sumPointIndex].left + sumPadding - sumDigitSize * widthCoeff / 2}
+                top={points[sumPointIndex].top + sumPadding}
                 color={fontColor}
             />
 
             {showBottomSum && <KillerCageSum
                 sum={sum}
-                left={right - borderPadding - sumDigitSize * widthCoeff * (sum.toString().length - 0.5)}
-                top={bottom - borderPadding}
+                size={sumDigitSize}
+                left={right - sumPadding - sumDigitSize * widthCoeff * (sum.toString().length - 0.5)}
+                top={bottom - sumPadding}
                 color={fontColor}
             />}
         </>}
@@ -84,10 +97,11 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
 
 interface KillerCageSumProps extends Position {
     sum: string | number;
+    size: number;
     color?: string;
 }
 
-const KillerCageSum = ({sum, color = blackColor, left, top}: KillerCageSumProps) => {
+const KillerCageSum = ({sum, size, color = blackColor, left, top}: KillerCageSumProps) => {
     const {
         svgContentComponent: DigitSvgContent,
         widthCoeff,
@@ -96,25 +110,25 @@ const KillerCageSum = ({sum, color = blackColor, left, top}: KillerCageSumProps)
     return <>
         <rect
             x={left}
-            y={top - sumDigitSize / 2}
-            width={sumDigitSize * widthCoeff * sum.toString().length}
-            height={sumDigitSize}
+            y={top - size / 2}
+            width={size * widthCoeff * sum.toString().length}
+            height={size}
             fill={"white"}
         />
 
         {typeof sum === "number" && sum.toString().split("").map((digit, index) => <DigitSvgContent
             key={`digit-${index}`}
             digit={Number(digit)}
-            size={sumDigitSize}
-            left={left + sumDigitSize * widthCoeff * (index + 0.5)}
+            size={size}
+            left={left + size * widthCoeff * (index + 0.5)}
             top={top}
             color={color}
         />)}
 
         {typeof sum === "string" && sum.split("").map((character, index) => <CenteredText
             key={`character-${index}`}
-            size={sumDigitSize}
-            left={left + sumDigitSize * widthCoeff * (index + 0.5)}
+            size={size}
+            left={left + size * widthCoeff * (index + 0.5)}
             top={top}
             fill={color}
         >
@@ -127,6 +141,7 @@ export const DecorativeCageConstraint = <CellType,>(
     cellLiterals: PositionLiteral[],
     sum?: string | number,
     showBottomSum?: boolean,
+    sumPointIndex?: number,
     lineColor?: string,
     fontColor?: string
 ): Constraint<CellType, KillerCageProps> => ({
@@ -134,6 +149,7 @@ export const DecorativeCageConstraint = <CellType,>(
     cells: parsePositionLiterals(cellLiterals),
     sum,
     showBottomSum,
+    sumPointIndex,
     lineColor,
     fontColor,
     component: KillerCage,
@@ -143,10 +159,11 @@ export const KillerCageConstraint = <CellType,>(
     cellLiterals: PositionLiteral[],
     sum?: number,
     showBottomSum?: boolean,
+    sumPointIndex?: number,
     lineColor?: string,
     fontColor?: string
 ): Constraint<CellType, KillerCageProps> => ({
-    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, lineColor, fontColor),
+    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor),
     name: "killer cage",
     isValidCell(cell, digits, cells, {puzzle, state}) {
         if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
@@ -177,12 +194,20 @@ export const KillerCageConstraint = <CellType,>(
     },
 });
 
-export const KillerCageConstraintByRect = <CellType,>(topLeft: PositionLiteral, width: number, height: number, sum?: number, showBottomSum?: boolean) => {
+export const KillerCageConstraintByRect = <CellType,>(
+    topLeft: PositionLiteral,
+    width: number,
+    height: number,
+    sum?: number,
+    showBottomSum?: boolean,
+    sumPointIndex?: number,
+) => {
     const {top, left} = parsePositionLiteral(topLeft);
 
     return KillerCageConstraint<CellType>(
         indexes(height).flatMap(dy => indexes(width).map(dx => ({top: top + dy, left: left + dx}))),
         sum,
-        showBottomSum
+        showBottomSum,
+        sumPointIndex,
     );
 };

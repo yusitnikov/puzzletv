@@ -67,6 +67,8 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         allowOverridingInitialColors = false,
         loopHorizontally,
         loopVertically,
+        forceEnableConflictChecker,
+        prioritizeSelection,
     } = puzzle;
 
     const {
@@ -246,6 +248,31 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         ? initialColors(context)
         : initialColors as GivenDigitsMap<CellColorValue[]>;
 
+    const selection = !isNoSelectionMode && renderCellsLayer("selection", (cellState, cellPosition) => {
+        let color = "";
+        let width = 1;
+
+        if (selectedCells.contains(cellPosition)) {
+            color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
+                ? CellSelectionColor.mainCurrent
+                : CellSelectionColor.mainPrevious;
+        } else if (getCellSelectionType) {
+            const customSelection = getCellSelectionType(cellPosition, puzzle, state);
+            if (customSelection) {
+                color = customSelection.color;
+                width = customSelection.strokeWidth;
+            }
+        }
+
+        return !!color && <CellSelection
+            context={readOnlySafeContext}
+            cellPosition={cellPosition}
+            size={cellSize}
+            color={color}
+            strokeWidth={width}
+        />;
+    });
+
     return <Absolute
         {...rect}
         angle={typeManager.getFieldAngle?.(state)}
@@ -285,36 +312,15 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     </FieldLayerContext.Provider>
                 </FieldSvg>
 
-                {!isNoSelectionMode && renderCellsLayer("selection", (cellState, cellPosition) => {
-                    let color = "";
-                    let width = 1;
-
-                    if (selectedCells.contains(cellPosition)) {
-                        color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
-                            ? CellSelectionColor.mainCurrent
-                            : CellSelectionColor.mainPrevious;
-                    } else if (getCellSelectionType) {
-                        const customSelection = getCellSelectionType(cellPosition, puzzle, state);
-                        if (customSelection) {
-                            color = customSelection.color;
-                            width = customSelection.strokeWidth;
-                        }
-                    }
-
-                    return !!color && <CellSelection
-                        context={readOnlySafeContext}
-                        cellPosition={cellPosition}
-                        size={cellSize}
-                        color={color}
-                        strokeWidth={width}
-                    />;
-                })}
+                {!prioritizeSelection && selection}
 
                 <FieldSvg context={readOnlySafeContext}>
                     <FieldLayerContext.Provider value={FieldLayer.regular}>
                         <Items {...itemsProps}/>
                     </FieldLayerContext.Provider>
                 </FieldSvg>
+
+                {prioritizeSelection && selection}
 
                 <FieldSvg context={readOnlySafeContext} useShadow={false}>
                     <FieldLayerContext.Provider value={FieldLayer.lines}>
@@ -351,7 +357,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                         excludedDigits={cellExcludedDigits}
                         size={1}
                         cellPosition={cell}
-                        isValidUserDigit={!enableConflictChecker || disableConflictChecker || isValidUserDigit(cell, userDigits, items, readOnlySafeContext)}
+                        isValidUserDigit={!(enableConflictChecker || forceEnableConflictChecker) || disableConflictChecker || isValidUserDigit(cell, userDigits, items, readOnlySafeContext)}
                     />;
                 }, true)}
 

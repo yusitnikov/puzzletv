@@ -26,6 +26,7 @@ import {FPuzzles} from "./FPuzzles";
 import {HeartsCube} from "./HeartsCube";
 import {AbstractKillerDots, DollHouse, LegoHouse, MoodyLines} from "./TenInOne";
 import {TheOnlyThingThatMatters} from "./TheOnlyThingThatMatters";
+import {LumosMaxima} from "./LumosMaxima";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -72,6 +73,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region My puzzles
+    LumosMaxima,
+
     TheOnlyThingThatMatters,
 
     HeartsCube(false),

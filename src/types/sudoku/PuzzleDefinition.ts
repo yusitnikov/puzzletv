@@ -71,6 +71,8 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     noIndex?: boolean;
     saveState?: boolean;
     saveStateKey?: string;
+    forceEnableConflictChecker?: boolean;
+    prioritizeSelection?: boolean;
 }
 
 export interface PuzzleDefinitionLoader<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
