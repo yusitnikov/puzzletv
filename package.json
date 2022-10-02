@@ -2,6 +2,11 @@
     "name": "@chameleon/puzzletv",
     "version": "0.1.0",
     "private": true,
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "publish": "npm run build && git rm -r docs && move build docs && git add docs && git commit -m Build && git push"
+    },
     "dependencies": {
         "@emotion-icons/boxicons-logos": "^3.19.0",
         "@emotion-icons/fluentui-system-filled": "^3.15.0",
@@ -29,11 +34,6 @@
         "@types/styled-components": "^5.1.24",
         "geojson": "^0.5.0",
         "typescript": "^4.6.3"
-    },
-    "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "publish": "npm run build && git rm -r docs && move build docs && git add docs && git commit -m Build"
     },
     "eslintConfig": {
         "extends": [
