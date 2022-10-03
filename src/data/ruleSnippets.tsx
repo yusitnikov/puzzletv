@@ -82,7 +82,7 @@ export const arrowsTitle: Translatable = {
 };
 
 export const arrowsExplained: Translatable = {
-    [LanguageCode.en]: "Digits along arrows sum to the numbers in the circles",
+    [LanguageCode.en]: "Digits along an arrow sum to the number in the circle",
     [LanguageCode.ru]: "Сумма цифр, расположенных вдоль стрелок, равняется цифре в кружке",
 };
 

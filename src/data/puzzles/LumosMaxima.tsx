@@ -39,7 +39,13 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     fieldSize: FieldSize9,
     rules: (translate) => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>{translate(arrowsExplained)}. {translate(canRepeatOnArrows)}.</RulesParagraph>
+        <RulesParagraph>{translate(arrowsExplained)} ({translate({
+            [LanguageCode.en]: "there are only 1-cell circles in this puzzle",
+            [LanguageCode.ru]: "в этом судоку нет кругов, состоящих из нескольких клеток",
+        })}). {translate(canRepeatOnArrows)}. {translate({
+            [LanguageCode.en]: "There are no intersecting arrow clues",
+            [LanguageCode.ru]: "Стрелки не пересекаются друг с другом",
+        })}.</RulesParagraph>
         <RulesParagraph>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)}.</RulesParagraph>
         <RulesParagraph>{translate({
             [LanguageCode.en]: "The grid is covered with fog",
