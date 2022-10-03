@@ -76,6 +76,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
         FogConstraint(solution, ["R2C2", "R8C7"]),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
+    allowDrawing: ["center-line", "border-mark", "corner-mark", "center-mark"],
     forceEnableConflictChecker: true,
     prioritizeSelection: true,
 };
