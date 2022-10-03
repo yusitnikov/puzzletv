@@ -45,7 +45,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
         })}). {translate(canRepeatOnArrows)}.</RulesParagraph>
         <RulesParagraph>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)}.</RulesParagraph>
         <RulesParagraph>{translate({
-            [LanguageCode.en]: "Cage clues don't intersect with other cage clues, but they can intersect with other arrow clues",
+            [LanguageCode.en]: "Cages don't intersect with other cages, but they can intersect with other arrows",
             [LanguageCode.ru]: "Клетки не пересекаются с другими клетками, но они могут пересекаться с другими стрелками",
         })}.</RulesParagraph>
         <RulesParagraph>{translate({
