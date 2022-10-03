@@ -34,7 +34,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     title: {[LanguageCode.en]: "Lumos Maxima"},
     author: Chameleon,
     slug: "lumos-maxima",
-    saveStateKey: "lumos-maxima-v2",
+    saveStateKey: "lumos-maxima-v3",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     rules: (translate) => <>
