@@ -42,11 +42,12 @@ export const LumosMaxima: PuzzleDefinition<number> = {
         <RulesParagraph>{translate(arrowsExplained)} ({translate({
             [LanguageCode.en]: "there are only 1-cell circles in this puzzle",
             [LanguageCode.ru]: "в этом судоку нет кругов, состоящих из нескольких клеток",
-        })}). {translate(canRepeatOnArrows)}. {translate({
-            [LanguageCode.en]: "There are no intersecting arrow clues",
-            [LanguageCode.ru]: "Стрелки не пересекаются друг с другом",
-        })}.</RulesParagraph>
+        })}). {translate(canRepeatOnArrows)}.</RulesParagraph>
         <RulesParagraph>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)}.</RulesParagraph>
+        <RulesParagraph>{translate({
+            [LanguageCode.en]: "Cage clues don't intersect with other cage clues, but they can intersect with other arrow clues",
+            [LanguageCode.ru]: "Клетки не пересекаются с другими клетками, но они могут пересекаться с другими стрелками",
+        })}.</RulesParagraph>
         <RulesParagraph>{translate({
             [LanguageCode.en]: "The grid is covered with fog",
             [LanguageCode.ru]: "Поле покрыто туманом",
