@@ -13,6 +13,7 @@ import {createCubeFieldSize, CubeTypeManager} from "../../sudokuTypes/cube/types
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {AutoRegionConstraint} from "../../components/sudoku/constraints/auto-region/AutoRegion";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
@@ -91,4 +92,12 @@ export const EmptyToroidal: PuzzleDefinition<number> = {
     loopHorizontally: true,
     loopVertically: true,
     fieldMargin: 0.99,
+};
+
+export const EmptyLatin: PuzzleDefinition<number> = {
+    noIndex: true,
+    title,
+    slug: "empty-latin",
+    typeManager: LatinDigitSudokuTypeManager,
+    fieldSize: FieldSize9,
 };

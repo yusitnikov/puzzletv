@@ -50,18 +50,21 @@ import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwic
 import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
 import {CellSelectionColor} from "../../components/sudoku/cell/CellSelection";
 import {
+    CenteredCalculatorDigitComponentType,
     RegularCalculatorDigitComponentType
 } from "../../components/sudoku/digit/CalculatorDigit";
 import {RegularDigitComponentType} from "../../components/sudoku/digit/RegularDigit";
 import {
     FillableCalculatorDigitConstraint
 } from "../../components/sudoku/constraints/fillable-calculator-digit/FillableCalculatorDigit";
+import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
+import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
     slug: "f-puzzles",
     fulfillParams: (params) => params,
-    loadPuzzle: ({load, tesseract, fillableDigitalDisplay, noSpecialRules}) => {
+    loadPuzzle: ({load, type = "regular", tesseract, fillableDigitalDisplay, noSpecialRules}) => {
         if (typeof load !== "string") {
             throw new Error("Missing parameter");
         }
@@ -73,6 +76,17 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
         const puzzleJson = JSON.parse(jsonStr) as FPuzzlesPuzzle;
         console.log("Importing from f-puzzles:", puzzleJson);
 
+        const regularTypeManager = DigitSudokuTypeManager(
+            fillableDigitalDisplay
+                ? RegularCalculatorDigitComponentType
+                : RegularDigitComponentType
+        );
+        const typesMap: Record<string, SudokuTypeManager<number>> = {
+            regular: regularTypeManager,
+            latin: LatinDigitSudokuTypeManager,
+            calculator: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
+        };
+
         const initialDigits: GivenDigitsMap<number> = {};
         const initialColors: GivenDigitsMap<CellColorValue[]> = {};
         const items: ConstraintOrComponent<number, any>[] = [];
@@ -82,11 +96,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             saveStateKey: `f-puzzles-${sha1().update(load).digest("hex").substring(0, 20)}`,
             title: {[LanguageCode.en]: "Untitled"},
             typeManager: {
-                ...DigitSudokuTypeManager(
-                    fillableDigitalDisplay
-                        ? RegularCalculatorDigitComponentType
-                        : RegularDigitComponentType
-                ),
+                ...(typesMap[type] ?? regularTypeManager),
                 getCellSelectionType: tesseract
                     ? (cell, puzzle, {selectedCells}) => {
                         if (selectedCells.size !== 1) {

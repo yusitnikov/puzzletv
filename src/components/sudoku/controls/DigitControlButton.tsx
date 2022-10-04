@@ -6,6 +6,7 @@ import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {enterDigitAction} from "../../../types/sudoku/GameStateAction";
+import {joinListSemantically} from "../../../utils/array";
 
 export interface DigitControlButtonProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     index: number;
@@ -25,6 +26,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
     const {
         createCellDataByDisplayDigit,
+        disableDigitShortcuts,
         digitShortcuts = [],
         digitShortcutTips = [],
     } = typeManager;
@@ -37,15 +39,18 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
     const digit = index + 1;
     const cellData = createCellDataByDisplayDigit(digit, state);
-    const shortcut = isDigitMode && digitShortcuts[index];
+    let shortcuts = isDigitMode && digitShortcuts[index] || [];
     const shortcutTip = isDigitMode && digitShortcutTips[index];
 
-    let title = `${translate("Shortcut")}: ${digit}`;
-    if (shortcut) {
-        title = `${title} ${translate("or")} ${shortcut}`;
+    if (!isDigitMode || !disableDigitShortcuts) {
+        shortcuts = [digit.toString(), ...shortcuts];
     }
-    if (shortcutTip) {
-        title = `${title} (${translate(shortcutTip)})`;
+    let title = "";
+    if (shortcuts.length) {
+        title = `${translate("Shortcut")}: ${joinListSemantically(shortcuts, translate("or"))}`;
+        if (shortcutTip) {
+            title += ` (${translate(shortcutTip)})`;
+        }
     }
 
     const handleDigit = useCallback(
@@ -60,12 +65,11 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
         const {code} = ev;
 
-        if (
-            code === `Digit${digit}` ||
-            code === `Numpad${digit}` ||
-            (shortcut && code === `Key${shortcut}`)
-        ) {
+        if (shortcuts.flatMap(shortcut => [`Key${shortcut}`, `Digit${shortcut}`, `Numpad${shortcut}`]).includes(code)) {
             handleDigit();
+            ev.preventDefault();
+        } else if ([`Digit${digit}`, `Numpad${digit}`].includes(code)) {
+            // Prevent Ctrl+digit from navigating to another tab even if the digit shortcut is not supported
             ev.preventDefault();
         }
     });

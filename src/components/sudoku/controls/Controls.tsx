@@ -85,6 +85,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         createCellDataByDisplayDigit,
         mainControlsComponent: MainControls,
         getPlayerScore,
+        disableCellModeLetterShortcuts,
     } = typeManager;
 
     const {
@@ -203,7 +204,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         const anyKey = ctrlKey || shiftKey;
 
         for (const [index, {mode}] of allowedCellWriteModes.entries()) {
-            if (code === ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"][index] && !anyKey) {
+            if (!disableCellModeLetterShortcuts && code === ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"][index] && !anyKey) {
                 handleSetCellWriteMode(mode);
                 ev.preventDefault();
             }

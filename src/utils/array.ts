@@ -7,3 +7,11 @@ export const splitArrayIntoChunks = <T>(array: T[], chunkSize: number): T[][] =>
 
     return result;
 };
+
+export const joinListSemantically = (list: string[], lastSeparator: string) => {
+    if (list.length < 2) {
+        return list.join(", ");
+    }
+
+    return list.slice(0, -1).join(", ") + " " + lastSeparator + " " + list[list.length - 1];
+};

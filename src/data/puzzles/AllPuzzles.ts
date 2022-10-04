@@ -7,7 +7,7 @@ import {
     EmptyChaosConstructionLoop,
     EmptyChess,
     EmptyCube,
-    EmptyCubedoku,
+    EmptyCubedoku, EmptyLatin,
     EmptyRegular,
     EmptyRotatable,
     EmptyToroidal
@@ -38,6 +38,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     EmptyCubedoku,
     EmptyCube,
     EmptyToroidal,
+    EmptyLatin,
     // endregion
 
     FPuzzles,

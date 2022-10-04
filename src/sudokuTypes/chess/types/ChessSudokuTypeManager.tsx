@@ -78,7 +78,7 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
 
     maxDigitsCount: 6,
 
-    digitShortcuts: ["P", "N", "B", "R", "Q", "K"],
+    digitShortcuts: [["P"], ["N"], ["B"], ["R"], ["Q"], ["K"]],
 
     digitShortcutTips: [
         undefined,

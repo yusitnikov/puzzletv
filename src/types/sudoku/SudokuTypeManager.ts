@@ -157,7 +157,11 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     maxDigitsCount?: number;
 
-    digitShortcuts?: string[];
+    disableCellModeLetterShortcuts?: boolean;
+
+    disableDigitShortcuts?: boolean;
+
+    digitShortcuts?: string[][];
 
     digitShortcutTips?: (Translatable|undefined)[];
 
