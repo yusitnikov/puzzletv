@@ -39,7 +39,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
     const digit = index + 1;
     const cellData = createCellDataByDisplayDigit(digit, state);
-    let shortcuts = isDigitMode && digitShortcuts[index] || [];
+    let shortcuts = (isDigitMode && digitShortcuts[index]) || [];
     const shortcutTip = isDigitMode && digitShortcutTips[index];
 
     if (!isDigitMode || !disableDigitShortcuts) {
