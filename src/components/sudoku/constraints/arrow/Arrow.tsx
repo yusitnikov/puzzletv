@@ -11,6 +11,7 @@ import {
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
+import {defaultGetDefaultNumberByDigits} from "../../../../types/sudoku/SudokuTypeManager";
 
 const lineWidth = 0.1;
 const arrowSize = 0.25;
@@ -84,7 +85,8 @@ export const ArrowConstraint = <CellType,>(
     circleCellLiterals: PositionLiteral | PositionLiteral[],
     arrowCellLiterals: PositionLiteral[] = [],
     transparentCircle = false,
-    arrowStartCellLiteral: PositionLiteral | undefined = undefined
+    arrowStartCellLiteral: PositionLiteral | undefined = undefined,
+    product = false
 ): Constraint<CellType, ArrowProps> => {
     circleCellLiterals = Array.isArray(circleCellLiterals) ? circleCellLiterals : [circleCellLiterals];
     const arrowStartCell = parsePositionLiteral(arrowStartCellLiteral ?? circleCellLiterals[0]);
@@ -99,28 +101,40 @@ export const ArrowConstraint = <CellType,>(
         cells,
         transparentCircle,
         component: Arrow,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
-            let sum = 0;
-            for (const circleCell of circleCells) {
-                const sumData = digits[circleCell.top]?.[circleCell.left];
-                if (sumData === undefined) {
-                    return true;
-                }
-                sum *= 10;
-                sum += getDigitByCellData(sumData, state);
+        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData, getNumberByDigits = defaultGetDefaultNumberByDigits}}, state}) {
+            const circleDigits = circleCells.map(({top, left}) => {
+                const data = digits[top]?.[left];
+                return data === undefined ? undefined : getDigitByCellData(data, state);
+            });
+            if (circleDigits.some(digit => digit === undefined)) {
+                return true;
+            }
+            const circleNumber = getNumberByDigits(circleDigits as number[]);
+            if (circleNumber === undefined) {
+                return false;
             }
 
+            if (arrowCells.length === 0) {
+                return true;
+            }
+
+            let arrowNumber = product ? 1 : 0;
             for (const arrowCell of arrowCells) {
-                const arrowDigit = digits[arrowCell.top]?.[arrowCell.left];
+                const arrowData = digits[arrowCell.top]?.[arrowCell.left];
 
-                if (arrowDigit === undefined) {
+                if (arrowData === undefined) {
                     return true;
                 }
 
-                sum -= getDigitByCellData(arrowDigit, state);
+                const arrowDigit = getDigitByCellData(arrowData, state);
+                if (product) {
+                    arrowNumber *= arrowDigit;
+                } else {
+                    arrowNumber += arrowDigit;
+                }
             }
 
-            return sum === 0;
+            return arrowNumber === circleNumber;
         },
     });
 };

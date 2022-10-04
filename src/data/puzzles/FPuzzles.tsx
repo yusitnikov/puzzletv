@@ -64,7 +64,16 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
     slug: "f-puzzles",
     fulfillParams: (params) => params,
-    loadPuzzle: ({load, type = "regular", tesseract, fillableDigitalDisplay, noSpecialRules}) => {
+    loadPuzzle: (
+        {
+            load,
+            type = "regular",
+            tesseract,
+            fillableDigitalDisplay,
+            noSpecialRules,
+            "product-arrow": productArrow,
+        }
+    ) => {
         if (typeof load !== "string") {
             throw new Error("Missing parameter");
         }
@@ -253,8 +262,8 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         ObjectParser.empty.parse(other, "f-puzzles arrow");
 
                         return lines.length
-                            ? lines.map(([lineStart, ...line]) => ArrowConstraint(cells, line, false, lineStart))
-                            : ArrowConstraint(cells);
+                            ? lines.map(([lineStart, ...line]) => ArrowConstraint(cells, line, false, lineStart, !!productArrow))
+                            : ArrowConstraint(cells, [], false, undefined, !!productArrow);
                     }));
                 }
             },

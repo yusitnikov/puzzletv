@@ -58,6 +58,8 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
     ): number;
 
+    getNumberByDigits?(digits: number[]): number | undefined;
+
     transformDigit?(
         digit: number,
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
@@ -249,4 +251,15 @@ export const defaultProcessArrowDirection = (
     }
 
     return bestCell;
+};
+
+export const defaultGetDefaultNumberByDigits = (digits: number[]) => {
+    let num = 0;
+
+    for (const digit of digits) {
+        num *= 10;
+        num += digit;
+    }
+
+    return num;
 };
