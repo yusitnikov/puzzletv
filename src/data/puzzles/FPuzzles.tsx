@@ -252,7 +252,9 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...arrow.flatMap(({cells, lines, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles arrow");
 
-                        return lines.map(([circle, ...line]) => ArrowConstraint(circle, line));
+                        return lines.length
+                            ? lines.map(([lineStart, ...line]) => ArrowConstraint(cells, line, false, lineStart))
+                            : ArrowConstraint(cells);
                     }));
                 }
             },

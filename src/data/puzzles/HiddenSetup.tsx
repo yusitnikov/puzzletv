@@ -35,6 +35,7 @@ import {
     MultiStageSudokuTypeManager
 } from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
+import {Constraint} from "../../types/sudoku/Constraint";
 
 const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     switch (stage) {
@@ -197,7 +198,7 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiSta
         </>;
     },
     items: ({stage}) => {
-        const result = [
+        const result: Constraint<any, any>[] = [
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
             RenbanConstraint(["R1C6", "R4C6", "R4C9"]),

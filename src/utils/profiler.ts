@@ -11,9 +11,9 @@ class Profiler {
 
     flush() {
         if (this.enabled) {
-            console.log(`[${this.runId}]`);
+            console.debug(`[${this.runId}]`);
             for (const [key, {count, time}] of Object.entries(this.data)) {
-                console.log(`[${this.runId}] [${key}] ${time.toFixed(3)}s / ${count} = ${(time / count).toFixed(3 + count.toString().length)}s`);
+                console.debug(`[${this.runId}] [${key}] ${time.toFixed(3)}s / ${count} = ${(time / count).toFixed(3 + count.toString().length)}s`);
             }
 
             let changed = 0;
@@ -28,9 +28,9 @@ class Profiler {
                     el.setAttribute("data-rendered", "1");
                 }
             }
-            console.log(`[${this.runId}] ${same} same, ${changed} new`, changedByTagName);
+            console.debug(`[${this.runId}] ${same} same, ${changed} new`, changedByTagName);
 
-            const tracker = new Timer((time) => console.log(`[${this.runId}] [render] ${time.toFixed(3)}s`));
+            const tracker = new Timer((time) => console.debug(`[${this.runId}] [render] ${time.toFixed(3)}s`));
             setTimeout(() => tracker.stop(), 0);
         }
 

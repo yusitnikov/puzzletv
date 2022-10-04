@@ -76,6 +76,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         getRegionsWithSameCoordsTransformation,
         getCellSelectionType,
         disableConflictChecker,
+        disableArrowLetterShortcuts,
     } = typeManager;
 
     const items = useMemo(() => getAllPuzzleConstraintsAndComponents(context), [context]);
@@ -184,16 +185,24 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                     onStateChange(gameState => gameStateSelectAllCells(puzzle, gameState));
                     ev.preventDefault();
                 }
-                handleArrow(-1, 0, false);
+                if (!disableArrowLetterShortcuts) {
+                    handleArrow(-1, 0, false);
+                }
                 break;
             case "KeyD":
-                handleArrow(1, 0, false);
+                if (!disableArrowLetterShortcuts) {
+                    handleArrow(1, 0, false);
+                }
                 break;
             case "KeyW":
-                handleArrow(0, -1, false);
+                if (!disableArrowLetterShortcuts) {
+                    handleArrow(0, -1, false);
+                }
                 break;
             case "KeyS":
-                handleArrow(0, 1, false);
+                if (!disableArrowLetterShortcuts) {
+                    handleArrow(0, 1, false);
+                }
                 break;
             case "Escape":
                 if (!isAnyKeyDown) {

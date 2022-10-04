@@ -19,6 +19,7 @@ export const LatinDigitSudokuTypeManager: SudokuTypeManager<number> = {
     ...DigitSudokuTypeManager(),
 
     disableCellModeLetterShortcuts: true,
+    disableArrowLetterShortcuts: true,
     disableDigitShortcuts: true,
     digitShortcuts: [
         ["1", "I"],
