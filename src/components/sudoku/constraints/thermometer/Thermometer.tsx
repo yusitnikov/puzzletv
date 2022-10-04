@@ -1,15 +1,15 @@
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {lightGreyColor} from "../../../app/globals";
+import {darkGreyColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
 import {splitMultiLine} from "../../../../utils/lines";
 
-export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points, color = lightGreyColor}: ConstraintProps) => {
+export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points, color = darkGreyColor}: ConstraintProps) => {
     points = points.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
-    return <>
+    return <g opacity={0.5}>
         <circle
             cx={points[0].left}
             cy={points[0].top}
@@ -22,7 +22,7 @@ export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points, c
             strokeWidth={0.35}
             stroke={color}
         />
-    </>;
+    </g>;
 });
 
 export const ThermometerConstraint = <CellType,>(cellLiterals: PositionLiteral[], color?: string): Constraint<CellType> => {
