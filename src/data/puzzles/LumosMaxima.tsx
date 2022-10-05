@@ -81,6 +81,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     forceEnableConflictChecker: true,
     prioritizeSelection: true,
     initialLives: 3,
+    decreaseOnlyOneLive: true,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000BIU",
     getLmdSolutionCode: () => solution.map(row => row[8]).join(""),
 };

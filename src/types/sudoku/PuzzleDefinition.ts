@@ -74,6 +74,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     forceEnableConflictChecker?: boolean;
     prioritizeSelection?: boolean;
     initialLives?: number;
+    decreaseOnlyOneLive?: boolean;
 }
 
 export interface PuzzleDefinitionLoader<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {

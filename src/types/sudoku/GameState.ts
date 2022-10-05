@@ -595,7 +595,7 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
     clientId: string,
     isGlobal: boolean
 ) => {
-    const {puzzle: {typeManager, initialLives}, state} = context;
+    const {puzzle: {typeManager, initialLives, decreaseOnlyOneLive}, state} = context;
 
     const cellData = typeManager.createCellDataByTypedDigit(digit, state);
 
@@ -640,7 +640,7 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
         if (failedDigits.length) {
             result = {
                 ...result,
-                lives: Math.max(0, newState.lives - failedDigits.length),
+                lives: Math.max(0, newState.lives - (decreaseOnlyOneLive ? 1 : failedDigits.length)),
             };
             if (!result.lives) {
                 result.selectedCells = newState.selectedCells.clear();
