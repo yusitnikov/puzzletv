@@ -222,6 +222,11 @@ export const livesRules = (initialLives: number): Translatable => ({
     [LanguageCode.ru]: `У Вас есть ${initialLives} жизней на решение этого судоку. Одна жизнь отнимается при вводе неправильной цифры`,
 });
 
+export const noGuessingRequired: Translatable = {
+    [LanguageCode.en]: "Note: no guessing is required to finish the puzzle. The extra lives are given only to allow room for possible typos",
+    [LanguageCode.ru]: "Примечание: чтобы решить головоломку, не требуется никаких угадываний. Дополнительные жизни даны только для того, чтобы игра не закончилась из-за опечаток",
+};
+
 
 export const noBifurcation: Translatable<ReactNode> = {
     [LanguageCode.en]: <>And the most important rule: <strong>try using bifurcation as little as possible</strong> ;)</>,

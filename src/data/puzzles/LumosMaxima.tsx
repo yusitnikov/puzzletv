@@ -10,7 +10,7 @@ import {
     cannotRepeatInCage,
     canRepeatOnArrows,
     killerCagesExplained,
-    livesRules,
+    livesRules, noGuessingRequired,
     normalSudokuRulesApply
 } from "../ruleSnippets";
 import React from "react";
@@ -59,6 +59,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
             [LanguageCode.ru]: "Поместите правильные цифры в ячейки, чтобы получить больше света (можно поместить цифру в ячейку, покрытую туманом)",
         })}.</RulesParagraph>
         <RulesParagraph>{translate(livesRules(initialLives!))}.</RulesParagraph>
+        <RulesParagraph>{translate(noGuessingRequired)}.</RulesParagraph>
     </>,
     items: [
         ArrowConstraint("R6C1", ["R5C2", "R6C2"]),
@@ -80,7 +81,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     allowDrawing: ["center-line", "border-mark", "corner-mark", "center-mark"],
     forceEnableConflictChecker: true,
     prioritizeSelection: true,
-    initialLives: 3,
+    initialLives: 5,
     decreaseOnlyOneLive: true,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000BIU",
     getLmdSolutionCode: () => solution.map(row => row[8]).join(""),
