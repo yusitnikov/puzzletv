@@ -2,6 +2,7 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {LatinDigitComponentType} from "../../../components/sudoku/digit/LatinDigit";
 import {DigitCellDataComponentType} from "../../default/components/DigitCellData";
+import {areSameArrays} from "../../../utils/array";
 
 const map: Record<number, number> = {
     1: 1,
@@ -40,30 +41,65 @@ export const LatinDigitSudokuTypeManager: SudokuTypeManager<number> = {
     },
 
     getNumberByDigits(digits: number[]) {
-        let num = 0;
-        let skip = false;
-        for (let [index, digit] of digits.entries()) {
-            if (skip) {
-                skip = false;
-                continue;
-            }
+        digits = normalizeLatinDigits(digits);
 
-            // TODO: check for being a valid number
-            // const digitsBefore = digits.slice(0, index);
-            let nextDigit = digits[index + 1];
-            if (nextDigit !== undefined && nextDigit.toString().length === digit.toString().length && (nextDigit === digit * 2 || digit === nextDigit * 3)) {
-                digit += nextDigit;
-                ++index;
-                skip = true;
-                nextDigit = digits[index + 1];
-            }
-            // const digitsAfter = digits.slice(index + 1);
-            if (nextDigit !== undefined && digit < nextDigit) {
-                num -= digit;
-            } else {
-                num += digit;
-            }
-        }
-        return num;
+        const num = naiveLatinDigitsToNumber(digits);
+        const correctDigits = numberToLatinDigits(num);
+
+        return (correctDigits !== undefined && areSameArrays(digits, correctDigits))
+            ? num
+            : undefined;
     },
+};
+
+const normalizeLatinDigits = (digits: number[]) => digits.flatMap(digit => {
+    switch (digit) {
+        case 3: return [1, 1, 1];
+        case 2: return [1, 1];
+        default: return [digit];
+    }
+});
+
+const naiveLatinDigitsToNumber = (digits: number[]) => {
+    let num = 0;
+    for (let [index, digit] of digits.entries()) {
+        const nextDigit = digits[index + 1];
+        if (nextDigit !== undefined && digit < nextDigit) {
+            num -= digit;
+        } else {
+            num += digit;
+        }
+    }
+    return num;
+};
+
+const regularDigitToLatinDigit = (digit: number, coeff: number): number[] => [
+    [],
+    [coeff],
+    [coeff, coeff],
+    [coeff, coeff, coeff],
+    [coeff, coeff * 5],
+    [coeff * 5],
+    [coeff * 5, coeff],
+    [coeff * 5, coeff, coeff],
+    [coeff * 5, coeff, coeff, coeff],
+    [coeff, coeff * 10],
+][digit];
+
+const numberToLatinDigits = (num: number): number[] | undefined => {
+    if (num <= 0 || num >= 4000) {
+        return undefined;
+    }
+
+    const regularDigits = num
+        .toString()
+        .split("")
+        .map(Number);
+
+    return regularDigits.flatMap(
+        (digit, index) => regularDigitToLatinDigit(
+            digit,
+            Math.pow(10, regularDigits.length - 1 - index)
+        )
+    );
 };
