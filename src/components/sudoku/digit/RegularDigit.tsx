@@ -1,4 +1,3 @@
-import {memo} from "react";
 import {textColor} from "../../app/globals";
 import {DigitProps} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
