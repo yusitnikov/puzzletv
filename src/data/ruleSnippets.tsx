@@ -218,7 +218,7 @@ export const tapCluesApply = (maxNeighborsCount = 8): Translatable => ({
 });
 
 export const livesRules = (initialLives: number): Translatable => ({
-    [LanguageCode.en]: `You have ${initialLives} lives to solve the puzzle. It takes 1 live to enter wrong digit`,
+    [LanguageCode.en]: `You have ${initialLives} lives to solve the puzzle. It takes 1 life to enter a wrong digit`,
     [LanguageCode.ru]: `У Вас есть ${initialLives} жизней на решение этого судоку. Одна жизнь отнимается при вводе неправильной цифры`,
 });
 
