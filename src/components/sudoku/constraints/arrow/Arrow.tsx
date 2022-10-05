@@ -91,7 +91,7 @@ export const ArrowConstraint = <CellType,>(
     circleCellLiterals = Array.isArray(circleCellLiterals) ? circleCellLiterals : [circleCellLiterals];
     const arrowStartCell = parsePositionLiteral(arrowStartCellLiteral ?? circleCellLiterals[0]);
     const circleCells = splitMultiLine(parsePositionLiterals(circleCellLiterals));
-    const arrowCells = splitMultiLine(parsePositionLiterals(arrowCellLiterals));
+    const arrowCells = splitMultiLine([arrowStartCell, ...parsePositionLiterals(arrowCellLiterals)]).slice(1);
 
     return ({
         name: "arrow",
