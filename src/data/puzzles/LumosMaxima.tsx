@@ -31,7 +31,6 @@ const solution = [
 ];
 
 export const LumosMaxima: PuzzleDefinition<number> = {
-    noIndex: true,
     title: {[LanguageCode.en]: "Lumos Maxima"},
     author: Chameleon,
     slug: "lumos-maxima",
