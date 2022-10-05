@@ -90,15 +90,14 @@ export const ArrowConstraint = <CellType,>(
 ): Constraint<CellType, ArrowProps> => {
     circleCellLiterals = Array.isArray(circleCellLiterals) ? circleCellLiterals : [circleCellLiterals];
     const arrowStartCell = parsePositionLiteral(arrowStartCellLiteral ?? circleCellLiterals[0]);
-    const circleCells = parsePositionLiterals(circleCellLiterals);
-    const arrowCells = parsePositionLiterals(arrowCellLiterals);
-    const cells = splitMultiLine([...circleCells, ...arrowCells]);
+    const circleCells = splitMultiLine(parsePositionLiterals(circleCellLiterals));
+    const arrowCells = splitMultiLine(parsePositionLiterals(arrowCellLiterals));
 
     return ({
         name: "arrow",
         circleCells,
         arrowCells: [arrowStartCell, ...arrowCells],
-        cells,
+        cells: [...circleCells, ...arrowCells],
         transparentCircle,
         component: Arrow,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData, getNumberByDigits = defaultGetDefaultNumberByDigits}}, state}) {
