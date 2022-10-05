@@ -3,8 +3,13 @@ import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {Fragment, ReactElement} from "react";
-import {gameStateGetCurrentGivenDigits} from "../../../../types/sudoku/GameState";
+import {
+    gameStateGetCurrentFieldState,
+    gameStateGetCurrentGivenDigitsByCells
+} from "../../../../types/sudoku/GameState";
 import {darkGreyColor} from "../../../app/globals";
+import {CellBackground} from "../../cell/CellBackground";
+import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 
 export interface FogProps<CellType> {
     solution: CellType[][];
@@ -15,18 +20,21 @@ const shadeSize = 0.4;
 
 export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
     {
-        context: {
-            puzzle: {
-                fieldSize: {rowsCount, columnsCount},
-                typeManager: {areSameCellData},
-            },
-            state,
-        },
+        context,
         solution,
         startCells,
     }: ConstraintProps<any, FogProps<CellType>>
 ) => {
-    const givenDigits = gameStateGetCurrentGivenDigits(state);
+    const {
+        puzzle: {
+            fieldSize: {rowsCount, columnsCount},
+            typeManager: {areSameCellData},
+        },
+        state,
+    } = context;
+
+    const {cells} = gameStateGetCurrentFieldState(state);
+    const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
     const visible = solution.map(
         (row, top) => row.map(
             (digit, left) =>
@@ -148,6 +156,22 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             href={"#fog-light-source"}
             transform={`translate(${left} ${top})`}
         />)}
+
+        {visible.flatMap((row, top) => row.map((vis, left) => {
+            const {colors} = cells[top][left];
+
+            return !vis && colors.size !== 0 && <AutoSvg
+                key={`${top}-${left}`}
+                top={top}
+                left={left}
+            >
+                <CellBackground
+                    context={context}
+                    cellPosition={{top, left}}
+                    colors={colors}
+                />
+            </AutoSvg>;
+        }))}
     </>;
 }) as <CellType,>(props: ConstraintProps<any, FogProps<CellType>>) => ReactElement;
 
