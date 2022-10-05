@@ -22,6 +22,12 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
     const {
         typeManager,
+        /*
+         * Some browsers have a bug of not recognizing Shift key when pressing numpad digits.
+         * It may result in unintentionally writing main digits instead of pencilmarks into multiple cells.
+         * That's why numpad digits are disabled at all in puzzles when entering wrong digits reduces lives.
+         */
+        initialLives: disableNumpad,
     } = puzzle;
 
     const {
@@ -65,7 +71,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
         const {code} = ev;
 
-        if (shortcuts.flatMap(shortcut => [`Key${shortcut}`, `Digit${shortcut}`, `Numpad${shortcut}`]).includes(code)) {
+        if (shortcuts.flatMap(shortcut => [`Key${shortcut}`, `Digit${shortcut}`, disableNumpad ? "" : `Numpad${shortcut}`]).includes(code)) {
             handleDigit();
             ev.preventDefault();
         } else if ([`Digit${digit}`, `Numpad${digit}`].includes(code)) {
