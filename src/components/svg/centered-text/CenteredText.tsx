@@ -7,10 +7,8 @@ export interface CenteredTextProps extends Partial<Position>, Omit<SVGAttributes
 
 export const CenteredText = ({left = 0, top = 0, size, fill = "currentColor", style, children, ...otherProps}: CenteredTextProps) => <text
     x={left}
-    y={top}
+    y={top + size * 0.37}
     textAnchor={"middle"}
-    dominantBaseline={"middle"}
-    alignmentBaseline={"central"}
     style={{
         ...style,
         fontSize: `${size}px`,
