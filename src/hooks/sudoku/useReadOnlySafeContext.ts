@@ -6,7 +6,7 @@ export const useReadOnlySafeContext = <CellType, GameStateExtensionType, Process
 ): PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => useMemo(
     () => ({
         ...context,
-        onStateChange: context.state.isReady ? context.onStateChange : () => {}
+        onStateChange: (context.state.isReady && context.state.lives) ? context.onStateChange : () => {}
     }),
     [context]
 );

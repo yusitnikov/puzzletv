@@ -10,6 +10,7 @@ import {
     cannotRepeatInCage,
     canRepeatOnArrows,
     killerCagesExplained,
+    livesRules,
     normalSudokuRulesApply
 } from "../ruleSnippets";
 import React from "react";
@@ -37,7 +38,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     saveStateKey: "lumos-maxima-v4",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
-    rules: (translate) => <>
+    rules: (translate, {puzzle: {initialLives}}) => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(arrowsExplained)} ({translate({
             [LanguageCode.en]: "there are only 1-cell circles in this puzzle",
@@ -58,6 +59,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
             [LanguageCode.en]: "Put correct digits into the cells to get more light (it's ok to put a digit into a cell that is covered by fog)",
             [LanguageCode.ru]: "Поместите правильные цифры в ячейки, чтобы получить больше света (можно поместить цифру в ячейку, покрытую туманом)",
         })}.</RulesParagraph>
+        <RulesParagraph>{translate(livesRules(initialLives!))}.</RulesParagraph>
     </>,
     items: [
         ArrowConstraint("R6C1", ["R5C2", "R6C2"]),
@@ -79,4 +81,5 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     allowDrawing: ["center-line", "border-mark", "corner-mark", "center-mark"],
     forceEnableConflictChecker: true,
     prioritizeSelection: true,
+    initialLives: 3,
 };

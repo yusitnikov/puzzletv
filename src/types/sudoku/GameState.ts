@@ -19,7 +19,12 @@ import {indexes} from "../../utils/indexes";
 import {emptyPosition, Line, Position, PositionSet} from "../layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
-import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "./GivenDigitsMap";
+import {
+    GivenDigitsMap, givenDigitsMapToArray,
+    processGivenDigitsMaps,
+    serializeGivenDigitsMap,
+    unserializeGivenDigitsMap
+} from "./GivenDigitsMap";
 import {PuzzleContext} from "./PuzzleContext";
 import {SetInterface} from "../struct/Set";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../utils/playerDataHash";
@@ -33,6 +38,11 @@ import {LocalStorageKeys} from "../../data/LocalStorageKeys";
 import {CellMark} from "./CellMark";
 import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
+import {
+    getAllPuzzleConstraintsAndComponents,
+    isValidUserDigit,
+    prepareGivenDigitsMapForConstraints
+} from "./Constraint";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -52,6 +62,8 @@ export interface GameState<CellType> {
     loopOffset: Position;
 
     openedLmdOnce?: boolean;
+
+    lives: number;
 
     currentPlayer?: string;
     playerObjects: Record<string, PlayerObjectInfo>;
@@ -82,6 +94,7 @@ type SavedGameStates = [
     currentPlayer: any,
     ignore1: any, // ignore previous format for compatibility
     playerObjects: any,
+    lives: any,
 ][];
 const gameStateStorageKey = "savedGameState";
 const gameStateSerializerVersion = 2;
@@ -101,6 +114,7 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
         params = {},
         typeManager,
         saveState = true,
+        initialLives = 1,
     } = puzzle;
 
     const {
@@ -138,6 +152,8 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
         isAddingLine: false,
 
         loopOffset: emptyPosition,
+
+        lives: savedGameState?.[9] ?? initialLives,
 
         currentPlayer: savedGameState?.[6] || params.host,
         playerObjects: savedGameState?.[8] || {},
@@ -181,6 +197,7 @@ export const saveGameState = <CellType, GameStateExtensionType = {}, ProcessedGa
                 state.currentPlayer || "",
                 "",
                 state.playerObjects,
+                state.lives,
             ],
             ...getSavedGameStates().filter(([key]) => key !== fullSaveStateKey),
         ] as SavedGameStates).slice(0, maxSavedPuzzles),
@@ -578,13 +595,14 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
     clientId: string,
     isGlobal: boolean
 ) => {
-    const {puzzle: {typeManager}, state} = context;
+    const {puzzle: {typeManager, initialLives}, state} = context;
 
     const cellData = typeManager.createCellDataByTypedDigit(digit, state);
 
     const {
         handleDigitGlobally,
         handleDigitInCell = (isGlobal, clientId, cellWriteMode, cell, data, position, context, defaultValue) => defaultValue,
+        areSameCellData,
     } = typeManager;
 
     const defaultHandler = getDefaultDigitHandler(context, digit, isGlobal, cellData);
@@ -600,6 +618,34 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
 
     if (handleDigitGlobally) {
         result = handleDigitGlobally(isGlobal, clientId, context, cellData, result);
+    }
+
+    if (isGlobal && initialLives) {
+        const newState = {...state, ...result};
+        const digits = prepareGivenDigitsMapForConstraints(context, gameStateGetCurrentFieldState(state).cells);
+        const newDigits = prepareGivenDigitsMapForConstraints(context, gameStateGetCurrentFieldState(newState).cells);
+        const items = getAllPuzzleConstraintsAndComponents(context);
+
+        const failedDigits = givenDigitsMapToArray(processGivenDigitsMaps(
+            (digits, position) => {
+                const digit = digits[digits.length - 2];
+                const newDigit = digits[digits.length - 1];
+                return newDigit !== undefined
+                    && (digit === undefined || !areSameCellData(digit, newDigit, newState, true))
+                    && !isValidUserDigit(position, newDigits, items, context);
+            },
+            [digits, newDigits]
+        )).filter(({data}) => data);
+
+        if (failedDigits.length) {
+            result = {
+                ...result,
+                lives: Math.max(0, newState.lives - failedDigits.length),
+            };
+            if (!result.lives) {
+                result.selectedCells = newState.selectedCells.clear();
+            }
+        }
     }
 
     return result;

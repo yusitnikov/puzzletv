@@ -94,6 +94,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
         isShowingSettings,
         openedLmdOnce,
+        lives,
     } = state;
 
     const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;
@@ -103,6 +104,13 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const [isShowingResult, setIsShowingResult] = useState(false);
     const {isCorrectResult, resultPhrase} = useMemo(
         (): PuzzleResultCheck<string> => {
+            if (lives === 0) {
+                return {
+                    isCorrectResult: false,
+                    resultPhrase: translate("You lost") + "!",
+                };
+            }
+
             const result = resultChecker?.(context) ?? false;
             return typeof result === "boolean"
                 ? {
@@ -116,7 +124,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                     resultPhrase: translate(result.resultPhrase),
                 };
         },
-        [resultChecker, context, translate]
+        [resultChecker, context, translate, lives]
     );
     const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
 
@@ -145,6 +153,12 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
             setIsShowingResult(true);
         }
     }, [autoCheckOnFinish, resultChecker, isCorrectResult, resultPhrase, setIsShowingResult]);
+
+    useEffect(() => {
+        if (!lives) {
+            setIsShowingResult(true);
+        }
+    }, [lives]);
 
     const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
     const allowDragging = allowedCellWriteModes.some(({mode}) => mode === CellWriteMode.move);

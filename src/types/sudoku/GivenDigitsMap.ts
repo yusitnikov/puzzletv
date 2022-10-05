@@ -32,6 +32,18 @@ export const processGivenDigitsMaps = <CellType, ResultType = CellType>(processo
     return result;
 };
 
+export const givenDigitsMapToArray = <CellType>(map: GivenDigitsMap<CellType>) => Object.entries(map).flatMap(
+    ([top, rowMap]) => Object.entries(rowMap).map(
+        ([left, data]) => ({
+            data,
+            position: {
+                top: Number(top),
+                left: Number(left),
+            } as Position,
+        })
+    )
+);
+
 export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) =>
     processGivenDigitsMaps(([first]) => first, maps);
 

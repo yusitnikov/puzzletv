@@ -23,6 +23,11 @@ import {Fullscreen, FullscreenExit, OpenInNew, Share} from "@emotion-icons/mater
 import {ControlButton} from "../controls/ControlButton";
 import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
+import {indexes} from "../../../utils/indexes";
+import {Heart} from "@emotion-icons/fluentui-system-filled";
+
+const liveHeartCoeff = 0.3;
+const liveHeartMarginCoeff = 0.1;
 
 const StyledContainer = styled(Absolute)({
     display: "flex",
@@ -48,8 +53,9 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             aboveRules: puzzleAboveRules,
             typeManager: {getPlayerScore, getAboveRules: typeAboveRules},
             lmdLink,
+            initialLives = 0,
         },
-        state: {currentPlayer},
+        state: {currentPlayer, lives},
         cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
     } = context;
@@ -168,6 +174,34 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                 {translate("Score")}: {getPlayerScore(context, myClientId)}
             </div>}
         </div>
+
+        {initialLives > 0 && <div style={{
+            height: cellSize * liveHeartCoeff,
+            lineHeight: `${cellSize * liveHeartCoeff}px`,
+            fontSize: cellSize * liveHeartCoeff * 0.9,
+            textAlign: "center",
+            marginBottom: cellSize * rulesMarginCoeff,
+        }}>
+            <div style={{
+                position: "absolute",
+                left: `calc(50% - ${cellSize * liveHeartCoeff * (lives + (lives - 1) * liveHeartMarginCoeff) / 2}px)`
+            }}>
+                {indexes(lives).map(index => <div
+                    key={index}
+                    style={{
+                        position: "absolute",
+                        left: cellSize * liveHeartCoeff * index * (1 + liveHeartMarginCoeff),
+                        width: cellSize * liveHeartCoeff,
+                        height: cellSize * liveHeartCoeff,
+                        color: "#f00",
+                    }}
+                >
+                    <Heart/>
+                </div>)}
+            </div>
+
+            {!lives && translate("You lost") + "!"}
+        </div>}
 
         {puzzleAboveRules?.(translate, context)}
         {typeAboveRules?.(translate, context)}

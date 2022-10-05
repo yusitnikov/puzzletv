@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {Translatable} from "../types/translations/Translatable";
 import {LanguageCode} from "../types/translations/LanguageCode";
 import {ReactNode} from "react";
@@ -213,6 +215,11 @@ export const loopRulesApply: Translatable = {
 export const tapCluesApply = (maxNeighborsCount = 8): Translatable => ({
     [LanguageCode.en]: `Clues represent the numbers of consecutive cells occupied by the loop each time it enters the (up to) ${maxNeighborsCount} cells surrounding the clue`,
     [LanguageCode.ru]: `Подсказки указывают на количество последовательных ячеек, занимаемых петлей каждый раз, когда она проходит через (до) ${maxNeighborsCount} ячеек, окружающих подсказку`,
+});
+
+export const livesRules = (initialLives: number): Translatable => ({
+    [LanguageCode.en]: `You have ${initialLives} lives to solve the puzzle. It takes 1 live to enter wrong digit`,
+    [LanguageCode.ru]: `У Вас есть ${initialLives} жизней на решение этого судоку. Одна жизнь отнимается при вводе неправильной цифры`,
 });
 
 

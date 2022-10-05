@@ -141,6 +141,9 @@ export const translationsExactType = {
     "Congratulations": {
         [LanguageCode.ru]: "Поздравляем",
     },
+    "You lost": {
+        [LanguageCode.ru]: "Вы проиграли",
+    },
     "Your score is %1": {
         [LanguageCode.ru]: "Вы набрали %1 очков",
     },
