@@ -5,7 +5,7 @@ A web application for creating and solving different types of sudoku.
 ## TODO/TOFIX
 | Type | Easy? |  Important?  | Task                                                                      |
 |:----:|:-----:|:------------:|---------------------------------------------------------------------------|
-| Feat |  Mid  |  Must have   | Fully import the cubedoku pack.                                           |
+| Feat | Easy  |  Must have   | Fully import the cubedoku pack.                                           |
 | Feat |  Mid  |  Must have   | Letters.                                                                  |
 | Feat |  Mid  |  Must have   | Diagonal lines.                                                           |
 | Feat |  Mid  |  Must have   | Multi-color drawing tool.                                                 |
@@ -14,7 +14,7 @@ A web application for creating and solving different types of sudoku.
 | Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders and/or colors.      |
 | Feat | Easy  |  Important   | Timer.                                                                    |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).              |
-| Feat | Hard  |  Must have   | Setter mode.                                                              |
+| Feat | Hard  |  Important   | Options screen for import from f-puzzles.                                 |
 | Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                  |
 | Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules. |
 | Feat |  Mid  | Nice to have | Multiple color palettes that could be used simultaneously.                |
