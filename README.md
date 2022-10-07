@@ -6,6 +6,10 @@ A web application for creating and solving different types of sudoku.
 | Type | Easy? |  Important?  | Task                                                                      |
 |:----:|:-----:|:------------:|---------------------------------------------------------------------------|
 | Feat |  Mid  |  Must have   | Letters.                                                                  |
+| Feat |  Mid  |  Must have   | Diagonal lines.                                                           |
+| Feat |  Mid  |  Must have   | Multi-color drawing tool.                                                 |
+| Feat | Hard  |  Must have   | Candidates conflict checker.                                              |
+| Feat |  Mid  |  Important   | Color selection modes.                                                    |
 | Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders and/or colors.      |
 | Feat | Easy  |  Important   | Timer.                                                                    |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).              |
