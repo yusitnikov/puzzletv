@@ -5,6 +5,7 @@ A web application for creating and solving different types of sudoku.
 ## TODO/TOFIX
 | Type | Easy? |  Important?  | Task                                                                      |
 |:----:|:-----:|:------------:|---------------------------------------------------------------------------|
+| Feat |  Mid  |  Must have   | Fully import the cubedoku pack.                                           |
 | Feat |  Mid  |  Must have   | Letters.                                                                  |
 | Feat |  Mid  |  Must have   | Diagonal lines.                                                           |
 | Feat |  Mid  |  Must have   | Multi-color drawing tool.                                                 |
