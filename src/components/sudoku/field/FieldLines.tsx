@@ -4,25 +4,29 @@ import {darkGreyColor, textColor} from "../../app/globals";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {formatSvgPointsArray} from "../../../types/layout/Position";
+import {concatContinuousLines} from "../../../utils/lines";
 
 export const FieldLines = withFieldLayer(FieldLayer.lines, (
     {
         context: {
-            puzzle: {
-                typeManager: {
-                    borderColor: typeBorderColor,
-                },
-                fieldSize: {columnsCount, rowsCount},
-                borderColor: puzzleBorderColor,
-                customCellBounds,
-                fieldFitsWrapper,
-            },
+            puzzle,
             cellsIndexForState,
             cellSize,
             state,
         }
     }: ConstraintProps
 ) => {
+    const {
+        typeManager: {
+            borderColor: typeBorderColor,
+            isValidCell = () => true,
+        },
+        fieldSize: {columnsCount, rowsCount},
+        borderColor: puzzleBorderColor,
+        customCellBounds,
+        fieldFitsWrapper,
+    } = puzzle;
+
     const borderColor = state.isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
     const borderWidth = fieldFitsWrapper ? 1 : 1 / cellSize;
 
@@ -45,27 +49,33 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
     }
 
     return <>
-        {indexes(rowsCount, true).map(rowIndex => {
-            return <line
-                key={`h-line-${rowIndex}`}
-                x1={0}
-                y1={rowIndex}
-                x2={columnsCount}
-                y2={rowIndex}
+        {indexes(rowsCount, true).flatMap(
+            top => concatContinuousLines(indexes(columnsCount).filter(
+                left => isValidCell({top, left}, puzzle) || (top > 0 && isValidCell({top: top - 1, left}, puzzle))
+            )).map(({start, end}) => <line
+                key={`h-line-${top}-${start}`}
+                x1={start}
+                y1={top}
+                x2={end}
+                y2={top}
                 stroke={borderColor}
                 strokeWidth={borderWidth}
-            />;
-        })}
+            />)
+        )}
 
-        {indexes(columnsCount, true).flatMap(columnIndex => <line
-            key={`v-line-${columnIndex}`}
-            x1={columnIndex}
-            y1={0}
-            x2={columnIndex}
-            y2={rowsCount}
-            stroke={borderColor}
-            strokeWidth={1 / cellSize}
-        />)}
+        {indexes(columnsCount, true).flatMap(
+            left => concatContinuousLines(indexes(rowsCount).filter(
+                top => isValidCell({top, left}, puzzle) || (left > 0 && isValidCell({top, left: left - 1}, puzzle))
+            )).map(({start, end}) => <line
+                key={`v-line-${left}-${start}`}
+                x1={left}
+                y1={start}
+                x2={left}
+                y2={end}
+                stroke={borderColor}
+                strokeWidth={1 / cellSize}
+            />)
+        )}
     </>;
 });
 

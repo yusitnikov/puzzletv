@@ -25,3 +25,28 @@ export const splitMultiLine = (points: Position[]): Position[] => points.flatMap
 
     return end ? splitLine(start, end, false) : [start];
 });
+
+export interface OrthogonalLine {
+    start: number;
+    end: number;
+}
+
+// Concat 1-cell long lines that start at startPoints[i]
+export const concatContinuousLines = (startPoints: number[]) => startPoints.reduce<OrthogonalLine[]>(
+    (lines, point) => point === lines[lines.length - 1]?.end
+        ? [
+            ...lines.slice(0, -1),
+            {
+                start: lines[lines.length - 1].start,
+                end: point + 1,
+            },
+        ]
+        : [
+            ...lines,
+            {
+                start: point,
+                end: point + 1,
+            }
+        ],
+    []
+);
