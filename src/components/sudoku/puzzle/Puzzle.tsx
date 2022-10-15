@@ -59,16 +59,18 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     const minWindowSize = Math.min(windowSize.width, windowSize.height);
 
     const fieldSizeWithMargin = fieldSize + 2 * fieldMargin;
+    const fieldSizeForSidePanel = 9;
     const panelCoeff = getControlsWidthCoeff(puzzle);
-    const maxCoeff = fieldSizeWithMargin + panelCoeff + globalPaddingCoeff * 3;
-    const minCoeff = fieldSizeWithMargin + globalPaddingCoeff * 2;
+    const maxCoeff = fieldSizeForSidePanel + panelCoeff + globalPaddingCoeff * 3;
+    const minCoeff = fieldSizeForSidePanel + globalPaddingCoeff * 2;
 
-    const cellSize = Math.min(minWindowSize / minCoeff, maxWindowSize / maxCoeff);
-    const padding = cellSize * globalPaddingCoeff;
-    const sudokuSize = cellSize * fieldSizeWithMargin;
-    const controlsSize = cellSize * panelCoeff;
-    const maxContainerSize = cellSize * maxCoeff;
-    const minContainerSize = cellSize * minCoeff;
+    const cellSizeForSidePanel = Math.min(minWindowSize / minCoeff, maxWindowSize / maxCoeff);
+    const sudokuSize = cellSizeForSidePanel * fieldSizeForSidePanel;
+    const cellSize = sudokuSize / fieldSizeWithMargin;
+    const padding = cellSizeForSidePanel * globalPaddingCoeff;
+    const controlsSize = cellSizeForSidePanel * panelCoeff;
+    const maxContainerSize = cellSizeForSidePanel * maxCoeff;
+    const minContainerSize = cellSizeForSidePanel * minCoeff;
 
     const containerSize: Size = {
         width: isHorizontal ? maxContainerSize : minContainerSize,
@@ -90,7 +92,7 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
     }), [containerLeft, fieldInnerRect]);
     // endregion
 
-    const context = useGame(puzzle, cellSize);
+    const context = useGame(puzzle, cellSize, cellSizeForSidePanel);
 
     const {state: gameState, multiPlayer} = context;
 
@@ -130,17 +132,17 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
                 </Absolute>
 
                 {isEnabled && <>
-                    {!isLoaded && <Modal cellSize={cellSize}>
+                    {!isLoaded && <Modal cellSize={cellSizeForSidePanel}>
                         <div>{translate("Loading")}...</div>
                     </Modal>}
 
                     {isLoaded && <>
-                        {isDoubledConnected && <Modal cellSize={cellSize}>
+                        {isDoubledConnected && <Modal cellSize={cellSizeForSidePanel}>
                             <div>{translate("You opened this puzzle in more than one tab")}!</div>
                             <div>{translate("Please leave only one active tab")}.</div>
                         </Modal>}
 
-                        {!hostData && <Modal cellSize={cellSize}>
+                        {!hostData && <Modal cellSize={cellSizeForSidePanel}>
                             <div>{translate("The host of the game is not connected")}!</div>
                             <div>{translate("Please wait for them to join")}.</div>
                         </Modal>}

@@ -16,6 +16,7 @@ export interface PuzzleContext<CellType, GameStateExtensionType = {}, ProcessedG
         GameStateActionOrCallback<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[]
     >;
     cellSize: number;
+    cellSizeForSidePanel: number;
     multiPlayer: UseMultiPlayerResult;
 }
 

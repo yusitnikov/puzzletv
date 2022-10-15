@@ -56,7 +56,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             initialLives = 0,
         },
         state: {currentPlayer, lives},
-        cellSize,
+        cellSizeForSidePanel: cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
     } = context;
 

@@ -42,7 +42,7 @@ export const MultiStageSudokuTypeManager = (
         translate,
         context
     ) => {
-        const {state, onStateChange, cellSize} = context;
+        const {state, onStateChange, cellSizeForSidePanel: cellSize} = context;
         const stage = getStage(context);
         const isNext = stage > state.stage;
         const coeff = isNext ? 1 : 0;

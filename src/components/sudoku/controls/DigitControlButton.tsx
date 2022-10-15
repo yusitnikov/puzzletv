@@ -18,7 +18,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 ) => {
     const translate = useTranslate();
 
-    const {puzzle, state, onStateChange, cellSize} = context;
+    const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;
 
     const {
         typeManager,

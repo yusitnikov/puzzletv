@@ -27,6 +27,7 @@ const emptyObject: any = {};
 export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     cellSize: number,
+    cellSizeForSidePanel: number,
     readOnly = false
 ): PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => {
     const {
@@ -176,6 +177,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     cellsIndex,
                     cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState),
                     cellSize,
+                    cellSizeForSidePanel,
                     multiPlayer,
                     state: processedGameState,
                     onStateChange: () => console.error("Unexpected state change inside of the messages loop!"),
@@ -190,7 +192,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
         }
 
         return state;
-    }, [puzzle, cellsIndex, cellSize, calculateProcessedGameState]);
+    }, [puzzle, cellsIndex, cellSize, cellSizeForSidePanel, calculateProcessedGameState]);
 
     const multiPlayer = useMultiPlayer(
         `puzzle:${saveStateKey}`,
@@ -255,6 +257,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                         cellsIndex,
                         cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState),
                         cellSize,
+                        cellSizeForSidePanel,
                         multiPlayer,
                         state: {
                             ...processedGameState,
@@ -296,7 +299,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 return state;
             });
         },
-        [puzzle, cellsIndex, setGameState, mergeMyGameState, calculateProcessedGameState, processedGameStateExtension, cellSize, multiPlayer]
+        [puzzle, cellsIndex, setGameState, mergeMyGameState, calculateProcessedGameState, processedGameStateExtension, cellSize, cellSizeForSidePanel, multiPlayer]
     );
 
     const context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = useMemo(
@@ -306,10 +309,11 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
             cellsIndexForState,
             state: processedGameState,
             cellSize,
+            cellSizeForSidePanel,
             multiPlayer,
             onStateChange: mergeGameState,
         }),
-        [puzzle, cellsIndex, cellsIndexForState, processedGameState, cellSize, multiPlayer, mergeGameState]
+        [puzzle, cellsIndex, cellsIndexForState, processedGameState, cellSize, cellSizeForSidePanel, multiPlayer, mergeGameState]
     );
 
     useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);

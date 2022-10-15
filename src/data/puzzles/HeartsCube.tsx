@@ -22,7 +22,6 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<number> => ({
     typeManager: CubeTypeManager(true),
     fieldSize: createCubeFieldSize(3, 3, 3),
     digitsCount: 9,
-    fieldMargin: 1.2,
     rules: translate => <>
         <RulesParagraph>{translate({
             [LanguageCode.en]: "Put digits from 1 to 9 into every cell of all cube faces",

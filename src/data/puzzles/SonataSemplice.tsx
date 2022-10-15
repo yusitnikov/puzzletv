@@ -245,10 +245,10 @@ export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>
         LittleKillerConstraint("R7C3", "UL", fieldSize, 16),
         LittleKillerConstraint("R7C5", "UL", fieldSize, 16),
     ],
-    rules: (translate, {cellSize}) => <>
+    rules: (translate, {cellSizeForSidePanel}) => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(littleKillerExplained)}.</RulesParagraph>
-        <CardLink cellSize={cellSize}/>
+        <CardLink cellSize={cellSizeForSidePanel}/>
     </>,
     resultChecker: isValidFinishedPuzzleByConstraints,
 };

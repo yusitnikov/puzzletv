@@ -32,7 +32,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         fullSize,
     }: CellWriteModeButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const {puzzle, state, onStateChange, cellSize} = context;
+    const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;
 
     const handleSetCellWriteMode = useCallback(
         () => onStateChange({persistentCellWriteMode: cellWriteMode} as any),

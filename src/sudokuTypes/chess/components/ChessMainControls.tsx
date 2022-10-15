@@ -13,7 +13,7 @@ import {useTranslate} from "../../../hooks/useTranslate";
 export const ChessMainControls = (
     {
         context: {
-            cellSize,
+            cellSizeForSidePanel: cellSize,
             state: {cellWriteMode, selectedColor, isShowingSettings},
             onStateChange,
         },

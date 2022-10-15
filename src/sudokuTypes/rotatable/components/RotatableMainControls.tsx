@@ -13,7 +13,7 @@ import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/Anim
 export const RotatableMainControls = (
     {
         context: {
-            cellSize,
+            cellSizeForSidePanel: cellSize,
             state: {isReady, isStickyMode, animationSpeed, isShowingSettings},
             onStateChange,
         },

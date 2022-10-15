@@ -60,7 +60,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     {rect, isHorizontal, context}: ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const {
-        cellSize,
+        cellSizeForSidePanel: cellSize,
         puzzle,
         state,
         onStateChange,

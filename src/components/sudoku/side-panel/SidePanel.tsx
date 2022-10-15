@@ -17,7 +17,7 @@ export interface SidePanelProps<CellType, GameStateExtensionType = {}, Processed
 export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
     {context, rect, isHorizontal}: SidePanelProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
-    const {puzzle, cellSize} = context;
+    const {puzzle, cellSizeForSidePanel: cellSize} = context;
 
     const hasBottomRowControls = isPuzzleHasBottomRowControls(puzzle);
 

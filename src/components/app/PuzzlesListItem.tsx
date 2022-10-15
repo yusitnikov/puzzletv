@@ -22,7 +22,7 @@ export const PuzzlesListItem = <CellType, GameStateExtensionType = {}, Processed
     const thumbnailWidth = (width - padding * 2) * 0.4;
     const thumbnailCellSize = thumbnailWidth / (puzzle.fieldSize.fieldSize + (puzzle.fieldMargin || 0) * 2);
 
-    const context = useGame(puzzle, thumbnailCellSize, true);
+    const context = useGame(puzzle, thumbnailCellSize, thumbnailCellSize, true);
 
     return <a
         href={buildLink(puzzle.slug, language)}
