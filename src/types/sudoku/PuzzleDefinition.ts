@@ -43,6 +43,7 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     ) => ReactNode;
     typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
     fieldSize: FieldSize;
+    hideRegionBorders?: boolean;
     fieldMargin?: number;
     fieldWrapperComponent?: ComponentType<PuzzleContextProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
     fieldFitsWrapper?: boolean;

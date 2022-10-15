@@ -63,6 +63,7 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
 
     const {
         fieldSize,
+        hideRegionBorders,
         items: puzzleItemsOrFn = [],
         typeManager: {
             items: stateItemsOrFn = [],
@@ -73,7 +74,7 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
     return [
         FieldLinesConstraint,
         ...getRegionsForRowsAndColumns(puzzle, state),
-        ...fieldSize.regions.map(region => RegionConstraint(region)),
+        ...fieldSize.regions.map(region => RegionConstraint(region, !hideRegionBorders)),
         UserLinesConstraint,
         ...(
             typeof puzzleItemsOrFn === "function"
