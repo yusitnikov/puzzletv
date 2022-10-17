@@ -7,7 +7,8 @@ import {
     EmptyChaosConstructionLoop,
     EmptyChess,
     EmptyCube,
-    EmptyCubedoku, EmptyLatin,
+    EmptyCubedoku,
+    EmptyLatin,
     EmptyRegular,
     EmptyRotatable,
     EmptyToroidal
@@ -26,7 +27,7 @@ import {FPuzzles} from "./FPuzzles";
 import {HeartsCube} from "./HeartsCube";
 import {AbstractKillerDots, DollHouse, LegoHouse, MoodyLines} from "./TenInOne";
 import {TheOnlyThingThatMatters} from "./TheOnlyThingThatMatters";
-import {LumosMaxima} from "./LumosMaxima";
+import {LumosMaxima, LumosMaximaEternalLives, LumosMaximaNoFog} from "./LumosMaxima";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -74,6 +75,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region My puzzles
+    LumosMaximaNoFog,
+    LumosMaximaEternalLives,
     LumosMaxima,
 
     TheOnlyThingThatMatters,

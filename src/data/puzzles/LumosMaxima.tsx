@@ -2,7 +2,7 @@ import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {ConstraintOrComponent, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {Chameleon} from "../authors";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
@@ -30,11 +30,11 @@ const solution = [
     [3, 2, 1, 8, 9, 5, 6, 7, 4],
 ];
 
-export const LumosMaxima: PuzzleDefinition<number> = {
+export const LumosMaximaNoFog: PuzzleDefinition<number> = {
+    noIndex: true,
     title: {[LanguageCode.en]: "Lumos Maxima"},
     author: Chameleon,
-    slug: "lumos-maxima",
-    saveStateKey: "lumos-maxima-v4",
+    slug: "lumos-maxima-no-fog",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     rules: (translate, {puzzle: {initialLives}}) => <>
@@ -44,22 +44,6 @@ export const LumosMaxima: PuzzleDefinition<number> = {
             [LanguageCode.ru]: "в этом судоку нет кругов, состоящих из нескольких клеток",
         })}). {translate(canRepeatOnArrows)}.</RulesParagraph>
         <RulesParagraph>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)}.</RulesParagraph>
-        <RulesParagraph>{translate({
-            [LanguageCode.en]: "Cages don't intersect with other cages, but they can intersect with other arrows",
-            [LanguageCode.ru]: "Клетки не пересекаются с другими клетками, но они могут пересекаться с другими стрелками",
-        })}.</RulesParagraph>
-        <RulesParagraph>{translate({
-            [LanguageCode.en]: "The grid is covered with fog",
-            [LanguageCode.ru]: "Поле покрыто туманом",
-        })}. {translate({
-            [LanguageCode.en]: "There are two initial light sources that illuminate the darkness and clear the fog",
-            [LanguageCode.ru]: "Есть два изначальных источника света, которые освещают темноту и рассеивают туман",
-        })}. {translate({
-            [LanguageCode.en]: "Put correct digits into the cells to get more light (it's ok to put a digit into a cell that is covered by fog)",
-            [LanguageCode.ru]: "Поместите правильные цифры в ячейки, чтобы получить больше света (можно поместить цифру в ячейку, покрытую туманом)",
-        })}.</RulesParagraph>
-        <RulesParagraph>{translate(livesRules(initialLives!))}.</RulesParagraph>
-        <RulesParagraph>{translate(noGuessingRequired)}.</RulesParagraph>
     </>,
     items: [
         ArrowConstraint("R6C1", ["R5C2", "R6C2"]),
@@ -75,12 +59,50 @@ export const LumosMaxima: PuzzleDefinition<number> = {
         KillerCageConstraint(["R1C4", "R1C5", "R2C5", "R3C4", "R3C5", "R4C5", "R5C4", "R5C5", "R5C6"], 45),
         KillerCageConstraint(["R1C6", "R1C7", "R1C8", "R1C9", "R2C9", "R3C9"], 38),
         KillerCageConstraint(["R2C8", "R3C8", "R4C7", "R4C8", "R4C9"]),
-        FogConstraint(solution, ["R2C2", "R8C7"]),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
     allowDrawing: ["center-line", "border-mark", "corner-mark", "center-mark"],
-    forceEnableConflictChecker: true,
+};
+
+export const LumosMaximaEternalLives: PuzzleDefinition<number> = {
+    ...LumosMaximaNoFog,
+    slug: "lumos-maxima-eternal-lives",
+    items: [
+        ...(LumosMaximaNoFog.items as ConstraintOrComponent<number, any>[]),
+        FogConstraint(solution, ["R2C2", "R8C7"]),
+    ],
+    rules: (translate, context) => <>
+        {LumosMaximaNoFog.rules!(translate, context)}
+        <RulesParagraph>{translate({
+            [LanguageCode.en]: "Cages don't intersect with other cages, but they can intersect with other arrows",
+            [LanguageCode.ru]: "Клетки не пересекаются с другими клетками, но они могут пересекаться с другими стрелками",
+        })}.</RulesParagraph>
+        <RulesParagraph>{translate({
+            [LanguageCode.en]: "The grid is covered with fog",
+            [LanguageCode.ru]: "Поле покрыто туманом",
+        })}. {translate({
+            [LanguageCode.en]: "There are two initial light sources that illuminate the darkness and clear the fog",
+            [LanguageCode.ru]: "Есть два изначальных источника света, которые освещают темноту и рассеивают туман",
+        })}. {translate({
+            [LanguageCode.en]: "Put correct digits into the cells to get more light (it's ok to put a digit into a cell that is covered by fog)",
+            [LanguageCode.ru]: "Поместите правильные цифры в ячейки, чтобы получить больше света (можно поместить цифру в ячейку, покрытую туманом)",
+        })}.</RulesParagraph>
+    </>,
     prioritizeSelection: true,
+};
+
+// noinspection JSUnusedGlobalSymbols
+export const LumosMaxima: PuzzleDefinition<number> = {
+    ...LumosMaximaEternalLives,
+    noIndex: false,
+    slug: "lumos-maxima",
+    saveStateKey: "lumos-maxima-v4",
+    rules: (translate, context) => <>
+        {LumosMaximaEternalLives.rules!(translate, context)}
+        <RulesParagraph>{translate(livesRules(context.puzzle.initialLives!))}.</RulesParagraph>
+        <RulesParagraph>{translate(noGuessingRequired)}.</RulesParagraph>
+    </>,
+    forceEnableConflictChecker: true,
     initialLives: 5,
     decreaseOnlyOneLive: true,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000BIU",
