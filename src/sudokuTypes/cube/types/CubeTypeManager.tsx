@@ -1,4 +1,4 @@
-import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
+import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
 import {Position, PositionWithAngle} from "../../../types/layout/Position";
@@ -12,27 +12,6 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
 
     isValidCell({top, left}, {fieldSize: {rowsCount, columnsCount}}): boolean {
         return left * 2 < columnsCount || top * 2 >= rowsCount;
-    },
-
-    processArrowDirection(
-        cell,
-        xDirection,
-        yDirection,
-        context
-    ) {
-        const realFieldSize = context.puzzle.fieldSize.fieldSize / 2;
-
-        cell = defaultProcessArrowDirection(cell, xDirection, yDirection, context)!;
-
-        if (cell.left >= realFieldSize && cell.top < realFieldSize) {
-            if (xDirection) {
-                cell.left -= realFieldSize;
-            } else {
-                cell.top += realFieldSize;
-            }
-        }
-
-        return cell;
     },
 
     processCellDataPosition(

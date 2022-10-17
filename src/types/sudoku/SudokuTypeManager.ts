@@ -227,13 +227,40 @@ export const defaultProcessArrowDirection = (
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {puzzle: {fieldSize: {rowsCount, columnsCount}, customCellBounds}, cellsIndex}: PuzzleContext<any, any, any>
+    {puzzle, cellsIndex}: PuzzleContext<any, any, any>
 ): Position | undefined => {
+    const {
+        fieldSize: {rowsCount, columnsCount},
+        customCellBounds,
+        typeManager: {isValidCell = () => true},
+    } = puzzle;
+
     if (!customCellBounds) {
-        return {
-            left: (left + xDirection + columnsCount) % columnsCount,
-            top: (top + yDirection + rowsCount) % rowsCount,
+        const isTotallyValidCell = (position: Position) => {
+            const {top, left} = position;
+            return top >= 0 && top < rowsCount && left >= 0 && left < columnsCount && isValidCell(position, puzzle);
         };
+
+        // Try moving in the requested direction naively
+        let newPosition = {
+            left: left + xDirection,
+            top: top + yDirection,
+        };
+
+        if (isTotallyValidCell(newPosition)) {
+            return newPosition;
+        }
+
+        // If the naive new position is not valid then go in the reverse direction while it's possible
+        do {
+            newPosition.left -= xDirection;
+            newPosition.top -= yDirection;
+        } while (isTotallyValidCell({
+            left: newPosition.left - xDirection,
+            top: newPosition.top - yDirection,
+        }));
+
+        return newPosition;
     }
 
     const {center, neighbors} = cellsIndex.allCells[top][left];
