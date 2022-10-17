@@ -10,7 +10,7 @@ export interface FieldSize {
     columnsCount: number;
     regionWidth?: number;
     regionHeight?: number;
-    regions: Position[][];
+    regions: (Position[] | Constraint<any, any>)[];
 }
 
 export const createRegularRegions = (

@@ -8,6 +8,8 @@ import {RegionConstraint} from "../../../components/sudoku/constraints/region/Re
 import {indexes} from "../../../utils/indexes";
 import {DigitCellDataComponentType} from "../../default/components/DigitCellData";
 import {MonumentValleyDigitComponentType} from "../components/MonumentValleyDigit";
+import {Constraint} from "../../../types/sudoku/Constraint";
+import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 
 export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
     ...DigitSudokuTypeManager(),
@@ -227,18 +229,22 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
             {left: columnsCount - gridSize, top: 0},
         ];
 
-        return cubeFaces.flatMap(({left, top}) => indexes(gridSize).flatMap(i => [
-            RegionConstraint(
-                indexes(gridSize).map(j => processCellCoords({left: left + i, top: top + j}, processedFieldSize)),
-                false,
-                "column"
-            ),
-            RegionConstraint(
-                indexes(gridSize).map(j => processCellCoords({left: left + j, top: top + i}, processedFieldSize)),
-                false,
-                "row"
-            ),
-        ]));
+        return cubeFaces.flatMap(({left, top}, index) => {
+            const constraints: Constraint<number, any>[] = indexes(gridSize).flatMap(i => [
+                RegionConstraint(
+                    indexes(gridSize).map(j => processCellCoords({left: left + i, top: top + j}, processedFieldSize)),
+                    false,
+                    "column"
+                ),
+                RegionConstraint(
+                    indexes(gridSize).map(j => processCellCoords({left: left + j, top: top + i}, processedFieldSize)),
+                    false,
+                    "row"
+                ),
+            ]);
+
+            return index === 2 ? constraints.map(fixMonumentValleyDigitForConstraint) : constraints;
+        });
     },
 
     getAdditionalNeighbors({top, left}, {fieldSize}) {
@@ -297,10 +303,55 @@ const processCellCoords = (position: Position, fieldSize: FieldSize | ReturnType
         : position;
 };
 
+const digitRotationMap = [
+    1,
+    3,
+    2,
+    5,
+    4,
+    9,
+    6,
+    7,
+    8,
+];
+const rotateDigit = (digit: number) => digitRotationMap[digit - 1];
+const rotateDigitByPosition = (digit: number, {top, left}: Position, fieldSize: FieldSize) => {
+    const {gridSize, intersectionSize} = parseMonumentValleyFieldSize(fieldSize);
+    return left >= gridSize - intersectionSize && left < gridSize && top < intersectionSize
+        ? rotateDigit(digit)
+        : digit;
+};
+const rotateDigitsMap = (map: GivenDigitsMap<number>, fieldSize: FieldSize) => processGivenDigitsMaps(
+    ([digit], position) => rotateDigitByPosition(digit, position, fieldSize),
+    [map]
+);
+
+export const fixMonumentValleyDigitForConstraint = <DataT,>(constraint: Constraint<number, DataT>): Constraint<number, DataT> => ({
+    ...constraint,
+    isValidCell(cell, digits, regionCells, context, ...args) {
+        return constraint.isValidCell?.(
+            cell,
+            rotateDigitsMap(digits, context.puzzle.fieldSize),
+            regionCells,
+            context,
+            ...args
+        ) ?? true;
+    },
+    isValidPuzzle(lines, digits, regionCells, context) {
+        return constraint.isValidPuzzle?.(
+            lines,
+            rotateDigitsMap(digits, context.puzzle.fieldSize),
+            regionCells,
+            context
+        ) ?? true;
+    },
+});
+
 export const createMonumentValleyFieldSize = (
     gridSize: number,
     regionSize: number,
     intersectionSize = regionSize,
+    showBorders = true,
 ): FieldSize => {
     const columnsCount = gridSize * 3 - intersectionSize * 2;
     const regions = createRegularRegions(gridSize, gridSize, regionSize, regionSize);
@@ -309,18 +360,24 @@ export const createMonumentValleyFieldSize = (
         fieldSize: columnsCount,
         columnsCount,
         rowsCount: gridSize * 2 - intersectionSize,
-        regions: [
-            ...regions,
-            ...regions.map((region) => region.map(({top, left}) => ({
-                top: top + gridSize - intersectionSize,
-                left: left + gridSize - intersectionSize,
-            }))),
-            ...regions.map((region) => region.map(({top, left}) => ({
-                top,
-                left: top < intersectionSize && left < intersectionSize
-                    ? left + gridSize - intersectionSize
-                    : left + columnsCount - gridSize,
-            }))),
+        regions: regionSize === 1 ? [] : [
+            ...regions.map((region) => RegionConstraint(region, showBorders)),
+            ...regions.map((region) => RegionConstraint(
+                region.map(({top, left}) => ({
+                    top: top + gridSize - intersectionSize,
+                    left: left + gridSize - intersectionSize,
+                })),
+                showBorders
+            )),
+            ...regions.map((region) => fixMonumentValleyDigitForConstraint(RegionConstraint<number>(
+                region.map(({top, left}) => ({
+                    top,
+                    left: top < intersectionSize && left < intersectionSize
+                        ? left + gridSize - intersectionSize
+                        : left + columnsCount - gridSize,
+                })),
+                showBorders
+            ))),
         ]
     };
 };

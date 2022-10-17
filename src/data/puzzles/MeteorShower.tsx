@@ -7,6 +7,7 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {moveButtonTip, normalSudokuRulesApply, thermometersExplained, toroidalRulesApply} from "../ruleSnippets";
 import {darkGreyColor} from "../../components/app/globals";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {Position} from "../../types/layout/Position";
 
 const regularFieldSize = createRegularFieldSize(8, 2);
 
@@ -30,7 +31,7 @@ export const MeteorShower = (colorful: boolean): PuzzleDefinition<number> => ({
     fieldSize: {
         ...regularFieldSize,
         regions: regularFieldSize.regions.map(
-            (region, index) => region.map(({left, top}) => ({
+            (region, index) => (region as Position[]).map(({left, top}) => ({
                 left,
                 top: (top + [-1, -3, -2, -1, -1, -3, -2, -1][index]),
             }))

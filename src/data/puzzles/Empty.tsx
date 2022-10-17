@@ -101,7 +101,7 @@ export const EmptyMonumentValleyMini: PuzzleDefinition<number> = {
     title,
     slug: "empty-monument-valley-mini",
     typeManager: MonumentValleyTypeManager,
-    fieldSize: createMonumentValleyFieldSize(5, 5, 2),
+    fieldSize: createMonumentValleyFieldSize(5, 1, 2),
     hideRegionBorders: true,
     digitsCount: 5,
 };

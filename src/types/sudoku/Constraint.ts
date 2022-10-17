@@ -74,7 +74,11 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
     return [
         FieldLinesConstraint,
         ...getRegionsForRowsAndColumns(puzzle, state),
-        ...fieldSize.regions.map(region => RegionConstraint(region, !hideRegionBorders)),
+        ...fieldSize.regions.map(
+            (region) => Array.isArray(region)
+                ? RegionConstraint(region, !hideRegionBorders)
+                : region
+        ),
         UserLinesConstraint,
         ...(
             typeof puzzleItemsOrFn === "function"
