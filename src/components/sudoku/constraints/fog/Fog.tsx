@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+import styled from "@emotion/styled";
 import {isSamePosition, parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
@@ -17,6 +19,10 @@ export interface FogProps<CellType> {
 }
 
 const shadeSize = 0.4;
+
+const DarkReaderRectOverride = styled("rect")(({fill}) => ({
+    "--darkreader-inline-fill": `${fill} !important`,
+}));
 
 export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
     {
@@ -73,7 +79,7 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             </g>
 
             <mask id={"fog-mask"}>
-                <rect
+                <DarkReaderRectOverride
                     width={columnsCount}
                     height={rowsCount}
                     fill={"#fff"}
@@ -81,7 +87,7 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
                 />
 
                 {visible.flatMap((row, top) => row.map((vis, left) => vis && <Fragment key={`${top}-${left}`}>
-                    <rect
+                    <DarkReaderRectOverride
                         y={top - 1.01 + shadeSize}
                         x={left - 1.01 + shadeSize}
                         width={3.02 - 2 * shadeSize}
