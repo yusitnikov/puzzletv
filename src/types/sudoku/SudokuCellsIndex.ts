@@ -56,8 +56,8 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
             return {
                 position: {top, left},
                 bounds,
-                getTransformedBounds: (state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => {
-                    const transformCoordsBound = (point: Position) => transformCoords(point, puzzle, state);
+                getTransformedBounds: (state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType, cellSize: number) => {
+                    const transformCoordsBound = (point: Position) => transformCoords(point, puzzle, state, cellSize);
 
                     return {
                         borders: bounds.borders.map(border => border.map(transformCoordsBound)),
@@ -457,13 +457,14 @@ export class SudokuCellsIndexForState<CellType, GameStateExtensionType, Processe
     public readonly getAllCells = lazy(
         () => this.puzzleIndex.allCells.map(row => row.map(({getTransformedBounds, ...cell}): CellInfoForState => ({
             ...cell,
-            transformedBounds: getTransformedBounds(this.state),
+            transformedBounds: getTransformedBounds(this.state, this.cellSize),
         })))
     );
 
     constructor(
         private puzzleIndex: SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
         private state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+        private cellSize: number,
     ) {
         this.currentFieldState = gameStateGetCurrentFieldState(state);
     }
@@ -490,7 +491,7 @@ export interface SudokuCellBorderSegmentInfo {
 export interface CellInfo {
     position: Position;
     bounds: CustomCellBounds;
-    getTransformedBounds: (state: any) => TransformedCustomCellBounds;
+    getTransformedBounds: (state: any, cellSize: number) => TransformedCustomCellBounds;
     areCustomBounds: boolean;
     center: Position;
     neighbors: SetInterface<Position>;

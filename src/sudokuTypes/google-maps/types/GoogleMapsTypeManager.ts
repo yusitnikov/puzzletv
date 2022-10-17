@@ -20,8 +20,8 @@ export const GoogleMapsTypeManager = <CellType>(
 
         return {...baseTypeManager.keepStateOnRestart?.(state), zoom, center, map, overlay, renderVersion};
     },
-    transformCoords(coords, puzzle, state): Position {
-        coords = baseTypeManager.transformCoords?.(coords, puzzle, state) || coords;
+    transformCoords(coords, puzzle, state, cellSize): Position {
+        coords = baseTypeManager.transformCoords?.(coords, puzzle, state, cellSize) || coords;
 
         const projection = state.overlay?.getProjection();
         if (!projection) {

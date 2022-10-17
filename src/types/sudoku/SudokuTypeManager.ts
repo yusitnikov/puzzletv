@@ -127,10 +127,14 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     transformCoords?(
         coords: Position,
         puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+        cellSize: number,
     ): Position;
 
-    getRegionsWithSameCoordsTransformation?(puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): Rect[];
+    getRegionsWithSameCoordsTransformation?(
+        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        cellSize: number,
+    ): Rect[];
 
     items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
         | ((context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);

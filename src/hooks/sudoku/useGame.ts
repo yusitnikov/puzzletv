@@ -175,7 +175,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                 {
                     puzzle,
                     cellsIndex,
-                    cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState),
+                    cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState, cellSize),
                     cellSize,
                     cellSizeForSidePanel,
                     multiPlayer,
@@ -234,8 +234,8 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
     );
 
     const cellsIndexForState = useMemo(
-        () => new SudokuCellsIndexForState(cellsIndex, processedGameState),
-        [cellsIndex, processedGameState]
+        () => new SudokuCellsIndexForState(cellsIndex, processedGameState, cellSize),
+        [cellsIndex, processedGameState, cellSize]
     );
 
     const mergeGameState = useCallback(
@@ -255,7 +255,7 @@ export const useGame = <CellType, GameStateExtensionType = {}, ProcessedGameStat
                     const context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
                         puzzle,
                         cellsIndex,
-                        cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState),
+                        cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState, cellSize),
                         cellSize,
                         cellSizeForSidePanel,
                         multiPlayer,

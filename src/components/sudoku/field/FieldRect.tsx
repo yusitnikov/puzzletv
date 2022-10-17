@@ -35,7 +35,7 @@ export const FieldRect = <CellType, GameStateExtensionType = {}, ProcessedGameSt
 };
 
 export const getFieldRectTransform = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle, state}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    {puzzle, state, cellSize}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     position: Position
 ): TransformedRect => {
     const {
@@ -55,6 +55,6 @@ export const getFieldRectTransform = <CellType, GameStateExtensionType = {}, Pro
 
     return transformRect(
         {...position, width: 1, height: 1},
-        position => transformCoords(position, puzzle, state)
+        position => transformCoords(position, puzzle, state, cellSize)
     );
 };

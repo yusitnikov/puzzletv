@@ -81,7 +81,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
     const items = useMemo(() => getAllPuzzleConstraintsAndComponents(context), [context]);
 
-    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle);
+    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle, cellSize);
 
     const itemsProps: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
         context: readOnlySafeContext,
