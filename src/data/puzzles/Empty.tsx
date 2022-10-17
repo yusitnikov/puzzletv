@@ -14,6 +14,10 @@ import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuType
 import {AutoRegionConstraint} from "../../components/sudoku/constraints/auto-region/AutoRegion";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
+import {
+    createMonumentValleyFieldSize,
+    MonumentValleyTypeManager
+} from "../../sudokuTypes/monument-valley/types/MonumentValleyTypeManager";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
@@ -81,6 +85,25 @@ export const EmptyCubedoku: PuzzleDefinition<number> = {
     typeManager: CubedokuTypeManager,
     fieldSize: createCubeFieldSize(6, 3),
     digitsCount: 6,
+};
+
+export const EmptyMonumentValley: PuzzleDefinition<number> = {
+    noIndex: true,
+    title,
+    slug: "empty-monument-valley",
+    typeManager: MonumentValleyTypeManager,
+    fieldSize: createMonumentValleyFieldSize(9, 3),
+    digitsCount: 9,
+};
+
+export const EmptyMonumentValleyMini: PuzzleDefinition<number> = {
+    noIndex: true,
+    title,
+    slug: "empty-monument-valley-mini",
+    typeManager: MonumentValleyTypeManager,
+    fieldSize: createMonumentValleyFieldSize(5, 5, 2),
+    hideRegionBorders: true,
+    digitsCount: 5,
 };
 
 export const EmptyToroidal: PuzzleDefinition<number> = {

@@ -9,6 +9,8 @@ import {
     EmptyCube,
     EmptyCubedoku,
     EmptyLatin,
+    EmptyMonumentValley,
+    EmptyMonumentValleyMini,
     EmptyRegular,
     EmptyRotatable,
     EmptyToroidal
@@ -37,6 +39,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     EmptyRotatable,
     EmptyChess,
     EmptyCubedoku,
+    EmptyMonumentValley,
+    EmptyMonumentValleyMini,
     EmptyCube,
     EmptyToroidal,
     EmptyLatin,

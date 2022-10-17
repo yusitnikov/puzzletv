@@ -214,6 +214,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         }
 
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
+        console.log(code);
         const ctrlKey = winCtrlKey || macCtrlKey;
         const anyKey = ctrlKey || shiftKey;
 

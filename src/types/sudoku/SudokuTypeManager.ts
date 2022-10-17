@@ -15,6 +15,7 @@ import {CellStateEx} from "./CellState";
 import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
 import {GameStateAction, GameStateActionType} from "./GameStateAction";
 import {useTranslate} from "../../hooks/useTranslate";
+import {KeyInfo} from "./KeyInfo";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(
@@ -167,7 +168,7 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     disableArrowLetterShortcuts?: boolean;
     disableDigitShortcuts?: boolean;
 
-    digitShortcuts?: string[][];
+    digitShortcuts?: (string | KeyInfo)[][];
 
     digitShortcutTips?: (Translatable|undefined)[];
 

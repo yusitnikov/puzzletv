@@ -45,9 +45,13 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
     if (!isDigitMode || !disableDigitShortcuts) {
         shortcuts = [digit.toString(), ...shortcuts];
     }
+
+    const shortcutTitles = shortcuts.map(shortcut => typeof shortcut === "string" ? shortcut : shortcut.title);
+    const shortcutCodes = shortcuts.flatMap(shortcut => typeof shortcut === "string" ? [`Key${shortcut}`, `Digit${shortcut}`, `Numpad${shortcut}`] : shortcut.codes);
+
     let title = "";
     if (shortcuts.length) {
-        title = `${translate("Shortcut")}: ${joinListSemantically(shortcuts, translate("or"))}`;
+        title = `${translate("Shortcut")}: ${joinListSemantically(shortcutTitles, translate("or"))}`;
         if (shortcutTip) {
             title += ` (${translate(shortcutTip)})`;
         }
@@ -65,7 +69,7 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
 
         const {code} = ev;
 
-        if (shortcuts.flatMap(shortcut => [`Key${shortcut}`, `Digit${shortcut}`, `Numpad${shortcut}`]).includes(code)) {
+        if (shortcutCodes.includes(code)) {
             handleDigit();
             ev.preventDefault();
         } else if ([`Digit${digit}`, `Numpad${digit}`].includes(code)) {

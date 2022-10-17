@@ -1,16 +1,37 @@
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
-import {Position, PositionWithAngle} from "../../../types/layout/Position";
+import {isSamePosition, Position} from "../../../types/layout/Position";
 import {Rect} from "../../../types/layout/Rect";
 import {darkGreyColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
+import {indexes} from "../../../utils/indexes";
+import {DigitCellDataComponentType} from "../../default/components/DigitCellData";
+import {MonumentValleyDigitComponentType} from "../components/MonumentValleyDigit";
 
 export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
     ...DigitSudokuTypeManager(),
 
+    disableDigitShortcuts: true,
+    digitShortcuts: [
+        ["0"],
+        [{title: "-", codes: ["Minus", "NumpadSubtract"]}, "Q"],
+        ["1"],
+        ["I"],
+        ["8"],
+        ["Y"],
+        ["6"],
+        ["O"],
+        ["9"],
+    ],
+
+    cellDataComponentType: DigitCellDataComponentType(
+        MonumentValleyDigitComponentType.component,
+        MonumentValleyDigitComponentType.widthCoeff
+    ),
+
     isValidCell({top, left}, {fieldSize}): boolean {
-        const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
+        const {gridSize, intersectionSize, columnsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         if (top >= gridSize && (left < gridSize - intersectionSize || left >= columnsCount - gridSize + intersectionSize)) {
             return false;
@@ -28,50 +49,64 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
         return true;
     },
 
-    // processArrowDirection(
-    //     cell,
-    //     xDirection,
-    //     yDirection,
-    //     context
-    // ) {
-    //     const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(context.puzzle.fieldSize);
-    //
-    //     const realFieldSize = context.puzzle.fieldSize.fieldSize / 2;
-    //
-    //     cell = defaultProcessArrowDirection(cell, xDirection, yDirection, context)!;
-    //
-    //     if (cell.left >= realFieldSize && cell.top < realFieldSize) {
-    //         if (xDirection) {
-    //             cell.left -= realFieldSize;
-    //         } else {
-    //             cell.top += realFieldSize;
-    //         }
-    //     }
-    //
-    //     return cell;
-    // },
+    processArrowDirection(
+        cell,
+        xDirection,
+        yDirection,
+        context,
+        ...args
+    ) {
+        const processedFieldSize = parseMonumentValleyFieldSize(context.puzzle.fieldSize);
+        const {gridSize, intersectionSize, columnsCount, rowsCount} = processedFieldSize;
 
-    // processCellDataPosition(
-    //     {fieldSize},
-    //     basePosition,
-    //     dataSet,
-    //     dataIndex,
-    //     positionFunction,
-    //     cellPosition?
-    // ): PositionWithAngle | undefined {
-    //     const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
-    //
-    //     const position = basePosition;
-    //     if (!position || !cellPosition || cellPosition.top * 2 >= rowsCount) {
-    //         return position;
-    //     }
-    //
-    //     return {
-    //         left: (position.left + position.top) * 0.6,
-    //         top: (position.top - position.left) * 0.6,
-    //         angle: position.angle - 45,
-    //     };
-    // },
+        const defaultPosition = defaultProcessArrowDirection(cell, xDirection, yDirection, context)!;
+
+        const naive: Position = {
+            left: cell.left + xDirection,
+            top: cell.top + yDirection,
+        };
+        if (isSamePosition(naive, defaultPosition)) {
+            return defaultPosition;
+        }
+
+        const naiveTransformed = processCellCoords(naive, processedFieldSize);
+        if (!isSamePosition(naive, naiveTransformed)) {
+            return naiveTransformed;
+        }
+
+        if (naive.top === rowsCount && naive.left >= columnsCount - gridSize) {
+            return processCellCoords({
+                left: naive.left,
+                top: 0,
+            }, processedFieldSize);
+        }
+
+        if (naive.left === columnsCount && naive.top < intersectionSize) {
+            return processCellCoords({
+                left: columnsCount - gridSize,
+                top: naive.top,
+            }, processedFieldSize);
+        }
+
+        if (naive.left === gridSize && naive.top < intersectionSize) {
+            return context.puzzle.typeManager.processArrowDirection!(
+                cell,
+                0,
+                -1,
+                context,
+                ...args
+            );
+        }
+
+        if (naive.top === -1 && naive.left >= gridSize - intersectionSize && naive.left < gridSize) {
+            return {
+                left: columnsCount - gridSize + intersectionSize,
+                top: naive.left - (gridSize - intersectionSize),
+            };
+        }
+
+        return defaultPosition;
+    },
 
     transformCoords({top, left}, {fieldSize}, state, cellSize) {
         const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
@@ -182,43 +217,29 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
         ];
     },
 
-    // getRegionsForRowsAndColumns({fieldSize: {fieldSize}}) {
-    //     const realFieldSize = fieldSize / 2;
-    //
-    //     if (continuousRowColumnRegions) {
-    //         return indexes(realFieldSize).flatMap(i => [
-    //             RegionConstraint(
-    //                 indexes(fieldSize).map(j => ({left: i, top: j})),
-    //                 false,
-    //                 "column"
-    //             ),
-    //             RegionConstraint(
-    //                 indexes(realFieldSize).flatMap(j => [
-    //                     {left: j, top: i},
-    //                     {left: fieldSize - 1 - i, top: j + realFieldSize},
-    //                 ]),
-    //                 false,
-    //                 "row"
-    //             ),
-    //             RegionConstraint(
-    //                 indexes(fieldSize).map(j => ({left: j, top: i + realFieldSize})),
-    //                 false,
-    //                 "row"
-    //             ),
-    //         ]);
-    //     } else {
-    //         const cubeFaces: Position[] = [
-    //             {left: 0, top: 0},
-    //             {left: 0, top: realFieldSize},
-    //             {left: realFieldSize, top: realFieldSize},
-    //         ];
-    //
-    //         return cubeFaces.flatMap(({left, top}) => indexes(realFieldSize).flatMap(i => [
-    //             RegionConstraint(indexes(realFieldSize).map(j => ({left: left + i, top: top + j})), false, "column"),
-    //             RegionConstraint(indexes(realFieldSize).map(j => ({left: left + j, top: top + i})), false, "row"),
-    //         ]));
-    //     }
-    // },
+    getRegionsForRowsAndColumns({fieldSize}) {
+        const processedFieldSize = parseMonumentValleyFieldSize(fieldSize);
+        const {gridSize, intersectionSize, columnsCount} = processedFieldSize;
+
+        const cubeFaces = [
+            {left: 0, top: 0},
+            {left: gridSize - intersectionSize, top: gridSize - intersectionSize},
+            {left: columnsCount - gridSize, top: 0},
+        ];
+
+        return cubeFaces.flatMap(({left, top}) => indexes(gridSize).flatMap(i => [
+            RegionConstraint(
+                indexes(gridSize).map(j => processCellCoords({left: left + i, top: top + j}, processedFieldSize)),
+                false,
+                "column"
+            ),
+            RegionConstraint(
+                indexes(gridSize).map(j => processCellCoords({left: left + j, top: top + i}, processedFieldSize)),
+                false,
+                "row"
+            ),
+        ]));
+    },
 
     getAdditionalNeighbors({top, left}, {fieldSize}) {
         const {gridSize, intersectionSize, columnsCount} = parseMonumentValleyFieldSize(fieldSize);
@@ -259,6 +280,21 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
     },
 
     borderColor: darkGreyColor,
+};
+
+const processCellCoords = (position: Position, fieldSize: FieldSize | ReturnType<typeof parseMonumentValleyFieldSize>): Position => {
+    const {top, left} = position;
+    const {gridSize, intersectionSize, columnsCount} = "intersectionSize" in fieldSize
+        ? fieldSize
+        : parseMonumentValleyFieldSize(fieldSize);
+    const leftOffset = left - (columnsCount - gridSize);
+
+    return leftOffset >= 0 && leftOffset < intersectionSize && top < intersectionSize
+        ? {
+            top: intersectionSize - 1 - leftOffset,
+            left: gridSize - intersectionSize + top,
+        }
+        : position;
 };
 
 export const createMonumentValleyFieldSize = (
