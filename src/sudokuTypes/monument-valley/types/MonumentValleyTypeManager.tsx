@@ -17,10 +17,10 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
     disableDigitShortcuts: true,
     digitShortcuts: [
         ["0"],
-        [{title: "-", codes: ["Minus", "NumpadSubtract"]}, "Q"],
-        ["1"],
         ["I"],
         ["8"],
+        [{title: "-", codes: ["Minus", "NumpadSubtract"]}, "Q"],
+        ["1"],
         ["Y"],
         ["6"],
         ["O"],

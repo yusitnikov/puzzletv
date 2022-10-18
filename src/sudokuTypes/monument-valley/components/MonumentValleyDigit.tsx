@@ -30,25 +30,7 @@ const svgMap: Record<number, ReactElement> = {
         strokeWidth={width}
         stroke={"currentColor"}
     />,
-    2: <line
-        x1={-0.5}
-        y1={0}
-        x2={0.5}
-        y2={0}
-        fill={"none"}
-        strokeWidth={width}
-        stroke={"currentColor"}
-    />,
-    3: <line
-        x1={0}
-        y1={-0.5}
-        x2={0}
-        y2={0.5}
-        fill={"none"}
-        strokeWidth={width}
-        stroke={"currentColor"}
-    />,
-    4: <path
+    2: <path
         d={`
             M -0.25 ${0.3 - width / 2}
             Q ${-0.5 + width / 2} ${0.3 - width / 2} ${-0.5 + width / 2} 0
@@ -65,7 +47,7 @@ const svgMap: Record<number, ReactElement> = {
         strokeWidth={width}
         stroke={"currentColor"}
     />,
-    5: <path
+    3: <path
         d={`
             M ${0.3 - width / 2} -0.25
             Q ${0.3 - width / 2} ${-0.5 + width / 2} 0 ${-0.5 + width / 2}
@@ -78,6 +60,24 @@ const svgMap: Record<number, ReactElement> = {
             T ${0.3 - width / 2} -0.25
             Z
         `}
+        fill={"none"}
+        strokeWidth={width}
+        stroke={"currentColor"}
+    />,
+    4: <line
+        x1={-0.5}
+        y1={0}
+        x2={0.5}
+        y2={0}
+        fill={"none"}
+        strokeWidth={width}
+        stroke={"currentColor"}
+    />,
+    5: <line
+        x1={0}
+        y1={-0.5}
+        x2={0}
+        y2={0.5}
         fill={"none"}
         strokeWidth={width}
         stroke={"currentColor"}
