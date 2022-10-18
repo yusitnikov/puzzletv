@@ -388,3 +388,20 @@ export const parseMonumentValleyFieldSize = ({columnsCount, rowsCount}: FieldSiz
     gridSize: rowsCount * 2 - columnsCount,
     intersectionSize: rowsCount * 3 - columnsCount * 2,
 });
+
+const digitLiteralsMap: Record<number, number> = {
+    0: 1,
+    8.5: 2,
+    8: 3,
+    1.5: 4,
+    1: 5,
+    6.5: 6,
+    6: 7,
+    9.5: 8,
+    9: 9,
+};
+export const parseMonumentValleyDigitLiteral = (literal: number) => digitLiteralsMap[literal] ?? literal;
+export const parseMonumentValleyDigitsMap = (map: GivenDigitsMap<number>) => processGivenDigitsMaps(
+    ([digit]) => parseMonumentValleyDigitLiteral(digit),
+    [map]
+);
