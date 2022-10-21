@@ -41,6 +41,13 @@ export const useControlKeysState = () => {
 
     useEventListener(window, "keydown", handleKeyboardEvent);
     useEventListener(window, "keyup", handleKeyboardEvent);
+    useEventListener(window, "blur", () => setState({
+        isCtrlDown: false,
+        isAltDown: false,
+        isShiftDown: false,
+        isAnyKeyDown: false,
+        keysStr: "",
+    }));
 
     return state;
 };
