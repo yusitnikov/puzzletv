@@ -731,43 +731,50 @@ export const gameStateResetCurrentMultiLine = <CellType, ProcessedGameStateExten
 } as Partial<ProcessedGameState<CellType>> as any);
 
 export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    clientId: string,
+    isGlobal: boolean
 ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
     const {puzzle: {typeManager, allowDrawing = []}, state: gameState} = context;
 
-    return {
-        fieldStateHistory: fieldStateHistoryAddState(
-            typeManager,
-            gameState.fieldStateHistory,
-            state => {
-                let {marks} = state;
+    if (isGlobal) {
+        return {
+            fieldStateHistory: fieldStateHistoryAddState(
+                typeManager,
+                gameState.fieldStateHistory,
+                state => {
+                    let {marks} = state;
 
-                if (gameState.dragStartPoint) {
-                    const {type, round} = gameState.dragStartPoint;
+                    if (gameState.dragStartPoint) {
+                        const {type, round} = gameState.dragStartPoint;
 
-                    if (allowDrawing.includes(`${type}-mark`)) {
-                        const xMark: CellMark = {position: round, isCircle: false, isCenter: type === "center"};
-                        const circleMark: CellMark = {position: round, isCircle: true, isCenter: type === "center"};
+                        if (allowDrawing.includes(`${type}-mark`)) {
+                            const xMark: CellMark = {position: round, isCircle: false, isCenter: type === "center"};
+                            const circleMark: CellMark = {position: round, isCircle: true, isCenter: type === "center"};
 
-                        if (type !== "center") {
-                            marks = marks.toggle(xMark);
-                        } else if (marks.contains(circleMark)) {
-                            marks = marks.remove(circleMark).add(xMark);
-                        } else if (marks.contains(xMark)) {
-                            marks = marks.remove(xMark);
-                        } else {
-                            marks = marks.add(circleMark);
+                            if (type !== "center") {
+                                marks = marks.toggle(xMark);
+                            } else if (marks.contains(circleMark)) {
+                                marks = marks.remove(circleMark).add(xMark);
+                            } else if (marks.contains(xMark)) {
+                                marks = marks.remove(xMark);
+                            } else {
+                                marks = marks.add(circleMark);
+                            }
                         }
                     }
-                }
 
-                return {
-                    ...state,
-                    lines: state.lines.toggleAll(gameState.currentMultiLine, gameState.isAddingLine),
-                    marks,
-                };
-            }
-        ),
+                    return {
+                        ...state,
+                        lines: state.lines.toggleAll(gameState.currentMultiLine, gameState.isAddingLine),
+                        marks,
+                    };
+                }
+            ),
+        } as Partial<ProcessedGameState<CellType>> as any;
+    }
+
+    return {
         currentMultiLine: [],
         currentMultiLineEnd: undefined,
         dragStartPoint: undefined,

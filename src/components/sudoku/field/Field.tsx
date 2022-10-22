@@ -122,7 +122,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     });
 
     useEventListener(window, "pointerup", () => {
-        onStateChange(applyCurrentMultiLineAction());
+        onStateChange(applyCurrentMultiLineAction(context));
 
         setDragStart(undefined);
     });

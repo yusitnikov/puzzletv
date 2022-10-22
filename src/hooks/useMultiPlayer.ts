@@ -4,7 +4,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {usePureMemo} from "./usePureMemo";
 import {useTranslate} from "./useTranslate";
 
-export const myClientId = (window.localStorage.clientId = window.localStorage.clientId || Math.random().toString().substring(2));
+export const myClientId: string = (window.localStorage.clientId = window.localStorage.clientId || Math.random().toString().substring(2));
 
 export const ablyOptions: Types.ClientOptions = {
     key: "fzkxHw.SEUR7g:J1rgfUWwc397XqQ34wjLftylIcQlAWZeJHxV-bFpPuM",

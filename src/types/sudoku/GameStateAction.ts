@@ -86,14 +86,19 @@ export const enterDigitAction = <CellType, GameStateExtensionType, ProcessedGame
 export const applyCurrentMultiLineActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
     : GameStateActionType<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
     key: "apply-current-multiline",
-    callback: (_, context) =>
-        state => gameStateApplyCurrentMultiLine({...context, state}),
+    callback: (_, context, clientId) =>
+        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, true),
 });
-export const applyCurrentMultiLineAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateActionOrCallback<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
-    type: applyCurrentMultiLineActionType(),
-    params: undefined,
-});
+export const applyCurrentMultiLineAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+)
+    : GameStateActionOrCallback<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] => [
+    {
+        type: applyCurrentMultiLineActionType(),
+        params: undefined,
+    },
+    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, false),
+];
 // endregion
 
 export const coreGameStateActionTypes: GameStateActionType<any, any, any, any>[] = [
