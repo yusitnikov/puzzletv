@@ -181,9 +181,17 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
         [onStateChange, hideDeleteButton]
     );
 
-    const handleUndo = useCallback(() => onStateChange(undoAction()), [onStateChange]);
+    const handleUndo = useCallback(() => {
+        if (!isEnabled) {
+            onStateChange(undoAction());
+        }
+    }, [isEnabled, onStateChange]);
 
-    const handleRedo = useCallback(() => onStateChange(redoAction()), [onStateChange]);
+    const handleRedo = useCallback(() => {
+        if (!isEnabled) {
+            onStateChange(redoAction());
+        }
+    }, [isEnabled, onStateChange]);
 
     const handleCheckResult = useCallback(() => setIsShowingResult(true), [setIsShowingResult]);
     const handleCloseCheckResult = useCallback(() => setIsShowingResult(false), [setIsShowingResult]);
@@ -266,25 +274,27 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
                 context={context}
             />)}
 
-            <ControlButton
-                left={isRevertedUndo ? undoRow : 0}
-                top={isRevertedUndo ? 0 : undoRow}
-                cellSize={cellSize}
-                onClick={handleUndo}
-                title={`${translate("Undo the last action")} (${translate("shortcut")}: Ctrl+Z)`}
-            >
-                <Undo/>
-            </ControlButton>
+            {!isEnabled && <>
+                <ControlButton
+                    left={isRevertedUndo ? undoRow : 0}
+                    top={isRevertedUndo ? 0 : undoRow}
+                    cellSize={cellSize}
+                    onClick={handleUndo}
+                    title={`${translate("Undo the last action")} (${translate("shortcut")}: Ctrl+Z)`}
+                >
+                    <Undo/>
+                </ControlButton>
 
-            <ControlButton
-                left={isRevertedUndo ? undoRow : 1}
-                top={isRevertedUndo ? 1 : undoRow}
-                cellSize={cellSize}
-                onClick={handleRedo}
-                title={`${translate("Redo the last action")} (${translate("shortcut")}: Ctrl+Y)`}
-            >
-                <Redo/>
-            </ControlButton>
+                <ControlButton
+                    left={isRevertedUndo ? undoRow : 1}
+                    top={isRevertedUndo ? 1 : undoRow}
+                    cellSize={cellSize}
+                    onClick={handleRedo}
+                    title={`${translate("Redo the last action")} (${translate("shortcut")}: Ctrl+Y)`}
+                >
+                    <Redo/>
+                </ControlButton>
+            </>}
 
             {!hideDeleteButton && <ControlButton
                 left={isRevertedUndo ? undoRow : 2}
