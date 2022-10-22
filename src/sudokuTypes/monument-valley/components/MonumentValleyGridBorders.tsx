@@ -1,30 +1,37 @@
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
-import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
-import {darkGreyColor, getRegionBorderWidth, textColor} from "../../../components/app/globals";
-import {Position} from "../../../types/layout/Position";
+import {darkGreyColor, textColor} from "../../../components/app/globals";
+import {formatSvgPointsArray} from "../../../types/layout/Position";
 import {parseMonumentValleyFieldSize} from "../types/MonumentValleyTypeManager";
 
 export const MonumentValleyGridBorders = withFieldLayer(FieldLayer.lines, (
     {
         context: {
-            puzzle: {
-                fieldSize,
-                typeManager: {transformCoords},
-            },
-            cellSize,
+            puzzle: {fieldSize},
             state: {isMyTurn},
         }
     }: ConstraintProps
 ) => {
     const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
-    const borderWidth = getRegionBorderWidth(cellSize);
 
-    return <RoundedPolyLine
-        points={([] as Position[])}
-        stroke={isMyTurn ? textColor : darkGreyColor}
-        strokeWidth={borderWidth}
+    return <polygon
+        points={formatSvgPointsArray([
+            {
+                left: gridSize + 0.001,
+                top: rowsCount - gridSize,
+            },
+            {
+                left: columnsCount / 2,
+                top: intersectionSize,
+            },
+            {
+                left: columnsCount - gridSize - 0.001,
+                top: rowsCount - gridSize,
+            },
+        ])}
+        fill={isMyTurn ? textColor : darkGreyColor}
+        strokeWidth={0}
     />;
 });
 

@@ -110,15 +110,13 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
         return defaultPosition;
     },
 
-    transformCoords({top, left}, {fieldSize}, state, cellSize) {
+    transformCoords({top, left}, {fieldSize}) {
         const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         const centerX = columnsCount / 2;
         const centerY = rowsCount / 2;
 
-        const borderWidth = getRegionBorderWidth(cellSize) / 2;
-
-        if (left <= gridSize + borderWidth) {
+        if (left <= gridSize) {
             if (top < intersectionSize) {
                 return {
                     left: centerX + (left - gridSize) + (intersectionSize - top),
@@ -135,7 +133,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
                     top: centerY + (top - (gridSize - intersectionSize)) - (gridSize - left) / 2,
                 };
             }
-        } else if (left < columnsCount - gridSize - borderWidth) {
+        } else if (left < columnsCount - gridSize) {
             return {
                 left,
                 top: centerY + (top - (gridSize - intersectionSize)),
@@ -161,11 +159,13 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
         }
     },
 
-    getRegionsWithSameCoordsTransformation({fieldSize, fieldMargin = 0, hideRegionBorders}, cellSize): Rect[] {
+    getRegionsWithSameCoordsTransformation({fieldSize, fieldMargin = 0}, cellSize): Rect[] {
         const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         const fullMargin = fieldMargin + 1;
-        const borderWidth = getRegionBorderWidth(cellSize) / 2;
+        const borderWidth = fieldSize.regions.length
+            ? getRegionBorderWidth(cellSize)
+            : 1 / cellSize;
 
         return [
             {
@@ -177,7 +177,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
             {
                 left: -fullMargin,
                 top: intersectionSize,
-                width: gridSize + fullMargin + borderWidth,
+                width: gridSize + fullMargin,
                 height: gridSize - intersectionSize * 2,
             },
             {
@@ -187,17 +187,17 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
                 height: gridSize + fullMargin,
             },
             {
+                left: gridSize + borderWidth,
+                top: 0,
+                width: gridSize - intersectionSize * 2 - borderWidth * 2,
+                height: rowsCount - gridSize,
+            },
+            {
                 left: gridSize,
                 top: rowsCount - gridSize,
                 width: gridSize - intersectionSize * 2,
                 height: gridSize + fullMargin,
             },
-            ...(hideRegionBorders ? [] : [{
-                left: gridSize + borderWidth + 0.001,
-                top: rowsCount - gridSize - borderWidth,
-                width: gridSize - intersectionSize * 2 - borderWidth * 2 - 0.002,
-                height: borderWidth,
-            }]),
             {
                 left: columnsCount - gridSize + intersectionSize,
                 top: -fullMargin,
@@ -205,9 +205,9 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number> = {
                 height: intersectionSize + fullMargin,
             },
             {
-                left: columnsCount - gridSize - borderWidth,
+                left: columnsCount - gridSize,
                 top: intersectionSize,
-                width: gridSize + fullMargin + borderWidth,
+                width: gridSize + fullMargin,
                 height: gridSize - intersectionSize * 2,
             },
             {

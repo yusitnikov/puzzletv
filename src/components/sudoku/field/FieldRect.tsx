@@ -22,6 +22,11 @@ export const FieldRect = <CellType, GameStateExtensionType = {}, ProcessedGameSt
     }: FieldRectProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
 ) => {
     const transformedRect = getFieldRectTransform(context, position);
+    if (width !== 1) {
+        const bla = getFieldRectTransform(context, position);
+        console.log({...position, width, height});
+        console.log(bla);
+    }
 
     return <g transform={getTransformedRectMatrix(transformedRect)}>
         <AutoSvg
@@ -55,6 +60,7 @@ export const getFieldRectTransform = <CellType, GameStateExtensionType = {}, Pro
 
     return transformRect(
         {...position, width: 1, height: 1},
-        position => transformCoords(position, puzzle, state, cellSize)
+        position => transformCoords(position, puzzle, state, cellSize),
+        0.1
     );
 };

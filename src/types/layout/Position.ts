@@ -104,10 +104,12 @@ export const getLineVector = ({start, end}: Line): Position => ({
 
 export const getVectorLength = ({left, top}: Position) => Math.hypot(left, top);
 
-export const normalizeVector = (vector: Position, length = getVectorLength(vector) || 1): Position => ({
-    left: vector.left / length,
-    top: vector.top / length,
+export const scaleVector = (vector: Position, coeff: number): Position => ({
+    left: vector.left * coeff,
+    top: vector.top * coeff,
 });
+
+export const normalizeVector = (vector: Position): Position => scaleVector(vector, 1 / (getVectorLength(vector) || 1));
 
 export const getCircleConnectionPoint = ({left: x1, top: y1}: Position, {left: x2, top: y2}: Position, circleRadius: number): Position => {
     let dx = x2 - x1;

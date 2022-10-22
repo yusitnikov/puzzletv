@@ -1,4 +1,4 @@
-import {emptyPosition, getLineVector, Position} from "./Position";
+import {emptyPosition, getLineVector, Position, scaleVector} from "./Position";
 import {emptySize, Size} from "./Size";
 
 export interface Rect extends Position, Size {
@@ -17,16 +17,17 @@ export const emptyRect: Rect = {
 
 export const transformRect = (
     {top, left, width, height}: Rect,
-    transformCoords: (position: Position) => Position = position => position
+    transformCoords: (position: Position) => Position = position => position,
+    coeff = 1
 ): TransformedRect => {
     const base = transformCoords({top, left});
-    const right = transformCoords({top, left: left + width});
-    const bottom = transformCoords({top: top + height, left});
+    const right = transformCoords({top, left: left + width * coeff});
+    const bottom = transformCoords({top: top + height * coeff, left});
 
     return {
         base,
-        rightVector: getLineVector({start: base, end: right}),
-        bottomVector: getLineVector({start: base, end: bottom}),
+        rightVector: scaleVector(getLineVector({start: base, end: right}), 1 / coeff),
+        bottomVector: scaleVector(getLineVector({start: base, end: bottom}), 1 / coeff),
     };
 };
 

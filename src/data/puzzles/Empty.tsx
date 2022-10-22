@@ -18,6 +18,9 @@ import {
     createMonumentValleyFieldSize,
     MonumentValleyTypeManager
 } from "../../sudokuTypes/monument-valley/types/MonumentValleyTypeManager";
+import {
+    MonumentValleyGridBordersConstraint
+} from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
@@ -93,6 +96,9 @@ export const EmptyMonumentValley: PuzzleDefinition<number> = {
     slug: "empty-monument-valley",
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(9, 3),
+    items: [
+        MonumentValleyGridBordersConstraint(),
+    ],
     digitsCount: 9,
 };
 
@@ -102,7 +108,9 @@ export const EmptyMonumentValleyMini: PuzzleDefinition<number> = {
     slug: "empty-monument-valley-mini",
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(5, 1, 2),
-    hideRegionBorders: true,
+    items: [
+        MonumentValleyGridBordersConstraint(),
+    ],
     digitsCount: 5,
 };
 

@@ -9,6 +9,9 @@ import {
 } from "../../sudokuTypes/monument-valley/types/MonumentValleyTypeManager";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import React from "react";
+import {
+    MonumentValleyGridBordersConstraint
+} from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
 
 const author: PartiallyTranslatable = {
     [LanguageCode.en]: "TrevorTao",
@@ -32,6 +35,9 @@ export const MonumentValley: PuzzleDefinition<number> = {
     fieldSize: createMonumentValleyFieldSize(9, 3),
     digitsCount: 9,
     rules: (translate) => <RulesParagraph>{translate(rules("0 1 6 8 9"))}</RulesParagraph>,
+    items: [
+        MonumentValleyGridBordersConstraint(),
+    ],
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             4: 8.5,
@@ -134,9 +140,11 @@ export const MonumentValleyMini: PuzzleDefinition<number> = {
     slug: "monument-valley-mini",
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(5, 1, 2),
-    hideRegionBorders: true,
     digitsCount: 5,
     rules: (translate) => <RulesParagraph>{translate(rules("0 1 8"))}</RulesParagraph>,
+    items: [
+        MonumentValleyGridBordersConstraint(),
+    ],
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             2: 1,
