@@ -5,7 +5,7 @@ import {CubeTypeManager} from "../../cube/types/CubeTypeManager";
 export const CubedokuTypeManager: SudokuTypeManager<number> = {
     ...CubeTypeManager(false),
 
-    getCellSelectionType: function ({top, left}, {fieldSize: {fieldSize}}, {selectedCells}) {
+    getCellSelectionType: function ({top, left}, {puzzle: {fieldSize: {fieldSize}}, state: {selectedCells}}) {
         const realFieldSize = fieldSize / 2;
 
         const tooltipResult: Required<Pick<CellSelectionProps, "color" | "strokeWidth">> = {

@@ -266,7 +266,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                 ? CellSelectionColor.mainCurrent
                 : CellSelectionColor.mainPrevious;
         } else if (getCellSelectionType) {
-            const customSelection = getCellSelectionType(cellPosition, puzzle, state);
+            const customSelection = getCellSelectionType(cellPosition, context);
             if (customSelection) {
                 color = customSelection.color;
                 width = customSelection.strokeWidth;

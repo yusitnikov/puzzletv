@@ -16,6 +16,7 @@ import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
 import {GameStateAction, GameStateActionType} from "./GameStateAction";
 import {useTranslate} from "../../hooks/useTranslate";
 import {KeyInfo} from "./KeyInfo";
+import {SettingsContentProps} from "../../components/sudoku/controls/settings/SettingsContent";
 
 export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
     areSameCellData(
@@ -154,13 +155,14 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     getCellSelectionType?(
         cell: Position,
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
     ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined;
 
     hasBottomRowControls?: boolean;
 
     mainControlsComponent?: ComponentType<ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
+
+    settingsComponents?: ComponentType<SettingsContentProps<CellType, ProcessedGameStateExtensionType>>[];
 
     maxDigitsCount?: number;
 

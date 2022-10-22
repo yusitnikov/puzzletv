@@ -1,27 +1,27 @@
-/** @jsxImportSource @emotion/react */
-import styled from "@emotion/styled";
-import {FC, useState} from "react";
-import {useLanguageCode, useTranslate} from "../../../hooks/useTranslate";
-import {textColor, textHeightCoeff} from "../../app/globals";
-import {saveBoolToLocalStorage, saveNumberToLocalStorage, saveStringToLocalStorage} from "../../../utils/localStorage";
-import {LocalStorageKeys} from "../../../data/LocalStorageKeys";
+import {useState} from "react";
+import {useLanguageCode, useTranslate} from "../../../../hooks/useTranslate";
+import {textHeightCoeff} from "../../../app/globals";
+import {saveBoolToLocalStorage, saveNumberToLocalStorage, saveStringToLocalStorage} from "../../../../utils/localStorage";
+import {LocalStorageKeys} from "../../../../data/LocalStorageKeys";
 import InputSlider from "react-input-slider";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {Button} from "../../layout/button/Button";
-import {myClientId} from "../../../hooks/useMultiPlayer";
-import {buildLink} from "../../../utils/link";
+import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {myClientId} from "../../../../hooks/useMultiPlayer";
+import {buildLink} from "../../../../utils/link";
 import {Check, Share} from "@emotion-icons/material";
+import {SettingsItem} from "./SettingsItem";
+import {SettingsButton} from "./SettingsButton";
+import {SettingsTextBox} from "./SettingsTextBox";
+import {SettingsCheckbox} from "./SettingsCheckbox";
 
-interface SizeProps {
+export interface SettingsContentProps<CellType, ProcessedGameStateExtensionType = {}> {
+    context: PuzzleContext<CellType, any, ProcessedGameStateExtensionType>;
     cellSize: number;
 }
 
-export interface SettingsContentProps<CellType, ProcessedGameStateExtensionType = {}> extends SizeProps {
-    context: PuzzleContext<CellType, any, ProcessedGameStateExtensionType>;
-}
-
 export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
-    {
+    props: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
+) => {
+    const {
         cellSize,
         context: {
             puzzle: {
@@ -31,7 +31,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
                 resultChecker,
                 forceAutoCheckOnFinish,
                 forceEnableConflictChecker,
-                typeManager: {disableConflictChecker},
+                typeManager: {disableConflictChecker, settingsComponents = []},
             },
             state: {
                 enableConflictChecker,
@@ -42,8 +42,8 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
             onStateChange,
             multiPlayer: {isEnabled},
         },
-    }: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
-) => {
+    } = props;
+
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -199,67 +199,7 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
                 onChange={({x}) => handleChangeBackgroundOpacity(x)}
             />
         </SettingsItem>
+
+        {settingsComponents.map((Component, index) => <Component key={`custom-${index}`} {...props}/>)}
     </div>;
 };
-
-interface SettingsItemProps {
-    noLabel?: boolean;
-}
-
-const StyledSettingsItem = styled("div", {
-    shouldForwardProp(propName) {
-        return propName !== "noLabel";
-    },
-})(({noLabel}: SettingsItemProps) => ({
-    marginBottom: "0.5em",
-    "*": {
-        cursor: noLabel ? undefined : "pointer",
-    },
-}));
-
-const SettingsItem: FC<SettingsItemProps> = ({noLabel, children}) => <StyledSettingsItem noLabel={noLabel}>
-    {noLabel ? children : <label>{children}</label>}
-</StyledSettingsItem>;
-
-const SettingsCheckbox = styled("input", {
-    shouldForwardProp(propName) {
-        return propName !== "cellSize";
-    }
-})(({cellSize}: SizeProps) => ({
-    padding: 0,
-    margin: 0,
-    marginLeft: cellSize * textHeightCoeff,
-    width: cellSize * textHeightCoeff * 0.8,
-    height: cellSize * textHeightCoeff * 0.8,
-}));
-
-const SettingsTextBox = styled("input", {
-    shouldForwardProp(propName) {
-        return propName !== "cellSize";
-    }
-})(({cellSize}: SizeProps) => ({
-    padding: "0.25em",
-    margin: 0,
-    width: cellSize * 2,
-    height: cellSize * textHeightCoeff,
-    border: `1px solid ${textColor}`,
-    outline: "none",
-    cursor: "text",
-    fontSize: "inherit",
-    lineHeight: "inherit",
-    fontWeight: "inherit",
-    fontFamily: "inherit",
-    "* + &": {
-        marginLeft: cellSize * textHeightCoeff,
-    },
-}));
-
-const SettingsButton = styled(Button)(({cellSize}: SizeProps) => ({
-    padding: "0.25em",
-    margin: 0,
-    marginLeft: cellSize * textHeightCoeff,
-    fontSize: "inherit",
-    lineHeight: "inherit",
-    fontWeight: "inherit",
-    fontFamily: "inherit",
-}));

@@ -16,7 +16,7 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff, textColor, textHeightCoeff} from "../../app/globals";
-import {SettingsContent} from "./SettingsContent";
+import {SettingsContent} from "./settings/SettingsContent";
 import {DigitControlButton} from "./DigitControlButton";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";

@@ -48,7 +48,6 @@ import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
 import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
-import {CellSelectionColor} from "../../components/sudoku/cell/CellSelection";
 import {
     CenteredCalculatorDigitComponentType,
     RegularCalculatorDigitComponentType
@@ -59,6 +58,8 @@ import {
 } from "../../components/sudoku/constraints/fillable-calculator-digit/FillableCalculatorDigit";
 import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
+import {TesseractSettings} from "../../sudokuTypes/tesseract/components/TesseractSettings";
+import {getTesseractCellSelectionType} from "../../sudokuTypes/tesseract/types/TesseractSelection";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
@@ -99,40 +100,24 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
         const initialDigits: GivenDigitsMap<number> = {};
         const initialColors: GivenDigitsMap<CellColorValue[]> = {};
         const items: ConstraintOrComponent<number, any>[] = [];
+
+        const baseTypeManager = typesMap[type] ?? regularTypeManager;
+        const typeManager = {...baseTypeManager};
+        if (tesseract) {
+            typeManager.getCellSelectionType = (...args) =>
+                getTesseractCellSelectionType?.(...args) ?? baseTypeManager.getCellSelectionType?.(...args);
+            typeManager.settingsComponents = [
+                ...(typeManager.settingsComponents ?? []),
+                TesseractSettings,
+            ];
+        }
+
         const puzzle: PuzzleDefinition<number> = {
             noIndex: true,
             slug: "f-puzzles",
             saveStateKey: `f-puzzles-${sha1().update(load).digest("hex").substring(0, 20)}`,
             title: {[LanguageCode.en]: "Untitled"},
-            typeManager: {
-                ...(typesMap[type] ?? regularTypeManager),
-                getCellSelectionType: tesseract
-                    ? (cell, puzzle, {selectedCells}) => {
-                        if (selectedCells.size !== 1) {
-                            return undefined;
-                        }
-
-                        const getTesseractsCoords = ({top, left}: Position) => [
-                            top % 3,
-                            left % 3,
-                            Math.floor(top / 3),
-                            Math.floor(left / 3),
-                        ];
-
-                        const cell4D = getTesseractsCoords(cell);
-                        const selected4D = getTesseractsCoords(selectedCells.first()!);
-
-                        if (cell4D.some((value, index) => Math.abs(value - selected4D[index]) > 1)) {
-                            return undefined;
-                        }
-
-                        return {
-                            color: CellSelectionColor.secondary,
-                            strokeWidth: 1,
-                        };
-                    }
-                    : undefined
-            },
+            typeManager,
             fieldSize: {
                 fieldSize: 9,
                 rowsCount: 9,

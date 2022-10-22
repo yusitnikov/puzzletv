@@ -160,10 +160,9 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiSta
         ...MultiStageSudokuTypeManager({getStage}),
         getCellSelectionType(
             {top, left},
-            puzzle,
-            state
+            {state: {stage}}
         ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined {
-            const colors = getStageCellsMap(state.stage);
+            const colors = getStageCellsMap(stage);
 
             return colors[top]?.[left] === undefined ? undefined : {
                 color: CellSelectionColor.secondary,
