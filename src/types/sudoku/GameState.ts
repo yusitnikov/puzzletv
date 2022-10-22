@@ -211,13 +211,14 @@ export const getAllShareState = <CellType, GameStateExtensionType = {}, Processe
 ): any => {
     const {typeManager} = puzzle;
     const {getSharedState, serializeCellData} = typeManager;
-    const {initialDigits, excludedDigits} = state;
+    const {initialDigits, excludedDigits, lives} = state;
 
     return {
         field: serializeFieldState(gameStateGetCurrentFieldState(state), typeManager),
         extension: typeManager.serializeGameState(state),
         initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
         excludedDigits: serializeGivenDigitsMap(excludedDigits, item => item.serialize()),
+        lives,
         ...getSharedState?.(puzzle, state),
     };
 }
@@ -228,7 +229,7 @@ export const setAllShareState = <CellType, GameStateExtensionType = {}, Processe
 ): GameState<CellType> & GameStateExtensionType => {
     const {typeManager} = puzzle;
     const {setSharedState, unserializeGameState, unserializeCellData} = typeManager;
-    const {field, extension, initialDigits, excludedDigits} = newState;
+    const {field, extension, initialDigits, excludedDigits, lives} = newState;
 
     const result: GameState<CellType> & GameStateExtensionType = {
         ...state,
@@ -236,6 +237,7 @@ export const setAllShareState = <CellType, GameStateExtensionType = {}, Processe
         ...unserializeGameState(extension),
         initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
         excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
+        lives,
     };
 
     return setSharedState?.(puzzle, result, newState) ?? result;
