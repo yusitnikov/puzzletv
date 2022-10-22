@@ -90,7 +90,7 @@ export const EmptyCubedoku: PuzzleDefinition<number> = {
     digitsCount: 6,
 };
 
-export const EmptyMonumentValley: PuzzleDefinition<number> = {
+export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
     noIndex: true,
     title,
     slug: "empty-monument-valley",
@@ -102,7 +102,7 @@ export const EmptyMonumentValley: PuzzleDefinition<number> = {
     digitsCount: 9,
 };
 
-export const EmptyMonumentValleyMini: PuzzleDefinition<number> = {
+export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
     noIndex: true,
     title,
     slug: "empty-monument-valley-mini",

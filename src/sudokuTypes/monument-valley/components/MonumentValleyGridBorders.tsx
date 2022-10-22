@@ -23,7 +23,7 @@ export const MonumentValleyGridBorders = withFieldLayer(FieldLayer.lines, (
             },
             {
                 left: columnsCount / 2,
-                top: intersectionSize,
+                top: rowsCount - gridSize - (gridSize - intersectionSize * 2) * Math.sqrt(0.75),
             },
             {
                 left: columnsCount - gridSize - 0.001,

@@ -1,29 +1,36 @@
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
-import {FastForward, PlayArrow, PushPin, RotateRight, Timelapse} from "@emotion-icons/material";
+import {FastForward, PlayArrow, PushPin, RotateLeft, RotateRight, Timelapse} from "@emotion-icons/material";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {rotateClockwise} from "../utils/rotation";
-import {RotatableDigit} from "../types/RotatableDigit";
 import {RotatableGameState, RotatableProcessedGameState} from "../types/RotatableGameState";
 import {ControlsProps} from "../../../components/sudoku/controls/Controls";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
+import {ReactElement} from "react";
 
-export const RotatableMainControls = (
+export const RotatableMainControls = <CellType,>(angleDelta: number, showBackButton: boolean, showStickyMode: boolean) => function RotatableMainControlsComponent(
     {
         context: {
             cellSizeForSidePanel: cellSize,
             state: {isReady, isStickyMode, animationSpeed, isShowingSettings},
             onStateChange,
         },
-    }: ControlsProps<RotatableDigit, RotatableGameState, RotatableProcessedGameState>
-) => {
+    }: ControlsProps<CellType, RotatableGameState, RotatableProcessedGameState>
+) {
     const translate = useTranslate();
 
-    const handleRotate = () => onStateChange(({angle}) => ({angle: rotateClockwise(angle)}));
+    const handleRotate = (delta: number) => onStateChange(({angle}) => ({
+        angle: isReady
+            ? angle + delta
+            : (Math.sign(angle) === Math.sign(delta) ? delta : 0)
+    }));
 
-    const handleToggleStickyMode = () => onStateChange(({isStickyMode}) => ({isStickyMode: !isStickyMode}));
+    const handleToggleStickyMode = () => {
+        if (showStickyMode) {
+            onStateChange(({isStickyMode}) => ({isStickyMode: !isStickyMode}));
+        }
+    };
 
     const handleSetAnimationSpeed = (animationSpeed: AnimationSpeed) => onStateChange({animationSpeed});
     const handleAnimationSpeedToggle = () => {
@@ -45,11 +52,11 @@ export const RotatableMainControls = (
             return;
         }
 
-        const {code} = ev;
+        const {code, shiftKey} = ev;
 
         switch (code) {
             case "KeyR":
-                handleRotate();
+                handleRotate(shiftKey ? -angleDelta : angleDelta);
                 ev.preventDefault();
                 break;
             case "KeyS":
@@ -58,6 +65,55 @@ export const RotatableMainControls = (
                 break;
         }
     });
+
+    const buttons: ((left: number) => ReactElement)[] = [
+        (left) => <ControlButton
+            left={left}
+            top={4}
+            cellSize={cellSize}
+            onClick={() => handleRotate(angleDelta)}
+            title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: R)\n${translate("Tip")}: ${translate("use the button from the right side to control the rotation speed")}`}
+        >
+            <RotateRight/>
+        </ControlButton>,
+    ];
+
+    if (showBackButton) {
+        buttons.push((left) => <ControlButton
+            left={left}
+            top={4}
+            cellSize={cellSize}
+            onClick={() => handleRotate(-angleDelta)}
+            title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: Shift+R)\n${translate("Tip")}: ${translate("use the button from the right side to control the rotation speed")}`}
+        >
+            <RotateLeft/>
+        </ControlButton>);
+    }
+
+    if (showStickyMode) {
+        buttons.push((left) => <ControlButton
+            left={left}
+            top={4}
+            cellSize={cellSize}
+            checked={isStickyMode}
+            onClick={handleToggleStickyMode}
+            title={`${translate("Sticky mode")}: ${translate(isStickyMode ? "ON" : "OFF")} (${translate("click to toggle")}, ${translate("shortcut")}: S).\n${translate("Sticky digits will preserve the orientation when rotating the field")}.\n${translate("Sticky digits are highlighted in green")}.`}
+        >
+            <PushPin/>
+        </ControlButton>);
+    }
+
+    buttons.push((left) => <ControlButton
+        left={left}
+        top={4}
+        cellSize={cellSize}
+        onClick={handleAnimationSpeedToggle}
+        title={`${translate("Rotation speed")}: ${translate(animationSpeedToString(animationSpeed))} (${translate("click to toggle")})`}
+    >
+        {animationSpeed === AnimationSpeed.regular && <PlayArrow/>}
+        {animationSpeed === AnimationSpeed.immediate && <FastForward/>}
+        {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
+    </ControlButton>);
 
     return <>
         {/* eslint-disable-next-line react/jsx-no-undef */}
@@ -82,37 +138,6 @@ export const RotatableMainControls = (
             </Absolute>
         </Absolute>}
 
-        <ControlButton
-            left={0}
-            top={4}
-            cellSize={cellSize}
-            onClick={handleRotate}
-            title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: R)\n${translate("Tip")}: ${translate("use the button from the right side to control the rotation speed")}`}
-        >
-            <RotateRight/>
-        </ControlButton>
-
-        <ControlButton
-            left={1}
-            top={4}
-            cellSize={cellSize}
-            checked={isStickyMode}
-            onClick={handleToggleStickyMode}
-            title={`${translate("Sticky mode")}: ${translate(isStickyMode ? "ON" : "OFF")} (${translate("click to toggle")}, ${translate("shortcut")}: S).\n${translate("Sticky digits will preserve the orientation when rotating the field")}.\n${translate("Sticky digits are highlighted in green")}.`}
-        >
-            <PushPin/>
-        </ControlButton>
-
-        <ControlButton
-            left={2}
-            top={4}
-            cellSize={cellSize}
-            onClick={handleAnimationSpeedToggle}
-            title={`${translate("Rotation speed")}: ${translate(animationSpeedToString(animationSpeed))} (${translate("click to toggle")})`}
-        >
-            {animationSpeed === AnimationSpeed.regular && <PlayArrow/>}
-            {animationSpeed === AnimationSpeed.immediate && <FastForward/>}
-            {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
-        </ControlButton>
+        {buttons.map((button, index) => ({...button(index), key: `button-${index}`}))}
     </>;
 };

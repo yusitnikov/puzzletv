@@ -538,7 +538,7 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
     }: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
     digit: number,
     isGlobal: boolean,
-    cellData: CellType
+    cellData: (position: Position) => CellType
 ): (cellState: CellStateEx<CellType>, position: Position) => Partial<CellStateEx<CellType>> => {
     if (isGlobal) {
         const isInitialDigit = ({top, left}: Position): boolean =>
@@ -547,7 +547,7 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
         switch (state.cellWriteMode) {
             case CellWriteMode.main:
                 return ({centerDigits, cornerDigits}, position) => isInitialDigit(position) ? {} : {
-                    usersDigit: cellData,
+                    usersDigit: cellData(position),
                     centerDigits: centerDigits.clear(),
                     cornerDigits: cornerDigits.clear(),
                 };
@@ -556,24 +556,24 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
                 const areAllCentersEnabled = gameStateAreAllSelectedCells(
                     state,
                     ({usersDigit, centerDigits}, position) =>
-                        isInitialDigit(position) || usersDigit !== undefined || centerDigits.contains(cellData)
+                        isInitialDigit(position) || usersDigit !== undefined || centerDigits.contains(cellData(position))
                 );
 
                 return ({usersDigit, centerDigits}, position) =>
                     isInitialDigit(position) || usersDigit !== undefined ? {} : {
-                        centerDigits: centerDigits.toggle(cellData, !areAllCentersEnabled)
+                        centerDigits: centerDigits.toggle(cellData(position), !areAllCentersEnabled)
                     };
 
             case CellWriteMode.corner:
                 const areAllCornersEnabled = gameStateAreAllSelectedCells(
                     state,
                     ({usersDigit, cornerDigits}, position) =>
-                        isInitialDigit(position) || usersDigit !== undefined || cornerDigits.contains(cellData)
+                        isInitialDigit(position) || usersDigit !== undefined || cornerDigits.contains(cellData(position))
                 );
 
                 return ({usersDigit, cornerDigits}, position) =>
                     isInitialDigit(position) || usersDigit !== undefined ? {} : {
-                        cornerDigits: cornerDigits.toggle(cellData, !areAllCornersEnabled)
+                        cornerDigits: cornerDigits.toggle(cellData(position), !areAllCornersEnabled)
                     };
 
             case CellWriteMode.color:
@@ -599,7 +599,7 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
 ) => {
     const {puzzle: {typeManager, initialLives, decreaseOnlyOneLive}, state} = context;
 
-    const cellData = typeManager.createCellDataByTypedDigit(digit, state);
+    const cellData = (position?: Position) => typeManager.createCellDataByTypedDigit(digit, context, position);
 
     const {
         handleDigitGlobally,
@@ -614,12 +614,12 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
         context,
         clientId,
         (cell, position) => handleDigitInCell(
-            isGlobal, clientId, state.cellWriteMode, cell, cellData, position, context, defaultHandler(cell, position), cache
+            isGlobal, clientId, state.cellWriteMode, cell, cellData(position), position, context, defaultHandler(cell, position), cache
         )
     );
 
     if (handleDigitGlobally) {
-        result = handleDigitGlobally(isGlobal, clientId, context, cellData, result);
+        result = handleDigitGlobally(isGlobal, clientId, context, cellData(undefined), result);
     }
 
     if (isGlobal && initialLives) {

@@ -52,7 +52,8 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     createCellDataByTypedDigit(
         digit: number,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        position?: Position
     ): CellType;
 
     getDigitByCellData(

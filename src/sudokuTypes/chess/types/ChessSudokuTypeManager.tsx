@@ -57,7 +57,7 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
         };
     },
 
-    createCellDataByTypedDigit(digit, {selectedColor}): ChessPiece {
+    createCellDataByTypedDigit(digit, {state: {selectedColor}}): ChessPiece {
         return {
             type: digit,
             color: selectedColor,

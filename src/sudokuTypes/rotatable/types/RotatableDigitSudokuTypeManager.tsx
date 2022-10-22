@@ -1,5 +1,5 @@
 import {isStickyRotatableDigit, RotatableDigit} from "./RotatableDigit";
-import {isStartAngle, isUpsideDownAngle} from "../utils/rotation";
+import {isUpsideDownAngle} from "../utils/rotation";
 import {RotatableDigitCellDataComponentType} from "../components/RotatableDigitCellData";
 import {RotatableGameState, RotatableProcessedGameState} from "./RotatableGameState";
 import {RotatableMainControls} from "../components/RotatableMainControls";
@@ -32,7 +32,67 @@ const toggleNumber = (digit: number, upsideDown = true) =>
 const toggleData = (data: RotatableDigit, upsideDown = true) =>
     toggleDigit(data.digit, upsideDown && isRotatableCellData(data));
 
+export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
+    startAngle: number,
+    angleDelta: number,
+    showBackButton: boolean,
+    showStickyMode: boolean
+): Pick<
+    SudokuTypeManager<CellType, RotatableGameState, RotatableProcessedGameState>,
+    "serializeGameState" | "unserializeGameState" | "initialGameStateExtension" | "isReady" |
+    "useProcessedGameStateExtension" | "getFieldAngle" | "hasBottomRowControls" | "mainControlsComponent" |
+    "getInternalState" | "unserializeInternalState"
+> => ({
+    serializeGameState({angle}) {
+        return {angle};
+    },
+
+    unserializeGameState({angle}) {
+        return {angle};
+    },
+
+    initialGameStateExtension: {
+        angle: startAngle,
+        isStickyMode: false,
+        animationSpeed: AnimationSpeed.regular,
+    },
+
+    isReady({angle}: RotatableGameState): boolean {
+        return startAngle === 0 || angle !== startAngle;
+    },
+
+    useProcessedGameStateExtension({angle, animationSpeed}: RotatableGameState): Omit<RotatableProcessedGameState, keyof RotatableGameState> {
+        const animatedAngle = useAnimatedValue(angle, animationSpeed);
+
+        return useMemo(() => ({animatedAngle}), [animatedAngle]);
+    },
+
+    getFieldAngle({animatedAngle}: RotatableProcessedGameState): number {
+        return animatedAngle;
+    },
+
+    hasBottomRowControls: true,
+
+    mainControlsComponent: RotatableMainControls(angleDelta, showBackButton, showStickyMode),
+
+    getInternalState(
+        puzzle,
+        {angle, isStickyMode}
+    ): any {
+        return {angle, isStickyMode};
+    },
+
+    unserializeInternalState(
+        puzzle,
+        {angle, isStickyMode}: any
+    ): Partial<GameState<CellType> & RotatableGameState> {
+        return {angle, isStickyMode};
+    }
+});
+
 export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
+    ...RotatableDigitSudokuTypeManagerBase<RotatableDigit>(-90, 180, false, true),
+
     areSameCellData(
         data1,
         data2,
@@ -77,14 +137,6 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         return data as RotatableDigit;
     },
 
-    serializeGameState({angle}) {
-        return {angle};
-    },
-
-    unserializeGameState({angle}) {
-        return {angle};
-    },
-
     createCellDataByDisplayDigit(digit: number, {isStickyMode}: RotatableGameState): RotatableDigit {
         return {
             digit,
@@ -92,7 +144,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         };
     },
 
-    createCellDataByTypedDigit(digit: number, {isStickyMode, angle}: RotatableGameState): RotatableDigit {
+    createCellDataByTypedDigit(digit, {state: {isStickyMode, angle}}): RotatableDigit {
         const naiveResult: RotatableDigit = {
             digit,
             sticky: isStickyMode,
@@ -149,26 +201,6 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
 
     cellDataComponentType: RotatableDigitCellDataComponentType,
 
-    initialGameStateExtension: {
-        angle: -90,
-        isStickyMode: false,
-        animationSpeed: AnimationSpeed.regular,
-    },
-
-    isReady({angle}: RotatableGameState): boolean {
-        return !isStartAngle(angle);
-    },
-
-    useProcessedGameStateExtension({angle, animationSpeed}: RotatableGameState): Omit<RotatableProcessedGameState, keyof RotatableGameState> {
-        const animatedAngle = useAnimatedValue(angle, animationSpeed);
-
-        return useMemo(() => ({animatedAngle}), [animatedAngle]);
-    },
-
-    getFieldAngle({animatedAngle}: RotatableProcessedGameState): number {
-        return animatedAngle;
-    },
-
     processArrowDirection(
         currentCell,
         xDirection,
@@ -189,22 +221,4 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
             context
         );
     },
-
-    hasBottomRowControls: true,
-
-    mainControlsComponent: RotatableMainControls,
-
-    getInternalState(
-        puzzle,
-        {angle, isStickyMode}
-    ): any {
-        return {angle, isStickyMode};
-    },
-
-    unserializeInternalState(
-        puzzle,
-        {angle, isStickyMode}: any
-    ): Partial<GameState<RotatableDigit> & RotatableGameState> {
-        return {angle, isStickyMode};
-    }
 };
