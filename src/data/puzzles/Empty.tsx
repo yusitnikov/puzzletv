@@ -94,6 +94,7 @@ export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState, R
     noIndex: true,
     title,
     slug: "empty-monument-valley",
+    saveStateKey: "empty-monument-valley-v2",
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(9, 3),
     items: [
@@ -106,6 +107,7 @@ export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameStat
     noIndex: true,
     title,
     slug: "empty-monument-valley-mini",
+    saveStateKey: "empty-monument-valley-mini-v2",
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(5, 1, 2),
     items: [
