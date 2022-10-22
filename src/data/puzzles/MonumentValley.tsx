@@ -8,12 +8,19 @@ import {
     parseMonumentValleyDigitsMap
 } from "../../sudokuTypes/monument-valley/types/MonumentValleyTypeManager";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {normalSudokuRulesApply} from "../ruleSnippets";
 import React from "react";
 
 const author: PartiallyTranslatable = {
     [LanguageCode.en]: "TrevorTao",
 };
+
+const rules = (validDigits: string): PartiallyTranslatable => ({
+    [LanguageCode.en]: `
+        Fill cells with digits ${validDigits} so that each of the three subgrids forms a valid Sudoku.
+        Use the panel or the keyboard shortcuts to enter rotated digits
+    `,
+});
+
 export const MonumentValley: PuzzleDefinition<number> = {
     noIndex: true,
     title: {
@@ -24,10 +31,7 @@ export const MonumentValley: PuzzleDefinition<number> = {
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(9, 3),
     digitsCount: 9,
-    rules: (translate) => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>TBD: real rules definition.</RulesParagraph>
-    </>,
+    rules: (translate) => <RulesParagraph>{translate(rules("0 1 6 8 9"))}.</RulesParagraph>,
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             4: 8.5,
@@ -132,10 +136,7 @@ export const MonumentValleyMini: PuzzleDefinition<number> = {
     fieldSize: createMonumentValleyFieldSize(5, 1, 2),
     hideRegionBorders: true,
     digitsCount: 5,
-    rules: (translate) => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>TBD: real rules definition.</RulesParagraph>
-    </>,
+    rules: (translate) => <RulesParagraph>{translate(rules("0 1 8"))}.</RulesParagraph>,
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             2: 1,
