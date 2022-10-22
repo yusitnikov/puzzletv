@@ -17,7 +17,7 @@ const author: PartiallyTranslatable = {
 const rules = (validDigits: string): PartiallyTranslatable => ({
     [LanguageCode.en]: `
         Fill cells with digits ${validDigits} so that each of the three subgrids forms a valid Sudoku.
-        Use the panel or the keyboard shortcuts to enter rotated digits
+        Use the panel or the keyboard shortcuts to enter rotated digits.
     `,
 });
 
@@ -31,7 +31,7 @@ export const MonumentValley: PuzzleDefinition<number> = {
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(9, 3),
     digitsCount: 9,
-    rules: (translate) => <RulesParagraph>{translate(rules("0 1 6 8 9"))}.</RulesParagraph>,
+    rules: (translate) => <RulesParagraph>{translate(rules("0 1 6 8 9"))}</RulesParagraph>,
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             4: 8.5,
@@ -136,7 +136,7 @@ export const MonumentValleyMini: PuzzleDefinition<number> = {
     fieldSize: createMonumentValleyFieldSize(5, 1, 2),
     hideRegionBorders: true,
     digitsCount: 5,
-    rules: (translate) => <RulesParagraph>{translate(rules("0 1 8"))}.</RulesParagraph>,
+    rules: (translate) => <RulesParagraph>{translate(rules("0 1 8"))}</RulesParagraph>,
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             2: 1,
