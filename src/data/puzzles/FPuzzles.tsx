@@ -60,6 +60,7 @@ import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
 import {TesseractSettings} from "../../sudokuTypes/tesseract/components/TesseractSettings";
 import {getTesseractCellSelectionType} from "../../sudokuTypes/tesseract/types/TesseractSelection";
+import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
@@ -534,6 +535,13 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             },
             disabledlogic: undefined,
             truecandidatesoptions: undefined,
+            fogofwar: (cells, {size}) => {
+                if (cells && puzzleJson.solution && puzzleJson.solution.filter(Boolean).length === size * size) {
+                    const solution = splitArrayIntoChunks(puzzleJson.solution, size);
+                    items.push(FogConstraint(solution, cells));
+                    puzzle.prioritizeSelection = true;
+                }
+            }
             // endregion
         }).parse(puzzleJson, "f-puzzles data");
 
