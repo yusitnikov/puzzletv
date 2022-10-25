@@ -12,6 +12,7 @@ import {
 import {darkGreyColor} from "../../../app/globals";
 import {CellBackground} from "../../cell/CellBackground";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
+import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
 
 export interface FogProps<CellType> {
     solution: CellType[][];
@@ -51,36 +52,43 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
         )
     );
 
+    const id = useAutoIncrementId();
+    const rectGradientId = `fog-rect-gradient-${id}`;
+    const circleGradientId = `fog-circle-gradient-${id}`;
+    const fogMaskPartId = `fog-mask-part-${id}`;
+    const fogMaskId = `fog-mask-${id}`;
+    const fogBulbId = `fog-bulb-${id}`;
+
     return <>
         <defs>
-            <linearGradient id={"fog-rect-gradient"}>
+            <linearGradient id={rectGradientId}>
                 <stop offset={"0%"} stopColor={"#000"} stopOpacity={0}/>
                 <stop offset={"100%"} stopColor={"#000"} stopOpacity={1}/>
             </linearGradient>
 
-            <radialGradient id={"fog-circle-gradient"} cx={"100%"} cy={"100%"} r={"100%"}>
+            <radialGradient id={circleGradientId} cx={"100%"} cy={"100%"} r={"100%"}>
                 <stop offset={"0%"} stopColor={"#000"} stopOpacity={1}/>
                 <stop offset={"100%"} stopColor={"#000"} stopOpacity={0}/>
             </radialGradient>
 
-            <g id={"fog-part"}>
+            <g id={fogMaskPartId}>
                 <rect
                     width={shadeSize}
                     y={shadeSize}
                     height={3 - 2 * shadeSize}
-                    fill={`url(#fog-rect-gradient)`}
+                    fill={`url(#${rectGradientId})`}
                     strokeWidth={0}
                 />
 
                 <rect
                     width={shadeSize}
                     height={shadeSize}
-                    fill={`url(#fog-circle-gradient)`}
+                    fill={`url(#${circleGradientId})`}
                     strokeWidth={0}
                 />
             </g>
 
-            <mask id={"fog-mask"}>
+            <mask id={fogMaskId}>
                 <DarkReaderRectOverride
                     width={columnsCount}
                     height={rowsCount}
@@ -98,15 +106,15 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
                         strokeWidth={0}
                     />
 
-                    <use href={"#fog-part"} transform={`translate(${left - 1} ${top - 1})`}/>
-                    <use href={"#fog-part"} transform={`translate(${left + 2} ${top - 1}) rotate(90)`}/>
-                    <use href={"#fog-part"} transform={`translate(${left + 2} ${top + 2}) rotate(180)`}/>
-                    <use href={"#fog-part"} transform={`translate(${left - 1} ${top + 2}) rotate(270)`}/>
+                    <use href={`#${fogMaskPartId}`} transform={`translate(${left - 1} ${top - 1})`}/>
+                    <use href={`#${fogMaskPartId}`} transform={`translate(${left + 2} ${top - 1}) rotate(90)`}/>
+                    <use href={`#${fogMaskPartId}`} transform={`translate(${left + 2} ${top + 2}) rotate(180)`}/>
+                    <use href={`#${fogMaskPartId}`} transform={`translate(${left - 1} ${top + 2}) rotate(270)`}/>
                 </Fragment>))}
             </mask>
 
             <path
-                id={"fog-light-source"}
+                id={fogBulbId}
                 d={`
                     M 0.4 0.68
                     H 0.6
@@ -155,13 +163,13 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             width={columnsCount}
             height={rowsCount}
             fill={darkGreyColor}
-            mask={"url(#fog-mask)"}
+            mask={`url(#${fogMaskId})`}
             strokeWidth={0}
         />
 
         {showBulbs && startCells.map(({top, left}) => <use
             key={`light-${top}-${left}`}
-            href={"#fog-light-source"}
+            href={`#${fogBulbId}`}
             transform={`translate(${left} ${top})`}
         />)}
 
