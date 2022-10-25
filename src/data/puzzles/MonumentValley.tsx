@@ -26,7 +26,6 @@ const rules = (validDigits: string): PartiallyTranslatable => ({
 });
 
 export const MonumentValley: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
-    noIndex: true,
     title: {
         [LanguageCode.en]: "Monument Valley Sudoku",
     },
@@ -134,7 +133,6 @@ export const MonumentValley: PuzzleDefinition<number, RotatableGameState, Rotata
 };
 
 export const MonumentValleyMini: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
-    noIndex: true,
     title: {
         [LanguageCode.en]: "Monument Valley Mini",
     },
