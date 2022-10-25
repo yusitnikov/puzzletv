@@ -16,6 +16,7 @@ import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 export interface FogProps<CellType> {
     solution: CellType[][];
     startCells: Position[];
+    showBulbs: boolean;
 }
 
 const shadeSize = 0.4;
@@ -29,6 +30,7 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
         context,
         solution,
         startCells,
+        showBulbs,
     }: ConstraintProps<any, FogProps<CellType>>
 ) => {
     const {
@@ -157,7 +159,7 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             strokeWidth={0}
         />
 
-        {startCells.map(({top, left}) => <use
+        {showBulbs && startCells.map(({top, left}) => <use
             key={`light-${top}-${left}`}
             href={"#fog-light-source"}
             transform={`translate(${left} ${top})`}
@@ -181,11 +183,16 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
     </>;
 }) as <CellType,>(props: ConstraintProps<any, FogProps<CellType>>) => ReactElement;
 
-export const FogConstraint = <CellType,>(solution: CellType[][], startCellLiterals: PositionLiteral[]): Constraint<CellType, FogProps<CellType>> => ({
+export const FogConstraint = <CellType,>(
+    solution: CellType[][],
+    startCellLiterals: PositionLiteral[],
+    showBulbs = true,
+): Constraint<CellType, FogProps<CellType>> => ({
     name: "fog",
     cells: [],
     solution,
     startCells: parsePositionLiterals(startCellLiterals),
+    showBulbs,
     component: Fog,
     isValidCell(
         {top, left},

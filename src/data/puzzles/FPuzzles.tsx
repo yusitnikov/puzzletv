@@ -61,6 +61,7 @@ import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDi
 import {TesseractSettings} from "../../sudokuTypes/tesseract/components/TesseractSettings";
 import {getTesseractCellSelectionType} from "../../sudokuTypes/tesseract/types/TesseractSelection";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
+import {FPuzzlesText} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesText";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
@@ -149,6 +150,10 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                 puzzle.fieldMargin = Math.max(puzzle.fieldMargin || 0, margin);
             }
         };
+
+        const isFowText = ({cells, value}: FPuzzlesText) => value === "💡"
+            && cells.length === 1
+            && puzzleJson.fogofwar?.includes(cells[0]);
 
         // TODO: go over rangsk solver and populate constraints from there
         new ObjectParser<FPuzzlesPuzzle>({
@@ -482,6 +487,10 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             },
             text: (text, {size: fieldSize}) => {
                 if (text instanceof Array) {
+                    if (puzzleJson.fogofwar) {
+                        text = text.filter((obj) => !isFowText(obj));
+                    }
+
                     items.push(...text.flatMap(({cells, value, fontC, size, angle, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles text");
 
@@ -538,7 +547,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             fogofwar: (cells, {size}) => {
                 if (cells && puzzleJson.solution && puzzleJson.solution.filter(Boolean).length === size * size) {
                     const solution = splitArrayIntoChunks(puzzleJson.solution, size);
-                    items.push(FogConstraint(solution, cells));
+                    items.push(FogConstraint(solution, cells, !!puzzleJson.text?.some(isFowText)));
                     puzzle.prioritizeSelection = true;
                 }
             }
