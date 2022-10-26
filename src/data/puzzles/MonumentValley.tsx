@@ -21,7 +21,7 @@ const author: PartiallyTranslatable = {
 const rules = (validDigits: string): PartiallyTranslatable => ({
     [LanguageCode.en]: `
         Fill cells with digits ${validDigits} so that each of the three subgrids forms a valid Sudoku.
-        Use the panel or the keyboard shortcuts to enter rotated digits.
+        All non-zero digits can be rotated by 90 degrees.
     `,
 });
 
