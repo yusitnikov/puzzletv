@@ -1,9 +1,10 @@
 import {Constraint} from "../../../../types/sudoku/Constraint";
 import {Line} from "../../../../types/layout/Position";
 
-export const LoopLineConstraint = <CellType>(): Constraint<CellType> => ({
+export const LoopLineConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
     name: "loop line",
     cells: [],
+    props: undefined,
     isValidPuzzle(lines, digits, cells, context) {
         const lineSegments = context.cellsIndexForState.getCenterLineSegments();
 

@@ -2,24 +2,29 @@ import {blackColor, textColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 
 export const KropkiDotTag = "kropki-dot";
 
 export interface KropkiDotProps {
-    isRatio?: boolean;
     value?: number | [number, number];
     showValue?: boolean;
 }
 
-export const KropkiDot = withFieldLayer(FieldLayer.top, (
+export const KropkiDot = withFieldLayer(FieldLayer.top, <CellType,>(
     {
         cells: [cell1, cell2],
         color = blackColor,
-        value,
-        showValue = true
-    }: ConstraintProps<any, KropkiDotProps>
+        props: {
+            value,
+            showValue = true
+        },
+    }: ConstraintProps<CellType, KropkiDotProps>
 ) => {
     const top = (cell1.top + cell2.top) / 2 + 0.5;
     const left = (cell1.left + cell2.left) / 2 + 0.5;
@@ -43,16 +48,16 @@ export const KropkiDot = withFieldLayer(FieldLayer.top, (
             {typeof value === "number" ? value : value.join(":")}
         </CenteredText>}
     </>;
-});
+}) as ConstraintPropsGenericFc<KropkiDotProps>;
 
-export const KropkiDotConstraint = <CellType,>(
+export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
     cellLiteral1: PositionLiteral,
     cellLiteral2: PositionLiteral,
     isRatio: boolean,
     value?: number | [number, number],
     color = isRatio ? blackColor : "white",
     showValue = true
-): Constraint<CellType, KropkiDotProps> => {
+): Constraint<CellType, KropkiDotProps, ExType, ProcessedExType> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
 
@@ -60,10 +65,11 @@ export const KropkiDotConstraint = <CellType,>(
         name: `${isRatio ? "black" : "white"} kropki dot (${value ?? "-"})`,
         tags: [KropkiDotTag],
         cells: [cell1, cell2],
-        isRatio,
         color,
-        value,
-        showValue,
+        props: {
+            value,
+            showValue,
+        },
         component: KropkiDot,
         isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const data1 = digits[cell1.top]?.[cell1.left];
@@ -86,5 +92,5 @@ export const KropkiDotConstraint = <CellType,>(
     });
 };
 
-export const HeartConstraint = <CellType,>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, showValue = false) =>
-    KropkiDotConstraint<CellType>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", showValue);
+export const HeartConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, showValue = false) =>
+    KropkiDotConstraint<CellType, ExType, ProcessedExType>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", showValue);

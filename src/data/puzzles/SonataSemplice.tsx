@@ -5,7 +5,7 @@ import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudok
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {littleKillerExplained, normalSudokuRulesApply} from "../ruleSnippets";
 import {LittleKillerConstraint} from "../../components/sudoku/constraints/little-killer/LittleKiller";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {ConstraintPropsGenericFc, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {parsePositionLiteral, PositionLiteral} from "../../types/layout/Position";
 import {withFieldLayer} from "../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
@@ -180,7 +180,7 @@ const Extras = withFieldLayer(FieldLayer.top, () => <>
     </g>
 
     <Note cell={"R4C7"} filled={true}/>
-</>);
+</>) as ConstraintPropsGenericFc;
 
 const shadedRow = {
     0: [CellColor.lightGrey],
@@ -236,7 +236,12 @@ export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>
         6: shadedRow,
     },
     items: [
-        <Extras/>,
+        {
+            name: "extras",
+            cells: [],
+            component: Extras,
+            props: undefined,
+        },
         LittleKillerConstraint("R1C3", "DL", fieldSize, 7),
         LittleKillerConstraint("R1C6", "DR", fieldSize, 7),
         LittleKillerConstraint("R1C6", "DL", fieldSize, 16),

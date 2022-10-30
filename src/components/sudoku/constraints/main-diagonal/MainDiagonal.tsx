@@ -1,13 +1,13 @@
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {ConstraintProps, ConstraintPropsGenericFc} from "../../../../types/sudoku/Constraint";
 import {getLineVector, PositionLiteral} from "../../../../types/layout/Position";
 import {RenbanConstraint} from "../renban/Renban";
 
 const diagonalColor = "#34bbe6";
 const diagonalWidth = 0.03;
 
-export const DiagonalComponent = withFieldLayer(FieldLayer.regular, ({cells, color = diagonalColor, context: {cellSize}}: ConstraintProps) => {
+export const DiagonalComponent = withFieldLayer(FieldLayer.regular, <CellType,>({cells, color = diagonalColor, context: {cellSize}}: ConstraintProps<CellType>) => {
     cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
     const [first, second] = cells;
@@ -22,22 +22,22 @@ export const DiagonalComponent = withFieldLayer(FieldLayer.regular, ({cells, col
         strokeWidth={3 / cellSize}
         stroke={color}
     />;
-});
+}) as ConstraintPropsGenericFc;
 
-const BaseDiagonalConstraint = <CellType,>(cellLiterals: PositionLiteral[]) => ({
-    ...RenbanConstraint<CellType>(cellLiterals, false),
+const BaseDiagonalConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[]) => ({
+    ...RenbanConstraint<CellType, ExType, ProcessedExType>(cellLiterals, false),
     name: "main diagonal",
     color: diagonalColor,
     width: diagonalWidth,
     component: DiagonalComponent,
 });
 
-export const PositiveDiagonalConstraint = <CellType,>(fieldSize: number) => ({
-    ...BaseDiagonalConstraint<CellType>([{top: fieldSize - 1, left: 0}, {top: 0, left: fieldSize - 1}]),
+export const PositiveDiagonalConstraint = <CellType, ExType, ProcessedExType>(fieldSize: number) => ({
+    ...BaseDiagonalConstraint<CellType, ExType, ProcessedExType>([{top: fieldSize - 1, left: 0}, {top: 0, left: fieldSize - 1}]),
     name: "main positive diagonal",
 });
 
-export const NegativeDiagonalConstraint = <CellType,>(fieldSize: number) => ({
-    ...BaseDiagonalConstraint<CellType>([{top: 0, left: 0}, {top: fieldSize - 1, left: fieldSize - 1}]),
+export const NegativeDiagonalConstraint = <CellType, ExType, ProcessedExType>(fieldSize: number) => ({
+    ...BaseDiagonalConstraint<CellType, ExType, ProcessedExType>([{top: 0, left: 0}, {top: fieldSize - 1, left: fieldSize - 1}]),
     name: "main negative diagonal",
 });

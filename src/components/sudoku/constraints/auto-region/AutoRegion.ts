@@ -2,10 +2,11 @@ import {Constraint} from "../../../../types/sudoku/Constraint";
 import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
 import {isValidCellForRegion} from "../region/Region";
 
-export const AutoRegionConstraint = <CellType>(): Constraint<CellType> => {
-    return ({
+export const AutoRegionConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+    return {
         name: "auto-region",
         cells: [],
+        props: undefined,
         isValidCell(cell, digits, cells, {puzzle, cellsIndex, state}, constraints, isFinalCheck) {
             const region = cellsIndex.getCustomRegionByBorderLinesAt(state, cell);
 
@@ -21,5 +22,5 @@ export const AutoRegionConstraint = <CellType>(): Constraint<CellType> => {
 
             return isValidCellForRegion(region, cell, digits, puzzle, state);
         },
-    });
+    };
 };

@@ -8,14 +8,18 @@ import {
 } from "../../../../types/layout/Position";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders} from "../../../../utils/regions";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
-import {ProcessedGameState} from "../../../../types/sudoku/GameState";
+import {ProcessedGameStateEx} from "../../../../types/sudoku/GameState";
 
-export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSize, state: {isMyTurn}}}: ConstraintProps) => {
+export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps) => {
     const points = useMemo(() => getRegionBorders(cells, true), [cells]);
 
     return <RoundedPolyLine
@@ -23,14 +27,14 @@ export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSi
         stroke={isMyTurn ? textColor : darkGreyColor}
         strokeWidth={getRegionBorderWidth(cellSize)}
     />;
-});
+}) as ConstraintPropsGenericFc;
 
-export const isValidCellForRegion = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
+export const isValidCellForRegion = <CellType, ExType, ProcessedExType>(
     region: Position[],
     cell: Position,
     digits: GivenDigitsMap<CellType>,
-    {typeManager: {areSameCellData}}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+    {typeManager: {areSameCellData}}: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
 ) => {
     const digit = digits[cell.top][cell.left]!;
 
@@ -49,15 +53,18 @@ export const isValidCellForRegion = <CellType, GameStateExtensionType = any, Pro
     return true;
 };
 
-export const RegionConstraint = <CellType,>(cellLiterals: PositionLiteral[], showBorders = true, name = "region"): Constraint<CellType> => {
+export const RegionConstraint = <CellType, ExType, ProcessedExType>(
+    cellLiterals: PositionLiteral[], showBorders = true, name = "region"
+): Constraint<CellType, undefined, ExType, ProcessedExType> => {
     const cells = parsePositionLiterals(cellLiterals);
 
-    return ({
+    return {
         name,
         cells,
         component: showBorders ? Region : undefined,
+        props: undefined,
         isValidCell(cell, digits, cells, {puzzle, state}) {
             return isValidCellForRegion(cells, cell, digits, puzzle, state);
         },
-    });
+    };
 };

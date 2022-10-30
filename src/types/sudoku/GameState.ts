@@ -39,7 +39,7 @@ import {CellMark} from "./CellMark";
 import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
 import {
-    getAllPuzzleConstraintsAndComponents,
+    getAllPuzzleConstraints,
     isValidUserDigit,
     prepareGivenDigitsMapForConstraints
 } from "./Constraint";
@@ -75,13 +75,62 @@ export interface GameState<CellType> {
     nickname: string;
 }
 
-export interface ProcessedGameState<CellType> extends GameState<CellType> {
-    cellWriteMode: CellWriteMode;
-    cellWriteModeInfo: CellWriteModeInfo<CellType, any, any>;
-    isReady: boolean;
-    isMyTurn: boolean;
-    lastPlayerObjects: Record<string, boolean>;
+export interface GameStateEx<CellType, ExType> extends GameState<CellType> {
+    extension: ExType;
 }
+
+export type PartialGameStateEx<CellType, ExType> = Partial<GameState<CellType>> & {
+    extension?: Partial<ExType>;
+}
+
+export interface ProcessedGameState<CellType> extends GameState<CellType> {
+    processed: {
+        cellWriteMode: CellWriteMode;
+        cellWriteModeInfo: CellWriteModeInfo<CellType, any, any>;
+        isReady: boolean;
+        isMyTurn: boolean;
+        lastPlayerObjects: Record<string, boolean>;
+    },
+}
+
+export interface ProcessedGameStateEx<CellType, ExType, ProcessedExType> extends ProcessedGameState<CellType> {
+    extension: ExType;
+    processedExtension: ProcessedExType;
+}
+
+export const mergeGameStateUpdates = <CellType, ExType>(
+    ...updatesArray: PartialGameStateEx<CellType, ExType>[]
+) => updatesArray.reduce(
+    ({extension: ex1, ...state1}, {extension: ex2, ...state2}) => ({
+        ...state1,
+        ...state2,
+        extension: {...ex1, ...ex2}
+    })
+);
+
+export const mergeGameStateWithUpdates = <CellType, ExType>(
+    state: GameStateEx<CellType, ExType>,
+    ...updatesArray: PartialGameStateEx<CellType, ExType>[]
+) => updatesArray.reduce<GameStateEx<CellType, ExType>>(
+    (state, updates) => ({
+        ...state,
+        ...updates,
+        extension: {
+            ...state.extension,
+            ...updates.extension,
+        },
+    }),
+    state
+);
+
+export const mergeProcessedGameStateWithUpdates = <CellType, ExType, ProcessedExType>(
+    {processed, processedExtension, ...state}: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
+    ...updatesArray: PartialGameStateEx<CellType, ExType>[]
+): ProcessedGameStateEx<CellType, ExType, ProcessedExType> => ({
+    ...mergeGameStateWithUpdates(state, ...updatesArray),
+    processed,
+    processedExtension,
+});
 
 // region Serialization & empty state
 type SavedGameStates = [
@@ -105,11 +154,11 @@ const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(ga
 const getPuzzleFullSaveStateKey = ({slug, params = {}, saveStateKey = slug}: PuzzleDefinition<any, any, any>): string =>
     `${saveStateKey}-${params.host || ""}-${params.room || ""}`;
 
-export const getEmptyGameState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
     useLocalStorage: boolean,
     readOnly = false
-): GameState<CellType> & GameStateExtensionType => {
+): GameStateEx<CellType, ExType> => {
     const {
         params = {},
         typeManager,
@@ -164,14 +213,16 @@ export const getEmptyGameState = <CellType, GameStateExtensionType = {}, Process
         backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
         nickname: loadStringFromLocalStorage(LocalStorageKeys.nickname, ""),
 
-        ...(initialGameStateExtension as any),
-        ...(savedGameState && unserializeGameState(savedGameState[2]))
+        extension: {
+            ...initialGameStateExtension,
+            ...(savedGameState && unserializeGameState(savedGameState[2]))
+        } as ExType,
     };
 };
 
-export const saveGameState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: GameState<CellType> & GameStateExtensionType
+export const saveGameState = <CellType, ExType = {}, ProcessedExType = {}>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    state: GameStateEx<CellType, ExType>
 ): void => {
     const {
         typeManager,
@@ -190,7 +241,7 @@ export const saveGameState = <CellType, GameStateExtensionType = {}, ProcessedGa
             [
                 fullSaveStateKey,
                 serializeFieldState(gameStateGetCurrentFieldState(state), typeManager),
-                typeManager.serializeGameState(state),
+                typeManager.serializeGameState(state.extension),
                 serializeGivenDigitsMap(state.initialDigits, typeManager.serializeCellData),
                 serializeGivenDigitsMap(state.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
                 state.persistentCellWriteMode,
@@ -205,40 +256,42 @@ export const saveGameState = <CellType, GameStateExtensionType = {}, ProcessedGa
     );
 };
 
-export const getAllShareState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: GameState<CellType> & GameStateExtensionType
+export const getAllShareState = <CellType, ExType = {}, ProcessedExType = {}>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    state: GameStateEx<CellType, ExType>
 ): any => {
     const {typeManager} = puzzle;
     const {getSharedState, serializeCellData} = typeManager;
-    const {initialDigits, excludedDigits, lives} = state;
+    const {initialDigits, excludedDigits, lives, extension} = state;
 
     return {
         field: serializeFieldState(gameStateGetCurrentFieldState(state), typeManager),
-        extension: typeManager.serializeGameState(state),
+        extension: typeManager.serializeGameState(extension),
         initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
         excludedDigits: serializeGivenDigitsMap(excludedDigits, item => item.serialize()),
         lives,
         ...getSharedState?.(puzzle, state),
     };
 }
-export const setAllShareState = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    state: GameState<CellType> & GameStateExtensionType,
+export const setAllShareState = <CellType, ExType = {}, ProcessedExType = {}>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    state: GameStateEx<CellType, ExType>,
     newState: any
-): GameState<CellType> & GameStateExtensionType => {
+): GameStateEx<CellType, ExType> => {
     const {typeManager} = puzzle;
     const {setSharedState, unserializeGameState, unserializeCellData} = typeManager;
     const {field, extension, initialDigits, excludedDigits, lives} = newState;
 
-    const result: GameState<CellType> & GameStateExtensionType = {
-        ...state,
-        fieldStateHistory: fieldStateHistoryAddState(typeManager, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
-        ...unserializeGameState(extension),
-        initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
-        excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
-        lives,
-    };
+    const result: GameStateEx<CellType, ExType> = mergeGameStateWithUpdates(
+        state,
+        {
+            fieldStateHistory: fieldStateHistoryAddState(typeManager, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
+            initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
+            excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
+            lives,
+            extension: unserializeGameState(extension),
+        }
+    );
 
     return setSharedState?.(puzzle, result, newState) ?? result;
 };
@@ -265,74 +318,72 @@ export const gameStateGetCurrentGivenDigitsByCells = <CellType>(cells: CellState
     return result;
 };
 
-export const gameStateGetCurrentGivenDigits = <CellType>(gameState: ProcessedGameState<CellType>) =>
-    gameStateGetCurrentGivenDigitsByCells(gameStateGetCurrentFieldState(gameState).cells);
+export const gameStateGetCurrentGivenDigits = <CellType>(state: GameState<CellType>) =>
+    gameStateGetCurrentGivenDigitsByCells(gameStateGetCurrentFieldState(state).cells);
 
-export const gameStateUndo = <CellType, ProcessedGameStateExtensionType = {}>(
-    {fieldStateHistory}: ProcessedGameState<CellType>
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+export const gameStateUndo = <CellType, ExType>(
+    {fieldStateHistory}: GameState<CellType>
+): PartialGameStateEx<CellType, ExType> => ({
     fieldStateHistory: fieldStateHistoryUndo(fieldStateHistory),
-} as any);
+});
 
-export const gameStateRedo = <CellType, ProcessedGameStateExtensionType = {}>(
-    {fieldStateHistory}: ProcessedGameState<CellType>
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+export const gameStateRedo = <CellType, ExType>(
+    {fieldStateHistory}: GameState<CellType>
+): PartialGameStateEx<CellType, ExType> => ({
     fieldStateHistory: fieldStateHistoryRedo(fieldStateHistory),
-} as any);
+});
 // endregion
 
 // region Selected cells
 export const gameStateAreAllSelectedCells = <CellType>(
-    gameState: ProcessedGameState<CellType>,
+    state: GameState<CellType>,
     predicate: (cellState: CellState<CellType>, position: Position) => boolean
-) =>
-    areAllFieldStateCells(
-        gameStateGetCurrentFieldState(gameState),
-        gameState.selectedCells.items,
-        predicate
-    );
+) => areAllFieldStateCells(
+    gameStateGetCurrentFieldState(state),
+    state.selectedCells.items,
+    predicate
+);
 
 export const gameStateIsAnySelectedCell = <CellType>(
-    gameState: ProcessedGameState<CellType>,
+    state: GameState<CellType>,
     predicate: (cellState: CellState<CellType>, position: Position) => boolean
-) =>
-    isAnyFieldStateCell(
-        gameStateGetCurrentFieldState(gameState),
-        gameState.selectedCells.items,
-        predicate
-    );
+) => isAnyFieldStateCell(
+    gameStateGetCurrentFieldState(state),
+    state.selectedCells.items,
+    predicate
+);
 
-export const gameStateAddSelectedCell = <CellType, ProcessedGameStateExtensionType = {}>(
-    gameState: ProcessedGameState<CellType>,
+export const gameStateAddSelectedCell = <CellType, ExType>(
+    state: ProcessedGameState<CellType>,
     cellPosition: Position
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    selectedCells: gameState.cellWriteModeInfo.isNoSelectionMode
-        ? gameState.selectedCells
-        : gameState.selectedCells.add(cellPosition),
-} as any);
+): PartialGameStateEx<CellType, ExType> => ({
+    selectedCells: state.processed.cellWriteModeInfo.isNoSelectionMode
+        ? state.selectedCells
+        : state.selectedCells.add(cellPosition),
+});
 
-export const gameStateSetSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
-    gameState: ProcessedGameState<CellType>,
+export const gameStateSetSelectedCells = <CellType, ExType>(
+    state: ProcessedGameState<CellType>,
     cellPositions: Position[]
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    selectedCells: gameState.cellWriteModeInfo.isNoSelectionMode
-        ? gameState.selectedCells
-        : gameState.selectedCells.set(cellPositions),
-} as any);
+): PartialGameStateEx<CellType, ExType> => ({
+    selectedCells: state.processed.cellWriteModeInfo.isNoSelectionMode
+        ? state.selectedCells
+        : state.selectedCells.set(cellPositions),
+});
 
-export const gameStateToggleSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
-    gameState: ProcessedGameState<CellType>,
+export const gameStateToggleSelectedCells = <CellType, ExType>(
+    state: ProcessedGameState<CellType>,
     cellPositions: Position[],
     forcedEnable?: boolean
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    selectedCells: gameState.cellWriteModeInfo.isNoSelectionMode
-        ? gameState.selectedCells
-        : gameState.selectedCells.toggleAll(cellPositions, forcedEnable),
-} as any);
+): PartialGameStateEx<CellType, ExType> => ({
+    selectedCells: state.processed.cellWriteModeInfo.isNoSelectionMode
+        ? state.selectedCells
+        : state.selectedCells.toggleAll(cellPositions, forcedEnable),
+});
 
-export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionType = {}>(
-    puzzle: PuzzleDefinition<CellType, any, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType>
+export const gameStateSelectAllCells = <CellType, ExType, ProcessedExType>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    state: ProcessedGameState<CellType>
 ) => {
     const {
         fieldSize: {rowsCount, columnsCount},
@@ -341,37 +392,37 @@ export const gameStateSelectAllCells = <CellType, ProcessedGameStateExtensionTyp
         },
     } = puzzle;
 
-    return gameStateSetSelectedCells<CellType, ProcessedGameStateExtensionType>(
-        gameState,
+    return gameStateSetSelectedCells<CellType, ExType>(
+        state,
         indexes(rowsCount)
             .flatMap(top => indexes(columnsCount).map(left => ({left, top})))
             .filter(cell => isValidCell(cell, puzzle))
     );
 };
 
-export const gameStateClearSelectedCells = <CellType, ProcessedGameStateExtensionType = {}>(
-    gameState: ProcessedGameState<CellType>
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
-    selectedCells: gameState.selectedCells.clear(),
-} as any);
+export const gameStateClearSelectedCells = <CellType, ExType>(
+    state: GameState<CellType>
+): PartialGameStateEx<CellType, ExType> => ({
+    selectedCells: state.selectedCells.clear(),
+});
 
-export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     xDirection: number,
     yDirection: number,
     isMultiSelection: boolean,
     isMainKeyboard: boolean
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+): PartialGameStateEx<CellType, ExType> => {
     const {puzzle, state} = context;
 
-    if (state.cellWriteModeInfo.isNoSelectionMode) {
-        return state;
+    if (state.processed.cellWriteModeInfo.isNoSelectionMode) {
+        return {};
     }
 
     const currentCell = state.selectedCells.last();
     // Nothing to do when there's no selection
     if (!currentCell) {
-        return state;
+        return {};
     }
 
     const {
@@ -383,10 +434,10 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
 
     const newCell = processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard);
     if (!newCell) {
-        return state;
+        return {};
     }
 
-    const result: Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> = isMultiSelection
+    const result: PartialGameStateEx<CellType, ExType> = isMultiSelection
         ? gameStateAddSelectedCell(state, newCell)
         : gameStateSetSelectedCells(state, [newCell]);
     let {loopOffset} = state;
@@ -431,11 +482,11 @@ export const gameStateApplyArrowToSelectedCells = <CellType, GameStateExtensionT
     };
 };
 
-export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const gameStateProcessSelectedCells = <CellType, ExType = {}, ProcessedExType = {}>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     clientId: string,
     fieldStateProcessor: (cellState: CellStateEx<CellType>, position: Position) => Partial<CellStateEx<CellType>>
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+): PartialGameStateEx<CellType, ExType> => {
     const {puzzle: {typeManager}, state} = context;
 
     const currentState = gameStateGetCurrentFieldState(state);
@@ -497,7 +548,7 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
         }
     }
 
-    if (!state.cellWriteModeInfo.isNoSelectionMode) {
+    if (!state.processed.cellWriteModeInfo.isNoSelectionMode) {
         fieldStateHistory = fieldStateHistoryAddState(
             typeManager,
             fieldStateHistory,
@@ -525,17 +576,17 @@ export const gameStateProcessSelectedCells = <CellType, GameStateExtensionType =
         initialDigits,
         excludedDigits,
         playerObjects,
-    } as Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+    };
 };
 
-const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+const getDefaultDigitHandler = <CellType, ExType = {}, ProcessedExType = {}>(
     {
         puzzle: {
             typeManager,
             initialDigits,
         },
         state,
-    }: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    }: PuzzleContext<CellType, ExType, ProcessedExType>,
     digit: number,
     isGlobal: boolean,
     cellData: (position: Position) => CellType
@@ -544,7 +595,7 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
         const isInitialDigit = ({top, left}: Position): boolean =>
             initialDigits?.[top]?.[left] !== undefined || state.initialDigits[top]?.[left] !== undefined;
 
-        switch (state.cellWriteMode) {
+        switch (state.processed.cellWriteMode) {
             case CellWriteMode.main:
                 return ({centerDigits, cornerDigits}, position) => isInitialDigit(position) ? {} : {
                     usersDigit: cellData(position),
@@ -591,8 +642,8 @@ const getDefaultDigitHandler = <CellType, GameStateExtensionType = {}, Processed
     return () => ({});
 };
 
-export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const gameStateHandleDigit = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     digit: number,
     clientId: string,
     isGlobal: boolean
@@ -614,7 +665,7 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
         context,
         clientId,
         (cell, position) => handleDigitInCell(
-            isGlobal, clientId, state.cellWriteMode, cell, cellData(position), position, context, defaultHandler(cell, position), cache
+            isGlobal, clientId, state.processed.cellWriteMode, cell, cellData(position), position, context, defaultHandler(cell, position), cache
         )
     );
 
@@ -623,10 +674,10 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
     }
 
     if (isGlobal && initialLives) {
-        const newState = {...state, ...result};
+        const newState = mergeProcessedGameStateWithUpdates(state, result);
         const digits = prepareGivenDigitsMapForConstraints(context, gameStateGetCurrentFieldState(state).cells);
         const newDigits = prepareGivenDigitsMapForConstraints(context, gameStateGetCurrentFieldState(newState).cells);
-        const items = getAllPuzzleConstraintsAndComponents(context);
+        const items = getAllPuzzleConstraints(context);
 
         const failedDigits = givenDigitsMapToArray(processGivenDigitsMaps(
             (digits, position) => {
@@ -640,10 +691,9 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
         )).filter(({data}) => data);
 
         if (failedDigits.length) {
-            result = {
-                ...result,
+            result = mergeGameStateUpdates(result, {
                 lives: Math.max(0, newState.lives - (decreaseOnlyOneLive ? 1 : failedDigits.length)),
-            };
+            });
             if (!result.lives) {
                 result.selectedCells = newState.selectedCells.clear();
             }
@@ -653,10 +703,10 @@ export const gameStateHandleDigit = <CellType, GameStateExtensionType = {}, Proc
     return result;
 };
 
-export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const gameStateClearSelectedCellsContent = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     clientId: string
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+): PartialGameStateEx<CellType, ExType> => {
     const {puzzle: {typeManager, hideDeleteButton}, state} = context;
 
     if (hideDeleteButton) {
@@ -674,7 +724,7 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
     }));
     const clearLines = () => gameStateDeleteAllLines(typeManager, state);
 
-    switch (state.cellWriteMode) {
+    switch (state.processed.cellWriteMode) {
         case CellWriteMode.main:
             if (gameStateIsAnySelectedCell(state, cell => !!cell.usersDigit)) {
                 return gameStateProcessSelectedCells(context, clientId, () => ({
@@ -715,38 +765,37 @@ export const gameStateClearSelectedCellsContent = <CellType, GameStateExtensionT
 // endregion
 
 // region Drawing
-export const gameStateNormalizeLoopOffset = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {fieldSize: {rowsCount, columnsCount}, fieldMargin = 0}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const gameStateNormalizeLoopOffset = <CellType, ExType = {}, ProcessedExType = {}>(
+    {fieldSize: {rowsCount, columnsCount}, fieldMargin = 0}: PuzzleDefinition<CellType, ExType, ProcessedExType>,
     {left, top}: Position
 ): Position => ({
     left: ((left + fieldMargin) % columnsCount + columnsCount) % columnsCount - fieldMargin,
     top: ((top + fieldMargin) % rowsCount + rowsCount) % rowsCount - fieldMargin,
 });
 
-export const gameStateResetCurrentMultiLine = <CellType, ProcessedGameStateExtensionType = {}>()
-    : Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+export const gameStateResetCurrentMultiLine = <CellType, ExType>(): PartialGameStateEx<CellType, ExType> => ({
     currentMultiLine: [],
     currentMultiLineEnd: undefined,
     dragStartPoint: undefined,
-} as Partial<ProcessedGameState<CellType>> as any);
+});
 
-export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     clientId: string,
     isGlobal: boolean
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
-    const {puzzle: {typeManager, allowDrawing = []}, state: gameState} = context;
+): PartialGameStateEx<CellType, ExType> => {
+    const {puzzle: {typeManager, allowDrawing = []}, state} = context;
 
     if (isGlobal) {
         return {
             fieldStateHistory: fieldStateHistoryAddState(
                 typeManager,
-                gameState.fieldStateHistory,
-                state => {
-                    let {marks} = state;
+                state.fieldStateHistory,
+                (fieldState) => {
+                    let {marks} = fieldState;
 
-                    if (gameState.dragStartPoint) {
-                        const {type, round} = gameState.dragStartPoint;
+                    if (state.dragStartPoint) {
+                        const {type, round} = state.dragStartPoint;
 
                         if (allowDrawing.includes(`${type}-mark`)) {
                             const xMark: CellMark = {position: round, isCircle: false, isCenter: type === "center"};
@@ -765,41 +814,41 @@ export const gameStateApplyCurrentMultiLine = <CellType, GameStateExtensionType 
                     }
 
                     return {
-                        ...state,
-                        lines: state.lines.toggleAll(gameState.currentMultiLine, gameState.isAddingLine),
+                        ...fieldState,
+                        lines: fieldState.lines.toggleAll(state.currentMultiLine, state.isAddingLine),
                         marks,
                     };
                 }
             ),
-        } as Partial<ProcessedGameState<CellType>> as any;
+        };
     }
 
     return {
         currentMultiLine: [],
         currentMultiLineEnd: undefined,
         dragStartPoint: undefined,
-    } as Partial<ProcessedGameState<CellType>> as any;
+    };
 };
 
-export const gameStateDeleteAllLines = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-    gameState: ProcessedGameState<CellType>
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => ({
+export const gameStateDeleteAllLines = <CellType, ExType, ProcessedExType>(
+    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
+    state: GameState<CellType>
+): PartialGameStateEx<CellType, ExType> => ({
     fieldStateHistory: fieldStateHistoryAddState(
         typeManager,
-        gameState.fieldStateHistory,
-        state => ({
-            ...state,
-            lines: state.lines.clear(),
-            marks: state.marks.clear(),
+        state.fieldStateHistory,
+        (fieldState) => ({
+            ...fieldState,
+            lines: fieldState.lines.clear(),
+            marks: fieldState.marks.clear(),
         })
     ),
-} as any);
+});
 
-export const gameStateStartMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle: {allowDrawing = []}, state}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const gameStateStartMultiLine = <CellType, ExType, ProcessedExType>(
+    {puzzle: {allowDrawing = []}, state}: PuzzleContext<CellType, ExType, ProcessedExType>,
     exactPosition: CellExactPosition
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
+): PartialGameStateEx<CellType, ExType> => {
     const {center, corner, type} = exactPosition;
 
     const isCenterLine: boolean | undefined = [
@@ -809,30 +858,29 @@ export const gameStateStartMultiLine = <CellType, GameStateExtensionType = {}, P
         .filter(isCenter => allowDrawing.includes(isCenter ? "center-line" : "border-line"))
         [0];
 
-    return ({
+    return mergeGameStateUpdates({
         currentMultiLine: [],
         currentMultiLineEnd: isCenterLine !== undefined
             ? (isCenterLine ? center : corner)
             : undefined,
         isCurrentMultiLineCenters: isCenterLine,
         dragStartPoint: exactPosition,
-        ...gameStateClearSelectedCells(state),
-    });
+    }, gameStateClearSelectedCells(state));
 };
 
-export const gameStateContinueMultiLine = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const gameStateContinueMultiLine = <CellType, ExType, ProcessedExType>(
     {
         puzzle,
         cellsIndex,
         state,
-    }: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    }: PuzzleContext<CellType, ExType, ProcessedExType>,
     exactPosition: CellExactPosition
-): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> => {
-    const result = {
+): PartialGameStateEx<CellType, ExType> => {
+    const result: PartialGameStateEx<CellType, ExType> = {
         dragStartPoint: state.dragStartPoint && JSON.stringify(state.dragStartPoint) === JSON.stringify(exactPosition)
             ? state.dragStartPoint
             : undefined,
-    } as Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+    };
 
     const currentMultiLineEnd = state.currentMultiLineEnd;
     if (!currentMultiLineEnd) {
@@ -846,13 +894,12 @@ export const gameStateContinueMultiLine = <CellType, GameStateExtensionType = {}
         return result;
     }
 
-    return {
-        ...result,
+    return mergeGameStateUpdates(result, {
         currentMultiLine: [...state.currentMultiLine, ...newLines],
         currentMultiLineEnd: normalizePuzzlePosition(position, puzzle),
         isAddingLine: state.currentMultiLine.length === 0
             ? !gameStateGetCurrentFieldState(state).lines.contains(newLines[0])
             : state.isAddingLine,
-    } as Partial<ProcessedGameState<CellType>> as any;
+    });
 };
 // endregion

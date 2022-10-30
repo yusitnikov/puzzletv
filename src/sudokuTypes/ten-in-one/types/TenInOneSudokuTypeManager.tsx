@@ -14,10 +14,10 @@ import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 export const TenInOneSudokuTypeManager = (
     isRemainingCell: (cell: Position) => boolean,
-): SudokuTypeManager<number, MultiStageGameState, MultiStageGameState> => ({
+): SudokuTypeManager<number, MultiStageGameState> => ({
     ...MultiStageSudokuTypeManager({
         getStage: (context) =>
-            context.state.stage === 1
+            context.state.extension.stage === 1
                 ? (isValidFinishedPuzzleByConstraints(context) ? 2 : 1)
                 : 3,
         onStageChange: (context, stage) => {
@@ -50,7 +50,7 @@ export const TenInOneSudokuTypeManager = (
                 fieldStateHistory: fieldStateHistoryAddState(
                     typeManager,
                     state.fieldStateHistory,
-                    state => ({
+                    (state) => ({
                         ...state,
                         cells: state.cells.map(cellsRow => cellsRow.map(
                             ({cornerDigits, centerDigits, colors}) => ({
@@ -64,13 +64,13 @@ export const TenInOneSudokuTypeManager = (
                 ),
             };
         },
-        getStageCompletionText: ({state: {stage}}) => stage === 2
+        getStageCompletionText: ({state: {extension: {stage}}}) => stage === 2
             ? {
                 [LanguageCode.en]: <>Now other digits from stage 1 can be&nbsp;removed.</>,
                 [LanguageCode.ru]: <>Теперь можно удалить остальные цифры с этапа 1.</>,
             }
             : undefined,
-        getStageButtonText: ({state: {stage}}) => stage === 2
+        getStageButtonText: ({state: {extension: {stage}}}) => stage === 2
             ? {
                 [LanguageCode.en]: "Clean up the grid",
                 [LanguageCode.ru]: "Очистить поле",
@@ -80,8 +80,8 @@ export const TenInOneSudokuTypeManager = (
 
     getRegionsForRowsAndColumns(
         puzzle,
-        {stage}
-    ): Constraint<any>[] {
+        {extension: {stage}}
+    ): Constraint<number, any, MultiStageGameState>[] {
         const individualBoxes = stage === 1;
         const {fieldSize: {rowsCount, columnsCount, regionWidth, regionHeight}} = puzzle;
 
@@ -90,7 +90,10 @@ export const TenInOneSudokuTypeManager = (
         }
 
         const regions = createRegularRegions(rowsCount, columnsCount, regionWidth, regionHeight);
-        const boxes = regions.map(region => individualBoxes ? TenInOneRegionConstraint(region) : RegionConstraint(region));
+        const boxes = regions.map(
+            (region): Constraint<number, any, MultiStageGameState> =>
+                individualBoxes ? TenInOneRegionConstraint(region) : RegionConstraint(region)
+        );
 
         if (!individualBoxes) {
             return [

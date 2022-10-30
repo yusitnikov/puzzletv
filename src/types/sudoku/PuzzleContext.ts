@@ -1,25 +1,25 @@
 import {PuzzleDefinition} from "./PuzzleDefinition";
-import {ProcessedGameState} from "./GameState";
+import {ProcessedGameStateEx} from "./GameState";
 import {UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
 import {Dispatch} from "react";
 import {GameStateActionOrCallback} from "./GameStateAction";
 import {SudokuCellsIndex, SudokuCellsIndexForState} from "./SudokuCellsIndex";
 
 // It's not a React context! Just a regular type.
-export interface PuzzleContext<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    cellsIndex: SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    cellsIndexForState: SudokuCellsIndexForState<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType;
+export interface PuzzleContext<CellType, ExType = {}, ProcessedExType = {}> {
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>;
+    cellsIndex: SudokuCellsIndex<CellType, ExType, ProcessedExType>;
+    cellsIndexForState: SudokuCellsIndexForState<CellType, ExType, ProcessedExType>;
+    state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
     onStateChange: Dispatch<
-        GameStateActionOrCallback<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> |
-        GameStateActionOrCallback<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[]
+        GameStateActionOrCallback<any, CellType, ExType, ProcessedExType> |
+        GameStateActionOrCallback<any, CellType, ExType, ProcessedExType>[]
     >;
     cellSize: number;
     cellSizeForSidePanel: number;
     multiPlayer: UseMultiPlayerResult;
 }
 
-export interface PuzzleContextProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface PuzzleContextProps<CellType, ExType = {}, ProcessedExType = {}> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
 }

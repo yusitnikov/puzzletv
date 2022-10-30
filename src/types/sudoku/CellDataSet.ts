@@ -1,11 +1,11 @@
 import {ComparableSet} from "../struct/Set";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 
-export class CellDataSet<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> extends ComparableSet<CellType> {
+export class CellDataSet<CellType, ExType, ProcessedExType> extends ComparableSet<CellType> {
     constructor(
         {
             typeManager: {areSameCellData, cloneCellData, serializeCellData}
-        }: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        }: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         items: CellType[] = []
     ) {
         super(
@@ -16,8 +16,8 @@ export class CellDataSet<CellType, GameStateExtensionType, ProcessedGameStateExt
         );
     }
 
-    static unserialize<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    static unserialize<CellType, ExType, ProcessedExType>(
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         items: any
     ) {
         return new CellDataSet(puzzle, (items as any[]).map(puzzle.typeManager.unserializeCellData));

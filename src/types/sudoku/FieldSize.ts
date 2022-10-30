@@ -10,7 +10,7 @@ export interface FieldSize {
     columnsCount: number;
     regionWidth?: number;
     regionHeight?: number;
-    regions: (Position[] | Constraint<any, any>)[];
+    regions: (Position[] | Constraint<any, any, any, any>)[];
 }
 
 export const createRegularRegions = (
@@ -52,15 +52,15 @@ export const createRegularFieldSize = (fieldSize: number, regionWidth: number, r
     regions: createRegularRegions(fieldSize, fieldSize, regionWidth, regionHeight)
 });
 
-export const getDefaultRegionsForRowsAndColumns = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
-    {customCellBounds, fieldSize}: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
-): Constraint<any>[] => customCellBounds ? [] : [
-    ...indexes(fieldSize.rowsCount).map(top => RegionConstraint(
+export const getDefaultRegionsForRowsAndColumns = <CellType, ExType, ProcessedExType>(
+    {customCellBounds, fieldSize}: PuzzleDefinition<CellType, ExType, ProcessedExType>
+): Constraint<CellType, any, ExType, ProcessedExType>[] => customCellBounds ? [] : [
+    ...indexes(fieldSize.rowsCount).map(top => RegionConstraint<CellType, ExType, ProcessedExType>(
         indexes(fieldSize.columnsCount).map(left => ({left, top})),
         false,
         "row"
     )),
-    ...indexes(fieldSize.columnsCount).map(left => RegionConstraint(
+    ...indexes(fieldSize.columnsCount).map(left => RegionConstraint<CellType, ExType, ProcessedExType>(
         indexes(fieldSize.rowsCount).map(top => ({left, top})),
         false,
         "column"

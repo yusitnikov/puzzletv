@@ -10,7 +10,11 @@ import {
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions";
 import {isValidCellForRegion} from "../region/Region";
 import {indexes} from "../../../../utils/indexes";
@@ -28,11 +32,13 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
     {
         context: {puzzle: {prioritizeSelection}},
         cells,
-        sum,
-        showBottomSum,
-        sumPointIndex = 0,
-        lineColor = blackColor,
-        fontColor = blackColor,
+        props: {
+            sum,
+            showBottomSum,
+            sumPointIndex = 0,
+            lineColor = blackColor,
+            fontColor = blackColor,
+        },
     }: ConstraintProps<any, KillerCageProps>
 ) => {
     const {widthCoeff} = useDigitComponentType();
@@ -92,7 +98,7 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
             />}
         </>}
     </>;
-});
+}) as ConstraintPropsGenericFc<KillerCageProps>;
 
 interface KillerCageSumProps extends Position {
     sum: string | number;
@@ -136,32 +142,34 @@ const KillerCageSum = ({sum, size, color = blackColor, left, top}: KillerCageSum
     </>;
 };
 
-export const DecorativeCageConstraint = <CellType,>(
+export const DecorativeCageConstraint = <CellType, ExType, ProcessedExType>(
     cellLiterals: PositionLiteral[],
     sum?: string | number,
     showBottomSum?: boolean,
     sumPointIndex?: number,
     lineColor?: string,
     fontColor?: string
-): Constraint<CellType, KillerCageProps> => ({
+): Constraint<CellType, KillerCageProps, ExType, ProcessedExType> => ({
     name: "cage",
     cells: parsePositionLiterals(cellLiterals),
-    sum,
-    showBottomSum,
-    sumPointIndex,
-    lineColor,
-    fontColor,
+    props: {
+        sum,
+        showBottomSum,
+        sumPointIndex,
+        lineColor,
+        fontColor,
+    },
     component: KillerCage,
 });
 
-export const KillerCageConstraint = <CellType,>(
+export const KillerCageConstraint = <CellType, ExType, ProcessedExType>(
     cellLiterals: PositionLiteral[],
     sum?: number,
     showBottomSum?: boolean,
     sumPointIndex?: number,
     lineColor?: string,
     fontColor?: string
-): Constraint<CellType, KillerCageProps> => ({
+): Constraint<CellType, KillerCageProps, ExType, ProcessedExType> => ({
     ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor),
     name: "killer cage",
     isValidCell(cell, digits, cells, {puzzle, state}) {
@@ -193,7 +201,7 @@ export const KillerCageConstraint = <CellType,>(
     },
 });
 
-export const KillerCageConstraintByRect = <CellType,>(
+export const KillerCageConstraintByRect = <CellType, ExType, ProcessedExType>(
     topLeft: PositionLiteral,
     width: number,
     height: number,
@@ -203,7 +211,7 @@ export const KillerCageConstraintByRect = <CellType,>(
 ) => {
     const {top, left} = parsePositionLiteral(topLeft);
 
-    return KillerCageConstraint<CellType>(
+    return KillerCageConstraint<CellType, ExType, ProcessedExType>(
         indexes(height).flatMap(dy => indexes(width).map(dx => ({top: top + dy, left: left + dx}))),
         sum,
         showBottomSum,

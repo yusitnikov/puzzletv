@@ -4,9 +4,10 @@ import {ChessGameState} from "../types/ChessGameState";
 import {ChessPieceType} from "../types/ChessPieceType";
 import {isSamePosition, Position} from "../../../types/layout/Position";
 
-export const ValidChessPositionConstraint: Constraint<ChessPiece, {}, ChessGameState, ChessGameState> = {
+export const ValidChessPositionConstraint: Constraint<ChessPiece, undefined, ChessGameState, {}> = {
     name: "valid chess position",
     cells: [],
+    props: undefined,
     isValidCell(cell, pieces): boolean {
         const {left, top} = cell;
         const {color, type} = pieces[top][left]!;

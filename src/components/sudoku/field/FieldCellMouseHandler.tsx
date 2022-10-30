@@ -16,24 +16,31 @@ import {CellPart} from "../../../types/sudoku/CellPart";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
-export interface FieldCellMouseHandlerProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface FieldCellMouseHandlerProps<CellType, ExType = {}, ProcessedExType = {}> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
     cellPosition: Position;
     isDeleteSelectedCellsStroke: boolean;
     onIsDeleteSelectedCellsStrokeChange: (newValue: boolean) => void;
 }
 
-export const FieldCellMouseHandler = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {}>(
     {
         context,
         cellPosition,
         isDeleteSelectedCellsStroke,
         onIsDeleteSelectedCellsStrokeChange,
-    }: FieldCellMouseHandlerProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    }: FieldCellMouseHandlerProps<CellType, ExType, ProcessedExType>
 ) => {
     const {puzzle, cellsIndex, state, onStateChange} = context;
 
-    const {cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter}, selectedCells, currentMultiLineEnd, initialDigits: stateInitialDigits} = state;
+    const {
+        selectedCells,
+        currentMultiLineEnd,
+        initialDigits: stateInitialDigits,
+        processed: {
+            cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter},
+        },
+    } = state;
 
     const {areCustomBounds, center, borderSegments} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
 

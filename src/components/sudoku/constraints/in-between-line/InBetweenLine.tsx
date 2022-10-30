@@ -7,7 +7,11 @@ import {
     parsePositionLiterals,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {darkGreyColor, lighterGreyColor} from "../../../app/globals";
 
@@ -49,15 +53,16 @@ export const InBetweenLine = withFieldLayer(FieldLayer.regular, ({cells}: Constr
             fill={backgroundColor}
         />
     </>;
-});
+}) as ConstraintPropsGenericFc;
 
-export const InBetweenLineConstraint = <CellType,>(cellLiterals: PositionLiteral[]): Constraint<CellType> => {
+export const InBetweenLineConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[]): Constraint<CellType, undefined, ExType, ProcessedExType> => {
     const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
 
-    return ({
+    return {
         name: "in-between line",
         cells,
         component: InBetweenLine,
+        props: undefined,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {areSameCellData, compareCellData}}, state}) {
             const digit = digits[cell.top][cell.left]!;
 
@@ -83,5 +88,5 @@ export const InBetweenLineConstraint = <CellType,>(cellLiterals: PositionLiteral
 
             return true;
         },
-    });
+    };
 };

@@ -1,7 +1,11 @@
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {indexes} from "../../../../utils/indexes";
@@ -12,7 +16,7 @@ export interface SandwichSumProps {
     sum: number;
 }
 
-export const SandwichSum = withFieldLayer(FieldLayer.regular, ({clueCell: {top, left}, sum}: ConstraintProps<any, SandwichSumProps>) => {
+export const SandwichSum = withFieldLayer(FieldLayer.regular, ({props: {clueCell: {top, left}, sum}}: ConstraintProps<unknown, SandwichSumProps>) => {
     const {
         svgContentComponent: DigitSvgContent,
     } = useDigitComponentType();
@@ -23,13 +27,13 @@ export const SandwichSum = withFieldLayer(FieldLayer.regular, ({clueCell: {top, 
         left={left + 0.5}
         top={top + 0.5}
     />;
-});
+}) as ConstraintPropsGenericFc<SandwichSumProps>;
 
-export const SandwichSumConstraint = <CellType,>(
+export const SandwichSumConstraint = <CellType, ExType, ProcessedExType>(
     clueCellLiteral: PositionLiteral,
     {rowsCount, columnsCount}: FieldSize,
     sum: number
-): Constraint<CellType, SandwichSumProps> => {
+): Constraint<CellType, SandwichSumProps, ExType, ProcessedExType> => {
     const clueCell = parsePositionLiteral(clueCellLiteral);
 
     return ({
@@ -37,8 +41,7 @@ export const SandwichSumConstraint = <CellType,>(
         cells: clueCell.left < 0 || clueCell.left >= columnsCount
             ? indexes(columnsCount).map(left => ({...clueCell, left}))
             : indexes(rowsCount).map(top => ({...clueCell, top})),
-        clueCell,
-        sum,
+        props: {clueCell, sum},
         component: SandwichSum,
         isValidCell(cell, digits, cells, {puzzle, state}, constraints, isFinalCheck) {
             const {typeManager: {getDigitByCellData}, digitsCount: maxDigit = getDefaultDigitsCount(puzzle)} = puzzle;

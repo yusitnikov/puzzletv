@@ -8,13 +8,13 @@ import {buildLink} from "../../utils/link";
 
 const padding = headerPadding;
 
-export interface PuzzlesListItemProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface PuzzlesListItemProps<CellType, ExType = {}, ProcessedExType = {}> {
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>;
     width: number;
 }
 
-export const PuzzlesListItem = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle, width}: PuzzlesListItemProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const PuzzlesListItem = <CellType, ExType = {}, ProcessedExType = {}>(
+    {puzzle, width}: PuzzlesListItemProps<CellType, ExType, ProcessedExType>
 ) => {
     const language = useLanguageCode();
     const translate = useTranslate();

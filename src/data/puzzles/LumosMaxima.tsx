@@ -2,7 +2,7 @@ import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {ConstraintOrComponent, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {Chameleon} from "../authors";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
@@ -37,7 +37,7 @@ export const LumosMaximaNoFog: PuzzleDefinition<number> = {
     slug: "lumos-maxima-no-fog",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
-    rules: (translate, {puzzle: {initialLives}}) => <>
+    rules: (translate) => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(arrowsExplained)} ({translate({
             [LanguageCode.en]: "there are only 1-cell circles in this puzzle",
@@ -68,7 +68,7 @@ export const LumosMaximaEternalLives: PuzzleDefinition<number> = {
     ...LumosMaximaNoFog,
     slug: "lumos-maxima-eternal-lives",
     items: [
-        ...(LumosMaximaNoFog.items as ConstraintOrComponent<number, any>[]),
+        ...(LumosMaximaNoFog.items as Constraint<number, any>[]),
         FogConstraint(solution, ["R2C2", "R8C7"]),
     ],
     rules: (translate, context) => <>

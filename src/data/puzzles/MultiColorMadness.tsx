@@ -38,7 +38,7 @@ export const MultiColorMadness: PuzzleDefinition<number> = {
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     items: [
-        AntiKnightConstraint,
+        AntiKnightConstraint(),
         AntiBishopFromCenterConstraint(3),
         GreaterConstraint("R2C5", "R1C5"),
         GreaterConstraint("R4C2", "R3C2"),

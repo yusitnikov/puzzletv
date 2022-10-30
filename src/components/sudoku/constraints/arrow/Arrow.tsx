@@ -8,7 +8,11 @@ import {
     parsePositionLiterals, Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {defaultGetDefaultNumberByDigits} from "../../../../types/sudoku/SudokuTypeManager";
@@ -24,7 +28,7 @@ export interface ArrowProps {
     transparentCircle?: boolean;
 }
 
-export const Arrow = withFieldLayer(FieldLayer.regular, ({circleCells, arrowCells, transparentCircle}: ConstraintProps<any, ArrowProps>) => {
+export const Arrow = withFieldLayer(FieldLayer.regular, <CellType,>({props: {circleCells, arrowCells, transparentCircle}}: ConstraintProps<CellType, ArrowProps>) => {
     circleCells = circleCells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
     const {left, top} = circleCells[0];
@@ -45,7 +49,7 @@ export const Arrow = withFieldLayer(FieldLayer.regular, ({circleCells, arrowCell
             fill={transparentCircle ? "none" : "#fff"}
         />
     </>;
-});
+}) as ConstraintPropsGenericFc<ArrowProps>;
 
 export const ArrowLine = ({cells}: {cells: Position[]}) => {
     if (cells.length < 2) {
@@ -81,13 +85,13 @@ export const ArrowLine = ({cells}: {cells: Position[]}) => {
     </>;
 };
 
-export const ArrowConstraint = <CellType,>(
+export const ArrowConstraint = <CellType, ExType, ProcessedExType>(
     circleCellLiterals: PositionLiteral | PositionLiteral[],
     arrowCellLiterals: PositionLiteral[] = [],
     transparentCircle = false,
     arrowStartCellLiteral: PositionLiteral | undefined = undefined,
     product = false
-): Constraint<CellType, ArrowProps> => {
+): Constraint<CellType, ArrowProps, ExType, ProcessedExType> => {
     circleCellLiterals = Array.isArray(circleCellLiterals) ? circleCellLiterals : [circleCellLiterals];
     const arrowStartCell = parsePositionLiteral(arrowStartCellLiteral ?? circleCellLiterals[0]);
     const circleCells = splitMultiLine(parsePositionLiterals(circleCellLiterals));
@@ -95,10 +99,12 @@ export const ArrowConstraint = <CellType,>(
 
     return ({
         name: "arrow",
-        circleCells,
-        arrowCells: [arrowStartCell, ...arrowCells],
+        props: {
+            circleCells,
+            arrowCells: [arrowStartCell, ...arrowCells],
+            transparentCircle,
+        },
         cells: [...circleCells, ...arrowCells],
-        transparentCircle,
         component: Arrow,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData, getNumberByDigits = defaultGetDefaultNumberByDigits}}, state}) {
             const circleDigits = circleCells.map(({top, left}) => {

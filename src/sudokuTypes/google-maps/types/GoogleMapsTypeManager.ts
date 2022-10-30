@@ -1,12 +1,12 @@
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {GoogleMapsState} from "./GoogleMapsState";
 import {emptyPosition, Position} from "../../../types/layout/Position";
-import {GameState} from "../../../types/sudoku/GameState";
+import {mergeGameStateUpdates, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {positionToLatLngLiteral} from "../utils/googleMapsCoords";
 
 export const GoogleMapsTypeManager = <CellType>(
-    baseTypeManager: SudokuTypeManager<CellType, GoogleMapsState, GoogleMapsState>
-): SudokuTypeManager<CellType, GoogleMapsState, GoogleMapsState> => ({
+    baseTypeManager: SudokuTypeManager<CellType, GoogleMapsState>
+): SudokuTypeManager<CellType, GoogleMapsState> => ({
     ...baseTypeManager,
     initialGameStateExtension: {
         zoom: 0,
@@ -15,15 +15,18 @@ export const GoogleMapsTypeManager = <CellType>(
         overlay: undefined as any,
         renderVersion: 0,
     },
-    keepStateOnRestart(state): Partial<GameState<CellType> & GoogleMapsState> {
-        const {zoom, center, map, overlay, renderVersion} = state;
+    keepStateOnRestart(state): PartialGameStateEx<CellType, GoogleMapsState> {
+        const {extension: {zoom, center, map, overlay, renderVersion}} = state;
 
-        return {...baseTypeManager.keepStateOnRestart?.(state), zoom, center, map, overlay, renderVersion};
+        return mergeGameStateUpdates(
+            baseTypeManager.keepStateOnRestart?.(state) ?? {},
+            {extension: {zoom, center, map, overlay, renderVersion}},
+        );
     },
     transformCoords(coords, puzzle, state, cellSize): Position {
         coords = baseTypeManager.transformCoords?.(coords, puzzle, state, cellSize) || coords;
 
-        const projection = state.overlay?.getProjection();
+        const projection = state.extension.overlay?.getProjection();
         if (!projection) {
             return coords;
         }

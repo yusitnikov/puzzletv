@@ -5,7 +5,11 @@ import {
     parsePositionLiteral,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 
 const width = 0.8;
 
@@ -15,19 +19,20 @@ export const Even = withFieldLayer(FieldLayer.beforeSelection, ({cells: [{left, 
     width={width}
     height={width}
     fill={lightGreyColor}
-/>);
+/>) as ConstraintPropsGenericFc;
 
-export const EvenConstraint = <CellType,>(cellLiteral: PositionLiteral): Constraint<CellType> => {
+export const EvenConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral): Constraint<CellType, undefined, ExType, ProcessedExType> => {
     const cell = parsePositionLiteral(cellLiteral);
 
-    return ({
+    return {
         name: "even",
         cells: [cell],
         component: Even,
+        props: undefined,
         isValidCell(cell, digits, _, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 
             return digit % 2 === 0;
         },
-    });
+    };
 };

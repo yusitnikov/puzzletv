@@ -1,5 +1,5 @@
 import {lightGreyColor, textColor} from "../../../app/globals";
-import {ComponentType, memo} from "react";
+import {ComponentType, memo, ReactElement} from "react";
 import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
@@ -36,11 +36,13 @@ export const MinMax = memo(({cells: [{left, top}], coeff}: ConstraintProps & {co
             <Arrow cx={left} cy={top} dx={0} dy={-1} coeff={coeff}/>
         </>}
     </>;
-});
+}) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, undefined, ExType, ProcessedExType> & {coeff: number}) => ReactElement;
 
-export const Min = (props: ConstraintProps) => <MinMax coeff={-1} {...props}/>;
+export const Min = <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, undefined, ExType, ProcessedExType>) =>
+    <MinMax coeff={-1} {...props}/>;
 
-export const Max = (props: ConstraintProps) => <MinMax coeff={1} {...props}/>;
+export const Max = <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, undefined, ExType, ProcessedExType>) =>
+    <MinMax coeff={1} {...props}/>;
 
 interface ArrowProps {
     cx: number;
@@ -78,12 +80,12 @@ const Arrow = ({cx, cy, dx, dy, coeff}: ArrowProps) => {
     />;
 };
 
-export const MinMaxConstraint = <CellType,>(
+export const MinMaxConstraint = <CellType, ExType, ProcessedExType>(
     cellLiteral: PositionLiteral,
     name: string,
-    component: ComponentType<ConstraintProps>,
+    component: ComponentType<ConstraintProps<CellType, undefined, ExType, ProcessedExType>>,
     coeff: number
-): Constraint<CellType> => {
+): Constraint<CellType, undefined, ExType, ProcessedExType> => {
     const mainCell = parsePositionLiteral(cellLiteral);
 
     return ({
@@ -96,6 +98,7 @@ export const MinMaxConstraint = <CellType,>(
             {left: mainCell.left, top: mainCell.top + 1},
         ],
         component,
+        props: undefined,
         isValidCell(cell, digits, [mainCell, ...neighborCells], {puzzle: {typeManager: {compareCellData}}, state}) {
             const digit = digits[cell.top][cell.left]!;
 
@@ -114,5 +117,7 @@ export const MinMaxConstraint = <CellType,>(
     });
 };
 
-export const MinConstraint = (cellLiteral: PositionLiteral) => MinMaxConstraint(cellLiteral, "min", Min, -1);
-export const MaxConstraint = (cellLiteral: PositionLiteral) => MinMaxConstraint(cellLiteral, "max", Max, 1);
+export const MinConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral) =>
+    MinMaxConstraint<CellType, ExType, ProcessedExType>(cellLiteral, "min", Min, -1);
+export const MaxConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral) =>
+    MinMaxConstraint<CellType, ExType, ProcessedExType>(cellLiteral, "max", Max, 1);

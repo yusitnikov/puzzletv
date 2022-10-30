@@ -1,9 +1,10 @@
 import {Constraint} from "../Constraint";
 import {normalizePuzzlePosition} from "../PuzzleDefinition";
 
-export const AntiKnightConstraint: Constraint<any> = {
+export const AntiKnightConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
     name: "anti-knight",
     cells: [],
+    props: undefined,
     isValidCell(
         {left, top},
         digits,
@@ -26,4 +27,4 @@ export const AntiKnightConstraint: Constraint<any> = {
 
         return true;
     },
-}
+});

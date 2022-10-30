@@ -4,6 +4,8 @@ import {chessColumnNameFromIndex, chessRowNameFromIndex} from "../utils/chessCoo
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {CenteredText} from "../../../components/svg/centered-text/CenteredText";
+import {ComponentType} from "react";
+import {ConstraintProps} from "../../../types/sudoku/Constraint";
 
 export const chessBoardIndexesMargin = 0.5;
 const chessBoardIndexesFontSize = chessBoardIndexesMargin * 0.8;
@@ -53,3 +55,10 @@ export const ChessBoardIndexes = withFieldLayer(FieldLayer.regular, ({shifted}: 
         {chessRowNameFromIndex(index)}
     </CenteredText>)}
 </>);
+
+export const ChessBoardIndexesConstraint = <CellType, ExType, ProcessedExType>() => ({
+    name: "chess board indexes",
+    cells: [],
+    component: ChessBoardIndexes as ComponentType<ConstraintProps<CellType, undefined, ExType, ProcessedExType>>,
+    props: undefined,
+});

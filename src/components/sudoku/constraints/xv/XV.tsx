@@ -2,7 +2,11 @@ import {formatSvgPointsArray, parsePositionLiteral, PositionLiteral} from "../..
 import {blackColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {ComponentType} from "react";
 
 const radius = 0.2;
@@ -31,7 +35,7 @@ export const XMark = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2]}: Co
             stroke={blackColor}
         />
     </>;
-});
+}) as ConstraintPropsGenericFc;
 
 export const VMark = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2]}: ConstraintProps) => {
     const left = (cell1.left + cell2.left) / 2 + 0.5;
@@ -47,15 +51,15 @@ export const VMark = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2]}: Co
         stroke={blackColor}
         fill={"none"}
     />;
-});
+}) as ConstraintPropsGenericFc;
 
-const XVConstraint = <CellType,>(
+const XVConstraint = <CellType, ExType, ProcessedExType>(
     cellLiteral1: PositionLiteral,
     cellLiteral2: PositionLiteral,
     name: string,
-    component: ComponentType<ConstraintProps<CellType>>,
+    component: ComponentType<ConstraintProps<CellType, undefined, ExType, ProcessedExType>>,
     expectedSum: number
-): Constraint<CellType> => {
+): Constraint<CellType, undefined, ExType, ProcessedExType> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
 
@@ -63,6 +67,7 @@ const XVConstraint = <CellType,>(
         name,
         cells: [cell1, cell2],
         component,
+        props: undefined,
         isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit1 = digits[cell1.top]?.[cell1.left];
             const digit2 = digits[cell2.top]?.[cell2.left];
@@ -73,8 +78,8 @@ const XVConstraint = <CellType,>(
     });
 };
 
-export const XMarkConstraint = <CellType,>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
-    XVConstraint<CellType>(cellLiteral1, cellLiteral2, "X", XMark, 10);
+export const XMarkConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
+    XVConstraint<CellType, ExType, ProcessedExType>(cellLiteral1, cellLiteral2, "X", XMark, 10);
 
-export const VMarkConstraint = <CellType,>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
-    XVConstraint<CellType>(cellLiteral1, cellLiteral2, "V", VMark, 5);
+export const VMarkConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
+    XVConstraint<CellType, ExType, ProcessedExType>(cellLiteral1, cellLiteral2, "V", VMark, 5);

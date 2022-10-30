@@ -1,24 +1,25 @@
-import {asConstraint, Constraint, isConstraint, normalizeConstraintCells} from "../../../../types/sudoku/Constraint";
+import {Constraint, normalizeConstraintCells} from "../../../../types/sudoku/Constraint";
 import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
 import {Position} from "../../../../types/layout/Position";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 import {KropkiDotTag} from "../kropki-dot/KropkiDot";
 
-const BaseNeighborsConstraint = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+const BaseNeighborsConstraint = <CellType, ExType, ProcessedExType>(
     name: string,
     areValidNeighborDigits: (
         digit1: number,
         digit2: number,
         position1: Position,
         position2: Position,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ) => boolean,
     excludedTags: string[] = [],
-): Constraint<CellType> => {
+): Constraint<CellType, undefined, ExType, ProcessedExType> => {
     return ({
         name,
         cells: [],
+        props: undefined,
         isValidCell(
             cell,
             digits,
@@ -34,17 +35,12 @@ const BaseNeighborsConstraint = <CellType, GameStateExtensionType, ProcessedGame
 
             let excludedCellsMap = new PuzzleLineSet(puzzle);
             if (excludedTags.length) {
-                for (const item of constraints) {
-                    if (!isConstraint(item)) {
+                for (const {tags, cells} of constraints) {
+                    if (!tags?.some((tag: string) => excludedTags.includes(tag))) {
                         continue;
                     }
 
-                    const constraint = asConstraint(item);
-                    if (!constraint.tags?.some((tag: string) => excludedTags.includes(tag))) {
-                        continue;
-                    }
-
-                    const [cell1, cell2] = normalizeConstraintCells(constraint.cells, puzzle);
+                    const [cell1, cell2] = normalizeConstraintCells(cells, puzzle);
                     excludedCellsMap = excludedCellsMap.add({start: cell1, end: cell2});
                 }
             }
@@ -68,11 +64,11 @@ const BaseNeighborsConstraint = <CellType, GameStateExtensionType, ProcessedGame
     });
 };
 
-const BaseConsecutiveNeighborsConstraint = <CellType>(
+const BaseConsecutiveNeighborsConstraint = <CellType, ExType, ProcessedExType>(
     invert: boolean,
     allowLoop = false,
     excludedTags: string[] = invert ? [KropkiDotTag] : []
-): Constraint<CellType> =>
+): Constraint<CellType, undefined, ExType, ProcessedExType> =>
     BaseNeighborsConstraint(
         invert ? "non-consecutive neighbors" : "consecutive neighbors",
         (digit1, digit2, position1, position2, {puzzle}) => {
@@ -87,16 +83,16 @@ const BaseConsecutiveNeighborsConstraint = <CellType>(
         excludedTags
     );
 
-export const ConsecutiveNeighborsConstraint = <CellType>(allowLoop = false) =>
-    BaseConsecutiveNeighborsConstraint<CellType>(false, allowLoop);
+export const ConsecutiveNeighborsConstraint = <CellType, ExType, ProcessedExType>(allowLoop = false) =>
+    BaseConsecutiveNeighborsConstraint<CellType, ExType, ProcessedExType>(false, allowLoop);
 
-export const NonConsecutiveNeighborsConstraint = <CellType>(allowLoop = false, excludedTags: string[] = [KropkiDotTag]) =>
-    BaseConsecutiveNeighborsConstraint<CellType>(true, allowLoop, excludedTags);
+export const NonConsecutiveNeighborsConstraint = <CellType, ExType, ProcessedExType>(allowLoop = false, excludedTags: string[] = [KropkiDotTag]) =>
+    BaseConsecutiveNeighborsConstraint<CellType, ExType, ProcessedExType>(true, allowLoop, excludedTags);
 
-export const NonRatioNeighborsConstraint = <CellType>(
+export const NonRatioNeighborsConstraint = <CellType, ExType, ProcessedExType>(
     excludedRatios: [number, number][] = [[1, 2]],
     excludedTags: string[] = [KropkiDotTag]
-): Constraint<CellType> =>
+): Constraint<CellType, undefined, ExType, ProcessedExType> =>
     BaseNeighborsConstraint(
         "negative ratio neighbors",
         (digit1, digit2) => {

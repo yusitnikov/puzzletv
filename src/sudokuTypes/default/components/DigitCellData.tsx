@@ -17,10 +17,10 @@ export const DigitCellData = (DigitComponent: ComponentType<DigitProps> = Regula
         />;
     });
 
-export const DigitCellDataComponentType = <ProcessedGameStateExtensionType,>(
+export const DigitCellDataComponentType = (
     DigitComponent: ComponentType<DigitProps> = RegularDigit,
     widthCoeff = RegularDigitComponentType.widthCoeff,
-): CellDataComponentType<number, ProcessedGameStateExtensionType> => ({
+): CellDataComponentType<number> => ({
     component: DigitCellData(DigitComponent),
     widthCoeff,
 });

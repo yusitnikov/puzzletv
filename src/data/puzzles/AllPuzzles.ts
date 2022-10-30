@@ -1,7 +1,6 @@
 import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
 import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
-import {RealChessPuzzleRubberBlando} from "./RealChessPuzzleRubberBlando";
 import {
     EmptyChaosConstruction,
     EmptyChaosConstructionLoop,
@@ -23,7 +22,6 @@ import {Africa} from "./Africa";
 import {generateQuadMasters} from "./QuadMasters";
 import {HiddenSetup} from "./HiddenSetup";
 import {SonataSemplice} from "./SonataSemplice";
-import {RealChessPuzzleCJK} from "./RealChessPuzzleCJK";
 import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
 import {FPuzzles} from "./FPuzzles";
 import {HeartsCube} from "./HeartsCube";
@@ -83,9 +81,6 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
 
     IntroToCubedoku,
     CubeIt,
-
-    RealChessPuzzleCJK,
-    RealChessPuzzleRubberBlando,
     // endregion
 
     // region My puzzles

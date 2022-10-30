@@ -10,12 +10,12 @@ import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
 import {isPuzzleHasBottomRowControls} from "../../../types/sudoku/PuzzleDefinition";
 
-export interface SidePanelProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
-    extends ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
+export interface SidePanelProps<CellType, ExType = {}, ProcessedExType = {}>
+    extends ControlsProps<CellType, ExType, ProcessedExType> {
 }
 
-export const SidePanel = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {context, rect, isHorizontal}: SidePanelProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const SidePanel = <CellType, ExType = {}, ProcessedExType = {}>(
+    {context, rect, isHorizontal}: SidePanelProps<CellType, ExType, ProcessedExType>
 ) => {
     const {puzzle, cellSizeForSidePanel: cellSize} = context;
 

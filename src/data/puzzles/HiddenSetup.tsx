@@ -99,7 +99,7 @@ const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     return {};
 };
 
-const getStage = ({state}: PuzzleContext<number, MultiStageGameState, MultiStageGameState>) => {
+const getStage = ({state}: PuzzleContext<number, MultiStageGameState>) => {
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (
@@ -148,7 +148,7 @@ const getStage = ({state}: PuzzleContext<number, MultiStageGameState, MultiStage
     return 5;
 };
 
-export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState> = {
     author: Raumplaner,
     title: {
         [LanguageCode.en]: "Hidden Setup",
@@ -160,7 +160,7 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiSta
         ...MultiStageSudokuTypeManager({getStage}),
         getCellSelectionType(
             {top, left},
-            {state: {stage}}
+            {state: {extension: {stage}}}
         ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined {
             const colors = getStageCellsMap(stage);
 
@@ -171,7 +171,7 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiSta
         },
     },
     fieldSize: FieldSize9,
-    rules: (translate, {state: {stage}}) => {
+    rules: (translate, {state: {extension: {stage}}}) => {
         return <>
             <RulesParagraph>{translate({
                 [LanguageCode.en]: "This puzzle does reveal its clues in stages",
@@ -196,8 +196,8 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState, MultiSta
             })}.</RulesParagraph>}
         </>;
     },
-    items: ({stage}) => {
-        const result: Constraint<any, any>[] = [
+    items: ({extension: {stage}}) => {
+        const result: Constraint<any, any, MultiStageGameState, {}>[] = [
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
             RenbanConstraint(["R1C6", "R4C6", "R4C9"]),

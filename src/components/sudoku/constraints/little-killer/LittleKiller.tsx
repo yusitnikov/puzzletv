@@ -2,7 +2,11 @@ import {textColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Line, parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
@@ -14,7 +18,9 @@ export interface LittleKillerProps {
     sum?: number;
 }
 
-export const LittleKiller = withFieldLayer(FieldLayer.regular, ({cells: [{top, left}], direction, sum}: ConstraintProps<any, LittleKillerProps>) => {
+export const LittleKiller = withFieldLayer(FieldLayer.regular, <CellType,>(
+    {cells: [{top, left}], props: {direction, sum}}: ConstraintProps<CellType, LittleKillerProps>
+) => {
     const {
         svgContentComponent: DigitSvgContent,
     } = useDigitComponentType();
@@ -60,14 +66,14 @@ export const LittleKiller = withFieldLayer(FieldLayer.regular, ({cells: [{top, l
             top={top - 0.5 * direction.top}
         />}
     </>;
-});
+}) as ConstraintPropsGenericFc<LittleKillerProps>;
 
-export const LittleKillerConstraint = <CellType,>(
+export const LittleKillerConstraint = <CellType, ExType, ProcessedExType>(
     startCellLiteral: PositionLiteral,
     directionLiteral: PositionLiteral,
     {rowsCount, columnsCount}: FieldSize,
     sum?: number
-): Constraint<CellType, LittleKillerProps> => {
+): Constraint<CellType, LittleKillerProps, ExType, ProcessedExType> => {
     const startCell = parsePositionLiteral(startCellLiteral);
     const direction = parsePositionLiteral(directionLiteral);
 
@@ -79,8 +85,10 @@ export const LittleKillerConstraint = <CellType,>(
     return ({
         name: "arrow",
         cells,
-        direction,
-        sum,
+        props: {
+            direction,
+            sum,
+        },
         component: LittleKiller,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             if (sum === undefined) {

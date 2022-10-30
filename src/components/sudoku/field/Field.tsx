@@ -3,7 +3,7 @@ import {Rect} from "../../../types/layout/Rect";
 import {Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
-import {Fragment, ReactNode, useMemo, useState} from "react";
+import {ReactNode, useMemo, useState} from "react";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
 import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
@@ -16,17 +16,14 @@ import {
     gameStateNormalizeLoopOffset,
     gameStateResetCurrentMultiLine,
     gameStateSelectAllCells,
-    ProcessedGameState
 } from "../../../types/sudoku/GameState";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
 import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {
-    asConstraint,
-    ConstraintOrComponent,
-    getAllPuzzleConstraintsAndComponents,
-    isConstraint,
+    Constraint,
+    getAllPuzzleConstraints,
     isValidUserDigit,
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
@@ -40,16 +37,16 @@ import {applyCurrentMultiLineAction} from "../../../types/sudoku/GameStateAction
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {CellColorValue} from "../../../types/sudoku/CellColor";
 
-export interface FieldProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
     rect: Rect;
 }
 
-export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     {
         context,
         rect,
-    }: FieldProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    }: FieldProps<CellType, ExType, ProcessedExType>
 ) => {
     const readOnlySafeContext = useReadOnlySafeContext(context);
 
@@ -79,11 +76,11 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
         disableArrowLetterShortcuts,
     } = typeManager;
 
-    const items = useMemo(() => getAllPuzzleConstraintsAndComponents(context), [context]);
+    const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
 
     const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle, cellSize);
 
-    const itemsProps: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> = {
+    const itemsProps: ItemsProps<CellType, ExType, ProcessedExType> = {
         context: readOnlySafeContext,
         items,
         regionsWithSameCoordsTransformation,
@@ -91,14 +88,16 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
 
     const {
         selectedCells,
-        isReady,
-        cellWriteMode,
-        cellWriteModeInfo: {isNoSelectionMode},
         enableConflictChecker,
         loopOffset,
         initialDigits: stateInitialDigits,
         excludedDigits,
         isShowingSettings,
+        processed: {
+            isReady,
+            cellWriteMode,
+            cellWriteModeInfo: {isNoSelectionMode},
+        },
     } = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
@@ -147,7 +146,7 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
                         ? dragStart.top + screenY / cellSize
                         : loopOffset.top,
                 }),
-            } as Partial<ProcessedGameState<CellType>> as any);
+            });
         }
     });
     // endregion
@@ -419,43 +418,33 @@ export const Field = <CellType, GameStateExtensionType = {}, ProcessedGameStateE
     </Absolute>;
 };
 
-interface ItemsInOneRegionProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    items: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[];
+interface ItemsInOneRegionProps<CellType, ExType = {}, ProcessedExType = {}> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+    items: Constraint<CellType, any, ExType, ProcessedExType>[];
 }
 
-const ItemsInOneRegion = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {context, items}: ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+const ItemsInOneRegion = <CellType, ExType = {}, ProcessedExType = {}>(
+    {context, items}: ItemsInOneRegionProps<CellType, ExType, ProcessedExType>
 ) => {
     return <>
-        {items.map((item, index) => {
-            if (isConstraint(item)) {
-                const {component: Component, ...otherData} = asConstraint(item);
-
-                return Component && <Component
-                    key={index}
-                    context={context}
-                    {...otherData}
-                />;
-            } else {
-                return (item as any)?.key
-                    ? item as ReactNode
-                    : <Fragment key={index}>{item as ReactNode}</Fragment>;
-            }
-        })}
+        {items.map(({component: Component, ...otherData}, index) => Component && <Component
+            key={index}
+            context={context}
+            {...otherData}
+        />)}
     </>;
 };
 
-interface ItemsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>
-    extends ItemsInOneRegionProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
+interface ItemsProps<CellType, ExType = {}, ProcessedExType = {}>
+    extends ItemsInOneRegionProps<CellType, ExType, ProcessedExType> {
     regionsWithSameCoordsTransformation?: Rect[];
 }
 
-const Items = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+const Items = <CellType, ExType = {}, ProcessedExType = {}>(
     {
         regionsWithSameCoordsTransformation,
         ...otherProps
-    }: ItemsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    }: ItemsProps<CellType, ExType, ProcessedExType>
 ) => <>
     {regionsWithSameCoordsTransformation?.map((rect, index) => <FieldRect
         key={`items-region-${index}`}

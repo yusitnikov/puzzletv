@@ -1,4 +1,4 @@
-import {ComponentType, ReactNode} from "react";
+import {ComponentType, ReactElement} from "react";
 import {isSamePosition, Line, Position} from "../layout/Position";
 import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "./GameState";
 import {PuzzleDefinition} from "./PuzzleDefinition";
@@ -11,54 +11,50 @@ import {PuzzleContext} from "./PuzzleContext";
 import {SetInterface} from "../struct/Set";
 import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 
-export type Constraint<CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> = {
+export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType = {}> = {
     name: string;
     tags?: string[];
     cells: Position[];
-    component?: ComponentType<ConstraintProps<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>>;
+    component?: ComponentType<ConstraintProps<CellType, DataT, ExType, ProcessedExType>>;
     color?: string;
     angle?: number;
     isValidCell?(
         cell: Position,
         digits: GivenDigitsMap<CellType>,
         regionCells: Position[],
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        constraints: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[],
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
+        constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
         isFinalCheck?: boolean,
     ): boolean;
     isValidPuzzle?(
         lines: SetInterface<Line>,
         digits: GivenDigitsMap<CellType>,
         regionCells: Position[],
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): boolean;
     getInvalidUserLines?(
         lines: SetInterface<Line>,
         digits: GivenDigitsMap<CellType>,
         regionCells: Position[],
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         isFinalCheck?: boolean
     ): Line[];
-} & DataT;
+    props: DataT;
+};
 
-export type ConstraintProps<CellType = any, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> =
-    Omit<Constraint<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>, "component"> & {
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export type ConstraintProps<CellType = unknown, DataT = undefined, ExType = {}, ProcessedExType = {}> =
+    Omit<Constraint<CellType, DataT, ExType, ProcessedExType>, "component"> & {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
 }
 
-export type ConstraintOrComponent<CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any> =
-    Constraint<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType> | ReactNode;
+export type ConstraintPropsGenericFc<DataT = undefined> = <CellType, ExType, ProcessedExType>(
+    props: ConstraintProps<CellType, DataT, ExType, ProcessedExType>
+) => ReactElement;
 
 // region Helper methods
-export const isConstraint = (item: ConstraintOrComponent<any, any>) => !!(item as Constraint<any>).name;
-
-export const asConstraint = <CellType, DataT = {}, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
-    item: ConstraintOrComponent<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>
-) => item as Constraint<CellType, DataT, GameStateExtensionType, ProcessedGameStateExtensionType>;
-
-export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
-): ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[] => {
+export const getAllPuzzleConstraints = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
+): Constraint<CellType, any, ExType, ProcessedExType>[] => {
     const {puzzle, state} = context;
 
     const {
@@ -74,7 +70,7 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
         FieldLinesConstraint,
         ...getRegionsForRowsAndColumns(puzzle, state),
         ...fieldSize.regions.map(
-            (region) => Array.isArray(region)
+            (region): Constraint<CellType, any, ExType, ProcessedExType> => Array.isArray(region)
                 ? RegionConstraint(region)
                 : region
         ),
@@ -82,12 +78,12 @@ export const getAllPuzzleConstraintsAndComponents = <CellType, GameStateExtensio
         ...(
             typeof puzzleItemsOrFn === "function"
                 ? puzzleItemsOrFn(state)
-                : puzzleItemsOrFn as ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
+                : puzzleItemsOrFn as Constraint<CellType, any, ExType, ProcessedExType>[]
         ),
         ...(
             typeof stateItemsOrFn === "function"
                 ? stateItemsOrFn(context)
-                : stateItemsOrFn as ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
+                : stateItemsOrFn as Constraint<CellType, any, ExType, ProcessedExType>[]
         ),
     ].filter(v => v);
 };
@@ -108,11 +104,11 @@ export const normalizeConstraintCell = (
 export const normalizeConstraintCells = (positions: Position[], puzzle: PuzzleDefinition<any, any, any>) =>
     positions.map(position => normalizeConstraintCell(position, puzzle));
 
-export const isValidUserDigit = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
+export const isValidUserDigit = <CellType, ExType, ProcessedExType>(
     cell: Position,
     userDigits: GivenDigitsMap<CellType>,
-    constraints: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[],
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     isFinalCheck = false
 ) => {
     const userDigit = userDigits[cell.top]?.[cell.left];
@@ -120,19 +116,13 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
         return true;
     }
 
-    for (const item of constraints) {
-        if (!isConstraint(item)) {
-            continue;
-        }
-
-        const constraint = asConstraint(item);
-
-        const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
+    for (const {cells, isValidCell} of constraints) {
+        const normalizedConstraintCells = normalizeConstraintCells(cells, context.puzzle);
         if (normalizedConstraintCells.length && !normalizedConstraintCells.some((constraintCell: Position) => isSamePosition(constraintCell, cell))) {
             continue;
         }
 
-        if (constraint.isValidCell && !constraint.isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, isFinalCheck)) {
+        if (isValidCell && !isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, isFinalCheck)) {
             return false;
         }
     }
@@ -140,22 +130,16 @@ export const isValidUserDigit = <CellType, GameStateExtensionType = any, Process
     return true;
 };
 
-export const getInvalidUserLines = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
+export const getInvalidUserLines = <CellType, ExType, ProcessedExType>(
     lines: SetInterface<Line>,
     userDigits: GivenDigitsMap<CellType>,
-    constraints: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[],
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     isFinalCheck = false
 ): SetInterface<Line> => {
     let result = lines.clear();
 
-    for (const item of constraints) {
-        if (!isConstraint(item)) {
-            continue;
-        }
-
-        const constraint = asConstraint(item);
-
+    for (const constraint of constraints) {
         const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
 
         if (constraint.getInvalidUserLines) {
@@ -169,12 +153,12 @@ export const getInvalidUserLines = <CellType, GameStateExtensionType = any, Proc
     return result;
 };
 
-export const isValidFinishedPuzzleByConstraints = <CellType, GameStateExtensionType = any, ProcessedGameStateExtensionType = any>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const isValidFinishedPuzzleByConstraints = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
 ) => {
     const {puzzle, state} = context;
     const {typeManager: {isValidCell = () => true}, digitsCount} = puzzle;
-    const constraints = getAllPuzzleConstraintsAndComponents(context).filter(isConstraint).map(asConstraint);
+    const constraints = getAllPuzzleConstraints(context);
     const {cells, lines} = gameStateGetCurrentFieldState(state);
     const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
 

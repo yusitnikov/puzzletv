@@ -30,12 +30,12 @@ const StyledContainer = styled("div", {
     cursor: isDragMode ? "pointer" : undefined,
 }));
 
-export interface PuzzleProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface PuzzleProps<CellType, ExType = {}, ProcessedExType = {}> {
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>;
 }
 
-export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle}: PuzzleProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const Puzzle = <CellType, ExType = {}, ProcessedExType = {}>(
+    {puzzle}: PuzzleProps<CellType, ExType, ProcessedExType>
 ) => {
     profiler.flush();
 
@@ -106,7 +106,7 @@ export const Puzzle = <CellType, GameStateExtensionType = {}, ProcessedGameState
         </Title>
 
         <StyledContainer
-            isDragMode={gameState.cellWriteMode === CellWriteMode.move}
+            isDragMode={gameState.processed.cellWriteMode === CellWriteMode.move}
         >
             <PuzzleContainerContext.Provider value={fieldOuterRect}>
                 <Absolute

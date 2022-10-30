@@ -10,16 +10,20 @@ import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useEventListener} from "../../../hooks/useEventListener";
 
 export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLiteral) =>
-    function GoogleMapsFieldWrapperComponent<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+    function GoogleMapsFieldWrapperComponent<CellType, ExType = {}, ProcessedExType = {}>(
         {
             context: {
                 puzzle: {fieldSize: {fieldSize}},
-                state: {cellWriteMode, map, overlay, isReady, isShowingSettings},
+                state: {
+                    isShowingSettings,
+                    processed: {cellWriteMode, isReady},
+                    extension: {map, overlay},
+                },
                 onStateChange,
                 cellSize,
             },
             children
-        }: PropsWithChildren<PuzzleContextProps<CellType, GameStateExtensionType & GoogleMapsState, ProcessedGameStateExtensionType & GoogleMapsState>>
+        }: PropsWithChildren<PuzzleContextProps<CellType, ExType & GoogleMapsState, ProcessedExType>>
     ) {
         const projection = overlay?.getProjection();
         const topLeft = projection?.fromContainerPixelToLatLng(new google.maps.Point(0, 0))?.toJSON();
@@ -61,12 +65,22 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                     gestureHandling={isDragMode ? "auto" : "none"}
                     onReady={(map) => {
                         map.fitBounds(initialBounds, 0);
-                        onStateChange(() => ({map} as Partial<GoogleMapsState> as any));
+                        onStateChange(() => ({
+                            extension: {map} as Partial<ExType & GoogleMapsState>
+                        }));
                     }}
-                    onOverlayReady={(overlay) => onStateChange({overlay} as Partial<GoogleMapsState> as any)}
-                    onRender={(renderVersion) => onStateChange({renderVersion} as Partial<GoogleMapsState> as any)}
-                    onCenterChanged={(ev) => onStateChange({center: latLngLiteralToPosition(ev.center)} as Partial<GoogleMapsState> as any)}
-                    onZoomChanged={(ev) => onStateChange({zoom: ev.zoom} as Partial<GoogleMapsState> as any)}
+                    onOverlayReady={(overlay) => onStateChange({
+                        extension: {overlay} as Partial<ExType & GoogleMapsState>
+                    })}
+                    onRender={(renderVersion) => onStateChange({
+                        extension: {renderVersion} as Partial<ExType & GoogleMapsState>
+                    })}
+                    onCenterChanged={(ev) => onStateChange({
+                        extension: {center: latLngLiteralToPosition(ev.center)} as Partial<ExType & GoogleMapsState>
+                    })}
+                    onZoomChanged={(ev) => onStateChange({
+                        extension: {zoom: ev.zoom} as Partial<ExType & GoogleMapsState>
+                    })}
                     // onClick={(ev) => console.log(ev.latLng.toJSON())}
                 >
                     <GoogleMapsPanePortal pane={"overlayMouseTarget"}>

@@ -1,15 +1,20 @@
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../types/sudoku/Constraint";
 import {darkGreyColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray} from "../../../types/layout/Position";
 import {parseMonumentValleyFieldSize} from "../types/MonumentValleyTypeManager";
+import {RotatableGameState, RotatableProcessedGameState} from "../../rotatable/types/RotatableGameState";
 
 export const MonumentValleyGridBorders = withFieldLayer(FieldLayer.lines, (
     {
         context: {
             puzzle: {fieldSize},
-            state: {isMyTurn},
+            state: {processed: {isMyTurn}},
         }
     }: ConstraintProps
 ) => {
@@ -33,12 +38,13 @@ export const MonumentValleyGridBorders = withFieldLayer(FieldLayer.lines, (
         fill={isMyTurn ? textColor : darkGreyColor}
         strokeWidth={0}
     />;
-});
+}) as ConstraintPropsGenericFc;
 
-export const MonumentValleyGridBordersConstraint = (): Constraint<number> => {
+export const MonumentValleyGridBordersConstraint = (): Constraint<number, undefined, RotatableGameState, RotatableProcessedGameState> => {
     return {
         name: "grid borders",
         cells: [],
         component: MonumentValleyGridBorders,
+        props: undefined,
     };
 };

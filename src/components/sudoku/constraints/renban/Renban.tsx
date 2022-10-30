@@ -4,11 +4,12 @@ import {splitMultiLine} from "../../../../utils/lines";
 import {isValidCellForRegion} from "../region/Region";
 import {LineComponent, LineProps} from "../line/Line";
 
-export const RenbanConstraint = <CellType,>(cellLiterals: PositionLiteral[], display = true): Constraint<CellType, LineProps> => ({
+export const RenbanConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], display = true): Constraint<CellType, LineProps, ExType, ProcessedExType> => ({
     name: "renban line",
     cells: splitMultiLine(parsePositionLiterals(cellLiterals)),
     color: "#f0f",
     component: display ? LineComponent : undefined,
+    props: {},
     isValidCell(cell, digits, cells, {puzzle, state}) {
         if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
             return false;

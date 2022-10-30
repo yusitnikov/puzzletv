@@ -3,14 +3,14 @@ import {getRegionBorderWidth, lightGreyColor} from "../../../app/globals";
 import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
-    asConstraint,
     Constraint,
-    ConstraintProps, getAllPuzzleConstraintsAndComponents,
-    getInvalidUserLines, isConstraint,
+    ConstraintProps,
+    getAllPuzzleConstraints,
+    getInvalidUserLines,
     prepareGivenDigitsMapForConstraints
 } from "../../../../types/sudoku/Constraint";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {gameStateGetCurrentFieldState, ProcessedGameState} from "../../../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState} from "../../../../types/sudoku/GameState";
 import {Line} from "../../../../types/layout/Position";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {CellMark} from "../../../../types/sudoku/CellMark";
@@ -26,7 +26,7 @@ export const UserLines = memo(({context}: ConstraintProps) => {
 
     const {cellSize, puzzle, state} = context;
 
-    const {currentMultiLine, isAddingLine} = state as ProcessedGameState<any>;
+    const {currentMultiLine, isAddingLine} = state;
 
     const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
 
@@ -35,7 +35,7 @@ export const UserLines = memo(({context}: ConstraintProps) => {
     const invalidLines = useMemo(() => getInvalidUserLines(
         lines,
         prepareGivenDigitsMapForConstraints(context, cells),
-        getAllPuzzleConstraintsAndComponents(context).filter(isConstraint).map(asConstraint),
+        getAllPuzzleConstraints(context),
         context
     ), [context, lines, cells]);
 
@@ -175,8 +175,9 @@ export const UserLinesByData = ({cellSize, start, end, isAdding = true}: UserLin
     />;
 };
 
-export const UserLinesConstraint: Constraint<any> = {
+export const UserLinesConstraint: Constraint<any, any, any, any> = {
     name: "user lines",
     cells: [],
     component: UserLines,
+    props: undefined,
 };

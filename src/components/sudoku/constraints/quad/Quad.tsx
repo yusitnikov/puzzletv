@@ -5,6 +5,7 @@ import {parsePositionLiteral, Position, PositionLiteral} from "../../../../types
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {ReactElement} from "react";
 
 export interface QuadProps<CellType> {
     expectedDigits?: CellType[];
@@ -15,34 +16,30 @@ export interface QuadProps<CellType> {
 
 export const Quad = withFieldLayer(
     FieldLayer.top,
-    (
+    <CellType, ExType, ProcessedExType>(
         {
             context,
             cells,
-            expectedDigits,
-            forbiddenDigits,
-            isRecent,
-            radius,
-        }: ConstraintProps<any, QuadProps<any>>
+            props,
+        }: ConstraintProps<CellType, QuadProps<CellType>, ExType, ProcessedExType>
     ) => <QuadByData
         context={context}
         cells={cells}
-        expectedDigits={expectedDigits}
-        forbiddenDigits={forbiddenDigits}
-        isRecent={isRecent}
-        radius={radius}
+        props={props}
     />
-);
+) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, QuadProps<CellType>, ExType, ProcessedExType>) => ReactElement;
 
-export const QuadByData = <CellType,>(
+export const QuadByData = <CellType, ExType, ProcessedExType>(
     {
         context: {puzzle: {typeManager: {cellDataComponentType: {component: CellData}}}},
         cells: [{top, left}],
-        expectedDigits = [],
-        forbiddenDigits = [],
-        isRecent,
-        radius = 0.3,
-    }: Pick<ConstraintProps<CellType, QuadProps<CellType>>, "context" | "cells" | "expectedDigits" | "forbiddenDigits" | "isRecent" | "radius">
+        props: {
+            expectedDigits = [],
+            forbiddenDigits = [],
+            isRecent,
+            radius = 0.3,
+        },
+    }: Pick<ConstraintProps<CellType, QuadProps<CellType>, ExType, ProcessedExType>, "context" | "cells" | "props">
 ) => {
     const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: CellType, valid?: boolean}[] = [
         ...expectedDigits.map(digit => ({digit, valid: true})),
@@ -91,20 +88,22 @@ const getQuadCells = ({top, left}: Position): Position[] => [
     {top: top - 1, left: left - 1},
 ];
 
-export const QuadConstraint = <CellType,>(
+export const QuadConstraint = <CellType, ExType, ProcessedExType>(
     cellLiteral: PositionLiteral,
     expectedDigits: CellType[],
     forbiddenDigits: CellType[] = [],
     isRecent = false,
     radius = 0.3
-): Constraint<CellType, QuadProps<CellType>> => {
+): Constraint<CellType, QuadProps<CellType>, ExType, ProcessedExType> => {
     return ({
         name: "quad",
         cells: getQuadCells(parsePositionLiteral(cellLiteral)),
-        expectedDigits,
-        forbiddenDigits,
-        isRecent,
-        radius,
+        props: {
+            expectedDigits,
+            forbiddenDigits,
+            isRecent,
+            radius,
+        },
         component: Quad,
         isValidCell({top, left}, digitsMap, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
             const data = digitsMap[top][left];
@@ -139,17 +138,17 @@ export const QuadConstraint = <CellType,>(
     });
 };
 
-export const QuadConstraintBySolution = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+export const QuadConstraintBySolution = <CellType, ExType, ProcessedExType>(
     {
         puzzle: {typeManager: {areSameCellData}},
         state
-    }: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+    }: PuzzleContext<CellType, ExType, ProcessedExType>,
     cellLiteral: PositionLiteral,
     digits: CellType[],
     solution: GivenDigitsMap<CellType>,
     isRecent = false,
     radius = 0.3
-): Constraint<CellType, QuadProps<CellType>> => {
+): Constraint<CellType, QuadProps<CellType>, ExType, ProcessedExType> => {
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
         .map(({top, left}) => solution[top]?.[left])
         .filter(value => value !== undefined)

@@ -3,7 +3,7 @@ import {loadStringFromLocalStorage, saveStringToLocalStorage} from "../../../uti
 import {isSamePosition, Position} from "../../../types/layout/Position";
 import {CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {asConstraint, getAllPuzzleConstraintsAndComponents, isConstraint} from "../../../types/sudoku/Constraint";
+import {getAllPuzzleConstraints} from "../../../types/sudoku/Constraint";
 
 export enum TesseractSelectionType {
     Always = "always",
@@ -38,7 +38,7 @@ export const getTesseractCellSelectionType: SudokuTypeManager<number>["getCellSe
         case TesseractSelectionType.Never:
             return undefined;
         case TesseractSelectionType.Clues:
-            const constraints = getAllPuzzleConstraintsAndComponents(context).filter(isConstraint).map(asConstraint);
+            const constraints = getAllPuzzleConstraints(context);
             if (!constraints.some(({name, cells}) => name === "ellipse" && isSamePosition(cells[0], selectedCell))) {
                 return undefined;
             }

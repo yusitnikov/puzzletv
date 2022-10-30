@@ -17,17 +17,17 @@ export interface CellStateEx<CellType> extends CellState<CellType> {
     isInvalid?: boolean;
 }
 
-export const createEmptyCellState = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const createEmptyCellState = <CellType, ExType, ProcessedExType>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>
 ): CellState<CellType> => ({
     centerDigits: new CellDataSet(puzzle),
     cornerDigits: new CellDataSet(puzzle),
     colors: new PlainValueSet<CellColor>(),
 });
 
-export const serializeCellState = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+export const serializeCellState = <CellType, ExType, ProcessedExType>(
     {usersDigit, centerDigits, cornerDigits, colors}: CellState<CellType>,
-    {serializeCellData}: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    {serializeCellData}: SudokuTypeManager<CellType, ExType, ProcessedExType>
 ) => ({
     usersDigit: usersDigit ? serializeCellData(usersDigit) : undefined,
     centerDigits: centerDigits.serialize(),
@@ -35,9 +35,9 @@ export const serializeCellState = <CellType, GameStateExtensionType, ProcessedGa
     colors: colors.serialize(),
 });
 
-export const unserializeCellState = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+export const unserializeCellState = <CellType, ExType, ProcessedExType>(
     {usersDigit, centerDigits, cornerDigits, colors}: any,
-    puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>
 ): CellState<CellType> => ({
     usersDigit: usersDigit ? puzzle.typeManager.unserializeCellData(usersDigit) : undefined,
     centerDigits: CellDataSet.unserialize(puzzle, centerDigits),

@@ -53,7 +53,7 @@ const initialColors: GivenDigitsMap<CellColorValue> = {
     },
 };
 
-const SameColorRegionConstraint: Constraint<number> = {
+const SameColorRegionConstraint: Constraint<number, undefined, {}, {}> = {
     name: "same color regions",
     cells: Object.entries(initialColors).flatMap(
         ([top, row]) => Object.keys(row).map(
@@ -63,6 +63,7 @@ const SameColorRegionConstraint: Constraint<number> = {
             })
         )
     ),
+    props: undefined,
     isValidCell(cell, digits, cells, {cellsIndex, state}) {
         const color = initialColors[cell.top][cell.left];
 

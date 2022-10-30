@@ -5,13 +5,13 @@ import {Size} from "../../../types/layout/Size";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getTransformedRectMatrix, TransformedRect, transformRect} from "../../../types/layout/Rect";
 
-export interface FieldRectProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> extends Position, Partial<Size> {
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface FieldRectProps<CellType, ExType = {}, ProcessedExType = {}> extends Position, Partial<Size> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
     clip?: boolean;
     children: ReactNode;
 }
 
-export const FieldRect = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const FieldRect = <CellType, ExType = {}, ProcessedExType = {}>(
     {
         context,
         clip,
@@ -19,14 +19,9 @@ export const FieldRect = <CellType, GameStateExtensionType = {}, ProcessedGameSt
         height = 1,
         children,
         ...position
-    }: FieldRectProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    }: FieldRectProps<CellType, ExType, ProcessedExType>
 ) => {
     const transformedRect = getFieldRectTransform(context, position);
-    if (width !== 1) {
-        const bla = getFieldRectTransform(context, position);
-        console.log({...position, width, height});
-        console.log(bla);
-    }
 
     return <g transform={getTransformedRectMatrix(transformedRect)}>
         <AutoSvg
@@ -39,8 +34,8 @@ export const FieldRect = <CellType, GameStateExtensionType = {}, ProcessedGameSt
     </g>;
 };
 
-export const getFieldRectTransform = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {puzzle, state, cellSize}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export const getFieldRectTransform = <CellType, ExType = {}, ProcessedExType = {}>(
+    {puzzle, state, cellSize}: PuzzleContext<CellType, ExType, ProcessedExType>,
     position: Position
 ): TransformedRect => {
     const {

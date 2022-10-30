@@ -1,6 +1,12 @@
 import {isSamePosition, Position} from "../../../../../types/layout/Position";
 import {PuzzleContext} from "../../../../../types/sudoku/PuzzleContext";
-import {GameState, ProcessedGameState} from "../../../../../types/sudoku/GameState";
+import {
+    GameStateEx,
+    mergeGameStateUpdates,
+    mergeGameStateWithUpdates,
+    PartialGameStateEx,
+    ProcessedGameStateEx
+} from "../../../../../types/sudoku/GameState";
 import {clearSelectionActionType, enterDigitActionType} from "../../../../../types/sudoku/GameStateAction";
 import {SudokuTypeManager} from "../../../../../types/sudoku/SudokuTypeManager";
 import {Constraint} from "../../../../../types/sudoku/Constraint";
@@ -15,31 +21,31 @@ import {CellExactPosition} from "../../../../../types/sudoku/CellExactPosition";
 
 // TODO: support CellType operations!
 
-export interface QuadInputSudokuTypeManagerOptions<CellType, GameStateExtensionType extends QuadInputGameState<CellType>, ProcessedGameStateExtensionType extends QuadInputGameState<CellType>> {
-    parent: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+export interface QuadInputSudokuTypeManagerOptions<CellType, ExType extends QuadInputGameState<CellType>, ProcessedExType = {}> {
+    parent: SudokuTypeManager<CellType, ExType, ProcessedExType>,
     isQuadle?: boolean;
     allowRepeat: boolean;
     allowOverflow: boolean;
     getReadyQuadConstraint?: (
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position: Position,
         digits: CellType[],
         isRecent: boolean
-    ) => Constraint<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>;
-    isQuadAllowedFn?: (state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => boolean;
+    ) => Constraint<CellType, any, ExType, ProcessedExType>;
+    isQuadAllowedFn?: (state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => boolean;
     onQuadFinish?: (
-        defaultResult: Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>,
+        defaultResult: PartialGameStateEx<CellType, ExType>,
         isGlobal: boolean,
         clientId: string,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         cellData: CellType
-    ) => Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+    ) => PartialGameStateEx<CellType, ExType>;
     radius?: number;
 }
 
-export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType extends QuadInputGameState<CellType>, ProcessedGameStateExtensionType extends QuadInputGameState<CellType>>(
-    options: QuadInputSudokuTypeManagerOptions<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
-): SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => {
+export const QuadInputSudokuTypeManager = <CellType, ExType extends QuadInputGameState<CellType>, ProcessedExType = {}>(
+    options: QuadInputSudokuTypeManagerOptions<CellType, ExType, ProcessedExType>
+): SudokuTypeManager<CellType, ExType, ProcessedExType> => {
     const {
         parent,
         isQuadle = false,
@@ -53,7 +59,7 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             QuadConstraint(position, digits, [], isRecent, radius),
     } = options;
 
-    const onCornerClick = ({onStateChange}: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>, {corner}: CellExactPosition) => {
+    const onCornerClick = ({onStateChange}: PuzzleContext<CellType, ExType, ProcessedExType>, {corner}: CellExactPosition) => {
         onStateChange(setQuadPositionAction(corner, options));
     };
 
@@ -74,7 +80,7 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             };
         },
 
-        unserializeGameState(data): Partial<GameStateExtensionType> {
+        unserializeGameState(data): Partial<ExType> {
             return {
                 ...parent.unserializeGameState?.(data),
                 currentQuad: data.currentQuad,
@@ -82,10 +88,16 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             };
         },
 
-        items: (context) => {
-            const {state: {cellWriteMode, allQuads, currentQuad}, multiPlayer: {isEnabled}} = context;
+        items: (context): Constraint<CellType, any, ExType, ProcessedExType>[] => {
+            const {
+                state: {
+                    processed: {cellWriteMode},
+                    extension: {allQuads, currentQuad},
+                },
+                multiPlayer: {isEnabled},
+            } = context;
 
-            return [
+            return ([
                 ...((parent.items instanceof Array && parent.items) || []),
                 ...((typeof parent.items === "function" && parent.items(context)) || []),
                 ...allQuads.map(
@@ -110,7 +122,9 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
                             radius
                         )
                 ),
-            ].filter(item => item).map(item => item!);
+            ] as (Constraint<CellType, any, ExType, ProcessedExType> | undefined)[])
+                .filter(item => item)
+                .map(item => item!);
         },
 
         handleDigitGlobally(
@@ -119,7 +133,7 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             context,
             cellData,
             defaultResult
-        ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> {
+        ): PartialGameStateEx<CellType, ExType> {
             defaultResult = parent.handleDigitGlobally?.(isGlobal, clientId, context, cellData, defaultResult) || defaultResult;
 
             if (!isGlobal) {
@@ -135,10 +149,12 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             } = context;
 
             const {
-                cellWriteMode,
-                currentQuad,
-                allQuads,
                 currentPlayer = "",
+                processed: {cellWriteMode},
+                extension: {
+                    currentQuad,
+                    allQuads,
+                },
             } = state;
 
             const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
@@ -157,33 +173,41 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             }
 
             if (newDigits.length < 4 || !onQuadFinish) {
-                return {
-                    ...defaultResult,
-                    currentQuad: {
-                        ...currentQuad,
-                        digits: newDigits,
-                    },
-                };
+                return mergeGameStateUpdates(
+                    defaultResult,
+                    {
+                        extension: {
+                            currentQuad: {
+                                ...currentQuad,
+                                digits: newDigits,
+                            },
+                        } as Partial<ExType>,
+                    }
+                );
             } else {
                 // Got enough digits
                 const isSameQuadPosition = ({position}: QuadInputState<CellType>) => isSamePosition(position, currentQuad.position);
 
-                defaultResult = {
-                    ...defaultResult,
-                    currentQuad: undefined,
-                    allQuads: [
-                        ...allQuads.filter(quad => !isSameQuadPosition(quad)),
-                        {
-                            ...currentQuad,
-                            digits: allowOverflow
-                                ? [...new Set([
-                                    ...allQuads.filter(isSameQuadPosition).flatMap(quad => quad.digits),
-                                    ...newDigits,
-                                ])]
-                                : newDigits,
-                        }
-                    ],
-                };
+                defaultResult = mergeGameStateUpdates(
+                    defaultResult,
+                    {
+                        extension: {
+                            currentQuad: undefined,
+                            allQuads: [
+                                ...allQuads.filter(quad => !isSameQuadPosition(quad)),
+                                {
+                                    ...currentQuad,
+                                    digits: allowOverflow
+                                        ? [...new Set([
+                                            ...allQuads.filter(isSameQuadPosition).flatMap(quad => quad.digits),
+                                            ...newDigits,
+                                        ])]
+                                        : newDigits,
+                                }
+                            ],
+                        } as Partial<ExType>,
+                    }
+                );
 
                 return onQuadFinish(defaultResult, isGlobal, clientId, context, cellData);
             }
@@ -191,8 +215,10 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
 
         getSharedState(puzzle, state): any {
             const {
-                currentQuad,
-                allQuads,
+                extension: {
+                    currentQuad,
+                    allQuads,
+                },
             } = state;
 
             return {
@@ -205,19 +231,18 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
         setSharedState(
             puzzle,
             state,
-            newState
-        ): GameState<CellType> & GameStateExtensionType {
-            const {
-                currentQuad,
-                allQuads,
-            } = newState;
-
-            return {
-                ...state,
-                ...parent.setSharedState?.(puzzle, state, newState),
-                currentQuad,
-                allQuads,
-            };
+            {currentQuad, allQuads, ...newState}
+        ): GameStateEx<CellType, ExType> {
+            return mergeGameStateWithUpdates(
+                state,
+                parent.setSharedState?.(puzzle, state, newState) ?? {},
+                {
+                    extension: {
+                        currentQuad,
+                        allQuads,
+                    } as Partial<ExType>,
+                },
+            );
         },
 
         mainControlsComponent: QuadInputControls(options),
@@ -244,7 +269,7 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
         ): boolean {
             return parent.isGlobalAction?.(action, context)
                 || action.type.key === setQuadPositionActionTypeKey
-                || (context.state.cellWriteMode === CellWriteMode.quads && [enterDigitActionType().key, clearSelectionActionType().key].includes(action.type.key));
+                || (context.state.processed.cellWriteMode === CellWriteMode.quads && [enterDigitActionType().key, clearSelectionActionType().key].includes(action.type.key));
         },
 
         handleClearAction(
@@ -254,8 +279,8 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
                 multiPlayer: {isEnabled},
             },
             clientId
-        ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType> {
-            const {cellWriteMode, currentQuad, currentPlayer} = state;
+        ): PartialGameStateEx<CellType, ExType> {
+            const {currentPlayer, processed: {cellWriteMode}, extension: {currentQuad}} = state;
 
             const isMyTurn = !isEnabled || currentPlayer === clientId || params?.share;
 
@@ -264,13 +289,15 @@ export const QuadInputSudokuTypeManager = <CellType, GameStateExtensionType exte
             }
 
             return {
-                currentQuad: currentQuad.digits.length
-                    ? {
-                        ...currentQuad,
-                        digits: currentQuad.digits.slice(0, currentQuad.digits.length - 1),
-                    }
-                    : undefined,
-            } as Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+                extension: {
+                    currentQuad: currentQuad.digits.length
+                        ? {
+                            ...currentQuad,
+                            digits: currentQuad.digits.slice(0, currentQuad.digits.length - 1),
+                        }
+                        : undefined,
+                } as Partial<ExType>,
+            };
         },
     };
 };

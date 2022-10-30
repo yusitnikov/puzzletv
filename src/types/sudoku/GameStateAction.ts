@@ -1,81 +1,81 @@
-import {MergeStateAction} from "../react/MergeStateAction";
 import {
     gameStateApplyCurrentMultiLine,
     gameStateClearSelectedCellsContent,
     gameStateHandleDigit,
     gameStateRedo,
     gameStateUndo,
-    ProcessedGameState
+    PartialGameStateEx,
+    ProcessedGameStateEx
 } from "./GameState";
 import {PuzzleContext} from "./PuzzleContext";
 import {myClientId} from "../../hooks/useMultiPlayer";
 
-export type GameStateActionCallback<CellType, ProcessedGameStateExtensionType> =
-    MergeStateAction<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+export type GameStateActionCallback<CellType, ExType, ProcessedExType> =
+    PartialGameStateEx<CellType, ExType> | ((prevState: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => PartialGameStateEx<CellType, ExType>);
 
-export interface GameStateActionType<ParamsType, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
+export interface GameStateActionType<ParamsType, CellType, ExType, ProcessedExType> {
     key: string;
     callback: (
         params: ParamsType,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         clientId: string
-    ) => GameStateActionCallback<CellType, ProcessedGameStateExtensionType>;
+    ) => GameStateActionCallback<CellType, ExType, ProcessedExType>;
 }
 
-export interface GameStateAction<ParamsType, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
-    type: GameStateActionType<ParamsType, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface GameStateAction<ParamsType, CellType, ExType, ProcessedExType> {
+    type: GameStateActionType<ParamsType, CellType, ExType, ProcessedExType>;
     params: ParamsType;
 }
 
-export type GameStateActionOrCallback<ParamsType, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> =
-    GameStateAction<ParamsType, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> |
-    GameStateActionCallback<CellType, ProcessedGameStateExtensionType>;
+export type GameStateActionOrCallback<ParamsType, CellType, ExType, ProcessedExType> =
+    GameStateAction<ParamsType, CellType, ExType, ProcessedExType> |
+    GameStateActionCallback<CellType, ExType, ProcessedExType>;
 
 // region Specific actions
-export const undoActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateActionType<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const undoActionType = <CellType, ExType, ProcessedExType>()
+    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
     key: "undo",
     callback: () => gameStateUndo,
 });
-export const undoAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateAction<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const undoAction = <CellType, ExType, ProcessedExType>()
+    : GameStateAction<undefined, CellType, ExType, ProcessedExType> => ({
     type: undoActionType(),
     params: undefined,
 });
 
-export const redoActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateActionType<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const redoActionType = <CellType, ExType, ProcessedExType>()
+    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
     key: "redo",
     callback: () => gameStateRedo,
 });
-export const redoAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateAction<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const redoAction = <CellType, ExType, ProcessedExType>()
+    : GameStateAction<undefined, CellType, ExType, ProcessedExType> => ({
     type: redoActionType(),
     params: undefined,
 });
 
-export const clearSelectionActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateActionType<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const clearSelectionActionType = <CellType, ExType, ProcessedExType>()
+    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
     key: "clear-selection",
     callback: (_, context, clientId) =>
         state => gameStateClearSelectedCellsContent({...context, state}, clientId),
 });
-export const clearSelectionAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateAction<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const clearSelectionAction = <CellType, ExType, ProcessedExType>()
+    : GameStateAction<undefined, CellType, ExType, ProcessedExType> => ({
     type: clearSelectionActionType(),
     params: undefined,
 });
 
-export const enterDigitActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateActionType<number, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const enterDigitActionType = <CellType, ExType, ProcessedExType>()
+    : GameStateActionType<number, CellType, ExType, ProcessedExType> => ({
     key: "enter-digit",
     callback: (digit, context, clientId) =>
         state => gameStateHandleDigit({...context, state}, digit, clientId, true),
 });
-export const enterDigitAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+export const enterDigitAction = <CellType, ExType, ProcessedExType>(
     digit: number,
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
-): GameStateActionOrCallback<number, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] => [
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
+): GameStateActionOrCallback<number, CellType, ExType, ProcessedExType>[] => [
     state => gameStateHandleDigit({...context, state}, digit, myClientId, false),
     {
         type: enterDigitActionType(),
@@ -83,16 +83,16 @@ export const enterDigitAction = <CellType, GameStateExtensionType, ProcessedGame
     },
 ];
 
-export const applyCurrentMultiLineActionType = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>()
-    : GameStateActionType<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+export const applyCurrentMultiLineActionType = <CellType, ExType, ProcessedExType>()
+    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
     key: "apply-current-multiline",
     callback: (_, context, clientId) =>
         state => gameStateApplyCurrentMultiLine({...context, state}, clientId, true),
 });
-export const applyCurrentMultiLineAction = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const applyCurrentMultiLineAction = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
 )
-    : GameStateActionOrCallback<undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] => [
+    : GameStateActionOrCallback<undefined, CellType, ExType, ProcessedExType>[] => [
     {
         type: applyCurrentMultiLineActionType(),
         params: undefined,

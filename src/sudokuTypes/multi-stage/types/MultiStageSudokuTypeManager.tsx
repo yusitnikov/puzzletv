@@ -1,7 +1,11 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {MultiStageGameState} from "./MultiStageGameState";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {ProcessedGameState} from "../../../types/sudoku/GameState";
+import {
+    mergeGameStateUpdates,
+    mergeProcessedGameStateWithUpdates,
+    PartialGameStateEx
+} from "../../../types/sudoku/GameState";
 import {h2HeightCoeff, rulesHeaderPaddingCoeff, rulesMarginCoeff, yellowColor} from "../../../components/app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
@@ -12,12 +16,12 @@ import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 import {processTranslations} from "../../../utils/translate";
 
 interface MultiStageSudokuOptions {
-    getStage: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>) => number;
-    onStageChange?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>, stage: number)
-        => Partial<ProcessedGameState<number> & MultiStageGameState>;
-    getStageCompletionText?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>)
+    getStage: (context: PuzzleContext<number, MultiStageGameState>) => number;
+    onStageChange?: (context: PuzzleContext<number, MultiStageGameState>, stage: number)
+        => PartialGameStateEx<number, MultiStageGameState>;
+    getStageCompletionText?: (context: PuzzleContext<number, MultiStageGameState>)
         => PartiallyTranslatable<ReactNode> | undefined;
-    getStageButtonText?: (context: PuzzleContext<number, MultiStageGameState, MultiStageGameState>)
+    getStageButtonText?: (context: PuzzleContext<number, MultiStageGameState>)
         => PartiallyTranslatable<ReactNode> | undefined;
 }
 
@@ -25,8 +29,8 @@ const aboveRulesTextHeightCoeff = h2HeightCoeff * 0.9;
 
 export const MultiStageSudokuTypeManager = (
     {getStage, onStageChange, getStageCompletionText, getStageButtonText}: MultiStageSudokuOptions
-): SudokuTypeManager<number, MultiStageGameState, MultiStageGameState> => ({
-    ...DigitSudokuTypeManager<MultiStageGameState, MultiStageGameState>(),
+): SudokuTypeManager<number, MultiStageGameState> => ({
+    ...DigitSudokuTypeManager<MultiStageGameState>(),
 
     initialGameStateExtension: {
         stage: 1,
@@ -44,7 +48,7 @@ export const MultiStageSudokuTypeManager = (
     ) => {
         const {state, onStateChange, cellSizeForSidePanel: cellSize} = context;
         const stage = getStage(context);
-        const isNext = stage > state.stage;
+        const isNext = stage > state.extension.stage;
         const coeff = isNext ? 1 : 0;
 
         return <div style={{
@@ -80,10 +84,10 @@ export const MultiStageSudokuTypeManager = (
                     paddingTop: 0,
                     paddingBottom: 0,
                 }}
-                onClick={() => onStateChange({
-                    stage,
-                    ...onStageChange?.(context, stage),
-                })}
+                onClick={() => onStateChange(mergeGameStateUpdates(
+                    {extension: {stage}},
+                    onStageChange?.(context, stage) ?? {}
+                ))}
             >
                 {translate(getStageButtonText?.(context) ?? {
                     [LanguageCode.en]: "Go to the next stage",
@@ -95,10 +99,7 @@ export const MultiStageSudokuTypeManager = (
 });
 
 export const isValidFinishedPuzzleByStageConstraints = <CellType,>(stage: number) =>
-    (context: PuzzleContext<CellType, MultiStageGameState, MultiStageGameState>) => isValidFinishedPuzzleByConstraints({
+    (context: PuzzleContext<CellType, MultiStageGameState>) => isValidFinishedPuzzleByConstraints({
         ...context,
-        state: {
-            ...context.state,
-            stage,
-        }
+        state: mergeProcessedGameStateWithUpdates(context.state, {extension: {stage}}),
     });

@@ -1,9 +1,10 @@
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {isSamePosition, Position, Position3D} from "../../../types/layout/Position";
 
-export const CubedokuIndexingConstraint = <CellType,>(): Constraint<CellType> => ({
+export const CubedokuIndexingConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
     name: "cubedoku indexing",
     cells: [],
+    props: undefined,
     isValidCell(cell, digits, _, {puzzle: {fieldSize: {fieldSize}, typeManager: {getDigitByCellData}}, state}): boolean {
         const realFieldSize = fieldSize / 2;
 

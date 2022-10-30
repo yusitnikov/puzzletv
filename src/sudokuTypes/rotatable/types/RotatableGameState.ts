@@ -6,6 +6,6 @@ export interface RotatableGameState {
     animationSpeed: AnimationSpeed;
 }
 
-export interface RotatableProcessedGameState extends RotatableGameState {
+export interface RotatableProcessedGameState {
     animatedAngle: number;
 }

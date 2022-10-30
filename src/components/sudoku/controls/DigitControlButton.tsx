@@ -8,13 +8,13 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {enterDigitAction} from "../../../types/sudoku/GameStateAction";
 import {joinListSemantically} from "../../../utils/array";
 
-export interface DigitControlButtonProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+export interface DigitControlButtonProps<CellType, ExType = {}, ProcessedExType = {}> {
     index: number;
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
 }
 
-export const DigitControlButton = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {index, context}: DigitControlButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
+    {index, context}: DigitControlButtonProps<CellType, ExType, ProcessedExType>
 ) => {
     const translate = useTranslate();
 
@@ -32,9 +32,11 @@ export const DigitControlButton = <CellType, GameStateExtensionType = {}, Proces
     } = typeManager;
 
     const {
-        cellWriteMode,
-        cellWriteModeInfo: {isDigitMode, buttonContent: ButtonContent},
         isShowingSettings,
+        processed: {
+            cellWriteMode,
+            cellWriteModeInfo: {isDigitMode, buttonContent: ButtonContent},
+        },
     } = state;
 
     const digit = index + 1;

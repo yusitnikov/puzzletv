@@ -64,7 +64,7 @@ export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState
     fieldSize: FieldSize9,
 };
 
-export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
+export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState> = {
     noIndex: true,
     title,
     slug: "empty-chess",

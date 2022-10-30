@@ -5,21 +5,21 @@ import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
-export interface CellWriteModeButtonProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+export interface CellWriteModeButtonProps<CellType, ExType = {}, ProcessedExType = {}> {
     cellWriteMode: CellWriteMode;
     top: number;
     left?: number;
     data: Partial<CellState<CellType>> | ((contentSize: number) => ReactNode);
     title?: string;
 
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
 
     noBorders?: boolean;
     childrenOnTopOfBorders?: boolean;
     fullSize?: boolean;
 }
 
-export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const CellWriteModeButton = <CellType, ExType = {}, ProcessedExType = {}>(
     {
         cellWriteMode,
         top,
@@ -30,12 +30,12 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         noBorders,
         childrenOnTopOfBorders,
         fullSize,
-    }: CellWriteModeButtonProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    }: CellWriteModeButtonProps<CellType, ExType, ProcessedExType>
 ) => {
     const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;
 
     const handleSetCellWriteMode = useCallback(
-        () => onStateChange({persistentCellWriteMode: cellWriteMode} as any),
+        () => onStateChange({persistentCellWriteMode: cellWriteMode}),
         [onStateChange, cellWriteMode]
     );
 
@@ -49,7 +49,7 @@ export const CellWriteModeButton = <CellType, GameStateExtensionType = {}, Proce
         top={top}
         cellSize={cellSize}
         innerBorderWidth={noBorders ? 0 : 1}
-        checked={state.cellWriteMode === cellWriteMode}
+        checked={state.processed.cellWriteMode === cellWriteMode}
         onClick={handleSetCellWriteMode}
         title={title}
         childrenOnTopOfBorders={childrenOnTopOfBorders}

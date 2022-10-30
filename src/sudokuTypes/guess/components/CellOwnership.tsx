@@ -1,6 +1,10 @@
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../types/sudoku/Constraint";
 import {indexes} from "../../../utils/indexes";
 import {currentPlayerColor, otherPlayerColor} from "../../../components/app/globals";
 import {getMainDigitDataHash} from "../../../utils/playerDataHash";
@@ -54,10 +58,11 @@ export const CellOwnership = withFieldLayer(
             </AutoSvg>;
         }))}
     </> : null
-);
+) as ConstraintPropsGenericFc;
 
-export const CellOwnershipConstraint: Constraint<any> = {
+export const CellOwnershipConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
     name: "cell-ownership",
     cells: [],
     component: CellOwnership,
-};
+    props: undefined,
+});

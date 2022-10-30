@@ -29,9 +29,11 @@ const DarkReaderRectOverride = styled("rect")(({fill}) => ({
 export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
     {
         context,
-        solution,
-        startCells,
-        showBulbs,
+        props: {
+            solution,
+            startCells,
+            showBulbs,
+        },
     }: ConstraintProps<any, FogProps<CellType>>
 ) => {
     const {
@@ -189,18 +191,20 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             </AutoSvg>;
         }))}
     </>;
-}) as <CellType,>(props: ConstraintProps<any, FogProps<CellType>>) => ReactElement;
+}) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, FogProps<CellType>, ExType, ProcessedExType>) => ReactElement;
 
-export const FogConstraint = <CellType,>(
+export const FogConstraint = <CellType, ExType, ProcessedExType>(
     solution: CellType[][],
     startCellLiterals: PositionLiteral[],
     showBulbs = true,
-): Constraint<CellType, FogProps<CellType>> => ({
+): Constraint<CellType, FogProps<CellType>, ExType, ProcessedExType> => ({
     name: "fog",
     cells: [],
-    solution,
-    startCells: parsePositionLiterals(startCellLiterals),
-    showBulbs,
+    props: {
+        solution,
+        startCells: parsePositionLiterals(startCellLiterals),
+        showBulbs,
+    },
     component: Fog,
     isValidCell(
         {top, left},

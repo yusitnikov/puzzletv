@@ -24,8 +24,8 @@ const corners: Position[] = [
     {left: 0, top: 0},
 ];
 
-export interface CellDigitsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+export interface CellDigitsProps<CellType, ExType = {}, ProcessedExType = {}> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
     data: Partial<CellState<CellType>>;
     initialData?: CellType;
     excludedDigits?: SetInterface<CellType>;
@@ -38,8 +38,8 @@ export interface CellDigitsProps<CellType, GameStateExtensionType = {}, Processe
 export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, excludedDigits: SetInterface<CellType> | undefined, data: Partial<CellState<CellType>>) =>
     initialData === undefined && !excludedDigits?.size && isEmptyCellState(data, true);
 
-export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {context, data, initialData, excludedDigits, size, cellPosition, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const CellDigits = <CellType, ExType = {}, ProcessedExType = {}>(
+    {context, data, initialData, excludedDigits, size, cellPosition, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, ExType, ProcessedExType>
 ) => {
     if (shouldSkipCellDigits(initialData, excludedDigits, data)) {
         return null;
@@ -129,7 +129,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                     () => emptyPositionWithAngle,
                     true,
                     true,
-                    cellPosition && context.state.lastPlayerObjects[getMainDigitDataHash(cellPosition)]
+                    cellPosition && context.state.processed.lastPlayerObjects[getMainDigitDataHash(cellPosition)]
                 )}
 
                 {initialData === undefined && <>
@@ -154,7 +154,7 @@ export const CellDigits = <CellType, GameStateExtensionType = {}, ProcessedGameS
                             }),
                             false,
                             (cellData) => !excludedDigits?.contains(cellData),
-                            (cellData) => !!cellPosition && context.state.lastPlayerObjects[getExcludedDigitDataHash(cellPosition, cellData, context)]
+                            (cellData) => !!cellPosition && context.state.processed.lastPlayerObjects[getExcludedDigitDataHash(cellPosition, cellData, context)]
                         )}
 
                         {cornerDigits?.size && renderAnimatedDigitsSet(

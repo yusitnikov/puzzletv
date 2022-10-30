@@ -12,7 +12,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
             puzzle,
             cellsIndexForState,
             cellSize,
-            state,
+            state: {processed: {isMyTurn}},
         }
     }: ConstraintProps
 ) => {
@@ -27,7 +27,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
         fieldFitsWrapper,
     } = puzzle;
 
-    const borderColor = state.isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
+    const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
     const borderWidth = fieldFitsWrapper ? 1 : 1 / cellSize;
 
     if (customCellBounds) {
@@ -79,8 +79,9 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
     </>;
 });
 
-export const FieldLinesConstraint: Constraint<any> = {
+export const FieldLinesConstraint: Constraint<any, any, any, any> = {
     name: "field lines",
     cells: [],
     component: FieldLines,
+    props: undefined,
 }

@@ -1,7 +1,6 @@
 import {CellDataProps, getDefaultCellDataColor} from "../../../components/sudoku/cell/CellDataProps";
 import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
 import {ChessPiece} from "../types/ChessPiece";
-import {ChessGameState} from "../types/ChessGameState";
 import {ChessColor} from "../types/ChessColor";
 import {ChessPieceType} from "../types/ChessPieceType";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
@@ -294,7 +293,7 @@ const map: Record<ChessColor, Record<ChessPieceType, ReactNode>> = {
     },
 };
 
-export const ChessPieceCellData = (props: CellDataProps<ChessPiece, ChessGameState>) => {
+export const ChessPieceCellData = (props: CellDataProps<ChessPiece>) => {
     const {data: {type, color}, size: miniSize, left = 0, top = 0} = props;
 
     const size = miniSize * 1.2;
@@ -314,7 +313,7 @@ export const ChessPieceCellData = (props: CellDataProps<ChessPiece, ChessGameSta
     </AutoSvg>;
 };
 
-export const ChessPieceCellDataComponentType: CellDataComponentType<ChessPiece, ChessGameState> = {
+export const ChessPieceCellDataComponentType: CellDataComponentType<ChessPiece> = {
     component: ChessPieceCellData,
     widthCoeff: 0.7,
 };

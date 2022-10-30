@@ -18,24 +18,24 @@ export enum CellWriteMode {
     custom,
 }
 
-export interface CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
+export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     mode: CellWriteMode | number;
     hotKeyStr?: string;
     isDigitMode?: boolean;
     isNoSelectionMode?: boolean;
     digitsCount?: number;
     buttonContent?: (
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         cellData: CellType,
         cellSize: number,
         index: number
     ) => ReactNode;
     onCornerClick?: (
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position: CellExactPosition
     ) => void;
     onCornerEnter?: (
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position: CellExactPosition
     ) => void;
 }
@@ -96,7 +96,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
 ];
 
-export const getAllowedCellWriteModeInfos = <CellType, GameStateExtensionType, ProcessedGameStateExtensionType>(
+export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
     {
         allowDrawing = [],
         loopHorizontally = false,
@@ -105,8 +105,8 @@ export const getAllowedCellWriteModeInfos = <CellType, GameStateExtensionType, P
         disableColoring = false,
         digitsCount,
         typeManager: {extraCellWriteModes = []},
-    }: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
-): CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[] => [
+    }: PuzzleDefinition<CellType, ExType, ProcessedExType>
+): CellWriteModeInfo<CellType, ExType, ProcessedExType>[] => [
     ...allCellWriteModeInfos.filter(({mode, isDigitMode}) => {
         if (isDigitMode) {
             return digitsCount !== 0;

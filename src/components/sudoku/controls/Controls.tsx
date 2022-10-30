@@ -23,7 +23,7 @@ import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {UserLinesByData, UserMarkByData} from "../constraints/user-lines/UserLines";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {clearSelectionAction, redoAction, undoAction} from "../../../types/sudoku/GameStateAction";
-import {GameState, getEmptyGameState} from "../../../types/sudoku/GameState";
+import {getEmptyGameState, mergeGameStateWithUpdates} from "../../../types/sudoku/GameState";
 import {
     getDefaultDigitsCount,
     isPuzzleHasBottomRowControls,
@@ -50,14 +50,14 @@ export const getControlsHeightCoeff = (puzzle: PuzzleDefinition<any, any, any>) 
     return height + controlButtonPaddingCoeff * (height - 1);
 };
 
-export interface ControlsProps<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+export interface ControlsProps<CellType, ExType = {}, ProcessedExType = {}> {
     rect: Rect;
     isHorizontal: boolean;
-    context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
 }
 
-export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
-    {rect, isHorizontal, context}: ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
+    {rect, isHorizontal, context}: ControlsProps<CellType, ExType, ProcessedExType>
 ) => {
     const {
         cellSizeForSidePanel: cellSize,
@@ -89,12 +89,14 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     } = typeManager;
 
     const {
-        isReady,
         persistentCellWriteMode,
-        cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
         isShowingSettings,
         openedLmdOnce,
         lives,
+        processed: {
+            isReady,
+            cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
+        },
     } = state;
 
     const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;
@@ -172,7 +174,7 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
 
     // region Event handlers
     const handleSetCellWriteMode = useCallback(
-        (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode} as any),
+        (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode}),
         [onStateChange]
     );
 
@@ -200,18 +202,18 @@ export const Controls = <CellType, GameStateExtensionType = {}, ProcessedGameSta
     const handleCloseRestart = useCallback(() => setIsShowingRestartConfirmation(false), [setIsShowingRestartConfirmation]);
     const handleSureRestart = useCallback(() => {
         handleCloseRestart();
-        onStateChange((state) => ({
-            ...getEmptyGameState(puzzle, false),
-            ...keepStateOnRestart?.(state),
-        }));
+        onStateChange((state) => mergeGameStateWithUpdates(
+            getEmptyGameState(puzzle, false),
+            keepStateOnRestart?.(state) ?? {},
+        ));
     }, [handleCloseRestart, onStateChange, puzzle, keepStateOnRestart]);
 
     const handleOpenSettings = useCallback(
-        () => onStateChange({isShowingSettings: true} as Partial<GameState<CellType>> as any),
+        () => onStateChange({isShowingSettings: true}),
         [onStateChange]
     );
     const handleCloseSettings = useCallback(
-        () => onStateChange({isShowingSettings: false} as Partial<GameState<CellType>> as any),
+        () => onStateChange({isShowingSettings: false}),
         [onStateChange]
     );
     // endregion

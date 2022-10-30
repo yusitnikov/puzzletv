@@ -2,14 +2,14 @@ import {DigitComponentType} from "../../components/sudoku/digit/DigitComponentTy
 import {CellDataComponentType} from "../../components/sudoku/cell/CellDataComponentType";
 import {getLineVector, Position, PositionWithAngle} from "../layout/Position";
 import {SetInterface} from "../struct/Set";
-import {GameState, ProcessedGameState} from "./GameState";
+import {GameStateEx, PartialGameStateEx, ProcessedGameStateEx} from "./GameState";
 import {ComponentType, ReactNode} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {Rect} from "../layout/Rect";
-import {Constraint, ConstraintOrComponent} from "./Constraint";
+import {Constraint} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
 import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
@@ -18,18 +18,18 @@ import {useTranslate} from "../../hooks/useTranslate";
 import {KeyInfo} from "./KeyInfo";
 import {SettingsContentProps} from "../../components/sudoku/controls/settings/SettingsContent";
 
-export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> {
     areSameCellData(
         data1: CellType,
         data2: CellType,
-        gameState: (ProcessedGameState<CellType> & ProcessedGameStateExtensionType) | undefined,
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType> | undefined,
         forConstraints: boolean
     ): boolean;
 
     compareCellData(
         data1: CellType,
         data2: CellType,
-        gameState: (ProcessedGameState<CellType> & ProcessedGameStateExtensionType) | undefined,
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType> | undefined,
         forConstraints: boolean
     ): number;
 
@@ -41,51 +41,51 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
 
     unserializeCellData(data: any): CellType;
 
-    serializeGameState(data: GameState<CellType> & GameStateExtensionType): any;
+    serializeGameState(data: Partial<ExType>): any;
 
-    unserializeGameState(data: any): Partial<GameStateExtensionType>;
+    unserializeGameState(data: any): Partial<ExType>;
 
     createCellDataByDisplayDigit(
         digit: number,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        gameState: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
     ): CellType;
 
     createCellDataByTypedDigit(
         digit: number,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position?: Position
     ): CellType;
 
     getDigitByCellData(
         data: CellType,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
     ): number;
 
     getNumberByDigits?(digits: number[]): number | undefined;
 
     transformDigit?(
         digit: number,
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
     ): number;
 
     processCellDataPosition?(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         basePosition: PositionWithAngle,
         dataSet: SetInterface<CellType>,
         dataIndex: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         cellPosition?: Position,
-        state?: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        state?: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
     ): PositionWithAngle | undefined;
 
     handleDigitGlobally?(
         isGlobal: boolean,
         clientId: string,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         cellData: CellType,
-        defaultResult: Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>
-    ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+        defaultResult: PartialGameStateEx<CellType, ExType>
+    ): PartialGameStateEx<CellType, ExType>;
 
     handleDigitInCell?(
         isGlobal: boolean,
@@ -94,76 +94,76 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
         cellState: CellStateEx<CellType>,
         cellData: CellType,
         position: Position,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         defaultResult: Partial<CellStateEx<CellType>>,
         cache: any
     ): Partial<CellStateEx<CellType>>;
 
-    extraCellWriteModes?: CellWriteModeInfo<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[];
+    extraCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
 
     initialCellWriteMode?: CellWriteMode;
 
     digitComponentType?: DigitComponentType;
 
-    cellDataComponentType: CellDataComponentType<CellType, ProcessedGameStateExtensionType>;
+    cellDataComponentType: CellDataComponentType<CellType>;
 
-    initialGameStateExtension?: GameStateExtensionType;
+    initialGameStateExtension?: ExType;
 
-    keepStateOnRestart?(gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType): Partial<GameState<CellType> & GameStateExtensionType>;
+    keepStateOnRestart?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): PartialGameStateEx<CellType, ExType>;
 
-    isReady?(gameState: GameState<CellType> & GameStateExtensionType): boolean;
+    isReady?(state: GameStateEx<CellType, ExType>): boolean;
 
-    useProcessedGameStateExtension?(gameState: GameState<CellType> & GameStateExtensionType): Omit<ProcessedGameStateExtensionType, keyof GameStateExtensionType>;
+    useProcessedGameStateExtension?(state: GameStateEx<CellType, ExType>): Omit<ProcessedExType, keyof ExType>;
 
-    getFieldAngle?(gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType): number;
+    getFieldAngle?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): number;
 
-    isValidCell?(cell: Position, puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>): boolean;
+    isValidCell?(cell: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): boolean;
 
     processArrowDirection?(
         currentCell: Position,
         xDirection: number,
         yDirection: number,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         isMainKeyboard: boolean
     ): Position | undefined;
 
     transformCoords?(
         coords: Position,
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
         cellSize: number,
     ): Position;
 
     getRegionsWithSameCoordsTransformation?(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         cellSize: number,
     ): Rect[];
 
-    items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
-        | ((context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
+    items?: Constraint<CellType, any, ExType, ProcessedExType>[]
+        | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => Constraint<CellType, any, ExType, ProcessedExType>[]);
 
     getRegionsForRowsAndColumns?(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
-    ): Constraint<any>[];
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
+    ): Constraint<CellType, any, ExType, ProcessedExType>[];
 
     getAdditionalNeighbors?(
         position: Position,
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
     ): Position[];
 
     borderColor?: string;
 
     getCellSelectionType?(
         cell: Position,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined;
 
     hasBottomRowControls?: boolean;
 
-    mainControlsComponent?: ComponentType<ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
+    mainControlsComponent?: ComponentType<ControlsProps<CellType, ExType, ProcessedExType>>;
 
-    settingsComponents?: ComponentType<SettingsContentProps<CellType, ProcessedGameStateExtensionType>>[];
+    settingsComponents?: ComponentType<SettingsContentProps<CellType, ProcessedExType>>[];
 
     maxDigitsCount?: number;
 
@@ -178,52 +178,52 @@ export interface SudokuTypeManager<CellType, GameStateExtensionType = {}, Proces
     disableConflictChecker?: boolean;
 
     getSharedState?(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        state: GameState<CellType> & GameStateExtensionType
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        state: GameStateEx<CellType, ExType>
     ): any;
 
     setSharedState?(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        state: GameState<CellType> & GameStateExtensionType,
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        state: GameStateEx<CellType, ExType>,
         newState: any
-    ): GameState<CellType> & GameStateExtensionType;
+    ): GameStateEx<CellType, ExType>;
 
     getInternalState?(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        state: GameState<CellType> & GameStateExtensionType
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        state: GameStateEx<CellType, ExType>
     ): any;
 
     unserializeInternalState?(
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         newState: any
-    ): Partial<GameState<CellType> & GameStateExtensionType>;
+    ): PartialGameStateEx<CellType, ExType>;
 
-    supportedActionTypes?: GameStateActionType<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>[];
+    supportedActionTypes?: GameStateActionType<any, CellType, ExType, ProcessedExType>[];
 
     handleClearAction?(
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         clientId: string
-    ): Partial<ProcessedGameState<CellType> & ProcessedGameStateExtensionType>;
+    ): PartialGameStateEx<CellType, ExType>;
 
     isGlobalAction?(
-        action: GameStateAction<any, CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        action: GameStateAction<any, CellType, ExType, ProcessedExType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): boolean;
 
     applyStateDiffEffect?(
-        state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
-        prevState: (ProcessedGameState<CellType> & ProcessedGameStateExtensionType) | undefined,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
+        prevState: ProcessedGameStateEx<CellType, ExType, ProcessedExType> | undefined,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): void;
 
     getPlayerScore?(
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
         clientId: string
     ): string | number;
 
     getAboveRules?(
         translate: ReturnType<typeof useTranslate>,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): ReactNode;
 }
 

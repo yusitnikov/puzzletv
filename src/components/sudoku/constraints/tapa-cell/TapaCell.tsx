@@ -1,4 +1,8 @@
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {
     Line,
     parsePositionLiteral,
@@ -21,10 +25,10 @@ export interface TapaCellProps {
 
 export const TapaCell = withFieldLayer(FieldLayer.regular, (
     {
-        cells: [cell],
-        clues,
         context,
-    }: ConstraintProps<any, TapaCellProps>
+        cells: [cell],
+        props: {clues},
+    }: ConstraintProps<unknown, TapaCellProps>
 ) => {
     const radius = clues.length === 1 ? 0 : 0.3;
     const size = clues.length === 1 ? 0.8 : 0.4;
@@ -52,9 +56,9 @@ export const TapaCell = withFieldLayer(FieldLayer.regular, (
             })}
         </FieldCellUserArea>
     </FieldRect>;
-});
+}) as ConstraintPropsGenericFc<TapaCellProps>;
 
-export const TapaCellConstraint = <CellType,>(cellLiteral: PositionLiteral, ...clues: (number | undefined)[]): Constraint<CellType, TapaCellProps> => {
+export const TapaCellConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral, ...clues: (number | undefined)[]): Constraint<CellType, TapaCellProps, ExType, ProcessedExType> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     const cluesMap: Record<number, number> = {};
@@ -75,7 +79,7 @@ export const TapaCellConstraint = <CellType,>(cellLiteral: PositionLiteral, ...c
     return {
         name: "tapa cell",
         cells: [cell],
-        clues,
+        props: {clues},
         component: TapaCell,
         isValidPuzzle(lines, digits, cells, context) {
             const neighborCenters = getNeighborCenters(context);

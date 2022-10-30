@@ -11,11 +11,11 @@ import {TapaCellConstraint} from "../../components/sudoku/constraints/tapa-cell/
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {loopRulesApply, tapCluesApply} from "../ruleSnippets";
 
-export const BaseHeptapagonLikeLoop = (
+export const BaseHeptapagonLikeLoop = <ExType, ProcessedExType>(
     fieldSize: number,
     layersCount: number,
-    constraints: Constraint<number, any>
-): Omit<PuzzleDefinition<number>, "slug" | "title"> => {
+    constraints: Constraint<number, any, ExType, ProcessedExType>[]
+): Omit<PuzzleDefinition<number, ExType, ProcessedExType>, "slug" | "title"> => {
     const scale = 1;
 
     const round = (value: number) => Math.round(value * 1000) / 1000;

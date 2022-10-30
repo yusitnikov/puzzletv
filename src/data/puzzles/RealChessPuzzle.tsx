@@ -7,8 +7,11 @@ import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuT
 import {chessInitialPiecesByCellNames} from "../../sudokuTypes/chess/utils/chessCoords";
 import {ChessPieceType} from "../../sudokuTypes/chess/types/ChessPieceType";
 import {ChessColor} from "../../sudokuTypes/chess/types/ChessColor";
-import {ChessBoardCellsBackground} from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
-import {ChessBoardIndexes, chessBoardIndexesMargin} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
+import {ChessBoardCellsBackgroundConstraint} from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
+import {
+    ChessBoardIndexesConstraint,
+    chessBoardIndexesMargin
+} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {Chameleon} from "../authors";
 import {almostNormalSudokuRulesApply} from "../ruleSnippets";
@@ -36,7 +39,7 @@ const optionalSolutionPieces = chessInitialPiecesByCellNames({
     "f7": {color: ChessColor.black, type: ChessPieceType.pawn},
 });
 
-export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, ChessGameState> = {
+export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState> = {
     title: {
         [LanguageCode.en]: "Easy-peasy, Mate in One",
         [LanguageCode.ru]: "Мат в 1 ход",
@@ -107,8 +110,8 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState, Chess
         return areSameGivenDigitsMaps(puzzle.typeManager, currentFinalDigits, correctFinalDigits);
     },
     items: [
-        <ChessBoardCellsBackground/>,
-        <ChessBoardIndexes/>,
+        ChessBoardCellsBackgroundConstraint(),
+        ChessBoardIndexesConstraint(),
         ValidChessPositionConstraint,
     ],
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AMM",

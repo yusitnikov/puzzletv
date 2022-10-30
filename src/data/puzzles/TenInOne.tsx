@@ -59,7 +59,7 @@ const fieldSize = {
 };
 const resultChecker = isValidFinishedPuzzleByStageConstraints<number>(2);
 
-export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState> = {
     author: Raumplaner,
     title: {
         [LanguageCode.en]: "Abstract Killer Dots",
@@ -138,7 +138,7 @@ export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState, M
     resultChecker,
 };
 
-export const LegoHouse: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+export const LegoHouse: PuzzleDefinition<number, MultiStageGameState> = {
     noIndex: true,
     author: AnalyticalNinja,
     title: {
@@ -209,7 +209,7 @@ export const LegoHouse: PuzzleDefinition<number, MultiStageGameState, MultiStage
     resultChecker,
 };
 
-export const DollHouse: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
     noIndex: true,
     author: AnalyticalNinja,
     title: {
@@ -243,8 +243,8 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState, MultiStage
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         </RulesIndentedBlock>
     </>,
-    items: ({stage}) => {
-        let lines: Constraint<number, unknown, MultiStageGameState, MultiStageGameState>[] = [
+    items: ({extension: {stage}}) => {
+        let lines: Constraint<number, any, MultiStageGameState, {}>[] = [
             RenbanConstraint(["R3C3", "R2C3", "R1C4", "R2C5"]),
             RenbanConstraint(["R5C6", "R6C6", "R6C7", "R5C8"]),
             GermanWhispersConstraint(["R5C5", "R4C4", "R6C2", "R8C2", "R8C6"]),
@@ -293,7 +293,7 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState, MultiStage
     resultChecker,
 };
 
-export const MoodyLines: PuzzleDefinition<number, MultiStageGameState, MultiStageGameState> = {
+export const MoodyLines: PuzzleDefinition<number, MultiStageGameState> = {
     noIndex: true,
     author: AnalyticalNinja,
     title: {
@@ -319,8 +319,8 @@ export const MoodyLines: PuzzleDefinition<number, MultiStageGameState, MultiStag
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         </RulesIndentedBlock>
     </>,
-    items: ({stage}) => {
-        let lines: Constraint<number, unknown, MultiStageGameState, MultiStageGameState>[] = [
+    items: ({extension: {stage}}) => {
+        let lines: Constraint<number, unknown, MultiStageGameState, {}>[] = [
             // TODO
         ];
         if (stage === 1) {

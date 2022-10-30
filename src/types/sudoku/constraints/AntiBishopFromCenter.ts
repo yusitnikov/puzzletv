@@ -1,9 +1,10 @@
 import {Constraint} from "../Constraint";
 import {isSamePosition} from "../../layout/Position";
 
-export const AntiBishopFromCenterConstraint = (regionSize: number): Constraint<any> => ({
+export const AntiBishopFromCenterConstraint = <CellType>(regionSize: number): Constraint<CellType> => ({
     name: "anti-bishop from center",
     cells: [],
+    props: undefined,
     isValidCell(
         {left, top},
         digits,

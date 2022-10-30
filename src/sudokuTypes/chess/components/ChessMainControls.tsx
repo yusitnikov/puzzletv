@@ -14,18 +14,20 @@ export const ChessMainControls = (
     {
         context: {
             cellSizeForSidePanel: cellSize,
-            state: {cellWriteMode, selectedColor, isShowingSettings},
+            state: {isShowingSettings, processed: {cellWriteMode}, extension: {selectedColor}},
             onStateChange,
         },
-    }: ControlsProps<ChessPiece, ChessGameState, ChessGameState>
+    }: ControlsProps<ChessPiece, ChessGameState>
 ) => {
     const translate = useTranslate();
 
     const [usedColorSelectionOnce, setUsedColorSelectionOnce] = useState(false);
 
     const handleToggleColor = useCallback(() => {
-        onStateChange(({selectedColor}) => ({
-            selectedColor: selectedColor === ChessColor.white ? ChessColor.black : ChessColor.white,
+        onStateChange(({extension: {selectedColor}}) => ({
+            extension: {
+                selectedColor: selectedColor === ChessColor.white ? ChessColor.black : ChessColor.white,
+            },
         }));
 
         setUsedColorSelectionOnce(true);

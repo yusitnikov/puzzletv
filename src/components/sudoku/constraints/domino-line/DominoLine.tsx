@@ -3,21 +3,21 @@ import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {LineComponent, LineProps} from "../line/Line";
 
-export const DominoLineConstraint = <CellType,>(
+export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
     name: string,
     color: string,
     cellLiterals: PositionLiteral[],
     isValidDomino: (digit1: number, digit2: number) => boolean,
     width: number | undefined = undefined,
     display = true
-): Constraint<CellType, LineProps> => {
+): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
     const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
 
     return {
         name,
         cells,
         color,
-        width,
+        props: {width},
         component: display ? LineComponent : undefined,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);

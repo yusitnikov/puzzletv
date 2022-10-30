@@ -3,7 +3,7 @@ import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager
 import {CellStateEx} from "../../../types/sudoku/CellState";
 import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {GameState} from "../../../types/sudoku/GameState";
+import {GameStateEx, mergeGameStateWithUpdates} from "../../../types/sudoku/GameState";
 import {CellOwnershipConstraint} from "../components/CellOwnership";
 import {indexes, indexesFromTo} from "../../../utils/indexes";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
@@ -11,12 +11,12 @@ import {Position} from "../../../types/layout/Position";
 import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 
-export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}>(
+export const GuessSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
     solution: GivenDigitsMap<number>
-): SudokuTypeManager<number, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
-    ...DigitSudokuTypeManager<GameStateExtensionType, ProcessedGameStateExtensionType>(),
+): SudokuTypeManager<number, ExType, ProcessedExType> => ({
+    ...DigitSudokuTypeManager<ExType, ProcessedExType>(),
 
-    items: [CellOwnershipConstraint],
+    items: [CellOwnershipConstraint()],
 
     handleDigitInCell(
         isGlobal,
@@ -25,7 +25,11 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         cellState,
         cellData,
         {top, left},
-        {puzzle: {params = {}}, state: {currentPlayer, selectedCells, initialDigits}, multiPlayer: {isEnabled}},
+        {
+            puzzle: {params = {}},
+            state: {currentPlayer, selectedCells, initialDigits},
+            multiPlayer: {isEnabled},
+        },
         defaultResult,
         cache
     ): Partial<CellStateEx<number>> {
@@ -80,12 +84,11 @@ export const GuessSudokuTypeManager = <GameStateExtensionType = {}, ProcessedGam
         puzzle,
         state,
         {initialDigits, excludedDigits}
-    ): GameState<number> & GameStateExtensionType {
-        return {
-            ...state,
+    ): GameStateEx<number, ExType> {
+        return mergeGameStateWithUpdates(state, {
             initialDigits: unserializeGivenDigitsMap(initialDigits, puzzle.typeManager.unserializeCellData),
             excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
-        };
+        });
     },
 
     getPlayerScore(context, clientId) {

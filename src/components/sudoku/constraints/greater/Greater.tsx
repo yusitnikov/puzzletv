@@ -2,7 +2,11 @@ import {getLineVector, parsePositionLiteral, PositionLiteral} from "../../../../
 import {blackColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 
 const radius = 0.15;
 const lineWidth = 0.03;
@@ -31,13 +35,14 @@ export const Greater = withFieldLayer(FieldLayer.top, ({cells: [greaterCell, les
             stroke={blackColor}
         />
     </g>;
-});
+}) as ConstraintPropsGenericFc;
 
 export const GreaterConstraint = <CellType,>(greaterCellLiteral: PositionLiteral, lessCellLiteral: PositionLiteral): Constraint<CellType> => {
     return ({
         name: "inequality",
         cells: [parsePositionLiteral(greaterCellLiteral), parsePositionLiteral(lessCellLiteral)],
         component: Greater,
+        props: undefined,
         isValidCell(cell, digits, [greaterCell, lessCell], {puzzle: {typeManager: {compareCellData}}, state}) {
             const greaterDigit = digits[greaterCell.top]?.[greaterCell.left];
             const lessDigit = digits[lessCell.top]?.[lessCell.left];

@@ -11,19 +11,19 @@ import {getRectPoints, Rect, transformRect} from "../layout/Rect";
 import {CustomCellBounds, TransformedCustomCellBounds} from "./CustomCellBounds";
 import {CellPart} from "./CellPart";
 import {PlainValueSet, SetInterface} from "../struct/Set";
-import {gameStateGetCurrentFieldState, ProcessedGameState} from "./GameState";
+import {gameStateGetCurrentFieldState, ProcessedGameStateEx} from "./GameState";
 import {PuzzlePositionSet} from "./PuzzlePositionSet";
 import {PuzzleLineSet} from "./PuzzleLineSet";
 import {lazy} from "../../utils/lazy";
 import {FieldState} from "./FieldState";
 
-export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
-    public readonly allCells: CellInfo[][];
+export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
+    public readonly allCells: CellInfo<CellType, ExType, ProcessedExType>[][];
 
     private readonly realCellPointMap: Record<string, SudokuCellPointInfo> = {};
     private readonly borderLineMap: Record<string, Record<string, SudokuCellBorderInfo>> = {};
 
-    constructor(private readonly puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) {
+    constructor(private readonly puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>) {
         const {
             typeManager: {
                 transformCoords = coords => coords,
@@ -56,7 +56,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
             return {
                 position: {top, left},
                 bounds,
-                getTransformedBounds: (state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType, cellSize: number) => {
+                getTransformedBounds: (state, cellSize) => {
                     const transformCoordsBound = (point: Position) => transformCoords(point, puzzle, state, cellSize);
 
                     return {
@@ -354,7 +354,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
     }
 
     // region Custom regions
-    getCustomRegionsByBorderLines(state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) {
+    getCustomRegionsByBorderLines(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) {
         const map: SudokuCustomRegionsMap = {
             regions: [],
             map: {},
@@ -380,7 +380,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
         };
     }
 
-    getCustomRegionByBorderLinesAt(state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType, cell: Position) {
+    getCustomRegionByBorderLinesAt(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>, cell: Position) {
         const map: SudokuCustomRegionsMap = {
             regions: [],
             map: {},
@@ -447,7 +447,7 @@ export class SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameSta
     //endregion
 }
 
-export class SudokuCellsIndexForState<CellType, GameStateExtensionType, ProcessedGameStateExtensionType> {
+export class SudokuCellsIndexForState<CellType, ExType, ProcessedExType> {
     private currentFieldState: FieldState<CellType>;
 
     public readonly getCenterLineSegments = lazy(
@@ -462,8 +462,8 @@ export class SudokuCellsIndexForState<CellType, GameStateExtensionType, Processe
     );
 
     constructor(
-        private puzzleIndex: SudokuCellsIndex<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        private state: ProcessedGameState<CellType> & ProcessedGameStateExtensionType,
+        private puzzleIndex: SudokuCellsIndex<CellType, ExType, ProcessedExType>,
+        private state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
         private cellSize: number,
     ) {
         this.currentFieldState = gameStateGetCurrentFieldState(state);
@@ -488,17 +488,17 @@ export interface SudokuCellBorderSegmentInfo {
     neighbors: SetInterface<Position>;
 }
 
-export interface CellInfo {
+export interface CellInfo<CellType, ExType, ProcessedExType> {
     position: Position;
     bounds: CustomCellBounds;
-    getTransformedBounds: (state: any, cellSize: number) => TransformedCustomCellBounds;
+    getTransformedBounds: (state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>, cellSize: number) => TransformedCustomCellBounds;
     areCustomBounds: boolean;
     center: Position;
     neighbors: SetInterface<Position>;
     borderSegments: Record<string, SudokuCellBorderSegmentInfo>;
 }
 
-export interface CellInfoForState extends Omit<CellInfo, "getTransformedBounds"> {
+export interface CellInfoForState extends Omit<CellInfo<unknown, unknown, unknown>, "getTransformedBounds"> {
     transformedBounds: TransformedCustomCellBounds;
 }
 

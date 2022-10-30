@@ -13,26 +13,32 @@ export const RotatableMainControls = <CellType,>(angleDelta: number, showBackBut
     {
         context: {
             cellSizeForSidePanel: cellSize,
-            state: {isReady, isStickyMode, animationSpeed, isShowingSettings},
+            state: {
+                isShowingSettings,
+                processed: {isReady},
+                extension: {isStickyMode, animationSpeed},
+            },
             onStateChange,
         },
     }: ControlsProps<CellType, RotatableGameState, RotatableProcessedGameState>
 ) {
     const translate = useTranslate();
 
-    const handleRotate = (delta: number) => onStateChange(({angle}) => ({
-        angle: isReady
-            ? angle + delta
-            : (Math.sign(angle) === Math.sign(delta) ? delta : 0)
+    const handleRotate = (delta: number) => onStateChange(({extension: {angle}}) => ({
+        extension: {
+            angle: isReady
+                ? angle + delta
+                : (Math.sign(angle) === Math.sign(delta) ? delta : 0)
+        },
     }));
 
     const handleToggleStickyMode = () => {
         if (showStickyMode) {
-            onStateChange(({isStickyMode}) => ({isStickyMode: !isStickyMode}));
+            onStateChange(({extension: {isStickyMode}}) => ({extension: {isStickyMode: !isStickyMode}}));
         }
     };
 
-    const handleSetAnimationSpeed = (animationSpeed: AnimationSpeed) => onStateChange({animationSpeed});
+    const handleSetAnimationSpeed = (animationSpeed: AnimationSpeed) => onStateChange({extension: {animationSpeed}});
     const handleAnimationSpeedToggle = () => {
         switch (animationSpeed) {
             case AnimationSpeed.regular:

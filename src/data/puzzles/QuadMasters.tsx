@@ -30,7 +30,7 @@ export const getQuadMastersTitle = (daily: boolean, isQuadle: boolean, includeRa
     [LanguageCode.ru]: (!daily && includeRandomWord ? "Случайный " : "") + (isQuadle ? "Quadle" : "Quad Masters") + (daily ? " дня" : ""),
 });
 
-export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<number, QuadMastersGameState, QuadMastersGameState> => ({
+export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<number, QuadMastersGameState> => ({
     slug,
     noIndex: true,
     fulfillParams: (

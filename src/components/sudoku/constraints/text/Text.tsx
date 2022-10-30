@@ -2,7 +2,11 @@ import {textColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {getAveragePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 
@@ -12,7 +16,7 @@ export interface TextProps {
 }
 
 export const TextComponent = (layer = FieldLayer.lines) => withFieldLayer(layer, (
-    {cells: [{top, left}], text, size = 0.5, angle = 0, color = textColor}: ConstraintProps<any, TextProps>
+    {cells: [{top, left}], angle = 0, color = textColor, props: {text, size = 0.5}}: ConstraintProps<unknown, TextProps>
 ) => <AutoSvg
     top={top + 0.5}
     left={left + 0.5}
@@ -24,23 +28,22 @@ export const TextComponent = (layer = FieldLayer.lines) => withFieldLayer(layer,
     >
         {text}
     </CenteredText>
-</AutoSvg>);
+</AutoSvg>) as ConstraintPropsGenericFc<TextProps>;
 
-export const TextConstraint = <CellType,>(
+export const TextConstraint = <CellType, ExType, ProcessedExType>(
     cellLiterals: PositionLiteral[],
     text: string,
     color?: string,
     size?: number,
     angle?: number,
     layer = FieldLayer.lines,
-): Constraint<CellType, TextProps> => {
-    return ({
+): Constraint<CellType, TextProps, ExType, ProcessedExType> => {
+    return {
         name: `text: ${text}`,
         cells: [getAveragePosition(parsePositionLiterals(cellLiterals))],
-        text,
+        props: {text, size},
         color,
-        size,
         angle,
         component: TextComponent(layer),
-    });
+    };
 };

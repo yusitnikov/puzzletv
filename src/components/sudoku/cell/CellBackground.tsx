@@ -21,7 +21,7 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
     cellPosition = usePureMemo(cellPosition, [cellPosition]);
 
     const cellInfo = cellPosition && context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
-    const customBounds = usePureMemo(cellInfo?.transformedBounds, [cellInfo, context.state]);
+    const customBounds = usePureMemo(cellInfo?.transformedBounds, [cellInfo]);
     const areCustomBounds = cellInfo?.areCustomBounds && !!customBounds;
 
     const customCellRect: Rect = usePureMemo(

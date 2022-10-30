@@ -18,7 +18,6 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Fragment} from "react";
 import {myClientId} from "../../../hooks/useMultiPlayer";
-import {GameState} from "../../../types/sudoku/GameState";
 import {Fullscreen, FullscreenExit, OpenInNew, Share} from "@emotion-icons/material";
 import {ControlButton} from "../controls/ControlButton";
 import {toggleFullScreen} from "../../../utils/fullScreen";
@@ -109,7 +108,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                     <a
                         href={lmdLink}
                         target={"_blank"}
-                        onClick={() => context.onStateChange({openedLmdOnce: true} as Partial<GameState<CellType>>)}
+                        onClick={() => context.onStateChange({openedLmdOnce: true})}
                         style={{
                             display: "inline-flex",
                             alignItems: "center",
@@ -131,7 +130,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                         style={{cursor: playerId === myClientId ? "pointer" : undefined}}
                         onClick={() => {
                             if (playerId === myClientId) {
-                                context.onStateChange({isShowingSettings: true} as Partial<GameState<CellType>>);
+                                context.onStateChange({isShowingSettings: true});
                             }
                         }}
                     >
@@ -162,7 +161,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                         alignItems: "center",
                         cursor: "pointer",
                     }}
-                    onClick={() => context.onStateChange({isShowingSettings: true} as Partial<GameState<CellType>>)}
+                    onClick={() => context.onStateChange({isShowingSettings: true})}
                 >
                     <span>{translate("Waiting for people to connect")}...</span>
 

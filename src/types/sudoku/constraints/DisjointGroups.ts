@@ -1,9 +1,12 @@
 import {Constraint} from "../Constraint";
 
 // TODO: support custom regions
-export const DisjointGroupsConstraint = (intervalX: number, intervalY = intervalX): Constraint<any> => ({
+export const DisjointGroupsConstraint = <CellType, ExType, ProcessedExType>(
+    intervalX: number, intervalY = intervalX
+): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
     name: "disjoint groups",
     cells: [],
+    props: undefined,
     isValidCell(
         {left, top},
         digits,

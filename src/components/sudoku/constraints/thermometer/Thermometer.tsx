@@ -2,7 +2,11 @@ import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {darkGreyColor} from "../../../app/globals";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
 import {splitMultiLine} from "../../../../utils/lines";
 
@@ -23,15 +27,16 @@ export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points, c
             stroke={color}
         />
     </g>;
-});
+}) as ConstraintPropsGenericFc;
 
-export const ThermometerConstraint = <CellType,>(cellLiterals: PositionLiteral[], color?: string): Constraint<CellType> => {
+export const ThermometerConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], color?: string): Constraint<CellType, undefined, ExType, ProcessedExType> => {
     const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
 
     return ({
         name: "thermometer",
         cells,
         component: Thermometer,
+        props: undefined,
         color,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {compareCellData}}, state}) {
             const digit = digits[cell.top][cell.left]!;

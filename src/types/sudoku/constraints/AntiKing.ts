@@ -1,9 +1,10 @@
 import {Constraint} from "../Constraint";
 import {normalizePuzzlePosition} from "../PuzzleDefinition";
 
-export const AntiKingConstraint: Constraint<any> = {
+export const AntiKingConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
     name: "anti-king",
     cells: [],
+    props: undefined,
     isValidCell(
         {left, top},
         digits,
@@ -26,4 +27,4 @@ export const AntiKingConstraint: Constraint<any> = {
 
         return true;
     },
-}
+});

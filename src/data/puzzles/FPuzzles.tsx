@@ -14,7 +14,7 @@ import {CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {splitArrayIntoChunks} from "../../utils/array";
-import {ConstraintOrComponent, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {LittleKillerConstraint} from "../../components/sudoku/constraints/little-killer/LittleKiller";
 import {FPuzzlesLittleKillerSum} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesLittleKillerSum";
 import {
@@ -101,7 +101,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
         const initialDigits: GivenDigitsMap<number> = {};
         const initialColors: GivenDigitsMap<CellColorValue[]> = {};
-        const items: ConstraintOrComponent<number, any>[] = [];
+        const items: Constraint<number, any>[] = [];
 
         const baseTypeManager = typesMap[type] ?? regularTypeManager;
         const typeManager = {...baseTypeManager};
@@ -195,7 +195,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         value: (value, {given}) => {
                             if (typeof value === "number" && given) {
                                 if (fillableDigitalDisplay) {
-                                    items.push(FillableCalculatorDigitConstraint({top, left}, value));
+                                    items.push(FillableCalculatorDigitConstraint<number, {}, {}>({top, left}, value));
                                 } else {
                                     initialDigits[top] = initialDigits[top] || {};
                                     initialDigits[top][left] = value;
@@ -243,7 +243,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...littleKillerSum.map(({cell, cells: [startCell], direction, value, ...other}: FPuzzlesLittleKillerSum) => {
                         ObjectParser.empty.parse(other, "f-puzzles little killer sum");
 
-                        return LittleKillerConstraint(startCell, direction, fieldSize, parseOptionalNumber(value));
+                        return LittleKillerConstraint<number, {}, {}>(startCell, direction, fieldSize, parseOptionalNumber(value));
                     }));
                 }
             },
@@ -253,8 +253,8 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         ObjectParser.empty.parse(other, "f-puzzles arrow");
 
                         return lines.length
-                            ? lines.map(([lineStart, ...line]) => ArrowConstraint(cells, line, false, lineStart, !!productArrow))
-                            : ArrowConstraint(cells, [], false, undefined, !!productArrow);
+                            ? lines.map(([lineStart, ...line]) => ArrowConstraint<number, {}, {}>(cells, line, false, lineStart, !!productArrow))
+                            : ArrowConstraint<number, {}, {}>(cells, [], false, undefined, !!productArrow);
                     }));
                 }
             },
@@ -263,18 +263,18 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles killer cage");
 
-                        return KillerCageConstraint(cells, parseOptionalNumber(value), false, undefined, outlineC, fontC);
+                        return KillerCageConstraint<number, {}, {}>(cells, parseOptionalNumber(value), false, undefined, outlineC, fontC);
                     }));
                 }
             },
             antiknight: (antiKnight) => {
                 if (antiKnight) {
-                    items.push(AntiKnightConstraint);
+                    items.push(AntiKnightConstraint());
                 }
             },
             antiking: (antiKing) => {
                 if (antiKing) {
-                    items.push(AntiKingConstraint);
+                    items.push(AntiKingConstraint());
                 }
             },
             disjointgroups: (disjointGroups, {size}) => {
@@ -295,7 +295,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...ratio.map(({cells: [cell1, cell2], value, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles ratio");
 
-                        return KropkiDotConstraint(cell1, cell2, true, parseOptionalNumber(value));
+                        return KropkiDotConstraint<number, {}, {}>(cell1, cell2, true, parseOptionalNumber(value));
                     }));
                 }
             },
@@ -304,7 +304,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...difference.map(({cells: [cell1, cell2], value, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles difference");
 
-                        return KropkiDotConstraint(cell1, cell2, false, parseOptionalNumber(value));
+                        return KropkiDotConstraint<number, {}, {}>(cell1, cell2, false, parseOptionalNumber(value));
                     }));
                 }
             },
@@ -314,8 +314,8 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         ObjectParser.empty.parse(other, "f-puzzles XV");
 
                         switch (value) {
-                            case "X": return [XMarkConstraint(cell1, cell2)];
-                            case "V": return [VMarkConstraint(cell1, cell2)];
+                            case "X": return [XMarkConstraint<number, {}, {}>(cell1, cell2)];
+                            case "V": return [VMarkConstraint<number, {}, {}>(cell1, cell2)];
                             default: return [];
                         }
                     }));
@@ -326,7 +326,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...thermometer.flatMap(({lines, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles thermometer");
 
-                        return lines.map((line) => ThermometerConstraint(line));
+                        return lines.map((line) => ThermometerConstraint<number, {}, {}>(line));
                     }));
                 }
             },
@@ -339,7 +339,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...sandwichsum.flatMap(({cell, value, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
 
-                        return value ? [SandwichSumConstraint(cell, fieldSize, Number(value))] : [];
+                        return value ? [SandwichSumConstraint<number, {}, {}>(cell, fieldSize, Number(value))] : [];
                     }));
                 }
             },
@@ -348,7 +348,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...even.map(({cell, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles even cell");
 
-                        return EvenConstraint(cell);
+                        return EvenConstraint<number, {}, {}>(cell);
                     }));
                 }
             },
@@ -357,7 +357,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...odd.map(({cell, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles odd cell");
 
-                        return OddConstraint(cell);
+                        return OddConstraint<number, {}, {}>(cell);
                     }));
                 }
             },
@@ -366,7 +366,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...extraregion.map(({cells, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles extra region");
 
-                        return KillerCageConstraint(cells);
+                        return KillerCageConstraint<number, {}, {}>(cells);
                     }));
                 }
             },
@@ -380,7 +380,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                             ...parsePositionLiterals(cloneCells),
                         ]).items;
 
-                        return uniqueCells.length > 1 ? [CloneConstraint(uniqueCells)] : [];
+                        return uniqueCells.length > 1 ? [CloneConstraint<number, {}, {}>(uniqueCells)] : [];
                     }));
                 }
             },
@@ -390,7 +390,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
                         ObjectParser.empty.parse(other, "f-puzzles quadruple");
 
-                        return QuadConstraint(cells[3], values);
+                        return QuadConstraint<number, {}, {}>(cells[3], values);
                     }));
                 }
             },
@@ -399,7 +399,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...betweenLine.flatMap(({lines, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles between line");
 
-                        return lines.map((line) => InBetweenLineConstraint(line));
+                        return lines.map((line) => InBetweenLineConstraint<number, {}, {}>(line));
                     }));
                 }
             },
@@ -408,7 +408,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...minimum.map(({cell, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles minimum");
 
-                        return MinConstraint(cell);
+                        return MinConstraint<number, {}, {}>(cell);
                     }));
                 }
             },
@@ -417,7 +417,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...maximum.map(({cell, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles maximum");
 
-                        return MaxConstraint(cell);
+                        return MaxConstraint<number, {}, {}>(cell);
                     }));
                 }
             },
@@ -426,7 +426,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...palindrome.flatMap(({lines, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles palindrome");
 
-                        return lines.map((line) => PalindromeConstraint(line));
+                        return lines.map((line) => PalindromeConstraint<number, {}, {}>(line));
                     }));
                 }
             },
@@ -436,7 +436,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         ObjectParser.empty.parse(other, "f-puzzles renban line");
 
                         // Don't display the line - it's represented by a line constraint with isNewConstraint
-                        return lines.map((line) => RenbanConstraint(line, false));
+                        return lines.map((line) => RenbanConstraint<number, {}, {}>(line, false));
                     }));
                 }
             },
@@ -446,7 +446,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         ObjectParser.empty.parse(other, "f-puzzles German whispers line");
 
                         // Don't display the line - it's represented by a line constraint with isNewConstraint
-                        return lines.map((line) => GermanWhispersConstraint(line, false));
+                        return lines.map((line) => GermanWhispersConstraint<number, {}, {}>(line, false));
                     }));
                 }
             },
@@ -458,7 +458,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                         return lines.map((line) => {
                             checkForOutsideCells(line, size);
 
-                            return LineConstraint(line, outlineC, width === undefined ? undefined : width / 2);
+                            return LineConstraint<number, {}, {}>(line, outlineC, width === undefined ? undefined : width / 2);
                         });
                     }));
                 }
@@ -470,7 +470,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
                         checkForOutsideCells(cells, size);
 
-                        return RectConstraint(cells, {width, height}, baseC, outlineC, value, fontC, angle);
+                        return RectConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle);
                     }));
                 }
             },
@@ -481,7 +481,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
                         checkForOutsideCells(cells, size);
 
-                        return EllipseConstraint(cells, {width, height}, baseC, outlineC, value, fontC, angle);
+                        return EllipseConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle);
                     }));
                 }
             },
@@ -500,7 +500,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
                         checkForOutsideCells(cells, fieldSize);
 
-                        return [TextConstraint(cells, value, fontC, size, angle)];
+                        return [TextConstraint<number, {}, {}>(cells, value, fontC, size, angle)];
                     }));
                 }
             },
@@ -509,7 +509,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                     items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles cage");
 
-                        return DecorativeCageConstraint(cells, value?.toString(), false, undefined, outlineC, fontC);
+                        return DecorativeCageConstraint<number, {}, {}>(cells, value?.toString(), false, undefined, outlineC, fontC);
                     }));
                 }
             },
@@ -547,7 +547,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             fogofwar: (cells, {size}) => {
                 if (cells && puzzleJson.solution && puzzleJson.solution.filter(Boolean).length === size * size) {
                     const solution = splitArrayIntoChunks(puzzleJson.solution, size);
-                    items.push(FogConstraint(solution, cells, !!puzzleJson.text?.some(isFowText)));
+                    items.push(FogConstraint<number, {}, {}>(solution, cells, !!puzzleJson.text?.some(isFowText)));
                     puzzle.prioritizeSelection = true;
                 }
             }

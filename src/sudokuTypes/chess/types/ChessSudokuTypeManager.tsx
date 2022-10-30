@@ -5,9 +5,9 @@ import {ChessColor} from "./ChessColor";
 import {ChessPieceCellDataComponentType} from "../components/ChessPieceCellData";
 import {ChessMainControls} from "../components/ChessMainControls";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
-import {GameState} from "../../../types/sudoku/GameState";
+import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 
-export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState, ChessGameState> = {
+export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState> = {
     areSameCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
@@ -46,18 +46,18 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
         return {selectedColor};
     },
 
-    unserializeGameState({selectedColor}) {
+    unserializeGameState({selectedColor}): Partial<ChessGameState> {
         return {selectedColor};
     },
 
-    createCellDataByDisplayDigit(digit, {selectedColor}): ChessPiece {
+    createCellDataByDisplayDigit(digit, {extension: {selectedColor}}): ChessPiece {
         return {
             type: digit,
             color: selectedColor,
         };
     },
 
-    createCellDataByTypedDigit(digit, {state: {selectedColor}}): ChessPiece {
+    createCellDataByTypedDigit(digit, {state: {extension: {selectedColor}}}): ChessPiece {
         return {
             type: digit,
             color: selectedColor,
@@ -88,14 +88,14 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
         },
     ],
 
-    getInternalState(puzzle, {selectedColor}): any {
+    getInternalState(puzzle, {extension: {selectedColor}}): any {
         return {selectedColor};
     },
 
     unserializeInternalState(
         puzzle,
         {selectedColor}
-    ): Partial<GameState<ChessPiece> & ChessGameState> {
-        return {selectedColor};
+    ): PartialGameStateEx<ChessPiece, ChessGameState> {
+        return {extension: {selectedColor}};
     }
 };

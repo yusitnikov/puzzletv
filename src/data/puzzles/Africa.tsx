@@ -9,7 +9,7 @@ import {
     AfricaCountriesBounds,
     AfricaCountriesEnum
 } from "./africa-data/AfricaCountries";
-import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {processGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {latLngLiteralToPosition} from "../../sudokuTypes/google-maps/utils/googleMapsCoords";
 import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
@@ -19,7 +19,7 @@ import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
 import {GoogleMapsTypeManager} from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
 
-export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> = {
+export const Africa: PuzzleDefinition<number, GoogleMapsState> = {
     slug: "africa",
     title: {
         [LanguageCode.en]: "Africa",
@@ -65,6 +65,7 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         {
             name: "neighbors",
             cells: [],
+            props: undefined,
             isValidCell({top, left}, digits, regionCells, {puzzle, cellsIndex, state}): boolean {
                 const digit = digits[top][left]!;
 
@@ -91,7 +92,7 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState, GoogleMapsState> 
         OddConstraint({top: 0, left: AfricaCountriesEnum.CentAfrRep}, false),
         OddConstraint({top: 0, left: AfricaCountriesEnum.SouthSudan}, false),
         OddConstraint({top: 0, left: AfricaCountriesEnum.Gabon}, false),
-    ] as Constraint<number, {}, GoogleMapsState, GoogleMapsState>[],
+    ],
     resultChecker: (context) => {
         if (!isValidFinishedPuzzleByConstraints(context)) {
             return false;

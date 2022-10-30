@@ -6,6 +6,7 @@ import {Rect} from "../../../types/layout/Rect";
 import {darkGreyColor} from "../../../components/app/globals";
 import {indexes} from "../../../utils/indexes";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
+import {Constraint} from "../../../types/sudoku/Constraint";
 
 export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuTypeManager<number> => ({
     ...DigitSudokuTypeManager(),
@@ -76,7 +77,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         ];
     },
 
-    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}) {
+    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}): Constraint<number, any, {}, {}>[] {
         const realFieldSize = fieldSize / 2;
 
         if (continuousRowColumnRegions) {

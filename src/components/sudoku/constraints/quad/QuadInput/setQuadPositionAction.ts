@@ -4,15 +4,16 @@ import {CellWriteMode} from "../../../../../types/sudoku/CellWriteMode";
 import {QuadInputGameState} from "./QuadInputGameState";
 import {QuadInputSudokuTypeManagerOptions} from "./QuadInputSudokuTypeManager";
 import {QuadInputState} from "./QuadInputState";
+import {PartialGameStateEx} from "../../../../../types/sudoku/GameState";
 
 export const setQuadPositionActionTypeKey = "set-quad-position";
 
-export const setQuadPositionActionType = <CellType, GameStateExtensionType extends QuadInputGameState<CellType>, ProcessedGameStateExtensionType extends QuadInputGameState<CellType>>(
+export const setQuadPositionActionType = <CellType, ExType extends QuadInputGameState<CellType>, ProcessedExType = {}>(
     {
         isQuadAllowedFn = () => true,
         onQuadFinish,
-    }: QuadInputSudokuTypeManagerOptions<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
-): GameStateActionType<Position | undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+    }: QuadInputSudokuTypeManagerOptions<CellType, ExType, ProcessedExType>
+): GameStateActionType<Position | undefined, CellType, ExType, ProcessedExType> => ({
     key: setQuadPositionActionTypeKey,
     callback: (
         position,
@@ -21,28 +22,35 @@ export const setQuadPositionActionType = <CellType, GameStateExtensionType exten
                 params = {},
                 fieldSize: {rowsCount, columnsCount},
             },
-            state: {currentPlayer, currentQuad, allQuads},
+            state: {currentPlayer, extension: {currentQuad, allQuads}},
             multiPlayer: {isEnabled}
         },
         clientId
-    ) => (state) => {
+    ) => (state): PartialGameStateEx<CellType, ExType> => {
         if (position && !(position.top > 0 && position.top < rowsCount && position.left > 0 && position.left < columnsCount)) {
             return {};
         }
 
         const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
-        if (!isMyTurn || !isQuadAllowedFn(state) || state.cellWriteMode !== CellWriteMode.quads) {
+        if (!isMyTurn || !isQuadAllowedFn(state) || state.processed.cellWriteMode !== CellWriteMode.quads) {
             return {};
         }
 
         if (!position) {
-            return {currentQuad: undefined} as Partial<GameStateExtensionType>;
+            return {
+                extension: {currentQuad: undefined} as Partial<ExType>
+            };
         }
 
         if (onQuadFinish) {
             return {
-                currentQuad: {position, digits: []},
-            } as Partial<QuadInputGameState<CellType>> as any;
+                extension: {
+                    currentQuad: {
+                        position,
+                        digits: [] as CellType[],
+                    },
+                } as Partial<ExType>,
+            };
         }
 
         if (currentQuad) {
@@ -54,19 +62,21 @@ export const setQuadPositionActionType = <CellType, GameStateExtensionType exten
         allQuads = allQuads.filter(quad => !isSame(quad));
 
         return {
-            allQuads,
-            currentQuad: {
-                position,
-                digits: sameQuad?.digits || [],
-            },
-        } as Partial<QuadInputGameState<CellType>> as any;
+            extension: {
+                allQuads,
+                currentQuad: {
+                    position,
+                    digits: sameQuad?.digits || [],
+                },
+            } as Partial<ExType>,
+        };
     },
 });
 
-export const setQuadPositionAction = <CellType, GameStateExtensionType extends QuadInputGameState<CellType>, ProcessedGameStateExtensionType extends QuadInputGameState<CellType>>(
+export const setQuadPositionAction = <CellType, ExType extends QuadInputGameState<CellType>, ProcessedExType = {}>(
     position: Position | undefined,
-    options: QuadInputSudokuTypeManagerOptions<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
-): GameStateAction<Position | undefined, CellType, GameStateExtensionType, ProcessedGameStateExtensionType> => ({
+    options: QuadInputSudokuTypeManagerOptions<CellType, ExType, ProcessedExType>
+): GameStateAction<Position | undefined, CellType, ExType, ProcessedExType> => ({
     type: setQuadPositionActionType(options),
     params: position,
 });

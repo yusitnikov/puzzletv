@@ -10,14 +10,13 @@ import {useEventListener} from "../../../../../hooks/useEventListener";
 import {QuadleByData, QuadleDigitType} from "../Quadle";
 import {QuadInputGameState} from "./QuadInputGameState";
 import {QuadInputSudokuTypeManagerOptions} from "./QuadInputSudokuTypeManager";
-import {GameState} from "../../../../../types/sudoku/GameState";
 import {setQuadPositionAction} from "./setQuadPositionAction";
 import {indexesFromTo} from "../../../../../utils/indexes";
 
-export const QuadInputControls = <CellType, GameStateExtensionType extends QuadInputGameState<CellType>, ProcessedGameStateExtensionType extends QuadInputGameState<CellType>>(
-    options: QuadInputSudokuTypeManagerOptions<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+export const QuadInputControls = <CellType, ExType extends QuadInputGameState<CellType>, ProcessedExType = {}>(
+    options: QuadInputSudokuTypeManagerOptions<CellType, ExType, ProcessedExType>
 ) => function QuadMastersControlsComponent(
-    props: ControlsProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+    props: ControlsProps<CellType, ExType, ProcessedExType>
 ) {
     const translate = useTranslate();
 
@@ -37,7 +36,11 @@ export const QuadInputControls = <CellType, GameStateExtensionType extends QuadI
         onStateChange,
     } = context;
 
-    const {isShowingSettings, isMyTurn, cellWriteMode, currentQuad} = state;
+    const {
+        isShowingSettings,
+        processed: {isMyTurn, cellWriteMode},
+        extension: {currentQuad},
+    } = state;
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
         if (isShowingSettings) {
@@ -53,15 +56,15 @@ export const QuadInputControls = <CellType, GameStateExtensionType extends QuadI
             case "Tab":
                 onStateChange(({persistentCellWriteMode}) => ({
                     persistentCellWriteMode: persistentCellWriteMode === CellWriteMode.quads ? CellWriteMode.main : CellWriteMode.quads
-                } as Partial<GameState<CellType>> as any));
+                }));
                 ev.preventDefault();
                 break;
             case "Home":
-                onStateChange({persistentCellWriteMode: CellWriteMode.main} as Partial<GameState<CellType>> as any);
+                onStateChange({persistentCellWriteMode: CellWriteMode.main});
                 ev.preventDefault();
                 break;
             case "End":
-                onStateChange({persistentCellWriteMode: CellWriteMode.quads} as Partial<GameState<CellType>> as any);
+                onStateChange({persistentCellWriteMode: CellWriteMode.quads});
                 ev.preventDefault();
                 break;
             case "Escape":
@@ -108,30 +111,34 @@ export const QuadInputControls = <CellType, GameStateExtensionType extends QuadI
                 {isQuadle && <QuadleByData
                     context={context}
                     cells={[{top: 0.5, left: 0.5}]}
-                    digits={[
-                        {
-                            digit: digitExamples[0],
-                            type: QuadleDigitType.here
-                        },
-                        {
-                            digit: digitExamples[1],
-                            type: QuadleDigitType.elsewhere
-                        },
-                        {
-                            digit: digitExamples[2],
-                            type: QuadleDigitType.nowhere
-                        },
-                        {
-                            digit: digitExamples[3],
-                            type: QuadleDigitType.unknown
-                        },
-                    ]}
+                    props={{
+                        digits: [
+                            {
+                                digit: digitExamples[0],
+                                type: QuadleDigitType.here
+                            },
+                            {
+                                digit: digitExamples[1],
+                                type: QuadleDigitType.elsewhere
+                            },
+                            {
+                                digit: digitExamples[2],
+                                type: QuadleDigitType.nowhere
+                            },
+                            {
+                                digit: digitExamples[3],
+                                type: QuadleDigitType.unknown
+                            },
+                        ]
+                    }}
                 />}
                 {!isQuadle && <QuadByData
                     context={context}
                     cells={[{top: 0.5, left: 0.5}]}
-                    expectedDigits={digitExamples}
-                    radius={radius}
+                    props={{
+                        expectedDigits: digitExamples,
+                        radius,
+                    }}
                 />}
             </AutoSvg>}
             fullSize={true}

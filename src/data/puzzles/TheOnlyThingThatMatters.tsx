@@ -52,7 +52,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
     </>,
     initialDigits: {0: {2: 5, 6: 7}},
     items: [
-        AntiKnightConstraint,
+        AntiKnightConstraint(),
         KillerCageConstraintByRect("R2C1", 1, 3, 6),
         KillerCageConstraintByRect("R2C4", 3, 1, 15),
         KillerCageConstraintByRect("R2C9", 1, 3, 15),

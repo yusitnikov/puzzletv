@@ -4,8 +4,8 @@ import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
 import {PartiallyTranslatable} from "../translations/Translatable";
 import {useTranslate} from "../../hooks/useTranslate";
-import {ProcessedGameState} from "./GameState";
-import {ConstraintOrComponent} from "./Constraint";
+import {ProcessedGameStateEx} from "./GameState";
+import {Constraint} from "./Constraint";
 import {CellColorValue} from "./CellColor";
 import {PuzzleContext, PuzzleContextProps} from "./PuzzleContext";
 import {CustomCellBounds} from "./CustomCellBounds";
@@ -22,7 +22,7 @@ import {
 } from "../layout/Position";
 import {PuzzleResultCheck} from "./PuzzleResultCheck";
 
-export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     title: PartiallyTranslatable;
     slug: string;
     params?: {
@@ -35,27 +35,27 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     author?: PartiallyTranslatable<ReactNode>;
     rules?: (
         translate: ReturnType<typeof useTranslate>,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ) => ReactNode;
     aboveRules?: (
         translate: ReturnType<typeof useTranslate>,
-        context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ) => ReactNode;
-    typeManager: SudokuTypeManager<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>;
     fieldSize: FieldSize;
     fieldMargin?: number;
-    fieldWrapperComponent?: ComponentType<PuzzleContextProps<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>>;
+    fieldWrapperComponent?: ComponentType<PuzzleContextProps<CellType, ExType, ProcessedExType>>;
     fieldFitsWrapper?: boolean;
     ignoreRowsColumnCountInTheWrapper?: boolean;
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
-    initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => GivenDigitsMap<CellColorValue[]>);
+    initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => GivenDigitsMap<CellColorValue[]>);
     allowOverridingInitialColors?: boolean;
-    resultChecker?: (context: PuzzleContext<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
+    resultChecker?: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
     forceAutoCheckOnFinish?: boolean;
-    items?: ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]
-        | ((gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType) => ConstraintOrComponent<CellType, any, GameStateExtensionType, ProcessedGameStateExtensionType>[]);
+    items?: Constraint<CellType, any, ExType, ProcessedExType>[]
+        | ((state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => Constraint<CellType, any, ExType, ProcessedExType>[]);
     borderColor?: string;
     allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
     hideDeleteButton?: boolean;
@@ -65,8 +65,8 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     disableColoring?: boolean;
     lmdLink?: string;
     getLmdSolutionCode?: (
-        puzzle: PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>,
-        gameState: ProcessedGameState<CellType> & ProcessedGameStateExtensionType
+        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
     ) => string;
     noIndex?: boolean;
     saveState?: boolean;
@@ -77,11 +77,11 @@ export interface PuzzleDefinition<CellType, GameStateExtensionType = {}, Process
     decreaseOnlyOneLive?: boolean;
 }
 
-export interface PuzzleDefinitionLoader<CellType, GameStateExtensionType = {}, ProcessedGameStateExtensionType = {}> {
+export interface PuzzleDefinitionLoader<CellType, ExType = {}, ProcessedExType = {}> {
     slug: string;
     noIndex?: boolean;
     fulfillParams: (params: any) => any;
-    loadPuzzle: (params: any) => PuzzleDefinition<CellType, GameStateExtensionType, ProcessedGameStateExtensionType>;
+    loadPuzzle: (params: any) => PuzzleDefinition<CellType, ExType, ProcessedExType>;
 }
 
 export const isPuzzleHasBottomRowControls = (

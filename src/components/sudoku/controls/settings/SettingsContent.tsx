@@ -13,13 +13,13 @@ import {SettingsButton} from "./SettingsButton";
 import {SettingsTextBox} from "./SettingsTextBox";
 import {SettingsCheckbox} from "./SettingsCheckbox";
 
-export interface SettingsContentProps<CellType, ProcessedGameStateExtensionType = {}> {
-    context: PuzzleContext<CellType, any, ProcessedGameStateExtensionType>;
+export interface SettingsContentProps<CellType, ProcessedExType = {}> {
+    context: PuzzleContext<CellType, any, ProcessedExType>;
     cellSize: number;
 }
 
-export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
-    props: SettingsContentProps<CellType, ProcessedGameStateExtensionType>
+export const SettingsContent = <CellType, ProcessedExType = {}>(
+    props: SettingsContentProps<CellType, ProcessedExType>
 ) => {
     const {
         cellSize,
@@ -52,22 +52,22 @@ export const SettingsContent = <CellType, ProcessedGameStateExtensionType = {}>(
     const [isCopied, setIsCopied] = useState(false);
 
     const handleChangeEnableConflictChecker = (value: boolean) => {
-        onStateChange({enableConflictChecker: value} as any);
+        onStateChange({enableConflictChecker: value});
         saveBoolToLocalStorage(LocalStorageKeys.enableConflictChecker, value);
     };
 
     const handleChangeAutoCheckOnFinish = (value: boolean) => {
-        onStateChange({autoCheckOnFinish: value} as any);
+        onStateChange({autoCheckOnFinish: value});
         saveBoolToLocalStorage(LocalStorageKeys.autoCheckOnFinish, value);
     };
 
     const handleChangeBackgroundOpacity = (value: number) => {
-        onStateChange({backgroundOpacity: value} as any);
+        onStateChange({backgroundOpacity: value});
         saveNumberToLocalStorage(LocalStorageKeys.backgroundOpacity, value);
     };
 
     const handleChangeNickname = (value: string) => {
-        onStateChange({nickname: value} as any);
+        onStateChange({nickname: value});
         saveStringToLocalStorage(LocalStorageKeys.nickname, value);
     };
 
