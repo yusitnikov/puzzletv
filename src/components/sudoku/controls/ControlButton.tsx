@@ -33,19 +33,36 @@ const StyledContainer = styled(Absolute, {
 export interface ControlButtonProps extends Position, Partial<Size>, ButtonHTMLAttributes<HTMLButtonElement> {
     cellSize: number;
     checked?: boolean;
-    fullSize?: boolean;
+    fullWidth?: boolean;
+    fullHeight?: boolean;
     innerBorderWidth?: number;
     opacityOnHover?: boolean;
     children?: ReactNode | ((contentSize: number) => ReactNode);
     childrenOnTopOfBorders?: boolean;
 }
 
-export const ControlButton = memo(({children, childrenOnTopOfBorders, left, top, width = 1, height = 1, cellSize, fullSize, innerBorderWidth, checked, ...otherProps}: ControlButtonProps) => {
-    const contentSize = fullSize
-        ? cellSize
-        : cellSize * 0.7;
+export const ControlButton = memo((
+    {
+        children,
+        childrenOnTopOfBorders,
+        left,
+        top,
+        width = 1,
+        height = 1,
+        cellSize,
+        fullWidth,
+        fullHeight,
+        innerBorderWidth,
+        checked,
+        ...otherProps
+    }: ControlButtonProps
+) => {
     const containerWidth = cellSize * (width + controlButtonPaddingCoeff * (width - 1));
     const containerHeight = cellSize * (height + controlButtonPaddingCoeff * (height - 1));
+    const contentHeight = fullHeight
+        ? cellSize
+        : cellSize * 0.7;
+    const contentWidth = fullWidth ? containerWidth : contentHeight;
 
     return <StyledContainer
         tagName={"button"}
@@ -63,18 +80,18 @@ export const ControlButton = memo(({children, childrenOnTopOfBorders, left, top,
         {...otherProps}
     >
         <Absolute
-            left={(containerWidth - contentSize) / 2}
-            top={(containerHeight - contentSize) / 2}
-            width={contentSize}
-            height={contentSize}
+            left={(containerWidth - contentWidth) / 2}
+            top={(containerHeight - contentHeight) / 2}
+            width={contentWidth}
+            height={contentHeight}
             borderWidth={innerBorderWidth}
             childrenOnTopOfBorders={childrenOnTopOfBorders}
             style={{
-                fontSize: contentSize,
-                lineHeight: `${contentSize}px`,
+                fontSize: contentHeight,
+                lineHeight: `${contentHeight}px`,
             }}
         >
-            {typeof children === "function" ? children(contentSize) : children}
+            {typeof children === "function" ? children(contentHeight) : children}
         </Absolute>
     </StyledContainer>;
 });

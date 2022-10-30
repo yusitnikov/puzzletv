@@ -91,7 +91,7 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
                     top={0}
                     cellSize={cellSize * (h1HeightCoeff + rulesHeaderPaddingCoeff)}
                     onClick={toggleFullScreen}
-                    fullSize={true}
+                    fullHeight={true}
                     title={translate(isFullScreen ? "Exit full screen mode" : "Enter full screen mode")}
                 >
                     {isFullScreen ? <FullscreenExit/> : <Fullscreen/>}

@@ -84,7 +84,7 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
         left={index % 3}
         top={(index - index % 3) / 3}
         cellSize={cellSize}
-        fullSize={true}
+        fullHeight={true}
         opacityOnHover={cellWriteMode === CellWriteMode.color}
         onClick={handleDigit}
         title={title}

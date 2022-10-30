@@ -120,6 +120,9 @@ export const translationsExactType = {
     "Move the grid": {
         [LanguageCode.ru]: "Двигать поле",
     },
+    "Reset position": {
+        [LanguageCode.ru]: "Сброс позиции",
+    },
     "Clear the cell contents": {
         [LanguageCode.ru]: "Очистить содержимое ячейки",
     },

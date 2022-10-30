@@ -16,7 +16,7 @@ export interface CellWriteModeButtonProps<CellType, ExType = {}, ProcessedExType
 
     noBorders?: boolean;
     childrenOnTopOfBorders?: boolean;
-    fullSize?: boolean;
+    fullHeight?: boolean;
 }
 
 export const CellWriteModeButton = <CellType, ExType = {}, ProcessedExType = {}>(
@@ -29,7 +29,7 @@ export const CellWriteModeButton = <CellType, ExType = {}, ProcessedExType = {}>
         context,
         noBorders,
         childrenOnTopOfBorders,
-        fullSize,
+        fullHeight,
     }: CellWriteModeButtonProps<CellType, ExType, ProcessedExType>
 ) => {
     const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;
@@ -53,7 +53,7 @@ export const CellWriteModeButton = <CellType, ExType = {}, ProcessedExType = {}>
         onClick={handleSetCellWriteMode}
         title={title}
         childrenOnTopOfBorders={childrenOnTopOfBorders}
-        fullSize={fullSize}
+        fullHeight={fullHeight}
     >
         {
             typeof data === "function"

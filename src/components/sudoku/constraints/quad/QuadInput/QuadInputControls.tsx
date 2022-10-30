@@ -141,7 +141,7 @@ export const QuadInputControls = <CellType, ExType extends QuadInputGameState<Ce
                     }}
                 />}
             </AutoSvg>}
-            fullSize={true}
+            fullHeight={true}
             title={`${translate(quads)} (${translate("shortcut")}: Q / End)`}
             context={context}
         />

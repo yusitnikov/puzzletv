@@ -96,6 +96,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
         processed: {
             isReady,
             cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
+            cellWriteMode,
         },
     } = state;
 
@@ -216,6 +217,11 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
         () => onStateChange({isShowingSettings: false}),
         [onStateChange]
     );
+
+    const handleResetPosition = useCallback(
+        () => onStateChange({loopOffset: {top: 0, left: 0}}),
+        [onStateChange]
+    )
     // endregion
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
@@ -414,6 +420,19 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             title={`${translate("Move the grid")} (${translate("shortcut")}: Alt+Shift)`}
             context={context}
         />
+
+        {cellWriteMode === CellWriteMode.move && <ControlButton
+            cellSize={cellSize}
+            left={0}
+            top={0}
+            width={3}
+            fullWidth={true}
+            onClick={handleResetPosition}
+        >
+            {contentSize => <div style={{fontSize: contentSize * 0.6}}>
+                {translate("Reset position")}
+            </div>}
+        </ControlButton>}
         {/*endregion*/}
 
         <ControlButton
