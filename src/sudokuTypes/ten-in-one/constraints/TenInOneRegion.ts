@@ -3,7 +3,7 @@ import {Constraint} from "../../../types/sudoku/Constraint";
 import {Region} from "../../../components/sudoku/constraints/region/Region";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 
-export const TenInOneRegionConstraint = <CellType, >(cellLiterals: PositionLiteral[]): Constraint<CellType> => ({
+export const TenInOneRegionConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[]): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
     name: "10-in-1 region",
     cells: parsePositionLiterals(cellLiterals),
     component: Region,

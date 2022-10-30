@@ -92,7 +92,9 @@ export const TenInOneSudokuTypeManager = (
         const regions = createRegularRegions(rowsCount, columnsCount, regionWidth, regionHeight);
         const boxes = regions.map(
             (region): Constraint<number, any, MultiStageGameState> =>
-                individualBoxes ? TenInOneRegionConstraint(region) : RegionConstraint(region)
+                individualBoxes
+                    ? TenInOneRegionConstraint<number, MultiStageGameState, {}>(region)
+                    : RegionConstraint<number, MultiStageGameState, {}>(region)
         );
 
         if (!individualBoxes) {
@@ -113,7 +115,7 @@ export const TenInOneSudokuTypeManager = (
                     const boxRightOffset = boxRightIndex * boxSize;
 
                     return indexes(boxSize).flatMap(i => [
-                        RegionConstraint(
+                        RegionConstraint<number, MultiStageGameState, {}>(
                             indexes(boxSize).map(left => ({
                                 left: boxLeftOffset + left,
                                 top: boxRightOffset + i,
@@ -121,7 +123,7 @@ export const TenInOneSudokuTypeManager = (
                             false,
                             "row"
                         ),
-                        RegionConstraint(
+                        RegionConstraint<number, MultiStageGameState, {}>(
                             indexes(boxSize).map(top => ({
                                 left: boxLeftOffset + i,
                                 top: boxRightOffset + top,
