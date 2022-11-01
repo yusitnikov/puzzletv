@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/puzzletv/static/js/main.e7629e56.js",
+    "main.js": "/puzzletv/static/js/main.fb392166.js",
     "index.html": "/puzzletv/index.html",
-    "main.e7629e56.js.map": "/puzzletv/static/js/main.e7629e56.js.map"
+    "main.fb392166.js.map": "/puzzletv/static/js/main.fb392166.js.map"
   },
   "entrypoints": [
-    "static/js/main.e7629e56.js"
+    "static/js/main.fb392166.js"
   ]
 }
