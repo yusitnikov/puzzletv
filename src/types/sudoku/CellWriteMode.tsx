@@ -20,7 +20,7 @@ export enum CellWriteMode {
 
 export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     mode: CellWriteMode | number;
-    hotKeyStr?: string;
+    hotKeyStr?: string[];
     isDigitMode?: boolean;
     isNoSelectionMode?: boolean;
     digitsCount?: number;
@@ -47,7 +47,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.corner,
-        hotKeyStr: "Shift",
+        hotKeyStr: ["Shift"],
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
@@ -57,7 +57,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.center,
-        hotKeyStr: "Ctrl",
+        hotKeyStr: ["Ctrl"],
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
@@ -67,7 +67,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.color,
-        hotKeyStr: "Ctrl+Shift",
+        hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
         digitsCount: 9,
         buttonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
@@ -77,7 +77,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.lines,
-        hotKeyStr: "Alt",
+        hotKeyStr: ["Alt"],
         isNoSelectionMode: true,
         onCornerClick: (context, position) =>
             context.onStateChange(state => gameStateStartMultiLine({...context, state}, position)),
@@ -90,7 +90,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.move,
-        hotKeyStr: "Alt+Shift",
+        hotKeyStr: ["Alt+Shift"],
         isNoSelectionMode: true,
         digitsCount: 0,
     },

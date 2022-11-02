@@ -12,7 +12,7 @@ export const getFinalCellWriteMode = (
     }
 
     for (const {mode, hotKeyStr} of allowedModes) {
-        if (keysStr === hotKeyStr) {
+        if (hotKeyStr?.includes(keysStr)) {
             return mode;
         }
     }
