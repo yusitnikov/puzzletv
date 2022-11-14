@@ -223,8 +223,8 @@ export const livesRules = (initialLives: number): Translatable => ({
 });
 
 export const noGuessingRequired: Translatable = {
-    [LanguageCode.en]: "Note: no guessing is required to finish the puzzle. The extra lives are given only to allow room for possible typos",
-    [LanguageCode.ru]: "Примечание: чтобы решить головоломку, не требуется никаких угадываний. Дополнительные жизни даны только для того, чтобы игра не закончилась из-за опечаток",
+    [LanguageCode.en]: "Note: no guessing is required to finish the puzzle",
+    [LanguageCode.ru]: "Примечание: чтобы решить головоломку, не требуется никаких угадываний",
 };
 
 

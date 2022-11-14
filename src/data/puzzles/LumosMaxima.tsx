@@ -10,7 +10,7 @@ import {
     cannotRepeatInCage,
     canRepeatOnArrows,
     killerCagesExplained,
-    livesRules, noGuessingRequired,
+    noGuessingRequired,
     normalSudokuRulesApply
 } from "../ruleSnippets";
 import React from "react";
@@ -64,9 +64,11 @@ export const LumosMaximaNoFog: PuzzleDefinition<number> = {
     allowDrawing: ["center-line", "border-mark", "corner-mark", "center-mark"],
 };
 
-export const LumosMaximaEternalLives: PuzzleDefinition<number> = {
+export const LumosMaxima: PuzzleDefinition<number> = {
     ...LumosMaximaNoFog,
-    slug: "lumos-maxima-eternal-lives",
+    noIndex: false,
+    slug: "lumos-maxima",
+    saveStateKey: "lumos-maxima-v5",
     items: [
         ...(LumosMaximaNoFog.items as Constraint<number, any>[]),
         FogConstraint(solution, ["R2C2", "R8C7"]),
@@ -87,24 +89,9 @@ export const LumosMaximaEternalLives: PuzzleDefinition<number> = {
             [LanguageCode.en]: "Put correct digits into the cells to get more light (it's ok to put a digit into a cell that is covered by fog)",
             [LanguageCode.ru]: "Поместите правильные цифры в ячейки, чтобы получить больше света (можно поместить цифру в ячейку, покрытую туманом)",
         })}.</RulesParagraph>
-    </>,
-    prioritizeSelection: true,
-};
-
-// noinspection JSUnusedGlobalSymbols
-export const LumosMaxima: PuzzleDefinition<number> = {
-    ...LumosMaximaEternalLives,
-    noIndex: false,
-    slug: "lumos-maxima",
-    saveStateKey: "lumos-maxima-v4",
-    rules: (translate, context) => <>
-        {LumosMaximaEternalLives.rules!(translate, context)}
-        <RulesParagraph>{translate(livesRules(context.puzzle.initialLives!))}.</RulesParagraph>
         <RulesParagraph>{translate(noGuessingRequired)}.</RulesParagraph>
     </>,
-    forceEnableConflictChecker: true,
-    initialLives: 5,
-    decreaseOnlyOneLive: true,
+    prioritizeSelection: true,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000BIU",
     getLmdSolutionCode: () => solution.map(row => row[8]).join(""),
 };
