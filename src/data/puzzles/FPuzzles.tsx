@@ -74,6 +74,8 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             tesseract,
             fillableDigitalDisplay,
             noSpecialRules,
+            loopX,
+            loopY,
             "product-arrow": productArrow,
         }
     ) => {
@@ -126,6 +128,9 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                 columnsCount: 9,
                 regions: [],
             },
+            loopHorizontally: loopX,
+            loopVertically: loopY,
+            fieldMargin: loopX || loopY ? 0.99 : 0,
             allowDrawing: ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"],
             initialDigits,
             initialColors,
