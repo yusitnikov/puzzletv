@@ -39,7 +39,7 @@ export const normalYinYangRulesApply: Translatable = {
 };
 
 export const normalYinYangRulesExplained: Translatable = {
-    [LanguageCode.en]: "Shade some cells in the grid so that both all shaded and all unshaded cells form one orthogonally connected region, and there's no fully shaded or fully unshaded 2x2 block",
+    [LanguageCode.en]: "Shade some cells in the grid such that all shaded cells are connected and all unshaded cells are connected. No 2x2 box may be fully shaded or fully unshaded",
     [LanguageCode.ru]: "Заштрихуйте некоторые ячейки в сетке так, чтобы и все заштрихованные, и все незаштрихованные ячейки образовывали одну ортогонально связанную область, и не было полностью заштрихованного или незаштрихованного блока 2x2",
 };
 
