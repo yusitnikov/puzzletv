@@ -43,13 +43,15 @@ export const calculateDefaultRegionWidth = (fieldSize: number) => {
     return fieldSize / bestHeight;
 }
 
-export const createRegularFieldSize = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth): FieldSize => ({
+export const createRegularFieldSize = (fieldSize: number, regionWidth?: number, regionHeight = regionWidth && fieldSize / regionWidth): FieldSize => ({
     fieldSize,
     rowsCount: fieldSize,
     columnsCount: fieldSize,
     regionWidth,
     regionHeight,
-    regions: createRegularRegions(fieldSize, fieldSize, regionWidth, regionHeight)
+    regions: regionWidth && regionHeight
+        ? createRegularRegions(fieldSize, fieldSize, regionWidth, regionHeight)
+        : []
 });
 
 export const getDefaultRegionsForRowsAndColumns = <CellType, ExType, ProcessedExType>(

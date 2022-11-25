@@ -33,6 +33,16 @@ export const toroidalRulesApply: Translatable = {
     [LanguageCode.ru]: "Поле имеет форму тора: верх соединяется с низом, левая часть соединяется с правой",
 };
 
+export const normalYinYangRulesApply: Translatable = {
+    [LanguageCode.en]: "Standard Yin Yang rules apply",
+    [LanguageCode.ru]: "Стандартные правила инь-янь",
+};
+
+export const normalYinYangRulesExplained: Translatable = {
+    [LanguageCode.en]: "Shade some cells in the grid so that both all shaded and all unshaded cells form one orthogonally connected region, and there's no fully shaded or fully unshaded 2x2 block",
+    [LanguageCode.ru]: "Заштрихуйте некоторые ячейки в сетке так, чтобы и все заштрихованные, и все незаштрихованные ячейки образовывали одну ортогонально связанную область, и не было полностью заштрихованного или незаштрихованного блока 2x2",
+};
+
 export const moveButtonTip: Translatable = {
     [LanguageCode.en]: "Use the \"move\" button or the arrow keys to move the grid",
     [LanguageCode.ru]: "Используйте кнопку «двигать» или стрелки, чтобы двигать поле",

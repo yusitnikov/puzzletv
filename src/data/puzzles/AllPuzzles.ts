@@ -29,6 +29,7 @@ import {AbstractKillerDots, DollHouse, LegoHouse, MoodyLines} from "./TenInOne";
 import {TheOnlyThingThatMatters} from "./TheOnlyThingThatMatters";
 import {LumosMaxima, LumosMaximaNoFog} from "./LumosMaxima";
 import {MonumentValley, MonumentValleyMini} from "./MonumentValley";
+import {ToroidalYinYang} from "./ToroidalYinYang";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -84,6 +85,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region My puzzles
+    ToroidalYinYang,
+
     LumosMaximaNoFog,
     LumosMaxima,
 
