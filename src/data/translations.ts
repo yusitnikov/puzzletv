@@ -114,6 +114,9 @@ export const translationsExactType = {
     "Colors": {
         [LanguageCode.ru]: "Цвета",
     },
+    "Shading": {
+        [LanguageCode.ru]: "Штриховка",
+    },
     "Lines": {
         [LanguageCode.ru]: "Линии",
     },

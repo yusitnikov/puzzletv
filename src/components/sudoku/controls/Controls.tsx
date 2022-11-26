@@ -32,6 +32,7 @@ import {
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
+import {CellColor} from "../../../types/sudoku/CellColor";
 
 export const getControlsWidthCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
     const allowedModes = getAllowedCellWriteModeInfos(puzzle);
@@ -346,6 +347,14 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             cellWriteMode={CellWriteMode.color}
             data={{colors: new PlainValueSet(indexes(9))}}
             title={`${translate("Colors")} (${translate("shortcut")}: Ctrl+Shift)`}
+            context={context}
+        />
+
+        <CellWriteModeButton
+            top={3}
+            cellWriteMode={CellWriteMode.shading}
+            data={{colors: new PlainValueSet([CellColor.green, CellColor.black])}}
+            title={`${translate("Shading")} (${translate("shortcut")}: Ctrl+Shift)`}
             context={context}
         />
 

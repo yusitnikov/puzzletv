@@ -1,7 +1,9 @@
 import {
     gameStateApplyCurrentMultiLine,
-    gameStateClearSelectedCellsContent,
-    gameStateHandleDigit,
+    gameStateApplyShading,
+    gameStateClearSelectedCellsContent, gameStateGetCellShading,
+    gameStateGetCurrentFieldState,
+    gameStateHandleDigit, gameStateIncrementShading,
     gameStateRedo,
     gameStateUndo,
     PartialGameStateEx,
@@ -9,6 +11,8 @@ import {
 } from "./GameState";
 import {PuzzleContext} from "./PuzzleContext";
 import {myClientId} from "../../hooks/useMultiPlayer";
+import {Position} from "../layout/Position";
+import {DragAction} from "./DragAction";
 
 export type GameStateActionCallback<CellType, ExType, ProcessedExType> =
     PartialGameStateEx<CellType, ExType> | ((prevState: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => PartialGameStateEx<CellType, ExType>);
@@ -103,6 +107,39 @@ export const applyCurrentMultiLineAction = <CellType, ExType, ProcessedExType>(
     },
     state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isRightButton, false),
 ];
+
+interface ShadingActionParams extends Position {
+    action: DragAction;
+}
+export const shadingActionType = <CellType, ExType, ProcessedExType>()
+    : GameStateActionType<ShadingActionParams, CellType, ExType, ProcessedExType> => ({
+    key: "apply-shading",
+    callback: ({action, ...position}, context) =>
+        state => gameStateApplyShading({...context, state}, position, action),
+});
+export const shadingAction = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    position: Position,
+    action: DragAction
+): GameStateActionOrCallback<ShadingActionParams, CellType, ExType, ProcessedExType> => ({
+    type: shadingActionType(),
+    params: {...position, action},
+});
+export const shadingStartAction = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    position: Position,
+    isRightButton: boolean
+): GameStateActionOrCallback<ShadingActionParams, CellType, ExType, ProcessedExType>[] => {
+    const field = gameStateGetCurrentFieldState(context.state);
+    const action = gameStateIncrementShading(
+        gameStateGetCellShading(field.cells[position.top][position.left]),
+        isRightButton ? -1 : 1
+    );
+    return [
+        () => ({dragAction: action}),
+        shadingAction(context, position, action),
+    ];
+}
 // endregion
 
 export const coreGameStateActionTypes: GameStateActionType<any, any, any, any>[] = [
@@ -111,4 +148,5 @@ export const coreGameStateActionTypes: GameStateActionType<any, any, any, any>[]
     clearSelectionActionType(),
     enterDigitActionType(),
     applyCurrentMultiLineActionType(),
+    shadingActionType(),
 ];

@@ -63,6 +63,7 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     loopVertically?: boolean;
     enableDragMode?: boolean;
     disableColoring?: boolean;
+    enableShading?: boolean;
     lmdLink?: string;
     getLmdSolutionCode?: (
         puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,

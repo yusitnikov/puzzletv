@@ -41,5 +41,6 @@ export const ToroidalYinYang: PuzzleDefinition<number> = {
         9: {2: B, 7: B},
     },
     allowOverridingInitialColors: false,
+    enableShading: true,
     allowDrawing: ["center-line", "border-line", "border-mark"],
 };

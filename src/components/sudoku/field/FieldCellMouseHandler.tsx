@@ -142,7 +142,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     top={topOffset * 0.25}
                     width={0.25}
                     height={0.25}
-                    onClick={() => onCornerClick?.(context, exactPosition)}
+                    onClick={({button}) => onCornerClick?.(context, exactPosition, !!button)}
                     onEnter={() => onCornerEnter?.(context, exactPosition)}
                     onContextMenu={handleContextMenu}
                 />;
@@ -153,7 +153,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     key={"draw-center"}
                     context={context}
                     cellPosition={cellPosition}
-                    onClick={() => onCornerClick?.(context, centerExactPosition)}
+                    onClick={({button}) => onCornerClick?.(context, centerExactPosition, !!button)}
                     onEnter={() => onCornerEnter?.(context, centerExactPosition)}
                 />
 
@@ -170,7 +170,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                         context={context}
                         cellPosition={cellPosition}
                         line={line}
-                        onClick={() => onCornerClick?.(context, exactPosition)}
+                        onClick={({button}) => onCornerClick?.(context, exactPosition, !!button)}
                         onEnter={() => onCornerEnter?.(context, exactPosition)}
                         onContextMenu={handleContextMenu}
                     />
@@ -239,7 +239,7 @@ export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDouble
     }}
     onDoubleClick={onDoubleClick}
     onPointerEnter={(ev: PointerEvent<any>) => {
-        if (ev.buttons !== 1) {
+        if (!ev.buttons) {
             return;
         }
 

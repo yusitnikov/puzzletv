@@ -19,6 +19,7 @@ import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions"
 import {isValidCellForRegion} from "../region/Region";
 import {indexes} from "../../../../utils/indexes";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
+import {incrementArrayItemByIndex} from "../../../../utils/array";
 
 export interface KillerCageProps {
     sum?: string | number;
@@ -61,8 +62,8 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
             points={formatSvgPointsArray(
                 points
                     .map(({left: x, top: y}, index) => {
-                        const {left: prevX, top: prevY} = points[(index + points.length - 1) % points.length];
-                        const {left: nextX, top: nextY} = points[(index + 1) % points.length];
+                        const {left: prevX, top: prevY} = incrementArrayItemByIndex(points, index, -1);
+                        const {left: nextX, top: nextY} = incrementArrayItemByIndex(points, index);
                         const prevDirX = Math.sign(x - prevX);
                         const prevDirY = Math.sign(y - prevY);
                         const nextDirX = Math.sign(nextX - x);

@@ -16,6 +16,7 @@ import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {CellMark} from "../../../../types/sudoku/CellMark";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {normalizePuzzleLine} from "../../../../types/sudoku/PuzzleDefinition";
+import {DragAction} from "../../../../types/sudoku/DragAction";
 
 const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
@@ -26,7 +27,7 @@ export const UserLines = memo(({context}: ConstraintProps) => {
 
     const {cellSize, puzzle, state} = context;
 
-    const {currentMultiLine, isAddingLine} = state;
+    const {currentMultiLine, dragAction} = state;
 
     const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
 
@@ -62,7 +63,7 @@ export const UserLines = memo(({context}: ConstraintProps) => {
             key={`new-line-${index}`}
             cellSize={cellSize}
             {...line}
-            isAdding={isAddingLine}
+            isAdding={dragAction === DragAction.SetTrue}
         />)}
     </>;
 });

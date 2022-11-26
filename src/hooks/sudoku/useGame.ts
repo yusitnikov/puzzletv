@@ -153,7 +153,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                     lineEnd,
                     lineCenters,
                     dragStart,
-                    addingLine,
+                    dragAction,
                     ...otherState
                 },
             } = message;
@@ -171,7 +171,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                         currentMultiLineEnd: lineEnd,
                         isCurrentMultiLineCenters: lineCenters,
                         dragStartPoint: dragStart,
-                        isAddingLine: addingLine,
+                        dragAction,
                     },
                     puzzle.typeManager.unserializeInternalState?.(puzzle, otherState) ?? {}
                 ),
@@ -298,7 +298,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                                 lineEnd: state.currentMultiLineEnd,
                                 lineCenters: state.isCurrentMultiLineCenters,
                                 dragStart: state.dragStartPoint,
-                                addingLine: state.isAddingLine,
+                                dragAction: state.dragAction,
                                 ...puzzle.typeManager.getInternalState?.(puzzle, state),
                             },
                         });

@@ -16,6 +16,7 @@ import {PuzzlePositionSet} from "./PuzzlePositionSet";
 import {PuzzleLineSet} from "./PuzzleLineSet";
 import {lazy} from "../../utils/lazy";
 import {FieldState} from "./FieldState";
+import {incrementArrayItemByIndex} from "../../utils/array";
 
 export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     public readonly allCells: CellInfo<CellType, ExType, ProcessedExType>[][];
@@ -93,8 +94,8 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
             borders.forEach((border) => border.forEach((point, index) => {
                 const pointKey = this.getPositionHash(point);
 
-                const next = border[(index + 1) % border.length];
-                const prev = border[(index + border.length - 1) % border.length];
+                const next = incrementArrayItemByIndex(border, index);
+                const prev = incrementArrayItemByIndex(border, index, -1);
 
                 const borderLineStartMap = (this.borderLineMap[pointKey] = this.borderLineMap[pointKey] || {});
                 for (const end of [next, prev]) {
@@ -133,7 +134,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
             );
 
             borders.forEach((border) => border.forEach((point, index) => {
-                const next = border[(index + 1) % border.length];
+                const next = incrementArrayItemByIndex(border, index);
 
                 info.neighbors = info.neighbors.toggleAll(
                     this.borderLineMap[this.getPositionHash(point)][this.getPositionHash(next)]

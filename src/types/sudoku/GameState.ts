@@ -20,7 +20,8 @@ import {emptyPosition, Line, Position, PositionSet} from "../layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {
-    GivenDigitsMap, givenDigitsMapToArray,
+    GivenDigitsMap,
+    givenDigitsMapToArray,
     processGivenDigitsMaps,
     serializeGivenDigitsMap,
     unserializeGivenDigitsMap
@@ -31,18 +32,19 @@ import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../utils/player
 import {PlayerObjectInfo} from "./PlayerObjectInfo";
 import {
     loadBoolFromLocalStorage,
-    loadNumberFromLocalStorage, loadStringFromLocalStorage, serializeToLocalStorage,
+    loadNumberFromLocalStorage,
+    loadStringFromLocalStorage,
+    serializeToLocalStorage,
     unserializeFromLocalStorage
 } from "../../utils/localStorage";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
 import {CellMark} from "./CellMark";
 import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
-import {
-    getAllPuzzleConstraints,
-    isValidUserDigit,
-    prepareGivenDigitsMapForConstraints
-} from "./Constraint";
+import {getAllPuzzleConstraints, isValidUserDigit, prepareGivenDigitsMapForConstraints} from "./Constraint";
+import {DragAction} from "./DragAction";
+import {incrementArrayItem} from "../../utils/array";
+import {CellColor} from "./CellColor";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -57,7 +59,7 @@ export interface GameState<CellType> {
     currentMultiLineEnd?: Position;
     isCurrentMultiLineCenters?: boolean;
     dragStartPoint?: CellExactPosition;
-    isAddingLine: boolean;
+    dragAction: DragAction;
 
     loopOffset: Position;
 
@@ -198,7 +200,7 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         currentMultiLineEnd: undefined,
         isCurrentMultiLineCenters: false,
         dragStartPoint: undefined,
-        isAddingLine: false,
+        dragAction: DragAction.SetUndefined,
 
         loopOffset: emptyPosition,
 
@@ -814,9 +816,11 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
                                     x: marks.contains(xMark),
                                     o: marks.contains(circleMark),
                                 };
-                                const currentIndex = allMarkOptions.findIndex(({x, o}) => x === currentMark.x && o === currentMark.o);
-                                const newIndex = (currentIndex + (isRightButton ? -1 : 1) + allMarkOptions.length) % allMarkOptions.length;
-                                const newMark = allMarkOptions[newIndex];
+                                const newMark = incrementArrayItem(
+                                    allMarkOptions,
+                                    ({x, o}) => x === currentMark.x && o === currentMark.o,
+                                    isRightButton ? -1 : 1
+                                )
                                 marks = marks
                                     .toggle(xMark, newMark.x)
                                     .toggle(circleMark, newMark.o);
@@ -826,7 +830,7 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
 
                     return {
                         ...fieldState,
-                        lines: fieldState.lines.toggleAll(state.currentMultiLine, state.isAddingLine),
+                        lines: fieldState.lines.toggleAll(state.currentMultiLine, state.dragAction === DragAction.SetTrue),
                         marks,
                     };
                 }
@@ -908,9 +912,57 @@ export const gameStateContinueMultiLine = <CellType, ExType, ProcessedExType>(
     return mergeGameStateUpdates(result, {
         currentMultiLine: [...state.currentMultiLine, ...newLines],
         currentMultiLineEnd: normalizePuzzlePosition(position, puzzle),
-        isAddingLine: state.currentMultiLine.length === 0
-            ? !gameStateGetCurrentFieldState(state).lines.contains(newLines[0])
-            : state.isAddingLine,
+        dragAction: state.currentMultiLine.length === 0
+            ? (gameStateGetCurrentFieldState(state).lines.contains(newLines[0]) ? DragAction.SetUndefined : DragAction.SetTrue)
+            : state.dragAction,
     });
+};
+
+export const gameStateGetCellShading = <CellType>({colors}: CellState<CellType>) =>
+    colors.contains(CellColor.green)
+        ? DragAction.SetTrue
+        : colors.contains(CellColor.black)
+            ? DragAction.SetFalse
+            : DragAction.SetUndefined;
+
+export const gameStateIncrementShading = (currentState: DragAction, increment = 1) => incrementArrayItem(
+    [DragAction.SetUndefined, DragAction.SetTrue, DragAction.SetFalse],
+    currentState,
+    increment
+);
+export const gameStateApplyShading = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    position: Position,
+    action: DragAction,
+): PartialGameStateEx<CellType, ExType> => {
+    const {
+        puzzle: {typeManager, initialColors: initialColorsFunc, allowOverridingInitialColors},
+        state: {fieldStateHistory},
+    } = context;
+
+    const initialColors = typeof initialColorsFunc === "function" ? initialColorsFunc(context) : initialColorsFunc;
+
+    if (!allowOverridingInitialColors && initialColors?.[position.top]?.[position.left]?.length) {
+        return {};
+    }
+
+    return {
+        fieldStateHistory: fieldStateHistoryAddState(
+            typeManager,
+            fieldStateHistory,
+            fieldState => processFieldStateCells(
+                fieldState,
+                [position],
+                (cellState) => {
+                    return {
+                        ...cellState,
+                        colors: cellState.colors
+                            .toggle(CellColor.green, action === DragAction.SetTrue)
+                            .toggle(CellColor.black, action === DragAction.SetFalse),
+                    };
+                }
+            )
+        ),
+    };
 };
 // endregion

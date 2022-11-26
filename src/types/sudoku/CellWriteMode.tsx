@@ -6,6 +6,8 @@ import {CellBackground} from "../../components/sudoku/cell/CellBackground";
 import {gameStateContinueMultiLine, gameStateStartMultiLine} from "./GameState";
 import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
+import {shadingAction, shadingStartAction} from "./GameStateAction";
+import {incrementArrayItem} from "../../utils/array";
 
 export enum CellWriteMode {
     main,
@@ -16,6 +18,7 @@ export enum CellWriteMode {
     move,
     quads,
     custom,
+    shading,
 }
 
 export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
@@ -33,7 +36,8 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     ) => ReactNode;
     onCornerClick?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
-        position: CellExactPosition
+        position: CellExactPosition,
+        isRightButton: boolean,
     ) => void;
     onCornerEnter?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
@@ -77,6 +81,37 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         />,
     },
     {
+        mode: CellWriteMode.shading,
+        // color and shading are never together, so it's ok to have the same hotkey
+        hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
+        buttonContent: (context, _, cellSize, index) => <CellBackground
+            context={context}
+            colors={new CellDataSet(context.puzzle, [index])}
+            size={cellSize}
+        />,
+        handlesRightMouseClick: true,
+        isNoSelectionMode: true,
+        onCornerClick: (context, position, isRightButton) => {
+            context.onStateChange(shadingStartAction(
+                context,
+                {
+                    top: Math.floor(position.center.top),
+                    left: Math.floor(position.center.left),
+                },
+                isRightButton
+            ));
+        },
+        onCornerEnter: (context, position) =>
+            context.onStateChange(shadingAction(
+                context,
+                {
+                    top: Math.floor(position.center.top),
+                    left: Math.floor(position.center.left),
+                },
+                context.state.dragAction
+            )),
+    },
+    {
         mode: CellWriteMode.lines,
         hotKeyStr: ["Alt"],
         isNoSelectionMode: true,
@@ -104,6 +139,7 @@ export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
         loopHorizontally = false,
         loopVertically = false,
         enableDragMode = false,
+        enableShading = false,
         disableColoring = false,
         digitsCount,
         typeManager: {extraCellWriteModes = []},
@@ -116,7 +152,9 @@ export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
 
         switch (mode) {
             case CellWriteMode.color:
-                return !disableColoring;
+                return !disableColoring && !enableShading;
+            case CellWriteMode.shading:
+                return enableShading;
             case CellWriteMode.lines:
                 return allowDrawing.length !== 0;
             case CellWriteMode.move:
@@ -128,13 +166,10 @@ export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
     ...extraCellWriteModes,
 ];
 
-export const incrementCellWriteMode = (allowedModes: CellWriteModeInfo<any, any, any>[], mode: CellWriteMode, increment: number): CellWriteMode => {
-    const currentModeIndex = allowedModes.findIndex(item => item.mode === mode);
-
-    return allowedModes[(currentModeIndex + allowedModes.length + increment) % allowedModes.length].mode;
-};
+export const incrementCellWriteMode = (allowedModes: CellWriteModeInfo<any, any, any>[], mode: CellWriteMode, increment: number): CellWriteMode =>
+    incrementArrayItem(allowedModes, item => item.mode === mode, increment).mode;
 
 export const isCompactControlsPanel = (allowedModeInfos: CellWriteModeInfo<any, any, any>[]): boolean =>
     !allowedModeInfos.some(
-        ({mode, isDigitMode     }) => isDigitMode || mode === CellWriteMode.color
+        ({mode, isDigitMode     }) => isDigitMode || [CellWriteMode.color, CellWriteMode.shading].includes(mode)
     );
