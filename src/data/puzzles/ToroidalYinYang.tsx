@@ -11,13 +11,13 @@ const B = [CellColor.black];
 const G = [CellColor.green];
 
 export const ToroidalYinYang: PuzzleDefinition<number> = {
-    noIndex: true,
     author: Chameleon,
     title: {
         [LanguageCode.en]: "No secret rules today",
         [LanguageCode.ru]: "Никаких скрытых правил сегодня",
     },
     slug: "toroidal-yin-yang",
+    saveStateKey: "toroidal-yin-yang-v2",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: createRegularFieldSize(10),
     digitsCount: 0,
