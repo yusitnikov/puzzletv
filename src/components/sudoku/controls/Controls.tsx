@@ -353,7 +353,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
         <CellWriteModeButton
             top={3}
             cellWriteMode={CellWriteMode.shading}
-            data={{colors: new PlainValueSet([CellColor.green, CellColor.black])}}
+            data={{colors: new PlainValueSet([CellColor.shaded, CellColor.unshaded])}}
             title={`${translate("Shading")} (${translate("shortcut")}: Ctrl+Shift)`}
             context={context}
         />

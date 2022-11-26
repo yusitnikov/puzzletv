@@ -919,9 +919,9 @@ export const gameStateContinueMultiLine = <CellType, ExType, ProcessedExType>(
 };
 
 export const gameStateGetCellShading = <CellType>({colors}: CellState<CellType>) =>
-    colors.contains(CellColor.green)
+    colors.contains(CellColor.shaded)
         ? DragAction.SetTrue
-        : colors.contains(CellColor.black)
+        : colors.contains(CellColor.unshaded)
             ? DragAction.SetFalse
             : DragAction.SetUndefined;
 
@@ -957,8 +957,8 @@ export const gameStateApplyShading = <CellType, ExType, ProcessedExType>(
                     return {
                         ...cellState,
                         colors: cellState.colors
-                            .toggle(CellColor.green, action === DragAction.SetTrue)
-                            .toggle(CellColor.black, action === DragAction.SetFalse),
+                            .toggle(CellColor.shaded, action === DragAction.SetTrue)
+                            .toggle(CellColor.unshaded, action === DragAction.SetFalse),
                     };
                 }
             )

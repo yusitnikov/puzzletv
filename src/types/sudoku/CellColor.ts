@@ -18,6 +18,8 @@ export enum CellColor {
     red,
     yellow,
     blue,
+    shaded = black,
+    unshaded = green,
 }
 
 export const cellColors: Record<CellColor, string> = {

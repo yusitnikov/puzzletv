@@ -7,8 +7,8 @@ import {CellColor} from "../../types/sudoku/CellColor";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {moveButtonTip, normalYinYangRulesApply, normalYinYangRulesExplained, toroidalRulesApply} from "../ruleSnippets";
 
-const B = [CellColor.black];
-const G = [CellColor.green];
+const S = [CellColor.shaded];
+const U = [CellColor.unshaded];
 
 export const ToroidalYinYang: PuzzleDefinition<number> = {
     author: Chameleon,
@@ -29,16 +29,16 @@ export const ToroidalYinYang: PuzzleDefinition<number> = {
         <RulesParagraph>{translate(toroidalRulesApply)}. {translate(moveButtonTip)}.</RulesParagraph>
     </>,
     initialColors: {
-        0: {4: B, 6: B, /*7: B, */8: B},
-        1: {0: B, 3: B, 4: B, 8: B, 9: B},
-        2: {0: B, 4: B, 6: B},
-        3: {1: B, 7: B},
-        4: {0: B, 1: B, 2: B, 4: B, 6: B, 7: B, 8: B},
-        5: {1: B, 7: B},
-        6: {0: G, 4: B, 8: G},
-        7: {0: G, 1: B, 3: B, 4: B, 5: B},
-        8: {0: G, 2: B, 5: B, 6: B, 7: B, 8: G},
-        9: {2: B, 7: B},
+        0: {4: S, 6: S, /*7: B, */8: S},
+        1: {0: S, 3: S, 4: S, 8: S, 9: S},
+        2: {0: S, 4: S, 6: S},
+        3: {1: S, 7: S},
+        4: {0: S, 1: S, 2: S, 4: S, 6: S, 7: S, 8: S},
+        5: {1: S, 7: S},
+        6: {0: U, 4: S, 8: U},
+        7: {0: U, 1: S, 3: S, 4: S, 5: S},
+        8: {0: U, 2: S, 5: S, 6: S, 7: S, 8: U},
+        9: {2: S, 7: S},
     },
     allowOverridingInitialColors: false,
     enableShading: true,
