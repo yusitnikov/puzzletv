@@ -83,21 +83,25 @@ export const enterDigitAction = <CellType, ExType, ProcessedExType>(
     },
 ];
 
+interface ApplyCurrentMultiLineActionParams {
+    isRightButton?: boolean;
+}
 export const applyCurrentMultiLineActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
+    : GameStateActionType<ApplyCurrentMultiLineActionParams, CellType, ExType, ProcessedExType> => ({
     key: "apply-current-multiline",
-    callback: (_, context, clientId) =>
-        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, true),
+    callback: ({isRightButton = false} = {}, context, clientId) =>
+        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, isRightButton, true),
 });
 export const applyCurrentMultiLineAction = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    isRightButton = false
 )
-    : GameStateActionOrCallback<undefined, CellType, ExType, ProcessedExType>[] => [
+    : GameStateActionOrCallback<ApplyCurrentMultiLineActionParams, CellType, ExType, ProcessedExType>[] => [
     {
         type: applyCurrentMultiLineActionType(),
-        params: undefined,
+        params: {isRightButton},
     },
-    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, false),
+    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isRightButton, false),
 ];
 // endregion
 

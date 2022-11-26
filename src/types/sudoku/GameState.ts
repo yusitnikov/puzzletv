@@ -782,6 +782,7 @@ export const gameStateResetCurrentMultiLine = <CellType, ExType>(): PartialGameS
 export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType>(
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
     clientId: string,
+    isRightButton: boolean,
     isGlobal: boolean
 ): PartialGameStateEx<CellType, ExType> => {
     const {puzzle: {typeManager, allowDrawing = []}, state} = context;
@@ -803,12 +804,22 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
 
                             if (type !== "center") {
                                 marks = marks.toggle(xMark);
-                            } else if (marks.contains(circleMark)) {
-                                marks = marks.remove(circleMark).add(xMark);
-                            } else if (marks.contains(xMark)) {
-                                marks = marks.remove(xMark);
                             } else {
-                                marks = marks.add(circleMark);
+                                const allMarkOptions = [
+                                    {x: false, o: false},
+                                    {x: false, o: true},
+                                    {x: true, o: false},
+                                ];
+                                const currentMark = {
+                                    x: marks.contains(xMark),
+                                    o: marks.contains(circleMark),
+                                };
+                                const currentIndex = allMarkOptions.findIndex(({x, o}) => x === currentMark.x && o === currentMark.o);
+                                const newIndex = (currentIndex + (isRightButton ? -1 : 1) + allMarkOptions.length) % allMarkOptions.length;
+                                const newMark = allMarkOptions[newIndex];
+                                marks = marks
+                                    .toggle(xMark, newMark.x)
+                                    .toggle(circleMark, newMark.o);
                             }
                         }
                     }

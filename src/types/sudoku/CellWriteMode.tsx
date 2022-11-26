@@ -24,6 +24,7 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     isDigitMode?: boolean;
     isNoSelectionMode?: boolean;
     digitsCount?: number;
+    handlesRightMouseClick?: boolean;
     buttonContent?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
         cellData: CellType,
@@ -87,6 +88,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
                 position
             )),
         digitsCount: 0,
+        handlesRightMouseClick: true,
     },
     {
         mode: CellWriteMode.move,

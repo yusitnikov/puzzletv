@@ -120,8 +120,9 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         onStateChange(gameStateResetCurrentMultiLine);
     });
 
-    useEventListener(window, "pointerup", () => {
-        onStateChange(applyCurrentMultiLineAction(context));
+    useEventListener(window, "pointerup", ({button}: PointerEvent) => {
+        // button === 0 is the left mouse button
+        onStateChange(applyCurrentMultiLineAction(context, !!button));
 
         setDragStart(undefined);
     });

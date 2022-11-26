@@ -38,7 +38,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         currentMultiLineEnd,
         initialDigits: stateInitialDigits,
         processed: {
-            cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter},
+            cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter, handlesRightMouseClick},
         },
     } = state;
 
@@ -109,6 +109,12 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         }
     };
 
+    const handleContextMenu = (ev: MouseEvent<any>) => {
+        if (handlesRightMouseClick) {
+            ev.preventDefault();
+        }
+    };
+
     return <>
         {(onCornerClick || onCornerEnter) && <>
             {!areCustomBounds && indexes(4).flatMap(topOffset => indexes(4).map(leftOffset => {
@@ -138,6 +144,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     height={0.25}
                     onClick={() => onCornerClick?.(context, exactPosition)}
                     onEnter={() => onCornerEnter?.(context, exactPosition)}
+                    onContextMenu={handleContextMenu}
                 />;
             }))}
 
@@ -165,6 +172,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                         line={line}
                         onClick={() => onCornerClick?.(context, exactPosition)}
                         onEnter={() => onCornerEnter?.(context, exactPosition)}
+                        onContextMenu={handleContextMenu}
                     />
                 })}
             </>}
@@ -178,6 +186,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                 onClick={handleCellClick}
                 onDoubleClick={handleCellDoubleClick}
                 onEnter={handleContinueCellSelection}
+                onContextMenu={handleContextMenu}
             />
 
             {!areCustomBounds && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
@@ -191,6 +200,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     height={borderPaddingCoeff}
                     onClick={handleCellClick}
                     onDoubleClick={handleCellDoubleClick}
+                    onContextMenu={handleContextMenu}
                 />;
             }))}
         </>}
@@ -204,9 +214,10 @@ interface MouseHandlerRectProps extends Partial<Rect> {
     onClick?: (ev: PointerEvent<any>) => void;
     onDoubleClick?: (ev: MouseEvent<any>) => void;
     onEnter?: (ev: PointerEvent<any>) => void;
+    onContextMenu?: (ev: MouseEvent<any>) => void;
 }
 
-export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDoubleClick, onEnter, ...rect}: MouseHandlerRectProps) => <FieldCellShape
+export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDoubleClick, onEnter, onContextMenu, ...rect}: MouseHandlerRectProps) => <FieldCellShape
     context={context}
     cellPosition={cellPosition}
     line={line}
@@ -234,5 +245,6 @@ export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDouble
 
         onEnter?.(ev);
     }}
+    onContextMenu={onContextMenu}
     {...rect}
 />;
