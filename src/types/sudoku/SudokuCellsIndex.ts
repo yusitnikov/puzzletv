@@ -17,6 +17,8 @@ import {PuzzleLineSet} from "./PuzzleLineSet";
 import {lazy} from "../../utils/lazy";
 import {FieldState} from "./FieldState";
 import {incrementArrayItemByIndex} from "../../utils/array";
+import {CellColorValue} from "./CellColor";
+import {LineWithColor} from "./LineWithColor";
 
 export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     public readonly allCells: CellInfo<CellType, ExType, ProcessedExType>[][];
@@ -242,7 +244,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
         return this.realCellPointMap[this.getPositionHash(point)];
     }
 
-    getPath({start, end}: Line): Line[] {
+    getPath({start, end}: Line, color?: CellColorValue): LineWithColor[] {
         const startKey = this.getPositionHash(start);
         const endKey = this.getPositionHash(end);
 
@@ -275,6 +277,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
         return points.map((position, index) => normalizePuzzleLine({
             start: index ? points[index - 1] : start,
             end: position,
+            color,
         }, this.puzzle));
     }
 

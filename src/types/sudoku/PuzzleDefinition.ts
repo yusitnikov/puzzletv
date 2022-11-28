@@ -58,6 +58,7 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
         | ((state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => Constraint<CellType, any, ExType, ProcessedExType>[]);
     borderColor?: string;
     allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
+    disableLineColors?: boolean;
     hideDeleteButton?: boolean;
     loopHorizontally?: boolean;
     loopVertically?: boolean;
@@ -144,10 +145,10 @@ export const normalizePuzzleVector = (
     };
 };
 
-export const normalizePuzzleLine = (
-    line: Line,
+export const normalizePuzzleLine = <LineT extends Line = Line>(
+    line: LineT,
     puzzle: PuzzleDefinition<any, any, any>
-): Line => {
+): LineT => {
     let vector = normalizePuzzleVector(getLineVector(line), puzzle);
     if (vector.top < 0 || (vector.top === 0 && vector.left < 0)) {
         vector = invertPosition(vector);
@@ -157,6 +158,7 @@ export const normalizePuzzleLine = (
     const start = normalizePuzzlePosition(line.start, puzzle);
 
     return {
+        ...line,
         start,
         end: {
             top: start.top + vector.top,

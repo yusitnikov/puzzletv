@@ -7,16 +7,17 @@ import {
     unserializeCellState
 } from "./CellState";
 import {indexes} from "../../utils/indexes";
-import {Line, Position} from "../layout/Position";
+import {Position} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {SetInterface} from "../struct/Set";
 import {CellMark, CellMarkSet} from "./CellMark";
 import {PuzzleLineSet} from "./PuzzleLineSet";
+import {LineWithColor} from "./LineWithColor";
 
 export interface FieldState<CellType> {
     cells: CellState<CellType>[][];
-    lines: SetInterface<Line>;
+    lines: SetInterface<LineWithColor>;
     marks: SetInterface<CellMark>;
 }
 

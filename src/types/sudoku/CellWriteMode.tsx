@@ -26,7 +26,7 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     hotKeyStr?: string[];
     isDigitMode?: boolean;
     isNoSelectionMode?: boolean;
-    digitsCount?: number;
+    digitsCount?: number | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => number);
     handlesRightMouseClick?: boolean;
     buttonContent?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
@@ -34,6 +34,8 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
         cellSize: number,
         index: number
     ) => ReactNode;
+    getCurrentButton?: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => (number | undefined);
+    setCurrentButton?: (context: PuzzleContext<CellType, ExType, ProcessedExType>, index: number) => void;
     onCornerClick?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position: CellExactPosition,
@@ -84,11 +86,6 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         mode: CellWriteMode.shading,
         // color and shading are never together, so it's ok to have the same hotkey
         hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
-        buttonContent: (context, _, cellSize, index) => <CellBackground
-            context={context}
-            colors={new CellDataSet(context.puzzle, [index])}
-            size={cellSize}
-        />,
         handlesRightMouseClick: true,
         isNoSelectionMode: true,
         onCornerClick: (context, position, isRightButton) => {
@@ -122,7 +119,16 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
                 {...context, state},
                 position
             )),
-        digitsCount: 0,
+        digitsCount: ({puzzle: {disableLineColors}}) => disableLineColors ? 0 : 9,
+        buttonContent: (context, _, cellSize, index) => <CellBackground
+            context={context}
+            colors={new CellDataSet(context.puzzle, [index])}
+            size={cellSize}
+            noOpacity={true}
+        />,
+        getCurrentButton: ({puzzle: {disableLineColors}, state: {selectedColor}}) =>
+            disableLineColors ? undefined : selectedColor,
+        setCurrentButton: ({onStateChange}, index) => onStateChange({selectedColor: index}),
         handlesRightMouseClick: true,
     },
     {

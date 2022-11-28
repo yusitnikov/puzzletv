@@ -92,9 +92,10 @@ export const invertPosition = ({left, top}: Position): Position => ({
     top: -top,
 });
 
-export const invertLine = ({start, end}: Line): Line => ({
-    start: end,
-    end: start,
+export const invertLine = <LineT extends Line = Line>(line: LineT): LineT => ({
+    ...line,
+    start: line.end,
+    end: line.start,
 });
 
 export const getLineVector = ({start, end}: Line): Position => ({

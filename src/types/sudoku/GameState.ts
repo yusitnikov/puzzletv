@@ -16,7 +16,7 @@ import {
     unserializeFieldState
 } from "./FieldState";
 import {indexes} from "../../utils/indexes";
-import {emptyPosition, Line, Position, PositionSet} from "../layout/Position";
+import {emptyPosition, Position, PositionSet} from "../layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {
@@ -45,6 +45,7 @@ import {getAllPuzzleConstraints, isValidUserDigit, prepareGivenDigitsMapForConst
 import {DragAction} from "./DragAction";
 import {incrementArrayItem} from "../../utils/array";
 import {CellColor} from "./CellColor";
+import {LineWithColor} from "./LineWithColor";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -54,8 +55,9 @@ export interface GameState<CellType> {
     excludedDigits: GivenDigitsMap<SetInterface<CellType>>;
 
     selectedCells: SetInterface<Position>;
+    selectedColor: CellColor;
 
-    currentMultiLine: Line[];
+    currentMultiLine: LineWithColor[];
     currentMultiLineEnd?: Position;
     isCurrentMultiLineCenters?: boolean;
     dragStartPoint?: CellExactPosition;
@@ -146,6 +148,7 @@ type SavedGameStates = [
     ignore1: any, // ignore previous format for compatibility
     playerObjects: any,
     lives: any,
+    color: CellColor,
 ][];
 const gameStateStorageKey = "savedGameState";
 const gameStateSerializerVersion = 2;
@@ -191,6 +194,7 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         },
         persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode ?? getAllowedCellWriteModeInfos(puzzle)[0].mode,
         selectedCells: new PositionSet(),
+        selectedColor: savedGameState?.[10] ?? CellColor.green,
         initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
         excludedDigits: savedGameState?.[4]
             ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) => CellDataSet.unserialize(puzzle, excludedDigits))
@@ -251,6 +255,7 @@ export const saveGameState = <CellType, ExType = {}, ProcessedExType = {}>(
                 "",
                 state.playerObjects,
                 state.lives,
+                state.selectedColor,
             ],
             ...getSavedGameStates().filter(([key]) => key !== fullSaveStateKey),
         ] as SavedGameStates).slice(0, maxSavedPuzzles),
@@ -787,7 +792,8 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
     isRightButton: boolean,
     isGlobal: boolean
 ): PartialGameStateEx<CellType, ExType> => {
-    const {puzzle: {typeManager, allowDrawing = []}, state} = context;
+    const {puzzle: {typeManager, allowDrawing = [], disableLineColors}, state} = context;
+    const selectedColor = disableLineColors ? undefined : state.selectedColor;
 
     if (isGlobal) {
         return {
@@ -801,8 +807,8 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
                         const {type, round} = state.dragStartPoint;
 
                         if (allowDrawing.includes(`${type}-mark`)) {
-                            const xMark: CellMark = {position: round, isCircle: false, isCenter: type === "center"};
-                            const circleMark: CellMark = {position: round, isCircle: true, isCenter: type === "center"};
+                            const xMark: CellMark = {position: round, color: selectedColor, isCircle: false, isCenter: type === "center"};
+                            const circleMark: CellMark = {position: round, color: selectedColor, isCircle: true, isCenter: type === "center"};
 
                             if (type !== "center") {
                                 marks = marks.toggle(xMark);
@@ -903,7 +909,10 @@ export const gameStateContinueMultiLine = <CellType, ExType, ProcessedExType>(
     }
 
     const position = state.isCurrentMultiLineCenters ? exactPosition.center : exactPosition.corner;
-    const newLines = cellsIndex.getPath({start: currentMultiLineEnd, end: position});
+    const newLines = cellsIndex.getPath(
+        {start: currentMultiLineEnd, end: position},
+        puzzle.disableLineColors ? undefined : state.selectedColor
+    );
 
     if (!newLines.length) {
         return result;

@@ -96,10 +96,14 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
         lives,
         processed: {
             isReady,
-            cellWriteModeInfo: {digitsCount: digitsCountInCurrentMode = digitsCount},
+            cellWriteModeInfo: {digitsCount: digitsCountFunc = digitsCount},
             cellWriteMode,
         },
     } = state;
+
+    const digitsCountInCurrentMode = typeof digitsCountFunc === "function"
+        ? digitsCountFunc(context)
+        : digitsCountFunc;
 
     const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;
 

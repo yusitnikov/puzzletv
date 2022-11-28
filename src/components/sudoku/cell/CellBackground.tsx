@@ -14,9 +14,10 @@ export interface CellBackgroundProps {
     cellPosition?: Position;
     colors: SetInterface<CellColorValue>;
     size?: number;
+    noOpacity?: boolean;
 }
 
-export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBackgroundProps) => {
+export const CellBackground = ({context, cellPosition, colors, noOpacity, size = 1}: CellBackgroundProps) => {
     colors = colors.sorted();
     cellPosition = usePureMemo(cellPosition, [cellPosition]);
 
@@ -62,7 +63,7 @@ export const CellBackground = ({context, cellPosition, colors, size = 1}: CellBa
         colors={colors}
         size={size}
         clip={colors.size > 1 || !!cellInfo?.areCustomBounds}
-        opacity={context.state.backgroundOpacity}
+        opacity={noOpacity ? 1 : context.state.backgroundOpacity}
         customCellRect={customCellRect}
         customCellCenter={customCellCenter}
         customCellRadius={customCellRadius}

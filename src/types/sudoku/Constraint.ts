@@ -10,6 +10,7 @@ import {UserLinesConstraint} from "../../components/sudoku/constraints/user-line
 import {PuzzleContext} from "./PuzzleContext";
 import {SetInterface} from "../struct/Set";
 import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
+import {LineWithColor} from "./LineWithColor";
 
 export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType = {}> = {
     name: string;
@@ -131,12 +132,12 @@ export const isValidUserDigit = <CellType, ExType, ProcessedExType>(
 };
 
 export const getInvalidUserLines = <CellType, ExType, ProcessedExType>(
-    lines: SetInterface<Line>,
+    lines: SetInterface<LineWithColor>,
     userDigits: GivenDigitsMap<CellType>,
     constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
     isFinalCheck = false
-): SetInterface<Line> => {
+): SetInterface<LineWithColor> => {
     let result = lines.clear();
 
     for (const constraint of constraints) {

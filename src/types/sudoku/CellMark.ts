@@ -1,9 +1,11 @@
 import {Position} from "../layout/Position";
 import {getPuzzlePositionHasher, PuzzleDefinition} from "./PuzzleDefinition";
 import {HashSet} from "../struct/Set";
+import {CellColor} from "./CellColor";
 
 export interface CellMark {
     position: Position;
+    color?: CellColor;
     isCircle: boolean;
     isCenter?: boolean;
 }

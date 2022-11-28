@@ -149,6 +149,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                 state: {
                     mode,
                     selected,
+                    color,
                     line,
                     lineEnd,
                     lineCenters,
@@ -167,6 +168,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                     {
                         persistentCellWriteMode: mode,
                         selectedCells: PositionSet.unserialize(selected),
+                        selectedColor: color,
                         currentMultiLine: line,
                         currentMultiLineEnd: lineEnd,
                         isCurrentMultiLineCenters: lineCenters,
@@ -294,6 +296,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                             state: {
                                 mode: processedGameState.processed.cellWriteMode,
                                 selected: state.selectedCells.serialize(),
+                                color: state.selectedColor,
                                 line: state.currentMultiLine,
                                 lineEnd: state.currentMultiLineEnd,
                                 lineCenters: state.isCurrentMultiLineCenters,

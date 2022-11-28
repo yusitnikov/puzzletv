@@ -35,9 +35,17 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
         isShowingSettings,
         processed: {
             cellWriteMode,
-            cellWriteModeInfo: {isDigitMode, buttonContent: ButtonContent},
+            cellWriteModeInfo: {
+                isDigitMode,
+                buttonContent: ButtonContent,
+                getCurrentButton,
+                setCurrentButton,
+            },
         },
     } = state;
+
+    const currentButton = getCurrentButton?.(context);
+    const selectableButtonContent = currentButton !== undefined;
 
     const digit = index + 1;
     const cellData = createCellDataByDisplayDigit(digit, state);
@@ -60,8 +68,14 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
     }
 
     const handleDigit = useCallback(
-        () => onStateChange(enterDigitAction(digit, context)),
-        [onStateChange, digit, context]
+        () => {
+            if (setCurrentButton) {
+                setCurrentButton(context, index);
+            } else {
+                onStateChange(enterDigitAction(digit, context));
+            }
+        },
+        [onStateChange, digit, index, context]
     );
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
@@ -84,15 +98,17 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
         left={index % 3}
         top={(index - index % 3) / 3}
         cellSize={cellSize}
-        fullHeight={true}
+        fullHeight={!selectableButtonContent}
+        innerBorderWidth={selectableButtonContent ? 1 : 0}
+        checked={currentButton === index}
         opacityOnHover={cellWriteMode === CellWriteMode.color}
         onClick={handleDigit}
         title={title}
     >
-        {ButtonContent?.(context, cellData, cellSize, index) || <CellContent
+        {contentSize => ButtonContent?.(context, cellData, contentSize, index) || <CellContent
             context={context}
             data={{usersDigit: cellData}}
-            size={cellSize}
+            size={contentSize}
         />}
     </ControlButton>;
 };

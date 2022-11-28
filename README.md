@@ -8,7 +8,6 @@ A web application for creating and solving different types of sudoku.
 | Feat | Easy  |  Must have   | Fully import the cubedoku pack.                                           |
 | Feat |  Mid  |  Must have   | Letters.                                                                  |
 | Feat |  Mid  |  Must have   | Diagonal lines.                                                           |
-| Feat |  Mid  |  Must have   | Multi-color drawing tool.                                                 |
 | Feat | Hard  |  Must have   | Candidates conflict checker.                                              |
 | Feat |  Mid  |  Important   | Color selection modes.                                                    |
 | Feat |  Mid  |  Must have   | Auto-detect and check regions based on user's borders and/or colors.      |

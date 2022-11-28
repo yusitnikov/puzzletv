@@ -11,12 +11,13 @@ import {
 } from "../../../../types/sudoku/Constraint";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {gameStateGetCurrentFieldState} from "../../../../types/sudoku/GameState";
-import {Line} from "../../../../types/layout/Position";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {CellMark} from "../../../../types/sudoku/CellMark";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {normalizePuzzleLine} from "../../../../types/sudoku/PuzzleDefinition";
 import {DragAction} from "../../../../types/sudoku/DragAction";
+import {resolveCellColorValue} from "../../../../types/sudoku/CellColor";
+import {LineWithColor} from "../../../../types/sudoku/LineWithColor";
 
 const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
@@ -47,7 +48,7 @@ export const UserLines = memo(({context}: ConstraintProps) => {
             return <RoundedPolyLine
                 key={`existing-line-${index}`}
                 points={[line.start, line.end]}
-                stroke={invalidLines.contains(line) ? errorBorderColor : regularBorderColor}
+                stroke={invalidLines.contains(line) ? errorBorderColor : resolveCellColorValue(line.color ?? regularBorderColor)}
                 strokeWidth={borderWidth}
             />;
         })}
@@ -79,6 +80,7 @@ export const UserMarkByData = (
         cellSize,
         position,
         isCircle,
+        color,
         // Leaving the defaults only for compatibility
         isCenter = position.left % 1 !== 0 && position.top % 1 !== 0,
     }: UserMarkByDataProps
@@ -88,6 +90,8 @@ export const UserMarkByData = (
     const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
 
     let userAreaSize = 1;
+
+    const resolvedColor = color ? resolveCellColorValue(color) : regularBorderColor;
 
     if (context) {
         const {
@@ -126,14 +130,14 @@ export const UserMarkByData = (
     return <AutoSvg
         top={top}
         left={left}
-        stroke={regularBorderColor}
+        stroke={resolvedColor}
         strokeWidth={borderWidth}
     >
         {isCircle && <circle
             cx={0}
             cy={0}
             r={radius}
-            stroke={regularBorderColor}
+            stroke={resolvedColor}
             strokeWidth={lineWidth}
             fill={"none"}
             opacity={opacity}
@@ -145,7 +149,7 @@ export const UserMarkByData = (
                 y1={-radius}
                 x2={radius}
                 y2={radius}
-                stroke={regularBorderColor}
+                stroke={resolvedColor}
                 strokeWidth={lineWidth}
             />
 
@@ -154,24 +158,24 @@ export const UserMarkByData = (
                 y1={-radius}
                 x2={-radius}
                 y2={radius}
-                stroke={regularBorderColor}
+                stroke={resolvedColor}
                 strokeWidth={lineWidth}
             />
         </g>}
     </AutoSvg>;
 };
 
-export interface UserLinesByDataProps extends Line {
+export interface UserLinesByDataProps extends LineWithColor {
     cellSize: number;
     isAdding?: boolean;
 }
 
-export const UserLinesByData = ({cellSize, start, end, isAdding = true}: UserLinesByDataProps) => {
+export const UserLinesByData = ({cellSize, start, end, color = regularBorderColor, isAdding = true}: UserLinesByDataProps) => {
     const borderWidth = getRegionBorderWidth(cellSize) * 2;
 
     return <RoundedPolyLine
         points={[start, end]}
-        stroke={isAdding ? regularBorderColor : removingBorderColor}
+        stroke={isAdding ? resolveCellColorValue(color) : removingBorderColor}
         strokeWidth={borderWidth}
     />;
 };
