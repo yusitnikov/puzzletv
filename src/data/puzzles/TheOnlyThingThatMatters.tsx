@@ -125,3 +125,11 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
         };
     },
 };
+
+export const TheOnlyThingThatMattersNoGivens: PuzzleDefinition<number> = {
+    ...TheOnlyThingThatMatters,
+    noIndex: true,
+    slug: TheOnlyThingThatMatters.slug + "-v2",
+    saveStateKey: undefined,
+    initialDigits: undefined,
+};

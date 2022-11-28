@@ -26,7 +26,7 @@ import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
 import {FPuzzles} from "./FPuzzles";
 import {HeartsCube} from "./HeartsCube";
 import {AbstractKillerDots, DollHouse, LegoHouse, MoodyLines} from "./TenInOne";
-import {TheOnlyThingThatMatters} from "./TheOnlyThingThatMatters";
+import {TheOnlyThingThatMatters, TheOnlyThingThatMattersNoGivens} from "./TheOnlyThingThatMatters";
 import {LumosMaxima, LumosMaximaNoFog} from "./LumosMaxima";
 import {MonumentValley, MonumentValleyMini} from "./MonumentValley";
 import {ToroidalYinYang} from "./ToroidalYinYang";
@@ -91,6 +91,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     LumosMaxima,
 
     TheOnlyThingThatMatters,
+    TheOnlyThingThatMattersNoGivens,
 
     HeartsCube(false),
     HeartsCube(true),
