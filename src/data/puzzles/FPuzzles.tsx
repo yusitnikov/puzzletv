@@ -62,6 +62,8 @@ import {TesseractSettings} from "../../sudokuTypes/tesseract/components/Tesserac
 import {getTesseractCellSelectionType} from "../../sudokuTypes/tesseract/types/TesseractSelection";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {FPuzzlesText} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesText";
+import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
+import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
@@ -99,11 +101,16 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             regular: regularTypeManager,
             latin: LatinDigitSudokuTypeManager,
             calculator: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
+            cubedoku: CubedokuTypeManager,
         };
 
         const initialDigits: GivenDigitsMap<number> = {};
         const initialColors: GivenDigitsMap<CellColorValue[]> = {};
         const items: Constraint<number, any>[] = [];
+
+        if (type === "cubedoku") {
+            items.push(CubedokuIndexingConstraint());
+        }
 
         const baseTypeManager = typesMap[type] ?? regularTypeManager;
         const typeManager = {...baseTypeManager};
