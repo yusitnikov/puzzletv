@@ -3,7 +3,7 @@ type FieldMap<ObjectT> = {
 };
 
 export class ObjectParser<ObjectT> {
-    constructor(private fieldMap: FieldMap<ObjectT>) {}
+    constructor(private fieldMap: FieldMap<ObjectT>, private fieldsOrder: (keyof ObjectT)[] = []) {}
 
     parse(object: ObjectT, objectDescriptionForDebug = "object") {
         if (typeof object !== "object" || object === null || object instanceof Array) {
@@ -16,7 +16,11 @@ export class ObjectParser<ObjectT> {
             }
         }
 
-        for (const key of Object.keys(this.fieldMap) as (keyof ObjectT)[]) {
+        const orderedFields = [
+            ...this.fieldsOrder,
+            ...(Object.keys(this.fieldMap) as (keyof ObjectT)[]).filter(fieldName => !this.fieldsOrder.includes(fieldName)),
+        ];
+        for (const key of orderedFields) {
             if (this.fieldMap[key]?.(object[key], object) === false) {
                 console.warn(`Unsupported feature "${key}" while parsing ${objectDescriptionForDebug}, value is`, object[key]);
             }

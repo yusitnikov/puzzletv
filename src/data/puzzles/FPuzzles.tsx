@@ -178,15 +178,27 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                 const defaultRegionHeight = size / defaultRegionWidth;
                 const defaultRegionColumnsCount = size / defaultRegionWidth;
 
-                const gridCells: (FPuzzlesGridCell & Position)[] = grid.flatMap(
-                    (row, top) => row.map(
-                        (cell, left) => ({top, left, ...cell})
+                const gridCells: (FPuzzlesGridCell & Position)[] = grid
+                    .flatMap(
+                        (row, top) => row.map(
+                            (cell, left) => ({top, left, ...cell})
+                        )
                     )
-                );
+                    .filter((cell) => typeManager.isValidCell?.(cell, puzzle) ?? true);
 
-                const regions = indexes(size)
+                const faces = typeManager.getRegionsWithSameCoordsTransformation?.(puzzle, 1) ?? [{
+                    top: 0,
+                    left: 0,
+                    width: size,
+                    height: size,
+                }];
+                const regions = faces.flatMap(face => indexes(size)
                     .map(regionIndex => gridCells.filter(
                         ({top, left, region}) => {
+                            if (top < face.top || left < face.left || top >= face.top + face.height || left >= face.left + face.width) {
+                                return false;
+                            }
+
                             if (region === undefined) {
                                 const topIndex = Math.floor(top / defaultRegionHeight);
                                 const leftIndex = Math.floor(left / defaultRegionWidth);
@@ -196,7 +208,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                             return region === regionIndex;
                         }
                     ))
-                    .filter(({length}) => length);
+                    .filter(({length}) => length));
                 if (regions.length > 1) {
                     puzzle.fieldSize.regions = regions;
                 }
@@ -564,7 +576,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
                 }
             }
             // endregion
-        }).parse(puzzleJson, "f-puzzles data");
+        }, ["size"]).parse(puzzleJson, "f-puzzles data");
 
         return puzzle;
     }
