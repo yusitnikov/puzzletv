@@ -65,6 +65,15 @@ import {FPuzzlesText} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesTex
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 
+export const decodeFPuzzlesString = (load: string) => {
+    load = decodeURIComponent(load);
+    const jsonStr = decompressFromBase64(load);
+    if (typeof jsonStr !== "string" || jsonStr[0] !== "{" || jsonStr[jsonStr.length - 1] !== "}") {
+        throw new Error("Failed to decode");
+    }
+    return JSON.parse(jsonStr) as FPuzzlesPuzzle;
+};
+
 export const FPuzzles: PuzzleDefinitionLoader<number> = {
     noIndex: true,
     slug: "f-puzzles",
@@ -84,12 +93,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
         if (typeof load !== "string") {
             throw new Error("Missing parameter");
         }
-        load = decodeURIComponent(load);
-        const jsonStr = decompressFromBase64(load);
-        if (typeof jsonStr !== "string" || jsonStr[0] !== "{" || jsonStr[jsonStr.length - 1] !== "}") {
-            throw new Error("Failed to decode");
-        }
-        const puzzleJson = JSON.parse(jsonStr) as FPuzzlesPuzzle;
+        const puzzleJson = decodeFPuzzlesString(load);
         console.log("Importing from f-puzzles:", puzzleJson);
 
         const regularTypeManager = DigitSudokuTypeManager(

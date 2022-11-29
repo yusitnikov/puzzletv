@@ -11,6 +11,7 @@ import {GamesList} from "./GamesList";
 import {HomePage} from "./HomePage";
 import {ContactMe} from "./ContactMe";
 import {ForSetters} from "./ForSetters";
+import {FPuzzlesWizardPage} from "./FPuzzlesWizardPage";
 
 export const App = () => {
     const {hash = "", slug, params} = useRoute();
@@ -86,6 +87,13 @@ export const App = () => {
                 title={translate("Contacts")}
             >
                 <ContactMe/>
+            </PageLayout>;
+        case "f-puzzles-wizard":
+            return <PageLayout
+                scrollable={true}
+                title={translate("Import from f-puzzles")}
+            >
+                <FPuzzlesWizardPage load={params.load}/>
             </PageLayout>;
     }
 

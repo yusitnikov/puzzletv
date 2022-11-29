@@ -78,6 +78,9 @@ export const translationsExactType = {
     "Contacts": {
         [LanguageCode.ru]: "Контакты",
     },
+    "Import from f-puzzles": {
+        [LanguageCode.ru]: "Импорт из f-puzzles",
+    },
     // endregion
     // region Common for controls
     "Shortcut": {

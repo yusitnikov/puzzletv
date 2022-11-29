@@ -1,12 +1,25 @@
+import {useCallback} from "react";
+import {useStateWithStorage} from "../hooks/useStateWithStorage";
+
 export const loadStringFromLocalStorage = (key: string, defaultValue = "") =>
     typeof window.localStorage[key] === "string" ? window.localStorage[key] : defaultValue;
 
 export const saveStringToLocalStorage = (key: string, value: string) => window.localStorage[key] = value;
 
+export const useStringFromLocalStorage = (key: string, defaultValue = "") => useStateWithStorage(
+    () => loadStringFromLocalStorage(key, defaultValue),
+    useCallback(value => saveStringToLocalStorage(key, value), [key])
+);
+
 export const loadBoolFromLocalStorage = (key: string, defaultValue = false) =>
     typeof window.localStorage[key] === "string" ? window.localStorage[key] === "1" : defaultValue;
 
 export const saveBoolToLocalStorage = (key: string, value: boolean) => window.localStorage[key] = value ? "1" : "0";
+
+export const useBoolFromLocalStorage = (key: string, defaultValue = false) => useStateWithStorage(
+    () => loadBoolFromLocalStorage(key, defaultValue),
+    useCallback(value => saveBoolToLocalStorage(key, value), [key])
+);
 
 export const loadNumberFromLocalStorage = (key: string, defaultValue = 0) =>
     typeof window.localStorage[key] === "string" ? Number(window.localStorage[key]) : defaultValue;
