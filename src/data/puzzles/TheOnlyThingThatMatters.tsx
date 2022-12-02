@@ -11,7 +11,7 @@ import {
     normalSudokuRulesApply
 } from "../ruleSnippets";
 import React from "react";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {
     KillerCageConstraint,
     KillerCageConstraintByRect
@@ -34,6 +34,24 @@ const correctAnswer: number[][] = [
     [8, 2, 1, 6, 7, 3, 4, 5, 9],
 ];
 
+const items: Constraint<number, any>[] = [
+    AntiKnightConstraint(),
+    KillerCageConstraintByRect("R2C1", 1, 3, 6),
+    KillerCageConstraintByRect("R2C4", 3, 1, 15),
+    KillerCageConstraintByRect("R2C9", 1, 3, 15),
+    KillerCageConstraintByRect("R5C1", 3, 1, 8),
+    KillerCageConstraintByRect("R5C5", 1, 2, 7),
+    KillerCageConstraintByRect("R5C7", 3, 1, 21),
+    KillerCageConstraintByRect("R9C3", 2, 1, 7),
+    KillerCageConstraintByRect("R9C6", 2, 1, 7),
+    KillerCageConstraint(["R3C3", "R3C4", "R4C3"], 24),
+    KillerCageConstraint(["R3C6", "R3C7", "R4C7"], 6),
+    KillerCageConstraint(["R6C3", "R7C3", "R7C4"], 21),
+    KillerCageConstraint(["R6C7", "R7C6", "R7C7"], 9),
+    KillerCageConstraint(["R8C1", "R9C1", "R9C2"], 15),
+    KillerCageConstraint(["R8C9", "R9C8", "R9C9"], 15),
+];
+
 export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
     title: {
         [LanguageCode.en]: "The only thing that matters",
@@ -52,22 +70,8 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
     </>,
     initialDigits: {0: {2: 5, 6: 7}},
     items: [
-        AntiKnightConstraint(),
-        KillerCageConstraintByRect("R2C1", 1, 3, 6),
-        KillerCageConstraintByRect("R2C4", 3, 1, 15),
-        KillerCageConstraintByRect("R2C9", 1, 3, 15),
-        KillerCageConstraintByRect("R5C1", 3, 1, 8),
-        KillerCageConstraintByRect("R5C5", 1, 2, 7),
-        KillerCageConstraintByRect("R5C7", 3, 1, 21),
+        ...items,
         KillerCageConstraintByRect("R7C5", 1, 2, 7),
-        KillerCageConstraintByRect("R9C3", 2, 1, 7),
-        KillerCageConstraintByRect("R9C6", 2, 1, 7),
-        KillerCageConstraint(["R3C3", "R3C4", "R4C3"], 24),
-        KillerCageConstraint(["R3C6", "R3C7", "R4C7"], 6),
-        KillerCageConstraint(["R6C3", "R7C3", "R7C4"], 21),
-        KillerCageConstraint(["R6C7", "R7C6", "R7C7"], 9),
-        KillerCageConstraint(["R8C1", "R9C1", "R9C2"], 15),
-        KillerCageConstraint(["R8C9", "R9C8", "R9C9"], 15),
     ],
     allowDrawing: ["center-mark"],
     resultChecker: context => {
@@ -129,7 +133,8 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
 export const TheOnlyThingThatMattersNoGivens: PuzzleDefinition<number> = {
     ...TheOnlyThingThatMatters,
     noIndex: true,
-    slug: TheOnlyThingThatMatters.slug + "-v2",
+    slug: TheOnlyThingThatMatters.slug + "-v3",
     saveStateKey: undefined,
     initialDigits: undefined,
+    items,
 };
