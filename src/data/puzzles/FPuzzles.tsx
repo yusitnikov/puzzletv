@@ -1,4 +1,4 @@
-import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {allDrawingModes, PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {decompressFromBase64} from "lz-string";
@@ -142,7 +142,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             loopHorizontally: loopX,
             loopVertically: loopY,
             fieldMargin: loopX || loopY ? 0.99 : 0,
-            allowDrawing: ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"],
+            allowDrawing: allDrawingModes,
             initialDigits,
             initialColors,
             items,

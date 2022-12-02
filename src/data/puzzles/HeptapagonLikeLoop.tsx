@@ -204,6 +204,8 @@ export const BaseHeptapagonLikeLoop = <ExType, ProcessedExType>(
             "center-line",
             "border-mark",
         ],
+        disableDiagonalCenterLines: true,
+        disableDiagonalBorderLines: true,
         disableLineColors: true,
         items: [
             LoopLineConstraint(),

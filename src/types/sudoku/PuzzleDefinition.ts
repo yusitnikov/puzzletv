@@ -58,6 +58,8 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
         | ((state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => Constraint<CellType, any, ExType, ProcessedExType>[]);
     borderColor?: string;
     allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
+    disableDiagonalCenterLines?: boolean;
+    disableDiagonalBorderLines?: boolean;
     disableLineColors?: boolean;
     hideDeleteButton?: boolean;
     loopHorizontally?: boolean;
@@ -78,6 +80,8 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     initialLives?: number;
     decreaseOnlyOneLive?: boolean;
 }
+
+export const allDrawingModes: PuzzleDefinition<any, any, any>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];
 
 export interface PuzzleDefinitionLoader<CellType, ExType = {}, ProcessedExType = {}> {
     slug: string;

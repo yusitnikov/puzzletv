@@ -19,6 +19,7 @@ import {FieldState} from "./FieldState";
 import {incrementArrayItemByIndex} from "../../utils/array";
 import {CellColorValue} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
+import {PrioritizedQueue} from "../struct/PrioritizedQueue";
 
 export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     public readonly allCells: CellInfo<CellType, ExType, ProcessedExType>[][];
@@ -34,6 +35,8 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
             },
             fieldSize: {rowsCount, columnsCount},
             customCellBounds = {},
+            disableDiagonalCenterLines,
+            disableDiagonalBorderLines,
         } = puzzle;
 
         // Init all cell infos (neighbors and border segments are empty at this point)
@@ -73,6 +76,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                     left: bounds.userArea.left + bounds.userArea.width / 2,
                 },
                 neighbors: new PuzzlePositionSet(puzzle),
+                diagonalNeighbors: new PuzzlePositionSet(puzzle),
                 borderSegments: {},
             };
         }));
@@ -91,6 +95,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                 cells: new PuzzlePositionSet(puzzle, [cellPosition]),
                 type: CellPart.center,
                 neighbors: new PuzzlePositionSet(puzzle),
+                diagonalNeighbors: new PuzzlePositionSet(puzzle),
             };
 
             borders.forEach((border) => border.forEach((point, index) => {
@@ -114,6 +119,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                     cells: new PuzzlePositionSet(puzzle),
                     type: areCustomBounds ? CellPart.border : CellPart.corner,
                     neighbors: new PuzzlePositionSet(puzzle),
+                    diagonalNeighbors: new PuzzlePositionSet(puzzle),
                 });
                 pointInfo.cells = pointInfo.cells.add(cellPosition);
                 if (Object.keys(borderLineStartMap).length > 2) {
@@ -130,12 +136,15 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                 bounds: {borders},
             } = info;
 
+            // Add neighbors by type manager's special geometry
             info.neighbors = info.neighbors.toggleAll(
                 getAdditionalNeighbors(cellPosition, puzzle),
                 true
             );
+            // TODO: getAdditionalDiagonalNeighbors
 
             borders.forEach((border) => border.forEach((point, index) => {
+                // Add neighbors by shared borders
                 const next = incrementArrayItemByIndex(border, index);
 
                 info.neighbors = info.neighbors.toggleAll(
@@ -145,11 +154,42 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                         .items,
                     true
                 );
+
+                // Add neighbors by shared corners
+                const cornerInfo = this.realCellPointMap[this.getPositionHash(point)];
+
+                if (!disableDiagonalCenterLines) {
+                    info.diagonalNeighbors = info.diagonalNeighbors.toggleAll(
+                        cornerInfo
+                            .cells
+                            .remove(cellPosition)
+                            .items,
+                        true
+                    );
+                }
+
+                // Add other border points as diagonal neighbors to the corner point
+                if (!disableDiagonalBorderLines) {
+                    cornerInfo.diagonalNeighbors = cornerInfo.diagonalNeighbors.toggleAll(
+                        border.filter((_, index2) => {
+                            const indexDiff = Math.abs(index2 - index);
+                            return indexDiff > 1 && indexDiff < border.length - 1;
+                        }),
+                        true
+                    );
+                }
             }));
 
+            // Ensure that the regular neighbors are not duplicated as diagonal neighbors
+            info.diagonalNeighbors = info.diagonalNeighbors.toggleAll(info.neighbors.items, false);
+
+            // Set center point's neighbors by cell's neighbors
             const centerInfo = this.realCellPointMap[this.getPositionHash(center)];
             centerInfo.neighbors = centerInfo.neighbors.set(
                 info.neighbors.items.map(({top, left}) => this.allCells[top][left].center)
+            );
+            centerInfo.diagonalNeighbors = centerInfo.diagonalNeighbors.set(
+                info.diagonalNeighbors.items.map(({top, left}) => this.allCells[top][left].center)
             );
         }));
 
@@ -249,8 +289,8 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
         const endKey = this.getPositionHash(end);
 
         const map: Record<string, Position> = {[startKey]: start};
-        const queue = [start];
-        while (queue.length && map[endKey] === undefined) {
+        const queue = new PrioritizedQueue([start]);
+        while (!queue.isEmpty() && map[endKey] === undefined) {
             const position = queue.shift()!;
 
             const info = this.realCellPointMap[this.getPositionHash(position)];
@@ -264,7 +304,16 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
 
                 if (map[nextKey] === undefined) {
                     map[nextKey] = position;
-                    queue.push(next);
+                    queue.push(2, next);
+                }
+            }
+
+            for (const next of info.diagonalNeighbors.items) {
+                const nextKey = this.getPositionHash(next);
+
+                if (map[nextKey] === undefined) {
+                    map[nextKey] = position;
+                    queue.push(3, next);
                 }
             }
         }
@@ -479,6 +528,7 @@ export interface SudokuCellPointInfo {
     cells: SetInterface<Position>;
     type: CellPart;
     neighbors: SetInterface<Position>;
+    diagonalNeighbors: SetInterface<Position>;
 }
 
 export interface SudokuCellBorderInfo {
@@ -499,6 +549,7 @@ export interface CellInfo<CellType, ExType, ProcessedExType> {
     areCustomBounds: boolean;
     center: Position;
     neighbors: SetInterface<Position>;
+    diagonalNeighbors: SetInterface<Position>;
     borderSegments: Record<string, SudokuCellBorderSegmentInfo>;
 }
 

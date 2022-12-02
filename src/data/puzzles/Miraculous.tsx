@@ -1,4 +1,4 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
@@ -109,7 +109,8 @@ export const Miraculous: PuzzleDefinition<number> = {
         SameColorRegionConstraint,
         AutoRegionConstraint(),
     ],
-    allowDrawing: ["center-line", "border-line", "border-mark", "center-mark", "corner-mark"],
+    allowDrawing: allDrawingModes,
+    disableDiagonalBorderLines: true,
     loopHorizontally: true,
     loopVertically: true,
     fieldMargin: 0.99,

@@ -46,6 +46,7 @@ import {DragAction} from "./DragAction";
 import {incrementArrayItem} from "../../utils/array";
 import {CellColor} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
+import {CellPart} from "./CellPart";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -905,6 +906,10 @@ export const gameStateContinueMultiLine = <CellType, ExType, ProcessedExType>(
 
     const currentMultiLineEnd = state.currentMultiLineEnd;
     if (!currentMultiLineEnd) {
+        return result;
+    }
+
+    if (exactPosition.type === (state.isCurrentMultiLineCenters ? CellPart.corner : CellPart.center)) {
         return result;
     }
 

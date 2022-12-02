@@ -1,4 +1,4 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 import {RotatableGameState, RotatableProcessedGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
@@ -33,6 +33,7 @@ export const EmptyRegular: PuzzleDefinition<number> = {
     slug: "empty-regular",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyChaosConstruction: PuzzleDefinition<number> = {
@@ -43,7 +44,8 @@ export const EmptyChaosConstruction: PuzzleDefinition<number> = {
     typeManager: DigitSudokuTypeManager(),
     fieldSize: {...FieldSize9, regions: []},
     items: [AutoRegionConstraint()],
-    allowDrawing: ["center-line", "border-line", "border-mark", "center-mark", "corner-mark"],
+    allowDrawing: allDrawingModes,
+    disableDiagonalBorderLines: true,
     resultChecker: isValidFinishedPuzzleByConstraints,
 };
 
@@ -62,6 +64,7 @@ export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState
     slug: "empty-rotatable",
     typeManager: RotatableDigitSudokuTypeManager,
     fieldSize: FieldSize9,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState> = {
@@ -70,6 +73,7 @@ export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState> = {
     slug: "empty-chess",
     typeManager: ChessSudokuTypeManager,
     fieldSize: FieldSize8,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyCube: PuzzleDefinition<number> = {
@@ -79,6 +83,7 @@ export const EmptyCube: PuzzleDefinition<number> = {
     typeManager: CubeTypeManager(true),
     fieldSize: createCubeFieldSize(6, 3),
     digitsCount: 6,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyCubedoku: PuzzleDefinition<number> = {
@@ -88,6 +93,7 @@ export const EmptyCubedoku: PuzzleDefinition<number> = {
     typeManager: CubedokuTypeManager,
     fieldSize: createCubeFieldSize(6, 3),
     digitsCount: 6,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
@@ -101,6 +107,7 @@ export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState, R
         MonumentValleyGridBordersConstraint(),
     ],
     digitsCount: 9,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
@@ -114,6 +121,7 @@ export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameStat
         MonumentValleyGridBordersConstraint(),
     ],
     digitsCount: 5,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyToroidal: PuzzleDefinition<number> = {
@@ -125,6 +133,7 @@ export const EmptyToroidal: PuzzleDefinition<number> = {
     loopHorizontally: true,
     loopVertically: true,
     fieldMargin: 0.99,
+    allowDrawing: allDrawingModes,
 };
 
 export const EmptyLatin: PuzzleDefinition<number> = {
@@ -133,4 +142,5 @@ export const EmptyLatin: PuzzleDefinition<number> = {
     slug: "empty-latin",
     typeManager: LatinDigitSudokuTypeManager,
     fieldSize: FieldSize9,
+    allowDrawing: allDrawingModes,
 };
