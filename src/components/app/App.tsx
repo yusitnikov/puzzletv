@@ -56,6 +56,7 @@ export const App = () => {
             return <PageLayout
                 scrollable={true}
                 title={translate("Welcome to Puzzle TV!")}
+                addTitleSuffix={false}
             >
                 <HomePage/>
             </PageLayout>;

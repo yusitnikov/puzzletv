@@ -4,15 +4,17 @@ import {useLanguageCode, useTranslate} from "../../../hooks/useTranslate";
 import {buildLink} from "../../../utils/link";
 import {HorizontalMenu, MenuItem, VerticalMenu} from "../menu/Menu";
 import {useWindowSize} from "../../../hooks/useWindowSize";
+import {Title} from "../title/Title";
 
 export interface PageLayoutProps {
     addPadding?: boolean;
     scrollable: boolean;
     title?: ReactNode;
+    addTitleSuffix?: boolean;
     children: ReactNode;
 }
 
-export const PageLayout = ({addPadding = true, scrollable, title, children}: PageLayoutProps) => {
+export const PageLayout = ({addPadding = true, scrollable, title, addTitleSuffix = true, children}: PageLayoutProps) => {
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -45,6 +47,8 @@ export const PageLayout = ({addPadding = true, scrollable, title, children}: Pag
         color: textColor,
         fontFamily: "Lato, sans-serif",
     }}>
+        {title && <Title>{title}{addTitleSuffix && " – Puzzle TV"}</Title>}
+
         <div style={{
             position: "absolute",
             left: 0,
