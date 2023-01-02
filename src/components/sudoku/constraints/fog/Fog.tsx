@@ -16,11 +16,10 @@ import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
 
 export interface FogProps<CellType> {
     solution: CellType[][];
-    startCells: Position[];
-    showBulbs: boolean;
+    startCells?: Position[];
+    startCells3x3?: Position[];
+    bulbCells?: Position[];
 }
-
-const shadeSize = 0.4;
 
 const DarkReaderRectOverride = styled("rect")(({fill}) => ({
     "--darkreader-inline-fill": `${fill} !important`,
@@ -32,7 +31,8 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
         props: {
             solution,
             startCells,
-            showBulbs,
+            startCells3x3,
+            bulbCells,
         },
     }: ConstraintProps<any, FogProps<CellType>>
 ) => {
@@ -46,50 +46,35 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
 
     const {cells} = gameStateGetCurrentFieldState(state);
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
+    const visible3x3Centers = solution.map(
+        (row, top) => row.map(
+            (digit, left) =>
+                startCells3x3?.some((position) => isSamePosition(position, {top, left})) ||
+                (!!givenDigits[top]?.[left] && areSameCellData(digit, givenDigits[top][left], state, true))
+        )
+    );
+    const visible3x3 = solution.map(
+        (row, top) => row.map(
+            (digit, left) =>
+                visible3x3Centers[top - 1]?.[left - 1] || visible3x3Centers[top - 1]?.[left] || visible3x3Centers[top - 1]?.[left + 1] ||
+                visible3x3Centers[top][left - 1]       || visible3x3Centers[top][left]       || visible3x3Centers[top][left + 1] ||
+                visible3x3Centers[top + 1]?.[left - 1] || visible3x3Centers[top + 1]?.[left] || visible3x3Centers[top + 1]?.[left + 1]
+        )
+    );
     const visible = solution.map(
         (row, top) => row.map(
             (digit, left) =>
-                startCells.some((position) => isSamePosition(position, {top, left})) ||
-                (!!givenDigits[top]?.[left] && areSameCellData(digit, givenDigits[top][left], state, true))
+                startCells?.some((position) => isSamePosition(position, {top, left})) ||
+                visible3x3[top][left]
         )
     );
 
     const id = useAutoIncrementId();
-    const rectGradientId = `fog-rect-gradient-${id}`;
-    const circleGradientId = `fog-circle-gradient-${id}`;
-    const fogMaskPartId = `fog-mask-part-${id}`;
     const fogMaskId = `fog-mask-${id}`;
     const fogBulbId = `fog-bulb-${id}`;
 
     return <>
         <defs>
-            <linearGradient id={rectGradientId}>
-                <stop offset={"0%"} stopColor={"#000"} stopOpacity={0}/>
-                <stop offset={"100%"} stopColor={"#000"} stopOpacity={1}/>
-            </linearGradient>
-
-            <radialGradient id={circleGradientId} cx={"100%"} cy={"100%"} r={"100%"}>
-                <stop offset={"0%"} stopColor={"#000"} stopOpacity={1}/>
-                <stop offset={"100%"} stopColor={"#000"} stopOpacity={0}/>
-            </radialGradient>
-
-            <g id={fogMaskPartId}>
-                <rect
-                    width={shadeSize}
-                    y={shadeSize}
-                    height={3 - 2 * shadeSize}
-                    fill={`url(#${rectGradientId})`}
-                    strokeWidth={0}
-                />
-
-                <rect
-                    width={shadeSize}
-                    height={shadeSize}
-                    fill={`url(#${circleGradientId})`}
-                    strokeWidth={0}
-                />
-            </g>
-
             <mask id={fogMaskId}>
                 <DarkReaderRectOverride
                     width={columnsCount}
@@ -100,18 +85,13 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
 
                 {visible.flatMap((row, top) => row.map((vis, left) => vis && <Fragment key={`${top}-${left}`}>
                     <DarkReaderRectOverride
-                        y={top - 1.01 + shadeSize}
-                        x={left - 1.01 + shadeSize}
-                        width={3.02 - 2 * shadeSize}
-                        height={3.02 - 2 * shadeSize}
+                        y={top}
+                        x={left}
+                        width={1}
+                        height={1}
                         fill={"#000"}
                         strokeWidth={0}
                     />
-
-                    <use href={`#${fogMaskPartId}`} transform={`translate(${left - 1} ${top - 1})`}/>
-                    <use href={`#${fogMaskPartId}`} transform={`translate(${left + 2} ${top - 1}) rotate(90)`}/>
-                    <use href={`#${fogMaskPartId}`} transform={`translate(${left + 2} ${top + 2}) rotate(180)`}/>
-                    <use href={`#${fogMaskPartId}`} transform={`translate(${left - 1} ${top + 2}) rotate(270)`}/>
                 </Fragment>))}
             </mask>
 
@@ -169,7 +149,7 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             strokeWidth={0}
         />
 
-        {showBulbs && startCells.map(({top, left}) => <use
+        {bulbCells?.map(({top, left}) => <use
             key={`light-${top}-${left}`}
             href={`#${fogBulbId}`}
             transform={`translate(${left} ${top})`}
@@ -195,15 +175,17 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
 
 export const FogConstraint = <CellType, ExType, ProcessedExType>(
     solution: CellType[][],
-    startCellLiterals: PositionLiteral[],
-    showBulbs = true,
+    startCell3x3Literals: PositionLiteral[] = [],
+    startCellLiterals: PositionLiteral[] = [],
+    bulbCellLiterals = startCell3x3Literals,
 ): Constraint<CellType, FogProps<CellType>, ExType, ProcessedExType> => ({
     name: "fog",
     cells: [],
     props: {
         solution,
+        startCells3x3: parsePositionLiterals(startCell3x3Literals),
         startCells: parsePositionLiterals(startCellLiterals),
-        showBulbs,
+        bulbCells: parsePositionLiterals(bulbCellLiterals),
     },
     component: Fog,
     isValidCell(

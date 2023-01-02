@@ -171,6 +171,9 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             && cells.length === 1
             && puzzleJson.fogofwar?.includes(cells[0]);
 
+        let fowCells: string[] | undefined;
+        let fowCells3x3: string[] | undefined;
+
         // TODO: go over rangsk solver and populate constraints from there
         new ObjectParser<FPuzzlesPuzzle>({
             // region Core fields
@@ -572,15 +575,20 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             },
             disabledlogic: undefined,
             truecandidatesoptions: undefined,
-            fogofwar: (cells, {size}) => {
-                if (cells && puzzleJson.solution && puzzleJson.solution.filter(Boolean).length === size * size) {
-                    const solution = splitArrayIntoChunks(puzzleJson.solution, size);
-                    items.push(FogConstraint<number, {}, {}>(solution, cells, !!puzzleJson.text?.some(isFowText)));
-                    puzzle.prioritizeSelection = true;
-                }
-            }
+            fogofwar: (cells) => {
+                fowCells3x3 = cells;
+            },
+            foglight: (cells) => {
+                fowCells = cells;
+            },
             // endregion
         }, ["size"]).parse(puzzleJson, "f-puzzles data");
+
+        if ((fowCells3x3 || fowCells) && puzzleJson.solution && puzzleJson.solution.filter(Boolean).length === puzzleJson.size * puzzleJson.size) {
+            const solution = splitArrayIntoChunks(puzzleJson.solution, puzzleJson.size);
+            items.push(FogConstraint<number, {}, {}>(solution, fowCells3x3, fowCells, puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells)));
+            puzzle.prioritizeSelection = true;
+        }
 
         return puzzle;
     }

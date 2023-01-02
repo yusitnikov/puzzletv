@@ -62,6 +62,7 @@ export interface FPuzzlesPuzzle {
     renban?: FPuzzlesLineCoords[];
     whispers?: FPuzzlesLineCoords[];
     fogofwar?: FPuzzlesCellsCoords["cells"];
+    foglight?: FPuzzlesCellsCoords["cells"];
     // endregion
     // endregion
 }
