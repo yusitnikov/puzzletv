@@ -1,7 +1,5 @@
 import {useTranslate} from "../../hooks/useTranslate";
 import {LanguageCode} from "../../types/translations/LanguageCode";
-import {ContactMeShort} from "./ContactMe";
-import {ReactNode} from "react";
 
 export const HowToImport = () => {
     const translate = useTranslate();
