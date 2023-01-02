@@ -585,10 +585,9 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             // endregion
         }, ["size"]).parse(puzzleJson, "f-puzzles data");
 
-        if ((fowCells3x3 || fowCells) && puzzleJson.solution && puzzleJson.solution.filter(Boolean).length === puzzleJson.size * puzzleJson.size) {
-            const solution = splitArrayIntoChunks(puzzleJson.solution, puzzleJson.size);
+        if (fowCells3x3 || fowCells) {
             items.push(FogConstraint<number, {}, {}>(
-                solution,
+                puzzleJson.solution && splitArrayIntoChunks(puzzleJson.solution, puzzleJson.size),
                 fowCells3x3,
                 fowCells,
                 puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),

@@ -13,9 +13,10 @@ import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
 import {CellColor} from "../../../../types/sudoku/CellColor";
 import {CellPart} from "../../../../types/sudoku/CellPart";
 import {PuzzlePositionSet} from "../../../../types/sudoku/PuzzlePositionSet";
+import {indexes} from "../../../../utils/indexes";
 
 export interface FogProps<CellType> {
-    solution: CellType[][];
+    solution?: CellType[][];
     startCells?: Position[];
     startCells3x3?: Position[];
     bulbCells?: Position[];
@@ -54,17 +55,17 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
     const {cells, lines} = gameStateGetCurrentFieldState(state);
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
 
-    const visible3x3Centers = solution.map(
-        (row, top) => row.map(
-            (digit, left) =>
+    const visible3x3Centers = indexes(rowsCount).map(
+        (top) => indexes(columnsCount).map(
+            (left) =>
                 startCells3x3?.some((position) => isSamePosition(position, {top, left})) ||
-                (!!givenDigits[top]?.[left] && areSameCellData(digit, givenDigits[top][left], state, true)) ||
+                (!!givenDigits[top]?.[left] && (!solution || areSameCellData(solution[top][left], givenDigits[top][left], state, true))) ||
                 (revealByColors && revealByColors.length > 0 && cells[top][left].colors.containsOneOf(revealByColors))
         )
     );
-    const visible3x3 = solution.map(
-        (row, top) => row.map(
-            (digit, left) =>
+    const visible3x3 = indexes(rowsCount).map(
+        (top) => indexes(columnsCount).map(
+            (left) =>
                 visible3x3Centers[top - 1]?.[left - 1] || visible3x3Centers[top - 1]?.[left] || visible3x3Centers[top - 1]?.[left + 1] ||
                 visible3x3Centers[top][left - 1]       || visible3x3Centers[top][left]       || visible3x3Centers[top][left + 1] ||
                 visible3x3Centers[top + 1]?.[left - 1] || visible3x3Centers[top + 1]?.[left] || visible3x3Centers[top + 1]?.[left + 1]
@@ -79,23 +80,23 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             .filter(info => info?.type === CellPart.center)
             .map(info => info!.cells.first()!)
     );
-    const visibleCrossCenters = solution.map(
-        (row, top) => row.map(
-            (digit, left) => revealByCenterLines && linePoints.contains({top, left})
+    const visibleCrossCenters = indexes(rowsCount).map(
+        (top) => indexes(columnsCount).map(
+            (left) => revealByCenterLines && linePoints.contains({top, left})
         )
     );
-    const visibleCross = solution.map(
-        (row, top) => row.map(
-            (digit, left) =>
+    const visibleCross = indexes(rowsCount).map(
+        (top) => indexes(columnsCount).map(
+            (left) =>
                                                       visibleCrossCenters[top - 1]?.[left] ||
                 visibleCrossCenters[top][left - 1] || visibleCrossCenters[top][left] || visibleCrossCenters[top][left + 1] ||
                                                       visibleCrossCenters[top + 1]?.[left]
         )
     );
 
-    const visible = solution.map(
-        (row, top) => row.map(
-            (digit, left) =>
+    const visible = indexes(rowsCount).map(
+        (top) => indexes(columnsCount).map(
+            (left) =>
                 startCells?.some((position) => isSamePosition(position, {top, left})) ||
                 visible3x3[top][left] || visibleCross[top][left]
         )
@@ -206,7 +207,7 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
 }) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, FogProps<CellType>, ExType, ProcessedExType>) => ReactElement;
 
 export const FogConstraint = <CellType, ExType, ProcessedExType>(
-    solution: CellType[][],
+    solution?: CellType[][],
     startCell3x3Literals: PositionLiteral[] = [],
     startCellLiterals: PositionLiteral[] = [],
     bulbCellLiterals = startCell3x3Literals,
@@ -224,17 +225,17 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
         revealByColors,
     },
     component: Fog,
-    isValidCell(
+    isValidCell: solution && ((
         {top, left},
         digits,
         _,
         {puzzle: {typeManager: {areSameCellData}}, state}
-    ) {
+    ) => {
         return areSameCellData(
             digits[top][left],
             solution[top][left],
             state,
             true
         );
-    },
+    }),
 });

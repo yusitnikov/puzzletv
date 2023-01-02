@@ -25,7 +25,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const isCalculator = type === "calculator";
     const isSpecialGrid = type === "cubedoku";
     const hasSolution = !!puzzle.solution;
-    const hasFog = !!(puzzle.fogofwar || puzzle.foglight) && hasSolution;
+    const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
 
     const handleSubmit = (ev: FormEvent) => {
         ev.preventDefault();
