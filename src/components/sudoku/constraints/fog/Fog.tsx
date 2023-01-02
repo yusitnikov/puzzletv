@@ -5,20 +5,22 @@ import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {Fragment, ReactElement} from "react";
-import {
-    gameStateGetCurrentFieldState,
-    gameStateGetCurrentGivenDigitsByCells
-} from "../../../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "../../../../types/sudoku/GameState";
 import {darkGreyColor} from "../../../app/globals";
 import {CellBackground} from "../../cell/CellBackground";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
+import {CellColor} from "../../../../types/sudoku/CellColor";
+import {CellPart} from "../../../../types/sudoku/CellPart";
+import {PuzzlePositionSet} from "../../../../types/sudoku/PuzzlePositionSet";
 
 export interface FogProps<CellType> {
     solution: CellType[][];
     startCells?: Position[];
     startCells3x3?: Position[];
     bulbCells?: Position[];
+    revealByCenterLines?: boolean;
+    revealByColors?: CellColor[];
 }
 
 const DarkReaderRectOverride = styled("rect")(({fill}) => ({
@@ -33,24 +35,31 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             startCells,
             startCells3x3,
             bulbCells,
+            revealByColors,
+            revealByCenterLines,
         },
     }: ConstraintProps<any, FogProps<CellType>>
 ) => {
     const {
-        puzzle: {
-            fieldSize: {rowsCount, columnsCount},
-            typeManager: {areSameCellData},
-        },
+        puzzle,
         state,
+        cellsIndex,
     } = context;
 
-    const {cells} = gameStateGetCurrentFieldState(state);
+    const {
+        fieldSize: {rowsCount, columnsCount},
+        typeManager: {areSameCellData},
+    } = puzzle;
+
+    const {cells, lines} = gameStateGetCurrentFieldState(state);
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
+
     const visible3x3Centers = solution.map(
         (row, top) => row.map(
             (digit, left) =>
                 startCells3x3?.some((position) => isSamePosition(position, {top, left})) ||
-                (!!givenDigits[top]?.[left] && areSameCellData(digit, givenDigits[top][left], state, true))
+                (!!givenDigits[top]?.[left] && areSameCellData(digit, givenDigits[top][left], state, true)) ||
+                (revealByColors && revealByColors.length > 0 && cells[top][left].colors.containsOneOf(revealByColors))
         )
     );
     const visible3x3 = solution.map(
@@ -61,11 +70,34 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
                 visible3x3Centers[top + 1]?.[left - 1] || visible3x3Centers[top + 1]?.[left] || visible3x3Centers[top + 1]?.[left + 1]
         )
     );
+
+    const linePoints = new PuzzlePositionSet(
+        puzzle,
+        lines.items
+            .flatMap(({start, end}) => [start, end])
+            .map(point => cellsIndex.getPointInfo(point))
+            .filter(info => info?.type === CellPart.center)
+            .map(info => info!.cells.first()!)
+    );
+    const visibleCrossCenters = solution.map(
+        (row, top) => row.map(
+            (digit, left) => revealByCenterLines && linePoints.contains({top, left})
+        )
+    );
+    const visibleCross = solution.map(
+        (row, top) => row.map(
+            (digit, left) =>
+                                                      visibleCrossCenters[top - 1]?.[left] ||
+                visibleCrossCenters[top][left - 1] || visibleCrossCenters[top][left] || visibleCrossCenters[top][left + 1] ||
+                                                      visibleCrossCenters[top + 1]?.[left]
+        )
+    );
+
     const visible = solution.map(
         (row, top) => row.map(
             (digit, left) =>
                 startCells?.some((position) => isSamePosition(position, {top, left})) ||
-                visible3x3[top][left]
+                visible3x3[top][left] || visibleCross[top][left]
         )
     );
 
@@ -178,6 +210,8 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     startCell3x3Literals: PositionLiteral[] = [],
     startCellLiterals: PositionLiteral[] = [],
     bulbCellLiterals = startCell3x3Literals,
+    revealByCenterLines = false,
+    revealByColors: CellColor[] = [],
 ): Constraint<CellType, FogProps<CellType>, ExType, ProcessedExType> => ({
     name: "fog",
     cells: [],
@@ -186,6 +220,8 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
         startCells3x3: parsePositionLiterals(startCell3x3Literals),
         startCells: parsePositionLiterals(startCellLiterals),
         bulbCells: parsePositionLiterals(bulbCellLiterals),
+        revealByCenterLines,
+        revealByColors,
     },
     component: Fog,
     isValidCell(

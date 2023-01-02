@@ -10,7 +10,7 @@ import {parsePositionLiterals, Position, PositionSet, stringifyCellCoords} from 
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
-import {CellColorValue} from "../../types/sudoku/CellColor";
+import {CellColor, CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {splitArrayIntoChunks} from "../../utils/array";
@@ -88,6 +88,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             loopX,
             loopY,
             "product-arrow": productArrow,
+            yajilinFog,
         }
     ) => {
         if (typeof load !== "string") {
@@ -586,8 +587,21 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
         if ((fowCells3x3 || fowCells) && puzzleJson.solution && puzzleJson.solution.filter(Boolean).length === puzzleJson.size * puzzleJson.size) {
             const solution = splitArrayIntoChunks(puzzleJson.solution, puzzleJson.size);
-            items.push(FogConstraint<number, {}, {}>(solution, fowCells3x3, fowCells, puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells)));
+            items.push(FogConstraint<number, {}, {}>(
+                solution,
+                fowCells3x3,
+                fowCells,
+                puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),
+                yajilinFog,
+                yajilinFog ? [CellColor.black] : []
+            ));
             puzzle.prioritizeSelection = true;
+        }
+
+        if (yajilinFog && puzzleJson.size > 9) {
+            puzzle.digitsCount = 9;
+            puzzle.disableDiagonalBorderLines = true;
+            puzzle.disableDiagonalCenterLines = true;
         }
 
         return puzzle;

@@ -20,10 +20,12 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
+    const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
 
     const isCalculator = type === "calculator";
     const isSpecialGrid = type === "cubedoku";
     const hasSolution = !!puzzle.solution;
+    const hasFog = !!(puzzle.fogofwar || puzzle.foglight) && hasSolution;
 
     const handleSubmit = (ev: FormEvent) => {
         ev.preventDefault();
@@ -35,6 +37,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             loopY: !isSpecialGrid && loopY,
             tesseract: !isSpecialGrid && tesseract,
             "product-arrow": !!puzzle.arrow && productArrow,
+            yajilinFog: hasFog && yajilinFog,
             noSpecialRules: !hasSolution && noSpecialRules,
             load,
         });
@@ -89,6 +92,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             <label>
                 Arrow circle is a product instead of a sum:&nbsp;
                 <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
+            </label>
+        </p>}
+
+        {hasFog && <p>
+            <label>
+                Yajilin fog:&nbsp;
+                <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
             </label>
         </p>}
 
