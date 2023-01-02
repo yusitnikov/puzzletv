@@ -75,6 +75,9 @@ export const translationsExactType = {
     "For Setters": {
         [LanguageCode.ru]: "Для авторов головоломок",
     },
+    "How to import puzzle": {
+        [LanguageCode.ru]: "Как импортировать головоломку",
+    },
     "Contacts": {
         [LanguageCode.ru]: "Контакты",
     },

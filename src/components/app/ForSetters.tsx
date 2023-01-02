@@ -1,10 +1,15 @@
-import {useTranslate} from "../../hooks/useTranslate";
+import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {ContactMeShort} from "./ContactMe";
 import {ReactNode} from "react";
+import {buildLink} from "../../utils/link";
 
 export const ForSetters = () => {
+    const language = useLanguageCode();
     const translate = useTranslate();
+
+    const fPuzzlesLink = <a href="https://f-puzzles.com" target="_blank">f-puzzles</a>;
+    const importLink = buildLink("how-to-import-puzzle", language);
 
     return <>
         <dl>
@@ -24,6 +29,17 @@ export const ForSetters = () => {
                 </p>
 
                 <p><ContactMeShort/></p>
+
+                <p>
+                    <strong style={{color: "#f00"}}>{translate({
+                        [LanguageCode.en]: "NEW!",
+                        [LanguageCode.ru]: "НОВИНКА!",
+                    })}</strong>{" "}
+                    {translate({
+                        [LanguageCode.en]: <>There's a limited support for importing from {fPuzzlesLink}. See details <a href={importLink}>here</a>.</>,
+                        [LanguageCode.ru]: <>Есть ограниченная поддержка импорта из {fPuzzlesLink}. Подробнее <a href={importLink}>здесь</a>.</>,
+                    })}
+                </p>
             </FaqItem>
 
             <FaqItem question={translate({

@@ -12,6 +12,7 @@ import {HomePage} from "./HomePage";
 import {ContactMe} from "./ContactMe";
 import {ForSetters} from "./ForSetters";
 import {FPuzzlesWizardPage} from "./FPuzzlesWizardPage";
+import {HowToImport} from "./HowToImport";
 
 export const App = () => {
     const {hash = "", slug, params} = useRoute();
@@ -81,6 +82,13 @@ export const App = () => {
                 title={translate("For Setters")}
             >
                 <ForSetters/>
+            </PageLayout>;
+        case "how-to-import-puzzle":
+            return <PageLayout
+                scrollable={true}
+                title={translate("How to import puzzle")}
+            >
+                <HowToImport/>
             </PageLayout>;
         case "contacts":
             return <PageLayout
