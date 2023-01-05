@@ -5,6 +5,8 @@ export const HowToImport = () => {
     const translate = useTranslate();
 
     const fPuzzlesLink = <a href="https://f-puzzles.com" target="_blank">f-puzzles</a>;
+    // eslint-disable-next-line no-script-url
+    const bookmarkletCode = "javascript:void(d=window.exportPuzzle&&exportPuzzle(),d?open('https://yusitnikov.github.io/puzzletv/#f-puzzles-wizard:load='+d):alert('Unable to extract a puzzle definition'))";
 
     return <ol>
         <li>{translate({
@@ -14,9 +16,7 @@ export const HowToImport = () => {
         <li>{translate({
             [LanguageCode.en]: "Drag&drop the following bookmarklet into your bookmarks bar (only once)",
             [LanguageCode.ru]: "Перетащите следующий букмарклет в Вашу панель закладок (только один раз)",
-        })}: <a
-            href={"javascript:void(d=window.exportPuzzle&&exportPuzzle(),d?open('https://yusitnikov.github.io/puzzletv/#f-puzzles-wizard:load='+d):alert('Unable to extract a puzzle definition'))"}
-        >{translate({
+        })}: <a href={bookmarkletCode}>{translate({
             [LanguageCode.en]: "Export to PuzzleTV",
             [LanguageCode.ru]: "Экспорт в PuzzleTV",
         })}</a>.</li>
