@@ -312,6 +312,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                         context={readOnlySafeContext}
                         cellPosition={cellPosition}
                         colors={finalColors}
+                        noOpacity={!!initialCellColors?.length}
                     />;
                 })}
 
