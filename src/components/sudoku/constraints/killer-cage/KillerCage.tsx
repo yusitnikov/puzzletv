@@ -54,9 +54,7 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
     );
 
     const borderPadding = prioritizeSelection ? 0.15 : 0.1;
-    // TODO: the sum should be visible when the cell is partially covered by fog, but not obscured by the main digit
-    // const sumPadding = prioritizeSelection ? 0.3 : borderPadding;
-    const sumPadding = borderPadding;
+    const sumPadding = prioritizeSelection ? 0.17 : borderPadding;
     const sumDigitSize = prioritizeSelection ? 0.25 : 0.15;
 
     return <>
