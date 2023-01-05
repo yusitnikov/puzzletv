@@ -7,6 +7,7 @@ export const rulesHeaderPaddingCoeff = 1 / 8;
 export const h1HeightCoeff = 1 / 3;
 export const h2HeightCoeff = 1 / 4;
 export const textHeightCoeff = 1 / 5;
+export const aboveRulesTextHeightCoeff = h2HeightCoeff * 0.9;
 
 export const blackColor = "#000";
 export const lightGreyColor = "#cfcfcf";

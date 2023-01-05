@@ -70,6 +70,8 @@ export interface GameState<CellType> {
 
     lives: number;
 
+    fogDemoFieldStateHistory?: FieldStateHistory<CellType>;
+
     currentPlayer?: string;
     playerObjects: Record<string, PlayerObjectInfo>;
 
@@ -210,6 +212,8 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         loopOffset: emptyPosition,
 
         lives: savedGameState?.[9] ?? initialLives,
+
+        fogDemoFieldStateHistory: undefined,
 
         currentPlayer: savedGameState?.[6] || params.host,
         playerObjects: savedGameState?.[8] || {},

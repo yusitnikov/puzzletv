@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import {isSamePosition, parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, getAllPuzzleConstraints} from "../../../../types/sudoku/Constraint";
 import {Fragment, ReactElement} from "react";
 import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "../../../../types/sudoku/GameState";
 import {darkGreyColor} from "../../../app/globals";
@@ -14,7 +14,10 @@ import {CellColor} from "../../../../types/sudoku/CellColor";
 import {CellPart} from "../../../../types/sudoku/CellPart";
 import {PuzzlePositionSet} from "../../../../types/sudoku/PuzzlePositionSet";
 import {indexes} from "../../../../utils/indexes";
+import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {fieldStateHistoryGetCurrent} from "../../../../types/sudoku/FieldStateHistory";
 
+const fogTag = "fog";
 const shadowSize = 0.07;
 
 export interface FogProps<CellType> {
@@ -30,18 +33,15 @@ const DarkReaderRectOverride = styled("rect")(({fill}) => ({
     "--darkreader-inline-fill": `${fill} !important`,
 }));
 
-export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
+export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     {
-        context,
-        props: {
-            solution,
-            startCells,
-            startCells3x3,
-            bulbCells,
-            revealByColors,
-            revealByCenterLines,
-        },
-    }: ConstraintProps<any, FogProps<CellType>>
+        solution,
+        startCells,
+        startCells3x3,
+        revealByColors,
+        revealByCenterLines,
+    }: FogProps<CellType>
 ) => {
     const {
         puzzle,
@@ -54,7 +54,7 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
         typeManager: {areSameCellData},
     } = puzzle;
 
-    const {cells, lines} = gameStateGetCurrentFieldState(state);
+    const {cells, lines} = fieldStateHistoryGetCurrent(state.fogDemoFieldStateHistory ?? state.fieldStateHistory);
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
 
     const visible3x3Centers = indexes(rowsCount).map(
@@ -96,13 +96,28 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
         )
     );
 
-    const visible = indexes(rowsCount).map(
+    return indexes(rowsCount).map(
         (top) => indexes(columnsCount).map(
             (left) =>
                 startCells?.some((position) => isSamePosition(position, {top, left})) ||
                 visible3x3[top][left] || visibleCross[top][left]
         )
     );
+};
+
+export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
+    {context, props}: ConstraintProps<CellType, FogProps<CellType>>
+) => {
+    const {bulbCells} = props;
+
+    const {
+        puzzle: {fieldSize: {rowsCount, columnsCount}},
+        state,
+    } = context;
+
+    const {cells} = gameStateGetCurrentFieldState(state);
+
+    const visible = getFogVisibleCells(context, props);
 
     const id = useAutoIncrementId();
     const blurFilterId = `blur-filter-${id}`;
@@ -224,6 +239,7 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     revealByColors: CellColor[] = [],
 ): Constraint<CellType, FogProps<CellType>, ExType, ProcessedExType> => ({
     name: "fog",
+    tags: [fogTag],
     cells: [],
     props: {
         solution,
@@ -240,7 +256,7 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
         _,
         {puzzle: {typeManager: {areSameCellData}}, state}
     ) => {
-        return areSameCellData(
+        return !!state.fogDemoFieldStateHistory || areSameCellData(
             digits[top][left],
             solution[top][left],
             state,
@@ -248,3 +264,10 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
         );
     }),
 });
+
+export const getFogPropsByContext = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
+): FogProps<CellType> | undefined =>
+    getAllPuzzleConstraints(context)
+        .find(({tags}) => tags?.includes(fogTag))
+        ?.props;

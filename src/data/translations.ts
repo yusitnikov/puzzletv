@@ -36,6 +36,12 @@ export const translationsExactType = {
     "Cancel": {
         [LanguageCode.ru]: "Отмена",
     },
+    "Turn on": {
+        [LanguageCode.ru]: "Включить",
+    },
+    "Turn off": {
+        [LanguageCode.ru]: "Выключить",
+    },
     "Stage %1": {
         [LanguageCode.ru]: "Этап %1",
     },

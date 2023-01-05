@@ -3,8 +3,10 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import styled from "@emotion/styled";
 import {
+    aboveRulesTextHeightCoeff,
     blueColor,
     currentPlayerColor,
+    darkGreyColor,
     greenColor,
     h1HeightCoeff,
     h2HeightCoeff,
@@ -24,6 +26,9 @@ import {toggleFullScreen} from "../../../utils/fullScreen";
 import {useIsFullScreen} from "../../../hooks/useIsFullScreen";
 import {indexes} from "../../../utils/indexes";
 import {Heart} from "@emotion-icons/fluentui-system-filled";
+import {getFogPropsByContext} from "../constraints/fog/Fog";
+import {Button} from "../../layout/button/Button";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 const liveHeartCoeff = 0.3;
 const liveHeartMarginCoeff = 0.1;
@@ -54,12 +59,17 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             lmdLink,
             initialLives = 0,
         },
-        state: {currentPlayer, lives},
+        state,
+        onStateChange,
         cellSizeForSidePanel: cellSize,
         multiPlayer: {isEnabled, allPlayerIds, playerNicknames},
     } = context;
 
+    const {currentPlayer, lives, fogDemoFieldStateHistory} = state;
+
     const isCompetitive = isEnabled && !params.share;
+
+    const fogProps = getFogPropsByContext(context);
 
     return <StyledContainer {...rect} pointerEvents={true}>
         <div
@@ -200,6 +210,55 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
             </div>
 
             {!lives && translate("You lost") + "!"}
+        </div>}
+
+        {fogProps && <div
+            style={{marginBottom: cellSize * rulesMarginCoeff}}
+            title={translate({
+                [LanguageCode.en]: "Turn on to safely modify the grid without revealing the fog.\n" +
+                "All actions made in this mode will be reverted after turning it back off.",
+                [LanguageCode.ru]: "Включите, чтобы свободно изменять вещи на поле, не раскрывая при этом туман.\n" +
+                "Все действия, совершенные в этом режиме, будут отменены после его выключения.",
+            })}
+        >
+            {translate({
+                [LanguageCode.en]: "No fog reveal mode",
+                [LanguageCode.ru]: "Режим без раскрытия тумана",
+            })}{" "}
+
+            <span style={{
+                background: darkGreyColor,
+                color: "#fff",
+                display: "inline-block",
+                textAlign: "center",
+                width: "1.2em",
+                height: "1.2em",
+                lineHeight: "1.2em",
+                borderRadius: "50%",
+                cursor: "pointer",
+            }}>?</span>
+
+            : {translate(fogDemoFieldStateHistory ? "ON" : "OFF")}
+
+            <Button
+                type={"button"}
+                cellSize={cellSize}
+                style={{
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
+                    lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5 - 2}px`,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    marginLeft: cellSize * rulesMarginCoeff,
+                }}
+                onClick={() => onStateChange(
+                    fogDemoFieldStateHistory
+                        ? {fieldStateHistory: fogDemoFieldStateHistory, fogDemoFieldStateHistory: undefined}
+                        : {fogDemoFieldStateHistory: state.fieldStateHistory}
+                )}
+            >
+                {translate(fogDemoFieldStateHistory ? "Turn off" : "Turn on")}
+            </Button>
         </div>}
 
         {puzzleAboveRules?.(translate, context)}

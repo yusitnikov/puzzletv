@@ -6,7 +6,12 @@ import {
     mergeProcessedGameStateWithUpdates,
     PartialGameStateEx
 } from "../../../types/sudoku/GameState";
-import {h2HeightCoeff, rulesHeaderPaddingCoeff, rulesMarginCoeff, yellowColor} from "../../../components/app/globals";
+import {
+    aboveRulesTextHeightCoeff,
+    rulesHeaderPaddingCoeff,
+    rulesMarginCoeff,
+    yellowColor
+} from "../../../components/app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
 import React, {ReactNode} from "react";
@@ -24,8 +29,6 @@ interface MultiStageSudokuOptions {
     getStageButtonText?: (context: PuzzleContext<number, MultiStageGameState>)
         => PartiallyTranslatable<ReactNode> | undefined;
 }
-
-const aboveRulesTextHeightCoeff = h2HeightCoeff * 0.9;
 
 export const MultiStageSudokuTypeManager = (
     {getStage, onStageChange, getStageCompletionText, getStageButtonText}: MultiStageSudokuOptions
