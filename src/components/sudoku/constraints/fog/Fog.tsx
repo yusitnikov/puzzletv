@@ -15,6 +15,8 @@ import {CellPart} from "../../../../types/sudoku/CellPart";
 import {PuzzlePositionSet} from "../../../../types/sudoku/PuzzlePositionSet";
 import {indexes} from "../../../../utils/indexes";
 
+const shadowSize = 0.07;
+
 export interface FogProps<CellType> {
     solution?: CellType[][];
     startCells?: Position[];
@@ -103,29 +105,35 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
     );
 
     const id = useAutoIncrementId();
+    const blurFilterId = `blur-filter-${id}`;
     const fogMaskId = `fog-mask-${id}`;
     const fogBulbId = `fog-bulb-${id}`;
 
     return <>
         <defs>
+            <filter id={blurFilterId}>
+                <feGaussianBlur stdDeviation={shadowSize}/>
+            </filter>
             <mask id={fogMaskId}>
-                <DarkReaderRectOverride
-                    width={columnsCount}
-                    height={rowsCount}
-                    fill={"#fff"}
-                    strokeWidth={0}
-                />
-
-                {visible.flatMap((row, top) => row.map((vis, left) => vis && <Fragment key={`${top}-${left}`}>
+                <g filter={`url(#${blurFilterId})`}>
                     <DarkReaderRectOverride
-                        y={top}
-                        x={left}
-                        width={1}
-                        height={1}
+                        width={columnsCount}
+                        height={rowsCount}
                         fill={"#000"}
                         strokeWidth={0}
                     />
-                </Fragment>))}
+
+                    {visible.flatMap((row, top) => row.map((vis, left) => !vis && <Fragment key={`${top}-${left}`}>
+                        <DarkReaderRectOverride
+                            y={top - shadowSize}
+                            x={left - shadowSize}
+                            width={1 + 2 * shadowSize}
+                            height={1 + 2 * shadowSize}
+                            fill={"#fff"}
+                            strokeWidth={0}
+                        />
+                    </Fragment>))}
+                </g>
             </mask>
 
             <path
