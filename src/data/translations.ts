@@ -258,6 +258,9 @@ export const translationsExactType = {
     "Highlight conflicts": {
         [LanguageCode.ru]: "Подсвечивать конфликты",
     },
+    "Check pencilmarks": {
+        [LanguageCode.ru]: "Проверять пометки",
+    },
     "Auto-check on finish": {
         [LanguageCode.ru]: "Авто-проверка при завершении",
     },

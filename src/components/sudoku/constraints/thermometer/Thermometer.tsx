@@ -38,6 +38,7 @@ export const ThermometerConstraint = <CellType, ExType, ProcessedExType>(cellLit
         component: Thermometer,
         props: undefined,
         color,
+        isObvious: true,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {compareCellData}}, state}) {
             const digit = digits[cell.top][cell.left]!;
 

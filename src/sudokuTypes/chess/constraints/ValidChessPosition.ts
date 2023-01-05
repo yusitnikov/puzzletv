@@ -8,6 +8,7 @@ export const ValidChessPositionConstraint: Constraint<ChessPiece, undefined, Che
     name: "valid chess position",
     cells: [],
     props: undefined,
+    isObvious: true,
     isValidCell(cell, pieces): boolean {
         const {left, top} = cell;
         const {color, type} = pieces[top][left]!;

@@ -7,6 +7,7 @@ export const DisjointGroupsConstraint = <CellType, ExType, ProcessedExType>(
     name: "disjoint groups",
     cells: [],
     props: undefined,
+    isObvious: true,
     isValidCell(
         {left, top},
         digits,

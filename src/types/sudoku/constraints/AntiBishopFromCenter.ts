@@ -5,6 +5,7 @@ export const AntiBishopFromCenterConstraint = <CellType>(regionSize: number): Co
     name: "anti-bishop from center",
     cells: [],
     props: undefined,
+    isObvious: true,
     isValidCell(
         {left, top},
         digits,

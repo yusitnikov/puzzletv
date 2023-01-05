@@ -63,6 +63,8 @@ export const RegionConstraint = <CellType, ExType, ProcessedExType>(
         cells,
         component: showBorders ? Region : undefined,
         props: undefined,
+        isObvious: true,
+        isCheckingFog: true,
         isValidCell(cell, digits, cells, {puzzle, state}) {
             return isValidCellForRegion(cells, cell, digits, puzzle, state);
         },

@@ -249,6 +249,7 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
         revealByColors,
     },
     component: Fog,
+    noPencilmarkCheck: true,
     isValidCell: solution && ((
         {top, left},
         digits,
@@ -264,9 +265,13 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     }),
 });
 
-export const getFogPropsByContext = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>
+export const getFogPropsByConstraintsList = <CellType, ExType, ProcessedExType>(
+    constraints: Constraint<CellType, any, ExType, ProcessedExType>[]
 ): FogProps<CellType> | undefined =>
-    getAllPuzzleConstraints(context)
+    constraints
         .find(({tags}) => tags?.includes(fogTag))
         ?.props;
+
+export const getFogPropsByContext = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
+) => getFogPropsByConstraintsList(getAllPuzzleConstraints(context));

@@ -1,7 +1,11 @@
 import {useState} from "react";
 import {useLanguageCode, useTranslate} from "../../../../hooks/useTranslate";
 import {textHeightCoeff} from "../../../app/globals";
-import {saveBoolToLocalStorage, saveNumberToLocalStorage, saveStringToLocalStorage} from "../../../../utils/localStorage";
+import {
+    saveBoolToLocalStorage,
+    saveNumberToLocalStorage,
+    saveStringToLocalStorage
+} from "../../../../utils/localStorage";
 import {LocalStorageKeys} from "../../../../data/LocalStorageKeys";
 import InputSlider from "react-input-slider";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
@@ -12,6 +16,9 @@ import {SettingsItem} from "./SettingsItem";
 import {SettingsButton} from "./SettingsButton";
 import {SettingsTextBox} from "./SettingsTextBox";
 import {SettingsCheckbox} from "./SettingsCheckbox";
+import {SettingsSelect} from "./SettingsSelect";
+import {PencilmarksCheckerMode} from "../../../../types/sudoku/PencilmarksCheckerMode";
+import {LanguageCode} from "../../../../types/translations/LanguageCode";
 
 export interface SettingsContentProps<CellType, ProcessedExType = {}> {
     context: PuzzleContext<CellType, any, ProcessedExType>;
@@ -35,6 +42,7 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
             },
             state: {
                 enableConflictChecker,
+                pencilmarksCheckerMode,
                 autoCheckOnFinish,
                 backgroundOpacity,
                 nickname,
@@ -54,6 +62,11 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
     const handleChangeEnableConflictChecker = (value: boolean) => {
         onStateChange({enableConflictChecker: value});
         saveBoolToLocalStorage(LocalStorageKeys.enableConflictChecker, value);
+    };
+
+    const handleChangePencilmarksCheckerMode = (value: PencilmarksCheckerMode) => {
+        onStateChange({pencilmarksCheckerMode: value});
+        saveNumberToLocalStorage(LocalStorageKeys.pencilmarksCheckerMode, value);
     };
 
     const handleChangeAutoCheckOnFinish = (value: boolean) => {
@@ -165,16 +178,39 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
             />
         </SettingsItem>}
 
-        {!disableConflictChecker && !forceEnableConflictChecker && <SettingsItem>
-            {translate("Highlight conflicts")}:
+        {!disableConflictChecker && !forceEnableConflictChecker && <>
+            <SettingsItem>
+                {translate("Highlight conflicts")}:
 
-            <SettingsCheckbox
-                type={"checkbox"}
-                cellSize={cellSize}
-                checked={enableConflictChecker}
-                onChange={(ev) => handleChangeEnableConflictChecker(ev.target.checked)}
-            />
-        </SettingsItem>}
+                <SettingsCheckbox
+                    type={"checkbox"}
+                    cellSize={cellSize}
+                    checked={enableConflictChecker}
+                    onChange={(ev) => handleChangeEnableConflictChecker(ev.target.checked)}
+                />
+            </SettingsItem>
+
+            <SettingsItem>
+                <span>{translate("Check pencilmarks")}:</span>
+
+                <SettingsSelect
+                    cellSize={cellSize}
+                    disabled={!enableConflictChecker}
+                    value={enableConflictChecker ? pencilmarksCheckerMode : PencilmarksCheckerMode.Off}
+                    onChange={(ev) => handleChangePencilmarksCheckerMode(Number(ev.target.value))}
+                >
+                    <option value={PencilmarksCheckerMode.Off}>{translate("OFF")}</option>
+                    <option value={PencilmarksCheckerMode.CheckObvious}>{translate({
+                        [LanguageCode.en]: "Check obvious logic",
+                        [LanguageCode.ru]: "Проверять очевидную логику",
+                    })}</option>
+                    <option value={PencilmarksCheckerMode.CheckAll}>{translate({
+                        [LanguageCode.en]: "Check all",
+                        [LanguageCode.ru]: "Проверять всё",
+                    })}</option>
+                </SettingsSelect>
+            </SettingsItem>
+        </>}
 
         {resultChecker && !forceAutoCheckOnFinish && <SettingsItem>
             {translate("Auto-check on finish")}:

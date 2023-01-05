@@ -32,14 +32,14 @@ export interface CellDigitsProps<CellType, ExType = {}, ProcessedExType = {}> {
     size: number;
     cellPosition?: Position;
     mainColor?: boolean;
-    isValidUserDigit?: boolean;
+    isValidUserDigit?: (digit?: CellType) => boolean;
 }
 
 export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, excludedDigits: SetInterface<CellType> | undefined, data: Partial<CellState<CellType>>) =>
     initialData === undefined && !excludedDigits?.size && isEmptyCellState(data, true);
 
 export const CellDigits = <CellType, ExType = {}, ProcessedExType = {}>(
-    {context, data, initialData, excludedDigits, size, cellPosition, mainColor, isValidUserDigit = true}: CellDigitsProps<CellType, ExType, ProcessedExType>
+    {context, data, initialData, excludedDigits, size, cellPosition, mainColor, isValidUserDigit = () => true}: CellDigitsProps<CellType, ExType, ProcessedExType>
 ) => {
     if (shouldSkipCellDigits(initialData, excludedDigits, data)) {
         return null;
@@ -139,7 +139,7 @@ export const CellDigits = <CellType, ExType = {}, ProcessedExType = {}>(
                         size * mainDigitCoeff,
                         () => emptyPositionWithAngle,
                         false,
-                        isValidUserDigit
+                        isValidUserDigit()
                     )}
 
                     {usersDigit === undefined && <>
@@ -153,7 +153,7 @@ export const CellDigits = <CellType, ExType = {}, ProcessedExType = {}>(
                                 angle: 0,
                             }),
                             false,
-                            (cellData) => !excludedDigits?.contains(cellData),
+                            (cellData) => !excludedDigits?.contains(cellData) && isValidUserDigit(cellData),
                             (cellData) => !!cellPosition && context.state.processed.lastPlayerObjects[getExcludedDigitDataHash(cellPosition, cellData, context)]
                         )}
 
@@ -165,7 +165,9 @@ export const CellDigits = <CellType, ExType = {}, ProcessedExType = {}>(
                                 left: size * corners[index].left * (0.45 - cornerDigitCoeff * 0.5),
                                 top: size * corners[index].top * (0.45 - cornerDigitCoeff * 0.5),
                                 angle: 0,
-                            })
+                            }),
+                            false,
+                            (cellData) => isValidUserDigit(cellData)
                         )}
                     </>}
                 </>}

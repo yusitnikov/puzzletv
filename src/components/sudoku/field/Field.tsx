@@ -34,8 +34,9 @@ import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
 import {applyCurrentMultiLineAction} from "../../../types/sudoku/GameStateAction";
-import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {CellColorValue} from "../../../types/sudoku/CellColor";
+import {PencilmarksCheckerMode} from "../../../types/sudoku/PencilmarksCheckerMode";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -89,6 +90,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const {
         selectedCells,
         enableConflictChecker,
+        pencilmarksCheckerMode,
         loopOffset,
         initialDigits: stateInitialDigits,
         excludedDigits,
@@ -367,7 +369,23 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                         excludedDigits={cellExcludedDigits}
                         size={1}
                         cellPosition={cell}
-                        isValidUserDigit={!(enableConflictChecker || forceEnableConflictChecker) || disableConflictChecker || isValidUserDigit(cell, userDigits, items, readOnlySafeContext)}
+                        isValidUserDigit={
+                            (digit) =>
+                                !(enableConflictChecker || forceEnableConflictChecker) ||
+                                disableConflictChecker ||
+                                (digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.Off) ||
+                                isValidUserDigit(
+                                    cell,
+                                    digit === undefined
+                                        ? userDigits
+                                        : mergeGivenDigitsMaps(userDigits, {[cell.top]: {[cell.left]: digit}}),
+                                    items,
+                                    readOnlySafeContext,
+                                    false,
+                                    digit !== undefined,
+                                    digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.CheckObvious
+                                )
+                        }
                     />;
                 }, true)}
 

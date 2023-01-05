@@ -156,6 +156,7 @@ export const QuadleConstraint = <CellType, ExType, ProcessedExType>(
             isRecent,
         },
         component: Quadle,
+        isObvious: true,
         isValidCell(cell, digitsMap, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
             const data = digitsMap[cell.top][cell.left];
 

@@ -29,6 +29,7 @@ export const EvenConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: P
         cells: [cell],
         component: Even,
         props: undefined,
+        isObvious: true,
         isValidCell(cell, digits, _, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 

@@ -5,6 +5,7 @@ import {LineComponent, LineProps} from "../line/Line";
 
 export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
     name: string,
+    isObvious: boolean,
     color: string,
     cellLiterals: PositionLiteral[],
     isValidDomino: (digit1: number, digit2: number) => boolean,
@@ -19,6 +20,7 @@ export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
         color,
         props: {width},
         component: display ? LineComponent : undefined,
+        isObvious,
         isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 

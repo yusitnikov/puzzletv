@@ -11,6 +11,7 @@ import {PuzzleContext} from "./PuzzleContext";
 import {SetInterface} from "../struct/Set";
 import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 import {LineWithColor} from "./LineWithColor";
+import {getFogPropsByConstraintsList} from "../../components/sudoku/constraints/fog/Fog";
 
 export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType = {}> = {
     name: string;
@@ -19,6 +20,9 @@ export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType
     component?: ComponentType<ConstraintProps<CellType, DataT, ExType, ProcessedExType>>;
     color?: string;
     angle?: number;
+    isObvious?: boolean;
+    isCheckingFog?: boolean;
+    noPencilmarkCheck?: boolean;
     isValidCell?(
         cell: Position,
         digits: GivenDigitsMap<CellType>,
@@ -26,6 +30,7 @@ export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
         constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
         isFinalCheck?: boolean,
+        onlyObvious?: boolean,
     ): boolean;
     isValidPuzzle?(
         lines: SetInterface<Line>,
@@ -102,20 +107,36 @@ export const isValidUserDigit = <CellType, ExType, ProcessedExType>(
     userDigits: GivenDigitsMap<CellType>,
     constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
-    isFinalCheck = false
+    isFinalCheck = false,
+    isPencilmark = false,
+    onlyObvious = false
 ) => {
     const userDigit = userDigits[cell.top]?.[cell.left];
     if (userDigit === undefined) {
         return true;
     }
 
-    for (const {cells, isValidCell} of constraints) {
+    const isFogPuzzle = !!getFogPropsByConstraintsList(constraints);
+
+    for (const {cells, isValidCell, isObvious, isCheckingFog, noPencilmarkCheck} of constraints) {
+        if (onlyObvious && !isObvious) {
+            continue;
+        }
+
+        if (isPencilmark && noPencilmarkCheck) {
+            continue;
+        }
+
+        if (isFogPuzzle && !isCheckingFog) {
+            continue;
+        }
+
         const normalizedConstraintCells = normalizeConstraintCells(cells, context.puzzle);
         if (normalizedConstraintCells.length && !normalizedConstraintCells.some((constraintCell: Position) => isSamePosition(constraintCell, cell))) {
             continue;
         }
 
-        if (isValidCell && !isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, isFinalCheck)) {
+        if (isValidCell && !isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, isFinalCheck, onlyObvious)) {
             return false;
         }
     }

@@ -8,6 +8,7 @@ export const TenInOneRegionConstraint = <CellType, ExType, ProcessedExType>(cell
     cells: parsePositionLiterals(cellLiterals),
     component: Region,
     props: undefined,
+    isObvious: true,
     isValidCell(cell, digits, cells, {puzzle}) {
         const cellData = cells
             .map(({top, left}) => digits[top]?.[left])

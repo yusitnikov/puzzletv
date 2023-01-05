@@ -16,6 +16,7 @@ export const BasePalindromeConstraint = <CellType, ExType, ProcessedExType>(
     color,
     props: {width},
     component: LineComponent,
+    isObvious: true,
     isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
         const index = cells.findIndex(position => isSamePosition(cell, position));
         if (index < 0) {

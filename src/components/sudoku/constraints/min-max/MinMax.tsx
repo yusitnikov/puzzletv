@@ -99,6 +99,7 @@ export const MinMaxConstraint = <CellType, ExType, ProcessedExType>(
         ],
         component,
         props: undefined,
+        isObvious: true,
         isValidCell(cell, digits, [mainCell, ...neighborCells], {puzzle: {typeManager: {compareCellData}}, state}) {
             const digit = digits[cell.top][cell.left]!;
 

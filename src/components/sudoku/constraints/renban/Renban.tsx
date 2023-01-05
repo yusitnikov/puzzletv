@@ -10,9 +10,22 @@ export const RenbanConstraint = <CellType, ExType, ProcessedExType>(cellLiterals
     color: "#f0f",
     component: display ? LineComponent : undefined,
     props: {},
-    isValidCell(cell, digits, cells, {puzzle, state}) {
+    isObvious: true,
+    isValidCell(
+        cell,
+        digits,
+        cells,
+        {puzzle, state},
+        constraints,
+        isFinalCheck,
+        onlyObvious
+    ) {
         if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
             return false;
+        }
+
+        if (onlyObvious) {
+            return true;
         }
 
         const actualDigits = cells

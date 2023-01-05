@@ -5,6 +5,7 @@ export const AntiKnightConstraint = <CellType, ExType, ProcessedExType>(): Const
     name: "anti-knight",
     cells: [],
     props: undefined,
+    isObvious: true,
     isValidCell(
         {left, top},
         digits,

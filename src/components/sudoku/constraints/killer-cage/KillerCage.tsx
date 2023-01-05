@@ -173,12 +173,21 @@ export const KillerCageConstraint = <CellType, ExType, ProcessedExType>(
 ): Constraint<CellType, KillerCageProps, ExType, ProcessedExType> => ({
     ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor),
     name: "killer cage",
-    isValidCell(cell, digits, cells, {puzzle, state}) {
+    isObvious: true,
+    isValidCell(
+        cell,
+        digits,
+        cells,
+        {puzzle, state},
+        constraints,
+        isFinalCheck,
+        onlyObvious
+    ) {
         if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
             return false;
         }
 
-        if (sum === undefined) {
+        if (sum === undefined || onlyObvious) {
             return true;
         }
 

@@ -47,6 +47,7 @@ import {incrementArrayItem} from "../../utils/array";
 import {CellColor} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
 import {CellPart} from "./CellPart";
+import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -77,6 +78,7 @@ export interface GameState<CellType> {
 
     isShowingSettings: boolean;
     enableConflictChecker: boolean;
+    pencilmarksCheckerMode: PencilmarksCheckerMode;
     autoCheckOnFinish: boolean;
     backgroundOpacity: number;
     nickname: string;
@@ -220,6 +222,7 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
 
         isShowingSettings: false,
         enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
+        pencilmarksCheckerMode: loadNumberFromLocalStorage(LocalStorageKeys.pencilmarksCheckerMode, PencilmarksCheckerMode.CheckObvious),
         autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
         backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
         nickname: loadStringFromLocalStorage(LocalStorageKeys.nickname, ""),

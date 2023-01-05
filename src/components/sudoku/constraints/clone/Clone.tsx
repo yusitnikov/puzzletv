@@ -24,6 +24,7 @@ export const CloneConstraint = <CellType, ExType, ProcessedExType>(cellLiterals:
     cells: parsePositionLiterals(cellLiterals),
     component: Clone,
     props: undefined,
+    isObvious: true,
     isValidCell({top, left}, digits, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
         const digit = digits[top][left]!;
 

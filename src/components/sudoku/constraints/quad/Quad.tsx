@@ -105,6 +105,7 @@ export const QuadConstraint = <CellType, ExType, ProcessedExType>(
             radius,
         },
         component: Quad,
+        isObvious: true,
         isValidCell({top, left}, digitsMap, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
             const data = digitsMap[top][left];
 

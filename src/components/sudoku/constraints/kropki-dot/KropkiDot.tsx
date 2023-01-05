@@ -71,6 +71,7 @@ export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
             showValue,
         },
         component: KropkiDot,
+        isObvious: true,
         isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const data1 = digits[cell1.top]?.[cell1.left];
             const data2 = digits[cell2.top]?.[cell2.left];

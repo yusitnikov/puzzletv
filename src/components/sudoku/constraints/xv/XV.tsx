@@ -68,6 +68,7 @@ const XVConstraint = <CellType, ExType, ProcessedExType>(
         cells: [cell1, cell2],
         component,
         props: undefined,
+        isObvious: true,
         isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
             const digit1 = digits[cell1.top]?.[cell1.left];
             const digit2 = digits[cell2.top]?.[cell2.left];

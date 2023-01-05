@@ -20,6 +20,7 @@ const BaseNeighborsConstraint = <CellType, ExType, ProcessedExType>(
         name,
         cells: [],
         props: undefined,
+        isObvious: true,
         isValidCell(
             cell,
             digits,
