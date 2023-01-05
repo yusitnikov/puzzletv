@@ -182,35 +182,36 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             />
         </defs>
 
-        <rect
-            width={columnsCount}
-            height={rowsCount}
-            fill={darkGreyColor}
-            mask={`url(#${fogMaskId})`}
-            strokeWidth={0}
-        />
+        <g mask={`url(#${fogMaskId})`}>
+            <rect
+                width={columnsCount}
+                height={rowsCount}
+                fill={darkGreyColor}
+                strokeWidth={0}
+            />
+
+            {indexes(rowsCount).map((top) => indexes(columnsCount).map((left) => {
+                const {colors} = cells[top][left];
+
+                return colors.size !== 0 && <AutoSvg
+                    key={`${top}-${left}`}
+                    top={top}
+                    left={left}
+                >
+                    <CellBackground
+                        context={context}
+                        cellPosition={{top, left}}
+                        colors={colors}
+                    />
+                </AutoSvg>;
+            }))}
+        </g>
 
         {bulbCells?.map(({top, left}) => <use
             key={`light-${top}-${left}`}
             href={`#${fogBulbId}`}
             transform={`translate(${left} ${top})`}
         />)}
-
-        {visible.flatMap((row, top) => row.map((vis, left) => {
-            const {colors} = cells[top][left];
-
-            return !vis && colors.size !== 0 && <AutoSvg
-                key={`${top}-${left}`}
-                top={top}
-                left={left}
-            >
-                <CellBackground
-                    context={context}
-                    cellPosition={{top, left}}
-                    colors={colors}
-                />
-            </AutoSvg>;
-        }))}
     </>;
 }) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, FogProps<CellType>, ExType, ProcessedExType>) => ReactElement;
 
