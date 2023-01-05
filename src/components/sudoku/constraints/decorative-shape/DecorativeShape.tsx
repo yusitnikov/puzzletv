@@ -15,8 +15,11 @@ export interface DecorativeShapeProps extends Size {
     textColor?: string;
 }
 
-const DecorativeShapeComponent = <CellType, >(Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>) => {
-    return withFieldLayer(FieldLayer.lines, function DecorativeShapeComponent(
+const DecorativeShapeComponent = <CellType, >(
+    Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>,
+    layer = FieldLayer.lines
+) => {
+    return withFieldLayer(layer, function DecorativeShapeComponent(
         {
             cells: [{top, left}],
             props: {
@@ -55,19 +58,19 @@ const DecorativeShapeComponent = <CellType, >(Component: ComponentType<Size & Om
     }) as ConstraintPropsGenericFc<DecorativeShapeProps>;
 };
 
-export const RectComponent = DecorativeShapeComponent((props) => <rect
+export const RectComponent = (layer = FieldLayer.lines) => DecorativeShapeComponent((props) => <rect
     x={-props.width / 2}
     y={-props.height / 2}
     {...props}
-/>);
+/>, layer);
 
-export const EllipseComponent = DecorativeShapeComponent(({width, height, ...props}) => <ellipse
+export const EllipseComponent = (layer = FieldLayer.lines) => DecorativeShapeComponent(({width, height, ...props}) => <ellipse
     cx={0}
     cy={0}
     rx={width / 2}
     ry={height / 2}
     {...props}
-/>);
+/>, layer);
 
 const DecorativeShapeConstraint = <CellType, ExType, ProcessedExType>(
     name: string,
@@ -103,8 +106,9 @@ export const RectConstraint = <CellType, ExType, ProcessedExType>(
     borderColor?: string,
     text?: string,
     textColor?: string,
-    angle?: number
-) => DecorativeShapeConstraint<CellType, ExType, ProcessedExType>("rect", RectComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+    angle?: number,
+    layer = FieldLayer.lines,
+) => DecorativeShapeConstraint<CellType, ExType, ProcessedExType>("rect", RectComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
 
 export const EllipseConstraint = <CellType, ExType, ProcessedExType>(
     cellLiterals: PositionLiteral[],
@@ -113,5 +117,6 @@ export const EllipseConstraint = <CellType, ExType, ProcessedExType>(
     borderColor?: string,
     text?: string,
     textColor?: string,
-    angle?: number
-) => DecorativeShapeConstraint<CellType, ExType, ProcessedExType>("ellipse", EllipseComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+    angle?: number,
+    layer = FieldLayer.lines,
+) => DecorativeShapeConstraint<CellType, ExType, ProcessedExType>("ellipse", EllipseComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);

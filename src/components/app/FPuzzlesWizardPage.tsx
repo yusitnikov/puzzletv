@@ -21,11 +21,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
+    const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
 
     const isCalculator = type === "calculator";
     const isSpecialGrid = type === "cubedoku";
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
+    const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
 
     const handleSubmit = (ev: FormEvent) => {
         ev.preventDefault();
@@ -38,6 +40,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             tesseract: !isSpecialGrid && tesseract,
             "product-arrow": !!puzzle.arrow && productArrow,
             yajilinFog: hasFog && yajilinFog,
+            cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
             noSpecialRules: !hasSolution && noSpecialRules,
             load,
         });
@@ -95,12 +98,22 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             </label>
         </p>}
 
-        {hasFog && <p>
-            <label>
-                Yajilin fog:&nbsp;
-                <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
-            </label>
-        </p>}
+        {hasFog && <>
+            <p>
+                <label>
+                    Yajilin fog:&nbsp;
+                    <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
+                </label>
+            </p>
+
+            {hasCosmeticElements && <p>
+                <label>
+                    Hide cosmetic elements behind the fog:&nbsp;
+                    <input type={"checkbox"} checked={cosmeticsBehindFog}
+                           onChange={ev => setCosmeticsBehindFog(ev.target.checked)}/>
+                </label>
+            </p>}
+        </>}
 
         {!hasSolution && <p>
             <label>

@@ -64,6 +64,7 @@ import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {FPuzzlesText} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesText";
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
+import {FieldLayer} from "../../types/sudoku/FieldLayer";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -89,6 +90,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
             loopY,
             "product-arrow": productArrow,
             yajilinFog,
+            cosmeticsBehindFog,
         }
     ) => {
         if (typeof load !== "string") {
@@ -174,6 +176,8 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
         let fowCells: string[] | undefined;
         let fowCells3x3: string[] | undefined;
+
+        const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.lines;
 
         // TODO: go over rangsk solver and populate constraints from there
         new ObjectParser<FPuzzlesPuzzle>({
@@ -502,7 +506,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
                         checkForOutsideCells(cells, size);
 
-                        return RectConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle);
+                        return RectConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
                     }));
                 }
             },
@@ -513,7 +517,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
                         checkForOutsideCells(cells, size);
 
-                        return EllipseConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle);
+                        return EllipseConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
                     }));
                 }
             },
@@ -532,7 +536,7 @@ export const FPuzzles: PuzzleDefinitionLoader<number> = {
 
                         checkForOutsideCells(cells, fieldSize);
 
-                        return [TextConstraint<number, {}, {}>(cells, value, fontC, size, angle)];
+                        return [TextConstraint<number, {}, {}>(cells, value, fontC, size, angle, cosmeticsLayer)];
                     }));
                 }
             },
