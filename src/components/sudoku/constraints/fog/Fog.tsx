@@ -15,7 +15,6 @@ import {CellPart} from "../../../../types/sudoku/CellPart";
 import {PuzzlePositionSet} from "../../../../types/sudoku/PuzzlePositionSet";
 import {indexes} from "../../../../utils/indexes";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
-import {fieldStateHistoryGetCurrent} from "../../../../types/sudoku/FieldStateHistory";
 
 const fogTag = "fog";
 const shadowSize = 0.07;
@@ -54,7 +53,7 @@ export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
         typeManager: {areSameCellData},
     } = puzzle;
 
-    const {cells, lines} = fieldStateHistoryGetCurrent(state.fogDemoFieldStateHistory ?? state.fieldStateHistory);
+    const {cells, lines} = gameStateGetCurrentFieldState(state, true);
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
 
     const visible3x3Centers = indexes(rowsCount).map(

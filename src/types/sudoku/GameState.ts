@@ -251,7 +251,7 @@ export const saveGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         ([
             [
                 fullSaveStateKey,
-                serializeFieldState(gameStateGetCurrentFieldState(state), typeManager),
+                serializeFieldState(gameStateGetCurrentFieldState(state, true), typeManager),
                 typeManager.serializeGameState(state.extension),
                 serializeGivenDigitsMap(state.initialDigits, typeManager.serializeCellData),
                 serializeGivenDigitsMap(state.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
@@ -310,8 +310,12 @@ export const setAllShareState = <CellType, ExType = {}, ProcessedExType = {}>(
 // endregion
 
 // region History
-export const gameStateGetCurrentFieldState = <CellType>({fieldStateHistory}: GameState<CellType>) =>
-    fieldStateHistoryGetCurrent(fieldStateHistory);
+export const gameStateGetCurrentFieldState = <CellType>(
+    {fieldStateHistory, fogDemoFieldStateHistory}: GameState<CellType>,
+    useFogDemoState = false
+) => fieldStateHistoryGetCurrent(
+    (useFogDemoState ? fogDemoFieldStateHistory : undefined) ?? fieldStateHistory
+);
 
 export const gameStateGetCurrentGivenDigitsByCells = <CellType>(cells: CellState<CellType>[][]) => {
     const result: GivenDigitsMap<CellType> = {};
