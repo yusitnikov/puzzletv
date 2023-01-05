@@ -1,7 +1,7 @@
 import {ComponentType, ReactElement} from "react";
 import {isSamePosition, Line, Position} from "../layout/Position";
 import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "./GameState";
-import {PuzzleDefinition} from "./PuzzleDefinition";
+import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
 import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
 import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
@@ -94,16 +94,8 @@ export const prepareGivenDigitsMapForConstraints = <CellType>(
     cells: CellState<CellType>[][]
 ) => mergeGivenDigitsMaps(gameStateGetCurrentGivenDigitsByCells(cells), initialDigits, stateInitialDigits);
 
-export const normalizeConstraintCell = (
-    {left, top}: Position,
-    {fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<any, any, any>
-): Position => ({
-    left: (left + columnsCount) % columnsCount,
-    top: (top + rowsCount) % rowsCount,
-});
-
 export const normalizeConstraintCells = (positions: Position[], puzzle: PuzzleDefinition<any, any, any>) =>
-    positions.map(position => normalizeConstraintCell(position, puzzle));
+    positions.map(position => normalizePuzzlePosition(position, puzzle));
 
 export const isValidUserDigit = <CellType, ExType, ProcessedExType>(
     cell: Position,
