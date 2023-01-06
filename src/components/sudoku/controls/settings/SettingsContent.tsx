@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useLanguageCode, useTranslate} from "../../../../hooks/useTranslate";
 import {textHeightCoeff} from "../../../app/globals";
 import {
@@ -19,6 +19,7 @@ import {SettingsCheckbox} from "./SettingsCheckbox";
 import {SettingsSelect} from "./SettingsSelect";
 import {PencilmarksCheckerMode} from "../../../../types/sudoku/PencilmarksCheckerMode";
 import {LanguageCode} from "../../../../types/translations/LanguageCode";
+import {shortenUrl} from "../../../../services/tinyUrl";
 
 export interface SettingsContentProps<CellType, ProcessedExType = {}> {
     context: PuzzleContext<CellType, any, ProcessedExType>;
@@ -59,6 +60,14 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
 
     const [isCopied, setIsCopied] = useState(false);
 
+    const fullUrl = window.location.href;
+    const [shortenedUrl, setShortenedUrl] = useState(fullUrl);
+    useEffect(() => {
+        if (isEnabled) {
+            shortenUrl(fullUrl).then(setShortenedUrl);
+        }
+    }, [isEnabled, fullUrl]);
+
     const handleChangeEnableConflictChecker = (value: boolean) => {
         onStateChange({enableConflictChecker: value});
         saveBoolToLocalStorage(LocalStorageKeys.enableConflictChecker, value);
@@ -96,7 +105,7 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
                 type={"button"}
                 cellSize={cellSize}
                 onClick={() => {
-                    window.open(window.location.origin + window.location.pathname + buildLink(
+                    window.open(buildLink(
                         slug,
                         language,
                         {
@@ -104,7 +113,8 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
                             host: myClientId,
                             room: Math.random().toString().substring(2),
                             share: false,
-                        }
+                        },
+                        true
                     ));
                 }}
             >
@@ -115,7 +125,7 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
                 type={"button"}
                 cellSize={cellSize}
                 onClick={() => {
-                    window.open(window.location.origin + window.location.pathname + buildLink(
+                    window.open(buildLink(
                         slug,
                         language,
                         {
@@ -124,7 +134,8 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
                             host: myClientId,
                             room: Math.random().toString().substring(2),
                             share: true,
-                        }
+                        },
+                        true
                     ));
                 }}
             >
@@ -143,7 +154,7 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
                     type={"text"}
                     readOnly={true}
                     cellSize={cellSize}
-                    value={window.location.href}
+                    value={shortenedUrl}
                     onFocus={({target}) => target.select()}
                 />
 
@@ -152,7 +163,7 @@ export const SettingsContent = <CellType, ProcessedExType = {}>(
                         type={"button"}
                         cellSize={cellSize}
                         onClick={async () => {
-                            await window.navigator.clipboard.writeText(window.location.href);
+                            await window.navigator.clipboard.writeText(shortenedUrl);
                             setIsCopied(true);
                             window.setTimeout(() => setIsCopied(false), 1000);
                         }}

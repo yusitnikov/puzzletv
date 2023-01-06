@@ -1,9 +1,9 @@
 import {LanguageCode} from "../types/translations/LanguageCode";
 
-export const buildLink = (slug: string, language: LanguageCode, params: any = {}) => {
+export const buildLink = (slug: string, language: LanguageCode, params: any = {}, fullUrl = false) => {
     params.lang = language === LanguageCode.en ? undefined : language;
 
-    let href = `#${slug}`;
+    let href = `${fullUrl ? window.location.origin + window.location.pathname : ""}#${slug}`;
 
     for (const [key, value] of Object.entries(params)) {
         if (["string", "number"].includes(typeof value)) {
