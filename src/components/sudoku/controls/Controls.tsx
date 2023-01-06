@@ -94,6 +94,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
         isShowingSettings,
         openedLmdOnce,
         lives,
+        fogDemoFieldStateHistory,
         processed: {
             isReady,
             cellWriteModeInfo: {digitsCount: digitsCountFunc = digitsCount},
@@ -563,7 +564,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             </form>
         </Modal>}
 
-        {resultChecker && !forceAutoCheckOnFinish && <ControlButton
+        {resultChecker && !forceAutoCheckOnFinish && !fogDemoFieldStateHistory && <ControlButton
             left={isRevertedMisc ? miscRow : 2}
             top={isRevertedMisc ? 2 : miscRow}
             cellSize={cellSize}
@@ -573,7 +574,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             <Check/>
         </ControlButton>}
         {/* The score could be mis-calculated before getting confirmation from the host, so don't display the results until then */}
-        {isShowingResult && myPendingMessages.length === 0 && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
+        {isShowingResult && !fogDemoFieldStateHistory && myPendingMessages.length === 0 && <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
             <div>
                 {
                     getPlayerScore

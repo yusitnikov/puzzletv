@@ -40,7 +40,8 @@
             "react-app"
         ],
         "rules": {
-            "react/jsx-no-target-blank": "off"
+            "react/jsx-no-target-blank": "off",
+            "no-loop-func": "off"
         }
     },
     "browserslist": {

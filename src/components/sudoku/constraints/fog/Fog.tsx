@@ -11,12 +11,14 @@ import {CellBackground} from "../../cell/CellBackground";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
 import {CellColor} from "../../../../types/sudoku/CellColor";
-import {CellPart} from "../../../../types/sudoku/CellPart";
 import {PuzzlePositionSet} from "../../../../types/sudoku/PuzzlePositionSet";
 import {indexes} from "../../../../utils/indexes";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
+import {resolvePuzzleInitialColors} from "../../../../types/sudoku/PuzzleDefinition";
+import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 
-const fogTag = "fog";
+export const fogTag = "fog";
 const shadowSize = 0.07;
 
 export interface FogProps<CellType> {
@@ -24,8 +26,8 @@ export interface FogProps<CellType> {
     startCells?: Position[];
     startCells3x3?: Position[];
     bulbCells?: Position[];
-    revealByCenterLines?: boolean;
-    revealByColors?: CellColor[];
+    revealByCenterLines?: boolean | PuzzleLineSet<CellType, any, any>;
+    revealByColors?: CellColor[] | GivenDigitsMap<CellColor>;
 }
 
 const DarkReaderRectOverride = styled("rect")(({fill}) => ({
@@ -55,13 +57,18 @@ export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
 
     const {cells, lines} = gameStateGetCurrentFieldState(state, true);
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
+    const initialColors = resolvePuzzleInitialColors(context);
 
     const visible3x3Centers = indexes(rowsCount).map(
         (top) => indexes(columnsCount).map(
             (left) =>
                 startCells3x3?.some((position) => isSamePosition(position, {top, left})) ||
                 (!!givenDigits[top]?.[left] && (!solution || areSameCellData(solution[top][left], givenDigits[top][left], state, true))) ||
-                (revealByColors && revealByColors.length > 0 && cells[top][left].colors.containsOneOf(revealByColors))
+                (revealByColors && cells[top][left].colors.size === 1 && !initialColors[top]?.[left] && (
+                    Array.isArray(revealByColors)
+                        ? revealByColors.includes(cells[top][left].colors.first()!)
+                        : cells[top][left].colors.first() === revealByColors[top]?.[left]
+                ))
         )
     );
     const visible3x3 = indexes(rowsCount).map(
@@ -75,11 +82,9 @@ export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
 
     const linePoints = new PuzzlePositionSet(
         puzzle,
-        lines.items
+        cellsIndex.getCenterLines(lines.items, true)
+            .filter(line => typeof revealByCenterLines !== "object" || revealByCenterLines.contains(line))
             .flatMap(({start, end}) => [start, end])
-            .map(point => cellsIndex.getPointInfo(point))
-            .filter(info => info?.type === CellPart.center)
-            .map(info => info!.cells.first()!)
     );
     const visibleCrossCenters = indexes(rowsCount).map(
         (top) => indexes(columnsCount).map(
@@ -234,8 +239,8 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     startCell3x3Literals: PositionLiteral[] = [],
     startCellLiterals: PositionLiteral[] = [],
     bulbCellLiterals = startCell3x3Literals,
-    revealByCenterLines = false,
-    revealByColors: CellColor[] = [],
+    revealByCenterLines: boolean | PuzzleLineSet<CellType, any, any> = false,
+    revealByColors: CellColor[] | GivenDigitsMap<CellColor> = {},
 ): Constraint<CellType, FogProps<CellType>, ExType, ProcessedExType> => ({
     name: "fog",
     tags: [fogTag],

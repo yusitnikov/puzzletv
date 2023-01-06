@@ -176,3 +176,11 @@ export const getIsSamePuzzleLine = (puzzle: PuzzleDefinition<any, any, any>) =>
 
 export const getPuzzleLineHasher = (puzzle: PuzzleDefinition<any, any, any>) =>
     (line: Line) => stringifyLine(normalizePuzzleLine(line, puzzle));
+
+export const resolvePuzzleInitialColors = (context: PuzzleContext<any, any, any>): GivenDigitsMap<CellColorValue[]> => {
+    const {puzzle: {initialColors = {}}} = context;
+
+    return typeof initialColors === "function"
+        ? initialColors(context)
+        : initialColors;
+};

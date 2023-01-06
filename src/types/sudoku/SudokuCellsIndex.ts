@@ -3,7 +3,8 @@ import {
     getIsSamePuzzlePosition,
     getPuzzleLineHasher,
     getPuzzlePositionHasher,
-    normalizePuzzleLine, normalizePuzzlePosition,
+    normalizePuzzleLine,
+    normalizePuzzlePosition,
     PuzzleDefinition
 } from "./PuzzleDefinition";
 import {indexes} from "../../utils/indexes";
@@ -330,15 +331,31 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
         }, this.puzzle));
     }
 
+    getCenterLines(lines: Line[], convertToCellPoints: boolean): Line[] {
+        const linesWithPointInfo = lines
+            .map(({start, end}) => ({
+                start: {
+                    point: start,
+                    info: this.getPointInfo(start),
+                },
+                end: {
+                    point: end,
+                    info: this.getPointInfo(end),
+                },
+            }))
+            .filter(({start: {info}}) => info?.type === CellPart.center);
+
+        return linesWithPointInfo.map(({start, end}) => ({
+            start: convertToCellPoints ? start.info!.cells.first()! : start.point,
+            end: convertToCellPoints ? end.info!.cells.first()! : end.point,
+        }));
+    }
+
     getCenterLineSegments(lines: Line[]): SudokuMultiLine[] {
         const map: Record<string, SetInterface<Position>> = {};
         let remainingPoints: SetInterface<Position> = new PuzzlePositionSet(this.puzzle);
 
-        for (const {start, end} of lines) {
-            if (this.getPointInfo(start)?.type !== CellPart.center) {
-                continue;
-            }
-
+        for (const {start, end} of this.getCenterLines(lines, false)) {
             const startKey = this.getPositionHash(start);
             const endKey = this.getPositionHash(end);
 

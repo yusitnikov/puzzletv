@@ -75,7 +75,7 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
                 onStateChange(enterDigitAction(digit, context));
             }
         },
-        [onStateChange, digit, index, context]
+        [setCurrentButton, onStateChange, digit, index, context]
     );
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {

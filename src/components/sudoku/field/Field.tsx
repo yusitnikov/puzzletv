@@ -34,9 +34,9 @@ import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
 import {applyCurrentMultiLineAction} from "../../../types/sudoku/GameStateAction";
-import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
-import {CellColorValue} from "../../../types/sudoku/CellColor";
+import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {PencilmarksCheckerMode} from "../../../types/sudoku/PencilmarksCheckerMode";
+import {resolvePuzzleInitialColors} from "../../../types/sudoku/PuzzleDefinition";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -61,7 +61,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         fieldFitsWrapper,
         customCellBounds,
         initialDigits = {},
-        initialColors = {},
         allowOverridingInitialColors = false,
         loopHorizontally,
         loopVertically,
@@ -255,9 +254,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
             }))}
         </FieldSvg>;
 
-    const initialColorsResolved = typeof initialColors === "function"
-        ? initialColors(context)
-        : initialColors as GivenDigitsMap<CellColorValue[]>;
+    const initialColorsResolved = resolvePuzzleInitialColors(context);
 
     const selection = !isNoSelectionMode && renderCellsLayer("selection", (cellState, cellPosition) => {
         let color = "";
@@ -305,7 +302,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                 </FieldSvg>
 
                 {renderCellsLayer("background", ({colors}, cellPosition) => {
-                    const initialCellColors: CellColorValue[] = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
+                    const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
                     const finalColors = allowOverridingInitialColors
                         ? (colors?.size ? colors : new PlainValueSet(initialCellColors || []))
                         : (initialCellColors ? new PlainValueSet(initialCellColors) : colors);

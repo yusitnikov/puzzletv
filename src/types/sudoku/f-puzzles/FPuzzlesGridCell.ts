@@ -12,6 +12,6 @@ export interface FPuzzlesGridCell {
     highlight?: string;
     // endregion
     // region Extensions
-    givenPencilMarks?: number[];
+    givenPencilMarks?: number[] | null;
     // endregion
 }

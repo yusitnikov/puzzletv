@@ -1,7 +1,7 @@
 import {buildLink} from "../../utils/link";
 import {FormEvent, useMemo} from "react";
 import {useBoolFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
-import {decodeFPuzzlesString} from "../../data/puzzles/FPuzzles";
+import {decodeFPuzzlesString, FPuzzlesImportOptions} from "../../data/puzzles/FPuzzles";
 import {useLanguageCode} from "../../hooks/useTranslate";
 
 interface FPuzzlesWizardPageProps {
@@ -43,7 +43,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
             noSpecialRules: !hasSolution && noSpecialRules,
             load,
-        });
+        } as FPuzzlesImportOptions);
 
         return false;
     };

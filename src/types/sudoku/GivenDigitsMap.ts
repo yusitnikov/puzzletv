@@ -3,7 +3,10 @@ import {Position} from "../layout/Position";
 
 export type GivenDigitsMap<CellType> = Record<number, Record<number, CellType>>;
 
-export const processGivenDigitsMaps = <CellType, ResultType = CellType>(processor: (cells: CellType[], position: Position) => ResultType, maps: GivenDigitsMap<CellType>[]) => {
+export const processGivenDigitsMaps = <CellType, ResultType = CellType>(
+    processor: (cells: CellType[], position: Position) => (ResultType | undefined),
+    maps: GivenDigitsMap<CellType>[]
+) => {
     const arrayMap: GivenDigitsMap<CellType[]> = {};
 
     for (const map of maps) {
@@ -24,8 +27,11 @@ export const processGivenDigitsMaps = <CellType, ResultType = CellType>(processo
         const rowIndex = Number(rowIndexStr);
         for (const [columnIndexStr, cells] of Object.entries(row)) {
             const columnIndex = Number(columnIndexStr);
-            result[rowIndex] = result[rowIndex] || {};
-            result[rowIndex][columnIndex] = processor(cells, {top: rowIndex, left: columnIndex});
+            const cellResult = processor(cells, {top: rowIndex, left: columnIndex});
+            if (cellResult !== undefined) {
+                result[rowIndex] = result[rowIndex] || {};
+                result[rowIndex][columnIndex] = cellResult;
+            }
         }
     }
 
