@@ -7,6 +7,8 @@ A web application for creating and solving different types of sudoku.
 |:----:|:-----:|:------------:|---------------------------------------------------------------------------|
 | Feat | Easy  |  Must have   | Fully import the cubedoku pack.                                           |
 | Feat |  Mid  |  Must have   | Letters.                                                                  |
+| Feat | Hard  |  Must have   | Undo/redo via network.                                                    |
+| Bug  | Easy  |  Important   | Toggling actions shouldn't cancel each other via network.                 |
 | Feat | Easy  |  Important   | Timer.                                                                    |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).              |
 | Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                  |
