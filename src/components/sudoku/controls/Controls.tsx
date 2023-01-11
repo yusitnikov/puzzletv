@@ -33,6 +33,7 @@ import {myClientId} from "../../../hooks/useMultiPlayer";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
 import {CellColor} from "../../../types/sudoku/CellColor";
+import {ctrlKeyText} from "../../../utils/os";
 
 export const getControlsWidthCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
     const allowedModes = getAllowedCellWriteModeInfos(puzzle);
@@ -294,7 +295,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
                     top={isRevertedUndo ? 0 : undoRow}
                     cellSize={cellSize}
                     onClick={handleUndo}
-                    title={`${translate("Undo the last action")} (${translate("shortcut")}: Ctrl+Z)`}
+                    title={`${translate("Undo the last action")} (${translate("shortcut")}: ${ctrlKeyText}+Z)`}
                 >
                     <Undo/>
                 </ControlButton>
@@ -304,7 +305,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
                     top={isRevertedUndo ? 1 : undoRow}
                     cellSize={cellSize}
                     onClick={handleRedo}
-                    title={`${translate("Redo the last action")} (${translate("shortcut")}: Ctrl+Y)`}
+                    title={`${translate("Redo the last action")} (${translate("shortcut")}: ${ctrlKeyText}+Y)`}
                 >
                     <Redo/>
                 </ControlButton>
@@ -343,7 +344,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             top={2}
             cellWriteMode={CellWriteMode.center}
             data={{centerDigits: new CellDataSet(puzzle, [1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
-            title={`${translate("Center")} (${translate("shortcut")}: Ctrl)`}
+            title={`${translate("Center")} (${translate("shortcut")}: ${ctrlKeyText})`}
             context={context}
         />
 
@@ -351,7 +352,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             top={3}
             cellWriteMode={CellWriteMode.color}
             data={{colors: new PlainValueSet(indexes(9))}}
-            title={`${translate("Colors")} (${translate("shortcut")}: Ctrl+Shift)`}
+            title={`${translate("Colors")} (${translate("shortcut")}: ${ctrlKeyText}+Shift)`}
             context={context}
         />
 
@@ -359,7 +360,7 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             top={3}
             cellWriteMode={CellWriteMode.shading}
             data={{colors: new PlainValueSet([CellColor.shaded, CellColor.unshaded])}}
-            title={`${translate("Shading")} (${translate("shortcut")}: Ctrl+Shift)`}
+            title={`${translate("Shading")} (${translate("shortcut")}: ${ctrlKeyText}+Shift)`}
             context={context}
         />
 

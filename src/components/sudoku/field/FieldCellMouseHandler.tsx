@@ -51,8 +51,8 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         type: CellPart.center,
     };
 
-    const handleCellClick = ({ctrlKey, shiftKey, isPrimary}: PointerEvent<any>) => {
-        const isMultiSelection = ctrlKey || shiftKey || !isPrimary;
+    const handleCellClick = ({ctrlKey, metaKey, shiftKey, isPrimary}: PointerEvent<any>) => {
+        const isMultiSelection = ctrlKey || metaKey || shiftKey || !isPrimary;
 
         onIsDeleteSelectedCellsStrokeChange(isMultiSelection && selectedCells.contains(cellPosition));
         onStateChange(
@@ -62,7 +62,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         );
     };
 
-    const handleCellDoubleClick = ({ctrlKey, shiftKey}: MouseEvent<any>) => {
+    const handleCellDoubleClick = ({ctrlKey, metaKey, shiftKey}: MouseEvent<any>) => {
         const {initialDigits, typeManager: {areSameCellData}} = puzzle;
         const {cells} = gameStateGetCurrentFieldState(state);
 
@@ -96,7 +96,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
             .filter(({cellState, initialDigit}) => filter(cellState, initialDigit))
             .map(({position}) => position);
 
-        if (ctrlKey || shiftKey) {
+        if (ctrlKey || metaKey || shiftKey) {
             onStateChange(gameState => gameStateToggleSelectedCells(gameState, matchingPositions, true));
         } else {
             onStateChange(gameState => gameStateSetSelectedCells(gameState, matchingPositions));

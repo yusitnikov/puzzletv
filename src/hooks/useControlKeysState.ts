@@ -20,7 +20,8 @@ export const useControlKeysState = () => {
         keysStr: "",
     });
 
-    const handleKeyboardEvent = ({ctrlKey, altKey, shiftKey}: KeyboardEvent) => {
+    const handleKeyboardEvent = ({ctrlKey: winCtrlKey, metaKey: macCtrlKey, altKey, shiftKey}: KeyboardEvent) => {
+        const ctrlKey = winCtrlKey || macCtrlKey;
         const doSet = () => setState({
             isCtrlDown: ctrlKey,
             isAltDown: altKey,

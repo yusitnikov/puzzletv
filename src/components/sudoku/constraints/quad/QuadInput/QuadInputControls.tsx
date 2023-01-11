@@ -47,7 +47,7 @@ export const QuadInputControls = <CellType, ExType extends QuadInputGameState<Ce
             return;
         }
 
-        if (ev.ctrlKey || ev.shiftKey || ev.altKey) {
+        if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey) {
             return;
         }
 

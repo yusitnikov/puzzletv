@@ -6,6 +6,7 @@ import {ChessPieceCellDataComponentType} from "../components/ChessPieceCellData"
 import {ChessMainControls} from "../components/ChessMainControls";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {ctrlKeyText} from "../../../utils/os";
 
 export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState> = {
     areSameCellData(
@@ -83,8 +84,8 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
     digitShortcutTips: [
         undefined,
         {
-            [LanguageCode.en]: "please note that Ctrl+N may not work",
-            [LanguageCode.ru]: "Ctrl+N может не работать",
+            [LanguageCode.en]: `please note that ${ctrlKeyText}+N may not work`,
+            [LanguageCode.ru]: `${ctrlKeyText}+N может не работать`,
         },
     ],
 

@@ -159,7 +159,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
             return;
         }
 
-        const {code, ctrlKey, shiftKey} = ev;
+        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
+        const ctrlKey = winCtrlKey || macCtrlKey;
 
         // Use the key modifiers from the event - they are always up-to-date
         const isAnyKeyDown = ctrlKey || shiftKey;

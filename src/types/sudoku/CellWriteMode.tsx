@@ -8,6 +8,7 @@ import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
 import {shadingAction, shadingStartAction} from "./GameStateAction";
 import {incrementArrayItem} from "../../utils/array";
+import {ctrlKeyText} from "../../utils/os";
 
 export enum CellWriteMode {
     main,
@@ -64,7 +65,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.center,
-        hotKeyStr: ["Ctrl"],
+        hotKeyStr: [ctrlKeyText],
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
@@ -74,7 +75,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.color,
-        hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
+        hotKeyStr: [`${ctrlKeyText}+Shift`, `${ctrlKeyText}+Alt+Shift`],
         digitsCount: 9,
         buttonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
@@ -85,7 +86,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     {
         mode: CellWriteMode.shading,
         // color and shading are never together, so it's ok to have the same hotkey
-        hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
+        hotKeyStr: [`${ctrlKeyText}+Shift`, `${ctrlKeyText}+Alt+Shift`],
         handlesRightMouseClick: true,
         isNoSelectionMode: true,
         onCornerClick: (context, position, isRightButton) => {
