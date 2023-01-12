@@ -1,6 +1,7 @@
 import {usePureState} from "./usePureState";
 import {useEventListener} from "./useEventListener";
 import {useState} from "react";
+import {ctrlKeyText} from "../utils/os";
 
 export interface ControlKeysState {
     isCtrlDown: boolean;
@@ -20,20 +21,15 @@ export const useControlKeysState = () => {
         keysStr: "",
     });
 
-    const handleKeyboardEvent = (ev: KeyboardEvent) => {
-        console.log("Got keyboard event", ev);
-        const {ctrlKey: winCtrlKey, metaKey: macCtrlKey, altKey, shiftKey} = ev;
+    const handleKeyboardEvent = ({ctrlKey: winCtrlKey, metaKey: macCtrlKey, altKey, shiftKey}: KeyboardEvent) => {
         const ctrlKey = winCtrlKey || macCtrlKey;
-        const doSet = () => {
-            console.log("Set state", ev, ctrlKey);
-            setState({
-                isCtrlDown: ctrlKey,
-                isAltDown: altKey,
-                isShiftDown: shiftKey,
-                isAnyKeyDown: ctrlKey || altKey || shiftKey,
-                keysStr: [ctrlKey ? "Ctrl" : "", altKey ? "Alt" : "", shiftKey ? "Shift" : ""].filter(s => s).join("+"),
-            });
-        };
+        const doSet = () => setState({
+            isCtrlDown: ctrlKey,
+            isAltDown: altKey,
+            isShiftDown: shiftKey,
+            isAnyKeyDown: ctrlKey || altKey || shiftKey,
+            keysStr: [ctrlKey ? ctrlKeyText : "", altKey ? "Alt" : "", shiftKey ? "Shift" : ""].filter(s => s).join("+"),
+        });
         if (shiftTimeout) {
             clearTimeout(shiftTimeout);
         }
