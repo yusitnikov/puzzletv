@@ -1,7 +1,6 @@
 import {usePureState} from "./usePureState";
 import {useEventListener} from "./useEventListener";
 import {useState} from "react";
-import {ctrlKeyText} from "../utils/os";
 
 export interface ControlKeysState {
     isCtrlDown: boolean;
@@ -28,7 +27,7 @@ export const useControlKeysState = () => {
             isAltDown: altKey,
             isShiftDown: shiftKey,
             isAnyKeyDown: ctrlKey || altKey || shiftKey,
-            keysStr: [ctrlKey ? ctrlKeyText : "", altKey ? "Alt" : "", shiftKey ? "Shift" : ""].filter(s => s).join("+"),
+            keysStr: [ctrlKey ? "Ctrl" : "", altKey ? "Alt" : "", shiftKey ? "Shift" : ""].filter(s => s).join("+"),
         });
         if (shiftTimeout) {
             clearTimeout(shiftTimeout);

@@ -65,7 +65,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.center,
-        hotKeyStr: [ctrlKeyText],
+        hotKeyStr: ["Ctrl"],
         isDigitMode: true,
         buttonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
@@ -75,7 +75,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     },
     {
         mode: CellWriteMode.color,
-        hotKeyStr: [`${ctrlKeyText}+Shift`, `${ctrlKeyText}+Alt+Shift`],
+        hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
         digitsCount: 9,
         buttonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
@@ -86,7 +86,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     {
         mode: CellWriteMode.shading,
         // color and shading are never together, so it's ok to have the same hotkey
-        hotKeyStr: [`${ctrlKeyText}+Shift`, `${ctrlKeyText}+Alt+Shift`],
+        hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
         handlesRightMouseClick: true,
         isNoSelectionMode: true,
         onCornerClick: (context, position, isRightButton) => {
