@@ -20,15 +20,20 @@ export const useControlKeysState = () => {
         keysStr: "",
     });
 
-    const handleKeyboardEvent = ({ctrlKey: winCtrlKey, metaKey: macCtrlKey, altKey, shiftKey}: KeyboardEvent) => {
+    const handleKeyboardEvent = (ev: KeyboardEvent) => {
+        console.log("Got keyboard event", ev);
+        const {ctrlKey: winCtrlKey, metaKey: macCtrlKey, altKey, shiftKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
-        const doSet = () => setState({
-            isCtrlDown: ctrlKey,
-            isAltDown: altKey,
-            isShiftDown: shiftKey,
-            isAnyKeyDown: ctrlKey || altKey || shiftKey,
-            keysStr: [ctrlKey ? "Ctrl" : "", altKey ? "Alt" : "", shiftKey ? "Shift" : ""].filter(s => s).join("+"),
-        });
+        const doSet = () => {
+            console.log("Set state", ev, ctrlKey);
+            setState({
+                isCtrlDown: ctrlKey,
+                isAltDown: altKey,
+                isShiftDown: shiftKey,
+                isAnyKeyDown: ctrlKey || altKey || shiftKey,
+                keysStr: [ctrlKey ? "Ctrl" : "", altKey ? "Alt" : "", shiftKey ? "Shift" : ""].filter(s => s).join("+"),
+            });
+        };
         if (shiftTimeout) {
             clearTimeout(shiftTimeout);
         }
