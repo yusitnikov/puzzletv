@@ -69,8 +69,3 @@ export const PuzzlesListItemField = <CellType, ExType = {}, ProcessedExType = {}
         context={context}
     />;
 };
-
-export const PuzzlesListItemSpace = () => <div style={{
-    flex: "1 1 100%",
-    padding,
-}}/>;
