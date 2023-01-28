@@ -9,3 +9,10 @@ export const Embark = {
     noIndex: false,
     slug: "embark",
 };
+
+// CTC posted this slug in the video description, no idea why. So let's make it actually work.
+export const EmbarkWeirdSlug = {
+    ...Embark,
+    noIndex: true,
+    slug: "embarkation",
+};

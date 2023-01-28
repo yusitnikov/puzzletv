@@ -31,7 +31,7 @@ import {LumosMaxima, LumosMaximaNoFog} from "./LumosMaxima";
 import {MonumentValley, MonumentValleyMini} from "./MonumentValley";
 import {ToroidalYinYang} from "./ToroidalYinYang";
 import {TheAngelIslington} from "./TheAngelIslington";
-import {Embark} from "./Embark";
+import {Embark, EmbarkWeirdSlug} from "./Embark";
 import {ToroidalRenbanmometers} from "./ToroidalRenbanmometers";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
@@ -60,6 +60,7 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
 
     // region Other authors
     Embark,
+    EmbarkWeirdSlug,
 
     TheAngelIslington,
 
