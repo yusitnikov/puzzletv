@@ -36,7 +36,11 @@ export interface SetInterface<ItemT, AlternativeItemsArrayT = never> {
 
     remove(item: ItemT): this;
 
+    bulkRemove(items: ItemT[]): this;
+
     add(item: ItemT): this;
+
+    bulkAdd(items: ItemT[]): this;
 
     toggle(item: ItemT, forcedEnable?: boolean): this;
 
@@ -69,6 +73,8 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     abstract set(items: ItemT[] | AlternativeItemsArrayT): this;
 
     abstract remove(item: ItemT): this;
+
+    abstract bulkRemove(items: ItemT[]): this;
 
     containsOneOf(items: ItemT[]) {
         return items.some(item => this.contains(item));
@@ -114,12 +120,27 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
         return this.set([...this.remove(item).items, item]);
     }
 
+    bulkAdd(items: ItemT[]) {
+        return this.set([
+            ...this.bulkRemove(items).items,
+            ...items,
+        ]);
+    }
+
     toggle(item: ItemT, forcedEnable?: boolean) {
         const enable = forcedEnable ?? !this.contains(item);
         return enable ? this.add(item) : this.remove(item);
     }
 
     toggleAll(items: ItemT[], forcedEnable?: boolean) {
+        if (forcedEnable === true) {
+            return this.bulkAdd(items);
+        }
+
+        if (forcedEnable === false) {
+            return this.bulkRemove(items);
+        }
+
         let result = this;
         for (const item of items) {
             result = result.toggle(item, forcedEnable);
@@ -144,7 +165,7 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
             return new HashSet<ItemT>();
         }
 
-        return sets.reduce((previousValue, currentValue) => previousValue.toggleAll(currentValue.items, true));
+        return sets.reduce((previousValue, currentValue) => previousValue.bulkAdd(currentValue.items));
     }
 }
 
@@ -176,6 +197,10 @@ export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<Ite
 
     remove(item: ItemT) {
         return this.filter(i => !this.comparer(i, item));
+    }
+
+    bulkRemove(items: ItemT[]) {
+        return this.filter(i => items.some(item => !this.comparer(i, item)));
     }
 }
 
@@ -234,6 +259,19 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
         return this.set(map);
     }
 
+    bulkRemove(items: ItemT[]) {
+        const map = {...this._map};
+
+        for (const item of items) {
+            const hash = this.hasher(item);
+            if (hash in map) {
+                delete map[hash];
+            }
+        }
+
+        return this.set(map);
+    }
+
     add(item: ItemT) {
         const hash = this.hasher(item);
 
@@ -242,6 +280,20 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
             delete map[hash];
         }
         map[hash] = item;
+
+        return this.set(map);
+    }
+
+    bulkAdd(items: ItemT[]) {
+        const map = {...this._map};
+
+        for (const item of items) {
+            const hash = this.hasher(item);
+            if (hash in map) {
+                delete map[hash];
+            }
+            map[hash] = item;
+        }
 
         return this.set(map);
     }

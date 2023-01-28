@@ -553,7 +553,7 @@ export const gameStateProcessSelectedCells = <CellType, ExType = {}, ProcessedEx
                 }
             };
 
-            const newDigits = newState.excludedDigits.toggleAll(state.excludedDigits[top]?.[left]?.items || [], false);
+            const newDigits = newState.excludedDigits.bulkRemove(state.excludedDigits[top]?.[left]?.items || []);
             for (const digit of newDigits.items) {
                 playerObjects = {
                     ...playerObjects,

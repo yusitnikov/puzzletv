@@ -138,51 +138,45 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
             } = info;
 
             // Add neighbors by type manager's special geometry
-            info.neighbors = info.neighbors.toggleAll(
-                getAdditionalNeighbors(cellPosition, puzzle),
-                true
-            );
+            info.neighbors = info.neighbors.bulkAdd(getAdditionalNeighbors(cellPosition, puzzle));
             // TODO: getAdditionalDiagonalNeighbors
 
             borders.forEach((border) => border.forEach((point, index) => {
                 // Add neighbors by shared borders
                 const next = incrementArrayItemByIndex(border, index);
 
-                info.neighbors = info.neighbors.toggleAll(
+                info.neighbors = info.neighbors.bulkAdd(
                     this.borderLineMap[this.getPositionHash(point)][this.getPositionHash(next)]
                         .cells
                         .remove(cellPosition)
-                        .items,
-                    true
+                        .items
                 );
 
                 // Add neighbors by shared corners
                 const cornerInfo = this.realCellPointMap[this.getPositionHash(point)];
 
                 if (!disableDiagonalCenterLines) {
-                    info.diagonalNeighbors = info.diagonalNeighbors.toggleAll(
+                    info.diagonalNeighbors = info.diagonalNeighbors.bulkAdd(
                         cornerInfo
                             .cells
                             .remove(cellPosition)
-                            .items,
-                        true
+                            .items
                     );
                 }
 
                 // Add other border points as diagonal neighbors to the corner point
                 if (!disableDiagonalBorderLines) {
-                    cornerInfo.diagonalNeighbors = cornerInfo.diagonalNeighbors.toggleAll(
+                    cornerInfo.diagonalNeighbors = cornerInfo.diagonalNeighbors.bulkAdd(
                         border.filter((_, index2) => {
                             const indexDiff = Math.abs(index2 - index);
                             return indexDiff > 1 && indexDiff < border.length - 1;
-                        }),
-                        true
+                        })
                     );
                 }
             }));
 
             // Ensure that the regular neighbors are not duplicated as diagonal neighbors
-            info.diagonalNeighbors = info.diagonalNeighbors.toggleAll(info.neighbors.items, false);
+            info.diagonalNeighbors = info.diagonalNeighbors.bulkRemove(info.neighbors.items);
 
             // Set center point's neighbors by cell's neighbors
             const centerInfo = this.realCellPointMap[this.getPositionHash(center)];
@@ -211,7 +205,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                 while (nextKey !== undefined && this.realCellPointMap[nextKey].type === CellPart.border) {
                     const nextBorders: Record<string, SudokuCellBorderInfo> = this.borderLineMap[nextKey];
                     nextKey = new PlainValueSet(Object.keys(nextBorders))
-                        .toggleAll(lineKeys, false)
+                        .bulkRemove(lineKeys)
                         .first();
                     if (nextKey === undefined) {
                         next = undefined;
@@ -483,11 +477,13 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
 
             for (const {line, neighbors} of Object.values(cellInfo.borderSegments)) {
                 if (lines.contains({start: line[0], end: line[line.length - 1]})) {
-                    connectedNeighbors = connectedNeighbors.toggleAll(neighbors.items, false);
+                    connectedNeighbors = connectedNeighbors.bulkRemove(neighbors.items);
                 }
             }
 
-            queue = queue.toggleAll(connectedNeighbors.items.filter(neighbor => map[this.getPositionHash(neighbor)] === undefined), true);
+            queue = queue.bulkAdd(
+                connectedNeighbors.items.filter(neighbor => map[this.getPositionHash(neighbor)] === undefined)
+            );
         }
 
         return newRegion;

@@ -501,7 +501,7 @@ export const loadByFPuzzlesObject = (
             if (lineData instanceof Array) {
                 for (const {lines, outlineC, width, isNewConstraint, ...other} of lineData) {
                     if (yajilinFog && outlineC === "#000000") {
-                        yajilinFogLineSolution = yajilinFogLineSolution.toggleAll(lines.flatMap(lineStr => {
+                        yajilinFogLineSolution = yajilinFogLineSolution.bulkAdd(lines.flatMap(lineStr => {
                             const line = parsePositionLiterals(lineStr);
                             return indexes(line.length - 1).map(i => ({
                                 start: line[i],

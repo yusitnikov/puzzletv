@@ -15,7 +15,7 @@ export const TenInOneRegionConstraint = <CellType, ExType, ProcessedExType>(cell
             .filter(data => data !== undefined)
             .map(data => data!);
 
-        const uniqueCellData = new CellDataSet(puzzle).toggleAll(cellData, true);
+        const uniqueCellData = new CellDataSet(puzzle).bulkAdd(cellData);
 
         return uniqueCellData.size <= puzzle.fieldSize.regionWidth!;
     },

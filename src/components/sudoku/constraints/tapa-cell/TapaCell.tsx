@@ -165,15 +165,14 @@ export const TapaCellConstraint = <CellType, ExType, ProcessedExType>(cellLitera
             }
 
             if (isFinalCheck && finishedSegments.length !== clues.length) {
-                result = result.toggleAll(
-                    [...finishedSegments, ...unfinishedSegments].flatMap(({lines}) => lines),
-                    true
+                result = result.bulkAdd(
+                    [...finishedSegments, ...unfinishedSegments].flatMap(({lines}) => lines)
                 );
             } else {
                 for (const {lines, points: {length}} of finishedSegments) {
                     const remaining = remainingCluesMap[length] >= 0 ? remainingCluesMap[length] : remainingCluesMap[0];
                     if (remaining < 0 || (isFinalCheck && remaining > 0)) {
-                        result = result.toggleAll(lines, true);
+                        result = result.bulkAdd(lines);
                     }
                 }
 
@@ -185,7 +184,7 @@ export const TapaCellConstraint = <CellType, ExType, ProcessedExType>(cellLitera
 
                     for (const {lines, points: {length}} of unfinishedSegments) {
                         if (length > maxRemainingLength) {
-                            result = result.toggleAll(lines, true);
+                            result = result.bulkAdd(lines);
                         }
                     }
                 }

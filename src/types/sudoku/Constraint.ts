@@ -157,9 +157,8 @@ export const getInvalidUserLines = <CellType, ExType, ProcessedExType>(
         const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
 
         if (constraint.getInvalidUserLines) {
-            result = result.toggleAll(
-                constraint.getInvalidUserLines(lines, userDigits, normalizedConstraintCells, context, isFinalCheck),
-                true
+            result = result.bulkAdd(
+                constraint.getInvalidUserLines(lines, userDigits, normalizedConstraintCells, context, isFinalCheck)
             )
         }
     }
