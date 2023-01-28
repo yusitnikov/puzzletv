@@ -200,7 +200,7 @@ export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<Ite
     }
 
     bulkRemove(items: ItemT[]) {
-        return this.filter(i => items.some(item => !this.comparer(i, item)));
+        return this.filter(i => !items.some(item => this.comparer(i, item)));
     }
 }
 
