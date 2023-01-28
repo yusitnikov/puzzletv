@@ -8,7 +8,6 @@ import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
 import {shadingAction, shadingStartAction} from "./GameStateAction";
 import {incrementArrayItem} from "../../utils/array";
-import {ctrlKeyText} from "../../utils/os";
 
 export enum CellWriteMode {
     main,
