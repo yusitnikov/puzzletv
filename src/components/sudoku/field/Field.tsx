@@ -3,7 +3,7 @@ import {Rect} from "../../../types/layout/Rect";
 import {Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
-import {ReactNode, useMemo, useState} from "react";
+import React, {ReactNode, useMemo, useState} from "react";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
 import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
@@ -37,6 +37,9 @@ import {applyCurrentMultiLineAction} from "../../../types/sudoku/GameStateAction
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {PencilmarksCheckerMode} from "../../../types/sudoku/PencilmarksCheckerMode";
 import {resolvePuzzleInitialColors} from "../../../types/sudoku/PuzzleDefinition";
+import {redColor} from "../../app/globals";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {useTranslate} from "../../../hooks/useTranslate";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -49,6 +52,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         rect,
     }: FieldProps<CellType, ExType, ProcessedExType>
 ) => {
+    const translate = useTranslate();
+
     const readOnlySafeContext = useReadOnlySafeContext(context);
 
     const {puzzle, state, onStateChange, cellSize} = readOnlySafeContext;
@@ -99,6 +104,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
             cellWriteMode,
             cellWriteModeInfo: {isNoSelectionMode},
         },
+        fogDemoFieldStateHistory,
     } = state;
     const {cells} = gameStateGetCurrentFieldState(state);
 
@@ -282,158 +288,175 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         />;
     });
 
-    return <Absolute
-        {...rect}
-        angle={typeManager.getFieldAngle?.(state)}
-        style={{
-            backgroundColor: "white",
-            overflow: loopHorizontally || loopVertically ? "hidden" : undefined,
-        }}
-    >
-        <FieldWrapper context={context}>
-            <Absolute
-                left={loopOffset.left * cellSize}
-                top={loopOffset.top * cellSize}
-                fitParent={fieldFitsWrapper}
-            >
-                <FieldSvg context={readOnlySafeContext}>
-                    <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                        <Items {...itemsProps}/>
-                    </FieldLayerContext.Provider>
-                </FieldSvg>
+    return <>
+        <Absolute
+            {...rect}
+            angle={typeManager.getFieldAngle?.(state)}
+            style={{
+                backgroundColor: "white",
+                overflow: loopHorizontally || loopVertically ? "hidden" : undefined,
+            }}
+        >
+            <FieldWrapper context={context}>
+                <Absolute
+                    left={loopOffset.left * cellSize}
+                    top={loopOffset.top * cellSize}
+                    fitParent={fieldFitsWrapper}
+                >
+                    <FieldSvg context={readOnlySafeContext}>
+                        <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
+                            <Items {...itemsProps}/>
+                        </FieldLayerContext.Provider>
+                    </FieldSvg>
 
-                {renderCellsLayer("background", ({colors}, cellPosition) => {
-                    const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
-                    const finalColors = allowOverridingInitialColors
-                        ? (colors?.size ? colors : new PlainValueSet(initialCellColors || []))
-                        : (initialCellColors ? new PlainValueSet(initialCellColors) : colors);
+                    {renderCellsLayer("background", ({colors}, cellPosition) => {
+                        const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
+                        const finalColors = allowOverridingInitialColors
+                            ? (colors?.size ? colors : new PlainValueSet(initialCellColors || []))
+                            : (initialCellColors ? new PlainValueSet(initialCellColors) : colors);
 
-                    return !!finalColors?.size && <CellBackground
+                        return !!finalColors?.size && <CellBackground
+                            context={readOnlySafeContext}
+                            cellPosition={cellPosition}
+                            colors={finalColors}
+                            noOpacity={!!initialCellColors?.length}
+                        />;
+                    })}
+
+                    <FieldSvg context={readOnlySafeContext}>
+                        <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
+                            <Items {...itemsProps}/>
+                        </FieldLayerContext.Provider>
+                    </FieldSvg>
+
+                    {!prioritizeSelection && selection}
+
+                    <FieldSvg context={readOnlySafeContext}>
+                        <FieldLayerContext.Provider value={FieldLayer.regular}>
+                            <Items {...itemsProps}/>
+                        </FieldLayerContext.Provider>
+                    </FieldSvg>
+
+                    {prioritizeSelection && selection}
+
+                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
+                        <FieldLayerContext.Provider value={FieldLayer.lines}>
+                            <Items {...itemsProps}/>
+                        </FieldLayerContext.Provider>
+                    </FieldSvg>
+
+                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
+                        <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
+                            <Items {...itemsProps}/>
+                        </FieldLayerContext.Provider>
+                    </FieldSvg>
+
+                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
+                        <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
+                            <Items {...itemsProps}/>
+                        </FieldLayerContext.Provider>
+                    </FieldSvg>
+
+                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
+                        <FieldLayerContext.Provider value={FieldLayer.top}>
+                            <Items {...itemsProps}/>
+                        </FieldLayerContext.Provider>
+                    </FieldSvg>
+
+                    {renderCellsLayer("digits", (cellState, cell) => {
+                        const initialData = initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left];
+                        const cellExcludedDigits = excludedDigits[cell.top][cell.left];
+
+                        return !shouldSkipCellDigits(initialData, cellExcludedDigits, cellState) && <CellDigits
+                            context={readOnlySafeContext}
+                            data={cellState}
+                            initialData={initialData}
+                            excludedDigits={cellExcludedDigits}
+                            size={1}
+                            cellPosition={cell}
+                            isValidUserDigit={
+                                (digit) =>
+                                    !(enableConflictChecker || forceEnableConflictChecker) ||
+                                    disableConflictChecker ||
+                                    (digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.Off) ||
+                                    isValidUserDigit(
+                                        cell,
+                                        digit === undefined
+                                            ? userDigits
+                                            : mergeGivenDigitsMaps(userDigits, {[cell.top]: {[cell.left]: digit}}),
+                                        items,
+                                        readOnlySafeContext,
+                                        false,
+                                        digit !== undefined,
+                                        digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.CheckObvious
+                                    )
+                            }
+                        />;
+                    }, true)}
+
+                    {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
                         context={readOnlySafeContext}
                         cellPosition={cellPosition}
-                        colors={finalColors}
-                        noOpacity={!!initialCellColors?.length}
-                    />;
-                })}
+                        isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
+                        onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
+                    />)}
+                </Absolute>
 
-                <FieldSvg context={readOnlySafeContext}>
-                    <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                        <Items {...itemsProps}/>
-                    </FieldLayerContext.Provider>
-                </FieldSvg>
+                {loopHorizontally && <>
+                    <Absolute
+                        width={fieldMargin * cellSize}
+                        height={rect.height}
+                        style={{
+                            background: "linear-gradient(to right, white, transparent)",
+                        }}
+                    />
 
-                {!prioritizeSelection && selection}
+                    <Absolute
+                        left={rect.width - fieldMargin * cellSize}
+                        width={fieldMargin * cellSize}
+                        height={rect.height}
+                        style={{
+                            background: "linear-gradient(to left, white, transparent)",
+                        }}
+                    />
+                </>}
 
-                <FieldSvg context={readOnlySafeContext}>
-                    <FieldLayerContext.Provider value={FieldLayer.regular}>
-                        <Items {...itemsProps}/>
-                    </FieldLayerContext.Provider>
-                </FieldSvg>
+                {loopVertically && <>
+                    <Absolute
+                        width={rect.width}
+                        height={fieldMargin * cellSize}
+                        style={{
+                            background: "linear-gradient(to bottom, white, transparent)",
+                        }}
+                    />
 
-                {prioritizeSelection && selection}
+                    <Absolute
+                        top={rect.height - fieldMargin * cellSize}
+                        width={rect.width}
+                        height={fieldMargin * cellSize}
+                        style={{
+                            background: "linear-gradient(to top, white, transparent)",
+                        }}
+                    />
+                </>}
+            </FieldWrapper>
+        </Absolute>
 
-                <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                    <FieldLayerContext.Provider value={FieldLayer.lines}>
-                        <Items {...itemsProps}/>
-                    </FieldLayerContext.Provider>
-                </FieldSvg>
-
-                <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                    <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
-                        <Items {...itemsProps}/>
-                    </FieldLayerContext.Provider>
-                </FieldSvg>
-
-                <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                    <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
-                        <Items {...itemsProps}/>
-                    </FieldLayerContext.Provider>
-                </FieldSvg>
-
-                <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                    <FieldLayerContext.Provider value={FieldLayer.top}>
-                        <Items {...itemsProps}/>
-                    </FieldLayerContext.Provider>
-                </FieldSvg>
-
-                {renderCellsLayer("digits", (cellState, cell) => {
-                    const initialData = initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left];
-                    const cellExcludedDigits = excludedDigits[cell.top][cell.left];
-
-                    return !shouldSkipCellDigits(initialData, cellExcludedDigits, cellState) && <CellDigits
-                        context={readOnlySafeContext}
-                        data={cellState}
-                        initialData={initialData}
-                        excludedDigits={cellExcludedDigits}
-                        size={1}
-                        cellPosition={cell}
-                        isValidUserDigit={
-                            (digit) =>
-                                !(enableConflictChecker || forceEnableConflictChecker) ||
-                                disableConflictChecker ||
-                                (digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.Off) ||
-                                isValidUserDigit(
-                                    cell,
-                                    digit === undefined
-                                        ? userDigits
-                                        : mergeGivenDigitsMaps(userDigits, {[cell.top]: {[cell.left]: digit}}),
-                                    items,
-                                    readOnlySafeContext,
-                                    false,
-                                    digit !== undefined,
-                                    digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.CheckObvious
-                                )
-                        }
-                    />;
-                }, true)}
-
-                {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
-                    context={readOnlySafeContext}
-                    cellPosition={cellPosition}
-                    isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
-                    onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
-                />)}
-            </Absolute>
-
-            {loopHorizontally && <>
-                <Absolute
-                    width={fieldMargin * cellSize}
-                    height={rect.height}
-                    style={{
-                        background: "linear-gradient(to right, white, transparent)",
-                    }}
-                />
-
-                <Absolute
-                    left={rect.width - fieldMargin * cellSize}
-                    width={fieldMargin * cellSize}
-                    height={rect.height}
-                    style={{
-                        background: "linear-gradient(to left, white, transparent)",
-                    }}
-                />
-            </>}
-
-            {loopVertically && <>
-                <Absolute
-                    width={rect.width}
-                    height={fieldMargin * cellSize}
-                    style={{
-                        background: "linear-gradient(to bottom, white, transparent)",
-                    }}
-                />
-
-                <Absolute
-                    top={rect.height - fieldMargin * cellSize}
-                    width={rect.width}
-                    height={fieldMargin * cellSize}
-                    style={{
-                        background: "linear-gradient(to top, white, transparent)",
-                    }}
-                />
-            </>}
-        </FieldWrapper>
-    </Absolute>;
+        {fogDemoFieldStateHistory && <Absolute {...rect} style={{
+            opacity: 0.2,
+            color: redColor,
+            textAlign: "center",
+            verticalAlign: "middle",
+            fontSize: rect.width * 0.08,
+            padding: "0.5em",
+            boxSizing: "border-box",
+        }}>
+            {translate({
+                [LanguageCode.en]: "No fog reveal mode on!",
+                [LanguageCode.ru]: "Режим без раскрытия тумана включен!",
+            })}
+        </Absolute>}
+    </>;
 };
 
 interface ItemsInOneRegionProps<CellType, ExType = {}, ProcessedExType = {}> {
