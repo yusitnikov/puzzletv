@@ -21,7 +21,7 @@ export const PuzzlesList = () => {
     return <div style={{
         display: "grid",
         gap: gridGap,
-        gridTemplateColumns: "auto ".repeat(columnsCount),
+        gridTemplateColumns: "minmax(0, 1fr) ".repeat(columnsCount),
     }}>
         {puzzles.map((puzzle, puzzleIndex) => <PuzzlesListItem
             key={`item-${puzzle.slug}`}
