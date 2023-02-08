@@ -554,7 +554,7 @@ export const loadByFPuzzlesObject = (
                     text = text.filter((obj) => !isFowText(obj));
                 }
 
-                items.push(...text.flatMap(({cells, value, fontC, size, angle, ...other}) => {
+                items.push(...text.flatMap(({cells, value, fontC, size, angle, ...other}): Constraint<number, any>[] => {
                     ObjectParser.empty.parse(other, "f-puzzles text");
 
                     if (!value) {
