@@ -69,6 +69,7 @@ import {PuzzleLineSet} from "../../types/sudoku/PuzzleLineSet";
 import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
 import {BaseSafeCrackerPuzzle} from "../../sudokuTypes/safe-cracker/types/BaseSafeCrackerPuzzle";
 import {SafeCrackerPuzzleParams} from "../../sudokuTypes/safe-cracker/types/SafeCrackerPuzzleParams";
+import {SafeCrackerStarConstraint} from "../../sudokuTypes/safe-cracker/constraints/SafeCrackerStarConstraint";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -568,6 +569,9 @@ export const loadByFPuzzlesObject = (
                         }
                         if (["<", "<-", "<="].includes(value)) {
                             value = "←";
+                        }
+                        if (["s", "star"].includes(value.toLowerCase())) {
+                            return [SafeCrackerStarConstraint(cells, cosmeticsLayer)];
                         }
                     }
 

@@ -5,6 +5,8 @@ import {
     defaultProcessArrowDirection,
     defaultProcessArrowDirectionForRegularCellBounds, SudokuTypeManager
 } from "../../../types/sudoku/SudokuTypeManager";
+import {SafeCrackerStarConstraint} from "../constraints/SafeCrackerStarConstraint";
+import {indexes} from "../../../utils/indexes";
 
 export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
     {
@@ -52,6 +54,7 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
             }
 
             return basePosition;
-        }
+        },
+        items: indexes(codeCellsCount).map(left => SafeCrackerStarConstraint([{top: circleRegionsCount * 2 + 1, left}])),
     };
 };
