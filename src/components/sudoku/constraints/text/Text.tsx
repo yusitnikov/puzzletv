@@ -45,5 +45,6 @@ export const TextConstraint = <CellType, ExType, ProcessedExType>(
         color,
         angle,
         component: TextComponent(layer),
+        renderSingleCellInUserArea: true,
     };
 };

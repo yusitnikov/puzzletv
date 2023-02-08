@@ -96,6 +96,7 @@ const DecorativeShapeConstraint = <CellType, ExType, ProcessedExType>(
         color: backgroundColor,
         angle,
         component,
+        renderSingleCellInUserArea: true,
     };
 };
 

@@ -66,6 +66,9 @@ import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuType
 import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {PuzzleLineSet} from "../../types/sudoku/PuzzleLineSet";
+import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
+import {BaseSafeCrackerPuzzle} from "../../sudokuTypes/safe-cracker/types/BaseSafeCrackerPuzzle";
+import {SafeCrackerPuzzleParams} from "../../sudokuTypes/safe-cracker/types/SafeCrackerPuzzleParams";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -78,7 +81,7 @@ export const decodeFPuzzlesString = (load: string) => {
 
 export interface FPuzzlesImportOptions {
     load: string;
-    type?: "regular" | "latin" | "calculator" | "cubedoku";
+    type?: "regular" | "latin" | "calculator" | "cubedoku" | "safe-cracker";
     tesseract?: boolean;
     fillableDigitalDisplay?: boolean;
     noSpecialRules?: boolean;
@@ -113,11 +116,13 @@ export const loadByFPuzzlesObject = (
             ? RegularCalculatorDigitComponentType
             : RegularDigitComponentType
     );
+    const safeCrackerParams: Partial<SafeCrackerPuzzleParams> = {size: puzzleJson.size};
     const typesMap: Record<string, SudokuTypeManager<number>> = {
         regular: regularTypeManager,
         latin: LatinDigitSudokuTypeManager,
         calculator: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
         cubedoku: CubedokuTypeManager,
+        "safe-cracker": SafeCrackerSudokuTypeManager(safeCrackerParams),
     };
 
     const initialDigits: GivenDigitsMap<number> = {};
@@ -198,13 +203,13 @@ export const loadByFPuzzlesObject = (
             const defaultRegionHeight = size / defaultRegionWidth;
             const defaultRegionColumnsCount = size / defaultRegionWidth;
 
-            const gridCells: (FPuzzlesGridCell & Position)[] = grid
+            const allGridCells: (FPuzzlesGridCell & Position)[] = grid
                 .flatMap(
                     (row, top) => row.map(
                         (cell, left) => ({top, left, ...cell})
                     )
-                )
-                .filter((cell) => typeManager.isValidCell?.(cell, puzzle) ?? true);
+                );
+            const validGridCells = allGridCells.filter((cell) => typeManager.isValidCell?.(cell, puzzle) ?? true);
 
             const faces = typeManager.getRegionsWithSameCoordsTransformation?.(puzzle, 1) ?? [{
                 top: 0,
@@ -213,7 +218,7 @@ export const loadByFPuzzlesObject = (
                 height: size,
             }];
             const regions = faces.flatMap(face => indexes(size)
-                .map(regionIndex => gridCells.filter(
+                .map(regionIndex => validGridCells.filter(
                     ({top, left, region}) => {
                         if (top < face.top || left < face.left || top >= face.top + face.height || left >= face.left + face.width) {
                             return false;
@@ -233,7 +238,7 @@ export const loadByFPuzzlesObject = (
                 puzzle.fieldSize.regions = regions;
             }
 
-            for (const {top, left, ...cell} of gridCells) {
+            for (const {top, left, ...cell} of allGridCells) {
                 new ObjectParser<FPuzzlesGridCell>({
                     region: undefined,
                     value: (value, {given}) => {
@@ -557,6 +562,15 @@ export const loadByFPuzzlesObject = (
 
                     checkForOutsideCells(cells, fieldSize);
 
+                    if (type === "safe-cracker") {
+                        if ([">", "->", "=>"].includes(value)) {
+                            value = "→";
+                        }
+                        if (["<", "<-", "<="].includes(value)) {
+                            value = "←";
+                        }
+                    }
+
                     return [TextConstraint<number, {}, {}>(cells, value, fontC, size, angle, cosmeticsLayer)];
                 }));
             }
@@ -655,6 +669,10 @@ export const loadByFPuzzlesObject = (
         puzzle.digitsCount = 9;
         puzzle.disableDiagonalBorderLines = true;
         puzzle.disableDiagonalCenterLines = true;
+    }
+
+    if (type === "safe-cracker") {
+        Object.assign(puzzle, BaseSafeCrackerPuzzle(safeCrackerParams));
     }
 
     return puzzle;

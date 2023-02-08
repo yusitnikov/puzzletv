@@ -22,6 +22,7 @@ export const OddConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: Po
         name: "odd",
         cells: [cell],
         component: visible ? Odd : undefined,
+        renderSingleCellInUserArea: true,
         props: undefined,
         isObvious: true,
         isValidCell(cell, digits, _, {puzzle: {typeManager: {getDigitByCellData}}, state}) {

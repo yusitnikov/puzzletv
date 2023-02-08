@@ -227,45 +227,53 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
     ): ReactNode;
 }
 
-export const defaultProcessArrowDirection = (
+export const defaultProcessArrowDirectionForRegularCellBounds = (
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {puzzle, cellsIndex}: PuzzleContext<any, any, any>
+    {puzzle}: PuzzleContext<any, any, any>
 ): Position | undefined => {
     const {
         fieldSize: {rowsCount, columnsCount},
-        customCellBounds,
         typeManager: {isValidCell = () => true},
     } = puzzle;
 
-    if (!customCellBounds) {
-        const isTotallyValidCell = (position: Position) => {
-            const {top, left} = position;
-            return top >= 0 && top < rowsCount && left >= 0 && left < columnsCount && isValidCell(position, puzzle);
-        };
+    const isTotallyValidCell = (position: Position) => {
+        const {top, left} = position;
+        return top >= 0 && top < rowsCount && left >= 0 && left < columnsCount && isValidCell(position, puzzle);
+    };
 
-        // Try moving in the requested direction naively
-        let newPosition = {
-            left: left + xDirection,
-            top: top + yDirection,
-        };
+    // Try moving in the requested direction naively
+    let newPosition = {
+        left: left + xDirection,
+        top: top + yDirection,
+    };
 
-        if (isTotallyValidCell(newPosition)) {
-            return newPosition;
-        }
-
-        // If the naive new position is not valid then go in the reverse direction while it's possible
-        do {
-            newPosition.left -= xDirection;
-            newPosition.top -= yDirection;
-        } while (isTotallyValidCell({
-            left: newPosition.left - xDirection,
-            top: newPosition.top - yDirection,
-        }));
-
+    if (isTotallyValidCell(newPosition)) {
         return newPosition;
     }
+
+    // If the naive new position is not valid then go in the reverse direction while it's possible
+    do {
+        newPosition.left -= xDirection;
+        newPosition.top -= yDirection;
+    } while (isTotallyValidCell({
+        left: newPosition.left - xDirection,
+        top: newPosition.top - yDirection,
+    }));
+
+    return newPosition;
+};
+
+export const defaultProcessArrowDirectionForCustomCellBounds = (
+    {left, top}: Position,
+    xDirection: number,
+    yDirection: number,
+    {puzzle, cellsIndex}: PuzzleContext<any, any, any>,
+    isMainKeyboard?: boolean,
+    enableBackwardSteps = true,
+): Position | undefined => {
+    const {typeManager: {isValidCell = () => true}} = puzzle;
 
     const {center, neighbors} = cellsIndex.allCells[top][left];
 
@@ -273,10 +281,17 @@ export const defaultProcessArrowDirection = (
     let bestCell: Position | undefined = undefined;
 
     for (const neighbor of neighbors.items) {
+        if (!isValidCell(neighbor, puzzle)) {
+            continue;
+        }
+
         const center2 = cellsIndex.allCells[neighbor.top][neighbor.left].center;
         const vector = getLineVector({start: center, end: center2});
 
         const straightDist = vector.left * xDirection + vector.top * yDirection;
+        if (!enableBackwardSteps && straightDist < 0) {
+            continue;
+        }
         const errorDist = Math.abs(vector.left * yDirection) + Math.abs(vector.top * xDirection);
         const dist = Math.abs(Math.atan2(errorDist, straightDist));
         if (bestDist === undefined || dist < bestDist) {
@@ -286,6 +301,19 @@ export const defaultProcessArrowDirection = (
     }
 
     return bestCell;
+};
+
+export const defaultProcessArrowDirection = (
+    position: Position,
+    xDirection: number,
+    yDirection: number,
+    context: PuzzleContext<any, any, any>,
+    isMainKeyboard?: boolean,
+    enableBackwardSteps?: boolean,
+): Position | undefined => {
+    return context.puzzle.customCellBounds
+        ? defaultProcessArrowDirectionForCustomCellBounds(position, xDirection, yDirection, context, isMainKeyboard, enableBackwardSteps)
+        : defaultProcessArrowDirectionForRegularCellBounds(position, xDirection, yDirection, context);
 };
 
 export const defaultGetDefaultNumberByDigits = (digits: number[]) => {

@@ -24,7 +24,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
 
     const isCalculator = type === "calculator";
-    const isSpecialGrid = type === "cubedoku";
+    const isSpecialGrid = ["cubedoku", "safe-cracker"].includes(type);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
     const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
@@ -57,6 +57,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     <option value={"latin"}>Latin digits</option>
                     <option value={"calculator"}>Calculator digits</option>
                     <option value={"cubedoku"}>Cubedoku</option>
+                    <option value={"safe-cracker"}>Safe Cracker</option>
                 </select>
             </label>
         </p>

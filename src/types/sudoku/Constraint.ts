@@ -17,6 +17,7 @@ export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType
     name: string;
     tags?: string[];
     cells: Position[];
+    renderSingleCellInUserArea?: boolean;
     component?: ComponentType<ConstraintProps<CellType, DataT, ExType, ProcessedExType>>;
     color?: string;
     angle?: number;

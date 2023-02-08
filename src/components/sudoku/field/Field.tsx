@@ -1,6 +1,6 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
-import {Position} from "../../../types/layout/Position";
+import {emptyPosition, Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import React, {ReactNode, useMemo, useState} from "react";
@@ -29,7 +29,7 @@ import {
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {PlainValueSet} from "../../../types/struct/Set";
+import {HashSet, PlainValueSet} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
@@ -40,6 +40,7 @@ import {resolvePuzzleInitialColors} from "../../../types/sudoku/PuzzleDefinition
 import {redColor} from "../../app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {useTranslate} from "../../../hooks/useTranslate";
+import {FieldCellUserArea} from "./FieldCellUserArea";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -224,7 +225,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const renderCellsLayer = (
         keyPrefix: string,
         renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
-        useShadow = false
+        {useShadow = false, renderInvalidCells = false}: {useShadow?: boolean, renderInvalidCells?: boolean} = {}
     ) =>
         <FieldSvg context={readOnlySafeContext} useShadow={useShadow}>
             {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
@@ -245,7 +246,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     top: rowIndex,
                 };
 
-                if (!isValidCell(cellPosition, puzzle)) {
+                if (!renderInvalidCells && !isValidCell(cellPosition, puzzle)) {
                     return null;
                 }
 
@@ -321,7 +322,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                             colors={finalColors}
                             noOpacity={!!initialCellColors?.length}
                         />;
-                    })}
+                    }, {renderInvalidCells: true})}
 
                     <FieldSvg context={readOnlySafeContext}>
                         <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
@@ -392,7 +393,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                     )
                             }
                         />;
-                    }, true)}
+                    }, {useShadow: true, renderInvalidCells: true})}
 
                     {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
                         context={readOnlySafeContext}
@@ -468,11 +469,48 @@ const ItemsInOneRegion = <CellType, ExType = {}, ProcessedExType = {}>(
     {context, items}: ItemsInOneRegionProps<CellType, ExType, ProcessedExType>
 ) => {
     return <>
-        {items.map(({component: Component, ...otherData}, index) => Component && <Component
-            key={index}
-            context={context}
-            {...otherData}
-        />)}
+        {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
+            if (!Component) {
+                return null;
+            }
+
+            if (renderSingleCellInUserArea && cells.length === 1) {
+                const position = cells[0];
+
+                if (position.top % 1 === 0 && position.left % 1 === 0) {
+                    const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
+                        context.puzzle,
+                        {...position, angle: 0},
+                        new HashSet<CellType>(),
+                        0,
+                        () => undefined,
+                        position,
+                        context.state
+                    );
+
+                    return <FieldRect key={index} context={context} {...position}>
+                        <FieldCellUserArea context={context} cellPosition={position}>
+                            <AutoSvg top={0.5} left={0.5} angle={processedPosition?.angle}>
+                                <AutoSvg top={-0.5} left={-0.5}>
+                                    <Component
+                                        context={context}
+                                        cells={[emptyPosition]}
+                                        {...otherData}
+                                    />
+                                </AutoSvg>
+                            </AutoSvg>
+                        </FieldCellUserArea>
+                    </FieldRect>;
+                }
+            }
+
+            return <Component
+                key={index}
+                context={context}
+                cells={cells}
+                {...otherData}
+            />;
+        })}
     </>;
 };
 

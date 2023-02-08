@@ -41,6 +41,7 @@ export const FillableCalculatorDigitConstraint = <CellType, ExType, ProcessedExT
         name: "fillable calculator digit",
         cells: [cell],
         component: FillableCalculatorDigit,
+        renderSingleCellInUserArea: true,
         props: {digit},
         isObvious: true,
         isValidCell(cell, digits, _, {puzzle: {typeManager: {getDigitByCellData}}, state}) {

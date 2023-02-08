@@ -33,29 +33,21 @@ export const TapaCell = withFieldLayer(FieldLayer.regular, (
     const radius = clues.length === 1 ? 0 : 0.3;
     const size = clues.length === 1 ? 0.8 : 0.4;
 
-    return <FieldRect
-        context={context}
-        {...cell}
-    >
-        <FieldCellUserArea
-            context={context}
-            cellPosition={cell}
-        >
-            {clues.map((value, index) => {
-                const angle = 2 * Math.PI * ((index + 0.5) / clues.length + 3 / 8);
+    return <>
+        {clues.map((value, index) => {
+            const angle = 2 * Math.PI * ((index + 0.5) / clues.length + 3 / 8);
 
-                return <CenteredText
-                    key={index}
-                    top={0.5 + radius * Math.sin(angle)}
-                    left={0.5 + radius * Math.cos(angle)}
-                    size={size}
-                    fill={textColor}
-                >
-                    {value ?? "?"}
-                </CenteredText>;
-            })}
-        </FieldCellUserArea>
-    </FieldRect>;
+            return <CenteredText
+                key={index}
+                top={0.5 + radius * Math.sin(angle)}
+                left={0.5 + radius * Math.cos(angle)}
+                size={size}
+                fill={textColor}
+            >
+                {value ?? "?"}
+            </CenteredText>;
+        })}
+    </>;
 }) as ConstraintPropsGenericFc<TapaCellProps>;
 
 export const TapaCellConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral, ...clues: (number | undefined)[]): Constraint<CellType, TapaCellProps, ExType, ProcessedExType> => {
@@ -81,6 +73,7 @@ export const TapaCellConstraint = <CellType, ExType, ProcessedExType>(cellLitera
         cells: [cell],
         props: {clues},
         component: TapaCell,
+        renderSingleCellInUserArea: true,
         isValidPuzzle(lines, digits, cells, context) {
             const neighborCenters = getNeighborCenters(context);
 
