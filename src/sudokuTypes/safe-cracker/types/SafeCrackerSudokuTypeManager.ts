@@ -1,4 +1,4 @@
-import {defaultSafeCrackerPuzzleParams, SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
+import {SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {Position, PositionWithAngle} from "../../../types/layout/Position";
 import {
@@ -9,11 +9,7 @@ import {SafeCrackerStarConstraint} from "../constraints/SafeCrackerStarConstrain
 import {indexes} from "../../../utils/indexes";
 
 export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
-    {
-        size = defaultSafeCrackerPuzzleParams.size,
-        circleRegionsCount = defaultSafeCrackerPuzzleParams.circleRegionsCount,
-        codeCellsCount = defaultSafeCrackerPuzzleParams.codeCellsCount,
-    }: Partial<SafeCrackerPuzzleParams> = {}
+    {size, circleRegionsCount, codeCellsCount}: SafeCrackerPuzzleParams
 ): SudokuTypeManager<number, ExType, ProcessedExType> => {
     const baseTypeManager = DigitSudokuTypeManager<ExType, ProcessedExType>();
 

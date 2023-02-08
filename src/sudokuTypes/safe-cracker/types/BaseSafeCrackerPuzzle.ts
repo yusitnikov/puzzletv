@@ -1,4 +1,4 @@
-import {defaultSafeCrackerPuzzleParams, SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
+import {SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {Position} from "../../../types/layout/Position";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
@@ -7,13 +7,9 @@ import {createGivenDigitsMapFromArray} from "../../../types/sudoku/GivenDigitsMa
 import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
 import {SafeCrackerSudokuTypeManager} from "./SafeCrackerSudokuTypeManager";
 
-export const BaseSafeCrackerPuzzle = (params: Partial<SafeCrackerPuzzleParams> = {})
+export const BaseSafeCrackerPuzzle = (params: SafeCrackerPuzzleParams)
     : Pick<PuzzleDefinition<any>, "fieldSize" | "digitsCount" | "customCellBounds" | "ignoreRowsColumnCountInTheWrapper" | "typeManager" | "allowDrawing"> => {
-    const {
-        size = defaultSafeCrackerPuzzleParams.size,
-        circleRegionsCount = defaultSafeCrackerPuzzleParams.circleRegionsCount,
-        codeCellsCount = defaultSafeCrackerPuzzleParams.codeCellsCount,
-    } = params;
+    const {size, circleRegionsCount, codeCellsCount} = params;
 
     const round = (value: number) => Math.round(value * 1000) / 1000;
 

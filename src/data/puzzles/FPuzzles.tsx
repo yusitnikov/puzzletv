@@ -117,7 +117,11 @@ export const loadByFPuzzlesObject = (
             ? RegularCalculatorDigitComponentType
             : RegularDigitComponentType
     );
-    const safeCrackerParams: Partial<SafeCrackerPuzzleParams> = {size: puzzleJson.size};
+    const safeCrackerParams: SafeCrackerPuzzleParams = {
+        size: puzzleJson.size,
+        circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
+        codeCellsCount: Math.min(puzzleJson.size, 6),
+    };
     const typesMap: Record<string, SudokuTypeManager<number>> = {
         regular: regularTypeManager,
         latin: LatinDigitSudokuTypeManager,
