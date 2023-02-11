@@ -38,7 +38,7 @@ import {
     unserializeFromLocalStorage
 } from "../../utils/localStorage";
 import {LocalStorageKeys} from "../../data/LocalStorageKeys";
-import {CellMark} from "./CellMark";
+import {CellMark, CellMarkType} from "./CellMark";
 import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
 import {getAllPuzzleConstraints, isValidUserDigit, prepareGivenDigitsMapForConstraints} from "./Constraint";
@@ -406,16 +406,17 @@ export const gameStateSelectAllCells = <CellType, ExType, ProcessedExType>(
 ) => {
     const {
         fieldSize: {rowsCount, columnsCount},
-        typeManager: {
-            isValidCell = () => true,
-        },
+        typeManager: {getCellTypeProps},
     } = puzzle;
 
     return gameStateSetSelectedCells<CellType, ExType>(
         state,
         indexes(rowsCount)
             .flatMap(top => indexes(columnsCount).map(left => ({left, top})))
-            .filter(cell => isValidCell(cell, puzzle))
+            .filter(cell => {
+                const cellTypeProps = getCellTypeProps?.(cell, puzzle);
+                return cellTypeProps?.isVisible !== false && cellTypeProps?.isSelectable !== false;
+            })
     );
 };
 
@@ -819,29 +820,24 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
                         const {type, round} = state.dragStartPoint;
 
                         if (allowDrawing.includes(`${type}-mark`)) {
-                            const xMark: CellMark = {position: round, color: selectedColor, isCircle: false, isCenter: type === "center"};
-                            const circleMark: CellMark = {position: round, color: selectedColor, isCircle: true, isCenter: type === "center"};
+                            const xMark: CellMark = {position: round, color: selectedColor, type: CellMarkType.X, isCenter: type === "center"};
+                            const circleMark: CellMark = {position: round, color: selectedColor, type: CellMarkType.O, isCenter: type === "center"};
 
                             if (type !== "center") {
                                 marks = marks.toggle(xMark);
                             } else {
-                                const allMarkOptions = [
-                                    {x: false, o: false},
-                                    {x: false, o: true},
-                                    {x: true, o: false},
+                                const allMarkOptions: (CellMark | undefined)[] = [
+                                    undefined,
+                                    circleMark,
+                                    xMark,
                                 ];
-                                const currentMark = {
-                                    x: marks.contains(xMark),
-                                    o: marks.contains(circleMark),
-                                };
+                                const currentMark = marks.find(xMark)?.type;
                                 const newMark = incrementArrayItem(
                                     allMarkOptions,
-                                    ({x, o}) => x === currentMark.x && o === currentMark.o,
+                                    (mark) => mark?.type === currentMark,
                                     isRightButton ? -1 : 1
                                 )
-                                marks = marks
-                                    .toggle(xMark, newMark.x)
-                                    .toggle(circleMark, newMark.o);
+                                marks = newMark ? marks.add(newMark) : marks.remove(xMark);
                             }
                         }
                     }
@@ -941,6 +937,41 @@ export const gameStateContinueMultiLine = <CellType, ExType, ProcessedExType>(
             ? (gameStateGetCurrentFieldState(state).lines.contains(newLines[0]) ? DragAction.SetUndefined : DragAction.SetTrue)
             : state.dragAction,
     });
+};
+
+export const gameStateSetCellMark = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    position: Position,
+    isCenter: boolean,
+    cellMarkType?: CellMarkType,
+    color = CellColor.black
+): PartialGameStateEx<CellType, ExType> => {
+    const {
+        puzzle: {typeManager},
+        state: {fieldStateHistory},
+    } = context;
+
+    return {
+        fieldStateHistory: fieldStateHistoryAddState(
+            typeManager,
+            fieldStateHistory,
+            (fieldState) => {
+                let {marks} = fieldState;
+
+                const mark: CellMark = {
+                    type: cellMarkType ?? CellMarkType.Any,
+                    position,
+                    color,
+                    isCenter,
+                };
+
+                return {
+                    ...fieldState,
+                    marks: cellMarkType ? marks.add(mark) : marks.remove(mark),
+                };
+            }
+        ),
+    };
 };
 
 export const gameStateGetCellShading = <CellType>({colors}: CellState<CellType>) =>

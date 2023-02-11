@@ -19,7 +19,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
     const {
         typeManager: {
             borderColor: typeBorderColor,
-            isValidCell = () => true,
+            getCellTypeProps,
         },
         fieldSize: {columnsCount, rowsCount},
         borderColor: puzzleBorderColor,
@@ -51,7 +51,8 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
     return <>
         {indexes(rowsCount, true).flatMap(
             top => concatContinuousLines(indexes(columnsCount).filter(
-                left => isValidCell({top, left}, puzzle) || (top > 0 && isValidCell({top: top - 1, left}, puzzle))
+                left => getCellTypeProps?.({top, left}, puzzle)?.isVisible !== false
+                    || (top > 0 && getCellTypeProps?.({top: top - 1, left}, puzzle)?.isVisible !== false)
             )).map(({start, end}) => <line
                 key={`h-line-${top}-${start}`}
                 x1={start}
@@ -65,7 +66,8 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
 
         {indexes(columnsCount, true).flatMap(
             left => concatContinuousLines(indexes(rowsCount).filter(
-                top => isValidCell({top, left}, puzzle) || (left > 0 && isValidCell({top, left: left - 1}, puzzle))
+                top => getCellTypeProps?.({top, left}, puzzle)?.isVisible !== false
+                    || (left > 0 && getCellTypeProps?.({top, left: left - 1}, puzzle)?.isVisible !== false)
             )).map(({start, end}) => <line
                 key={`v-line-${left}-${start}`}
                 x1={left}

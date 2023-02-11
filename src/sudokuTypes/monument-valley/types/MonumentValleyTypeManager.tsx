@@ -55,23 +55,23 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         }
     },
 
-    isValidCell({top, left}, {fieldSize}): boolean {
+    getCellTypeProps({top, left}, {fieldSize}) {
         const {gridSize, intersectionSize, columnsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         if (top >= gridSize && (left < gridSize - intersectionSize || left >= columnsCount - gridSize + intersectionSize)) {
-            return false;
+            return {isVisible: false};
         }
 
         if (top < gridSize - intersectionSize && left >= gridSize && left < columnsCount - gridSize) {
-            return false;
+            return {isVisible: false};
         }
 
         // noinspection RedundantIfStatementJS
         if (top < intersectionSize && left >= columnsCount - gridSize && left < columnsCount - gridSize + intersectionSize) {
-            return false;
+            return {isVisible: false};
         }
 
-        return true;
+        return {};
     },
 
     processCellDataPosition(puzzle, {left, top, angle}, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {

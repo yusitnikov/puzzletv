@@ -3,10 +3,12 @@ import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager
 import {Position, PositionWithAngle} from "../../../types/layout/Position";
 import {
     defaultProcessArrowDirection,
-    defaultProcessArrowDirectionForRegularCellBounds, SudokuTypeManager
+    defaultProcessArrowDirectionForRegularCellBounds,
+    SudokuTypeManager
 } from "../../../types/sudoku/SudokuTypeManager";
 import {SafeCrackerStarConstraint} from "../constraints/SafeCrackerStarConstraint";
 import {indexes} from "../../../utils/indexes";
+import {safeCrackerArrowsCellWriteModeInfo} from "./LeftRightArrow";
 
 export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
     {size, circleRegionsCount, codeCellsCount}: SafeCrackerPuzzleParams
@@ -15,11 +17,14 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
 
     return {
         ...baseTypeManager,
-        isValidCell({top, left}): boolean {
+        getCellTypeProps({top, left}) {
             switch (top - circleRegionsCount * 2) {
-                case 0: return true;
-                case 1: return left < codeCellsCount;
-                default: return top % 2 === 1;
+                case 0: return {};
+                case 1: return {isVisible: left < codeCellsCount};
+                default: return top % 2 === 1 ? {} : {
+                    isSelectable: false,
+                    forceCellWriteMode: safeCrackerArrowsCellWriteModeInfo(),
+                };
             }
         },
         processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard): Position | undefined {

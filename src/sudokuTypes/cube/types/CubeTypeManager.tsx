@@ -11,8 +11,8 @@ import {Constraint} from "../../../types/sudoku/Constraint";
 export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuTypeManager<number> => ({
     ...DigitSudokuTypeManager(),
 
-    isValidCell({top, left}, {fieldSize: {rowsCount, columnsCount}}): boolean {
-        return left * 2 < columnsCount || top * 2 >= rowsCount;
+    getCellTypeProps({top, left}, {fieldSize: {rowsCount, columnsCount}}) {
+        return {isVisible: left * 2 < columnsCount || top * 2 >= rowsCount};
     },
 
     processCellDataPosition(
@@ -77,7 +77,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         ];
     },
 
-    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}): Constraint<number, any, {}, {}>[] {
+    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}): Constraint<number, any>[] {
         const realFieldSize = fieldSize / 2;
 
         if (continuousRowColumnRegions) {

@@ -285,10 +285,14 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                             ? asAction.type.callback(asAction.params, context, myClientId)
                             : actionOrCallback as GameStateActionCallback<CellType, ExType, ProcessedExType>;
 
-                        state = mergeGameStateWithUpdates(
-                            state,
-                            typeof callback === "function" ? callback(processedGameState) : callback,
-                        );
+                        const updates = typeof callback === "function" ? callback(processedGameState) : callback;
+                        if (updates.selectedCells) {
+                            updates.selectedCells = updates.selectedCells.filter((cell) => {
+                                const cellTypeProps = puzzle.typeManager.getCellTypeProps?.(cell, puzzle);
+                                return cellTypeProps?.isVisible !== false && cellTypeProps?.isSelectable !== false;
+                            });
+                        }
+                        state = mergeGameStateWithUpdates(state, updates);
                     } else {
                         sendMessage({
                             type: asAction.type.key,

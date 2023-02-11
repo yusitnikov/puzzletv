@@ -117,7 +117,11 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     getFieldAngle?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): number;
 
-    isValidCell?(cell: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): boolean;
+    getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): {
+        isVisible?: boolean;
+        isSelectable?: boolean;
+        forceCellWriteMode?: CellWriteModeInfo<CellType, ExType, ProcessedExType>;
+    };
 
     processArrowDirection?(
         currentCell: Position,
@@ -235,12 +239,16 @@ export const defaultProcessArrowDirectionForRegularCellBounds = (
 ): Position | undefined => {
     const {
         fieldSize: {rowsCount, columnsCount},
-        typeManager: {isValidCell = () => true},
+        typeManager: {getCellTypeProps},
     } = puzzle;
 
     const isTotallyValidCell = (position: Position) => {
         const {top, left} = position;
-        return top >= 0 && top < rowsCount && left >= 0 && left < columnsCount && isValidCell(position, puzzle);
+        if (top < 0 || top >= rowsCount || left < 0 || left >= columnsCount) {
+            return false;
+        }
+        const cellTypeProps = getCellTypeProps?.(position, puzzle);
+        return cellTypeProps?.isVisible !== false && cellTypeProps?.isSelectable !== false;
     };
 
     // Try moving in the requested direction naively
@@ -273,7 +281,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = (
     isMainKeyboard?: boolean,
     enableBackwardSteps = true,
 ): Position | undefined => {
-    const {typeManager: {isValidCell = () => true}} = puzzle;
+    const {typeManager: {getCellTypeProps}} = puzzle;
 
     const {center, neighbors} = cellsIndex.allCells[top][left];
 
@@ -281,7 +289,8 @@ export const defaultProcessArrowDirectionForCustomCellBounds = (
     let bestCell: Position | undefined = undefined;
 
     for (const neighbor of neighbors.items) {
-        if (!isValidCell(neighbor, puzzle)) {
+        const cellTypeProps = getCellTypeProps?.(neighbor, puzzle);
+        if (cellTypeProps?.isVisible === false || cellTypeProps?.isSelectable === false) {
             continue;
         }
 

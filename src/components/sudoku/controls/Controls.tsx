@@ -34,6 +34,7 @@ import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
 import {CellColor} from "../../../types/sudoku/CellColor";
 import {ctrlKeyText} from "../../../utils/os";
+import {CellMarkType} from "../../../types/sudoku/CellMark";
 
 export const getControlsWidthCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
     const allowedModes = getAllowedCellWriteModeInfos(puzzle);
@@ -393,20 +394,20 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
                     {allowDrawing.includes("center-mark") && <UserMarkByData
                         cellSize={contentSize}
                         position={{left: 0.5, top: 0.5}}
-                        isCircle={true}
+                        type={CellMarkType.O}
                         isCenter={true}
                     />}
 
                     {allowDrawing.includes("border-mark") && <UserMarkByData
                         cellSize={contentSize}
                         position={{left: 0.5, top: 1}}
-                        isCircle={false}
+                        type={CellMarkType.X}
                     />}
 
                     {allowDrawing.includes("corner-mark") && <UserMarkByData
                         cellSize={contentSize}
                         position={{left: 1, top: 0}}
-                        isCircle={false}
+                        type={CellMarkType.X}
                     />}
                 </AutoSvg>;
             }}

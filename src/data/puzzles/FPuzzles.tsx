@@ -214,7 +214,7 @@ export const loadByFPuzzlesObject = (
                         (cell, left) => ({top, left, ...cell})
                     )
                 );
-            const validGridCells = allGridCells.filter((cell) => typeManager.isValidCell?.(cell, puzzle) ?? true);
+            const validGridCells = allGridCells.filter((cell) => typeManager.getCellTypeProps?.(cell, puzzle)?.isVisible !== false);
 
             const faces = typeManager.getRegionsWithSameCoordsTransformation?.(puzzle, 1) ?? [{
                 top: 0,

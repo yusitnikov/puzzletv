@@ -37,10 +37,15 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         selectedCells,
         currentMultiLineEnd,
         initialDigits: stateInitialDigits,
-        processed: {
-            cellWriteModeInfo: {isNoSelectionMode, onCornerClick, onCornerEnter, handlesRightMouseClick},
-        },
+        processed: {cellWriteModeInfo},
     } = state;
+
+    const {
+        isNoSelectionMode,
+        onCornerClick,
+        onCornerEnter,
+        handlesRightMouseClick,
+    } = puzzle.typeManager.getCellTypeProps?.(cellPosition, puzzle)?.forceCellWriteMode || cellWriteModeInfo;
 
     const {areCustomBounds, center, borderSegments} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
 

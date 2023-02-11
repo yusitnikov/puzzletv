@@ -7,7 +7,7 @@ export class PuzzleLineSet<CellType, ExType, ProcessedExType, LineT extends Line
         puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         items: LineT[] = []
     ) {
-        super(items, getPuzzleLineHasher(puzzle));
+        super(items, {hasher: getPuzzleLineHasher(puzzle)});
     }
 
     static unserialize<CellType, ExType, ProcessedExType>(

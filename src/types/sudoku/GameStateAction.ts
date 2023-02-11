@@ -1,10 +1,12 @@
 import {
     gameStateApplyCurrentMultiLine,
     gameStateApplyShading,
-    gameStateClearSelectedCellsContent, gameStateGetCellShading,
+    gameStateClearSelectedCellsContent,
+    gameStateGetCellShading,
     gameStateGetCurrentFieldState,
-    gameStateHandleDigit, gameStateIncrementShading,
-    gameStateRedo,
+    gameStateHandleDigit,
+    gameStateIncrementShading,
+    gameStateRedo, gameStateSetCellMark,
     gameStateUndo,
     PartialGameStateEx,
     ProcessedGameStateEx
@@ -13,6 +15,8 @@ import {PuzzleContext} from "./PuzzleContext";
 import {myClientId} from "../../hooks/useMultiPlayer";
 import {Position} from "../layout/Position";
 import {DragAction} from "./DragAction";
+import {CellMarkType} from "./CellMark";
+import {CellColor} from "./CellColor";
 
 export type GameStateActionCallback<CellType, ExType, ProcessedExType> =
     PartialGameStateEx<CellType, ExType> | ((prevState: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => PartialGameStateEx<CellType, ExType>);
@@ -108,6 +112,18 @@ export const applyCurrentMultiLineAction = <CellType, ExType, ProcessedExType>(
     state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isRightButton, false),
 ];
 
+export interface SetCellMarkActionParams extends Position {
+    isCenter: boolean;
+    cellMarkType?: CellMarkType;
+    color?: CellColor;
+}
+export const setCellMarkActionType = <CellType, ExType, ProcessedExType>()
+    : GameStateActionType<SetCellMarkActionParams, CellType, ExType, ProcessedExType> => ({
+    key: "set-cell-mark",
+    callback: ({isCenter, cellMarkType, color, ...position}, context) =>
+        state => gameStateSetCellMark({...context, state}, position, isCenter, cellMarkType, color),
+});
+
 interface ShadingActionParams extends Position {
     action: DragAction;
 }
@@ -148,5 +164,6 @@ export const coreGameStateActionTypes: GameStateActionType<any, any, any, any>[]
     clearSelectionActionType(),
     enterDigitActionType(),
     applyCurrentMultiLineActionType(),
+    setCellMarkActionType(),
     shadingActionType(),
 ];

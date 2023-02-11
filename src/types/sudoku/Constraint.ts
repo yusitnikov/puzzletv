@@ -171,7 +171,7 @@ export const isValidFinishedPuzzleByConstraints = <CellType, ExType, ProcessedEx
     context: PuzzleContext<CellType, ExType, ProcessedExType>
 ) => {
     const {puzzle, state} = context;
-    const {typeManager: {isValidCell = () => true}, digitsCount} = puzzle;
+    const {typeManager: {getCellTypeProps}, digitsCount} = puzzle;
     const constraints = getAllPuzzleConstraints(context);
     const {cells, lines} = gameStateGetCurrentFieldState(state);
     const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
@@ -190,7 +190,8 @@ export const isValidFinishedPuzzleByConstraints = <CellType, ExType, ProcessedEx
             const position: Position = {left, top};
             const digit = userDigits[top]?.[left];
 
-            return !isValidCell(position, puzzle)
+            const cellTypeProps = getCellTypeProps?.(position, puzzle);
+            return (cellTypeProps?.isVisible === false || cellTypeProps?.isSelectable === false)
                 || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
         }))
     ) && getInvalidUserLines(lines, userDigits, constraints, context, true).size === 0;

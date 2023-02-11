@@ -75,7 +75,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     } = puzzle;
 
     const {
-        isValidCell = () => true,
+        getCellTypeProps,
         getRegionsWithSameCoordsTransformation,
         getCellSelectionType,
         disableConflictChecker,
@@ -225,7 +225,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const renderCellsLayer = (
         keyPrefix: string,
         renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
-        {useShadow = false, renderInvalidCells = false}: {useShadow?: boolean, renderInvalidCells?: boolean} = {}
+        {useShadow = false}: {useShadow?: boolean} = {}
     ) =>
         <FieldSvg context={readOnlySafeContext} useShadow={useShadow}>
             {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
@@ -246,7 +246,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     top: rowIndex,
                 };
 
-                if (!renderInvalidCells && !isValidCell(cellPosition, puzzle)) {
+                if (getCellTypeProps?.(cellPosition, puzzle)?.isVisible === false) {
                     return null;
                 }
 
@@ -322,7 +322,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                             colors={finalColors}
                             noOpacity={!!initialCellColors?.length}
                         />;
-                    }, {renderInvalidCells: true})}
+                    })}
 
                     <FieldSvg context={readOnlySafeContext}>
                         <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
@@ -393,7 +393,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                     )
                             }
                         />;
-                    }, {useShadow: true, renderInvalidCells: true})}
+                    }, {useShadow: true})}
 
                     {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
                         context={readOnlySafeContext}

@@ -3,17 +3,25 @@ import {getPuzzlePositionHasher, PuzzleDefinition} from "./PuzzleDefinition";
 import {HashSet} from "../struct/Set";
 import {CellColor} from "./CellColor";
 
+export enum CellMarkType {
+    Any = "",
+    X = "X",
+    O = "O",
+    LeftArrow = "←",
+    RightArrow = "→",
+}
+
 export interface CellMark {
     position: Position;
     color?: CellColor;
-    isCircle: boolean;
+    type: CellMarkType;
     isCenter?: boolean;
 }
 
 export const getMarkHasher = (puzzle: PuzzleDefinition<any, any, any>) => {
     const positionHasher = getPuzzlePositionHasher(puzzle);
 
-    return ({position, isCircle = false, isCenter = false}: CellMark) => `${positionHasher(position)}:${isCircle}:${isCenter}`;
+    return ({position, isCenter = false}: CellMark) => `${positionHasher(position)}:${isCenter}`;
 };
 
 export class CellMarkSet extends HashSet<CellMark> {
@@ -21,7 +29,12 @@ export class CellMarkSet extends HashSet<CellMark> {
         puzzle: PuzzleDefinition<any, any, any>,
         items: CellMark[] = []
     ) {
-        super(items, getMarkHasher(puzzle));
+        const hasher = getMarkHasher(puzzle);
+
+        super(items, {
+            hasher,
+            comparer: (item1, item2) => hasher(item1) === hasher(item2) && item1.type === item2.type,
+        });
     }
 
     static unserialize(

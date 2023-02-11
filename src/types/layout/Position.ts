@@ -146,7 +146,7 @@ export const getAveragePosition = (positions: Position[]): Position => {
 
 export class PositionSet extends HashSet<Position> {
     constructor(items: Position[] = []) {
-        super(items, stringifyPosition);
+        super(items, {hasher: stringifyPosition});
     }
 
     static unserialize(items: any) {

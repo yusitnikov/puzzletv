@@ -11,7 +11,7 @@ import {Position} from "../layout/Position";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {SetInterface} from "../struct/Set";
-import {CellMark, CellMarkSet} from "./CellMark";
+import {CellMark, CellMarkSet, CellMarkType} from "./CellMark";
 import {PuzzleLineSet} from "./PuzzleLineSet";
 import {LineWithColor} from "./LineWithColor";
 
@@ -44,7 +44,13 @@ export const unserializeFieldState = <CellType>(
 ) => ({
     cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle))),
     lines: PuzzleLineSet.unserialize(puzzle, lines),
-    marks: CellMarkSet.unserialize(puzzle, marks),
+    marks: CellMarkSet.unserialize(
+        puzzle,
+        marks.map(({type, isCircle, ...mark}: any) => ({
+            ...mark,
+            type: type ?? (isCircle ? CellMarkType.O : CellMarkType.X),
+        }))
+    ),
 });
 
 export const cloneFieldState = <CellType>(

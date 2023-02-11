@@ -12,12 +12,15 @@ import {
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {gameStateGetCurrentFieldState} from "../../../../types/sudoku/GameState";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
-import {CellMark} from "../../../../types/sudoku/CellMark";
+import {CellMark, CellMarkType} from "../../../../types/sudoku/CellMark";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {normalizePuzzleLine} from "../../../../types/sudoku/PuzzleDefinition";
 import {DragAction} from "../../../../types/sudoku/DragAction";
 import {resolveCellColorValue} from "../../../../types/sudoku/CellColor";
 import {LineWithColor} from "../../../../types/sudoku/LineWithColor";
+import {CenteredText} from "../../../svg/centered-text/CenteredText";
+import {HashSet} from "../../../../types/struct/Set";
+import {emptyPositionWithAngle} from "../../../../types/layout/Position";
 
 const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
@@ -79,13 +82,14 @@ export const UserMarkByData = (
         context,
         cellSize,
         position,
-        isCircle,
+        type,
         color,
         // Leaving the defaults only for compatibility
         isCenter = position.left % 1 !== 0 && position.top % 1 !== 0,
     }: UserMarkByDataProps
 ) => {
     let {top, left} = position;
+    let angle = 0;
 
     const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
 
@@ -94,23 +98,31 @@ export const UserMarkByData = (
     const resolvedColor = color ? resolveCellColorValue(color) : regularBorderColor;
 
     if (context) {
+        const {puzzle, state, cellsIndex} = context;
         const {
-            puzzle: {
-                fieldSize: {
-                    rowsCount,
-                    columnsCount,
-                },
-                loopHorizontally,
-                loopVertically,
+            fieldSize: {
+                rowsCount,
+                columnsCount,
             },
-            cellsIndex,
-        } = context;
+            loopHorizontally,
+            loopVertically,
+            typeManager: {processCellDataPosition},
+        } = puzzle;
 
         if (isCenter) {
             const cellPosition = cellsIndex.getPointInfo(position)?.cells.first();
             if (cellPosition) {
                 const {bounds: {userArea}} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
                 userAreaSize = (userArea.width + userArea.height) / 2;
+                angle = processCellDataPosition?.(
+                    puzzle,
+                    emptyPositionWithAngle,
+                    new HashSet(),
+                    0,
+                    () => undefined,
+                    cellPosition,
+                    state,
+                )?.angle ?? 0;
             }
         }
 
@@ -130,10 +142,11 @@ export const UserMarkByData = (
     return <AutoSvg
         top={top}
         left={left}
+        angle={angle}
         stroke={resolvedColor}
         strokeWidth={borderWidth}
     >
-        {isCircle && <circle
+        {type === CellMarkType.O && <circle
             cx={0}
             cy={0}
             r={radius}
@@ -143,7 +156,7 @@ export const UserMarkByData = (
             opacity={opacity}
         />}
 
-        {!isCircle && <g opacity={opacity}>
+        {type === CellMarkType.X && <g opacity={opacity}>
             <line
                 x1={-radius}
                 y1={-radius}
@@ -162,6 +175,8 @@ export const UserMarkByData = (
                 strokeWidth={lineWidth}
             />
         </g>}
+
+        {![CellMarkType.X, CellMarkType.O].includes(type) && <CenteredText size={1}>{type}</CenteredText>}
     </AutoSvg>;
 };
 

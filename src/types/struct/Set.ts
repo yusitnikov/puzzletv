@@ -16,6 +16,8 @@ export interface SetInterface<ItemT, AlternativeItemsArrayT = never> {
 
     containsOneOf(items: ItemT[]): boolean;
 
+    find(item: ItemT): ItemT | undefined;
+
     equals(set: SetInterface<ItemT>): boolean;
 
     at(index: number): ItemT | undefined;
@@ -57,8 +59,9 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     private cache: Record<string, any> = {};
 
     protected constructor(
-        protected readonly cloner: Cloner<ItemT> = defaultCloner,
-        protected readonly serializer: Serializer<ItemT> = defaultSerializer
+        public readonly cloner: Cloner<ItemT> = defaultCloner,
+        public readonly comparer: Comparer<ItemT> = defaultComparer,
+        public readonly serializer: Serializer<ItemT> = defaultSerializer
     ) {
     }
 
@@ -69,6 +72,8 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     }
 
     abstract contains(item: ItemT): boolean;
+
+    abstract find(item: ItemT): ItemT | undefined;
 
     abstract set(items: ItemT[] | AlternativeItemsArrayT): this;
 
@@ -81,7 +86,10 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     }
 
     equals(set: SetInterface<ItemT>) {
-        return this.size === set.size && this.items.every(item => set.contains(item));
+        return this.size === set.size && this.items.every(item => {
+            const matchingItem = set.find(item);
+            return matchingItem !== undefined && this.comparer(item, matchingItem);
+        });
     }
 
     at(index: number) {
@@ -170,17 +178,13 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
 }
 
 export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<ItemT> {
-    protected readonly comparer: Comparer<ItemT>;
-
     constructor(
         private readonly _items: ItemT[] = [],
         comparer?: Comparer<ItemT>,
         cloner?: Cloner<ItemT>,
         serializer?: Serializer<ItemT>
     ) {
-        super(cloner, serializer);
-
-        this.comparer = comparer || defaultComparer;
+        super(cloner, comparer, serializer);
     }
 
     get items(): ItemT[] {
@@ -189,6 +193,10 @@ export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<Ite
 
     contains(item: ItemT) {
         return this.items.some(i => this.comparer(i, item));
+    }
+
+    find(item: ItemT): ItemT | undefined {
+        return this.items.find(i => this.comparer(i, item));
     }
 
     set(items: ItemT[]): this {
@@ -205,19 +213,27 @@ export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<Ite
 }
 
 export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements SetInterface<ItemT, Record<string, ItemT>> {
-    private readonly hasher: Hasher<ItemT>;
+    public readonly hasher: Hasher<ItemT>;
 
     private readonly _map: Record<string, ItemT> = {};
 
     constructor(
         private _items: ItemT[] | Record<string, ItemT> = [],
-        hasher?: Hasher<ItemT>,
-        cloner?: Cloner<ItemT>,
-        serializer?: Serializer<ItemT>
+        {
+            cloner = defaultCloner,
+            serializer = defaultSerializer,
+            hasher = defaultHasher(serializer),
+            comparer = (item1, item2) => hasher(item1) === hasher(item2),
+        }: {
+            cloner?: Cloner<ItemT>,
+            serializer?: Serializer<ItemT>,
+            hasher?: Hasher<ItemT>,
+            comparer?: Comparer<ItemT>,
+        } = {},
     ) {
-        super(cloner, serializer);
+        super(cloner, comparer, serializer);
 
-        this.hasher = hasher || defaultHasher(serializer || defaultSerializer);
+        this.hasher = hasher;
 
         if (_items instanceof Array) {
             for (const item of _items) {
@@ -240,8 +256,12 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
         return this.hasher(item) in this._map;
     }
 
+    find(item: ItemT): ItemT | undefined {
+        return this._map[this.hasher(item)];
+    }
+
     set(items: ItemT[] | Record<string, ItemT>): this {
-        return new HashSet(items, this.hasher, this.cloner, this.serializer) as this;
+        return new HashSet(items, this) as this;
     }
 
     clone() {

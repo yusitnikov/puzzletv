@@ -7,7 +7,7 @@ export class PuzzlePositionSet<CellType, ExType, ProcessedExType> extends HashSe
         puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         items: Position[] = []
     ) {
-        super(items, getPuzzlePositionHasher(puzzle));
+        super(items, {hasher: getPuzzlePositionHasher(puzzle)});
     }
 
     static unserialize<CellType, ExType, ProcessedExType>(
