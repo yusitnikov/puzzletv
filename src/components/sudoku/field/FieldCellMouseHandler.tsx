@@ -155,6 +155,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     cellPosition={cellPosition}
                     onClick={({button}) => onCornerClick?.(context, centerExactPosition, !!button)}
                     onEnter={() => onCornerEnter?.(context, centerExactPosition)}
+                    onContextMenu={handleContextMenu}
                 />
 
                 {Object.entries(borderSegments).map(([key, {line, center: borderCenter}]) => {
