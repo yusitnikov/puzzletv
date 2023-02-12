@@ -22,7 +22,7 @@ export const safeCrackerArrowsAction = <CellType, ExType, ProcessedExType>(
             ...position,
             isCenter: true,
             cellMarkType: incrementArrayItem<CellMarkType | undefined>(
-                [undefined, CellMarkType.LeftArrow, CellMarkType.RightArrow],
+                [undefined, CellMarkType.LeftArrow, CellMarkType.RightArrow, CellMarkType.X],
                 marks.find({position, isCenter: true, type: CellMarkType.Any})?.type,
                 isRightButton ? -1 : 1,
             ),

@@ -113,6 +113,16 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
                                 })
                             }
                             break;
+                        case CellMarkType.X.toLowerCase():
+                            if (center) {
+                                initialCellMarks.push({
+                                    type: CellMarkType.X,
+                                    position: center,
+                                    isCenter: true,
+                                    color: CellColor.black,
+                                })
+                            }
+                            break;
                         case "s":
                         case "star":
                             items.push(SafeCrackerStarConstraint(item.cells, item.layer));
