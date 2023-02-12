@@ -1,6 +1,9 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {CellSelectionColor, CellSelectionProps} from "../../../components/sudoku/cell/CellSelection";
 import {CubeTypeManager} from "../../cube/types/CubeTypeManager";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {CubedokuIndexingConstraint} from "../constraints/CubedokuIndexing";
+import {Constraint} from "../../../types/sudoku/Constraint";
 
 export const CubedokuTypeManager: SudokuTypeManager<number> = {
     ...CubeTypeManager(false),
@@ -71,5 +74,19 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
         }
 
         return isTrack ? trackResult : undefined;
-    }
+    },
+
+    postProcessPuzzle({items, ...puzzle}: PuzzleDefinition<number>): PuzzleDefinition<number> {
+        const addConstraint = (items: Constraint<number, any>[]): Constraint<number, any>[] => [
+            CubedokuIndexingConstraint(),
+            ...items,
+        ];
+
+        return {
+            ...puzzle,
+            items: typeof items === "function"
+                ? (state) => addConstraint(items(state))
+                : addConstraint(items ?? []),
+        };
+    },
 };

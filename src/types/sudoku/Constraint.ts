@@ -12,12 +12,14 @@ import {SetInterface} from "../struct/Set";
 import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 import {LineWithColor} from "./LineWithColor";
 import {getFogPropsByConstraintsList} from "../../components/sudoku/constraints/fog/Fog";
+import {FieldLayer} from "./FieldLayer";
 
 export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType = {}> = {
     name: string;
     tags?: string[];
     cells: Position[];
     renderSingleCellInUserArea?: boolean;
+    layer?: FieldLayer;
     component?: ComponentType<ConstraintProps<CellType, DataT, ExType, ProcessedExType>>;
     color?: string;
     angle?: number;

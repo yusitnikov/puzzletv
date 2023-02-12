@@ -7,8 +7,10 @@ import {createGivenDigitsMapFromArray} from "../../../types/sudoku/GivenDigitsMa
 import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
 import {SafeCrackerSudokuTypeManager} from "./SafeCrackerSudokuTypeManager";
 
-export const BaseSafeCrackerPuzzle = (params: SafeCrackerPuzzleParams)
-    : Pick<PuzzleDefinition<any>, "fieldSize" | "digitsCount" | "customCellBounds" | "ignoreRowsColumnCountInTheWrapper" | "typeManager" | "allowDrawing"> => {
+export const BaseSafeCrackerPuzzle = <ExType, ProcessedExType>(params: SafeCrackerPuzzleParams): Pick<
+    PuzzleDefinition<number, ExType, ProcessedExType>,
+    "fieldSize" | "digitsCount" | "customCellBounds" | "ignoreRowsColumnCountInTheWrapper" | "typeManager" | "allowDrawing"
+> => {
     const {size, circleRegionsCount, codeCellsCount} = params;
 
     const round = (value: number) => Math.round(value * 1000) / 1000;

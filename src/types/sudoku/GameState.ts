@@ -17,7 +17,7 @@ import {
 } from "./FieldState";
 import {indexes} from "../../utils/indexes";
 import {emptyPosition, Position, PositionSet} from "../layout/Position";
-import {defaultProcessArrowDirection, SudokuTypeManager} from "./SudokuTypeManager";
+import {defaultProcessArrowDirection} from "./SudokuTypeManager";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {
     GivenDigitsMap,
@@ -254,7 +254,7 @@ export const saveGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         ([
             [
                 fullSaveStateKey,
-                serializeFieldState(gameStateGetCurrentFieldState(state, true), typeManager),
+                serializeFieldState(gameStateGetCurrentFieldState(state, true), puzzle),
                 typeManager.serializeGameState(state.extension),
                 serializeGivenDigitsMap(state.initialDigits, typeManager.serializeCellData),
                 serializeGivenDigitsMap(state.excludedDigits, (excludedDigits) => excludedDigits.serialize()),
@@ -280,7 +280,7 @@ export const getAllShareState = <CellType, ExType = {}, ProcessedExType = {}>(
     const {initialDigits, excludedDigits, lives, extension} = state;
 
     return {
-        field: serializeFieldState(gameStateGetCurrentFieldState(state), typeManager),
+        field: serializeFieldState(gameStateGetCurrentFieldState(state), puzzle),
         extension: typeManager.serializeGameState(extension),
         initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
         excludedDigits: serializeGivenDigitsMap(excludedDigits, item => item.serialize()),
@@ -727,7 +727,8 @@ export const gameStateClearSelectedCellsContent = <CellType, ExType, ProcessedEx
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
     clientId: string
 ): PartialGameStateEx<CellType, ExType> => {
-    const {puzzle: {typeManager, hideDeleteButton}, state} = context;
+    const {puzzle, state} = context;
+    const {typeManager, hideDeleteButton} = puzzle;
 
     if (hideDeleteButton) {
         return {};
@@ -742,7 +743,7 @@ export const gameStateClearSelectedCellsContent = <CellType, ExType, ProcessedEx
     const clearColor = () => gameStateProcessSelectedCells(context, clientId, cell => ({
         colors: cell.colors.clear()
     }));
-    const clearLines = () => gameStateDeleteAllLines(typeManager, state);
+    const clearLines = () => gameStateDeleteAllLines(puzzle, state);
 
     switch (state.processed.cellWriteMode) {
         case CellWriteMode.main:
@@ -805,7 +806,8 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
     isRightButton: boolean,
     isGlobal: boolean
 ): PartialGameStateEx<CellType, ExType> => {
-    const {puzzle: {typeManager, allowDrawing = [], disableLineColors}, state} = context;
+    const {puzzle, state} = context;
+    const {typeManager, allowDrawing = [], disableLineColors} = puzzle;
     const selectedColor = disableLineColors ? undefined : state.selectedColor;
 
     if (isGlobal) {
@@ -845,7 +847,7 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
                     return {
                         ...fieldState,
                         lines: fieldState.lines.toggleAll(state.currentMultiLine, state.dragAction === DragAction.SetTrue),
-                        marks,
+                        marks: marks.bulkAdd(puzzle.initialCellMarks ?? []),
                     };
                 }
             ),
@@ -860,16 +862,16 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
 };
 
 export const gameStateDeleteAllLines = <CellType, ExType, ProcessedExType>(
-    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
     state: GameState<CellType>
 ): PartialGameStateEx<CellType, ExType> => ({
     fieldStateHistory: fieldStateHistoryAddState(
-        typeManager,
+        puzzle.typeManager,
         state.fieldStateHistory,
         (fieldState) => ({
             ...fieldState,
             lines: fieldState.lines.clear(),
-            marks: fieldState.marks.clear(),
+            marks: fieldState.marks.clear().bulkAdd(puzzle.initialCellMarks ?? []),
         })
     ),
 });
@@ -947,16 +949,16 @@ export const gameStateSetCellMark = <CellType, ExType, ProcessedExType>(
     color = CellColor.black
 ): PartialGameStateEx<CellType, ExType> => {
     const {
-        puzzle: {typeManager},
+        puzzle,
         state: {fieldStateHistory},
     } = context;
 
     return {
         fieldStateHistory: fieldStateHistoryAddState(
-            typeManager,
+            puzzle.typeManager,
             fieldStateHistory,
             (fieldState) => {
-                let {marks} = fieldState;
+                const {marks} = fieldState;
 
                 const mark: CellMark = {
                     type: cellMarkType ?? CellMarkType.Any,
@@ -967,7 +969,8 @@ export const gameStateSetCellMark = <CellType, ExType, ProcessedExType>(
 
                 return {
                     ...fieldState,
-                    marks: cellMarkType ? marks.add(mark) : marks.remove(mark),
+                    marks: (cellMarkType ? marks.add(mark) : marks.remove(mark))
+                        .bulkAdd(puzzle.initialCellMarks ?? []),
                 };
             }
         ),

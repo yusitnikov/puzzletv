@@ -21,6 +21,7 @@ import {
     stringifyPosition
 } from "../layout/Position";
 import {PuzzleResultCheck} from "./PuzzleResultCheck";
+import {CellMark} from "./CellMark";
 
 export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     title: PartiallyTranslatable;
@@ -51,6 +52,7 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
     initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => GivenDigitsMap<CellColorValue[]>);
+    initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
     resultChecker?: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
     forceAutoCheckOnFinish?: boolean;

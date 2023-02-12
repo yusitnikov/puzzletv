@@ -63,13 +63,9 @@ import {getTesseractCellSelectionType} from "../../sudokuTypes/tesseract/types/T
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {FPuzzlesText} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesText";
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
-import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {PuzzleLineSet} from "../../types/sudoku/PuzzleLineSet";
 import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
-import {BaseSafeCrackerPuzzle} from "../../sudokuTypes/safe-cracker/types/BaseSafeCrackerPuzzle";
-import {SafeCrackerPuzzleParams} from "../../sudokuTypes/safe-cracker/types/SafeCrackerPuzzleParams";
-import {SafeCrackerStarConstraint} from "../../sudokuTypes/safe-cracker/constraints/SafeCrackerStarConstraint";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -117,26 +113,21 @@ export const loadByFPuzzlesObject = (
             ? RegularCalculatorDigitComponentType
             : RegularDigitComponentType
     );
-    const safeCrackerParams: SafeCrackerPuzzleParams = {
-        size: puzzleJson.size,
-        circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
-        codeCellsCount: Math.min(puzzleJson.size, 6),
-    };
     const typesMap: Record<string, SudokuTypeManager<number>> = {
         regular: regularTypeManager,
         latin: LatinDigitSudokuTypeManager,
         calculator: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
         cubedoku: CubedokuTypeManager,
-        "safe-cracker": SafeCrackerSudokuTypeManager(safeCrackerParams),
+        "safe-cracker": SafeCrackerSudokuTypeManager({
+            size: puzzleJson.size,
+            circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
+            codeCellsCount: Math.min(puzzleJson.size, 6),
+        }),
     };
 
     const initialDigits: GivenDigitsMap<number> = {};
     const initialColors: GivenDigitsMap<CellColorValue[]> = {};
     const items: Constraint<number, any>[] = [];
-
-    if (type === "cubedoku") {
-        items.push(CubedokuIndexingConstraint());
-    }
 
     const baseTypeManager = typesMap[type] ?? regularTypeManager;
     const typeManager = {...baseTypeManager};
@@ -567,18 +558,6 @@ export const loadByFPuzzlesObject = (
 
                     checkForOutsideCells(cells, fieldSize);
 
-                    if (type === "safe-cracker") {
-                        if ([">", "->", "=>"].includes(value)) {
-                            value = "→";
-                        }
-                        if (["<", "<-", "<="].includes(value)) {
-                            value = "←";
-                        }
-                        if (["s", "star"].includes(value.toLowerCase())) {
-                            return [SafeCrackerStarConstraint(cells, cosmeticsLayer)];
-                        }
-                    }
-
                     return [TextConstraint<number, {}, {}>(cells, value, fontC, size, angle, cosmeticsLayer)];
                 }));
             }
@@ -679,11 +658,7 @@ export const loadByFPuzzlesObject = (
         puzzle.disableDiagonalCenterLines = true;
     }
 
-    if (type === "safe-cracker") {
-        Object.assign(puzzle, BaseSafeCrackerPuzzle(safeCrackerParams));
-    }
-
-    return puzzle;
+    return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 };
 
 export const FPuzzles: PuzzleDefinitionLoader<number> = {

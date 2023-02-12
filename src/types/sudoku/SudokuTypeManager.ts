@@ -229,6 +229,8 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
         translate: ReturnType<typeof useTranslate>,
         context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): ReactNode;
+
+    postProcessPuzzle?(puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): typeof puzzle;
 }
 
 export const defaultProcessArrowDirectionForRegularCellBounds = (

@@ -30,6 +30,8 @@ export const TextComponent = (layer = FieldLayer.lines) => withFieldLayer(layer,
     </CenteredText>
 </AutoSvg>) as ConstraintPropsGenericFc<TextProps>;
 
+export const textTag = "text";
+
 export const TextConstraint = <CellType, ExType, ProcessedExType>(
     cellLiterals: PositionLiteral[],
     text: string,
@@ -40,10 +42,12 @@ export const TextConstraint = <CellType, ExType, ProcessedExType>(
 ): Constraint<CellType, TextProps, ExType, ProcessedExType> => {
     return {
         name: `text: ${text}`,
+        tags: [textTag],
         cells: [getAveragePosition(parsePositionLiterals(cellLiterals))],
         props: {text, size},
         color,
         angle,
+        layer,
         component: TextComponent(layer),
         renderSingleCellInUserArea: true,
     };

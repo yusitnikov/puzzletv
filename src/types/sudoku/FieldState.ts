@@ -26,16 +26,16 @@ export const createEmptyFieldState = <CellType>(
 ): FieldState<CellType> => ({
     cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle))),
     lines: new PuzzleLineSet(puzzle),
-    marks: new CellMarkSet(puzzle),
+    marks: new CellMarkSet(puzzle).bulkAdd(puzzle.initialCellMarks ?? []),
 });
 
 export const serializeFieldState = <CellType>(
     {cells, lines, marks}: FieldState<CellType>,
-    typeManager: SudokuTypeManager<CellType, any, any>
+    puzzle: PuzzleDefinition<CellType, any, any>
 ) => ({
-    cells: cells.map(row => row.map(cell => serializeCellState(cell, typeManager))),
+    cells: cells.map(row => row.map(cell => serializeCellState(cell, puzzle.typeManager))),
     lines: lines.serialize(),
-    marks: marks.serialize(),
+    marks: marks.bulkRemove(puzzle.initialCellMarks ?? []).serialize(),
 });
 
 export const unserializeFieldState = <CellType>(
@@ -50,7 +50,7 @@ export const unserializeFieldState = <CellType>(
             ...mark,
             type: type ?? (isCircle ? CellMarkType.O : CellMarkType.X),
         }))
-    ),
+    ).bulkAdd(puzzle.initialCellMarks ?? []),
 });
 
 export const cloneFieldState = <CellType>(
