@@ -176,7 +176,7 @@ export const UserMarkByData = (
             />
         </g>}
 
-        {![CellMarkType.X, CellMarkType.O].includes(type) && <CenteredText size={1}>{type}</CenteredText>}
+        {![CellMarkType.X, CellMarkType.O].includes(type) && <CenteredText size={0.7}>{type}</CenteredText>}
     </AutoSvg>;
 };
 
