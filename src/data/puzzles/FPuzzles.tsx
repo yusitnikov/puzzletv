@@ -87,6 +87,7 @@ export interface FPuzzlesImportOptions {
     "product-arrow"?: boolean;
     yajilinFog?: boolean;
     cosmeticsBehindFog?: boolean;
+    safeCrackerCodeLength?: number;
 }
 
 export const getSolutionGridByFPuzzlesObject = ({solution, size}: FPuzzlesPuzzle) => {
@@ -106,6 +107,7 @@ export const loadByFPuzzlesObject = (
         "product-arrow": productArrow,
         yajilinFog,
         cosmeticsBehindFog,
+        safeCrackerCodeLength = 6,
     }: Omit<FPuzzlesImportOptions, "load">
 ): PuzzleDefinition<number> => {
     const regularTypeManager = DigitSudokuTypeManager(
@@ -121,7 +123,7 @@ export const loadByFPuzzlesObject = (
         "safe-cracker": SafeCrackerSudokuTypeManager({
             size: puzzleJson.size,
             circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
-            codeCellsCount: Math.min(puzzleJson.size, 6),
+            codeCellsCount: Math.min(puzzleJson.size, safeCrackerCodeLength),
         }),
     };
 

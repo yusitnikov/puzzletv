@@ -1,6 +1,6 @@
 import {buildLink} from "../../utils/link";
 import {FormEvent, useMemo} from "react";
-import {useBoolFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
+import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
 import {decodeFPuzzlesString, FPuzzlesImportOptions} from "../../data/puzzles/FPuzzles";
 import {useLanguageCode} from "../../hooks/useTranslate";
 
@@ -22,8 +22,10 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
+    const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
 
     const isCalculator = type === "calculator";
+    const isSafeCracker = type === "safe-cracker";
     const isSpecialGrid = ["cubedoku", "safe-cracker"].includes(type);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
@@ -41,6 +43,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             "product-arrow": !!puzzle.arrow && productArrow,
             yajilinFog: hasFog && yajilinFog,
             cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
+            safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
             noSpecialRules: !hasSolution && noSpecialRules,
             load,
         } as FPuzzlesImportOptions);
@@ -115,6 +118,18 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                 </label>
             </p>}
         </>}
+
+        {isSafeCracker && <p>
+            Safe cracker code length:&nbsp;
+            <input
+                type={"number"}
+                value={safeCrackerCodeLength}
+                min={1}
+                max={puzzle.size}
+                step={1}
+                onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
+            />
+        </p>}
 
         {!hasSolution && <p>
             <label>

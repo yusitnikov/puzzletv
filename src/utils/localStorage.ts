@@ -26,6 +26,11 @@ export const loadNumberFromLocalStorage = (key: string, defaultValue = 0) =>
 
 export const saveNumberToLocalStorage = (key: string, value: number) => window.localStorage[key] = value.toString();
 
+export const useNumberFromLocalStorage = (key: string, defaultValue = 0) => useStateWithStorage(
+    () => loadNumberFromLocalStorage(key, defaultValue),
+    useCallback(value => saveNumberToLocalStorage(key, value), [key])
+);
+
 export const serializeToLocalStorage = (key: string, value: any, version = 1) => {
     localStorage[key] = version + ":" + JSON.stringify(value);
 };
