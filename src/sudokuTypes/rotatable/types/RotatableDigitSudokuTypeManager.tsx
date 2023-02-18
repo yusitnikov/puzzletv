@@ -11,6 +11,8 @@ import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {CenteredCalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {useMemo} from "react";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {cageTag, KillerCageProps} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 
 const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);
@@ -224,5 +226,22 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
             coeff * yDirection,
             context
         );
+    },
+
+    postProcessPuzzle({items = [], ...puzzle}): PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> {
+        return {
+            ...puzzle,
+            items: (state) => (typeof items === "function" ? items(state) : items).map(
+                (item) => item.tags?.includes(cageTag)
+                    ? {
+                        ...item,
+                        props: {
+                            ...item.props,
+                            showBottomSum: true,
+                        } as KillerCageProps,
+                    }
+                    : item
+            ),
+        };
     },
 };

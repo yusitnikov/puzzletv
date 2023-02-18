@@ -21,6 +21,8 @@ import {indexes} from "../../../../utils/indexes";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {incrementArrayItemByIndex} from "../../../../utils/array";
 
+export const cageTag = "cage";
+
 export interface KillerCageProps {
     sum?: string | number;
     showBottomSum?: boolean;
@@ -152,6 +154,7 @@ export const DecorativeCageConstraint = <CellType, ExType, ProcessedExType>(
     fontColor?: string
 ): Constraint<CellType, KillerCageProps, ExType, ProcessedExType> => ({
     name: "cage",
+    tags: [cageTag],
     cells: parsePositionLiterals(cellLiterals),
     props: {
         sum,
