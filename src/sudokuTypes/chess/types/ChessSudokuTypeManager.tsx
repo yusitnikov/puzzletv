@@ -65,6 +65,14 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
         }
     },
 
+    createCellDataByImportedDigit(digit): ChessPiece {
+        return {
+            type: digit,
+            // TODO: support for importing piece's color
+            color: ChessColor.white,
+        }
+    },
+
     getDigitByCellData(data: ChessPiece) {
         return data.type;
     },

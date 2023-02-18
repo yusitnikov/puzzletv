@@ -1,12 +1,12 @@
 import {useCallback} from "react";
 import {useStateWithStorage} from "../hooks/useStateWithStorage";
 
-export const loadStringFromLocalStorage = (key: string, defaultValue = "") =>
+export const loadStringFromLocalStorage = <T extends string>(key: string, defaultValue = "" as T): T =>
     typeof window.localStorage[key] === "string" ? window.localStorage[key] : defaultValue;
 
 export const saveStringToLocalStorage = (key: string, value: string) => window.localStorage[key] = value;
 
-export const useStringFromLocalStorage = (key: string, defaultValue = "") => useStateWithStorage(
+export const useStringFromLocalStorage = <T extends string>(key: string, defaultValue?: T) => useStateWithStorage<T>(
     () => loadStringFromLocalStorage(key, defaultValue),
     useCallback(value => saveStringToLocalStorage(key, value), [key])
 );

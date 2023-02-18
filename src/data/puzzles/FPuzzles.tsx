@@ -66,6 +66,7 @@ import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuType
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {PuzzleLineSet} from "../../types/sudoku/PuzzleLineSet";
 import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
+import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -76,9 +77,18 @@ export const decodeFPuzzlesString = (load: string) => {
     return JSON.parse(jsonStr) as FPuzzlesPuzzle;
 };
 
+export enum FPuzzlesImportPuzzleType {
+    Regular = "regular",
+    Latin = "latin",
+    Calculator = "calculator",
+    Cubedoku = "cubedoku",
+    Rotatable = "rotatable",
+    SafeCracker = "safe-cracker",
+}
+
 export interface FPuzzlesImportOptions {
     load: string;
-    type?: "regular" | "latin" | "calculator" | "cubedoku" | "safe-cracker";
+    type?: FPuzzlesImportPuzzleType;
     tesseract?: boolean;
     fillableDigitalDisplay?: boolean;
     noSpecialRules?: boolean;
@@ -97,39 +107,32 @@ export const getSolutionGridByFPuzzlesObject = ({solution, size}: FPuzzlesPuzzle
 export const loadByFPuzzlesObject = (
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
-    {
-        type = "regular",
+    importOptions: Omit<FPuzzlesImportOptions, "load">
+): PuzzleDefinition<any, any, any> => {
+    const {
+        type = FPuzzlesImportPuzzleType.Regular,
         tesseract,
         fillableDigitalDisplay,
-        noSpecialRules,
-        loopX,
-        loopY,
-        "product-arrow": productArrow,
-        yajilinFog,
-        cosmeticsBehindFog,
         safeCrackerCodeLength = 6,
-    }: Omit<FPuzzlesImportOptions, "load">
-): PuzzleDefinition<number> => {
+    } = importOptions;
+
     const regularTypeManager = DigitSudokuTypeManager(
         fillableDigitalDisplay
             ? RegularCalculatorDigitComponentType
             : RegularDigitComponentType
     );
-    const typesMap: Record<string, SudokuTypeManager<number>> = {
-        regular: regularTypeManager,
-        latin: LatinDigitSudokuTypeManager,
-        calculator: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
-        cubedoku: CubedokuTypeManager,
-        "safe-cracker": SafeCrackerSudokuTypeManager({
+    const typesMap: Record<FPuzzlesImportPuzzleType, SudokuTypeManager<any, any, any>> = {
+        [FPuzzlesImportPuzzleType.Regular]: regularTypeManager,
+        [FPuzzlesImportPuzzleType.Latin]: LatinDigitSudokuTypeManager,
+        [FPuzzlesImportPuzzleType.Calculator]: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
+        [FPuzzlesImportPuzzleType.Cubedoku]: CubedokuTypeManager,
+        [FPuzzlesImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
+        [FPuzzlesImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
             size: puzzleJson.size,
             circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
             codeCellsCount: Math.min(puzzleJson.size, safeCrackerCodeLength),
         }),
     };
-
-    const initialDigits: GivenDigitsMap<number> = {};
-    const initialColors: GivenDigitsMap<CellColorValue[]> = {};
-    const items: Constraint<number, any>[] = [];
 
     const baseTypeManager = typesMap[type] ?? regularTypeManager;
     const typeManager = {...baseTypeManager};
@@ -142,7 +145,28 @@ export const loadByFPuzzlesObject = (
         ];
     }
 
-    const puzzle: PuzzleDefinition<number> = {
+    return loadByFPuzzlesObjectAndTypeManager(puzzleJson, slug, importOptions, typeManager);
+};
+
+export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedExType>(
+    puzzleJson: FPuzzlesPuzzle,
+    slug: string,
+    {
+        fillableDigitalDisplay,
+        noSpecialRules,
+        loopX,
+        loopY,
+        "product-arrow": productArrow,
+        yajilinFog,
+        cosmeticsBehindFog,
+    }: Omit<FPuzzlesImportOptions, "load">,
+    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
+): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
+    const initialDigits: GivenDigitsMap<CellType> = {};
+    const initialColors: GivenDigitsMap<CellColorValue[]> = {};
+    const items: Constraint<CellType, any, ExType, ProcessedExType>[] = [];
+
+    const puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType> = {
         noIndex: true,
         slug,
         title: {[LanguageCode.en]: "Untitled"},
@@ -242,10 +266,10 @@ export const loadByFPuzzlesObject = (
                     value: (value, {given}) => {
                         if (typeof value === "number" && given) {
                             if (fillableDigitalDisplay) {
-                                items.push(FillableCalculatorDigitConstraint<number, {}, {}>({top, left}, value));
+                                items.push(FillableCalculatorDigitConstraint<CellType, ExType, ProcessedExType>({top, left}, value));
                             } else {
                                 initialDigits[top] = initialDigits[top] || {};
-                                initialDigits[top][left] = value;
+                                initialDigits[top][left] = typeManager.createCellDataByImportedDigit(value);
                             }
                         }
                     },
@@ -293,7 +317,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...littleKillerSum.map(({cell, cells: [startCell], direction, value, ...other}: FPuzzlesLittleKillerSum) => {
                     ObjectParser.empty.parse(other, "f-puzzles little killer sum");
 
-                    return LittleKillerConstraint<number, {}, {}>(startCell, direction, fieldSize, parseOptionalNumber(value));
+                    return LittleKillerConstraint<CellType, ExType, ProcessedExType>(startCell, direction, fieldSize, parseOptionalNumber(value));
                 }));
             }
         },
@@ -303,8 +327,8 @@ export const loadByFPuzzlesObject = (
                     ObjectParser.empty.parse(other, "f-puzzles arrow");
 
                     return lines.length
-                        ? lines.map(([lineStart, ...line]) => ArrowConstraint<number, {}, {}>(cells, line, false, lineStart, !!productArrow))
-                        : ArrowConstraint<number, {}, {}>(cells, [], false, undefined, !!productArrow);
+                        ? lines.map(([lineStart, ...line]) => ArrowConstraint<CellType, ExType, ProcessedExType>(cells, line, false, lineStart, !!productArrow))
+                        : ArrowConstraint<CellType, ExType, ProcessedExType>(cells, [], false, undefined, !!productArrow);
                 }));
             }
         },
@@ -313,7 +337,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles killer cage");
 
-                    return KillerCageConstraint<number, {}, {}>(cells, parseOptionalNumber(value), false, undefined, outlineC, fontC);
+                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(cells, parseOptionalNumber(value), false, undefined, outlineC, fontC);
                 }));
             }
         },
@@ -345,7 +369,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...ratio.map(({cells: [cell1, cell2], value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles ratio");
 
-                    return KropkiDotConstraint<number, {}, {}>(cell1, cell2, true, parseOptionalNumber(value));
+                    return KropkiDotConstraint<CellType, ExType, ProcessedExType>(cell1, cell2, true, parseOptionalNumber(value));
                 }));
             }
         },
@@ -354,7 +378,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...difference.map(({cells: [cell1, cell2], value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles difference");
 
-                    return KropkiDotConstraint<number, {}, {}>(cell1, cell2, false, parseOptionalNumber(value));
+                    return KropkiDotConstraint<CellType, ExType, ProcessedExType>(cell1, cell2, false, parseOptionalNumber(value));
                 }));
             }
         },
@@ -364,8 +388,8 @@ export const loadByFPuzzlesObject = (
                     ObjectParser.empty.parse(other, "f-puzzles XV");
 
                     switch (value) {
-                        case "X": return [XMarkConstraint<number, {}, {}>(cell1, cell2)];
-                        case "V": return [VMarkConstraint<number, {}, {}>(cell1, cell2)];
+                        case "X": return [XMarkConstraint<CellType, ExType, ProcessedExType>(cell1, cell2)];
+                        case "V": return [VMarkConstraint<CellType, ExType, ProcessedExType>(cell1, cell2)];
                         default: return [];
                     }
                 }));
@@ -376,7 +400,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...thermometer.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles thermometer");
 
-                    return lines.map((line) => ThermometerConstraint<number, {}, {}>(line));
+                    return lines.map((line) => ThermometerConstraint<CellType, ExType, ProcessedExType>(line));
                 }));
             }
         },
@@ -389,7 +413,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...sandwichsum.flatMap(({cell, value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
 
-                    return value ? [SandwichSumConstraint<number, {}, {}>(cell, fieldSize, Number(value))] : [];
+                    return value ? [SandwichSumConstraint<CellType, ExType, ProcessedExType>(cell, fieldSize, Number(value))] : [];
                 }));
             }
         },
@@ -398,7 +422,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...even.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles even cell");
 
-                    return EvenConstraint<number, {}, {}>(cell);
+                    return EvenConstraint<CellType, ExType, ProcessedExType>(cell);
                 }));
             }
         },
@@ -407,7 +431,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...odd.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles odd cell");
 
-                    return OddConstraint<number, {}, {}>(cell);
+                    return OddConstraint<CellType, ExType, ProcessedExType>(cell);
                 }));
             }
         },
@@ -416,7 +440,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...extraregion.map(({cells, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles extra region");
 
-                    return KillerCageConstraint<number, {}, {}>(cells);
+                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(cells);
                 }));
             }
         },
@@ -430,7 +454,7 @@ export const loadByFPuzzlesObject = (
                         ...parsePositionLiterals(cloneCells),
                     ]).items;
 
-                    return uniqueCells.length > 1 ? [CloneConstraint<number, {}, {}>(uniqueCells)] : [];
+                    return uniqueCells.length > 1 ? [CloneConstraint<CellType, ExType, ProcessedExType>(uniqueCells)] : [];
                 }));
             }
         },
@@ -440,7 +464,7 @@ export const loadByFPuzzlesObject = (
 
                     ObjectParser.empty.parse(other, "f-puzzles quadruple");
 
-                    return QuadConstraint<number, {}, {}>(cells[3], values);
+                    return QuadConstraint<CellType, ExType, ProcessedExType>(cells[3], values.map(typeManager.createCellDataByImportedDigit));
                 }));
             }
         },
@@ -449,7 +473,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...betweenLine.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles between line");
 
-                    return lines.map((line) => InBetweenLineConstraint<number, {}, {}>(line));
+                    return lines.map((line) => InBetweenLineConstraint<CellType, ExType, ProcessedExType>(line));
                 }));
             }
         },
@@ -458,7 +482,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...minimum.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles minimum");
 
-                    return MinConstraint<number, {}, {}>(cell);
+                    return MinConstraint<CellType, ExType, ProcessedExType>(cell);
                 }));
             }
         },
@@ -467,7 +491,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...maximum.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles maximum");
 
-                    return MaxConstraint<number, {}, {}>(cell);
+                    return MaxConstraint<CellType, ExType, ProcessedExType>(cell);
                 }));
             }
         },
@@ -476,7 +500,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...palindrome.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles palindrome");
 
-                    return lines.map((line) => PalindromeConstraint<number, {}, {}>(line));
+                    return lines.map((line) => PalindromeConstraint<CellType, ExType, ProcessedExType>(line));
                 }));
             }
         },
@@ -486,7 +510,7 @@ export const loadByFPuzzlesObject = (
                     ObjectParser.empty.parse(other, "f-puzzles renban line");
 
                     // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((line) => RenbanConstraint<number, {}, {}>(line, false));
+                    return lines.map((line) => RenbanConstraint<CellType, ExType, ProcessedExType>(line, false));
                 }));
             }
         },
@@ -496,7 +520,7 @@ export const loadByFPuzzlesObject = (
                     ObjectParser.empty.parse(other, "f-puzzles German whispers line");
 
                     // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((line) => GermanWhispersConstraint<number, {}, {}>(line, false));
+                    return lines.map((line) => GermanWhispersConstraint<CellType, ExType, ProcessedExType>(line, false));
                 }));
             }
         },
@@ -517,7 +541,7 @@ export const loadByFPuzzlesObject = (
                         items.push(...lines.map((line) => {
                             checkForOutsideCells(line, size);
 
-                            return LineConstraint<number, {}, {}>(line, outlineC, width === undefined ? undefined : width / 2);
+                            return LineConstraint<CellType, ExType, ProcessedExType>(line, outlineC, width === undefined ? undefined : width / 2);
                         }));
                     }
                 }
@@ -530,7 +554,7 @@ export const loadByFPuzzlesObject = (
 
                     checkForOutsideCells(cells, size);
 
-                    return RectConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
+                    return RectConstraint<CellType, ExType, ProcessedExType>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
                 }));
             }
         },
@@ -541,7 +565,7 @@ export const loadByFPuzzlesObject = (
 
                     checkForOutsideCells(cells, size);
 
-                    return EllipseConstraint<number, {}, {}>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
+                    return EllipseConstraint<CellType, ExType, ProcessedExType>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
                 }));
             }
         },
@@ -551,7 +575,7 @@ export const loadByFPuzzlesObject = (
                     text = text.filter((obj) => !isFowText(obj));
                 }
 
-                items.push(...text.flatMap(({cells, value, fontC, size, angle, ...other}): Constraint<number, any>[] => {
+                items.push(...text.flatMap(({cells, value, fontC, size, angle, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles text");
 
                     if (!value) {
@@ -560,7 +584,7 @@ export const loadByFPuzzlesObject = (
 
                     checkForOutsideCells(cells, fieldSize);
 
-                    return [TextConstraint<number, {}, {}>(cells, value, fontC, size, angle, cosmeticsLayer)];
+                    return [TextConstraint<CellType, ExType, ProcessedExType>(cells, value, fontC, size, angle, cosmeticsLayer)];
                 }));
             }
         },
@@ -569,7 +593,7 @@ export const loadByFPuzzlesObject = (
                 items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles cage");
 
-                    return DecorativeCageConstraint<number, {}, {}>(cells, value?.toString(), false, undefined, outlineC, fontC);
+                    return DecorativeCageConstraint<CellType, ExType, ProcessedExType>(cells, value?.toString(), false, undefined, outlineC, fontC);
                 }));
             }
         },
@@ -640,8 +664,8 @@ export const loadByFPuzzlesObject = (
     }, ["size"]).parse(puzzleJson, "f-puzzles data");
 
     if (puzzleJson.fogofwar || puzzleJson.foglight) {
-        items.push(FogConstraint<number, {}, {}>(
-            getSolutionGridByFPuzzlesObject(puzzleJson),
+        items.push(FogConstraint<CellType, ExType, ProcessedExType>(
+            getSolutionGridByFPuzzlesObject(puzzleJson)?.map(row => row.map(typeManager.createCellDataByImportedDigit)),
             puzzleJson.fogofwar,
             puzzleJson.foglight,
             puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),
@@ -663,7 +687,7 @@ export const loadByFPuzzlesObject = (
     return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 };
 
-export const FPuzzles: PuzzleDefinitionLoader<number> = {
+export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
     noIndex: true,
     slug: "f-puzzles",
     fulfillParams: (params) => params,

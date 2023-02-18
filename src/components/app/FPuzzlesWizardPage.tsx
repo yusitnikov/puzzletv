@@ -1,7 +1,7 @@
 import {buildLink} from "../../utils/link";
 import {FormEvent, useMemo} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
-import {decodeFPuzzlesString, FPuzzlesImportOptions} from "../../data/puzzles/FPuzzles";
+import {decodeFPuzzlesString, FPuzzlesImportOptions, FPuzzlesImportPuzzleType} from "../../data/puzzles/FPuzzles";
 import {useLanguageCode} from "../../hooks/useTranslate";
 
 interface FPuzzlesWizardPageProps {
@@ -13,7 +13,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
 
     const puzzle = useMemo(() => decodeFPuzzlesString(load), [load]);
 
-    const [type, setType] = useStringFromLocalStorage("fpwType", "regular");
+    const [type, setType] = useStringFromLocalStorage<FPuzzlesImportPuzzleType>("fpwType", FPuzzlesImportPuzzleType.Regular);
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
@@ -24,9 +24,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
     const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
 
-    const isCalculator = type === "calculator";
-    const isSafeCracker = type === "safe-cracker";
-    const isSpecialGrid = ["cubedoku", "safe-cracker"].includes(type);
+    const isCalculator = type === FPuzzlesImportPuzzleType.Calculator;
+    const isSafeCracker = type === FPuzzlesImportPuzzleType.SafeCracker;
+    const isSpecialGrid = [
+        FPuzzlesImportPuzzleType.Cubedoku,
+        FPuzzlesImportPuzzleType.Rotatable,
+        FPuzzlesImportPuzzleType.SafeCracker,
+    ].includes(type);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
     const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
@@ -35,7 +39,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         ev.preventDefault();
 
         window.location.hash = buildLink("f-puzzles", languageCode, {
-            type: isCalculator && fillableDigitalDisplay ? "regular" : type,
+            type: isCalculator && fillableDigitalDisplay ? FPuzzlesImportPuzzleType.Regular : type,
             fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
             loopX: !isSpecialGrid && loopX,
             loopY: !isSpecialGrid && loopY,
@@ -55,12 +59,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         <p>
             <label>
                 Type:&nbsp;
-                <select value={type} onChange={ev => setType(ev.target.value)} style={{font: "inherit"}}>
-                    <option value={"regular"}>Regular</option>
-                    <option value={"latin"}>Latin digits</option>
-                    <option value={"calculator"}>Calculator digits</option>
-                    <option value={"cubedoku"}>Cubedoku</option>
-                    <option value={"safe-cracker"}>Safe Cracker</option>
+                <select value={type} onChange={ev => setType(ev.target.value as FPuzzlesImportPuzzleType)} style={{font: "inherit"}}>
+                    <option value={FPuzzlesImportPuzzleType.Regular}>Regular</option>
+                    <option value={FPuzzlesImportPuzzleType.Latin}>Latin digits</option>
+                    <option value={FPuzzlesImportPuzzleType.Calculator}>Calculator digits</option>
+                    <option value={FPuzzlesImportPuzzleType.Cubedoku}>Cubedoku</option>
+                    <option value={FPuzzlesImportPuzzleType.Rotatable}>Rotatable</option>
+                    <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe Cracker</option>
                 </select>
             </label>
         </p>

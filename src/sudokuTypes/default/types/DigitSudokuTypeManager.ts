@@ -46,6 +46,10 @@ export const DigitSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
         return digit;
     },
 
+    createCellDataByImportedDigit(digit: number): number {
+        return digit;
+    },
+
     getDigitByCellData(digit: number) {
         return digit;
     },

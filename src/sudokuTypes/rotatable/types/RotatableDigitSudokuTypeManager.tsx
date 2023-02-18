@@ -61,7 +61,7 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
         return startAngle === 0 || angle !== startAngle;
     },
 
-    useProcessedGameStateExtension({extension: {angle, animationSpeed}}): Omit<RotatableProcessedGameState, keyof RotatableGameState> {
+    useProcessedGameStateExtension({extension: {angle, animationSpeed}}): RotatableProcessedGameState {
         const animatedAngle = useAnimatedValue(angle, animationSpeed);
 
         return useMemo(() => ({animatedAngle}), [animatedAngle]);
@@ -154,6 +154,10 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
             ...naiveResult,
             digit: toggleData(naiveResult, isUpsideDownAngle(angle))
         }
+    },
+
+    createCellDataByImportedDigit(digit): RotatableDigit {
+        return {digit};
     },
 
     getDigitByCellData(data, {extension: {angle}}) {

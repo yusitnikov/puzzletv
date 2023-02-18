@@ -56,6 +56,8 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
         position?: Position
     ): CellType;
 
+    createCellDataByImportedDigit(digit: number): CellType;
+
     getDigitByCellData(
         data: CellType,
         state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
@@ -113,7 +115,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     isReady?(state: GameStateEx<CellType, ExType>): boolean;
 
-    useProcessedGameStateExtension?(state: GameStateEx<CellType, ExType>): Omit<ProcessedExType, keyof ExType>;
+    useProcessedGameStateExtension?(state: GameStateEx<CellType, ExType>): ProcessedExType;
 
     getFieldAngle?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): number;
 

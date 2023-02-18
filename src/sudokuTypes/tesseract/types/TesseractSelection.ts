@@ -13,7 +13,7 @@ export enum TesseractSelectionType {
 
 const localStorageKey = "tesseractSelection";
 
-const getTesseractSelectionType = (): TesseractSelectionType => loadStringFromLocalStorage(localStorageKey, TesseractSelectionType.Clues);
+const getTesseractSelectionType = () => loadStringFromLocalStorage<TesseractSelectionType>(localStorageKey, TesseractSelectionType.Clues);
 
 export const useTesseractSelectionType = (): [TesseractSelectionType, (type: TesseractSelectionType) => void] => {
     const [type, setType] = useState<TesseractSelectionType>(getTesseractSelectionType);
