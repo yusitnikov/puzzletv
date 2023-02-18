@@ -526,7 +526,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         },
         line: (lineData, {size}) => {
             if (lineData instanceof Array) {
-                for (const {lines, outlineC, width, isNewConstraint, ...other} of lineData) {
+                for (const {lines, outlineC, width, isNewConstraint, fromConstraint, ...other} of lineData) {
                     if (yajilinFog && outlineC === "#000000") {
                         yajilinFogLineSolution = yajilinFogLineSolution.bulkAdd(lines.flatMap(lineStr => {
                             const line = parsePositionLiterals(lineStr);
