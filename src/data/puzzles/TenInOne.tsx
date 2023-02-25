@@ -28,6 +28,8 @@ import {
     renbanExplained,
     renbanTitle,
     ruleWithTitle,
+    parityLineTitle,
+    sameParityLineExplained,
     twoDigitArrowCirclesExplained,
     whiteKropkiDotsExplained
 } from "../ruleSnippets";
@@ -41,7 +43,10 @@ import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
 import {Constraint} from "../../types/sudoku/Constraint";
 import {GermanWhispersConstraint} from "../../components/sudoku/constraints/german-whispers/GermanWhispers";
-import {Position} from "../../types/layout/Position";
+import {Position, PositionLiteral} from "../../types/layout/Position";
+import {AmbiguousLineConstraint} from "../../components/sudoku/constraints/ambiguous-line/AmbiguousLine";
+import {SameParityLineConstraint} from "../../components/sudoku/constraints/parity-line/ParityLine";
+import {peachColor} from "../../components/app/globals";
 
 const remainingBoxPositionIndexes = [0, 4, 8];
 const keepDigitsAccordingBoxPositionText = {
@@ -225,17 +230,14 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
         <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
         <RulesUnorderedList>
             <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}. {translate(twoDigitArrowCirclesExplained)}. {translate(canRepeatOnArrows)}.</li>
-            <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained))}.</li>
-            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained))}.</li>
+            <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</li>
+            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
         </RulesUnorderedList>
         <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
         <RulesIndentedBlock>
             <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
             <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)} ({translate({
-                [LanguageCode.en]: "in this stage, line segments in different boxes can be different line types",
-                [LanguageCode.ru]: "на этом этапе сегменты линий в разных квадратах могут быть линиями разных типов",
-            })}).</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)}.</RulesParagraph>
         </RulesIndentedBlock>
         <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
         <RulesIndentedBlock>
@@ -244,7 +246,7 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
         </RulesIndentedBlock>
     </>,
     items: ({extension: {stage}}) => {
-        let lines: Constraint<number, any, MultiStageGameState, {}>[] = [
+        let lines: Constraint<number, any, MultiStageGameState>[] = [
             RenbanConstraint(["R3C3", "R2C3", "R1C4", "R2C5"]),
             RenbanConstraint(["R5C6", "R6C6", "R6C7", "R5C8"]),
             GermanWhispersConstraint(["R5C5", "R4C4", "R6C2", "R8C2", "R8C6"]),
@@ -293,6 +295,13 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
     resultChecker,
 };
 
+const MoodyLineConstraint = (cellLiterals: PositionLiteral[], visible = true) => AmbiguousLineConstraint<number, MultiStageGameState, {}>(
+    cellLiterals,
+    [RenbanConstraint, GermanWhispersConstraint, SameParityLineConstraint],
+    visible ? undefined : 0,
+    peachColor
+);
+
 export const MoodyLines: PuzzleDefinition<number, MultiStageGameState> = {
     noIndex: true,
     author: AnalyticalNinja,
@@ -303,15 +312,28 @@ export const MoodyLines: PuzzleDefinition<number, MultiStageGameState> = {
     slug: "moody-lines",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
     fieldSize,
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000ASD",
+    getLmdSolutionCode: () => "592648736742839615",
     rules: translate => <>
         <RulesParagraph>{translate(arrowsExplained)}. {translate(canRepeatOnArrows)}.</RulesParagraph>
         <RulesParagraph>{translate(killerCagesExplained)}.</RulesParagraph>
-        {/*TODO: ambiguous lines*/}
+        <RulesParagraph>{translate({
+            [LanguageCode.en]: "Ambiguous lines, each line must be one of these types (at least)",
+            [LanguageCode.ru]: "Неоднозначные линии, каждая линия должна быть одного из этих типов (как минимум)",
+        })}:</RulesParagraph>
+        <RulesUnorderedList>
+            <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained(true)))}.</li>
+            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained(true)))}.</li>
+            <li>{ruleWithTitle(translate(parityLineTitle), translate(sameParityLineExplained(true)))}.</li>
+        </RulesUnorderedList>
         <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
         <RulesIndentedBlock>
             <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
             <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)}.</RulesParagraph>
+            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)} ({translate({
+                [LanguageCode.en]: "in this stage, line segments in different boxes can be different line types",
+                [LanguageCode.ru]: "на этом этапе сегменты линий в разных квадратах могут быть линиями разных типов",
+            })}).</RulesParagraph>
         </RulesIndentedBlock>
         <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
         <RulesIndentedBlock>
@@ -320,8 +342,10 @@ export const MoodyLines: PuzzleDefinition<number, MultiStageGameState> = {
         </RulesIndentedBlock>
     </>,
     items: ({extension: {stage}}) => {
-        let lines: Constraint<number, unknown, MultiStageGameState, {}>[] = [
-            // TODO
+        let lines = [
+            MoodyLineConstraint(["R5C2", "R3C2", "R1C4", "R1C5", "R2C5"]),
+            MoodyLineConstraint(["R4C6", "R7C3", "R8C3", "R8C4", "R9C5"]),
+            MoodyLineConstraint(["R2C8", "R3C9", "R5C9", "R7C7", "R9C9"]),
         ];
         if (stage === 1) {
             // Make the line constraints decorative (UI-only)
@@ -333,15 +357,42 @@ export const MoodyLines: PuzzleDefinition<number, MultiStageGameState> = {
 
             // Add parts of the lines in each box separately
             lines.push(
-                // TODO
+                MoodyLineConstraint(["R5C2", "R4C2"], false),
+                MoodyLineConstraint(["R3C2", "R2C3"], false),
+                MoodyLineConstraint(["R1C4", "R1C5", "R2C5"], false),
+                MoodyLineConstraint(["R4C6", "R6C4"], false),
+                MoodyLineConstraint(["R7C3", "R8C3"], false),
+                MoodyLineConstraint(["R8C4", "R9C5"], false),
+                MoodyLineConstraint(["R2C8", "R3C9"], false),
+                MoodyLineConstraint(["R4C9", "R5C9", "R6C8"], false),
+                MoodyLineConstraint(["R7C7", "R9C9"], false),
             );
         }
 
         return [
             ...lines,
 
-            // TODO
+            ArrowConstraint("R1C1", ["R2C1", "R2C2", "R3C3"], true),
+            ArrowConstraint("R2C5", ["R3C5", "R2C4"], true),
+            ArrowConstraint("R2C7", ["R3C8", "R2C9"], true),
+            ArrowConstraint("R6C3", ["R4C1"], true),
+            ArrowConstraint("R6C6", ["R5C6", "R6C5"], true),
+            ArrowConstraint("R4C7", ["R6C7"], true),
+            ArrowConstraint("R7C2", ["R8C2", "R9C3"], true),
+            ArrowConstraint("R9C6", ["R8C6", "R8C5", "R9C5"], true),
+            ArrowConstraint("R8C7", ["R9C7", "R9C8"], true),
+
+            KillerCageConstraint(["R1C2", "R1C3", "R2C3"], 16),
+            KillerCageConstraint(["R1C5", "R1C6", "R2C5"], 18),
+            KillerCageConstraint(["R1C7", "R2C7", "R2C8"], 16),
+            KillerCageConstraint(["R4C1", "R4C2"], 6),
+            KillerCageConstraint(["R4C4", "R4C5"], 14),
+            KillerCageConstraint(["R5C8", "R6C8"], 15),
+            KillerCageConstraint(["R7C1", "R8C1"], 9),
+            KillerCageConstraint(["R7C4", "R7C5"], 7),
+            KillerCageConstraint(["R7C8", "R8C8"], 11),
         ];
     },
+    allowDrawing: ["center-line", "center-mark"],
     resultChecker,
 };

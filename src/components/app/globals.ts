@@ -20,6 +20,7 @@ export const greenColor = "#a3e048";
 export const purpleColor = "#d23be7";
 export const redColor = "#e6261f";
 export const yellowColor = "#f7d038";
+export const peachColor = "#ffac80";
 
 export const textColor = blackColor;
 export const errorColor = redColor;

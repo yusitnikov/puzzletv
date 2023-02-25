@@ -185,7 +185,7 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState> = {
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
             <RulesUnorderedList>
                 <li>{ruleWithTitle(translate(evenTitle), translate(evenExplained))}.</li>
-                <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained))}.</li>
+                <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</li>
                 <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
                 <li>{ruleWithTitle(translate(inBetweenLineTitle), translate(inBetweenLineExplained))}.</li>
                 {stage >= 2 && <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>}

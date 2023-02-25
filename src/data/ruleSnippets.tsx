@@ -172,10 +172,10 @@ export const germanWhispersTitle: Translatable = {
     [LanguageCode.ru]: '"Немецкий шёпот"',
 };
 
-export const germanWhispersExplained: Translatable = {
-    [LanguageCode.en]: "Consecutive digits along the green line must have difference of 5 or more",
-    [LanguageCode.ru]: "Последовательные цифры вдоль зеленой линии должны различаться на 5 или более",
-};
+export const germanWhispersExplained = (noColor = false): Translatable => ({
+    [LanguageCode.en]: `Consecutive digits along the ${noColor ? "" : "green"} line must have difference of 5 or more`,
+    [LanguageCode.ru]: `Последовательные цифры вдоль ${noColor ? "" : "зеленой"} линии должны различаться на 5 или более`,
+});
 
 export const evenTitle: Translatable = {
     [LanguageCode.en]: "Even digits",
@@ -192,10 +192,10 @@ export const renbanTitle: Translatable = {
     [LanguageCode.ru]: 'Линии "Ренбан"',
 };
 
-export const renbanExplained: Translatable = {
-    [LanguageCode.en]: "Digits along the purple line must form a set of consecutive digits in any order",
-    [LanguageCode.ru]: "Цифры вдоль зеленой линии должны образовывать набор последовательных цифр в любом порядке",
-};
+export const renbanExplained = (noColor = false): Translatable => ({
+    [LanguageCode.en]: `Digits along the ${noColor ? "" : "purple"} line must form a set of consecutive digits in any order`,
+    [LanguageCode.ru]: `Цифры вдоль ${noColor ? "" : "фиолетовой"} линии должны образовывать набор последовательных цифр в любом порядке`,
+});
 
 export const inBetweenLineTitle: Translatable = {
     [LanguageCode.en]: "Between lines",
@@ -206,6 +206,16 @@ export const inBetweenLineExplained: Translatable = {
     [LanguageCode.en]: "Digits along the grey line must be strictly in between of digits on the circles",
     [LanguageCode.ru]: "Цифры на серой линии должны быть строго между цифрами на кружках",
 };
+
+export const parityLineTitle: Translatable = {
+    [LanguageCode.en]: "Parity line",
+    [LanguageCode.ru]: "Линия чётности",
+};
+
+export const sameParityLineExplained = (noColor = false): Translatable => ({
+    [LanguageCode.en]: `Digits along the ${noColor ? "" : "peach"} line must be either all even or all odd`,
+    [LanguageCode.ru]: `Цифры вдоль ${noColor ? "" : "персиковой"} линии должны быть либо все чётные, либо все нечётные`,
+});
 
 export const littleKillerTitle: Translatable = {
     [LanguageCode.en]: "Little killer",

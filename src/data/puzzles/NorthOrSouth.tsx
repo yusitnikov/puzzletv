@@ -59,7 +59,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState, 
             <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
             <li>{ruleWithTitle(translate(kropkiDotsTitle), translate(blackKropkiDotsExplained))}.</li>
             <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
-            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained))}.</li>
+            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
         </RulesUnorderedList>
         <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
     </>,
@@ -113,7 +113,7 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
             <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>
             <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
             <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
-            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained))}.</li>
+            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
         </RulesUnorderedList>
         <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
     </>,
