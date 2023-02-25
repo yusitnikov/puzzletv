@@ -284,7 +284,7 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
             ArrowConstraint("R3C8", ["R3C7", "R2C7"], true),
             ArrowConstraint("R4C3", ["R6C1"], true),
             ArrowConstraint("R6C4", ["R6C5", "R5C4", "R4C5"], true),
-            ArrowConstraint(["R6C9", "R5C9"], ["R6C8", "R5C7"], true, "R6C9"),
+            ArrowConstraint(["R5C9", "R6C9"], ["R6C8", "R5C7"], true, "R6C9"),
             ArrowConstraint("R9C2", ["R9C1", "R7C3"], true),
             ArrowConstraint(["R9C5", "R9C6"], ["R9C4", "R7C6"], true, "R9C5"),
             ArrowConstraint(["R9C8", "R9C9"], ["R9C7", "R7C7"], true, "R9C8"),
