@@ -3,9 +3,7 @@ import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudok
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {decompressFromBase64} from "lz-string";
 import {sha1} from "hash.js";
-import {FPuzzlesPuzzle} from "../../types/sudoku/f-puzzles/FPuzzlesPuzzle";
 import {indexes} from "../../utils/indexes";
-import {FPuzzlesGridCell} from "../../types/sudoku/f-puzzles/FPuzzlesGridCell";
 import {parsePositionLiterals, Position, PositionSet, stringifyCellCoords} from "../../types/layout/Position";
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
@@ -16,7 +14,6 @@ import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {LittleKillerConstraint} from "../../components/sudoku/constraints/little-killer/LittleKiller";
-import {FPuzzlesLittleKillerSum} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesLittleKillerSum";
 import {
     DecorativeCageConstraint,
     KillerCageConstraint
@@ -61,12 +58,12 @@ import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDi
 import {TesseractSettings} from "../../sudokuTypes/tesseract/components/TesseractSettings";
 import {getTesseractCellSelectionType} from "../../sudokuTypes/tesseract/types/TesseractSelection";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
-import {FPuzzlesText} from "../../types/sudoku/f-puzzles/constraints/FPuzzlesText";
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {PuzzleLineSet} from "../../types/sudoku/PuzzleLineSet";
 import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
+import {FPuzzlesGridCell, FPuzzlesLittleKillerSum, FPuzzlesPuzzle, FPuzzlesText} from "fpuzzles-data";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
