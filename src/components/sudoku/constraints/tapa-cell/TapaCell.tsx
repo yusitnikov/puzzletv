@@ -15,8 +15,6 @@ import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {textColor} from "../../../app/globals";
-import {FieldRect} from "../../field/FieldRect";
-import {FieldCellUserArea} from "../../field/FieldCellUserArea";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 
 export interface TapaCellProps {
@@ -24,11 +22,7 @@ export interface TapaCellProps {
 }
 
 export const TapaCell = withFieldLayer(FieldLayer.regular, (
-    {
-        context,
-        cells: [cell],
-        props: {clues},
-    }: ConstraintProps<unknown, TapaCellProps>
+    {props: {clues}}: ConstraintProps<unknown, TapaCellProps>
 ) => {
     const radius = clues.length === 1 ? 0 : 0.3;
     const size = clues.length === 1 ? 0.8 : 0.4;
