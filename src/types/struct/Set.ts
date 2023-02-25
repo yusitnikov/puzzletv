@@ -177,48 +177,14 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     }
 }
 
-export class ComparableSet<ItemT> extends Set<ItemT> implements SetInterface<ItemT> {
-    constructor(
-        private readonly _items: ItemT[] = [],
-        comparer?: Comparer<ItemT>,
-        cloner?: Cloner<ItemT>,
-        serializer?: Serializer<ItemT>
-    ) {
-        super(cloner, comparer, serializer);
-    }
-
-    get items(): ItemT[] {
-        return this._items;
-    }
-
-    contains(item: ItemT) {
-        return this.items.some(i => this.comparer(i, item));
-    }
-
-    find(item: ItemT): ItemT | undefined {
-        return this.items.find(i => this.comparer(i, item));
-    }
-
-    set(items: ItemT[]): this {
-        return new ComparableSet(items, this.comparer, this.cloner, this.serializer) as this;
-    }
-
-    remove(item: ItemT) {
-        return this.filter(i => !this.comparer(i, item));
-    }
-
-    bulkRemove(items: ItemT[]) {
-        return this.filter(i => !items.some(item => this.comparer(i, item)));
-    }
-}
-
 export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements SetInterface<ItemT, Record<string, ItemT>> {
     public readonly hasher: Hasher<ItemT>;
 
+    private _items: ItemT[] | undefined;
     private readonly _map: Record<string, ItemT> = {};
 
     constructor(
-        private _items: ItemT[] | Record<string, ItemT> = [],
+        items: ItemT[] | Record<string, ItemT> = [],
         {
             cloner = defaultCloner,
             serializer = defaultSerializer,
@@ -235,21 +201,25 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
 
         this.hasher = hasher;
 
-        if (_items instanceof Array) {
-            for (const item of _items) {
-                this._map[this.hasher(item)] = item;
+        if (items instanceof Array) {
+            let hasDuplicates = false;
+            for (const item of items) {
+                const key = this.hasher(item);
+                if (key in this._map) {
+                    hasDuplicates = true;
+                }
+                this._map[key] = item;
+            }
+            if (!hasDuplicates) {
+                this._items = items;
             }
         } else {
-            this._map = _items;
+            this._map = items;
         }
     }
 
     get items() {
-        if (!(this._items instanceof Array)) {
-            this._items = Object.values(this._map);
-        }
-
-        return this._items;
+        return this._items = this._items ?? Object.values(this._map);
     }
 
     contains(item: ItemT) {

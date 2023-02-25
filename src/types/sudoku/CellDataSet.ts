@@ -1,18 +1,21 @@
-import {ComparableSet} from "../struct/Set";
+import {HashSet} from "../struct/Set";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 
-export class CellDataSet<CellType, ExType, ProcessedExType> extends ComparableSet<CellType> {
+export class CellDataSet<CellType, ExType, ProcessedExType> extends HashSet<CellType> {
     constructor(
         {
-            typeManager: {areSameCellData, cloneCellData, serializeCellData}
+            typeManager: {areSameCellData, cloneCellData, serializeCellData, getCellDataHash}
         }: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         items: CellType[] = []
     ) {
         super(
             items,
-            (a, b) => areSameCellData(a, b, undefined, false),
-            cloneCellData,
-            serializeCellData
+            {
+                comparer: (a, b) => areSameCellData(a, b, undefined, false),
+                cloner: cloneCellData,
+                serializer: serializeCellData,
+                hasher: getCellDataHash,
+            }
         );
     }
 
