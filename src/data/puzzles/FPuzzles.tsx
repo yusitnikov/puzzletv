@@ -64,6 +64,7 @@ import {PuzzleLineSet} from "../../types/sudoku/PuzzleLineSet";
 import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 import {FPuzzlesGridCell, FPuzzlesLittleKillerSum, FPuzzlesPuzzle, FPuzzlesText} from "fpuzzles-data";
+import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -81,6 +82,7 @@ export enum FPuzzlesImportPuzzleType {
     Cubedoku = "cubedoku",
     Rotatable = "rotatable",
     SafeCracker = "safe-cracker",
+    InfiniteRings = "infinite-rings",
 }
 
 export interface FPuzzlesImportOptions {
@@ -129,6 +131,7 @@ export const loadByFPuzzlesObject = (
             circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
             codeCellsCount: Math.min(puzzleJson.size, safeCrackerCodeLength),
         }),
+        [FPuzzlesImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(regularTypeManager),
     };
 
     const baseTypeManager = typesMap[type] ?? regularTypeManager;

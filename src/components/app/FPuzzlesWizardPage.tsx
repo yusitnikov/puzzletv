@@ -30,6 +30,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         FPuzzlesImportPuzzleType.Cubedoku,
         FPuzzlesImportPuzzleType.Rotatable,
         FPuzzlesImportPuzzleType.SafeCracker,
+        FPuzzlesImportPuzzleType.InfiniteRings,
     ].includes(type);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
@@ -64,8 +65,9 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     <option value={FPuzzlesImportPuzzleType.Latin}>Latin digits</option>
                     <option value={FPuzzlesImportPuzzleType.Calculator}>Calculator digits</option>
                     <option value={FPuzzlesImportPuzzleType.Cubedoku}>Cubedoku</option>
+                    <option value={FPuzzlesImportPuzzleType.InfiniteRings}>Infinite rings</option>
                     <option value={FPuzzlesImportPuzzleType.Rotatable}>Rotatable</option>
-                    <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe Cracker</option>
+                    <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe cracker</option>
                 </select>
             </label>
         </p>
