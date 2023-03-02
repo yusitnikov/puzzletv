@@ -283,6 +283,12 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                             initialColors[top][left] = [color];
                         }
                     },
+                    cArray: (colors) => {
+                        if (!yajilinFog && Array.isArray(colors)) {
+                            initialColors[top] = initialColors[top] || {};
+                            initialColors[top][left] = colors;
+                        }
+                    },
                     highlight: undefined,
                     givenPencilMarks: undefined,
                     centerPencilMarks: (value) => value === undefined || value === null,
