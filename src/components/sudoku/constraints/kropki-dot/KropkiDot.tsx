@@ -11,6 +11,8 @@ import {CenteredText} from "../../../svg/centered-text/CenteredText";
 
 export const KropkiDotTag = "kropki-dot";
 
+const radius = 0.15;
+
 export interface KropkiDotProps {
     value?: number | [number, number];
     showValue?: boolean;
@@ -33,7 +35,7 @@ export const KropkiDot = withFieldLayer(FieldLayer.top, <CellType,>(
         <circle
             cx={left}
             cy={top}
-            r={0.2}
+            r={radius}
             strokeWidth={0.02}
             stroke={blackColor}
             fill={color}
@@ -42,7 +44,7 @@ export const KropkiDot = withFieldLayer(FieldLayer.top, <CellType,>(
         {value && showValue && <CenteredText
             top={top}
             left={left}
-            size={typeof value === "number" ? 0.35 : 0.25}
+            size={radius * (typeof value === "number" ? 1.75 : 1.25)}
             fill={[blackColor, textColor, "black", "#000", "#000000"].includes(color) ? "white" : blackColor}
         >
             {typeof value === "number" ? value : value.join(":")}
