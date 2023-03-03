@@ -215,7 +215,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         isMainKeyboard
     ) {
         if (!isMainKeyboard) {
-            return undefined;
+            return {};
         }
 
         const coeff = isUpsideDownAngle(context.state.extension.angle || 0) ? -1 : 1;

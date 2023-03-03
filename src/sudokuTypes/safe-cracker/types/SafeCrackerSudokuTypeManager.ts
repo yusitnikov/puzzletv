@@ -1,6 +1,6 @@
 import {SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {parsePositionLiteral, Position, PositionWithAngle} from "../../../types/layout/Position";
+import {parsePositionLiteral, PositionWithAngle} from "../../../types/layout/Position";
 import {
     defaultProcessArrowDirection,
     defaultProcessArrowDirectionForRegularCellBounds,
@@ -35,21 +35,23 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
                 };
             }
         },
-        processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard): Position | undefined {
+        processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard) {
             if (currentCell.top < circleRegionsCount * 2) {
                 return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard, false);
             }
 
             if (yDirection) {
-                return currentCell.top === circleRegionsCount * 2
-                    ? {
-                        top: circleRegionsCount * 2 + 1,
-                        left: Math.min(currentCell.left, codeCellsCount - 1),
-                    }
-                    : {
-                        top: circleRegionsCount * 2,
-                        left: currentCell.left,
-                    };
+                return {
+                    cell: currentCell.top === circleRegionsCount * 2
+                        ? {
+                            top: circleRegionsCount * 2 + 1,
+                            left: Math.min(currentCell.left, codeCellsCount - 1),
+                        }
+                        : {
+                            top: circleRegionsCount * 2,
+                            left: currentCell.left,
+                        }
+                };
             }
 
             return defaultProcessArrowDirectionForRegularCellBounds(currentCell, xDirection, yDirection, context);

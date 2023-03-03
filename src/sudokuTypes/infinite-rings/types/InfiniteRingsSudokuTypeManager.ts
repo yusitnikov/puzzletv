@@ -7,6 +7,12 @@ import {Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {indexes} from "../../../utils/indexes";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
+import {InfiniteRingsGameState, InfiniteRingsProcessedGameState} from "./InfiniteRingsGameState";
+import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
+import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
+import {InfiniteRingsFieldWrapper} from "../components/InfiniteRingsFieldWrapper";
+import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
+import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 
 const coordsRingToPlain = (fieldSize: number, ring: number, index: number) => [ring, fieldSize / 2 - 1, fieldSize / 2, fieldSize - 1 - ring][index];
 const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
@@ -29,9 +35,37 @@ const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
 
 export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
     baseTypeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>
-): SudokuTypeManager<CellType, ExType, ProcessedExType> => {
+): SudokuTypeManager<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState> => {
     return {
-        ...baseTypeManager,
+        ...baseTypeManager as unknown as SudokuTypeManager<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>,
+        initialGameStateExtension: {
+            ...baseTypeManager.initialGameStateExtension!,
+            ringOffset: 0,
+            animationSpeed: AnimationSpeed.regular,
+        },
+        serializeGameState({ringOffset, animationSpeed, ...data}: Partial<ExType & InfiniteRingsGameState>): any {
+            return {
+                ...baseTypeManager.serializeGameState(data as Partial<ExType>),
+                ringOffset,
+                animationSpeed,
+            };
+        },
+        unserializeGameState({ringOffset = 0, animationSpeed = AnimationSpeed.regular, ...data}: any): Partial<ExType & InfiniteRingsGameState> {
+            return {
+                ...baseTypeManager.unserializeGameState(data),
+                ringOffset,
+                animationSpeed,
+            } as Partial<ExType & InfiniteRingsGameState>;
+        },
+        useProcessedGameStateExtension(state): ProcessedExType & InfiniteRingsProcessedGameState {
+            const ringOffset = useAnimatedValue(state.extension.ringOffset, state.extension.animationSpeed * 0.5);
+
+            return {
+                ...baseTypeManager.useProcessedGameStateExtension?.(state) as ProcessedExType,
+                ringOffset,
+            };
+        },
+        mainControlsComponent: AnimationSpeedControlButton({top: 2, left: 0}),
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
             const quadSize = fieldSize / 2;
             const isCenterTop = top === quadSize - 1 || top === quadSize;
@@ -41,29 +75,47 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 isVisible: (top === left || top + left === fieldSize - 1 || isCenterTop || isCenterLeft) && !(isCenterTop && isCenterLeft),
             };
         },
-        processArrowDirection({top, left}, xDirection, yDirection, {puzzle: {fieldSize: {rowsCount: fieldSize}}}): Position | undefined {
-            const processRightArrow = (position: Position): Position => {
+        processArrowDirection(
+            {top, left},
+            xDirection,
+            yDirection,
+            {
+                puzzle: {fieldSize: {rowsCount: fieldSize}},
+                state: {extension: {ringOffset}},
+            },
+        ) {
+            const processRightArrow = (position: Position): {cell: Position, state?: PartialGameStateEx<CellType, ExType & InfiniteRingsGameState>} => {
+                const ringsCount = fieldSize / 2 - 1;
+
                 let {ring, top, left} = coordsPlainToRing(fieldSize, position);
 
+                let newRingOffset = ringOffset;
+                ring = ((ring - ringOffset) % ringsCount + ringsCount) % ringsCount;
+
                 if (left === 3) {
-                  if (ring === 0) {
-                      left = 0;
-                  } else {
-                      ring--;
-                      top = top < 2 ? 1 : 2;
-                  }
+                    ring--;
+                    if (ring < 0) {
+                        newRingOffset--;
+                    }
+                    top = top < 2 ? 1 : 2;
                 } else if ([0, 3].includes(top)) {
                     left++;
-                } else if (ring < fieldSize / 2 - 2) {
-                    ring++;
-                    top = top < 2 ? 0 : 3;
                 } else {
-                    left = 3;
+                    ring++;
+                    if (ring >= 2) {
+                        newRingOffset++;
+                    }
+                    top = top < 2 ? 0 : 3;
                 }
 
+                ring = ((ring + ringOffset) % ringsCount + ringsCount) % ringsCount;
+
                 return {
-                    top: coordsRingToPlain(fieldSize, ring, top),
-                    left: coordsRingToPlain(fieldSize, ring, left),
+                    cell: {
+                        top: coordsRingToPlain(fieldSize, ring, top),
+                        left: coordsRingToPlain(fieldSize, ring, left),
+                    },
+                    state: {extension: {ringOffset: newRingOffset} as Partial<ExType & InfiniteRingsGameState>}
                 };
             }
 
@@ -73,13 +125,13 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                     return processRightArrow({top, left});
                 } else {
                     // left
-                    const {top: newTop, left: newLeft} = processRightArrow({top, left: fieldSize - 1 - left});
-                    return {top: newTop, left: fieldSize - 1 - newLeft};
+                    const {cell: {top: newTop, left: newLeft}, state} = processRightArrow({top, left: fieldSize - 1 - left});
+                    return {cell: {top: newTop, left: fieldSize - 1 - newLeft}, state};
                 }
             } else {
                 const processDownArrow = ({top, left}: Position) => {
-                    const {top: newTop, left: newLeft} = processRightArrow({top: left, left: top});
-                    return {top: newLeft, left: newTop};
+                    const {cell: {top: newTop, left: newLeft}, state} = processRightArrow({top: left, left: top});
+                    return {cell: {top: newLeft, left: newTop}, state};
                 };
 
                 if (yDirection > 0) {
@@ -87,12 +139,12 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                     return processDownArrow({top, left});
                 } else {
                     // up
-                    const {top: newTop, left: newLeft} = processDownArrow({top: fieldSize - 1 - top, left});
-                    return {top: fieldSize - 1 - newTop, left: newLeft};
+                    const {cell: {top: newTop, left: newLeft}, state} = processDownArrow({top: fieldSize - 1 - top, left});
+                    return {cell: {top: fieldSize - 1 - newTop, left: newLeft}, state};
                 }
             }
         },
-        postProcessPuzzle(puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): typeof puzzle {
+        postProcessPuzzle(puzzle: PuzzleDefinition<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>): typeof puzzle {
             const fieldSize = puzzle.fieldSize.rowsCount;
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;
@@ -131,6 +183,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 },
                 customCellBounds,
                 ignoreRowsColumnCountInTheWrapper: true,
+                fieldWrapperComponent: InfiniteRingsFieldWrapper,
                 allowDrawing: puzzle.allowDrawing?.filter(type => ["center-mark", "center-line"].includes(type)),
             };
         },
@@ -141,11 +194,11 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 left: coordsRingToPlain(fieldSize, ring, left),
             };
         },
-        getRegionsForRowsAndColumns({fieldSize: {rowsCount: fieldSize}}): Constraint<CellType, any, ExType, ProcessedExType>[] {
+        getRegionsForRowsAndColumns({fieldSize: {rowsCount: fieldSize}}): Constraint<CellType, any, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>[] {
             const quadsCount = fieldSize / 2 - 1;
             return indexes(quadsCount).flatMap(outerRing => {
                 const innerRing = (outerRing + 1) % quadsCount;
-                const createRegion = (cells: (Position & { inner?: boolean })[], name: string) => RegionConstraint<CellType, ExType, ProcessedExType>(
+                const createRegion = (cells: (Position & { inner?: boolean })[], name: string) => RegionConstraint<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>(
                     cells.map(({inner, top, left}) => ({
                         top: coordsRingToPlain(fieldSize, inner ? innerRing : outerRing, top),
                         left: coordsRingToPlain(fieldSize, inner ? innerRing : outerRing, left),

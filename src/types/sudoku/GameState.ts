@@ -452,9 +452,9 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
         loopVertically,
     } = puzzle;
 
-    const newCell = processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard);
+    const {cell: newCell, state: newState = {}} = processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard);
     if (!newCell) {
-        return {};
+        return newState;
     }
 
     const result: PartialGameStateEx<CellType, ExType> = isMultiSelection
@@ -498,6 +498,7 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
 
     return {
         ...result,
+        ...newState,
         loopOffset: gameStateNormalizeLoopOffset(puzzle, loopOffset),
     };
 };

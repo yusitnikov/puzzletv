@@ -1,27 +1,29 @@
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
-import {FastForward, PlayArrow, PushPin, RotateLeft, RotateRight, Timelapse} from "@emotion-icons/material";
+import {PushPin, RotateLeft, RotateRight} from "@emotion-icons/material";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {RotatableGameState, RotatableProcessedGameState} from "../types/RotatableGameState";
 import {ControlsProps} from "../../../components/sudoku/controls/Controls";
 import {useTranslate} from "../../../hooks/useTranslate";
-import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 import {ReactElement} from "react";
+import {AnimationSpeedControlButtonByPosition} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 
 export const RotatableMainControls = <CellType,>(angleDelta: number, showBackButton: boolean, showStickyMode: boolean) => function RotatableMainControlsComponent(
-    {
+    props: ControlsProps<CellType, RotatableGameState, RotatableProcessedGameState>
+) {
+    const {
         context: {
             cellSizeForSidePanel: cellSize,
             state: {
                 isShowingSettings,
                 processed: {isReady},
-                extension: {isStickyMode, animationSpeed},
+                extension: {isStickyMode},
             },
             onStateChange,
         },
-    }: ControlsProps<CellType, RotatableGameState, RotatableProcessedGameState>
-) {
+    } = props;
+
     const translate = useTranslate();
 
     const handleRotate = (delta: number) => onStateChange(({extension: {angle}}) => ({
@@ -35,21 +37,6 @@ export const RotatableMainControls = <CellType,>(angleDelta: number, showBackBut
     const handleToggleStickyMode = () => {
         if (showStickyMode) {
             onStateChange(({extension: {isStickyMode}}) => ({extension: {isStickyMode: !isStickyMode}}));
-        }
-    };
-
-    const handleSetAnimationSpeed = (animationSpeed: AnimationSpeed) => onStateChange({extension: {animationSpeed}});
-    const handleAnimationSpeedToggle = () => {
-        switch (animationSpeed) {
-            case AnimationSpeed.regular:
-                handleSetAnimationSpeed(AnimationSpeed.immediate);
-                break;
-            case AnimationSpeed.immediate:
-                handleSetAnimationSpeed(AnimationSpeed.slow);
-                break;
-            case AnimationSpeed.slow:
-                handleSetAnimationSpeed(AnimationSpeed.regular);
-                break;
         }
     };
 
@@ -109,17 +96,7 @@ export const RotatableMainControls = <CellType,>(angleDelta: number, showBackBut
         </ControlButton>);
     }
 
-    buttons.push((left) => <ControlButton
-        left={left}
-        top={4}
-        cellSize={cellSize}
-        onClick={handleAnimationSpeedToggle}
-        title={`${translate("Rotation speed")}: ${translate(animationSpeedToString(animationSpeed))} (${translate("click to toggle")})`}
-    >
-        {animationSpeed === AnimationSpeed.regular && <PlayArrow/>}
-        {animationSpeed === AnimationSpeed.immediate && <FastForward/>}
-        {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
-    </ControlButton>);
+    buttons.push((left) => <AnimationSpeedControlButtonByPosition top={4} left={left} {...props}/>);
 
     return <>
         {/* eslint-disable-next-line react/jsx-no-undef */}

@@ -96,7 +96,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         const {gridSize, intersectionSize, columnsCount, rowsCount} = processedFieldSize;
 
         const process = (xDirection: number, yDirection: number): Position => {
-            const defaultPosition = defaultProcessArrowDirection(cell, xDirection, yDirection, context)!;
+            const defaultPosition = defaultProcessArrowDirection(cell, xDirection, yDirection, context).cell!;
 
             const naive: Position = {
                 left: cell.left + xDirection,
@@ -143,7 +143,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         cell = process(xDirection, yDirection);
         cell = rotateCellCoords(cell, processedFieldSize, -context.state.extension.angle);
 
-        return cell;
+        return {cell};
     },
 
     transformCoords({top, left}, {fieldSize}) {

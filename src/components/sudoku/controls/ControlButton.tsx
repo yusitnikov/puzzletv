@@ -9,15 +9,18 @@ import {EmotionIconBase} from "@emotion-icons/emotion-icon";
 
 export const controlButtonPaddingCoeff = 0.15;
 
-const StyledContainer = styled(Absolute, {
+export const controlButtonOptions = {
     shouldForwardProp(propName: PropertyKey): boolean {
         return propName !== "isActive" && propName !== "opacityOnHover";
     }
-})(({isActive, opacityOnHover}: {isActive?: boolean, opacityOnHover?: boolean}) => ({
+} as const;
+export const controlButtonStyles = ({isActive, opacityOnHover}: {isActive?: boolean, opacityOnHover?: boolean}) => ({
     textAlign: "center",
     border: 0,
     padding: 0,
     margin: 0,
+    fontSize: "inherit",
+    lineHeight: "inherit",
     cursor: "pointer",
     color: textColor,
     backgroundColor: isActive ? lightGreyColor : "white",
@@ -28,7 +31,9 @@ const StyledContainer = styled(Absolute, {
     [EmotionIconBase.toString()]: {
         verticalAlign: "top",
     },
-}));
+} as const);
+
+const StyledContainer = styled(Absolute, controlButtonOptions)(controlButtonStyles);
 
 export interface ControlButtonProps extends Position, Partial<Size>, ButtonHTMLAttributes<HTMLButtonElement> {
     cellSize: number;

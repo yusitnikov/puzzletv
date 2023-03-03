@@ -131,7 +131,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
         yDirection: number,
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
         isMainKeyboard: boolean
-    ): Position | undefined;
+    ): {cell?: Position, state?: PartialGameStateEx<CellType, ExType>};
 
     transformCoords?(
         coords: Position,
@@ -242,7 +242,7 @@ export const defaultProcessArrowDirectionForRegularCellBounds = (
     xDirection: number,
     yDirection: number,
     {puzzle}: PuzzleContext<any, any, any>
-): Position | undefined => {
+): {cell?: Position, state?: undefined} => {
     const {
         fieldSize: {rowsCount, columnsCount},
         typeManager: {getCellTypeProps},
@@ -264,7 +264,7 @@ export const defaultProcessArrowDirectionForRegularCellBounds = (
     };
 
     if (isTotallyValidCell(newPosition)) {
-        return newPosition;
+        return {cell: newPosition};
     }
 
     // If the naive new position is not valid then go in the reverse direction while it's possible
@@ -276,7 +276,7 @@ export const defaultProcessArrowDirectionForRegularCellBounds = (
         top: newPosition.top - yDirection,
     }));
 
-    return newPosition;
+    return {cell: newPosition};
 };
 
 export const defaultProcessArrowDirectionForCustomCellBounds = (
@@ -286,7 +286,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = (
     {puzzle, cellsIndex}: PuzzleContext<any, any, any>,
     isMainKeyboard?: boolean,
     enableBackwardSteps = true,
-): Position | undefined => {
+): {cell?: Position, state?: undefined} => {
     const {typeManager: {getCellTypeProps}} = puzzle;
 
     const {center, neighbors} = cellsIndex.allCells[top][left];
@@ -315,7 +315,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = (
         }
     }
 
-    return bestCell;
+    return {cell: bestCell};
 };
 
 export const defaultProcessArrowDirection = (
@@ -325,7 +325,7 @@ export const defaultProcessArrowDirection = (
     context: PuzzleContext<any, any, any>,
     isMainKeyboard?: boolean,
     enableBackwardSteps?: boolean,
-): Position | undefined => {
+): {cell?: Position, state?: undefined} => {
     return context.puzzle.customCellBounds
         ? defaultProcessArrowDirectionForCustomCellBounds(position, xDirection, yDirection, context, isMainKeyboard, enableBackwardSteps)
         : defaultProcessArrowDirectionForRegularCellBounds(position, xDirection, yDirection, context);
