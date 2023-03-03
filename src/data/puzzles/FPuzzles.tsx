@@ -4,7 +4,13 @@ import {LanguageCode} from "../../types/translations/LanguageCode";
 import {decompressFromBase64} from "lz-string";
 import {sha1} from "hash.js";
 import {indexes} from "../../utils/indexes";
-import {parsePositionLiterals, Position, PositionSet, stringifyCellCoords} from "../../types/layout/Position";
+import {
+    parsePositionLiterals,
+    Position,
+    PositionLiteral,
+    PositionSet,
+    stringifyCellCoords
+} from "../../types/layout/Position";
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
@@ -195,7 +201,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
     const parseOptionalNumber = (value?: string | number) => value === undefined ? undefined : Number(value);
 
-    const checkForOutsideCells = (cellLiterals: string[], fieldSize: number) => {
+    const checkForOutsideCells = (cellLiterals: PositionLiteral[], fieldSize: number) => {
         const margin = Math.max(0, ...parsePositionLiterals(cellLiterals).flatMap(({top, left}) => [
             -top,
             -left,
@@ -214,6 +220,8 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
     const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.lines;
 
+    const isVisibleGridCell = (cell: Position) => typeManager.getCellTypeProps?.(cell, puzzle)?.isVisible !== false;
+
     // TODO: go over rangsk solver and populate constraints from there
     new ObjectParser<FPuzzlesPuzzle>({
         // region Core fields
@@ -231,7 +239,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                         (cell, left) => ({top, left, ...cell})
                     )
                 );
-            const validGridCells = allGridCells.filter((cell) => typeManager.getCellTypeProps?.(cell, puzzle)?.isVisible !== false);
+            const validGridCells = allGridCells.filter(isVisibleGridCell);
 
             const faces = typeManager.getRegionsWithSameCoordsTransformation?.(puzzle, 1) ?? [{
                 top: 0,
@@ -332,9 +340,25 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...arrow.flatMap(({cells, lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles arrow");
 
+                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
+
                     return lines.length
-                        ? lines.map(([lineStart, ...line]) => ArrowConstraint<CellType, ExType, ProcessedExType>(cells, line, false, lineStart, !!productArrow))
-                        : ArrowConstraint<CellType, ExType, ProcessedExType>(cells, [], false, undefined, !!productArrow);
+                        ? lines.map(([lineStart, ...line]) => ArrowConstraint<CellType, ExType, ProcessedExType>(
+                            visibleCells,
+                            parsePositionLiterals(line).filter(isVisibleGridCell),
+                            false,
+                            lineStart,
+                            !!productArrow,
+                            false,
+                        ))
+                        : ArrowConstraint<CellType, ExType, ProcessedExType>(
+                            visibleCells,
+                            [],
+                            false,
+                            undefined,
+                            !!productArrow,
+                            false,
+                        );
                 }));
             }
         },
@@ -343,7 +367,16 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles killer cage");
 
-                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(cells, parseOptionalNumber(value), false, undefined, outlineC, fontC);
+                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
+
+                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(
+                        visibleCells,
+                        parseOptionalNumber(value),
+                        false,
+                        undefined,
+                        outlineC,
+                        fontC,
+                    );
                 }));
             }
         },
@@ -372,8 +405,11 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         },
         ratio: (ratio) => {
             if (ratio instanceof Array) {
-                items.push(...ratio.map(({cells: [cell1, cell2], value, ...other}) => {
+                items.push(...ratio.map(({cells, value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles ratio");
+
+                    const [cell1, cell2] = parsePositionLiterals(cells)
+                        .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
 
                     return KropkiDotConstraint<CellType, ExType, ProcessedExType>(cell1, cell2, true, parseOptionalNumber(value));
                 }));
@@ -381,8 +417,11 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         },
         difference: (difference) => {
             if (difference instanceof Array) {
-                items.push(...difference.map(({cells: [cell1, cell2], value, ...other}) => {
+                items.push(...difference.map(({cells, value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles difference");
+
+                    const [cell1, cell2] = parsePositionLiterals(cells)
+                        .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
 
                     return KropkiDotConstraint<CellType, ExType, ProcessedExType>(cell1, cell2, false, parseOptionalNumber(value));
                 }));
@@ -390,8 +429,11 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         },
         xv: (xv) => {
             if (xv instanceof Array) {
-                items.push(...xv.flatMap(({cells: [cell1, cell2], value, ...other}) => {
+                items.push(...xv.flatMap(({cells, value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles XV");
+
+                    const [cell1, cell2] = parsePositionLiterals(cells)
+                        .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
 
                     switch (value) {
                         case "X": return [XMarkConstraint<CellType, ExType, ProcessedExType>(cell1, cell2)];
@@ -406,7 +448,11 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...thermometer.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles thermometer");
 
-                    return lines.map((line) => ThermometerConstraint<CellType, ExType, ProcessedExType>(line));
+                    return lines.map((cells) => ThermometerConstraint<CellType, ExType, ProcessedExType>(
+                        parsePositionLiterals(cells).filter(isVisibleGridCell),
+                        undefined,
+                        false,
+                    ));
                 }));
             }
         },
@@ -446,7 +492,9 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...extraregion.map(({cells, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles extra region");
 
-                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(cells);
+                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
+
+                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(visibleCells);
                 }));
             }
         },
@@ -458,7 +506,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     const uniqueCells = new PositionSet([
                         ...parsePositionLiterals(cells),
                         ...parsePositionLiterals(cloneCells),
-                    ]).items;
+                    ].filter(isVisibleGridCell)).items;
 
                     return uniqueCells.length > 1 ? [CloneConstraint<CellType, ExType, ProcessedExType>(uniqueCells)] : [];
                 }));
@@ -479,7 +527,10 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...betweenLine.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles between line");
 
-                    return lines.map((line) => InBetweenLineConstraint<CellType, ExType, ProcessedExType>(line));
+                    return lines.map((cells) => InBetweenLineConstraint<CellType, ExType, ProcessedExType>(
+                        parsePositionLiterals(cells).filter(isVisibleGridCell),
+                        false
+                    ));
                 }));
             }
         },
@@ -506,7 +557,10 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...palindrome.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles palindrome");
 
-                    return lines.map((line) => PalindromeConstraint<CellType, ExType, ProcessedExType>(line));
+                    return lines.map((cells) => PalindromeConstraint<CellType, ExType, ProcessedExType>(
+                        parsePositionLiterals(cells).filter(isVisibleGridCell),
+                        false,
+                    ));
                 }));
             }
         },
@@ -516,7 +570,11 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     ObjectParser.empty.parse(other, "f-puzzles renban line");
 
                     // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((line) => RenbanConstraint<CellType, ExType, ProcessedExType>(line, false));
+                    return lines.map((cells) => RenbanConstraint<CellType, ExType, ProcessedExType>(
+                        parsePositionLiterals(cells).filter(isVisibleGridCell),
+                        false,
+                        false,
+                    ));
                 }));
             }
         },
@@ -526,7 +584,11 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     ObjectParser.empty.parse(other, "f-puzzles German whispers line");
 
                     // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((line) => GermanWhispersConstraint<CellType, ExType, ProcessedExType>(line, false));
+                    return lines.map((cells) => GermanWhispersConstraint<CellType, ExType, ProcessedExType>(
+                        parsePositionLiterals(cells).filter(isVisibleGridCell),
+                        false,
+                        false
+                    ));
                 }));
             }
         },
@@ -535,7 +597,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 for (const {lines, outlineC, width, isNewConstraint, fromConstraint, ...other} of lineData) {
                     if (yajilinFog && outlineC === "#000000") {
                         yajilinFogLineSolution = yajilinFogLineSolution.bulkAdd(lines.flatMap(lineStr => {
-                            const line = parsePositionLiterals(lineStr);
+                            const line = parsePositionLiterals(lineStr).filter(isVisibleGridCell);
                             return indexes(line.length - 1).map(i => ({
                                 start: line[i],
                                 end: line[i + 1],
@@ -544,10 +606,17 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     } else {
                         ObjectParser.empty.parse(other, "f-puzzles line");
 
-                        items.push(...lines.map((line) => {
-                            checkForOutsideCells(line, size);
+                        items.push(...lines.map((cells) => {
+                            const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
 
-                            return LineConstraint<CellType, ExType, ProcessedExType>(line, outlineC, width === undefined ? undefined : width / 2);
+                            checkForOutsideCells(visibleCells, size);
+
+                            return LineConstraint<CellType, ExType, ProcessedExType>(
+                                visibleCells,
+                                outlineC,
+                                width === undefined ? undefined : width / 2,
+                                false,
+                            );
                         }));
                     }
                 }
@@ -599,7 +668,9 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles cage");
 
-                    return DecorativeCageConstraint<CellType, ExType, ProcessedExType>(cells, value?.toString(), false, undefined, outlineC, fontC);
+                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
+
+                    return DecorativeCageConstraint<CellType, ExType, ProcessedExType>(visibleCells, value?.toString(), false, undefined, outlineC, fontC);
                 }));
             }
         },

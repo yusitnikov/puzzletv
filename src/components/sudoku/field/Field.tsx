@@ -1,5 +1,5 @@
 import {Absolute} from "../../layout/absolute/Absolute";
-import {Rect} from "../../../types/layout/Rect";
+import {getTransformedRectMatrix, Rect, transformRect} from "../../../types/layout/Rect";
 import {emptyPosition, Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
@@ -502,6 +502,32 @@ const ItemsInOneRegion = <CellType, ExType = {}, ProcessedExType = {}>(
                         </FieldCellUserArea>
                     </FieldRect>;
                 }
+            }
+            if (renderSingleCellInUserArea && cells.length === 2) {
+                const [cell1, cell2] = cells.map(({top, left}) => {
+                    const cellInfo = context.cellsIndex.allCells[top]?.[left];
+                    return cellInfo
+                        ? {...cellInfo.center, radius: cellInfo.bounds.userArea.width / 2}
+                        : {left: left + 0.5, top: top + 0.5, radius: 0.5};
+                });
+                const centerPoint = {
+                    top: (cell1.top + cell2.top) / 2,
+                    left: (cell1.left + cell2.left) / 2,
+                    radius: (cell1.radius + cell2.radius) / 2,
+                };
+                const centerRect: Rect = {
+                    top: centerPoint.top - centerPoint.radius,
+                    left: centerPoint.left - centerPoint.radius,
+                    width: centerPoint.radius * 2,
+                    height: centerPoint.radius * 2,
+                };
+                return <g key={index} transform={getTransformedRectMatrix(transformRect(centerRect))}>
+                    <Component
+                        context={context}
+                        cells={[emptyPosition, emptyPosition]}
+                        {...otherData}
+                    />
+                </g>
             }
 
             return <Component

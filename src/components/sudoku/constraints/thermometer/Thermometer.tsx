@@ -7,30 +7,50 @@ import {
     ConstraintProps,
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
-import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
+import {isSamePosition, parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {splitMultiLine} from "../../../../utils/lines";
 
-export const Thermometer = withFieldLayer(FieldLayer.regular, ({cells: points, color = darkGreyColor}: ConstraintProps) => {
-    points = points.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
+export const Thermometer = withFieldLayer(FieldLayer.regular, (
+    {
+        cells: points,
+        color = darkGreyColor,
+        context: {cellsIndex},
+    }: ConstraintProps
+) => {
+    const getPointInfo = ({top, left}: Position, radius: number) => {
+        const cellInfo = cellsIndex.allCells[top]?.[left];
+        return cellInfo
+            ? {...cellInfo.center, radius: radius * cellInfo.bounds.userArea.width}
+            : {left: left + 0.5, top: top + 0.5, radius};
+    };
+
+    const startPoint = getPointInfo(points[0], 0.4);
 
     return <g opacity={0.5}>
         <circle
-            cx={points[0].left}
-            cy={points[0].top}
-            r={0.4}
+            cx={startPoint.left}
+            cy={startPoint.top}
+            r={startPoint.radius}
             fill={color}
         />
 
         <RoundedPolyLine
-            points={points}
+            points={points.map((point) => getPointInfo(point, 0.175))}
             strokeWidth={0.35}
             stroke={color}
         />
     </g>;
 }) as ConstraintPropsGenericFc;
 
-export const ThermometerConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], color?: string): Constraint<CellType, undefined, ExType, ProcessedExType> => {
-    const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
+export const ThermometerConstraint = <CellType, ExType, ProcessedExType>(
+    cellLiterals: PositionLiteral[],
+    color?: string,
+    split = true,
+): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+    let cells = parsePositionLiterals(cellLiterals);
+    if (split) {
+        cells = splitMultiLine(cells);
+    }
 
     return ({
         name: "thermometer",

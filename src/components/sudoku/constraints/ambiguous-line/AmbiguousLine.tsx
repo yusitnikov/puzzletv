@@ -8,13 +8,19 @@ export const AmbiguousLineConstraint = <CellType, ExType, ProcessedExType>(
     cellLiterals: PositionLiteral[],
     constraintOptionsConstructors: ((cellLiterals: PositionLiteral[]) => Constraint<CellType, LineProps, ExType, ProcessedExType>)[],
     width: number | undefined = undefined,
-    color = peachColor
+    color = peachColor,
+    split = true,
 ): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
     const constraintOptions = constraintOptionsConstructors.map(constructor => constructor(cellLiterals));
 
+    let cells = parsePositionLiterals(cellLiterals);
+    if (split) {
+        cells = splitMultiLine(cells);
+    }
+
     return {
         name: "ambiguous line",
-        cells: splitMultiLine(parsePositionLiterals(cellLiterals)),
+        cells,
         color,
         component: width !== 0 ? LineComponent : undefined,
         props: {width},

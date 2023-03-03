@@ -134,6 +134,13 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 allowDrawing: puzzle.allowDrawing?.filter(type => ["center-mark", "center-line"].includes(type)),
             };
         },
+        fixCellPosition(position, {fieldSize: {rowsCount: fieldSize}}): Position | undefined {
+            const {ring, top, left} = coordsPlainToRing(fieldSize, position);
+            return {
+                top: coordsRingToPlain(fieldSize, ring, top),
+                left: coordsRingToPlain(fieldSize, ring, left),
+            };
+        },
         getRegionsForRowsAndColumns({fieldSize: {rowsCount: fieldSize}}): Constraint<CellType, any, ExType, ProcessedExType>[] {
             const quadsCount = fieldSize / 2 - 1;
             return indexes(quadsCount).flatMap(outerRing => {

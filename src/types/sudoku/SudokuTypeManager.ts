@@ -233,6 +233,8 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
     ): ReactNode;
 
     postProcessPuzzle?(puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): typeof puzzle;
+
+    fixCellPosition?(position: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): Position | undefined;
 }
 
 export const defaultProcessArrowDirectionForRegularCellBounds = (

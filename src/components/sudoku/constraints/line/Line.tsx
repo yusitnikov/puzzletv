@@ -15,17 +15,33 @@ export interface LineProps {
 }
 
 export const LineComponent = withFieldLayer(FieldLayer.regular, <CellType,>(
-    {cells, color = lightGreyColor, props: {width = 0.15}}: ConstraintProps<CellType, LineProps>
+    {
+        cells,
+        color = lightGreyColor,
+        props: {width = 0.15},
+        context: {cellsIndex},
+    }: ConstraintProps<CellType, LineProps>
 ) => <RoundedPolyLine
-    points={cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}))}
+    points={cells.map(({left, top}) => {
+        const cellInfo = cellsIndex.allCells[top]?.[left];
+        return cellInfo
+            ? {...cellInfo.center, radius: cellInfo.bounds.userArea.width * width / 2}
+            : {left: left + 0.5, top: top + 0.5};
+    })}
     strokeWidth={width}
     stroke={color}
 />) as ConstraintPropsGenericFc<LineProps>;
 
 export const LineConstraint = <CellType, ExType, ProcessedExType>(
-    cellLiterals: PositionLiteral[], color?: string, width?: number
+    cellLiterals: PositionLiteral[],
+    color?: string,
+    width?: number,
+    split = true,
 ): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
-    const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
+    let cells = parsePositionLiterals(cellLiterals);
+    if (split) {
+        cells = splitMultiLine(cells);
+    }
 
     return {
         name: "line",

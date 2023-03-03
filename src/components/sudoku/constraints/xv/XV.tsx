@@ -63,7 +63,7 @@ const XVConstraint = <CellType, ExType, ProcessedExType>(
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
 
-    return ({
+    return {
         name,
         cells: [cell1, cell2],
         component,
@@ -76,7 +76,8 @@ const XVConstraint = <CellType, ExType, ProcessedExType>(
             return digit1 === undefined || digit2 === undefined
                 || getDigitByCellData(digit1, state) + getDigitByCellData(digit2, state) === expectedSum;
         },
-    });
+        renderSingleCellInUserArea: true,
+    };
 };
 
 export const XMarkConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>

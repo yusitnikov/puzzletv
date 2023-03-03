@@ -61,7 +61,7 @@ export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
 
-    return ({
+    return {
         name: `${isRatio ? "black" : "white"} kropki dot (${value ?? "-"})`,
         tags: [KropkiDotTag],
         cells: [cell1, cell2],
@@ -90,7 +90,8 @@ export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
             const [ratio1, ratio2] = Array.isArray(value) ? value : [1, value ?? 2];
             return digit1 * ratio1 === digit2 * ratio2 || digit2 * ratio1 === digit1 * ratio2;
         },
-    });
+        renderSingleCellInUserArea: true,
+    };
 };
 
 export const HeartConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, showValue = false) =>

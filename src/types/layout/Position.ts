@@ -112,7 +112,7 @@ export const scaleVector = (vector: Position, coeff: number): Position => ({
 
 export const normalizeVector = (vector: Position): Position => scaleVector(vector, 1 / (getVectorLength(vector) || 1));
 
-export const getCircleConnectionPoint = ({left: x1, top: y1}: Position, {left: x2, top: y2}: Position, circleRadius: number): Position => {
+export const getCircleConnectionPoint = <T extends Position>({left: x1, top: y1, ...other}: T, {left: x2, top: y2}: T, circleRadius: number): T => {
     let dx = x2 - x1;
     let dy = y2 - y1;
     const dLength = Math.hypot(dx, dy);
@@ -121,7 +121,8 @@ export const getCircleConnectionPoint = ({left: x1, top: y1}: Position, {left: x
     return {
         left: x1 + circleRadius * dx,
         top: y1 + circleRadius * dy,
-    };
+        ...other,
+    } as T;
 };
 
 export const stringifyLine = ({start, end}: Line) => `${stringifyPosition(start)}>${stringifyPosition(end)}`;

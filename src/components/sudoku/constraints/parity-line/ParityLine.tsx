@@ -5,7 +5,7 @@ import {LineComponent, LineProps} from "../line/Line";
 import {splitMultiLine} from "../../../../utils/lines";
 import {Constraint} from "../../../../types/sudoku/Constraint";
 
-export const AlternatingParityLineConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], display = true) => {
+export const AlternatingParityLineConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], display = true, split = true) => {
     return DominoLineConstraint<CellType, ExType, ProcessedExType>(
         "alternating parity line",
         true,
@@ -13,16 +13,22 @@ export const AlternatingParityLineConstraint = <CellType, ExType, ProcessedExTyp
         cellLiterals,
         (digit1, digit2) => Math.abs(digit1 - digit2) % 2 === 1,
         undefined,
-        display
+        display,
+        split,
     );
 };
 
 export const SameParityLineConstraint = <CellType, ExType, ProcessedExType>(
-    cellLiterals: PositionLiteral[], display = true
+    cellLiterals: PositionLiteral[], display = true, split = true
 ): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
+    let cells = parsePositionLiterals(cellLiterals);
+    if (split) {
+        cells = splitMultiLine(cells);
+    }
+
     return {
         name: "same parity line",
-        cells: splitMultiLine(parsePositionLiterals(cellLiterals)),
+        cells,
         color: peachColor,
         props: {},
         component: display ? LineComponent : undefined,

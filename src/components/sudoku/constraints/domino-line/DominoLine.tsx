@@ -10,9 +10,13 @@ export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
     cellLiterals: PositionLiteral[],
     isValidDomino: (digit1: number, digit2: number) => boolean,
     width: number | undefined = undefined,
-    display = true
+    display = true,
+    split = true,
 ): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
-    const cells = splitMultiLine(parsePositionLiterals(cellLiterals));
+    let cells = parsePositionLiterals(cellLiterals);
+    if (split) {
+        cells = splitMultiLine(cells);
+    }
 
     return {
         name,
