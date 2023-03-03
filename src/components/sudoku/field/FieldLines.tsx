@@ -34,7 +34,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
         return <>
             {cellsIndexForState.getAllCells().flatMap(
                 (row, top) => row.flatMap(
-                    ({transformedBounds: {borders}}, left) => getCellTypeProps?.({top, left}, puzzle)?.isVisible ? borders.map(
+                    ({transformedBounds: {borders}}, left) => getCellTypeProps?.({top, left}, puzzle)?.isVisible !== false ? borders.map(
                         (border, partIndex) => <polygon
                             key={`${top}-${left}-${partIndex}`}
                             points={formatSvgPointsArray(border)}
