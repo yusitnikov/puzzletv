@@ -4,12 +4,15 @@
     "private": true,
     "scripts": {
         "start": "react-scripts start",
-        "build": "react-scripts build"
+        "build": "react-scripts build",
+        "storybook": "start-storybook -p 6006 -s public",
+        "build-storybook": "build-storybook -s public"
     },
     "dependencies": {
         "@emotion-icons/boxicons-logos": "^3.19.0",
         "@emotion-icons/fluentui-system-filled": "^3.15.0",
         "@emotion-icons/material": "^3.14.0",
+        "@emotion/react": "^11.10.6",
         "@emotion/styled": "^11.8.1",
         "@googlemaps/react-wrapper": "^1.1.32",
         "@types/pako": "^2.0.0",
@@ -24,6 +27,17 @@
         "react-scripts": "^5.0.0"
     },
     "devDependencies": {
+        "@storybook/addon-actions": "^6.5.16",
+        "@storybook/addon-essentials": "^6.5.16",
+        "@storybook/addon-interactions": "^6.5.16",
+        "@storybook/addon-links": "^6.5.16",
+        "@storybook/builder-webpack5": "^6.5.16",
+        "@storybook/jest": "^0.0.10",
+        "@storybook/manager-webpack5": "^6.5.16",
+        "@storybook/node-logger": "^6.5.16",
+        "@storybook/preset-create-react-app": "^4.1.2",
+        "@storybook/react": "^6.5.16",
+        "@storybook/testing-library": "^0.0.13",
         "@types/geojson": "^7946.0.8",
         "@types/googlemaps": "^3.43.3",
         "@types/lz-string": "^1.3.34",
@@ -31,9 +45,12 @@
         "@types/react": "^17.0.43",
         "@types/react-dom": "^17.0.14",
         "@types/styled-components": "^5.1.24",
+        "babel-plugin-named-exports-order": "^0.0.2",
         "fpuzzles-data": "^1.0.2",
         "geojson": "^0.5.0",
-        "typescript": "^4.6.3"
+        "prop-types": "^15.8.1",
+        "typescript": "^4.6.3",
+        "webpack": "^5.76.0"
     },
     "eslintConfig": {
         "extends": [
@@ -42,7 +59,17 @@
         "rules": {
             "react/jsx-no-target-blank": "off",
             "no-loop-func": "off"
-        }
+        },
+        "overrides": [
+            {
+                "files": [
+                    "**/*.stories.*"
+                ],
+                "rules": {
+                    "import/no-anonymous-default-export": "off"
+                }
+            }
+        ]
     },
     "browserslist": {
         "production": [

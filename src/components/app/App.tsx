@@ -14,7 +14,11 @@ import {ForSetters} from "./ForSetters";
 import {FPuzzlesWizardPage} from "./FPuzzlesWizardPage";
 import {HowToImport} from "./HowToImport";
 
-export const App = () => {
+interface AppProps {
+    onPageLoaded?: () => void;
+}
+
+export const App = ({onPageLoaded}: AppProps) => {
     const {hash = "", slug, params} = useRoute();
 
     const language = useLanguageCode();
@@ -67,7 +71,7 @@ export const App = () => {
                 scrollable={true}
                 title={translate("Puzzles")}
             >
-                <PuzzlesList/>
+                <PuzzlesList onLoaded={onPageLoaded}/>
             </PageLayout>;
         case "games":
             return <PageLayout

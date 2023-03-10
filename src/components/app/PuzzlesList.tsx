@@ -1,4 +1,4 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {headerPadding} from "./globals";
 import {getAllPuzzlesWithDefaultParams} from "../../data/puzzles/AllPuzzles";
@@ -7,7 +7,11 @@ import {useRaf} from "../../hooks/useRaf";
 
 const gridGap = headerPadding;
 
-export const PuzzlesList = () => {
+interface PuzzlesListProps {
+    onLoaded?: () => void;
+}
+
+export const PuzzlesList = ({onLoaded}: PuzzlesListProps) => {
     const {width: windowWidth} = useWindowSize();
     const innerWidth = windowWidth - headerPadding * 2;
     const columnsCount = Math.max(Math.round(innerWidth / 400), 1);
@@ -17,6 +21,12 @@ export const PuzzlesList = () => {
 
     const [visiblePuzzlesCount, setVisiblePuzzlesCount] = useState(0);
     useRaf(() => setVisiblePuzzlesCount(Math.min(visiblePuzzlesCount + 1, puzzles.length)));
+    const loaded = visiblePuzzlesCount >= puzzles.length;
+    useEffect(() => {
+        if (loaded) {
+            onLoaded?.();
+        }
+    }, [loaded]);
 
     return <div style={{
         display: "grid",
