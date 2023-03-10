@@ -13,6 +13,7 @@ jobs:
   chromatic:
     environment:
       name: chromatic
+      url: ${{ steps.publish.outputs.storybookUrl }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,6 +35,9 @@ jobs:
       - run: npm ci
 
       - name: Publish to Chromatic
+        id: publish
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          exitZeroOnChanges: true
+          exitOnceUploaded: true
