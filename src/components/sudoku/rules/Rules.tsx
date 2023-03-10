@@ -213,7 +213,11 @@ export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
         </div>}
 
         {fogProps && <div
-            style={{marginBottom: cellSize * rulesMarginCoeff}}
+            style={{
+                marginBottom: cellSize * rulesMarginCoeff,
+                lineHeight: `${cellSize * textHeightCoeff}px`,
+                fontSize: cellSize * textHeightCoeff,
+            }}
             title={translate({
                 [LanguageCode.en]: "Turn on to safely modify the grid without revealing the fog.\n" +
                 "All actions made in this mode will be reverted after turning it back off.",
