@@ -203,7 +203,7 @@ export const GoogleMap: FC<GoogleMapProps> = (
                 () => onZoomChangedRef.current && onZoomChangedRef.current({zoom: map!.getZoom()})
             );
         },
-        [map]
+        [map, onClickRef, onMouseMoveRef, onCenterChangedRef, onZoomChangedRef]
     );
 
     return <div
