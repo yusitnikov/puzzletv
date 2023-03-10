@@ -110,7 +110,7 @@ export const useSetMyAblyChannelPresence = (
         return () => {
             chain.then(() => channel.presence.leave());
         };
-    }, [channel, enabled, chain]);
+    }, [channel, enabled, chain, myPresenceDataRef]);
 
     useEffect(() => {
         if (!enabled || !channel) {
