@@ -1,6 +1,7 @@
 import {FC, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import {GoogleMapContext} from "../contexts/GoogleMapContext";
 import {useGoogleMapsApiContext} from "../contexts/GoogleMapsApiContext";
+import {useLastValueRef} from "../../../hooks/useLastValueRef";
 
 export interface CenterChangedEvent {
     center: google.maps.LatLngLiteral;
@@ -178,17 +179,10 @@ export const GoogleMap: FC<GoogleMapProps> = (
 
     const contextData = useMemo(() => ({map: map!, overlay, renderVersion}), [map, overlay, renderVersion]);
 
-    const onClickRef = useRef(onClick);
-    onClickRef.current = onClick;
-
-    const onMouseMoveRef = useRef(onMouseMove);
-    onMouseMoveRef.current = onMouseMove;
-
-    const onCenterChangedRef = useRef(onCenterChanged);
-    onCenterChangedRef.current = onCenterChanged;
-
-    const onZoomChangedRef = useRef(onZoomChanged);
-    onZoomChangedRef.current = onZoomChanged;
+    const onClickRef = useLastValueRef(onClick);
+    const onMouseMoveRef = useLastValueRef(onMouseMove);
+    const onCenterChangedRef = useLastValueRef(onCenterChanged);
+    const onZoomChangedRef = useLastValueRef(onZoomChanged);
 
     useEffect(
         () => {

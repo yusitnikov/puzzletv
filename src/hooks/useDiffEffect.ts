@@ -1,10 +1,10 @@
 import {useEffect, useRef} from "react";
+import {useLastValueRef} from "./useLastValueRef";
 
 export const useDiffEffect = <T extends Array<any>>(callback: (prevDependencies: T | []) => void, dependencies: T): void => {
     const dependenciesRef = useRef<T | []>([]);
 
-    const callbackRef = useRef(callback);
-    callbackRef.current = callback;
+    const callbackRef = useLastValueRef(callback);
 
     useEffect(
         () => {

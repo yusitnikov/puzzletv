@@ -1,10 +1,10 @@
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
+import {useLastValueRef} from "./useLastValueRef";
 
 export const useThrottle = (timeout: number, callback?: () => void) => {
     const [, setTimeout] = useState(0);
 
-    const callbackRef = useRef(callback);
-    callbackRef.current = callback;
+    const callbackRef = useLastValueRef(callback);
 
     return useCallback((customCallback?: () => void) => setTimeout((prevTimeout) => {
         if (prevTimeout) {

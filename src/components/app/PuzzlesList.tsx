@@ -4,6 +4,7 @@ import {headerPadding} from "./globals";
 import {getAllPuzzlesWithDefaultParams} from "../../data/puzzles/AllPuzzles";
 import {PuzzlesListItem} from "./PuzzlesListItem";
 import {useRaf} from "../../hooks/useRaf";
+import {useLastValueRef} from "../../hooks/useLastValueRef";
 
 const gridGap = headerPadding;
 
@@ -22,11 +23,12 @@ export const PuzzlesList = ({onLoaded}: PuzzlesListProps) => {
     const [visiblePuzzlesCount, setVisiblePuzzlesCount] = useState(0);
     useRaf(() => setVisiblePuzzlesCount(Math.min(visiblePuzzlesCount + 1, puzzles.length)));
     const loaded = visiblePuzzlesCount >= puzzles.length;
+    const onLoadedRef = useLastValueRef(onLoaded);
     useEffect(() => {
         if (loaded) {
-            onLoaded?.();
+            onLoadedRef.current?.();
         }
-    }, [loaded]);
+    }, [loaded, onLoadedRef]);
 
     return <div style={{
         display: "grid",

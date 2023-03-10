@@ -1,8 +1,9 @@
 import {Types} from "ably/promises";
 import {useAblyChannelPresence, useSetMyAblyChannelPresence} from "./useAbly";
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {usePureMemo} from "./usePureMemo";
 import {useTranslate} from "./useTranslate";
+import {useLastValueRef} from "./useLastValueRef";
 
 export const myClientId: string = (window.localStorage.clientId = window.localStorage.clientId || Math.random().toString().substring(2));
 
@@ -100,8 +101,7 @@ export const useMultiPlayer = (
 
     const [processedMessageIds, setProcessedMessageIds] = useState<Record<string, number>>({});
 
-    const onMessagesRef = useRef(onMessages);
-    onMessagesRef.current = onMessages;
+    const onMessagesRef = useLastValueRef(onMessages);
     useEffect(() => {
         if (!isHost) {
             return;
