@@ -6,7 +6,8 @@
         "start": "react-scripts start",
         "build": "react-scripts build",
         "storybook": "start-storybook -p 6006 -s public",
-        "build-storybook": "build-storybook -s public"
+        "build-storybook": "build-storybook -s public",
+        "chromatic": "chromatic --exit-zero-on-changes"
     },
     "dependencies": {
         "@emotion-icons/boxicons-logos": "^3.19.0",
@@ -46,6 +47,7 @@
         "@types/react-dom": "^17.0.14",
         "@types/styled-components": "^5.1.24",
         "babel-plugin-named-exports-order": "^0.0.2",
+        "chromatic": "^6.17.1",
         "fpuzzles-data": "^1.0.2",
         "geojson": "^0.5.0",
         "prop-types": "^15.8.1",
@@ -82,5 +84,7 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
-    }
+    },
+    "readme": "ERROR: No README data found!",
+    "_id": "@chameleon/puzzletv@0.1.0"
 }
