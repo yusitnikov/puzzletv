@@ -1,39 +1,30 @@
 import {FC} from "react";
-import {useGoogleMapsApiContext} from "../contexts/GoogleMapsApiContext";
 import {useGoogleMapProjection} from "../contexts/GoogleMapContext";
 
 export interface GoogleMapsOverlayProps {
-    bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral;
+    fieldSize: number;
 }
 
-export const GoogleMapsOverlay: FC<GoogleMapsOverlayProps> = ({bounds, children}) => {
-    const google = useGoogleMapsApiContext();
-
-    const {north, west, south, east} = bounds instanceof google.maps.LatLngBounds ? bounds.toJSON() : bounds;
-
+export const GoogleMapsOverlay: FC<GoogleMapsOverlayProps> = ({fieldSize, children}) => {
     const projection = useGoogleMapProjection();
-    const {x: x1, y: y1} = projection.fromLatLngToDivPixel(new google.maps.LatLng({
-        lat: north,
-        lng: west
-    }));
-    const {x: x2, y: y2} = projection.fromLatLngToDivPixel(new google.maps.LatLng({
-        lat: south,
-        lng: east
-    }));
+    if (!projection) {
+        return null;
+    }
 
-    const width = Math.abs(x1 - x2);
-    const height = Math.abs(y1 - y2);
+    const {x, y} = projection.fromLatLngToDivPixel(
+        projection.fromContainerPixelToLatLng(new google.maps.Point(0, 0))
+    );
 
     return <div
         style={{
             position: "absolute",
-            left: Math.min(x1, x2),
-            top: Math.min(y1, y2),
-            width,
-            height,
+            left: x,
+            top: y,
+            width: fieldSize,
+            height: fieldSize,
             textAlign: "center",
-            lineHeight: `${height}px`,
-            fontSize: `${height}px`,
+            lineHeight: `${fieldSize}px`,
+            fontSize: `${fieldSize}px`,
         }}
     >
         {children}

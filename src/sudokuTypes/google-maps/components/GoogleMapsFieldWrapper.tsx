@@ -17,7 +17,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                 state: {
                     isShowingSettings,
                     processed: {cellWriteMode, isReady},
-                    extension: {map, overlay},
+                    extension: {map},
                 },
                 onStateChange,
                 cellSize,
@@ -25,10 +25,6 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
             children
         }: PropsWithChildren<PuzzleContextProps<CellType, ExType & GoogleMapsState, ProcessedExType>>
     ) {
-        const projection = overlay?.getProjection();
-        const topLeft = projection?.fromContainerPixelToLatLng(new google.maps.Point(0, 0))?.toJSON();
-        const bottomRight = projection?.fromContainerPixelToLatLng(new google.maps.Point(fieldSize * cellSize, fieldSize * cellSize))?.toJSON();
-
         const isDragMode = cellWriteMode === CellWriteMode.move;
 
         useEventListener(window, "keydown", ({key}: KeyboardEvent) => {
@@ -85,12 +81,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                 >
                     <GoogleMapsPanePortal pane={"overlayMouseTarget"}>
                         <div style={{pointerEvents: "none"}}>
-                            <GoogleMapsOverlay bounds={{
-                                east: bottomRight?.lng || 0,
-                                west: topLeft?.lng || 1,
-                                south: bottomRight?.lat || 1,
-                                north: topLeft?.lat || 0,
-                            }}>
+                            <GoogleMapsOverlay fieldSize={fieldSize * cellSize}>
                                 {children}
                             </GoogleMapsOverlay>
                         </div>
