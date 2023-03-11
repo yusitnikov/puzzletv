@@ -1,14 +1,13 @@
 import {ComponentMeta, ComponentStory} from "@storybook/react";
 import {App} from "../../app/App";
 import {WithHashContext} from "../../../hooks/useHash";
-import {Puzzle} from "./Puzzle";
 
 // noinspection JSUnusedGlobalSymbols
 export default {
     title: "Pages/Puzzles",
-    component: Puzzle,
+    component: App,
     parameters: {layout: "fullscreen"},
-} as ComponentMeta<typeof Puzzle>;
+} as ComponentMeta<typeof App>;
 
 const AppStory = WithHashContext(App);
 
@@ -117,5 +116,3 @@ RealChessPuzzle.args = {_hash: "real-chess-sudoku"};
 
 export const Africa = Template.bind({});
 Africa.args = {_hash: "africa"};
-
-// TODO: stories for puzzles imported from f-puzzles
