@@ -116,7 +116,7 @@ export const ArrowConstraint = <CellType, ExType, ProcessedExType>(
     if (split) {
         circleCells = splitMultiLine(circleCells);
         arrowCells = splitMultiLine([arrowStartCell, ...arrowCells]).slice(1);
-    } else if (isSamePosition(arrowCells[0], arrowStartCell)) {
+    } else if (arrowCells[0] && isSamePosition(arrowCells[0], arrowStartCell)) {
         arrowCells = arrowCells.slice(1);
     }
 
