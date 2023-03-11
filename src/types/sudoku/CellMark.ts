@@ -1,7 +1,7 @@
 import {Position} from "../layout/Position";
 import {getPuzzlePositionHasher, PuzzleDefinition} from "./PuzzleDefinition";
 import {HashSet} from "../struct/Set";
-import {CellColor} from "./CellColor";
+import {CellColorValue} from "./CellColor";
 
 export enum CellMarkType {
     Any = "",
@@ -13,7 +13,7 @@ export enum CellMarkType {
 
 export interface CellMark {
     position: Position;
-    color?: CellColor;
+    color?: CellColorValue;
     type: CellMarkType;
     isCenter?: boolean;
 }

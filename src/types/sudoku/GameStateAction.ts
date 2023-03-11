@@ -16,7 +16,7 @@ import {myClientId} from "../../hooks/useMultiPlayer";
 import {Position} from "../layout/Position";
 import {DragAction} from "./DragAction";
 import {CellMarkType} from "./CellMark";
-import {CellColor} from "./CellColor";
+import {CellColorValue} from "./CellColor";
 
 export type GameStateActionCallback<CellType, ExType, ProcessedExType> =
     PartialGameStateEx<CellType, ExType> | ((prevState: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => PartialGameStateEx<CellType, ExType>);
@@ -115,7 +115,7 @@ export const applyCurrentMultiLineAction = <CellType, ExType, ProcessedExType>(
 export interface SetCellMarkActionParams extends Position {
     isCenter: boolean;
     cellMarkType?: CellMarkType;
-    color?: CellColor;
+    color?: CellColorValue;
 }
 export const setCellMarkActionType = <CellType, ExType, ProcessedExType>()
     : GameStateActionType<SetCellMarkActionParams, CellType, ExType, ProcessedExType> => ({

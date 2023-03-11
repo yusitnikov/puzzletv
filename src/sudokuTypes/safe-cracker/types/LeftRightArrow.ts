@@ -9,6 +9,7 @@ import {
 import {incrementArrayItem} from "../../../utils/array";
 import {CellMarkType} from "../../../types/sudoku/CellMark";
 import {CellWriteMode, CellWriteModeInfo} from "../../../types/sudoku/CellWriteMode";
+import {userDigitColor} from "../../../components/app/globals";
 
 export const safeCrackerArrowsAction = <CellType, ExType, ProcessedExType>(
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
@@ -21,6 +22,7 @@ export const safeCrackerArrowsAction = <CellType, ExType, ProcessedExType>(
         params: {
             ...position,
             isCenter: true,
+            color: userDigitColor,
             cellMarkType: incrementArrayItem<CellMarkType | undefined>(
                 [undefined, CellMarkType.LeftArrow, CellMarkType.RightArrow, CellMarkType.X],
                 marks.find({position, isCenter: true, type: CellMarkType.Any})?.type,

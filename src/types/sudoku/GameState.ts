@@ -44,7 +44,7 @@ import {CellDataSet} from "./CellDataSet";
 import {getAllPuzzleConstraints, isValidUserDigit, prepareGivenDigitsMapForConstraints} from "./Constraint";
 import {DragAction} from "./DragAction";
 import {incrementArrayItem} from "../../utils/array";
-import {CellColor} from "./CellColor";
+import {CellColor, CellColorValue} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
 import {CellPart} from "./CellPart";
 import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
@@ -947,7 +947,7 @@ export const gameStateSetCellMark = <CellType, ExType, ProcessedExType>(
     position: Position,
     isCenter: boolean,
     cellMarkType?: CellMarkType,
-    color = CellColor.black
+    color: CellColorValue = CellColor.black
 ): PartialGameStateEx<CellType, ExType> => {
     const {
         puzzle,
