@@ -247,23 +247,25 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 width: size,
                 height: size,
             }];
-            const regions = faces.flatMap(face => indexes(size)
-                .map(regionIndex => validGridCells.filter(
-                    ({top, left, region}) => {
-                        if (top < face.top || left < face.left || top >= face.top + face.height || left >= face.left + face.width) {
-                            return false;
-                        }
+            const regions = faces.flatMap(face => {
+                const validFaceCells = validGridCells.filter(
+                    ({top, left}) => top >= face.top && left >= face.left && top < face.top + face.height && left < face.left + face.width
+                );
 
-                        if (region === undefined) {
-                            const topIndex = Math.floor(top / defaultRegionHeight);
-                            const leftIndex = Math.floor(left / defaultRegionWidth);
-                            region = leftIndex + topIndex * defaultRegionColumnsCount;
-                        }
+                return indexes(size)
+                    .map(regionIndex => validFaceCells.filter(
+                        ({top, left, region}) => {
+                            if (region === undefined) {
+                                const topIndex = Math.floor(top / defaultRegionHeight);
+                                const leftIndex = Math.floor(left / defaultRegionWidth);
+                                region = leftIndex + topIndex * defaultRegionColumnsCount;
+                            }
 
-                        return region === regionIndex;
-                    }
-                ))
-                .filter(({length}) => length));
+                            return region === regionIndex;
+                        }
+                    ))
+                    .filter(({length}) => length);
+            });
             if (regions.length > 1) {
                 puzzle.fieldSize.regions = regions;
             }
