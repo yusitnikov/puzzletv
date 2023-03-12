@@ -22,6 +22,7 @@ import {
 } from "../layout/Position";
 import {PuzzleResultCheck} from "./PuzzleResultCheck";
 import {CellMark} from "./CellMark";
+import {loop} from "../../utils/math";
 
 export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     title: PartiallyTranslatable;
@@ -116,10 +117,10 @@ export const normalizePuzzlePosition = (
     }: PuzzleDefinition<any, any, any>
 ): Position => ({
     top: loopVertically
-        ? (top % rowsCount + rowsCount) % rowsCount
+        ? loop(top, rowsCount)
         : top,
     left: loopHorizontally
-        ? (left % columnsCount + columnsCount) % columnsCount
+        ? loop(left, columnsCount)
         : left,
 });
 

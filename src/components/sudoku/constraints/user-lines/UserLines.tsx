@@ -21,6 +21,7 @@ import {LineWithColor} from "../../../../types/sudoku/LineWithColor";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {HashSet} from "../../../../types/struct/Set";
 import {emptyPositionWithAngle} from "../../../../types/layout/Position";
+import {loop} from "../../../../utils/math";
 
 const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
@@ -127,11 +128,11 @@ export const UserMarkByData = (
         }
 
         if (loopVertically) {
-            top = ((top % rowsCount) + rowsCount) % rowsCount;
+            top = loop(top, rowsCount);
         }
 
         if (loopHorizontally) {
-            left = ((left % columnsCount) + columnsCount) % columnsCount;
+            left = loop(left, columnsCount);
         }
     }
 

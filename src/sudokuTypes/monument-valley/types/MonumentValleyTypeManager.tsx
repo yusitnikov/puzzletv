@@ -12,6 +12,7 @@ import {Constraint} from "../../../types/sudoku/Constraint";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {RotatableGameState, RotatableProcessedGameState} from "../../rotatable/types/RotatableGameState";
 import {RotatableDigitSudokuTypeManagerBase} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
+import {loop} from "../../../utils/math";
 
 export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameState, RotatableProcessedGameState> = {
     ...DigitSudokuTypeManager<RotatableGameState, RotatableProcessedGameState>(),
@@ -45,7 +46,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         const {top, left} = rotateCellCoords(position, processedFieldSize, 120 - angle);
         const isTopLeftGrid = top < gridSize && left < gridSize && (top < gridSize - intersectionSize || left < gridSize - intersectionSize);
 
-        switch ((angle % 360 + 360) % 360) {
+        switch (loop(angle, 360)) {
             case 120:
                 return rotateDigit(digit, isTopLeftGrid ? 2 : 3);
             case 240:
@@ -397,7 +398,7 @@ export const rotateCellCoords = (
     {gridSize, intersectionSize, columnsCount}: ReturnType<typeof parseMonumentValleyFieldSize>,
     angle: number
 ) => {
-    const times = (angle % 360 + 360) % 360 / 120;
+    const times = loop(angle, 360) / 120;
 
     for (let i = 0; i < times; i++) {
         const {top, left} = position;

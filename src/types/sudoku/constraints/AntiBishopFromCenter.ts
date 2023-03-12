@@ -1,5 +1,6 @@
 import {Constraint} from "../Constraint";
 import {isSamePosition} from "../../layout/Position";
+import {loop} from "../../../utils/math";
 
 export const AntiBishopFromCenterConstraint = <CellType>(regionSize: number): Constraint<CellType> => ({
     name: "anti-bishop from center",
@@ -32,13 +33,13 @@ export const AntiBishopFromCenterConstraint = <CellType>(regionSize: number): Co
 
             let x = left + offset;
             if (loopHorizontally) {
-                x = (x + columnsCount) % columnsCount;
+                x = loop(x, columnsCount);
             }
 
             for (const coeff of [-1, 1]) {
                 let y = top + offset * coeff;
                 if (loopVertically) {
-                    y = (y + rowsCount) % rowsCount;
+                    y = loop(y, rowsCount);
                 }
 
                 if (!isCurrentCellCenter && !(isCenterIndex(x) && isCenterIndex(y))) {

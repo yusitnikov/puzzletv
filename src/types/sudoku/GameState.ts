@@ -48,6 +48,7 @@ import {CellColor, CellColorValue} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
 import {CellPart} from "./CellPart";
 import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
+import {loop} from "../../utils/math";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -791,8 +792,8 @@ export const gameStateNormalizeLoopOffset = <CellType, ExType = {}, ProcessedExT
     {fieldSize: {rowsCount, columnsCount}, fieldMargin = 0}: PuzzleDefinition<CellType, ExType, ProcessedExType>,
     {left, top}: Position
 ): Position => ({
-    left: ((left + fieldMargin) % columnsCount + columnsCount) % columnsCount - fieldMargin,
-    top: ((top + fieldMargin) % rowsCount + rowsCount) % rowsCount - fieldMargin,
+    left: loop(left + fieldMargin, columnsCount) - fieldMargin,
+    top: loop(top + fieldMargin, rowsCount) - fieldMargin,
 });
 
 export const gameStateResetCurrentMultiLine = <CellType, ExType>(): PartialGameStateEx<CellType, ExType> => ({

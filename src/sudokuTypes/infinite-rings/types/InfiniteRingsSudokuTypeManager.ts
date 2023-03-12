@@ -13,6 +13,7 @@ import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {InfiniteRingsFieldWrapper} from "../components/InfiniteRingsFieldWrapper";
 import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {loop} from "../../../utils/math";
 
 const coordsRingToPlain = (fieldSize: number, ring: number, index: number) => [ring, fieldSize / 2 - 1, fieldSize / 2, fieldSize - 1 - ring][index];
 const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
@@ -90,7 +91,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 let {ring, top, left} = coordsPlainToRing(fieldSize, position);
 
                 let newRingOffset = ringOffset;
-                ring = ((ring - ringOffset) % ringsCount + ringsCount) % ringsCount;
+                ring = loop(ring - ringOffset, ringsCount);
 
                 if (left === 3) {
                     ring--;
@@ -108,7 +109,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                     top = top < 2 ? 0 : 3;
                 }
 
-                ring = ((ring + ringOffset) % ringsCount + ringsCount) % ringsCount;
+                ring = loop(ring + ringOffset, ringsCount);
 
                 return {
                     cell: {

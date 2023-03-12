@@ -1,3 +1,5 @@
+import {loop} from "./math";
+
 export const splitArrayIntoChunks = <T>(array: T[], chunkSize: number): T[][] => {
     const result: T[][] = [];
 
@@ -20,7 +22,7 @@ export const areSameArrays = <T>(a1: T[], a2: T[]) =>
     a1.length === a2.length && a1.every((value, index) => value === a2[index]);
 
 export const incrementArrayItemByIndex = <T>(array: T[], currentIndex: number, increment = 1) =>
-    array[((currentIndex + increment) % array.length + array.length) % array.length];
+    array[loop(currentIndex + increment, array.length)];
 
 export const incrementArrayItem = <T>(array: T[], currentItem: T | ((item: T) => boolean), increment = 1) =>
     incrementArrayItemByIndex(
