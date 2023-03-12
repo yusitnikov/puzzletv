@@ -145,6 +145,49 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 }
             }
         },
+        transformCoords({top, left}, {fieldSize: {rowsCount: fieldSize}}, {processedExtension: {ringOffset}}): Position {
+            const ringsCount = fieldSize / 2 - 1;
+            const loopedRingOffset = loop(ringOffset, ringsCount);
+            const unscaleCoeff = Math.pow(2, ringsCount);
+            const scaleCoeff = Math.pow(2, loopedRingOffset) / unscaleCoeff;
+
+            top -= 2;
+            left -= 2;
+
+            top *= scaleCoeff;
+            left *= scaleCoeff;
+
+            if (Math.abs(top) <= 0.5 && Math.abs(left) <= 0.5) {
+                top *= unscaleCoeff;
+                left *= unscaleCoeff;
+            }
+
+            top += 2;
+            left += 2;
+
+            return {top, left};
+        },
+        getRegionsWithSameCoordsTransformation({fieldSize: {rowsCount: fieldSize}}, cellSize, state): Rect[] {
+            const ringsCount = fieldSize / 2 - 1;
+            const ringOffset = state?.processedExtension.ringOffset ?? 0;
+            const loopedRingOffset = loop(ringOffset, ringsCount);
+            const regionBorder = 2 - 2 / Math.pow(2, loop(loopedRingOffset + 2.5, ringsCount));
+
+            return [
+                {
+                    top: 0,
+                    left: 0,
+                    width: 4,
+                    height: 4,
+                },
+                {
+                    top: regionBorder,
+                    left: regionBorder,
+                    width: 4 - 2 * regionBorder,
+                    height: 4 - 2 * regionBorder,
+                },
+            ];
+        },
         postProcessPuzzle(puzzle: PuzzleDefinition<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>): typeof puzzle {
             const fieldSize = puzzle.fieldSize.rowsCount;
             const quadSize = fieldSize / 2;
@@ -185,7 +228,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 customCellBounds,
                 ignoreRowsColumnCountInTheWrapper: true,
                 fieldWrapperComponent: InfiniteRingsFieldWrapper,
-                allowDrawing: puzzle.allowDrawing?.filter(type => ["center-mark", "center-line"].includes(type)),
+                allowDrawing: puzzle.allowDrawing?.filter(type => ["center-mark"].includes(type)),
             };
         },
         fixCellPosition(position, {fieldSize: {rowsCount: fieldSize}}): Position | undefined {

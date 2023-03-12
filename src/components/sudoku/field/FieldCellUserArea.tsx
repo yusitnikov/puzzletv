@@ -1,7 +1,7 @@
 import {Position} from "../../../types/layout/Position";
 import {ReactNode, useMemo} from "react";
-import {getTransformedRectMatrix} from "../../../types/layout/Rect";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 
 interface FieldCellUserAreaProps {
     context?: PuzzleContext<any, any, any>;
@@ -20,9 +20,9 @@ export const FieldCellUserArea = ({context, cellPosition, children}: FieldCellUs
     }, [context, cellPosition]);
 
     return <>
-        {customRect && <g transform={getTransformedRectMatrix(customRect)}>
+        {customRect && <TransformedRectGraphics rect={customRect}>
             {children}
-        </g>}
+        </TransformedRectGraphics>}
 
         {!customRect && children}
     </>;

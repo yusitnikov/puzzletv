@@ -31,7 +31,8 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     constructor(private readonly puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>) {
         const {
             typeManager: {
-                transformCoords = coords => coords,
+                transformCoords = (coords: Position) => coords,
+                isOddTransformCoords,
                 getAdditionalNeighbors = () => [],
             },
             fieldSize: {rowsCount, columnsCount},
@@ -64,7 +65,9 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                 position: {top, left},
                 bounds,
                 getTransformedBounds: (state, cellSize) => {
-                    const transformCoordsBound = (point: Position) => transformCoords(point, puzzle, state, cellSize);
+                    const transformCoordsBound = (point: Position) => isOddTransformCoords
+                        ? transformCoords(point, puzzle, state, cellSize)
+                        : point;
 
                     return {
                         borders: bounds.borders.map(border => border.map(transformCoordsBound)),

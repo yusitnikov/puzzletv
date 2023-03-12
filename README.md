@@ -10,6 +10,7 @@ A web application for creating and solving different types of sudoku.
 | Feat | Hard  |  Must have   | Undo/redo via network.                                                    |
 | Bug  | Easy  |  Important   | Toggling actions shouldn't cancel each other via network.                 |
 | Feat | Easy  |  Important   | Timer.                                                                    |
+| Bug  |  Mid  |  Important   | Infinity loop - highlight conflicts only for currently visible clues.     |
 | Feat |  Mid  |  Important   | Help button (for mobile users - they can't see the titles!).              |
 | Bug  | Easy  | Nice to have | Ctrl+Z to select the previous selection.                                  |
 | Feat | Easy  | Nice to have | Visual tooltips on the grid when hovering/clicking specific sudoku rules. |

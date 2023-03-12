@@ -37,7 +37,12 @@ export const FieldSvg = ({context: {puzzle, cellSize}, useShadow = true, childre
         width={cellSize * totalWidth}
         height={cellSize * totalWidth}
         fitParent={fieldFitsWrapper}
-        viewBox={fieldFitsWrapper ? undefined : `${(columnsCount - fieldSize) / 2 - fieldMargin} ${(rowsCount - fieldSize) / 2 - fieldMargin} ${totalWidth} ${totalWidth}`}
+        viewBox={fieldFitsWrapper ? undefined : {
+            left: (columnsCount - fieldSize) / 2 - fieldMargin,
+            top: (rowsCount - fieldSize) / 2 - fieldMargin,
+            width: totalWidth,
+            height: totalWidth,
+        }}
         style={useShadow ? svgShadowStyle : undefined}
     >
         {indexesFromTo(loopVertically ? -1 : 0, loopVertically ? 1 : 0, true).flatMap(

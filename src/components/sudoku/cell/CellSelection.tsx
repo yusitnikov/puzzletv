@@ -4,6 +4,7 @@ import {Position} from "../../../types/layout/Position";
 import {getTransformedRectAverageSize} from "../../../types/layout/Rect";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {useTransformScale} from "../../../contexts/TransformScaleContext";
 
 export const CellSelectionColor = {
     mainCurrent: blueColor,
@@ -14,29 +15,25 @@ export const CellSelectionColor = {
 export interface CellSelectionProps {
     context: PuzzleContext<any, any, any>;
     cellPosition: Position;
-    size: number;
     color?: string;
     strokeWidth?: number;
 }
 
-export const CellSelection = ({context, cellPosition, size, color = CellSelectionColor.mainCurrent, strokeWidth = 1}: CellSelectionProps) => {
+export const CellSelection = ({context, cellPosition, color = CellSelectionColor.mainCurrent, strokeWidth = 1}: CellSelectionProps) => {
+    const scale = useTransformScale();
+
     let selectionBorderWidth = 0.1 * strokeWidth;
-    let selectionBorderWidth2 = 2 / size;
+    const selectionBorderWidth2 = 2 / scale;
 
     const {
         areCustomBounds,
-        transformedBounds: {userArea: {rightVector, bottomVector}},
+        transformedBounds: {userArea},
     } = context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
 
     if (areCustomBounds) {
         const cellTransformedSize = getTransformedRectAverageSize(userArea);
 
-        const sizeCoeff = context.puzzle.fieldFitsWrapper
-            ? 1
-            : 1 / size;
-
-        selectionBorderWidth = Math.max(selectionBorderWidth * cellTransformedSize, 7 * sizeCoeff);
-        selectionBorderWidth2 = 2 * sizeCoeff;
+        selectionBorderWidth = Math.max(selectionBorderWidth * cellTransformedSize, 7 / scale);
 
         return <AutoSvg
             clip={<FieldCellShape

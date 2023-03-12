@@ -377,7 +377,12 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
                     top={-offset}
                     width={cellSize}
                     height={cellSize}
-                    viewBox={`${-offset / contentSize} ${-offset / contentSize} ${cellSize / contentSize} ${cellSize / contentSize}`}
+                    viewBox={{
+                        top: -offset / contentSize,
+                        left: -offset / contentSize,
+                        width: cellSize / contentSize,
+                        height: cellSize / contentSize,
+                    }}
                 >
                     {allowDrawing.includes("border-line") && <UserLinesByData
                         cellSize={contentSize}
@@ -423,7 +428,12 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
             data={(size) => <AutoSvg
                 width={size}
                 height={size}
-                viewBox={"-1.1 -1.1 2.2 2.2"}
+                viewBox={{
+                    top: -1.1,
+                    left: -1.1,
+                    width: 2.2,
+                    height: 2.2,
+                }}
             >
                 <line x1={-1} y1={0} x2={1} y2={0} stroke={textColor} strokeWidth={0.15}/>
                 <polyline points={"-0.7,0.3 -1,0 -0.7,-0.3"} stroke={textColor} strokeWidth={0.15}/>

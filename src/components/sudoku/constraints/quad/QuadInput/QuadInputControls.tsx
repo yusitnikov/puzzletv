@@ -88,7 +88,7 @@ export const QuadInputControls = <CellType, ExType extends QuadInputGameState<Ce
             data={cellSize => <AutoSvg
                 width={cellSize}
                 height={cellSize}
-                viewBox={"0 0 1 1"}
+                viewBox={{top: 0, left: 0, width: 1, height: 1}}
             >
                 <line
                     x1={0}

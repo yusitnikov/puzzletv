@@ -37,6 +37,7 @@ export const GoogleMapsTypeManager = <CellType>(
             top: y,
         };
     },
+    isOddTransformCoords: true,
     processArrowDirection(cell, xDirection, yDirection, context, isMainKeyboard) {
         return (baseTypeManager.processArrowDirection || defaultProcessArrowDirection)(cell, xDirection, -yDirection, context, isMainKeyboard);
     },

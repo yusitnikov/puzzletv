@@ -1,8 +1,9 @@
 import {Position} from "../../../types/layout/Position";
 import {ReactNode, useMemo} from "react";
-import {getTransformedRectMatrix, transformRect} from "../../../types/layout/Rect";
+import {transformRect} from "../../../types/layout/Rect";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getRegionBoundingBox} from "../../../utils/regions";
+import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 
 interface FieldCellBoundingBoxAreaProps {
     context?: PuzzleContext<any, any, any>;
@@ -29,9 +30,9 @@ export const FieldCellBoundingBoxArea = ({context, cellPosition, children}: Fiel
     }, [context, cellPosition]);
 
     return <>
-        {customRect && <g transform={getTransformedRectMatrix(customRect)}>
+        {customRect && <TransformedRectGraphics rect={customRect}>
             {children}
-        </g>}
+        </TransformedRectGraphics>}
 
         {!customRect && children}
     </>;

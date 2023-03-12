@@ -140,9 +140,14 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
         cellSize: number,
     ): Position;
 
+    // true if transformCoords() doesn't distribute the coords evenly (if it has distortion)
+    isOddTransformCoords?: boolean;
+
+    // Get rectangles of non-modified coords that get the same transformation matrix by transformCoords
     getRegionsWithSameCoordsTransformation?(
         puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         cellSize: number,
+        state?: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
     ): Rect[];
 
     items?: Constraint<CellType, any, ExType, ProcessedExType>[]

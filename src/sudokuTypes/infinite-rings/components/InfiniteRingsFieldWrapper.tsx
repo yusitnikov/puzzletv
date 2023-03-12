@@ -12,11 +12,9 @@ const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles)
 export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRingsGameState, ProcessedExType extends InfiniteRingsProcessedGameState>(
     {
         context: {
-            puzzle: {fieldSize: {rowsCount: fieldSize}},
             state: {
                 selectedCells,
                 extension: {ringOffset},
-                processedExtension: {ringOffset: animatedRingOffset},
                 isShowingSettings,
             },
             onStateChange,
@@ -25,7 +23,6 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
         children,
     }: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
 ) => {
-    const ringsCount = fieldSize / 2 - 1;
     const buttonFontSize = cellSize * 0.3;
 
     const setRingOffset = (ringOffset: number) => onStateChange({
@@ -52,9 +49,6 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
         }
     });
 
-    const scaleCoeff1 = Math.pow(2, ((animatedRingOffset % ringsCount) + ringsCount) % ringsCount);
-    const scaleCoeff2 = scaleCoeff1 / Math.pow(2, ringsCount);
-
     return <div style={{
         position: "absolute",
         inset: -1,
@@ -63,21 +57,9 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
         <div style={{
             position: "absolute",
             inset: 1,
+            outline: `1px solid ${blackColor}`,
         }}>
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                transform: `scale(${scaleCoeff1})`,
-            }}>
-                {children}
-            </div>
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                transform: `scale(${scaleCoeff2})`,
-            }}>
-                {children}
-            </div>
+            {children}
 
             <div style={{
                 position: "absolute",

@@ -3,7 +3,8 @@ import {emptyPosition, Position} from "../../../types/layout/Position";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {Size} from "../../../types/layout/Size";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {getTransformedRectMatrix, TransformedRect, transformRect} from "../../../types/layout/Rect";
+import {TransformedRect, transformRect} from "../../../types/layout/Rect";
+import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 
 export interface FieldRectProps<CellType, ExType = {}, ProcessedExType = {}> extends Position, Partial<Size> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -23,7 +24,7 @@ export const FieldRect = <CellType, ExType = {}, ProcessedExType = {}>(
 ) => {
     const transformedRect = getFieldRectTransform(context, position);
 
-    return <g transform={getTransformedRectMatrix(transformedRect)}>
+    return <TransformedRectGraphics rect={transformedRect}>
         <AutoSvg
             width={width}
             height={height}
@@ -31,7 +32,7 @@ export const FieldRect = <CellType, ExType = {}, ProcessedExType = {}>(
         >
             {children}
         </AutoSvg>
-    </g>;
+    </TransformedRectGraphics>;
 };
 
 export const getFieldRectTransform = <CellType, ExType = {}, ProcessedExType = {}>(
@@ -41,11 +42,11 @@ export const getFieldRectTransform = <CellType, ExType = {}, ProcessedExType = {
     const {
         typeManager: {
             transformCoords = coords => coords,
+            isOddTransformCoords,
         },
-        customCellBounds,
     } = puzzle;
 
-    if (customCellBounds) {
+    if (isOddTransformCoords) {
         return {
             base: emptyPosition,
             rightVector: {top: 0, left: 1},

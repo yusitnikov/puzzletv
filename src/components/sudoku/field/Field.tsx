@@ -1,9 +1,9 @@
 import {Absolute} from "../../layout/absolute/Absolute";
-import {getTransformedRectMatrix, Rect, transformRect} from "../../../types/layout/Rect";
+import {Rect, transformRect} from "../../../types/layout/Rect";
 import {emptyPosition, Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
-import React, {ReactNode, useMemo, useState} from "react";
+import React, {Fragment, ReactNode, useMemo, useState} from "react";
 import {CellState} from "../../../types/sudoku/CellState";
 import {CellBackground} from "../cell/CellBackground";
 import {CellSelection, CellSelectionColor} from "../cell/CellSelection";
@@ -19,7 +19,6 @@ import {
 } from "../../../types/sudoku/GameState";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
-import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {
     Constraint,
@@ -40,7 +39,9 @@ import {resolvePuzzleInitialColors} from "../../../types/sudoku/PuzzleDefinition
 import {redColor} from "../../app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {useTranslate} from "../../../hooks/useTranslate";
+import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCoordsTransformation";
 import {FieldCellUserArea} from "./FieldCellUserArea";
+import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -76,7 +77,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const {
         getCellTypeProps,
-        getRegionsWithSameCoordsTransformation,
         getCellSelectionType,
         disableConflictChecker,
         disableArrowLetterShortcuts,
@@ -84,12 +84,9 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
 
-    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle, cellSize);
-
     const itemsProps: ItemsProps<CellType, ExType, ProcessedExType> = {
         context: readOnlySafeContext,
         items,
-        regionsWithSameCoordsTransformation,
     };
 
     const {
@@ -228,38 +225,47 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         {useShadow = false}: {useShadow?: boolean} = {}
     ) =>
         <FieldSvg context={readOnlySafeContext} useShadow={useShadow}>
-            {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
-                if (!fieldFitsWrapper && !customCellBounds) {
-                    const finalTop = topOffset + loopOffset.top + rowIndex;
-                    if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
+            {({left: leftOffset, top: topOffset}) => <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
+                {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+                    if (!fieldFitsWrapper && !customCellBounds) {
+                        const finalTop = topOffset + loopOffset.top + rowIndex;
+                        if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
+                            return null;
+                        }
+
+                        const finalLeft = leftOffset + loopOffset.left + columnIndex;
+                        if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
+                            return null;
+                        }
+                    }
+
+                    const cellPosition: Position = {
+                        left: columnIndex,
+                        top: rowIndex,
+                    };
+
+                    if (getCellTypeProps?.(cellPosition, puzzle)?.isVisible === false) {
                         return null;
                     }
 
-                    const finalLeft = leftOffset + loopOffset.left + columnIndex;
-                    if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
+                    const content = renderer(cellState, cellPosition);
+                    if (!content) {
                         return null;
                     }
-                }
 
-                const cellPosition: Position = {
-                    left: columnIndex,
-                    top: rowIndex,
-                };
-
-                if (getCellTypeProps?.(cellPosition, puzzle)?.isVisible === false) {
-                    return null;
-                }
-
-                const content = renderer(cellState, cellPosition);
-
-                return content && <FieldRect
-                    key={`cell-${keyPrefix}-${rowIndex}-${columnIndex}`}
-                    context={readOnlySafeContext}
-                    {...cellPosition}
-                >
-                    {content}
-                </FieldRect>;
-            }))}
+                    const key = `cell-${keyPrefix}-${rowIndex}-${columnIndex}`;
+                    return customCellBounds
+                        ? <Fragment key={key}>{content}</Fragment>
+                        : <AutoSvg
+                            key={key}
+                            {...cellPosition}
+                            width={1}
+                            height={1}
+                        >
+                            {content}
+                        </AutoSvg>;
+                }))}
+            </FieldRegionsWithSameCoordsTransformation>}
         </FieldSvg>;
 
     const initialColorsResolved = resolvePuzzleInitialColors(context);
@@ -283,7 +289,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         return !!color && <CellSelection
             context={readOnlySafeContext}
             cellPosition={cellPosition}
-            size={cellSize}
             color={color}
             strokeWidth={width}
         />;
@@ -460,112 +465,78 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     </>;
 };
 
-interface ItemsInOneRegionProps<CellType, ExType = {}, ProcessedExType = {}> {
+interface ItemsProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
     items: Constraint<CellType, any, ExType, ProcessedExType>[];
 }
 
-const ItemsInOneRegion = <CellType, ExType = {}, ProcessedExType = {}>(
-    {context, items}: ItemsInOneRegionProps<CellType, ExType, ProcessedExType>
-) => {
-    return <>
-        {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
-            if (!Component) {
-                return null;
-            }
-
-            if (renderSingleCellInUserArea && cells.length === 1) {
-                const position = cells[0];
-
-                if (position.top % 1 === 0 && position.left % 1 === 0) {
-                    const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
-                        context.puzzle,
-                        {...position, angle: 0},
-                        new HashSet<CellType>(),
-                        0,
-                        () => undefined,
-                        position,
-                        context.state
-                    );
-
-                    return <FieldRect key={index} context={context} {...position}>
-                        <FieldCellUserArea context={context} cellPosition={position}>
-                            <AutoSvg top={0.5} left={0.5} angle={processedPosition?.angle}>
-                                <AutoSvg top={-0.5} left={-0.5}>
-                                    <Component
-                                        context={context}
-                                        cells={[emptyPosition]}
-                                        {...otherData}
-                                    />
-                                </AutoSvg>
-                            </AutoSvg>
-                        </FieldCellUserArea>
-                    </FieldRect>;
-                }
-            }
-            if (renderSingleCellInUserArea && cells.length === 2) {
-                const [cell1, cell2] = cells.map(({top, left}) => {
-                    const cellInfo = context.cellsIndex.allCells[top]?.[left];
-                    return cellInfo
-                        ? {...cellInfo.center, radius: cellInfo.bounds.userArea.width / 2}
-                        : {left: left + 0.5, top: top + 0.5, radius: 0.5};
-                });
-                const centerPoint = {
-                    top: (cell1.top + cell2.top) / 2,
-                    left: (cell1.left + cell2.left) / 2,
-                    radius: (cell1.radius + cell2.radius) / 2,
-                };
-                const centerRect: Rect = {
-                    top: centerPoint.top - centerPoint.radius,
-                    left: centerPoint.left - centerPoint.radius,
-                    width: centerPoint.radius * 2,
-                    height: centerPoint.radius * 2,
-                };
-                return <g key={index} transform={getTransformedRectMatrix(transformRect(centerRect))}>
-                    <Component
-                        context={context}
-                        cells={[emptyPosition, emptyPosition]}
-                        {...otherData}
-                    />
-                </g>
-            }
-
-            return <Component
-                key={index}
-                context={context}
-                cells={cells}
-                {...otherData}
-            />;
-        })}
-    </>;
-};
-
-interface ItemsProps<CellType, ExType = {}, ProcessedExType = {}>
-    extends ItemsInOneRegionProps<CellType, ExType, ProcessedExType> {
-    regionsWithSameCoordsTransformation?: Rect[];
-}
-
 const Items = <CellType, ExType = {}, ProcessedExType = {}>(
-    {
-        regionsWithSameCoordsTransformation,
-        ...otherProps
-    }: ItemsProps<CellType, ExType, ProcessedExType>
-) => <>
-    {regionsWithSameCoordsTransformation?.map((rect, index) => <FieldRect
-        key={`items-region-${index}`}
-        context={otherProps.context}
-        clip={true}
-        {...rect}
-    >
-        <AutoSvg
-            left={-rect.left}
-            top={-rect.top}
-            width={1}
-            height={1}
-        >
-            <ItemsInOneRegion {...otherProps}/>
-        </AutoSvg>
-    </FieldRect>)}
+    {context, items}: ItemsProps<CellType, ExType, ProcessedExType>
+) => <FieldRegionsWithSameCoordsTransformation context={context}>
+    {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
+        if (!Component) {
+            return null;
+        }
 
-    {!regionsWithSameCoordsTransformation && <ItemsInOneRegion {...otherProps}/>}
-</>;
+        if (renderSingleCellInUserArea && cells.length === 1) {
+            const position = cells[0];
+
+            if (position.top % 1 === 0 && position.left % 1 === 0) {
+                const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
+                    context.puzzle,
+                    {...position, angle: 0},
+                    new HashSet<CellType>(),
+                    0,
+                    () => undefined,
+                    position,
+                    context.state
+                );
+
+                return <FieldCellUserArea key={index} context={context} cellPosition={position}>
+                    <AutoSvg top={0.5} left={0.5} angle={processedPosition?.angle}>
+                        <AutoSvg top={-0.5} left={-0.5}>
+                            <Component
+                                context={context}
+                                cells={[emptyPosition]}
+                                {...otherData}
+                            />
+                        </AutoSvg>
+                    </AutoSvg>
+                </FieldCellUserArea>;
+            }
+        }
+        if (renderSingleCellInUserArea && cells.length === 2) {
+            const [cell1, cell2] = cells.map(({top, left}) => {
+                const cellInfo = context.cellsIndex.allCells[top]?.[left];
+                return cellInfo
+                    ? {...cellInfo.center, radius: cellInfo.bounds.userArea.width / 2}
+                    : {left: left + 0.5, top: top + 0.5, radius: 0.5};
+            });
+            const centerPoint = {
+                top: (cell1.top + cell2.top) / 2,
+                left: (cell1.left + cell2.left) / 2,
+                radius: (cell1.radius + cell2.radius) / 2,
+            };
+            const centerRect: Rect = {
+                top: centerPoint.top - centerPoint.radius,
+                left: centerPoint.left - centerPoint.radius,
+                width: centerPoint.radius * 2,
+                height: centerPoint.radius * 2,
+            };
+            return <TransformedRectGraphics key={index} rect={transformRect(centerRect)}>
+                <Component
+                    context={context}
+                    cells={[emptyPosition, emptyPosition]}
+                    {...otherData}
+                />
+            </TransformedRectGraphics>
+        }
+
+        return <Component
+            key={index}
+            context={context}
+            cells={cells}
+            {...otherData}
+        />;
+    })}
+</FieldRegionsWithSameCoordsTransformation>;

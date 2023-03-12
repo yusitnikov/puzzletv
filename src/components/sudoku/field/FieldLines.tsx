@@ -5,13 +5,13 @@ import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {formatSvgPointsArray} from "../../../types/layout/Position";
 import {concatContinuousLines} from "../../../utils/lines";
+import {useTransformScale} from "../../../contexts/TransformScaleContext";
 
 export const FieldLines = withFieldLayer(FieldLayer.lines, (
     {
         context: {
             puzzle,
             cellsIndexForState,
-            cellSize,
             state: {processed: {isMyTurn}},
         }
     }: ConstraintProps
@@ -24,11 +24,12 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
         fieldSize: {columnsCount, rowsCount},
         borderColor: puzzleBorderColor,
         customCellBounds,
-        fieldFitsWrapper,
     } = puzzle;
 
+    const scale = useTransformScale();
+
     const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
-    const borderWidth = fieldFitsWrapper ? 1 : 1 / cellSize;
+    const borderWidth = 1 / scale;
 
     if (customCellBounds) {
         return <>
@@ -75,7 +76,7 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
                 x2={left}
                 y2={end}
                 stroke={borderColor}
-                strokeWidth={1 / cellSize}
+                strokeWidth={borderWidth}
             />)
         )}
     </>;
