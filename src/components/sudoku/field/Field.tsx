@@ -492,19 +492,22 @@ const Items = <CellType, ExType = {}, ProcessedExType = {}>(
                     context.state
                 );
 
-                return <FieldCellUserArea key={index} context={context} cellPosition={position}>
-                    <AutoSvg top={0.5} left={0.5} angle={processedPosition?.angle}>
-                        <AutoSvg top={-0.5} left={-0.5}>
-                            <Component
-                                context={context}
-                                cells={[emptyPosition]}
-                                {...otherData}
-                            />
+                return <AutoSvg key={index} {...(context.puzzle.customCellBounds ? {} : position)}>
+                    <FieldCellUserArea context={context} cellPosition={position}>
+                        <AutoSvg top={0.5} left={0.5} angle={processedPosition?.angle}>
+                            <AutoSvg top={-0.5} left={-0.5}>
+                                <Component
+                                    context={context}
+                                    cells={[emptyPosition]}
+                                    {...otherData}
+                                />
+                            </AutoSvg>
                         </AutoSvg>
-                    </AutoSvg>
-                </FieldCellUserArea>;
+                    </FieldCellUserArea>
+                </AutoSvg>;
             }
         }
+
         if (renderSingleCellInUserArea && cells.length === 2) {
             const [cell1, cell2] = cells.map(({top, left}) => {
                 const cellInfo = context.cellsIndex.allCells[top]?.[left];
