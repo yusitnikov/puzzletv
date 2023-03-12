@@ -1,6 +1,6 @@
-import {formatSvgPointsArray, getVectorLength, Position} from "../../../types/layout/Position";
+import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {SVGAttributes, useMemo} from "react";
-import {Rect} from "../../../types/layout/Rect";
+import {getTransformedRectAverageSize, Rect} from "../../../types/layout/Rect";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {usePureMemo} from "../../../hooks/usePureMemo";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
@@ -38,8 +38,7 @@ export const FieldCellShape = ({context, cellPosition, line, left = 0, top = 0, 
     }
 
     if (line) {
-        const {rightVector, bottomVector} = customCellBounds.userArea;
-        const cellTransformedSize = (getVectorLength(rightVector) + getVectorLength(bottomVector)) / 2;
+        const cellTransformedSize = getTransformedRectAverageSize(customCellBounds.userArea);
 
         const sizeCoeff = context.puzzle.fieldFitsWrapper
             ? 1

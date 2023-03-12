@@ -1,4 +1,4 @@
-import {emptyPosition, getLineVector, Position, scaleVector} from "./Position";
+import {emptyPosition, getLineVector, getVectorLength, Position, scaleVector} from "./Position";
 import {emptySize, Size} from "./Size";
 
 export interface Rect extends Position, Size {
@@ -38,6 +38,9 @@ export const getTransformedRectCenter = ({base, rightVector, bottomVector}: Tran
 
 export const getTransformedRectMatrix = ({base, rightVector, bottomVector}: TransformedRect) =>
     `matrix(${rightVector.left} ${rightVector.top} ${bottomVector.left} ${bottomVector.top} ${base.left} ${base.top})`;
+
+export const getTransformedRectAverageSize = ({rightVector, bottomVector}: TransformedRect) =>
+    (getVectorLength(rightVector) + getVectorLength(bottomVector)) / 2;
 
 export const getRectPoints = ({left, top, width, height}: Rect): Position[] => [
     {left, top},

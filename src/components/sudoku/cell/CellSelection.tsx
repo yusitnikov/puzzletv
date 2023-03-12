@@ -1,6 +1,7 @@
 import {blueColor, lighterBlueColor, yellowColor} from "../../app/globals";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {getVectorLength, Position} from "../../../types/layout/Position";
+import {Position} from "../../../types/layout/Position";
+import {getTransformedRectAverageSize} from "../../../types/layout/Rect";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 
@@ -28,7 +29,7 @@ export const CellSelection = ({context, cellPosition, size, color = CellSelectio
     } = context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
 
     if (areCustomBounds) {
-        const cellTransformedSize = (getVectorLength(rightVector) + getVectorLength(bottomVector)) / 2;
+        const cellTransformedSize = getTransformedRectAverageSize(userArea);
 
         const sizeCoeff = context.puzzle.fieldFitsWrapper
             ? 1
