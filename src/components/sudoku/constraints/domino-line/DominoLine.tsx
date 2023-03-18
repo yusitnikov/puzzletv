@@ -2,13 +2,14 @@ import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../.
 import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {LineComponent, LineProps} from "../line/Line";
+import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 
 export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
     name: string,
     isObvious: boolean,
     color: string,
     cellLiterals: PositionLiteral[],
-    isValidDomino: (digit1: number, digit2: number) => boolean,
+    isValidDomino: (digit1: number, digit2: number, context: PuzzleContext<CellType, ExType, ProcessedExType>) => boolean,
     width: number | undefined = undefined,
     display = true,
     split = true,
@@ -25,7 +26,9 @@ export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
         props: {width},
         component: display ? LineComponent : undefined,
         isObvious,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
+        isValidCell(cell, digits, cells, context) {
+            const {puzzle: {typeManager: {getDigitByCellData}}, state} = context;
+
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
 
             const index = cells.findIndex(constraintCell => isSamePosition(constraintCell, cell));
@@ -34,8 +37,8 @@ export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
             const prevDigit = prevCell && digits[prevCell.top]?.[prevCell.left];
             const nextDigit = nextCell && digits[nextCell.top]?.[nextCell.left];
 
-            return (prevDigit === undefined || isValidDomino(getDigitByCellData(prevDigit, state), digit))
-                && (nextDigit === undefined || isValidDomino(getDigitByCellData(nextDigit, state), digit));
+            return (prevDigit === undefined || isValidDomino(getDigitByCellData(prevDigit, state), digit, context))
+                && (nextDigit === undefined || isValidDomino(getDigitByCellData(nextDigit, state), digit, context));
         },
     };
 };
