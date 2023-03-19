@@ -3,6 +3,8 @@ import {FormEvent, useMemo} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
 import {decodeFPuzzlesString, FPuzzlesImportOptions, FPuzzlesImportPuzzleType} from "../../data/puzzles/FPuzzles";
 import {useLanguageCode} from "../../hooks/useTranslate";
+import {veryDarkGreyColor} from "./globals";
+import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
 
 interface FPuzzlesWizardPageProps {
     load: string;
@@ -14,6 +16,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const puzzle = useMemo(() => decodeFPuzzlesString(load), [load]);
 
     const [type, setType] = useStringFromLocalStorage<FPuzzlesImportPuzzleType>("fpwType", FPuzzlesImportPuzzleType.Regular);
+    const [areHtmlRules, setAreHtmlRules] = useBoolFromLocalStorage("fpwHtmlRules");
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
@@ -41,6 +44,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
 
         window.location.hash = buildLink("f-puzzles", languageCode, {
             type: isCalculator && fillableDigitalDisplay ? FPuzzlesImportPuzzleType.Regular : type,
+            htmlRules: areHtmlRules,
             fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
             loopX: !isSpecialGrid && loopX,
             loopY: !isSpecialGrid && loopY,
@@ -70,6 +74,29 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe cracker</option>
                 </select>
             </label>
+        </p>
+
+        <p>
+            <label>
+                Rules are HTML:&nbsp;
+                <input type={"checkbox"} checked={areHtmlRules} onChange={ev => setAreHtmlRules(ev.target.checked)}/>
+            </label>
+            {areHtmlRules && <div style={{margin: "1em 0", color: veryDarkGreyColor}}>
+                Notes:
+                <ul style={{margin: 0}}>
+                    <li>
+                        Line breaks in the text will <strong>not</strong> be applied automatically in the HTML mode.
+                        Please use the <code>&lt;p&gt;</code> tag for paragraphs.
+                    </li>
+                    <li>
+                        The following HTML tags are allowed: <code>{allowedRulesHtmlTags.join(", ")}</code>.<br/>
+                        Tag attributes are not supported and will be stripped,
+                        except for the common attributes of <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.<br/>
+                        Please <a href={buildLink("contacts", languageCode)} target={"_blank"}>contact the site creator</a>{" "}
+                        to add support for other tags or attributes.
+                    </li>
+                </ul>
+            </div>}
         </p>
 
         {isCalculator && <p>

@@ -1,3 +1,4 @@
+import {ReactNode} from "react";
 import {allDrawingModes, PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {LanguageCode} from "../../types/translations/LanguageCode";
@@ -71,6 +72,7 @@ import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 import {FPuzzlesGridCell, FPuzzlesLittleKillerSum, FPuzzlesPuzzle, FPuzzlesText} from "fpuzzles-data";
 import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager";
+import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -94,6 +96,7 @@ export enum FPuzzlesImportPuzzleType {
 export interface FPuzzlesImportOptions {
     load: string;
     type?: FPuzzlesImportPuzzleType;
+    htmlRules?: boolean;
     tesseract?: boolean;
     fillableDigitalDisplay?: boolean;
     noSpecialRules?: boolean;
@@ -158,6 +161,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
     {
+        htmlRules,
         fillableDigitalDisplay,
         noSpecialRules,
         loopX,
@@ -318,9 +322,15 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         },
         ruleset: (ruleset) => {
             if (ruleset) {
-                puzzle.rules = () => <>{ruleset.split("\n").map(
-                    (line, index) => <RulesParagraph key={index}>{line || <span>&nbsp;</span>}</RulesParagraph>
-                )}</>;
+                let parsedRules: ReactNode;
+                if (htmlRules) {
+                    parsedRules = <ParsedRulesHtml>{ruleset}</ParsedRulesHtml>;
+                } else {
+                    parsedRules = <>{ruleset.split("\n").map(
+                        (line, index) => <RulesParagraph key={index}>{line || <span>&nbsp;</span>}</RulesParagraph>
+                    )}</>;
+                }
+                puzzle.rules = () => parsedRules;
             }
         },
         // region Constraints
