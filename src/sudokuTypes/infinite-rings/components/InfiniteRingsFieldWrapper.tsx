@@ -2,7 +2,7 @@
 import styled from "@emotion/styled";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {PropsWithChildren} from "react";
-import {blackColor} from "../../../components/app/globals";
+import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
 import {InfiniteRingsGameState, InfiniteRingsProcessedGameState} from "../types/InfiniteRingsGameState";
 import {useEventListener} from "../../../hooks/useEventListener";
@@ -24,6 +24,8 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
     }: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
 ) => {
     const buttonFontSize = cellSize * 0.3;
+
+    const borderWidth = Math.ceil(getRegionBorderWidth(cellSize) * cellSize / 2) * 2;
 
     const setRingOffset = (ringOffset: number) => onStateChange({
         extension: {ringOffset} as Partial<ExType>,
@@ -51,15 +53,33 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
 
     return <div style={{
         position: "absolute",
-        inset: -1,
+        inset: -borderWidth / 2,
         overflow: "hidden",
+        border: `${borderWidth}px solid ${blackColor}`,
     }}>
         <div style={{
             position: "absolute",
-            inset: 1,
-            outline: `1px solid ${blackColor}`,
+            inset: -borderWidth / 2,
         }}>
             {children}
+
+            {/*middle border lines*/}
+            <div style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: borderWidth,
+                margin: "auto",
+                background: blackColor,
+            }}/>
+            <div style={{
+                position: "absolute",
+                inset: 0,
+                width: borderWidth,
+                height: "100%",
+                margin: "auto",
+                background: blackColor,
+            }}/>
 
             <div style={{
                 position: "absolute",
