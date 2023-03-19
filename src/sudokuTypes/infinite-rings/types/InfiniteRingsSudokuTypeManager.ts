@@ -36,7 +36,8 @@ const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
 }
 
 export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
-    baseTypeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>
+    baseTypeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
+    visibleRingsCount = 2,
 ): SudokuTypeManager<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState> => {
     return {
         ...baseTypeManager as unknown as SudokuTypeManager<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>,
@@ -67,7 +68,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 ringOffset,
             };
         },
-        mainControlsComponent: AnimationSpeedControlButton({top: 2, left: 0}),
+        mainControlsComponent: visibleRingsCount < 3 ? AnimationSpeedControlButton({top: 2, left: 0}) : undefined,
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;
@@ -77,7 +78,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
 
             return {
                 isVisible: (top === left || top + left === fieldSize - 1 || isCenterTop || isCenterLeft) && !(isCenterTop && isCenterLeft),
-                isVisibleForState: ({processedExtension: {ringOffset}}) => loop(ring + 0.5 - ringOffset, ringsCount) < 2,
+                isVisibleForState: ({processedExtension: {ringOffset}}) => loop(ring + 0.5 - ringOffset, ringsCount) < visibleRingsCount,
             };
         },
         processArrowDirection(
@@ -107,7 +108,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                     left++;
                 } else {
                     ring++;
-                    if (ring >= 2) {
+                    if (ring >= visibleRingsCount) {
                         newRingOffset++;
                     }
                     top = top < 2 ? 0 : 3;
@@ -161,7 +162,8 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
             top *= scaleCoeff;
             left *= scaleCoeff;
 
-            if (Math.abs(top) <= 0.5 && Math.abs(left) <= 0.5) {
+            const blackRectSize = 2 / Math.pow(2, visibleRingsCount);
+            if (Math.abs(top) <= blackRectSize && Math.abs(left) <= blackRectSize) {
                 top *= unscaleCoeff;
                 left *= unscaleCoeff;
             }
@@ -175,7 +177,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
             const ringsCount = fieldSize / 2 - 1;
             const ringOffset = state?.processedExtension.ringOffset ?? 0;
             const loopedRingOffset = loop(ringOffset, ringsCount);
-            const regionBorder = 2 - 2 / Math.pow(2, loop(loopedRingOffset + 2.5, ringsCount));
+            const regionBorder = 2 - 2 / Math.pow(2, loop(loopedRingOffset + visibleRingsCount + 0.5, ringsCount));
 
             const regions: Rect[] = [
                 {
@@ -186,7 +188,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 },
             ];
 
-            if (loopedRingOffset > ringsCount - 2) {
+            if (loopedRingOffset > ringsCount - visibleRingsCount) {
                 regions.push({
                     top: regionBorder,
                     left: regionBorder,
@@ -228,7 +230,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
             }
             return {
                 ...puzzle,
-                digitsCount: 6,
+                digitsCount: visibleRingsCount * 3,
                 fieldSize: {
                     ...puzzle.fieldSize,
                     fieldSize: 4,
@@ -236,7 +238,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 },
                 customCellBounds,
                 ignoreRowsColumnCountInTheWrapper: true,
-                fieldWrapperComponent: InfiniteRingsFieldWrapper,
+                fieldWrapperComponent: InfiniteRingsFieldWrapper(visibleRingsCount),
                 allowDrawing: puzzle.allowDrawing?.filter(type => ["center-mark"].includes(type)),
             };
         },
@@ -250,71 +252,62 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
         getRegionsForRowsAndColumns({fieldSize: {rowsCount: fieldSize}}): Constraint<CellType, any, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>[] {
             const quadsCount = fieldSize / 2 - 1;
             return indexes(quadsCount).flatMap(outerRing => {
-                const innerRing = (outerRing + 1) % quadsCount;
-                const createRegion = (cells: (Position & { inner?: boolean })[], name: string) => RegionConstraint<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>(
-                    cells.map(({inner, top, left}) => ({
-                        top: coordsRingToPlain(fieldSize, inner ? innerRing : outerRing, top),
-                        left: coordsRingToPlain(fieldSize, inner ? innerRing : outerRing, left),
-                    })),
+                const createRegion = (cells: (Position & { ring: number })[]) => RegionConstraint<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>(
+                    cells.map(({ring: ringOffset, top, left}) => {
+                        const ring = loop(outerRing + ringOffset, quadsCount);
+                        return {
+                            top: coordsRingToPlain(fieldSize, ring, top),
+                            left: coordsRingToPlain(fieldSize, ring, left),
+                        };
+                    }),
                     false,
-                    `ring ${outerRing + 1} - ${name}`,
                 );
-                const createRowColumnRegions = (cells: (Position & { inner?: boolean })[], name: string) => [
-                    createRegion(cells, "row " + name),
-                    createRegion(
-                        cells.map(({top, left, inner}) => ({top: left, left: top, inner})),
-                        "column " + name.replace("top", "left").replace("bottom", "right")
-                    ),
+                const createRowColumnRegions = (cells: (Position & { ring: number })[]) => [
+                    createRegion(cells),
+                    createRegion(cells.map(({top, left, ring}) => ({
+                        top: left,
+                        left: top,
+                        ring,
+                    }))),
+                    createRegion(cells.map(({top, left, ring}) => ({
+                        top: 3 - top,
+                        left,
+                        ring,
+                    }))),
+                    createRegion(cells.map(({top, left, ring}) => ({
+                        top: left,
+                        left: 3 - top,
+                        ring,
+                    }))),
                 ];
-                const createQuadRegion = (cells: Position[], name: string) => createRegion([
-                    ...cells,
-                    ...cells.map(cell => ({...cell, inner: true})),
-                ], name);
+                const createQuadRegion = (cells: Position[]) => createRegion(indexes(visibleRingsCount).flatMap(
+                    ring => cells.map(cell => ({...cell, ring}))
+                ));
                 return [
-                    ...createRowColumnRegions(indexes(4).map(left => ({top: 0, left})), "1"),
-                    ...createRowColumnRegions([
-                        {top: 1, left: 0},
-                        ...indexes(4).map(left => ({top: 0, left, inner: true})),
-                        {top: 1, left: 3},
-                    ], "2 top"),
-                    ...createRowColumnRegions([
-                        {top: 1, left: 0},
-                        {top: 1, left: 0, inner: true},
-                        {top: 1, left: 3, inner: true},
-                        {top: 1, left: 3},
-                    ], "2 bottom"),
-                    ...createRowColumnRegions([
-                        {top: 2, left: 0},
-                        {top: 2, left: 0, inner: true},
-                        {top: 2, left: 3, inner: true},
-                        {top: 2, left: 3},
-                    ], "3 top"),
-                    ...createRowColumnRegions([
-                        {top: 2, left: 0},
-                        ...indexes(4).map(left => ({top: 3, left, inner: true})),
-                        {top: 2, left: 3},
-                    ], "3 bottom"),
-                    ...createRowColumnRegions(indexes(4).map(left => ({top: 3, left})), "4"),
+                    ...indexes(visibleRingsCount, true).flatMap(ring => createRowColumnRegions([
+                        ...indexes(ring === visibleRingsCount ? 0 : 4).map(left => ({top: 0, left, ring})),
+                        ...indexes(ring).flatMap(ring2 => [0, 3].map(left => ({top: 1, left, ring: ring2}))),
+                    ])),
                     createQuadRegion([
                         {top: 0, left: 0},
                         {top: 0, left: 1},
                         {top: 1, left: 0},
-                    ], "quad 1"),
+                    ]),
                     createQuadRegion([
                         {top: 0, left: 2},
                         {top: 0, left: 3},
                         {top: 1, left: 3},
-                    ], "quad 2"),
+                    ]),
                     createQuadRegion([
                         {top: 2, left: 0},
                         {top: 3, left: 0},
                         {top: 3, left: 1},
-                    ], "quad 3"),
+                    ]),
                     createQuadRegion([
                         {top: 2, left: 3},
                         {top: 3, left: 2},
                         {top: 3, left: 3},
-                    ], "quad 4"),
+                    ]),
                 ];
             });
         },

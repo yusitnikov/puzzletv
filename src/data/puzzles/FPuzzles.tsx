@@ -106,6 +106,7 @@ export interface FPuzzlesImportOptions {
     yajilinFog?: boolean;
     cosmeticsBehindFog?: boolean;
     safeCrackerCodeLength?: number;
+    visibleRingsCount?: number;
 }
 
 export const getSolutionGridByFPuzzlesObject = ({solution, size}: FPuzzlesPuzzle) => {
@@ -122,6 +123,7 @@ export const loadByFPuzzlesObject = (
         tesseract,
         fillableDigitalDisplay,
         safeCrackerCodeLength = 6,
+        visibleRingsCount = 2,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager(
@@ -138,9 +140,9 @@ export const loadByFPuzzlesObject = (
         [FPuzzlesImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
             size: puzzleJson.size,
             circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
-            codeCellsCount: Math.min(puzzleJson.size, safeCrackerCodeLength),
+            codeCellsCount: Math.min(puzzleJson.size, Number(safeCrackerCodeLength)),
         }),
-        [FPuzzlesImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(regularTypeManager),
+        [FPuzzlesImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(regularTypeManager, Number(visibleRingsCount)),
     };
 
     const baseTypeManager = typesMap[type] ?? regularTypeManager;
@@ -787,9 +789,38 @@ export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
         const puzzleJson = decodeFPuzzlesString(load);
         console.log("Importing from f-puzzles:", puzzleJson);
 
+        const {
+            type,
+            htmlRules,
+            tesseract,
+            fillableDigitalDisplay,
+            noSpecialRules,
+            loopX,
+            loopY,
+            "product-arrow": productArrow,
+            yajilinFog,
+            cosmeticsBehindFog,
+            safeCrackerCodeLength,
+            visibleRingsCount,
+        } = params as Omit<FPuzzlesImportOptions, "load">;
+        const sanitizedParams = {
+            type,
+            htmlRules,
+            tesseract,
+            fillableDigitalDisplay,
+            noSpecialRules,
+            loopX,
+            loopY,
+            productArrow,
+            yajilinFog,
+            cosmeticsBehindFog,
+            safeCrackerCodeLength,
+            visibleRingsCount,
+        };
+
         return {
             ...loadByFPuzzlesObject(puzzleJson, "f-puzzles", params),
-            saveStateKey: `f-puzzles-${sha1().update(load).digest("hex").substring(0, 20)}`,
+            saveStateKey: `f-puzzles-${sha1().update(load + JSON.stringify(sanitizedParams)).digest("hex").substring(0, 20)}`,
         };
     }
 };

@@ -27,8 +27,11 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
     const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
 
+    const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
+
     const isCalculator = type === FPuzzlesImportPuzzleType.Calculator;
     const isSafeCracker = type === FPuzzlesImportPuzzleType.SafeCracker;
+    const isInfiniteRings = type === FPuzzlesImportPuzzleType.InfiniteRings;
     const isSpecialGrid = [
         FPuzzlesImportPuzzleType.Cubedoku,
         FPuzzlesImportPuzzleType.Rotatable,
@@ -53,6 +56,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             yajilinFog: hasFog && yajilinFog,
             cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
             safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
+            visibleRingsCount: isInfiniteRings ? visibleRingsCount : undefined,
             noSpecialRules: !hasSolution && noSpecialRules,
             load,
         } as FPuzzlesImportOptions);
@@ -163,6 +167,14 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                 step={1}
                 onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
             />
+        </p>}
+
+        {isInfiniteRings && <p>
+            Visible rings count:&nbsp;
+            <select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))} style={{font: "inherit"}}>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+            </select>
         </p>}
 
         {!hasSolution && <p>

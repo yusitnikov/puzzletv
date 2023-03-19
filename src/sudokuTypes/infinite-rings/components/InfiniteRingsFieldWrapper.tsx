@@ -10,7 +10,11 @@ import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
-export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRingsGameState, ProcessedExType extends InfiniteRingsProcessedGameState>(
+export const InfiniteRingsFieldWrapper = <
+    CellType,
+    ExType extends InfiniteRingsGameState,
+    ProcessedExType extends InfiniteRingsProcessedGameState
+>(visibleRingsCount = 2) => function InfiniteRingsFieldWrapperComponent(
     {
         context: {
             state: {
@@ -23,8 +27,8 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
         },
         children,
     }: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
-) => {
-    const buttonFontSize = cellSize * 0.3;
+) {
+    const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);
 
     const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize);
 
@@ -66,7 +70,7 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
 
             <div style={{
                 position: "absolute",
-                inset: "37.5%",
+                inset: `${50 * (1 - Math.pow(0.5, visibleRingsCount))}%`,
                 background: blackColor,
                 pointerEvents: "all",
                 fontSize: buttonFontSize,
