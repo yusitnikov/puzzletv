@@ -174,20 +174,25 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
             const loopedRingOffset = loop(ringOffset, ringsCount);
             const regionBorder = 2 - 2 / Math.pow(2, loop(loopedRingOffset + 2.5, ringsCount));
 
-            return [
+            const regions: Rect[] = [
                 {
                     top: 0,
                     left: 0,
                     width: 4,
                     height: 4,
                 },
-                {
+            ];
+
+            if (loopedRingOffset > ringsCount - 2) {
+                regions.push({
                     top: regionBorder,
                     left: regionBorder,
                     width: 4 - 2 * regionBorder,
                     height: 4 - 2 * regionBorder,
-                },
-            ];
+                });
+            }
+
+            return regions;
         },
         postProcessPuzzle(puzzle: PuzzleDefinition<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>): typeof puzzle {
             const fieldSize = puzzle.fieldSize.rowsCount;
