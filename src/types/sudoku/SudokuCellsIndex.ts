@@ -28,7 +28,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     private readonly realCellPointMap: Record<string, SudokuCellPointInfo> = {};
     private readonly borderLineMap: Record<string, Record<string, SudokuCellBorderInfo>> = {};
 
-    constructor(private readonly puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>) {
+    constructor(public readonly puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>) {
         const {
             typeManager: {
                 transformCoords = (coords: Position) => coords,
@@ -523,12 +523,18 @@ export class SudokuCellsIndexForState<CellType, ExType, ProcessedExType> {
         () => this.puzzleIndex.getCenterLineSegments(this.currentFieldState.lines.items)
     );
 
-    public readonly getAllCells = lazy(
-        () => this.puzzleIndex.allCells.map(row => row.map(({getTransformedBounds, ...cell}): CellInfoForState => ({
-            ...cell,
-            transformedBounds: getTransformedBounds(this.state, this.cellSize),
-        })))
-    );
+    public readonly getAllCells = lazy(() => {
+        const {puzzle} = this.puzzleIndex;
+        const {typeManager: {getCellTypeProps}} = puzzle;
+
+        return this.puzzleIndex.allCells.map((row, top) => row.map(
+            ({getTransformedBounds, ...cell}, left): CellInfoForState => ({
+                ...cell,
+                transformedBounds: getTransformedBounds(this.state, this.cellSize),
+                isVisible: getCellTypeProps?.({top, left}, puzzle)?.isVisibleForState?.(this.state) !== false,
+            })
+        ));
+    });
 
     constructor(
         private puzzleIndex: SudokuCellsIndex<CellType, ExType, ProcessedExType>,
@@ -571,6 +577,7 @@ export interface CellInfo<CellType, ExType, ProcessedExType> {
 
 export interface CellInfoForState extends Omit<CellInfo<unknown, unknown, unknown>, "getTransformedBounds"> {
     transformedBounds: TransformedCustomCellBounds;
+    isVisible: boolean;
 }
 
 interface SudokuCustomRegionsMap {

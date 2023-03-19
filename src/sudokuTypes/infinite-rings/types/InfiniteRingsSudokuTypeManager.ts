@@ -70,11 +70,14 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
         mainControlsComponent: AnimationSpeedControlButton({top: 2, left: 0}),
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
             const quadSize = fieldSize / 2;
+            const ringsCount = quadSize - 1;
+            const {ring} = coordsPlainToRing(fieldSize, {top, left});
             const isCenterTop = top === quadSize - 1 || top === quadSize;
             const isCenterLeft = left === quadSize - 1 || left === quadSize;
 
             return {
                 isVisible: (top === left || top + left === fieldSize - 1 || isCenterTop || isCenterLeft) && !(isCenterTop && isCenterLeft),
+                isVisibleForState: ({processedExtension: {ringOffset}}) => loop(ring + 0.5 - ringOffset, ringsCount) < 2,
             };
         },
         processArrowDirection(

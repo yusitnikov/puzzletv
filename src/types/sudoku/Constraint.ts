@@ -135,8 +135,13 @@ export const isValidUserDigit = <CellType, ExType, ProcessedExType>(
         }
 
         const normalizedConstraintCells = normalizeConstraintCells(cells, context.puzzle);
-        if (normalizedConstraintCells.length && !normalizedConstraintCells.some((constraintCell: Position) => isSamePosition(constraintCell, cell))) {
-            continue;
+        if (normalizedConstraintCells.length) {
+            if (!isFinalCheck && normalizedConstraintCells.some(({top, left}) => !context.cellsIndexForState.getAllCells()[top]?.[left]?.isVisible)) {
+                continue;
+            }
+            if (!normalizedConstraintCells.some((constraintCell) => isSamePosition(constraintCell, cell))) {
+                continue;
+            }
         }
 
         if (isValidCell && !isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, isFinalCheck, onlyObvious)) {

@@ -121,6 +121,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): {
         isVisible?: boolean;
+        isVisibleForState?: (state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => boolean;
         isSelectable?: boolean;
         forceCellWriteMode?: CellWriteModeInfo<CellType, ExType, ProcessedExType>;
     };
