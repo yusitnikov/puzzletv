@@ -14,6 +14,7 @@ import {InfiniteRingsFieldWrapper} from "../components/InfiniteRingsFieldWrapper
 import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {loop} from "../../../utils/math";
+import {InfiniteRingsBorderLinesConstraint} from "../components/InfiniteRingsBorderLines";
 
 const coordsRingToPlain = (fieldSize: number, ring: number, index: number) => [ring, fieldSize / 2 - 1, fieldSize / 2, fieldSize - 1 - ring][index];
 const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
@@ -309,5 +310,6 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 ];
             });
         },
+        items: [InfiniteRingsBorderLinesConstraint()],
     };
 };

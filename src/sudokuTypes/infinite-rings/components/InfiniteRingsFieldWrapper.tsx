@@ -2,10 +2,11 @@
 import styled from "@emotion/styled";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {PropsWithChildren} from "react";
-import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
+import {blackColor} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
 import {InfiniteRingsGameState, InfiniteRingsProcessedGameState} from "../types/InfiniteRingsGameState";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
@@ -25,7 +26,7 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
 ) => {
     const buttonFontSize = cellSize * 0.3;
 
-    const borderWidth = Math.ceil(getRegionBorderWidth(cellSize) * cellSize / 2) * 2;
+    const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize);
 
     const setRingOffset = (ringOffset: number) => onStateChange({
         extension: {ringOffset} as Partial<ExType>,
@@ -62,24 +63,6 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType extends InfiniteRings
             inset: -borderWidth / 2,
         }}>
             {children}
-
-            {/*middle border lines*/}
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: borderWidth,
-                margin: "auto",
-                background: blackColor,
-            }}/>
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                width: borderWidth,
-                height: "100%",
-                margin: "auto",
-                background: blackColor,
-            }}/>
 
             <div style={{
                 position: "absolute",
