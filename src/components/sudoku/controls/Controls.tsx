@@ -12,7 +12,7 @@ import {
 import {PlainValueSet} from "../../../types/struct/Set";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useTranslate} from "../../../hooks/useTranslate";
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff, textColor, textHeightCoeff} from "../../app/globals";
@@ -35,6 +35,7 @@ import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
 import {CellColor} from "../../../types/sudoku/CellColor";
 import {ctrlKeyText} from "../../../utils/os";
 import {CellMarkType} from "../../../types/sudoku/CellMark";
+import {useEffectExceptInit} from "../../../hooks/useEffectExceptInit";
 
 export const getControlsWidthCoeff = (puzzle: PuzzleDefinition<any, any, any>) => {
     const allowedModes = getAllowedCellWriteModeInfos(puzzle);
@@ -159,13 +160,13 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const isLmdAllowed = !!params?.lmd;
 
-    useEffect(() => {
+    useEffectExceptInit(() => {
         if (autoCheckOnFinish && resultChecker && isCorrectResult) {
             setIsShowingResult(true);
         }
     }, [autoCheckOnFinish, resultChecker, isCorrectResult, resultPhrase, setIsShowingResult]);
 
-    useEffect(() => {
+    useEffectExceptInit(() => {
         if (!lives) {
             setIsShowingResult(true);
         }
