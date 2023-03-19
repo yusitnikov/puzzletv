@@ -38,7 +38,7 @@ export const ParsedRulesHtml = memo(({children: ruleset}: ParsedRulesHtmlProps) 
                 Component = RulesParagraph;
             } else if (Component === "details") {
                 Component = ({children}) => <RulesParagraph>
-                    <details>{children}</details>
+                    <details open={true}>{children}</details>
                 </RulesParagraph>;
             } else if (Component === "a") {
                 const {href} = attribs;
