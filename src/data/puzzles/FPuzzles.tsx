@@ -808,6 +808,7 @@ export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
             cosmeticsBehindFog,
             safeCrackerCodeLength,
             visibleRingsCount,
+            startOffset,
         } = params as Omit<FPuzzlesImportOptions, "load">;
         const sanitizedParams = {
             type,
@@ -822,6 +823,7 @@ export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
             cosmeticsBehindFog,
             safeCrackerCodeLength,
             visibleRingsCount,
+            startOffset,
         };
 
         return {
