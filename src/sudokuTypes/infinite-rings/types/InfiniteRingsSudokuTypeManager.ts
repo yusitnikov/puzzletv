@@ -38,12 +38,13 @@ const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
 export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
     baseTypeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
     visibleRingsCount = 2,
+    startRingOffset = 0,
 ): SudokuTypeManager<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState> => {
     return {
         ...baseTypeManager as unknown as SudokuTypeManager<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>,
         initialGameStateExtension: {
             ...baseTypeManager.initialGameStateExtension!,
-            ringOffset: 0,
+            ringOffset: startRingOffset,
             animationSpeed: AnimationSpeed.regular,
         },
         serializeGameState({ringOffset, animationSpeed, ...data}: Partial<ExType & InfiniteRingsGameState>): any {

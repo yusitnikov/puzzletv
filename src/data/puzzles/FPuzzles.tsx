@@ -107,6 +107,7 @@ export interface FPuzzlesImportOptions {
     cosmeticsBehindFog?: boolean;
     safeCrackerCodeLength?: number;
     visibleRingsCount?: number;
+    startOffset?: number;
 }
 
 export const getSolutionGridByFPuzzlesObject = ({solution, size}: FPuzzlesPuzzle) => {
@@ -124,6 +125,7 @@ export const loadByFPuzzlesObject = (
         fillableDigitalDisplay,
         safeCrackerCodeLength = 6,
         visibleRingsCount = 2,
+        startOffset = 0,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager(
@@ -142,7 +144,11 @@ export const loadByFPuzzlesObject = (
             circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
             codeCellsCount: Math.min(puzzleJson.size, Number(safeCrackerCodeLength)),
         }),
-        [FPuzzlesImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(regularTypeManager, Number(visibleRingsCount)),
+        [FPuzzlesImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(
+            regularTypeManager,
+            Number(visibleRingsCount),
+            Number(startOffset),
+        ),
     };
 
     const baseTypeManager = typesMap[type] ?? regularTypeManager;
