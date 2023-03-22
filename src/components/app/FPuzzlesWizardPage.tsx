@@ -37,6 +37,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
+    const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
@@ -58,6 +59,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
     const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
+    const hasInitialColors = puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length));
 
     const importOptions = usePureMemo<FPuzzlesImportOptions>({
         type: isCalculator && fillableDigitalDisplay ? FPuzzlesImportPuzzleType.Regular : type,
@@ -72,6 +74,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
         visibleRingsCount: isInfiniteRings ? (visibleRingsCount || (puzzle.size / 2 - 1)) : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
+        allowOverrideColors: hasInitialColors && allowOverrideColors,
         load,
     });
 
@@ -226,6 +229,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     <label>
                         Constraints-based solution check:&nbsp;
                         <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
+                    </label>
+                </p>}
+
+                {hasInitialColors && <p>
+                    <label>
+                        Allow overriding initial colors:&nbsp;
+                        <input type={"checkbox"} checked={allowOverrideColors} onChange={ev => setAllowOverrideColors(ev.target.checked)}/>
                     </label>
                 </p>}
 

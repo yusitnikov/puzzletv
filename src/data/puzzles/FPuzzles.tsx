@@ -108,6 +108,7 @@ export interface FPuzzlesImportOptions {
     safeCrackerCodeLength?: number;
     visibleRingsCount?: number;
     startOffset?: number;
+    allowOverrideColors?: boolean;
 }
 
 export const getSolutionGridByFPuzzlesObject = ({solution, size}: FPuzzlesPuzzle) => {
@@ -177,6 +178,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         "product-arrow": productArrow,
         yajilinFog,
         cosmeticsBehindFog,
+        allowOverrideColors = false,
     }: Omit<FPuzzlesImportOptions, "load">,
     typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
 ): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
@@ -202,6 +204,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         initialDigits,
         initialColors,
         items,
+        allowOverridingInitialColors: allowOverrideColors,
     };
 
     let yajilinFogLineSolution = new PuzzleLineSet(puzzle);
@@ -809,6 +812,7 @@ export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
             safeCrackerCodeLength,
             visibleRingsCount,
             startOffset,
+            allowOverrideColors,
         } = params as Omit<FPuzzlesImportOptions, "load">;
         const sanitizedParams = {
             type,
@@ -824,6 +828,7 @@ export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
             safeCrackerCodeLength,
             visibleRingsCount,
             startOffset,
+            allowOverrideColors,
         };
 
         return {
