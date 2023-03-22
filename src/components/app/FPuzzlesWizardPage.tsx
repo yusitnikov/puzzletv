@@ -70,7 +70,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         yajilinFog: hasFog && yajilinFog,
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
-        visibleRingsCount: isInfiniteRings ? visibleRingsCount : undefined,
+        visibleRingsCount: isInfiniteRings ? (visibleRingsCount || (puzzle.size / 2 - 1)) : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
         load,
     });
@@ -98,6 +98,8 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
 
         return false;
     };
+
+    const isValidForm = !isInfiniteRings || visibleRingsCount !== 0;
 
     return <div style={{
         display: "flex",
@@ -216,6 +218,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     <select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))} style={{font: "inherit"}}>
                         <option value={2}>2</option>
                         <option value={3}>3</option>
+                        <option value={0}>all (preview only)</option>
                     </select>
                 </p>}
 
@@ -227,7 +230,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                 </p>}
 
                 <p>
-                    <button type={"submit"}>Load</button>
+                    <button type={"submit"} disabled={!isValidForm}>Load</button>
                 </p>
             </form>
         </div>
