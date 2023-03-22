@@ -108,6 +108,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     return <div style={{
         display: "flex",
         flexDirection: width > height ? "row" : "column",
+        gap: "1em",
     }}>
         <div style={{flex: 1, minWidth: 0}}>
             <PageTitle>{translate(fPuzzlesWizardPageTitle)}</PageTitle>
@@ -133,7 +134,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         Rules are HTML:&nbsp;
                         <input type={"checkbox"} checked={areHtmlRules} onChange={ev => setAreHtmlRules(ev.target.checked)}/>
                     </label>
-                    {areHtmlRules && <div style={{margin: "1em 0", color: veryDarkGreyColor}}>
+                    {areHtmlRules && <div style={{marginTop: "0.25em", color: veryDarkGreyColor}}>
                         Notes:
                         <ul style={{margin: 0}}>
                             <li>
@@ -249,9 +250,18 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
 
                 {!hasSolution && <p>
                     <label>
-                        Constraints-based solution check:&nbsp;
+                        Verify the solution based on the conflict checker:&nbsp;
                         <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
                     </label>
+                    <div style={{marginTop: "0.25em", color: veryDarkGreyColor}}>
+                        When enabled, the software will say that the puzzle was solved correctly as soon as all digits are fulfilled
+                        and there are no conflicts for the standard constraints included in the puzzle.
+                    </div>
+                    <div style={{marginTop: "0.25em", color: veryDarkGreyColor}}>
+                        Please don't enable it when the puzzle contains non-standard constraints or rules
+                        that cannot be verified by the conflict checker!
+                        (also, it's recommended to include the embedded solution in this case)
+                    </div>
                 </p>}
 
                 <p>
