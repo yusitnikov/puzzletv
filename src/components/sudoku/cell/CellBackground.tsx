@@ -19,10 +19,10 @@ export interface CellBackgroundProps {
 
 export const CellBackground = ({context, cellPosition, colors, noOpacity, size = 1}: CellBackgroundProps) => {
     colors = colors.sorted();
-    cellPosition = usePureMemo(cellPosition, [cellPosition]);
+    cellPosition = usePureMemo(cellPosition);
 
     const cellInfo = cellPosition && context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
-    const customBounds = usePureMemo(cellInfo?.transformedBounds, [cellInfo]);
+    const customBounds = usePureMemo(() => cellInfo?.transformedBounds, [cellInfo]);
     const areCustomBounds = cellInfo?.areCustomBounds && !!customBounds;
 
     const customCellRect: Rect = usePureMemo(
@@ -37,7 +37,7 @@ export const CellBackground = ({context, cellPosition, colors, noOpacity, size =
         [areCustomBounds, customBounds, size]
     );
     const customCellCenter: Position = usePureMemo(
-        areCustomBounds
+        () => areCustomBounds
             ? getTransformedRectCenter(customBounds.userArea)
             : {
                 left: size / 2,
