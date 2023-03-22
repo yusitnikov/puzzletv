@@ -44,8 +44,8 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
     const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
-
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
+    const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
 
     const isCalculator = type === FPuzzlesImportPuzzleType.Calculator;
     const isSafeCracker = type === FPuzzlesImportPuzzleType.SafeCracker;
@@ -73,6 +73,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
         visibleRingsCount: isInfiniteRings ? (visibleRingsCount || (puzzle.size / 2 - 1)) : undefined,
+        startOffset: isInfiniteRings ? startOffset : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
         allowOverrideColors: hasInitialColors && allowOverrideColors,
         load,
@@ -216,14 +217,28 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     />
                 </p>}
 
-                {isInfiniteRings && <p>
-                    Visible rings count:&nbsp;
-                    <select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))} style={{font: "inherit"}}>
-                        <option value={2}>2</option>
-                        <option value={3}>3</option>
-                        <option value={0}>all (preview only)</option>
-                    </select>
-                </p>}
+                {isInfiniteRings && <>
+                    <p>
+                        Visible rings count:&nbsp;
+                        <select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))} style={{font: "inherit"}}>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                            <option value={0}>all (preview only)</option>
+                        </select>
+                    </p>
+
+                    <p>
+                        Initial zooming:&nbsp;
+                        <input
+                            type={"number"}
+                            value={startOffset}
+                            min={0}
+                            max={puzzle.size / 2 - 2}
+                            step={1}
+                            onChange={ev => setStartOffset(ev.target.valueAsNumber)}
+                        />
+                    </p>
+                </>}
 
                 {hasInitialColors && <p>
                     <label>
