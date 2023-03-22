@@ -11,7 +11,7 @@ import {GamesList} from "./GamesList";
 import {HomePage} from "./HomePage";
 import {ContactMe} from "./ContactMe";
 import {ForSetters} from "./ForSetters";
-import {FPuzzlesWizardPage} from "./FPuzzlesWizardPage";
+import {FPuzzlesWizardPage, fPuzzlesWizardPageTitle} from "./FPuzzlesWizardPage";
 import {HowToImport} from "./HowToImport";
 
 interface AppProps {
@@ -104,7 +104,8 @@ export const App = ({onPageLoaded}: AppProps) => {
         case "f-puzzles-wizard":
             return <PageLayout
                 scrollable={true}
-                title={translate("Import from f-puzzles")}
+                title={translate(fPuzzlesWizardPageTitle)}
+                hideTitleHeader={true}
             >
                 <FPuzzlesWizardPage load={params.load}/>
             </PageLayout>;

@@ -1,4 +1,4 @@
-import React, {ReactNode} from "react";
+import React, {FC, ReactNode} from "react";
 import {headerHeight, headerPadding, lightGreyColor, textColor} from "../../app/globals";
 import {useLanguageCode, useTranslate} from "../../../hooks/useTranslate";
 import {buildLink} from "../../../utils/link";
@@ -10,11 +10,12 @@ export interface PageLayoutProps {
     addPadding?: boolean;
     scrollable: boolean;
     title?: ReactNode;
+    hideTitleHeader?: boolean;
     addTitleSuffix?: boolean;
     children: ReactNode;
 }
 
-export const PageLayout = ({addPadding = true, scrollable, title, addTitleSuffix = true, children}: PageLayoutProps) => {
+export const PageLayout = ({addPadding = true, scrollable, title, hideTitleHeader, addTitleSuffix = true, children}: PageLayoutProps) => {
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -106,9 +107,11 @@ export const PageLayout = ({addPadding = true, scrollable, title, addTitleSuffix
             padding: addPadding ? headerPadding : 0,
             overflow: scrollable ? "auto" : "hidden",
         }}>
-            {title && <h1 style={{marginTop: 0}}>{title}</h1>}
+            {!hideTitleHeader && title && <PageTitle>{title}</PageTitle>}
 
             {children}
         </div>
     </div>;
 };
+
+export const PageTitle: FC = ({children}) => <h1 style={{marginTop: 0}}>{children}</h1>;

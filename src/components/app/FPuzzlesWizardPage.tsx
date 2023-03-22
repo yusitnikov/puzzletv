@@ -1,10 +1,23 @@
 import {buildLink} from "../../utils/link";
 import {FormEvent, useMemo} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
-import {decodeFPuzzlesString, FPuzzlesImportOptions, FPuzzlesImportPuzzleType} from "../../data/puzzles/FPuzzles";
-import {useLanguageCode} from "../../hooks/useTranslate";
-import {veryDarkGreyColor} from "./globals";
+import {
+    decodeFPuzzlesString,
+    FPuzzles,
+    FPuzzlesImportOptions,
+    FPuzzlesImportPuzzleType
+} from "../../data/puzzles/FPuzzles";
+import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
+import {headerPadding, veryDarkGreyColor} from "./globals";
 import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
+import {usePureMemo} from "../../hooks/usePureMemo";
+import {FieldPreview} from "../sudoku/field/FieldPreview";
+import {useWindowSize} from "../../hooks/useWindowSize";
+import {PageTitle} from "../layout/page-layout/PageLayout";
+
+export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
+
+let autoIncrement = 0;
 
 interface FPuzzlesWizardPageProps {
     load: string;
@@ -12,6 +25,10 @@ interface FPuzzlesWizardPageProps {
 
 export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const languageCode = useLanguageCode();
+    const translate = useTranslate();
+
+    const {width, height} = useWindowSize();
+    const previewSize = Math.min(width, height) - 2 * headerPadding;
 
     const puzzle = useMemo(() => decodeFPuzzlesString(load), [load]);
 
@@ -42,150 +59,183 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
     const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
 
+    const importOptions = usePureMemo<FPuzzlesImportOptions>({
+        type: isCalculator && fillableDigitalDisplay ? FPuzzlesImportPuzzleType.Regular : type,
+        htmlRules: areHtmlRules,
+        fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
+        loopX: !isSpecialGrid && loopX,
+        loopY: !isSpecialGrid && loopY,
+        tesseract: !isSpecialGrid && tesseract,
+        "product-arrow": !!puzzle.arrow && productArrow,
+        yajilinFog: hasFog && yajilinFog,
+        cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
+        safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
+        visibleRingsCount: isInfiniteRings ? visibleRingsCount : undefined,
+        noSpecialRules: !hasSolution && noSpecialRules,
+        load,
+    });
+
+    const importedPuzzle = useMemo(() => {
+        const version = ++autoIncrement;
+        try {
+            return {
+                puzzle: FPuzzles.loadPuzzle(importOptions),
+                version,
+            };
+        } catch (error: unknown) {
+            console.error(error);
+            return {
+                puzzle: undefined,
+                version,
+            };
+        }
+    }, [importOptions]);
+
     const handleSubmit = (ev: FormEvent) => {
         ev.preventDefault();
 
-        window.location.hash = buildLink("f-puzzles", languageCode, {
-            type: isCalculator && fillableDigitalDisplay ? FPuzzlesImportPuzzleType.Regular : type,
-            htmlRules: areHtmlRules,
-            fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
-            loopX: !isSpecialGrid && loopX,
-            loopY: !isSpecialGrid && loopY,
-            tesseract: !isSpecialGrid && tesseract,
-            "product-arrow": !!puzzle.arrow && productArrow,
-            yajilinFog: hasFog && yajilinFog,
-            cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
-            safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
-            visibleRingsCount: isInfiniteRings ? visibleRingsCount : undefined,
-            noSpecialRules: !hasSolution && noSpecialRules,
-            load,
-        } as FPuzzlesImportOptions);
+        window.location.hash = buildLink("f-puzzles", languageCode, importOptions);
 
         return false;
     };
 
-    return <form onSubmit={handleSubmit}>
-        <p>
-            <label>
-                Type:&nbsp;
-                <select value={type} onChange={ev => setType(ev.target.value as FPuzzlesImportPuzzleType)} style={{font: "inherit"}}>
-                    <option value={FPuzzlesImportPuzzleType.Regular}>Regular</option>
-                    <option value={FPuzzlesImportPuzzleType.Latin}>Latin digits</option>
-                    <option value={FPuzzlesImportPuzzleType.Calculator}>Calculator digits</option>
-                    <option value={FPuzzlesImportPuzzleType.Cubedoku}>Cubedoku</option>
-                    <option value={FPuzzlesImportPuzzleType.InfiniteRings}>Infinite rings</option>
-                    <option value={FPuzzlesImportPuzzleType.Rotatable}>Rotatable</option>
-                    <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe cracker</option>
-                </select>
-            </label>
-        </p>
+    return <div style={{
+        display: "flex",
+        flexDirection: width > height ? "row" : "column",
+    }}>
+        <div style={{flex: 1, minWidth: 0}}>
+            <PageTitle>{translate(fPuzzlesWizardPageTitle)}</PageTitle>
 
-        <p>
-            <label>
-                Rules are HTML:&nbsp;
-                <input type={"checkbox"} checked={areHtmlRules} onChange={ev => setAreHtmlRules(ev.target.checked)}/>
-            </label>
-            {areHtmlRules && <div style={{margin: "1em 0", color: veryDarkGreyColor}}>
-                Notes:
-                <ul style={{margin: 0}}>
-                    <li>
-                        Line breaks in the text will <strong>not</strong> be applied automatically in the HTML mode.
-                        Please use the <code>&lt;p&gt;</code> tag for paragraphs.
-                    </li>
-                    <li>
-                        The following HTML tags are allowed: <code>{allowedRulesHtmlTags.join(", ")}</code>.<br/>
-                        Tag attributes are not supported and will be stripped,
-                        except for the common attributes of <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.<br/>
-                        Please <a href={buildLink("contacts", languageCode)} target={"_blank"}>contact the site creator</a>{" "}
-                        to add support for other tags or attributes.
-                    </li>
-                </ul>
-            </div>}
-        </p>
+            <form onSubmit={handleSubmit}>
+                <p>
+                    <label>
+                        Type:&nbsp;
+                        <select value={type} onChange={ev => setType(ev.target.value as FPuzzlesImportPuzzleType)} style={{font: "inherit"}}>
+                            <option value={FPuzzlesImportPuzzleType.Regular}>Regular</option>
+                            <option value={FPuzzlesImportPuzzleType.Latin}>Latin digits</option>
+                            <option value={FPuzzlesImportPuzzleType.Calculator}>Calculator digits</option>
+                            <option value={FPuzzlesImportPuzzleType.Cubedoku}>Cubedoku</option>
+                            <option value={FPuzzlesImportPuzzleType.InfiniteRings}>Infinite rings</option>
+                            <option value={FPuzzlesImportPuzzleType.Rotatable}>Rotatable</option>
+                            <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe cracker</option>
+                        </select>
+                    </label>
+                </p>
 
-        {isCalculator && <p>
-            <label>
-                Fillable digital display:&nbsp;
-                <input type={"checkbox"} checked={fillableDigitalDisplay} onChange={ev => setFillableDigitalDisplay(ev.target.checked)}/>
-            </label>
-        </p>}
+                <p>
+                    <label>
+                        Rules are HTML:&nbsp;
+                        <input type={"checkbox"} checked={areHtmlRules} onChange={ev => setAreHtmlRules(ev.target.checked)}/>
+                    </label>
+                    {areHtmlRules && <div style={{margin: "1em 0", color: veryDarkGreyColor}}>
+                        Notes:
+                        <ul style={{margin: 0}}>
+                            <li>
+                                Line breaks in the text will <strong>not</strong> be applied automatically in the HTML mode.
+                                Please use the <code>&lt;p&gt;</code> tag for paragraphs.
+                            </li>
+                            <li>
+                                The following HTML tags are allowed: <code>{allowedRulesHtmlTags.join(", ")}</code>.<br/>
+                                Tag attributes are not supported and will be stripped,
+                                except for the common attributes of <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.<br/>
+                                Please <a href={buildLink("contacts", languageCode)} target={"_blank"}>contact the site creator</a>{" "}
+                                to add support for other tags or attributes.
+                            </li>
+                        </ul>
+                    </div>}
+                </p>
 
-        {!isSpecialGrid && <>
-            <p>
-                <label>
-                    Loop horizontally:&nbsp;
-                    <input type={"checkbox"} checked={loopX} onChange={ev => setLoopX(ev.target.checked)}/>
-                </label>
-            </p>
+                {isCalculator && <p>
+                    <label>
+                        Fillable digital display:&nbsp;
+                        <input type={"checkbox"} checked={fillableDigitalDisplay} onChange={ev => setFillableDigitalDisplay(ev.target.checked)}/>
+                    </label>
+                </p>}
 
-            <p>
-                <label>
-                    Loop vertically:&nbsp;
-                    <input type={"checkbox"} checked={loopY} onChange={ev => setLoopY(ev.target.checked)}/>
-                </label>
-            </p>
+                {!isSpecialGrid && <>
+                    <p>
+                        <label>
+                            Loop horizontally:&nbsp;
+                            <input type={"checkbox"} checked={loopX} onChange={ev => setLoopX(ev.target.checked)}/>
+                        </label>
+                    </p>
 
-            <p>
-                <label>
-                    Tesseract constraint:&nbsp;
-                    <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
-                </label>
-            </p>
-        </>}
+                    <p>
+                        <label>
+                            Loop vertically:&nbsp;
+                            <input type={"checkbox"} checked={loopY} onChange={ev => setLoopY(ev.target.checked)}/>
+                        </label>
+                    </p>
 
-        {!!puzzle.arrow && <p>
-            <label>
-                Arrow circle is a product instead of a sum:&nbsp;
-                <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
-            </label>
-        </p>}
+                    <p>
+                        <label>
+                            Tesseract constraint:&nbsp;
+                            <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
+                        </label>
+                    </p>
+                </>}
 
-        {hasFog && <>
-            <p>
-                <label>
-                    Yajilin fog:&nbsp;
-                    <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
-                </label>
-            </p>
+                {!!puzzle.arrow && <p>
+                    <label>
+                        Arrow circle is a product instead of a sum:&nbsp;
+                        <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
+                    </label>
+                </p>}
 
-            {hasCosmeticElements && <p>
-                <label>
-                    Hide cosmetic elements behind the fog:&nbsp;
-                    <input type={"checkbox"} checked={cosmeticsBehindFog}
-                           onChange={ev => setCosmeticsBehindFog(ev.target.checked)}/>
-                </label>
-            </p>}
-        </>}
+                {hasFog && <>
+                    <p>
+                        <label>
+                            Yajilin fog:&nbsp;
+                            <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
+                        </label>
+                    </p>
 
-        {isSafeCracker && <p>
-            Safe cracker code length:&nbsp;
-            <input
-                type={"number"}
-                value={safeCrackerCodeLength}
-                min={1}
-                max={puzzle.size}
-                step={1}
-                onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
-            />
-        </p>}
+                    {hasCosmeticElements && <p>
+                        <label>
+                            Hide cosmetic elements behind the fog:&nbsp;
+                            <input type={"checkbox"} checked={cosmeticsBehindFog}
+                                   onChange={ev => setCosmeticsBehindFog(ev.target.checked)}/>
+                        </label>
+                    </p>}
+                </>}
 
-        {isInfiniteRings && <p>
-            Visible rings count:&nbsp;
-            <select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))} style={{font: "inherit"}}>
-                <option value={2}>2</option>
-                <option value={3}>3</option>
-            </select>
-        </p>}
+                {isSafeCracker && <p>
+                    Safe cracker code length:&nbsp;
+                    <input
+                        type={"number"}
+                        value={safeCrackerCodeLength}
+                        min={1}
+                        max={puzzle.size}
+                        step={1}
+                        onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
+                    />
+                </p>}
 
-        {!hasSolution && <p>
-            <label>
-                Constraints-based solution check:&nbsp;
-                <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
-            </label>
-        </p>}
+                {isInfiniteRings && <p>
+                    Visible rings count:&nbsp;
+                    <select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))} style={{font: "inherit"}}>
+                        <option value={2}>2</option>
+                        <option value={3}>3</option>
+                    </select>
+                </p>}
 
-        <p>
-            <button type={"submit"}>Load</button>
-        </p>
-    </form>;
+                {!hasSolution && <p>
+                    <label>
+                        Constraints-based solution check:&nbsp;
+                        <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
+                    </label>
+                </p>}
+
+                <p>
+                    <button type={"submit"}>Load</button>
+                </p>
+            </form>
+        </div>
+
+        <FieldPreview
+            key={importedPuzzle.version}
+            puzzle={importedPuzzle.puzzle}
+            width={previewSize}
+        />
+    </div>;
 };
