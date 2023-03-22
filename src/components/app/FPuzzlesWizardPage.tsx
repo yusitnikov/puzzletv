@@ -225,17 +225,17 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     </select>
                 </p>}
 
-                {!hasSolution && <p>
-                    <label>
-                        Constraints-based solution check:&nbsp;
-                        <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
-                    </label>
-                </p>}
-
                 {hasInitialColors && <p>
                     <label>
                         Allow overriding initial colors:&nbsp;
                         <input type={"checkbox"} checked={allowOverrideColors} onChange={ev => setAllowOverrideColors(ev.target.checked)}/>
+                    </label>
+                </p>}
+
+                {!hasSolution && <p>
+                    <label>
+                        Constraints-based solution check:&nbsp;
+                        <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
                     </label>
                 </p>}
 
