@@ -69,7 +69,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 ringOffset,
             };
         },
-        mainControlsComponent: visibleRingsCount < 3 ? AnimationSpeedControlButton({top: 2, left: 0}) : undefined,
+        mainControlsComponent: AnimationSpeedControlButton({top: 2, left: 0}),
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;

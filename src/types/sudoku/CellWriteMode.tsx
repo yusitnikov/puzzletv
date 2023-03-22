@@ -1,6 +1,6 @@
 import {ReactNode} from "react";
 import {PuzzleContext} from "./PuzzleContext";
-import {PuzzleDefinition} from "./PuzzleDefinition";
+import {getDefaultDigitsCount, PuzzleDefinition} from "./PuzzleDefinition";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
 import {gameStateContinueMultiLine, gameStateStartMultiLine} from "./GameState";
@@ -179,3 +179,26 @@ export const isCompactControlsPanel = (allowedModeInfos: CellWriteModeInfo<any, 
     !allowedModeInfos.some(
         ({mode, isDigitMode     }) => isDigitMode || [CellWriteMode.color, CellWriteMode.shading].includes(mode)
     );
+
+export const resolveDigitsCountInCellWriteMode = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
+) => {
+    const {
+        puzzle,
+        state,
+    } = context;
+
+    const {
+        digitsCount = getDefaultDigitsCount(puzzle),
+    } = puzzle;
+
+    const {
+        processed: {
+            cellWriteModeInfo: {digitsCount: digitsCountFunc = digitsCount},
+        },
+    } = state;
+
+    return typeof digitsCountFunc === "function"
+        ? digitsCountFunc(context)
+        : digitsCountFunc;
+};

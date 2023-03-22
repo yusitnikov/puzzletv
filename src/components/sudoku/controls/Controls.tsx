@@ -7,7 +7,7 @@ import {
     CellWriteMode,
     getAllowedCellWriteModeInfos,
     incrementCellWriteMode,
-    isCompactControlsPanel
+    isCompactControlsPanel, resolveDigitsCountInCellWriteMode
 } from "../../../types/sudoku/CellWriteMode";
 import {PlainValueSet} from "../../../types/struct/Set";
 import {useEventListener} from "../../../hooks/useEventListener";
@@ -100,14 +100,11 @@ export const Controls = <CellType, ExType = {}, ProcessedExType = {}>(
         fogDemoFieldStateHistory,
         processed: {
             isReady,
-            cellWriteModeInfo: {digitsCount: digitsCountFunc = digitsCount},
             cellWriteMode,
         },
     } = state;
 
-    const digitsCountInCurrentMode = typeof digitsCountFunc === "function"
-        ? digitsCountFunc(context)
-        : digitsCountFunc;
+    const digitsCountInCurrentMode = resolveDigitsCountInCellWriteMode(context);
 
     const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;
 
