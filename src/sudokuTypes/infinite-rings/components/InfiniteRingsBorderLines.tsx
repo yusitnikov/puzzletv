@@ -4,13 +4,24 @@ import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../ty
 import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
+import {indexes} from "../../../utils/indexes";
+import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 
 export const getInfiniteLoopRegionBorderWidth = (cellSize: number) =>
     Math.ceil(getRegionBorderWidth(cellSize) * cellSize / 2) * 2;
 
-export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, ({context: {cellSize}}: ConstraintProps) => {
+export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, (
+    {
+        context: {
+            puzzle: {fieldSize: {rowsCount: fieldSize}},
+            cellSize,
+        },
+    }: ConstraintProps
+) => {
+    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings();
     const scale = useTransformScale();
     const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize) / scale;
+    const ringsCount = fieldSize / 2 - 1;
 
     return <>
         <RoundedPolyLine
@@ -30,6 +41,23 @@ export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, ({conte
             stroke={blackColor}
             strokeWidth={borderWidth}
         />
+
+        {isShowingAllInfiniteRings && indexes(ringsCount, true).map((ring) => {
+            const scaleCoeff = Math.pow(2, ring);
+
+            return <RoundedPolyLine
+                key={`ring-${ring}`}
+                points={[
+                    {top: 2 + 2 / scaleCoeff, left: 2 + 2 / scaleCoeff},
+                    {top: 2 + 2 / scaleCoeff, left: 2 - 2 / scaleCoeff},
+                    {top: 2 - 2 / scaleCoeff, left: 2 - 2 / scaleCoeff},
+                    {top: 2 - 2 / scaleCoeff, left: 2 + 2 / scaleCoeff},
+                    {top: 2 + 2 / scaleCoeff, left: 2 + 2 / scaleCoeff},
+                ]}
+                stroke={blackColor}
+                strokeWidth={borderWidth}
+            />;
+        })}
     </>;
 }) as ConstraintPropsGenericFc;
 

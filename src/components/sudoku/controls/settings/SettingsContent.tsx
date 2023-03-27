@@ -21,13 +21,13 @@ import {PencilmarksCheckerMode} from "../../../../types/sudoku/PencilmarksChecke
 import {LanguageCode} from "../../../../types/translations/LanguageCode";
 import {shortenUrl} from "../../../../services/tinyUrl";
 
-export interface SettingsContentProps<CellType, ProcessedExType = {}> {
-    context: PuzzleContext<CellType, any, ProcessedExType>;
+export interface SettingsContentProps<CellType, ExType, ProcessedExType = {}> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
     cellSize: number;
 }
 
-export const SettingsContent = <CellType, ProcessedExType = {}>(
-    props: SettingsContentProps<CellType, ProcessedExType>
+export const SettingsContent = <CellType, ExType, ProcessedExType>(
+    props: SettingsContentProps<CellType, ExType, ProcessedExType>
 ) => {
     const {
         cellSize,

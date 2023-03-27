@@ -7,6 +7,7 @@ import {controlButtonOptions, controlButtonStyles} from "../../../components/sud
 import {InfiniteRingsGameState, InfiniteRingsProcessedGameState} from "../types/InfiniteRingsGameState";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
+import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
@@ -14,9 +15,10 @@ export const InfiniteRingsFieldWrapper = <
     CellType,
     ExType extends InfiniteRingsGameState,
     ProcessedExType extends InfiniteRingsProcessedGameState
->(visibleRingsCount = 2) => function InfiniteRingsFieldWrapperComponent(
+>(visibleRingsCountArg = 2) => function InfiniteRingsFieldWrapperComponent(
     {
         context: {
+            puzzle: {fieldSize: {rowsCount: fieldSize}},
             state: {
                 selectedCells,
                 extension: {ringOffset},
@@ -28,6 +30,9 @@ export const InfiniteRingsFieldWrapper = <
         children,
     }: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
 ) {
+    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings();
+    const visibleRingsCount = isShowingAllInfiniteRings ? fieldSize / 2 - 1 : visibleRingsCountArg;
+
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);
 
     const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize);

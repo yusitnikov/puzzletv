@@ -175,7 +175,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     mainControlsComponent?: ComponentType<ControlsProps<CellType, ExType, ProcessedExType>>;
 
-    settingsComponents?: ComponentType<SettingsContentProps<CellType, ProcessedExType>>[];
+    settingsComponents?: ComponentType<SettingsContentProps<CellType, ExType, ProcessedExType>>[];
 
     maxDigitsCount?: number;
 

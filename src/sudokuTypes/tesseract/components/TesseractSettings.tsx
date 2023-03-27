@@ -5,8 +5,8 @@ import {SettingsSelect} from "../../../components/sudoku/controls/settings/Setti
 import {TesseractSelectionType, useTesseractSelectionType} from "../types/TesseractSelection";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 
-export const TesseractSettings = <CellType, ProcessedExType = {}>(
-    {cellSize}: SettingsContentProps<CellType, ProcessedExType>
+export const TesseractSettings = <CellType, ExType, ProcessedExType>(
+    {cellSize}: SettingsContentProps<CellType, ExType, ProcessedExType>
 ) => {
     const translate = useTranslate();
 
