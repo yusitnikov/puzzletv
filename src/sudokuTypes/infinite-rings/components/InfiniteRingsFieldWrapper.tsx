@@ -73,6 +73,50 @@ export const InfiniteRingsFieldWrapper = <
         }}>
             {children}
 
+            {isShowingAllInfiniteRings && <div style={{
+                position: "absolute",
+                inset: 0,
+                opacity: 0.15,
+            }}>
+                <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "25%",
+                    background: blackColor,
+                }}/>
+                <div style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "25%",
+                    background: blackColor,
+                }}/>
+                <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "25%",
+                    height: "100%",
+                    background: blackColor,
+                }}/>
+                <div style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    width: "25%",
+                    height: "100%",
+                    background: blackColor,
+                }}/>
+                <div style={{
+                    position: "absolute",
+                    inset: `${50 - 50 / Math.pow(2, visibleRingsCountArg + 1)}%`,
+                    background: blackColor,
+                }}/>
+            </div>}
+
             <div style={{
                 position: "absolute",
                 inset: `${50 * (1 - Math.pow(0.5, visibleRingsCount))}%`,
