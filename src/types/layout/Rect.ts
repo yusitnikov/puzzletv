@@ -10,6 +10,10 @@ export interface TransformedRect {
     bottomVector: Position;
 }
 
+export interface RectWithTransformation extends Rect {
+    transformCoords?: (position: Position) => Position;
+}
+
 export const emptyRect: Rect = {
     ...emptyPosition,
     ...emptySize,

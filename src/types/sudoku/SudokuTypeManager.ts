@@ -8,7 +8,7 @@ import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
-import {Rect} from "../layout/Rect";
+import {RectWithTransformation} from "../layout/Rect";
 import {Constraint} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
@@ -149,7 +149,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
         puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
         cellSize: number,
         state?: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
-    ): Rect[];
+    ): RectWithTransformation[];
 
     items?: Constraint<CellType, any, ExType, ProcessedExType>[]
         | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => Constraint<CellType, any, ExType, ProcessedExType>[]);

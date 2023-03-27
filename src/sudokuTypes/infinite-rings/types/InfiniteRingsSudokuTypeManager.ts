@@ -2,7 +2,7 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
-import {getRectPoints, Rect} from "../../../types/layout/Rect";
+import {getRectPoints, Rect, RectWithTransformation} from "../../../types/layout/Rect";
 import {Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {indexes} from "../../../utils/indexes";
@@ -174,31 +174,35 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
 
             return {top, left};
         },
-        getRegionsWithSameCoordsTransformation({fieldSize: {rowsCount: fieldSize}}, cellSize, state): Rect[] {
+        getRegionsWithSameCoordsTransformation({fieldSize: {rowsCount: fieldSize}}, cellSize, state): RectWithTransformation[] {
             const ringsCount = fieldSize / 2 - 1;
             const ringOffset = state?.processedExtension.ringOffset ?? 0;
             const loopedRingOffset = loop(ringOffset, ringsCount);
-            const regionBorder = 2 - 2 / Math.pow(2, loop(loopedRingOffset + visibleRingsCount + 0.5, ringsCount));
+            const scaleCoeff = Math.pow(2, loopedRingOffset);
+            const unscaleCoeff = Math.pow(2, ringsCount);
 
-            const regions: Rect[] = [
+            return [
+                {
+                    top: 2 - 2 / scaleCoeff,
+                    left: 2 - 2 / scaleCoeff,
+                    width: 4 / scaleCoeff,
+                    height: 4 / scaleCoeff,
+                    transformCoords: ({top, left}) => ({
+                        top: (top - 2) * scaleCoeff + 2,
+                        left: (left - 2) * scaleCoeff + 2,
+                    }),
+                },
                 {
                     top: 0,
                     left: 0,
                     width: 4,
                     height: 4,
+                    transformCoords: ({top, left}) => ({
+                        top: (top - 2) * scaleCoeff / unscaleCoeff + 2,
+                        left: (left - 2) * scaleCoeff / unscaleCoeff + 2,
+                    }),
                 },
             ];
-
-            if (loopedRingOffset > ringsCount - visibleRingsCount) {
-                regions.push({
-                    top: regionBorder,
-                    left: regionBorder,
-                    width: 4 - 2 * regionBorder,
-                    height: 4 - 2 * regionBorder,
-                });
-            }
-
-            return regions;
         },
         postProcessPuzzle(puzzle: PuzzleDefinition<CellType, ExType & InfiniteRingsGameState, ProcessedExType & InfiniteRingsProcessedGameState>): typeof puzzle {
             const fieldSize = puzzle.fieldSize.rowsCount;
