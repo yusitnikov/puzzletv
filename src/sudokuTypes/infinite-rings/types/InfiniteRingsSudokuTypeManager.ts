@@ -320,7 +320,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 ];
             });
         },
-        items: [InfiniteRingsBorderLinesConstraint()],
+        items: [InfiniteRingsBorderLinesConstraint(visibleRingsCountArg)],
         settingsComponents: [InfiniteRingsSettings],
     };
 };

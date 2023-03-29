@@ -35,7 +35,7 @@ export const InfiniteRingsFieldWrapper = <
 
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);
 
-    const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize);
+    const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount);
 
     const setRingOffset = (ringOffset: number) => onStateChange({
         extension: {ringOffset} as Partial<ExType>,

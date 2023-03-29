@@ -1,27 +1,34 @@
+import {ReactElement} from "react";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
 import {indexes} from "../../../utils/indexes";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 
-export const getInfiniteLoopRegionBorderWidth = (cellSize: number) =>
-    Math.ceil(getRegionBorderWidth(cellSize) * cellSize / 2) * 2;
+export const getInfiniteLoopRegionBorderWidth = (cellSize: number, visibleRingsCount: number) =>
+    Math.ceil(getRegionBorderWidth(cellSize) * cellSize / Math.pow(2, visibleRingsCount / 4) / 2) * 2;
 
-export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, (
+interface InfiniteRingsBorderLinesProps {
+    visibleRingsCount: number;
+}
+
+export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <CellType, ExType, ProcessedExType>(
     {
         context: {
             puzzle: {fieldSize: {rowsCount: fieldSize}},
             cellSize,
         },
-    }: ConstraintProps
+        props: {visibleRingsCount: visibleRingsCountArg},
+    }: ConstraintProps<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType>
 ) => {
     const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings();
     const scale = useTransformScale();
-    const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize) / scale;
     const ringsCount = fieldSize / 2 - 1;
+    const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
+    const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount) / scale;
 
     return <>
         <RoundedPolyLine
@@ -59,12 +66,12 @@ export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, (
             />;
         })}
     </>;
-}) as ConstraintPropsGenericFc;
+}) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType>) => ReactElement;
 
-export const InfiniteRingsBorderLinesConstraint = <CellType, ExType, ProcessedExType>()
-    : Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+export const InfiniteRingsBorderLinesConstraint = <CellType, ExType, ProcessedExType>(visibleRingsCount: number)
+    : Constraint<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType> => ({
     name: "region borders",
     cells: [],
     component: InfiniteRingsBorderLines,
-    props: undefined,
+    props: {visibleRingsCount},
 });
