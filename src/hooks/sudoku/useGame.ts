@@ -192,6 +192,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                     multiPlayer,
                     state: processedGameState,
                     onStateChange: () => console.error("Unexpected state change inside of the messages loop!"),
+                    isReadonlyContext: readOnly,
                 },
                 clientId
             );
@@ -203,7 +204,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
         }
 
         return state;
-    }, [puzzle, cellsIndex, cellSize, cellSizeForSidePanel, calculateProcessedGameState]);
+    }, [puzzle, cellsIndex, cellSize, cellSizeForSidePanel, calculateProcessedGameState, readOnly]);
 
     const multiPlayer = useMultiPlayer(
         `puzzle:${saveStateKey}`,
@@ -275,6 +276,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                             ...state,
                         },
                         onStateChange: () => {},
+                        isReadonlyContext: readOnly,
                     };
 
                     const asAction = actionOrCallback as GameStateAction<any, CellType, ExType, ProcessedExType>;
@@ -315,7 +317,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                 return state;
             });
         },
-        [puzzle, cellsIndex, setGameState, mergeMyGameState, calculateProcessedGameState, processedGameStateExtension, cellSize, cellSizeForSidePanel, multiPlayer]
+        [puzzle, cellsIndex, setGameState, mergeMyGameState, calculateProcessedGameState, processedGameStateExtension, cellSize, cellSizeForSidePanel, multiPlayer, readOnly]
     );
 
     const context: PuzzleContext<CellType, ExType, ProcessedExType> = useMemo(
@@ -328,8 +330,9 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
             cellSizeForSidePanel,
             multiPlayer,
             onStateChange: mergeGameState,
+            isReadonlyContext: readOnly,
         }),
-        [puzzle, cellsIndex, cellsIndexForState, processedGameState, cellSize, cellSizeForSidePanel, multiPlayer, mergeGameState]
+        [puzzle, cellsIndex, cellsIndexForState, processedGameState, cellSize, cellSizeForSidePanel, multiPlayer, mergeGameState, readOnly]
     );
 
     useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);

@@ -18,6 +18,7 @@ export interface PuzzleContext<CellType, ExType = {}, ProcessedExType = {}> {
     cellSize: number;
     cellSizeForSidePanel: number;
     multiPlayer: UseMultiPlayerResult;
+    isReadonlyContext: boolean;
 }
 
 export interface PuzzleContextProps<CellType, ExType = {}, ProcessedExType = {}> {

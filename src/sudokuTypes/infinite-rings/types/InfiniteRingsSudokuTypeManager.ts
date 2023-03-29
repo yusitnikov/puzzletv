@@ -18,6 +18,14 @@ import {isShowingAllInfiniteRings} from "./InfiniteRingsLayout";
 import {InfiniteRingControls} from "../components/InfiniteRingControls";
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
 
+/*
+ * TODO:
+ * - make the white dots white again!
+ * - remove the "all rings" mode for 1-9 puzzles
+ * - support killer cages
+ * - highlight seen cells
+ */
+
 const coordsRingToPlain = (fieldSize: number, ring: number, index: number) => [ring, fieldSize / 2 - 1, fieldSize / 2, fieldSize - 1 - ring][index];
 const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
     const quadSize = fieldSize / 2;

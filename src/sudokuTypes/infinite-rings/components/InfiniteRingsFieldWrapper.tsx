@@ -27,6 +27,7 @@ export const InfiniteRingsFieldWrapper = <
             },
             onStateChange,
             cellSize,
+            isReadonlyContext,
         },
         children,
     }: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
@@ -76,7 +77,7 @@ export const InfiniteRingsFieldWrapper = <
         }}>
             {children}
 
-            {isShowingAllInfiniteRings && <div style={{
+            {isShowingAllInfiniteRings && !isReadonlyContext && <div style={{
                 position: "absolute",
                 inset: 0,
                 opacity: 0.15,
@@ -128,33 +129,35 @@ export const InfiniteRingsFieldWrapper = <
                 fontSize: buttonFontSize,
                 lineHeight: `${buttonFontSize}px`,
             }}>
-                <StyledButton
-                    style={{
-                        position: "absolute",
-                        left: "5%",
-                        top: "30%",
-                        width: "40%",
-                        height: "40%",
-                    }}
-                    onClick={() => setRingOffset(ringOffset + 1)}
-                    title={translate("zoom in")}
-                >
-                    +
-                </StyledButton>
+                {!isReadonlyContext && <>
+                    <StyledButton
+                        style={{
+                            position: "absolute",
+                            left: "5%",
+                            top: "30%",
+                            width: "40%",
+                            height: "40%",
+                        }}
+                        onClick={() => setRingOffset(ringOffset + 1)}
+                        title={translate("zoom in")}
+                    >
+                        +
+                    </StyledButton>
 
-                <StyledButton
-                    style={{
-                        position: "absolute",
-                        left: "55%",
-                        top: "30%",
-                        width: "40%",
-                        height: "40%",
-                    }}
-                    onClick={() => setRingOffset(ringOffset - 1)}
-                    title={translate("zoom out")}
-                >
-                    -
-                </StyledButton>
+                    <StyledButton
+                        style={{
+                            position: "absolute",
+                            left: "55%",
+                            top: "30%",
+                            width: "40%",
+                            height: "40%",
+                        }}
+                        onClick={() => setRingOffset(ringOffset - 1)}
+                        title={translate("zoom out")}
+                    >
+                        -
+                    </StyledButton>
+                </>}
             </div>
         </div>
     </div>;
