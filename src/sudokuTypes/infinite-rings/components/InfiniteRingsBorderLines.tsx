@@ -5,7 +5,6 @@ import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
-import {indexes} from "../../../utils/indexes";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 
 export const getInfiniteLoopRegionBorderWidth = (cellSize: number, visibleRingsCount: number) =>
@@ -48,23 +47,6 @@ export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <CellTy
             stroke={blackColor}
             strokeWidth={borderWidth}
         />
-
-        {isShowingAllInfiniteRings && indexes(ringsCount, true).map((ring) => {
-            const scaleCoeff = Math.pow(2, ring);
-
-            return <RoundedPolyLine
-                key={`ring-${ring}`}
-                points={[
-                    {top: 2 + 2 / scaleCoeff, left: 2 + 2 / scaleCoeff},
-                    {top: 2 + 2 / scaleCoeff, left: 2 - 2 / scaleCoeff},
-                    {top: 2 - 2 / scaleCoeff, left: 2 - 2 / scaleCoeff},
-                    {top: 2 - 2 / scaleCoeff, left: 2 + 2 / scaleCoeff},
-                    {top: 2 + 2 / scaleCoeff, left: 2 + 2 / scaleCoeff},
-                ]}
-                stroke={blackColor}
-                strokeWidth={borderWidth}
-            />;
-        })}
     </>;
 }) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType>) => ReactElement;
 
