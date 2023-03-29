@@ -22,7 +22,6 @@ import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
  * TODO:
  * - make the white dots white again!
  * - support killer cages
- * - highlight seen cells
  */
 
 const coordsRingToPlain = (fieldSize: number, ring: number, index: number) => [ring, fieldSize / 2 - 1, fieldSize / 2, fieldSize - 1 - ring][index];

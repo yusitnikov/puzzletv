@@ -276,6 +276,9 @@ export const translationsExactType = {
     "Nickname": {
         [LanguageCode.ru]: "Никнейм",
     },
+    "Highlight cells seen by selection": {
+        [LanguageCode.ru]: "Подсвечивать клетки, видимые выделенными клетками",
+    },
     "Share the link to the game": {
         [LanguageCode.ru]: "Поделиться ссылкой на эту игру",
     },

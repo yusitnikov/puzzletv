@@ -42,6 +42,7 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCoordsTransformation";
 import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -77,7 +78,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const {
         getCellTypeProps,
-        getCellSelectionType,
+        getCellSelectionType = state.highlightSeenCells ? getDefaultCellSelectionType : undefined,
         disableConflictChecker,
         disableArrowLetterShortcuts,
     } = typeManager;
@@ -278,8 +279,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
             color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
                 ? CellSelectionColor.mainCurrent
                 : CellSelectionColor.mainPrevious;
-        } else if (getCellSelectionType) {
-            const customSelection = getCellSelectionType(cellPosition, context);
+        } else {
+            const customSelection = getCellSelectionType?.(cellPosition, context);
             if (customSelection) {
                 color = customSelection.color;
                 width = customSelection.strokeWidth;

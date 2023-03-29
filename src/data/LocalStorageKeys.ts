@@ -4,4 +4,5 @@ export enum LocalStorageKeys {
     autoCheckOnFinish = "autoCheckOnFinish",
     backgroundOpacity = "backgroundOpacity",
     nickname = "nickname",
+    highlightSeenCells = "highlightSeenCells",
 }

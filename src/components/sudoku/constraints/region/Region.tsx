@@ -19,6 +19,8 @@ import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
 import {ProcessedGameStateEx} from "../../../../types/sudoku/GameState";
 
+export const regionTag = "region";
+
 export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps) => {
     const points = useMemo(() => getRegionBorders(cells, true), [cells]);
 
@@ -60,6 +62,7 @@ export const RegionConstraint = <CellType, ExType, ProcessedExType>(
 
     return {
         name,
+        tags: [regionTag],
         cells,
         component: showBorders ? Region : undefined,
         props: undefined,

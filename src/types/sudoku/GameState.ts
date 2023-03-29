@@ -83,6 +83,7 @@ export interface GameState<CellType> {
     autoCheckOnFinish: boolean;
     backgroundOpacity: number;
     nickname: string;
+    highlightSeenCells: boolean;
 }
 
 export interface GameStateEx<CellType, ExType> extends GameState<CellType> {
@@ -227,6 +228,7 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
         backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
         nickname: loadStringFromLocalStorage(LocalStorageKeys.nickname, ""),
+        highlightSeenCells: loadBoolFromLocalStorage(LocalStorageKeys.highlightSeenCells, false),
 
         extension: {
             ...initialGameStateExtension,

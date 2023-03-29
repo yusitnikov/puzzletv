@@ -39,7 +39,7 @@ export const SettingsContent = <CellType, ExType, ProcessedExType>(
                 resultChecker,
                 forceAutoCheckOnFinish,
                 forceEnableConflictChecker,
-                typeManager: {disableConflictChecker, settingsComponents = []},
+                typeManager: {disableConflictChecker, settingsComponents = [], getCellSelectionType},
             },
             state: {
                 enableConflictChecker,
@@ -47,6 +47,7 @@ export const SettingsContent = <CellType, ExType, ProcessedExType>(
                 autoCheckOnFinish,
                 backgroundOpacity,
                 nickname,
+                highlightSeenCells,
             },
             onStateChange,
             multiPlayer: {isEnabled},
@@ -91,6 +92,11 @@ export const SettingsContent = <CellType, ExType, ProcessedExType>(
     const handleChangeNickname = (value: string) => {
         onStateChange({nickname: value});
         saveStringToLocalStorage(LocalStorageKeys.nickname, value);
+    };
+
+    const handleChangeHighlightSeenCells = (value: boolean) => {
+        onStateChange({highlightSeenCells: value});
+        saveBoolToLocalStorage(LocalStorageKeys.highlightSeenCells, value);
     };
 
     return <div>
@@ -246,6 +252,17 @@ export const SettingsContent = <CellType, ExType, ProcessedExType>(
                 onChange={({x}) => handleChangeBackgroundOpacity(x)}
             />
         </SettingsItem>
+
+        {!getCellSelectionType && <SettingsItem>
+            {translate("Highlight cells seen by selection")}:
+
+            <SettingsCheckbox
+                type={"checkbox"}
+                cellSize={cellSize}
+                checked={highlightSeenCells}
+                onChange={(ev) => handleChangeHighlightSeenCells(ev.target.checked)}
+            />
+        </SettingsItem>}
 
         {settingsComponents.map((Component, index) => <Component key={`custom-${index}`} {...props}/>)}
     </div>;

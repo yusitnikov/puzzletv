@@ -6,10 +6,10 @@ import {GameStateEx, PartialGameStateEx, ProcessedGameStateEx} from "./GameState
 import {ComponentType, ReactNode} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
-import {PuzzleDefinition} from "./PuzzleDefinition";
-import {CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
+import {getIsSamePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
+import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {RectWithTransformation} from "../layout/Rect";
-import {Constraint} from "./Constraint";
+import {Constraint, getAllPuzzleConstraints} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
 import {CellWriteMode, CellWriteModeInfo} from "./CellWriteMode";
@@ -17,6 +17,7 @@ import {GameStateAction, GameStateActionType} from "./GameStateAction";
 import {useTranslate} from "../../hooks/useTranslate";
 import {KeyInfo} from "./KeyInfo";
 import {SettingsContentProps} from "../../components/sudoku/controls/settings/SettingsContent";
+import {regionTag} from "../../components/sudoku/constraints/region/Region";
 
 export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> {
     areSameCellData(
@@ -344,4 +345,32 @@ export const defaultGetDefaultNumberByDigits = (digits: number[]) => {
     }
 
     return num;
+};
+
+export const getDefaultCellSelectionType: SudokuTypeManager<any, any, any>["getCellSelectionType"] = (
+    cell,
+    context,
+) => {
+    const {puzzle, state: {selectedCells}} = context;
+
+    if (selectedCells.size === 0) {
+        return undefined;
+    }
+
+    const isSamePosition = getIsSamePuzzlePosition(puzzle);
+    const doesRegionContainCell = (cells: Position[], cell: Position) =>
+        cells.some((cell2) => isSamePosition(cell2, cell));
+    const seenRegions = getAllPuzzleConstraints(context)
+        .filter(({tags}) => tags?.includes(regionTag))
+        .map(({cells}) => cells)
+        .filter((region) => doesRegionContainCell(region, cell));
+    const isSeen = selectedCells.items.every((selectedCell) => seenRegions.some(
+        (region) => doesRegionContainCell(region, selectedCell)
+    ));
+    return isSeen
+        ? {
+            color: CellSelectionColor.secondary,
+            strokeWidth: 1,
+        }
+        : undefined;
 };
