@@ -21,7 +21,6 @@ import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
 /*
  * TODO:
  * - make the white dots white again!
- * - remove the "all rings" mode for 1-9 puzzles
  * - support killer cages
  * - highlight seen cells
  */
@@ -91,7 +90,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 isVisible: (top === left || top + left === fieldSize - 1 || isCenterTop || isCenterLeft) && !(isCenterTop && isCenterLeft),
                 isVisibleForState: (context) => {
                     const {state: {processedExtension: {ringOffset}}} = context;
-                    return isShowingAllInfiniteRings(context) || loop(ring + 0.5 - ringOffset, ringsCount) < visibleRingsCountArg;
+                    return isShowingAllInfiniteRings(context, visibleRingsCountArg) || loop(ring + 0.5 - ringOffset, ringsCount) < visibleRingsCountArg;
                 },
             };
         },
@@ -103,7 +102,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
 
             const processRightArrow = (position: Position): {cell: Position, state?: PartialGameStateEx<CellType, ExType & InfiniteRingsGameState>} => {
                 const ringsCount = fieldSize / 2 - 1;
-                const visibleRingsCount = isShowingAllInfiniteRings(context) ? ringsCount : visibleRingsCountArg;
+                const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg) ? ringsCount : visibleRingsCountArg;
 
                 let {ring, top, left} = coordsPlainToRing(fieldSize, position);
 
@@ -168,7 +167,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 state: {processedExtension: {ringOffset}},
             } = context;
             const ringsCount = fieldSize / 2 - 1;
-            const visibleRingsCount = isShowingAllInfiniteRings(context) ? ringsCount : visibleRingsCountArg;
+            const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg) ? ringsCount : visibleRingsCountArg;
             const loopedRingOffset = loop(ringOffset, ringsCount);
             const unscaleCoeff = Math.pow(2, ringsCount);
             const scaleCoeff = Math.pow(2, loopedRingOffset) / unscaleCoeff;
@@ -333,6 +332,6 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
             });
         },
         items: [InfiniteRingsBorderLinesConstraint(visibleRingsCountArg)],
-        settingsComponents: [InfiniteRingsSettings],
+        settingsComponents: [InfiniteRingsSettings(visibleRingsCountArg)],
     };
 };

@@ -1,16 +1,20 @@
 import {SettingsContentProps} from "../../../components/sudoku/controls/settings/SettingsContent";
 import {useTranslate} from "../../../hooks/useTranslate";
-import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
+import {isShowingAllInfiniteRingsAllowed, useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {SettingsItem} from "../../../components/sudoku/controls/settings/SettingsItem";
 import {SettingsCheckbox} from "../../../components/sudoku/controls/settings/SettingsCheckbox";
 
-export const InfiniteRingsSettings = <CellType, ExType, ProcessedExType>(
+export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => function InfiniteRingsSettingsComponent<CellType, ExType, ProcessedExType>(
     {context, cellSize}: SettingsContentProps<CellType, ExType, ProcessedExType>
-) => {
+) {
     const translate = useTranslate();
 
-    const [isShowingAllInfiniteRings, setIsShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context);
+    const [isShowingAllInfiniteRings, setIsShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
+
+    if (!isShowingAllInfiniteRingsAllowed(visibleRingsCountArg)) {
+        return null;
+    }
 
     return <SettingsItem>
         {translate({

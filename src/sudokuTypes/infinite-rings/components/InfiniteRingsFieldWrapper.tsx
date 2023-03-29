@@ -33,7 +33,7 @@ export const InfiniteRingsFieldWrapper = <
 
     const translate = useTranslate();
 
-    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context);
+    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
     const visibleRingsCount = isShowingAllInfiniteRings ? fieldSize / 2 - 1 : visibleRingsCountArg;
 
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);

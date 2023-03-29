@@ -24,7 +24,7 @@ export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <CellTy
         puzzle: {fieldSize: {rowsCount: fieldSize}},
         cellSize,
     } = context;
-    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context);
+    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
     const scale = useTransformScale();
     const ringsCount = fieldSize / 2 - 1;
     const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
