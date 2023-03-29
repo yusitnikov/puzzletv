@@ -4,6 +4,7 @@ import {isSamePosition, Position} from "../../../types/layout/Position";
 import {CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {getAllPuzzleConstraints} from "../../../types/sudoku/Constraint";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export enum TesseractSelectionType {
     Always = "always",
@@ -26,7 +27,10 @@ export const useTesseractSelectionType = (): [TesseractSelectionType, (type: Tes
     return [type, handleSetType];
 };
 
-export const getTesseractCellSelectionType: SudokuTypeManager<number>["getCellSelectionType"] = (cell, context) => {
+export const getTesseractCellSelectionType: SudokuTypeManager<any, any, any>["getCellSelectionType"] = <CellType, ExType, ProcessedExType>(
+    cell: Position,
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+) => {
     const {state: {selectedCells}} = context;
 
     if (selectedCells.size !== 1) {

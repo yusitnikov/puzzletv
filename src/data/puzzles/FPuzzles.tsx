@@ -62,8 +62,6 @@ import {
 } from "../../components/sudoku/constraints/fillable-calculator-digit/FillableCalculatorDigit";
 import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
-import {TesseractSettings} from "../../sudokuTypes/tesseract/components/TesseractSettings";
-import {getTesseractCellSelectionType} from "../../sudokuTypes/tesseract/types/TesseractSelection";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
@@ -73,6 +71,7 @@ import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types
 import {FPuzzlesGridCell, FPuzzlesLittleKillerSum, FPuzzlesPuzzle, FPuzzlesText} from "fpuzzles-data";
 import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager";
 import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
+import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -152,18 +151,12 @@ export const loadByFPuzzlesObject = (
         ),
     };
 
-    const baseTypeManager = typesMap[type] ?? regularTypeManager;
-    const typeManager = {...baseTypeManager};
+    let typeManager = typesMap[type] ?? regularTypeManager;
     if (tesseract) {
-        typeManager.getCellSelectionType = (...args) =>
-            getTesseractCellSelectionType?.(...args) ?? baseTypeManager.getCellSelectionType?.(...args);
-        typeManager.settingsComponents = [
-            ...(typeManager.settingsComponents ?? []),
-            TesseractSettings,
-        ];
+        typeManager = TesseractSudokuTypeManager(typeManager);
     }
 
-    return loadByFPuzzlesObjectAndTypeManager(puzzleJson, slug, importOptions, typeManager);
+    return loadByFPuzzlesObjectAndTypeManager(puzzleJson, slug, importOptions, {...typeManager});
 };
 
 export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedExType>(
