@@ -36,15 +36,17 @@ export const FieldRect = <CellType, ExType, ProcessedExType>(
 };
 
 export const getFieldRectTransform = <CellType, ExType, ProcessedExType>(
-    {puzzle, state, cellSize}: PuzzleContext<CellType, ExType, ProcessedExType>,
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     {top, left, transformCoords: transformCoordsArg}: Omit<RectWithTransformation, keyof Size>,
 ): TransformedRect => {
     const {
-        typeManager: {
-            transformCoords: typeManagerTransformCoords,
-            isOddTransformCoords,
+        puzzle: {
+            typeManager: {
+                transformCoords: typeManagerTransformCoords,
+                isOddTransformCoords,
+            },
         },
-    } = puzzle;
+    } = context;
 
     if (isOddTransformCoords) {
         return {
@@ -56,7 +58,7 @@ export const getFieldRectTransform = <CellType, ExType, ProcessedExType>(
 
     return transformRect(
         {top, left, width: 1, height: 1},
-        position => (transformCoordsArg ?? typeManagerTransformCoords)?.(position, puzzle, state, cellSize) ?? position,
+        position => (transformCoordsArg ?? typeManagerTransformCoords)?.(position, context) ?? position,
         0.1
     );
 };

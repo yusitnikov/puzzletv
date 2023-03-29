@@ -147,7 +147,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         return {cell};
     },
 
-    transformCoords({top, left}, {fieldSize}) {
+    transformCoords({top, left}, {puzzle: {fieldSize}}) {
         const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         const coeff = Math.sqrt(0.75);

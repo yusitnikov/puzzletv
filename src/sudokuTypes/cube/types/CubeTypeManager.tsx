@@ -35,7 +35,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         };
     },
 
-    transformCoords({top, left}, {fieldSize: {fieldSize}}) {
+    transformCoords({top, left}, {puzzle: {fieldSize: {fieldSize}}}) {
         const realFieldSize = fieldSize / 2;
 
         if (top < realFieldSize) {

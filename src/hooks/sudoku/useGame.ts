@@ -181,18 +181,21 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                 false
             );
 
+            const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
+                puzzle,
+                cellsIndex,
+                cellSize,
+                cellSizeForSidePanel,
+                multiPlayer,
+                state: processedGameState,
+                onStateChange: () => console.error("Unexpected state change inside of the messages loop!"),
+                isReadonlyContext: readOnly,
+            };
             const callback = actionType.callback(
                 params,
                 {
-                    puzzle,
-                    cellsIndex,
-                    cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState, cellSize),
-                    cellSize,
-                    cellSizeForSidePanel,
-                    multiPlayer,
-                    state: processedGameState,
-                    onStateChange: () => console.error("Unexpected state change inside of the messages loop!"),
-                    isReadonlyContext: readOnly,
+                    ...contextNoIndex,
+                    cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, contextNoIndex),
                 },
                 clientId
             );
@@ -245,11 +248,6 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
         [calculateProcessedGameState, multiPlayer, gameState, processedGameStateExtension]
     );
 
-    const cellsIndexForState = useMemo(
-        () => new SudokuCellsIndexForState(cellsIndex, processedGameState, cellSize),
-        [cellsIndex, processedGameState, cellSize]
-    );
-
     const mergeGameState = useCallback(
         (
             actionsOrCallbacks: GameStateActionOrCallback<any, CellType, ExType, ProcessedExType>
@@ -264,10 +262,9 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
                 for (const actionOrCallback of actionsOrCallbacks) {
                     const processedGameState = calculateProcessedGameState(multiPlayer, state, processedGameStateExtension);
-                    const context: PuzzleContext<CellType, ExType, ProcessedExType> = {
+                    const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
                         puzzle,
                         cellsIndex,
-                        cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, processedGameState, cellSize),
                         cellSize,
                         cellSizeForSidePanel,
                         multiPlayer,
@@ -277,6 +274,10 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                         },
                         onStateChange: () => {},
                         isReadonlyContext: readOnly,
+                    };
+                    const context = {
+                        ...contextNoIndex,
+                        cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, contextNoIndex),
                     };
 
                     const asAction = actionOrCallback as GameStateAction<any, CellType, ExType, ProcessedExType>;
@@ -321,18 +322,23 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
     );
 
     const context: PuzzleContext<CellType, ExType, ProcessedExType> = useMemo(
-        () => ({
-            puzzle,
-            cellsIndex,
-            cellsIndexForState,
-            state: processedGameState,
-            cellSize,
-            cellSizeForSidePanel,
-            multiPlayer,
-            onStateChange: mergeGameState,
-            isReadonlyContext: readOnly,
-        }),
-        [puzzle, cellsIndex, cellsIndexForState, processedGameState, cellSize, cellSizeForSidePanel, multiPlayer, mergeGameState, readOnly]
+        () => {
+            const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
+                puzzle,
+                cellsIndex,
+                state: processedGameState,
+                cellSize,
+                cellSizeForSidePanel,
+                multiPlayer,
+                onStateChange: mergeGameState,
+                isReadonlyContext: readOnly,
+            };
+            return {
+                ...contextNoIndex,
+                cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, contextNoIndex),
+            }
+        },
+        [puzzle, cellsIndex, processedGameState, cellSize, cellSizeForSidePanel, multiPlayer, mergeGameState, readOnly]
     );
 
     useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);

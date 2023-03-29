@@ -6,11 +6,11 @@ import {SettingsItem} from "../../../components/sudoku/controls/settings/Setting
 import {SettingsCheckbox} from "../../../components/sudoku/controls/settings/SettingsCheckbox";
 
 export const InfiniteRingsSettings = <CellType, ExType, ProcessedExType>(
-    {cellSize}: SettingsContentProps<CellType, ExType, ProcessedExType>
+    {context, cellSize}: SettingsContentProps<CellType, ExType, ProcessedExType>
 ) => {
     const translate = useTranslate();
 
-    const [isShowingAllInfiniteRings, setIsShowingAllInfiniteRings] = useIsShowingAllInfiniteRings();
+    const [isShowingAllInfiniteRings, setIsShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context);
 
     return <SettingsItem>
         {translate({

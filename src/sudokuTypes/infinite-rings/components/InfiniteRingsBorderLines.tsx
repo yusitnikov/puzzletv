@@ -16,14 +16,15 @@ interface InfiniteRingsBorderLinesProps {
 
 export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <CellType, ExType, ProcessedExType>(
     {
-        context: {
-            puzzle: {fieldSize: {rowsCount: fieldSize}},
-            cellSize,
-        },
+        context,
         props: {visibleRingsCount: visibleRingsCountArg},
     }: ConstraintProps<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType>
 ) => {
-    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings();
+    const {
+        puzzle: {fieldSize: {rowsCount: fieldSize}},
+        cellSize,
+    } = context;
+    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context);
     const scale = useTransformScale();
     const ringsCount = fieldSize / 2 - 1;
     const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;

@@ -121,7 +121,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): {
         isVisible?: boolean;
-        isVisibleForState?: (state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => boolean;
+        isVisibleForState?: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => boolean;
         isSelectable?: boolean;
         forceCellWriteMode?: CellWriteModeInfo<CellType, ExType, ProcessedExType>;
     };
@@ -136,9 +136,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     transformCoords?(
         coords: Position,
-        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
-        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
-        cellSize: number,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
     ): Position;
 
     // true if transformCoords() doesn't distribute the coords evenly (if it has distortion)

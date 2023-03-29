@@ -17,14 +17,14 @@ export const FieldCellBoundingBoxArea = ({context, cellPosition, children}: Fiel
             return undefined;
         }
 
-        const {puzzle, cellsIndex, state, cellSize} = context;
+        const {puzzle, cellsIndex} = context;
         const {typeManager: {transformCoords = coords => coords}} = puzzle;
         const {areCustomBounds, bounds: {borders}} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
 
         return areCustomBounds
             ? transformRect(
                 getRegionBoundingBox(borders.flat()),
-                position => transformCoords(position, puzzle, state, cellSize)
+                position => transformCoords(position, context)
             )
             : undefined;
     }, [context, cellPosition]);

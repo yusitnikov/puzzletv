@@ -89,21 +89,21 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
 
             return {
                 isVisible: (top === left || top + left === fieldSize - 1 || isCenterTop || isCenterLeft) && !(isCenterTop && isCenterLeft),
-                isVisibleForState: ({processedExtension: {ringOffset}}) => isShowingAllInfiniteRings() || loop(ring + 0.5 - ringOffset, ringsCount) < visibleRingsCountArg,
+                isVisibleForState: (context) => {
+                    const {state: {processedExtension: {ringOffset}}} = context;
+                    return isShowingAllInfiniteRings(context) || loop(ring + 0.5 - ringOffset, ringsCount) < visibleRingsCountArg;
+                },
             };
         },
-        processArrowDirection(
-            {top, left},
-            xDirection,
-            yDirection,
-            {
+        processArrowDirection({top, left}, xDirection, yDirection, context) {
+            const {
                 puzzle: {fieldSize: {rowsCount: fieldSize}},
                 state: {extension: {ringOffset}},
-            },
-        ) {
+            } = context;
+
             const processRightArrow = (position: Position): {cell: Position, state?: PartialGameStateEx<CellType, ExType & InfiniteRingsGameState>} => {
                 const ringsCount = fieldSize / 2 - 1;
-                const visibleRingsCount = isShowingAllInfiniteRings() ? ringsCount : visibleRingsCountArg;
+                const visibleRingsCount = isShowingAllInfiniteRings(context) ? ringsCount : visibleRingsCountArg;
 
                 let {ring, top, left} = coordsPlainToRing(fieldSize, position);
 
@@ -162,9 +162,13 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 }
             }
         },
-        transformCoords({top, left}, {fieldSize: {rowsCount: fieldSize}}, {processedExtension: {ringOffset}}): Position {
+        transformCoords({top, left}, context): Position {
+            const {
+                puzzle: {fieldSize: {rowsCount: fieldSize}},
+                state: {processedExtension: {ringOffset}},
+            } = context;
             const ringsCount = fieldSize / 2 - 1;
-            const visibleRingsCount = isShowingAllInfiniteRings() ? ringsCount : visibleRingsCountArg;
+            const visibleRingsCount = isShowingAllInfiniteRings(context) ? ringsCount : visibleRingsCountArg;
             const loopedRingOffset = loop(ringOffset, ringsCount);
             const unscaleCoeff = Math.pow(2, ringsCount);
             const scaleCoeff = Math.pow(2, loopedRingOffset) / unscaleCoeff;

@@ -17,24 +17,23 @@ export const InfiniteRingsFieldWrapper = <
     ExType extends InfiniteRingsGameState,
     ProcessedExType extends InfiniteRingsProcessedGameState
 >(visibleRingsCountArg = 2) => function InfiniteRingsFieldWrapperComponent(
-    {
-        context: {
-            puzzle: {fieldSize: {rowsCount: fieldSize}},
-            state: {
-                selectedCells,
-                extension: {ringOffset},
-                isShowingSettings,
-            },
-            onStateChange,
-            cellSize,
-            isReadonlyContext,
-        },
-        children,
-    }: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
+    {context, children}: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
 ) {
+    const {
+        puzzle: {fieldSize: {rowsCount: fieldSize}},
+        state: {
+            selectedCells,
+            extension: {ringOffset},
+            isShowingSettings,
+        },
+        onStateChange,
+        cellSize,
+        isReadonlyContext,
+    } = context;
+
     const translate = useTranslate();
 
-    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings();
+    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context);
     const visibleRingsCount = isShowingAllInfiniteRings ? fieldSize / 2 - 1 : visibleRingsCountArg;
 
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);

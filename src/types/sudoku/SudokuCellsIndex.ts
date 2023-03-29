@@ -21,6 +21,7 @@ import {incrementArrayItemByIndex} from "../../utils/array";
 import {CellColorValue} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
 import {PrioritizedQueue} from "../struct/PrioritizedQueue";
+import {PuzzleContext} from "./PuzzleContext";
 
 export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     public readonly allCells: CellInfo<CellType, ExType, ProcessedExType>[][];
@@ -64,9 +65,9 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
             return {
                 position: {top, left},
                 bounds,
-                getTransformedBounds: (state, cellSize) => {
+                getTransformedBounds: (context) => {
                     const transformCoordsBound = (point: Position) => isOddTransformCoords
-                        ? transformCoords(point, puzzle, state, cellSize)
+                        ? transformCoords(point, context)
                         : point;
 
                     return {
@@ -517,7 +518,8 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
 }
 
 export class SudokuCellsIndexForState<CellType, ExType, ProcessedExType> {
-    private currentFieldState: FieldState<CellType>;
+    private readonly context: PuzzleContext<CellType, ExType, ProcessedExType>;
+    private readonly currentFieldState: FieldState<CellType>;
 
     public readonly getCenterLineSegments = lazy(
         () => this.puzzleIndex.getCenterLineSegments(this.currentFieldState.lines.items)
@@ -530,18 +532,18 @@ export class SudokuCellsIndexForState<CellType, ExType, ProcessedExType> {
         return this.puzzleIndex.allCells.map((row, top) => row.map(
             ({getTransformedBounds, ...cell}, left): CellInfoForState => ({
                 ...cell,
-                transformedBounds: getTransformedBounds(this.state, this.cellSize),
-                isVisible: getCellTypeProps?.({top, left}, puzzle)?.isVisibleForState?.(this.state) !== false,
+                transformedBounds: getTransformedBounds(this.context),
+                isVisible: getCellTypeProps?.({top, left}, puzzle)?.isVisibleForState?.(this.context) !== false,
             })
         ));
     });
 
     constructor(
         private puzzleIndex: SudokuCellsIndex<CellType, ExType, ProcessedExType>,
-        private state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
-        private cellSize: number,
+        contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState">,
     ) {
-        this.currentFieldState = gameStateGetCurrentFieldState(state);
+        this.context = {...contextNoIndex, cellsIndexForState: this};
+        this.currentFieldState = gameStateGetCurrentFieldState(contextNoIndex.state);
     }
 }
 
@@ -567,7 +569,7 @@ export interface SudokuCellBorderSegmentInfo {
 export interface CellInfo<CellType, ExType, ProcessedExType> {
     position: Position;
     bounds: CustomCellBounds;
-    getTransformedBounds: (state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>, cellSize: number) => TransformedCustomCellBounds;
+    getTransformedBounds: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => TransformedCustomCellBounds;
     areCustomBounds: boolean;
     center: Position;
     neighbors: SetInterface<Position>;

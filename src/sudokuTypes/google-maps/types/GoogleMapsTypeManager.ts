@@ -23,10 +23,10 @@ export const GoogleMapsTypeManager = <CellType>(
             {extension: {zoom, center, map, overlay, renderVersion}},
         );
     },
-    transformCoords(coords, puzzle, state, cellSize): Position {
-        coords = baseTypeManager.transformCoords?.(coords, puzzle, state, cellSize) || coords;
+    transformCoords(coords, context): Position {
+        coords = baseTypeManager.transformCoords?.(coords, context) || coords;
 
-        const projection = state.extension.overlay?.getProjection();
+        const projection = context.state.extension.overlay?.getProjection();
         if (!projection) {
             return coords;
         }
