@@ -7,7 +7,7 @@ import {RotatableGameState, RotatableProcessedGameState} from "../types/Rotatabl
 import {ControlsProps} from "../../../components/sudoku/controls/Controls";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ReactElement} from "react";
-import {AnimationSpeedControlButtonByPosition} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
+import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 
 export const RotatableMainControls = <CellType,>(angleDelta: number, showBackButton: boolean, showStickyMode: boolean) => function RotatableMainControlsComponent(
     props: ControlsProps<CellType, RotatableGameState, RotatableProcessedGameState>
@@ -96,7 +96,7 @@ export const RotatableMainControls = <CellType,>(angleDelta: number, showBackBut
         </ControlButton>);
     }
 
-    buttons.push((left) => <AnimationSpeedControlButtonByPosition top={4} left={left} {...props}/>);
+    buttons.push((left) => <AnimationSpeedControlButton top={4} left={left} {...props}/>);
 
     return <>
         {/* eslint-disable-next-line react/jsx-no-undef */}

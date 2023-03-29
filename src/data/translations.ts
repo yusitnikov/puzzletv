@@ -45,6 +45,12 @@ export const translationsExactType = {
     "Stage %1": {
         [LanguageCode.ru]: "Этап %1",
     },
+    "zoom in": {
+        [LanguageCode.ru]: "приблизить",
+    },
+    "zoom out": {
+        [LanguageCode.ru]: "уменьшить",
+    },
     // endregion
     // region App
     "Welcome to Puzzle TV!": {

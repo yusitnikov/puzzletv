@@ -8,6 +8,7 @@ import {InfiniteRingsGameState, InfiniteRingsProcessedGameState} from "../types/
 import {useEventListener} from "../../../hooks/useEventListener";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
+import {useTranslate} from "../../../hooks/useTranslate";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
@@ -30,6 +31,8 @@ export const InfiniteRingsFieldWrapper = <
         children,
     }: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
 ) {
+    const translate = useTranslate();
+
     const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings();
     const visibleRingsCount = isShowingAllInfiniteRings ? fieldSize / 2 - 1 : visibleRingsCountArg;
 
@@ -134,6 +137,7 @@ export const InfiniteRingsFieldWrapper = <
                         height: "40%",
                     }}
                     onClick={() => setRingOffset(ringOffset + 1)}
+                    title={translate("zoom in")}
                 >
                     +
                 </StyledButton>
@@ -147,6 +151,7 @@ export const InfiniteRingsFieldWrapper = <
                         height: "40%",
                     }}
                     onClick={() => setRingOffset(ringOffset - 1)}
+                    title={translate("zoom out")}
                 >
                     -
                 </StyledButton>

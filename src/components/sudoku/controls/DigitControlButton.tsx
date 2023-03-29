@@ -1,5 +1,5 @@
 import {useTranslate} from "../../../hooks/useTranslate";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode, resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useCallback} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {ControlButton} from "./ControlButton";
@@ -7,6 +7,7 @@ import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {enterDigitAction} from "../../../types/sudoku/GameStateAction";
 import {joinListSemantically} from "../../../utils/array";
+import {Position} from "../../../types/layout/Position";
 
 export interface DigitControlButtonProps<CellType, ExType = {}, ProcessedExType = {}> {
     index: number;
@@ -111,4 +112,12 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
             size={contentSize}
         />}
     </ControlButton>;
+};
+
+export const isFreeSpaceForControlButton = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    {top, left}: Position,
+) => {
+    const digitsCount = resolveDigitsCountInCellWriteMode(context);
+    return left >= 3 || digitsCount <= top * 3;
 };

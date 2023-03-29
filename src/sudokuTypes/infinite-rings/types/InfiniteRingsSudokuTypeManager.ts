@@ -11,11 +11,11 @@ import {InfiniteRingsGameState, InfiniteRingsProcessedGameState} from "./Infinit
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
 import {InfiniteRingsFieldWrapper} from "../components/InfiniteRingsFieldWrapper";
-import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {loop} from "../../../utils/math";
 import {InfiniteRingsBorderLinesConstraint} from "../components/InfiniteRingsBorderLines";
 import {isShowingAllInfiniteRings} from "./InfiniteRingsLayout";
+import {InfiniteRingControls} from "../components/InfiniteRingControls";
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
 
 const coordsRingToPlain = (fieldSize: number, ring: number, index: number) => [ring, fieldSize / 2 - 1, fieldSize / 2, fieldSize - 1 - ring][index];
@@ -71,7 +71,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 ringOffset,
             };
         },
-        mainControlsComponent: AnimationSpeedControlButton({top: 2, left: 0}),
+        mainControlsComponent: InfiniteRingControls,
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;

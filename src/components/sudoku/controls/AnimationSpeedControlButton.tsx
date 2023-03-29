@@ -4,18 +4,8 @@ import {ControlsProps} from "./Controls";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 import {Position} from "../../../types/layout/Position";
-import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteMode";
 
-export const AnimationSpeedControlButton = <CellType, ExType extends { animationSpeed: AnimationSpeed }, ProcessedExType>({top, left}: Position) =>
-    function AnimationSpeedControlButtonComponent(props: ControlsProps<CellType, ExType, ProcessedExType>) {
-        const digitsCount = resolveDigitsCountInCellWriteMode(props.context);
-        if (left < 3 && digitsCount > top * 3) {
-            return null;
-        }
-        return <AnimationSpeedControlButtonByPosition top={top} left={left} {...props}/>;
-    };
-
-export const AnimationSpeedControlButtonByPosition = <CellType, ExType extends { animationSpeed: AnimationSpeed }, ProcessedExType>(
+export const AnimationSpeedControlButton = <CellType, ExType extends { animationSpeed: AnimationSpeed }, ProcessedExType>(
     {
         top,
         left,
