@@ -9,8 +9,43 @@ import {useEventListener} from "../../../hooks/useEventListener";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {useTranslate} from "../../../hooks/useTranslate";
+import {indexes} from "../../../utils/indexes";
+import {loop} from "../../../utils/math";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
+
+const StyledCircleButton = styled("button", {
+    shouldForwardProp(propName: PropertyKey) {
+        return !["count", "index", "selected"].includes(propName as string);
+    },
+})(({count, index, selected}: {count: number, index: number, selected: boolean}) => {
+    const size = 100 / count;
+
+    return {
+        position: "absolute",
+        bottom: 0,
+        left: `${index * size}%`,
+        width: `${size}%`,
+        height: `${size}%`,
+        border: "none",
+        outline: "none",
+        background: "transparent",
+        padding: 0,
+        margin: 0,
+        cursor: "pointer",
+        transition: "opacity 0.3s ease",
+        opacity: selected ? 1 : 0.5,
+        "&:hover": {
+            opacity: 1,
+        },
+    };
+});
+const StyledCircle = styled("div")({
+    position: "absolute",
+    inset: "25%",
+    borderRadius: "50%",
+    background: "#fff",
+});
 
 export const InfiniteRingsFieldWrapper = <
     CellType,
@@ -34,7 +69,9 @@ export const InfiniteRingsFieldWrapper = <
     const translate = useTranslate();
 
     const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
-    const visibleRingsCount = isShowingAllInfiniteRings ? fieldSize / 2 - 1 : visibleRingsCountArg;
+    const ringsCount = fieldSize / 2 - 1;
+    const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
+    const loopedRingOffset = loop(ringOffset, ringsCount);
 
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);
 
@@ -133,7 +170,7 @@ export const InfiniteRingsFieldWrapper = <
                         style={{
                             position: "absolute",
                             left: "5%",
-                            top: "30%",
+                            top: `${30 - 50 / ringsCount}%`,
                             width: "40%",
                             height: "40%",
                         }}
@@ -147,7 +184,7 @@ export const InfiniteRingsFieldWrapper = <
                         style={{
                             position: "absolute",
                             left: "55%",
-                            top: "30%",
+                            top: `${30 - 50 / ringsCount}%`,
                             width: "40%",
                             height: "40%",
                         }}
@@ -156,6 +193,16 @@ export const InfiniteRingsFieldWrapper = <
                     >
                         -
                     </StyledButton>
+
+                    {indexes(ringsCount).map((index) => <StyledCircleButton
+                        key={`circle-${index}`}
+                        count={ringsCount}
+                        index={index}
+                        selected={index === loopedRingOffset}
+                        onClick={() => setRingOffset(loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2)}
+                    >
+                        <StyledCircle/>
+                    </StyledCircleButton>)}
                 </>}
             </div>
         </div>
