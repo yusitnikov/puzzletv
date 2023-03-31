@@ -10,6 +10,8 @@ import {
 import {splitMultiLine} from "../../../../utils/lines";
 import {lightGreyColor} from "../../../app/globals";
 
+export const lineTag = "line";
+
 export interface LineProps {
     width?: number;
 }
@@ -45,6 +47,7 @@ export const LineConstraint = <CellType, ExType, ProcessedExType>(
 
     return {
         name: "line",
+        tags: [lineTag],
         cells,
         color,
         props: {width},

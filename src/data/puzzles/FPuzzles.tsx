@@ -15,7 +15,7 @@ import {
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
-import {CellColor, CellColorValue} from "../../types/sudoku/CellColor";
+import {CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {splitArrayIntoChunks} from "../../utils/array";
@@ -65,13 +65,13 @@ import {LatinDigitSudokuTypeManager} from "../../sudokuTypes/latin/types/LatinDi
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
-import {PuzzleLineSet} from "../../types/sudoku/PuzzleLineSet";
 import {SafeCrackerSudokuTypeManager} from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
 import {FPuzzlesGridCell, FPuzzlesLittleKillerSum, FPuzzlesPuzzle, FPuzzlesText} from "fpuzzles-data";
 import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager";
 import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
 import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
+import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -122,6 +122,7 @@ export const loadByFPuzzlesObject = (
     const {
         type = FPuzzlesImportPuzzleType.Regular,
         tesseract,
+        yajilinFog,
         fillableDigitalDisplay,
         safeCrackerCodeLength = 6,
         visibleRingsCount = 2,
@@ -155,6 +156,9 @@ export const loadByFPuzzlesObject = (
     if (tesseract) {
         typeManager = TesseractSudokuTypeManager(typeManager);
     }
+    if (yajilinFog) {
+        typeManager = YajilinFogSudokuTypeManager(typeManager);
+    }
 
     return loadByFPuzzlesObjectAndTypeManager(puzzleJson, slug, importOptions, {...typeManager});
 };
@@ -169,7 +173,6 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         loopX,
         loopY,
         "product-arrow": productArrow,
-        yajilinFog,
         cosmeticsBehindFog,
         allowOverrideColors = false,
     }: Omit<FPuzzlesImportOptions, "load">,
@@ -199,9 +202,6 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         items,
         allowOverridingInitialColors: allowOverrideColors,
     };
-
-    let yajilinFogLineSolution = new PuzzleLineSet(puzzle);
-    const yajilinFogShadeSolution: GivenDigitsMap<CellColor> = {};
 
     if (noSpecialRules && !puzzleJson.solution) {
         puzzle.resultChecker = isValidFinishedPuzzleByConstraints;
@@ -293,16 +293,13 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     },
                     given: undefined,
                     c: (color) => {
-                        if (yajilinFog && color === "#A8A8A8") {
-                            yajilinFogShadeSolution[top] = yajilinFogShadeSolution[top] || {};
-                            yajilinFogShadeSolution[top][left] = CellColor.black;
-                        } else if (typeof color === "string") {
+                        if (typeof color === "string") {
                             initialColors[top] = initialColors[top] || {};
                             initialColors[top][left] = [color];
                         }
                     },
                     cArray: (colors) => {
-                        if (!yajilinFog && Array.isArray(colors)) {
+                        if (Array.isArray(colors) && colors.length) {
                             initialColors[top] = initialColors[top] || {};
                             initialColors[top][left] = colors;
                         }
@@ -611,30 +608,20 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         line: (lineData, {size}) => {
             if (lineData instanceof Array) {
                 for (const {lines, outlineC, width, isNewConstraint, fromConstraint, ...other} of lineData) {
-                    if (yajilinFog && outlineC === "#000000") {
-                        yajilinFogLineSolution = yajilinFogLineSolution.bulkAdd(lines.flatMap(lineStr => {
-                            const line = parsePositionLiterals(lineStr).filter(isVisibleGridCell);
-                            return indexes(line.length - 1).map(i => ({
-                                start: line[i],
-                                end: line[i + 1],
-                            }));
-                        }));
-                    } else {
-                        ObjectParser.empty.parse(other, "f-puzzles line");
+                    ObjectParser.empty.parse(other, "f-puzzles line");
 
-                        items.push(...lines.map((cells) => {
-                            const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
+                    items.push(...lines.map((cells) => {
+                        const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
 
-                            checkForOutsideCells(visibleCells, size);
+                        checkForOutsideCells(visibleCells, size);
 
-                            return LineConstraint<CellType, ExType, ProcessedExType>(
-                                visibleCells,
-                                outlineC,
-                                width === undefined ? undefined : width / 2,
-                                false,
-                            );
-                        }));
-                    }
+                        return LineConstraint<CellType, ExType, ProcessedExType>(
+                            visibleCells,
+                            outlineC,
+                            width === undefined ? undefined : width / 2,
+                            false,
+                        );
+                    }));
                 }
             }
         },
@@ -707,35 +694,8 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
             if (solution instanceof Array) {
                 const solutionGrid = splitArrayIntoChunks(solution, size);
 
-                puzzle.resultChecker = ({puzzle: {initialDigits}, state, cellsIndex}) => {
-                    const {cells, lines} = gameStateGetCurrentFieldState(state, true);
-
-                    if (yajilinFog) {
-                        if (
-                            Object.keys(yajilinFogShadeSolution).length &&
-                            !cells.every((row, top) => row.every(({colors}, left) => {
-                                if (initialColors[top]?.[left]?.length) {
-                                    return true;
-                                }
-
-                                const isActualBlack = colors.size === 1 && colors.first() === CellColor.black;
-                                const isExpectedBlack = !!yajilinFogShadeSolution[top]?.[left];
-                                return isActualBlack === isExpectedBlack;
-                            }))
-                        ) {
-                            return false;
-                        }
-
-                        if (
-                            yajilinFogLineSolution.size &&
-                            !new PuzzleLineSet(
-                                puzzle,
-                                cellsIndex.getCenterLines(lines.items, true)
-                            ).equals(yajilinFogLineSolution)
-                        ) {
-                            return false;
-                        }
-                    }
+                puzzle.resultChecker = ({puzzle: {initialDigits}, state}) => {
+                    const {cells} = gameStateGetCurrentFieldState(state, true);
 
                     return cells.every(
                         (row, top) => row.every(
@@ -762,19 +722,9 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
             puzzleJson.fogofwar,
             puzzleJson.foglight,
             puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),
-            yajilinFog && (yajilinFogLineSolution.size ? yajilinFogLineSolution : true),
-            yajilinFog
-                ? (Object.keys(yajilinFogShadeSolution).length ? yajilinFogShadeSolution : [CellColor.black])
-                : {}
         ));
 
         puzzle.prioritizeSelection = true;
-    }
-
-    if (yajilinFog && puzzleJson.size > 9) {
-        puzzle.digitsCount = 9;
-        puzzle.disableDiagonalBorderLines = true;
-        puzzle.disableDiagonalCenterLines = true;
     }
 
     return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
