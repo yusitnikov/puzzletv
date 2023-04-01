@@ -72,6 +72,7 @@ import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/
 import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
 import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
 import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
+import {HashSet} from "../../types/struct/Set";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -697,15 +698,61 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 puzzle.resultChecker = ({puzzle: {initialDigits}, state}) => {
                     const {cells} = gameStateGetCurrentFieldState(state, true);
 
-                    return cells.every(
-                        (row, top) => row.every(
-                            ({usersDigit}, left) => {
-                                const expected = solutionGrid[top][left] || undefined;
-                                const actual = initialDigits?.[top]?.[left] ?? usersDigit;
-                                return actual === expected;
+                    let areCorrectDigits = true;
+                    let areCorrectColors = true;
+                    const digitToColorMap: Record<number, CellColorValue> = {};
+                    for (const [top, row] of cells.entries()) {
+                        for (const [left, {usersDigit, colors}] of row.entries()) {
+                            const expectedDigit = solutionGrid[top][left] || undefined;
+                            const actualDigit = initialDigits?.[top]?.[left] ?? usersDigit;
+                            if (!expectedDigit || !actualDigit || Number(actualDigit) !== Number(expectedDigit)) {
+                                areCorrectDigits = false;
                             }
-                        )
-                    );
+
+                            if (!expectedDigit || colors.size > 1) {
+                                areCorrectColors = false;
+                            } else {
+                                const expectedColor = digitToColorMap[expectedDigit];
+                                const actualColor = colors.first() ?? "";
+                                if (!expectedColor) {
+                                    digitToColorMap[expectedDigit] = actualColor;
+                                } else if (actualColor !== expectedColor) {
+                                    areCorrectColors = false;
+                                }
+                            }
+
+                            if (!areCorrectDigits && !areCorrectColors) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (areCorrectDigits) {
+                        return true;
+                    }
+
+                    if (areCorrectColors) {
+                        const allColors = Object.values(digitToColorMap);
+                        if (new HashSet(allColors).size === allColors.length) {
+                            return {
+                                isCorrectResult: true,
+                                resultPhrase: {
+                                    [LanguageCode.en]: [
+                                        "Congratulations, you solved the puzzle!",
+                                        "No-one cares about the digits.",
+                                        "Fully-colored grid is just enough.",
+                                    ].join("\n"),
+                                    [LanguageCode.ru]: [
+                                        "Поздравляю, Вы решили судоку!",
+                                        "Никого не интересуют цифры.",
+                                        "Полностью разукрашенного поля вполне достаточно.",
+                                    ].join("\n"),
+                                },
+                            };
+                        }
+                    }
+
+                    return false;
                 };
             }
         },
