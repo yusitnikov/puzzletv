@@ -7,6 +7,11 @@ export enum AnimationSpeed {
     slow = 3000,
 }
 
+export interface AnimatableState {
+    animationSpeed: AnimationSpeed;
+    isAnimating: boolean;
+}
+
 export const animationSpeedToString = (speed: AnimationSpeed): Translatable => {
     switch (speed) {
         case AnimationSpeed.regular:
@@ -25,4 +30,4 @@ export const animationSpeedToString = (speed: AnimationSpeed): Translatable => {
                 [LanguageCode.ru]: "медленная",
             };
     }
-}
+};

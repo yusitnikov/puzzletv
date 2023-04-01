@@ -4,7 +4,11 @@ import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {PropsWithChildren} from "react";
 import {blackColor} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
-import {InfiniteRingsGameState, InfiniteRingsProcessedGameState} from "../types/InfiniteRingsGameState";
+import {
+    InfiniteRingsGameState,
+    InfiniteRingsProcessedGameState,
+    setInfiniteRingOffset
+} from "../types/InfiniteRingsGameState";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
@@ -57,11 +61,9 @@ export const InfiniteRingsFieldWrapper = <
     const {
         puzzle: {fieldSize: {rowsCount: fieldSize}},
         state: {
-            selectedCells,
             extension: {ringOffset},
             isShowingSettings,
         },
-        onStateChange,
         cellSize,
         isReadonlyContext,
     } = context;
@@ -77,11 +79,6 @@ export const InfiniteRingsFieldWrapper = <
 
     const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount);
 
-    const setRingOffset = (ringOffset: number) => onStateChange({
-        extension: {ringOffset} as Partial<ExType>,
-        selectedCells: selectedCells.clear(),
-    });
-
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
         if (isShowingSettings) {
             return;
@@ -90,12 +87,12 @@ export const InfiniteRingsFieldWrapper = <
         switch ((ev.shiftKey ? "Shift+" : "") + ev.code) {
             case "NumpadAdd":
             case "Shift+Equal":
-                setRingOffset(ringOffset + 1);
+                setInfiniteRingOffset(context, ringOffset + 1);
                 ev.preventDefault();
                 break;
             case "Minus":
             case "NumpadSubtract":
-                setRingOffset(ringOffset - 1);
+                setInfiniteRingOffset(context, ringOffset - 1);
                 ev.preventDefault();
                 break;
         }
@@ -174,7 +171,7 @@ export const InfiniteRingsFieldWrapper = <
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => setRingOffset(ringOffset + 1)}
+                        onClick={() => setInfiniteRingOffset(context, ringOffset + 1)}
                         title={translate("zoom in")}
                     >
                         +
@@ -188,7 +185,7 @@ export const InfiniteRingsFieldWrapper = <
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => setRingOffset(ringOffset - 1)}
+                        onClick={() => setInfiniteRingOffset(context, ringOffset - 1)}
                         title={translate("zoom out")}
                     >
                         -
@@ -199,7 +196,7 @@ export const InfiniteRingsFieldWrapper = <
                         count={ringsCount}
                         index={index}
                         selected={index === loopedRingOffset}
-                        onClick={() => setRingOffset(loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2)}
+                        onClick={() => setInfiniteRingOffset(context, loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2)}
                     >
                         <StyledCircle/>
                     </StyledCircleButton>)}

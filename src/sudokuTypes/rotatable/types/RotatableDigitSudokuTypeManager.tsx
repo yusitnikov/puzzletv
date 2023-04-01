@@ -57,14 +57,15 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
         angle: startAngle,
         isStickyMode: false,
         animationSpeed: AnimationSpeed.regular,
+        isAnimating: false,
     },
 
     isReady({extension: {angle}}): boolean {
         return startAngle === 0 || angle !== startAngle;
     },
 
-    useProcessedGameStateExtension({extension: {angle, animationSpeed}}): RotatableProcessedGameState {
-        const animatedAngle = useAnimatedValue(angle, animationSpeed);
+    useProcessedGameStateExtension({extension: {angle, animationSpeed, isAnimating}}): RotatableProcessedGameState {
+        const animatedAngle = useAnimatedValue(angle, isAnimating ? animationSpeed : 0);
 
         return useMemo(() => ({animatedAngle}), [animatedAngle]);
     },

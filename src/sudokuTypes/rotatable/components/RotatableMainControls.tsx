@@ -28,6 +28,7 @@ export const RotatableMainControls = <CellType,>(angleDelta: number, showBackBut
 
     const handleRotate = (delta: number) => onStateChange(({extension: {angle}}) => ({
         extension: {
+            isAnimating: true,
             angle: isReady
                 ? angle + delta
                 : (Math.sign(angle) === Math.sign(delta) ? delta : 0)

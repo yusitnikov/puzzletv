@@ -1,10 +1,18 @@
-import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
+import {AnimatableState} from "../../../types/sudoku/AnimationSpeed";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
-export interface InfiniteRingsGameState {
+export interface InfiniteRingsGameState extends AnimatableState {
     ringOffset: number;
-    animationSpeed: AnimationSpeed;
 }
 
 export interface InfiniteRingsProcessedGameState {
     ringOffset: number;
 }
+
+export const setInfiniteRingOffset = <CellType, ExType extends InfiniteRingsGameState, ProcessedExType>(
+    {state: {selectedCells}, onStateChange}: PuzzleContext<CellType, ExType, ProcessedExType>,
+    ringOffset: number
+) => onStateChange({
+    extension: {ringOffset, isAnimating: true} as Partial<ExType>,
+    selectedCells: selectedCells.clear(),
+});

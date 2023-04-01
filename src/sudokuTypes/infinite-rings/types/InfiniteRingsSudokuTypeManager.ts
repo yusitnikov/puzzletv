@@ -54,27 +54,39 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
             ...baseTypeManager.initialGameStateExtension!,
             ringOffset: startRingOffset,
             animationSpeed: AnimationSpeed.regular,
+            isAnimating: false,
         },
-        serializeGameState({ringOffset, animationSpeed, ...data}: Partial<ExType & InfiniteRingsGameState>): any {
+        serializeGameState({ringOffset, animationSpeed, isAnimating, ...data}: Partial<ExType & InfiniteRingsGameState>): any {
             return {
                 ...baseTypeManager.serializeGameState(data as Partial<ExType>),
                 ringOffset,
                 animationSpeed,
+                isAnimating,
             };
         },
-        unserializeGameState({ringOffset = 0, animationSpeed = AnimationSpeed.regular, ...data}: any): Partial<ExType & InfiniteRingsGameState> {
+        unserializeGameState(
+            {
+                ringOffset = 0,
+                animationSpeed = AnimationSpeed.regular,
+                isAnimating = false,
+                ...data
+            }: any
+        ): Partial<ExType & InfiniteRingsGameState> {
             return {
                 ...baseTypeManager.unserializeGameState(data),
                 ringOffset,
                 animationSpeed,
+                isAnimating,
             } as Partial<ExType & InfiniteRingsGameState>;
         },
         useProcessedGameStateExtension(state): ProcessedExType & InfiniteRingsProcessedGameState {
-            const ringOffset = useAnimatedValue(state.extension.ringOffset, state.extension.animationSpeed * 0.5);
+            const {extension: {ringOffset, animationSpeed, isAnimating}} = state;
+
+            const animatedRingOffset = useAnimatedValue(ringOffset, isAnimating ? animationSpeed * 0.5 : 0);
 
             return {
                 ...baseTypeManager.useProcessedGameStateExtension?.(state) as ProcessedExType,
-                ringOffset,
+                ringOffset: animatedRingOffset,
             };
         },
         mainControlsComponent: InfiniteRingControls,
