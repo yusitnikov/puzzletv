@@ -700,7 +700,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     let areCorrectDigits = true;
                     let areCorrectColors = true;
-                    const digitToColorMap: Record<number, CellColorValue> = {};
+                    const digitToColorMap: Record<number, string> = {};
                     for (const [top, row] of cells.entries()) {
                         for (const [left, {usersDigit, colors}] of row.entries()) {
                             const expectedDigit = solutionGrid[top][left] || undefined;
@@ -709,11 +709,11 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                                 areCorrectDigits = false;
                             }
 
-                            if (!expectedDigit || colors.size > 1) {
+                            if (!expectedDigit) {
                                 areCorrectColors = false;
                             } else {
                                 const expectedColor = digitToColorMap[expectedDigit];
-                                const actualColor = colors.first() ?? "";
+                                const actualColor = colors.sorted().items.join(",");
                                 if (!expectedColor) {
                                     digitToColorMap[expectedDigit] = actualColor;
                                 } else if (actualColor !== expectedColor) {
