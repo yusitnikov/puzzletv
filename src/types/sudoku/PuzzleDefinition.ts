@@ -93,18 +93,6 @@ export interface PuzzleDefinitionLoader<CellType, ExType = {}, ProcessedExType =
     loadPuzzle: (params: any) => PuzzleDefinition<CellType, ExType, ProcessedExType>;
 }
 
-export const isPuzzleHasBottomRowControls = (
-    {
-        typeManager: {
-            hasBottomRowControls = false,
-        },
-        allowDrawing = [],
-        loopHorizontally = false,
-        loopVertically = false,
-        enableDragMode = false,
-    }: PuzzleDefinition<any, any, any>
-): boolean => hasBottomRowControls || (allowDrawing.length !== 0 && (loopHorizontally || loopVertically || enableDragMode));
-
 export const getDefaultDigitsCount = ({typeManager: {maxDigitsCount}, fieldSize: {fieldSize}}: PuzzleDefinition<any, any, any>) =>
     Math.min(maxDigitsCount || fieldSize, fieldSize);
 

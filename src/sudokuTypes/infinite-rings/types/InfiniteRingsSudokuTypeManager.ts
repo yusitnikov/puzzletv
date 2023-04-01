@@ -15,8 +15,10 @@ import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {loop} from "../../../utils/math";
 import {InfiniteRingsBorderLinesConstraint} from "../components/InfiniteRingsBorderLines";
 import {isShowingAllInfiniteRings} from "./InfiniteRingsLayout";
-import {InfiniteRingControls} from "../components/InfiniteRingControls";
+import {InfiniteRingZoomButton} from "../components/InfiniteRingZoomButton";
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
+import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
+import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 
 /*
  * TODO:
@@ -89,7 +91,23 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 ringOffset: animatedRingOffset,
             };
         },
-        mainControlsComponent: InfiniteRingControls,
+        controlButtons: [
+            {
+                key: "zoom-in",
+                region: ControlButtonRegion.additional,
+                Component: InfiniteRingZoomButton(1, "zoom in", "+"),
+            },
+            {
+                key: "zoom-out",
+                region: ControlButtonRegion.additional,
+                Component: InfiniteRingZoomButton(-1, "zoom out", "-"),
+            },
+            {
+                key: "animation-speed",
+                region: ControlButtonRegion.additional,
+                Component: AnimationSpeedControlButton,
+            },
+        ],
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;

@@ -2,7 +2,6 @@ import {isStickyRotatableDigit, RotatableDigit} from "./RotatableDigit";
 import {isUpsideDownAngle} from "../utils/rotation";
 import {RotatableDigitCellDataComponentType} from "../components/RotatableDigitCellData";
 import {RotatableGameState, RotatableProcessedGameState} from "./RotatableGameState";
-import {RotatableMainControls} from "../components/RotatableMainControls";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 import {PositionWithAngle} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
@@ -13,6 +12,10 @@ import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {useMemo} from "react";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {cageTag, KillerCageProps} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
+import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
+import {RotateLeftButton, RotateRightButton} from "../components/RotateButton";
+import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
+import {StickyModeButton} from "../components/StickyModeButton";
 
 const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);
@@ -42,7 +45,7 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
 ): Pick<
     SudokuTypeManager<CellType, RotatableGameState, RotatableProcessedGameState>,
     "serializeGameState" | "unserializeGameState" | "initialGameStateExtension" | "isReady" |
-    "useProcessedGameStateExtension" | "getFieldAngle" | "hasBottomRowControls" | "mainControlsComponent" |
+    "useProcessedGameStateExtension" | "getFieldAngle" | "controlButtons" |
     "getInternalState" | "unserializeInternalState"
 > => ({
     serializeGameState({angle}) {
@@ -74,9 +77,28 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
         return animatedAngle;
     },
 
-    hasBottomRowControls: true,
-
-    mainControlsComponent: RotatableMainControls(angleDelta, showBackButton, showStickyMode),
+    controlButtons: [
+        {
+            key: "rotate-right",
+            region: ControlButtonRegion.additional,
+            Component: RotateRightButton(angleDelta),
+        },
+        showBackButton && {
+            key: "rotate-left",
+            region: ControlButtonRegion.additional,
+            Component: RotateLeftButton(angleDelta),
+        },
+        showStickyMode && {
+            key: "sticky-mode",
+            region: ControlButtonRegion.additional,
+            Component: StickyModeButton,
+        },
+        {
+            key: "animation-speed",
+            region: ControlButtonRegion.additional,
+            Component: AnimationSpeedControlButton,
+        },
+    ],
 
     getInternalState(
         puzzle,

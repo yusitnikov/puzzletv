@@ -3,10 +3,11 @@ import {ChessGameState} from "./ChessGameState";
 import {ChessPiece} from "./ChessPiece";
 import {ChessColor} from "./ChessColor";
 import {ChessPieceCellDataComponentType} from "../components/ChessPieceCellData";
-import {ChessMainControls} from "../components/ChessMainControls";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {ctrlKeyText} from "../../../utils/os";
+import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
+import {ChessMainControls} from "../components/ChessMainControls";
 
 export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState> = {
     areSameCellData(
@@ -83,7 +84,13 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
         selectedColor: ChessColor.black,
     },
 
-    mainControlsComponent: ChessMainControls,
+    controlButtons: [
+        {
+            key: "chess-piece-color",
+            region: ControlButtonRegion.custom,
+            Component: ChessMainControls,
+        }
+    ],
 
     maxDigitsCount: 6,
 

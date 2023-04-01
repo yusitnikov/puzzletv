@@ -8,6 +8,7 @@ import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
 import {shadingAction, shadingStartAction} from "./GameStateAction";
 import {incrementArrayItem} from "../../utils/array";
+import {useEventListener} from "../../hooks/useEventListener";
 
 export enum CellWriteMode {
     main,
@@ -175,11 +176,6 @@ export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
 export const incrementCellWriteMode = (allowedModes: CellWriteModeInfo<any, any, any>[], mode: CellWriteMode, increment: number): CellWriteMode =>
     incrementArrayItem(allowedModes, item => item.mode === mode, increment).mode;
 
-export const isCompactControlsPanel = (allowedModeInfos: CellWriteModeInfo<any, any, any>[]): boolean =>
-    !allowedModeInfos.some(
-        ({mode, isDigitMode     }) => isDigitMode || [CellWriteMode.color, CellWriteMode.shading].includes(mode)
-    );
-
 export const resolveDigitsCountInCellWriteMode = <CellType, ExType, ProcessedExType>(
     context: PuzzleContext<CellType, ExType, ProcessedExType>
 ) => {
@@ -201,4 +197,55 @@ export const resolveDigitsCountInCellWriteMode = <CellType, ExType, ProcessedExT
     return typeof digitsCountFunc === "function"
         ? digitsCountFunc(context)
         : digitsCountFunc;
+};
+
+export const useCellWriteModeHotkeys = <CellType, ExType = {}, ProcessedExType = {}>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+) => {
+    const {
+        puzzle,
+        state,
+        onStateChange,
+    } = context;
+
+    const {
+        typeManager: {disableCellModeLetterShortcuts},
+    } = puzzle;
+
+    const {
+        persistentCellWriteMode,
+        isShowingSettings,
+    } = state;
+
+    const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
+
+    const setCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode});
+
+    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+        if (isShowingSettings) {
+            return;
+        }
+
+        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
+        const ctrlKey = winCtrlKey || macCtrlKey;
+        const anyKey = ctrlKey || shiftKey;
+
+        for (const [index, {mode}] of allowedCellWriteModes.entries()) {
+            if (!disableCellModeLetterShortcuts && code === ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"][index] && !anyKey) {
+                setCellWriteMode(mode);
+                ev.preventDefault();
+            }
+        }
+
+        switch (code) {
+            case "PageUp":
+                setCellWriteMode(incrementCellWriteMode(allowedCellWriteModes, persistentCellWriteMode, -1));
+                ev.preventDefault();
+                break;
+            case "PageDown":
+                setCellWriteMode(incrementCellWriteMode(allowedCellWriteModes, persistentCellWriteMode, +1));
+                ev.preventDefault();
+                break;
+        }
+    });
 };

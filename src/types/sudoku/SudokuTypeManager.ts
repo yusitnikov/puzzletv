@@ -18,6 +18,7 @@ import {useTranslate} from "../../hooks/useTranslate";
 import {KeyInfo} from "./KeyInfo";
 import {SettingsContentProps} from "../../components/sudoku/controls/settings/SettingsContent";
 import {regionTag} from "../../components/sudoku/constraints/region/Region";
+import {ControlButtonItem} from "../../components/sudoku/controls/ControlButtonsManager";
 
 export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> {
     areSameCellData(
@@ -170,9 +171,8 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
         context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined;
 
-    hasBottomRowControls?: boolean;
-
     mainControlsComponent?: ComponentType<ControlsProps<CellType, ExType, ProcessedExType>>;
+    controlButtons?: (ControlButtonItem<CellType, ExType, ProcessedExType> | undefined | false)[];
 
     settingsComponents?: ComponentType<SettingsContentProps<CellType, ExType, ProcessedExType>>[];
 

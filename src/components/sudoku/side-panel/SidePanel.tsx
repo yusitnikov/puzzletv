@@ -2,13 +2,12 @@ import {Rules} from "../rules/Rules";
 import {
     Controls,
     ControlsProps,
-    getControlsHeightCoeff,
-    getControlsWidthCoeff
+    getControlsSizeCoeff
 } from "../controls/Controls";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
-import {isPuzzleHasBottomRowControls} from "../../../types/sudoku/PuzzleDefinition";
+import {useControlButtonsManager} from "../controls/ControlButtonsManager";
 
 export interface SidePanelProps<CellType, ExType = {}, ProcessedExType = {}>
     extends ControlsProps<CellType, ExType, ProcessedExType> {
@@ -19,12 +18,12 @@ export const SidePanel = <CellType, ExType = {}, ProcessedExType = {}>(
 ) => {
     const {puzzle, cellSizeForSidePanel: cellSize} = context;
 
-    const hasBottomRowControls = isPuzzleHasBottomRowControls(puzzle);
+    const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);
 
     const padding = cellSize * globalPaddingCoeff;
 
-    const controlsWidthCoeff = getControlsWidthCoeff(puzzle);
-    const controlsHeightCoeff = getControlsHeightCoeff(puzzle);
+    const controlsWidthCoeff = getControlsSizeCoeff(controlButtonsManager.width);
+    const controlsHeightCoeff = getControlsSizeCoeff(controlButtonsManager.height);
 
     const controlsSize: Size = {
         width: cellSize * (isHorizontal ? controlsWidthCoeff : controlsHeightCoeff),
@@ -53,7 +52,7 @@ export const SidePanel = <CellType, ExType = {}, ProcessedExType = {}>(
         <Controls
             context={context}
             rect={{...controlsPosition, ...controlsSize}}
-            isHorizontal={isHorizontal || hasBottomRowControls}
+            isHorizontal={isHorizontal}
         />
     </Absolute>;
 };

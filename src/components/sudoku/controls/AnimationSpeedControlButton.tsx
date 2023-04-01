@@ -1,9 +1,8 @@
 import {ControlButton} from "./ControlButton";
 import {FastForward, PlayArrow, Timelapse} from "@emotion-icons/material";
-import {ControlsProps} from "./Controls";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
-import {Position} from "../../../types/layout/Position";
+import {ControlButtonItemProps} from "./ControlButtonsManager";
 
 export const AnimationSpeedControlButton = <CellType, ExType extends { animationSpeed: AnimationSpeed }, ProcessedExType>(
     {
@@ -16,7 +15,7 @@ export const AnimationSpeedControlButton = <CellType, ExType extends { animation
             },
             onStateChange,
         },
-    }: ControlsProps<CellType, ExType, ProcessedExType> & Position
+    }: ControlButtonItemProps<CellType, ExType, ProcessedExType>
 ) => {
     const translate = useTranslate();
 

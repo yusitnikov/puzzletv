@@ -5,7 +5,7 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
 import {SidePanel} from "../side-panel/SidePanel";
 import {globalPaddingCoeff} from "../../app/globals";
-import {getControlsWidthCoeff} from "../controls/Controls";
+import {getControlsSizeCoeff} from "../controls/Controls";
 import styled from "@emotion/styled";
 import {useWindowSize} from "../../../hooks/useWindowSize";
 import {useGame} from "../../../hooks/sudoku/useGame";
@@ -19,6 +19,7 @@ import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Modal} from "../../layout/modal/Modal";
 import {Rect} from "../../../types/layout/Rect";
 import {profiler} from "../../../utils/profiler";
+import {useControlButtonsManager} from "../controls/ControlButtonsManager";
 
 const StyledContainer = styled("div", {
     shouldForwardProp(propName) {
@@ -58,9 +59,11 @@ export const Puzzle = <CellType, ExType = {}, ProcessedExType = {}>(
     const maxWindowSize = Math.max(windowSize.width, windowSize.height);
     const minWindowSize = Math.min(windowSize.width, windowSize.height);
 
+    const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);
+
     const fieldSizeWithMargin = fieldSize + 2 * fieldMargin;
     const fieldSizeForSidePanel = 9;
-    const panelCoeff = getControlsWidthCoeff(puzzle);
+    const panelCoeff = getControlsSizeCoeff(controlButtonsManager.width);
     const maxCoeff = fieldSizeForSidePanel + panelCoeff + globalPaddingCoeff * 3;
     const minCoeff = fieldSizeForSidePanel + globalPaddingCoeff * 2;
 

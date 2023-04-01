@@ -1,4 +1,4 @@
-import {CellWriteMode, getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellState} from "../../../types/sudoku/CellState";
 import {ReactNode, useCallback} from "react";
 import {ControlButton} from "./ControlButton";
@@ -32,17 +32,16 @@ export const CellWriteModeButton = <CellType, ExType = {}, ProcessedExType = {}>
         fullHeight,
     }: CellWriteModeButtonProps<CellType, ExType, ProcessedExType>
 ) => {
-    const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;
+    const {
+        state,
+        onStateChange,
+        cellSizeForSidePanel: cellSize,
+    } = context;
 
     const handleSetCellWriteMode = useCallback(
         () => onStateChange({persistentCellWriteMode: cellWriteMode}),
         [onStateChange, cellWriteMode]
     );
-
-    const allowedModeInfos = getAllowedCellWriteModeInfos(puzzle);
-    if (allowedModeInfos.length <= 1 || !allowedModeInfos.find(({mode}) => mode === cellWriteMode)) {
-        return null;
-    }
 
     return <ControlButton
         left={left}
