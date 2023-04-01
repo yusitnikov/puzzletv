@@ -24,10 +24,10 @@ export const RedoButton = <CellType, ExType, ProcessedExType>(
     const handleRedo = useCallback(() => onStateChange(redoAction()), [onStateChange]);
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
-        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
+        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 
-        if (!isShowingSettings && !isEnabled && ctrlKey && code === (shiftKey ? "KeyZ" : "KeyY")) {
+        if (!isShowingSettings && !isEnabled && ctrlKey && code === "KeyY") {
             handleRedo();
             ev.preventDefault();
         }

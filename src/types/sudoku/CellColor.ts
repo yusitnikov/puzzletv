@@ -18,6 +18,7 @@ export enum CellColor {
     red,
     yellow,
     blue,
+    white,
     shaded = black,
     unshaded = green,
 }
@@ -32,6 +33,7 @@ export const cellColors: Record<CellColor, string> = {
     [CellColor.red]: redColor,
     [CellColor.yellow]: yellowColor,
     [CellColor.blue]: blueColor,
+    [CellColor.white]: "#ffffff",
 };
 
 export type CellColorValue = CellColor | string;

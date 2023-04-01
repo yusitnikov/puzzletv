@@ -76,7 +76,7 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
     {
         mode: CellWriteMode.color,
         hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
-        digitsCount: 9,
+        digitsCount: 10,
         buttonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
             colors={new CellDataSet(context.puzzle, [index])}

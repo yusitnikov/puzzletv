@@ -48,12 +48,13 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
     const selectableButtonContent = currentButton !== undefined;
 
     const digit = index + 1;
+    const digitKey = digit === 10 ? 0 : digit;
     const cellData = createCellDataByDisplayDigit(digit, state);
     let shortcuts = (isDigitMode && digitShortcuts[index]) || [];
     const shortcutTip = isDigitMode && digitShortcutTips[index];
 
     if (!isDigitMode || !disableDigitShortcuts) {
-        shortcuts = [digit.toString(), ...shortcuts];
+        shortcuts = [digitKey.toString(), ...shortcuts];
     }
 
     const shortcutTitles = shortcuts.map(shortcut => typeof shortcut === "string" ? shortcut : shortcut.title);
@@ -83,19 +84,21 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
             return;
         }
 
-        const {code} = ev;
+        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
+        const ctrlKey = winCtrlKey || macCtrlKey;
 
-        if (shortcutCodes.includes(code)) {
+        // Windows doesn't recognize Ctrl+Shift+0 (on the main keyboard), so accept Ctrl+Shift+Minus as a fallback
+        if (shortcutCodes.includes(code) || (ctrlKey && shiftKey && shortcutCodes.includes("Digit0") && code === "Minus")) {
             handleDigit();
             ev.preventDefault();
-        } else if ([`Digit${digit}`, `Numpad${digit}`].includes(code)) {
+        } else if ([`Digit${digitKey}`, `Numpad${digitKey}`].includes(code)) {
             // Prevent Ctrl+digit from navigating to another tab even if the digit shortcut is not supported
             ev.preventDefault();
         }
     });
 
     return <ControlButton
-        left={index % 3}
+        left={index === 9 ? 1 : index % 3}
         top={(index - index % 3) / 3}
         cellSize={cellSize}
         fullHeight={!selectableButtonContent}

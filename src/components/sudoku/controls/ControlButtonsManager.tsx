@@ -180,6 +180,7 @@ export class ControlButtonsManager<CellType, ExType, ProcessedExType> {
 
         const isRevertedBottom = this.isCompact && !this.isHorizontal;
         const bottomRow = this.isCompact ? 0 : 3;
+        const isColorMode = context.state.processed.cellWriteMode === CellWriteMode.color;
 
         const isRevertedRight = this.isCompact === this.isHorizontal;
         const rightColumn = this.isCompact ? 1 : 4;
@@ -199,7 +200,7 @@ export class ControlButtonsManager<CellType, ExType, ProcessedExType> {
                 left={isRevertedRight ? index : rightColumn}
             />)}
 
-            {bottom.map(({key, Component}, index) => <Component
+            {bottom.map(({key, Component}, index) => (!isColorMode || index !== 1) && <Component
                 key={key}
                 context={context}
                 top={isRevertedBottom ? index : bottomRow}

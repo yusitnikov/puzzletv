@@ -26,10 +26,10 @@ export const UndoButton = <CellType, ExType, ProcessedExType>(
     const handleUndo = useCallback(() => onStateChange(undoAction()), [onStateChange]);
 
     useEventListener(window, "keydown", (ev: KeyboardEvent) => {
-        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
+        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 
-        if (!isShowingSettings && !isEnabled && ((ctrlKey && !shiftKey && code === "KeyZ") || (hideDeleteButton && deleteHotkeys.includes(code)))) {
+        if (!isShowingSettings && !isEnabled && ((ctrlKey && code === "KeyZ") || (hideDeleteButton && deleteHotkeys.includes(code)))) {
             handleUndo();
             ev.preventDefault();
         }
