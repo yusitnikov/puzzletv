@@ -21,6 +21,8 @@ export interface FieldCellMouseHandlerProps<CellType, ExType = {}, ProcessedExTy
     cellPosition: Position;
     isDeleteSelectedCellsStroke: boolean;
     onIsDeleteSelectedCellsStrokeChange: (newValue: boolean) => void;
+    isContinuingSelectingCells: boolean;
+    onIsContinuingSelectingCellsChange: (newValue: boolean) => void;
 }
 
 export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {}>(
@@ -29,6 +31,8 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         cellPosition,
         isDeleteSelectedCellsStroke,
         onIsDeleteSelectedCellsStrokeChange,
+        isContinuingSelectingCells,
+        onIsContinuingSelectingCellsChange,
     }: FieldCellMouseHandlerProps<CellType, ExType, ProcessedExType>
 ) => {
     const {puzzle, cellsIndex, state, onStateChange} = context;
@@ -57,8 +61,9 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
     };
 
     const handleCellClick = ({ctrlKey, metaKey, shiftKey, isPrimary}: PointerEvent<any>) => {
-        const isMultiSelection = ctrlKey || metaKey || shiftKey || !isPrimary;
+        const isMultiSelection = ctrlKey || metaKey || shiftKey || !isPrimary || state.isMultiSelection;
 
+        onIsContinuingSelectingCellsChange(true);
         onIsDeleteSelectedCellsStrokeChange(isMultiSelection && selectedCells.contains(cellPosition));
         onStateChange(
             gameState => isMultiSelection
@@ -101,15 +106,15 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
             .filter(({cellState, initialDigit}) => filter(cellState, initialDigit))
             .map(({position}) => position);
 
-        if (ctrlKey || metaKey || shiftKey) {
-            onStateChange(gameState => gameStateToggleSelectedCells(gameState, matchingPositions, true));
-        } else {
-            onStateChange(gameState => gameStateSetSelectedCells(gameState, matchingPositions));
-        }
+        onStateChange(
+            gameState => ctrlKey || metaKey || shiftKey || gameState.isMultiSelection
+                ? gameStateToggleSelectedCells(gameState, matchingPositions, true)
+                : gameStateSetSelectedCells(gameState, matchingPositions)
+        );
     };
 
     const handleContinueCellSelection = () => {
-        if (!currentMultiLineEnd) {
+        if (isContinuingSelectingCells && !currentMultiLineEnd) {
             onStateChange(gameState => gameStateToggleSelectedCells(gameState, [cellPosition], !isDeleteSelectedCellsStroke));
         }
     };

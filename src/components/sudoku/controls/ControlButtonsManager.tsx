@@ -16,6 +16,8 @@ import {MoveDigitModeButton} from "./MoveDigitModeButton";
 import {UndoButton} from "./UndoButton";
 import {RedoButton} from "./RedoButton";
 import {DeleteButton} from "./DeleteButton";
+import {MultiSelectionButton} from "./MultiSelectionButton";
+import {isTouchDevice} from "../../../utils/isTouchDevice";
 
 export enum ControlButtonRegion {
     // main digit, corner marks, center marks, colors, pen tool, etc.
@@ -125,6 +127,13 @@ export class ControlButtonsManager<CellType, ExType, ProcessedExType> {
             (forceAutoCheckOnFinish ? custom : right).push({
                 key: "result-check",
                 Component: ResultCheckButton,
+            });
+        }
+
+        if (isTouchDevice) {
+            right.push({
+                key: "multi-selection",
+                Component: MultiSelectionButton,
             });
         }
 

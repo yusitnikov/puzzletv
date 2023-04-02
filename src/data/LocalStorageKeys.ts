@@ -5,4 +5,5 @@ export enum LocalStorageKeys {
     backgroundOpacity = "backgroundOpacity",
     nickname = "nickname",
     highlightSeenCells = "highlightSeenCells",
+    enableMultiSelection = "enableMultiSelection",
 }

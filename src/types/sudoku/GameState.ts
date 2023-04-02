@@ -57,6 +57,7 @@ export interface GameState<CellType> {
     initialDigits: GivenDigitsMap<CellType>;
     excludedDigits: GivenDigitsMap<SetInterface<CellType>>;
 
+    isMultiSelection: boolean;
     selectedCells: SetInterface<Position>;
     selectedColor: CellColor;
 
@@ -201,6 +202,7 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         },
         persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode ?? getAllowedCellWriteModeInfos(puzzle)[0].mode,
         selectedCells: new PositionSet(),
+        isMultiSelection: loadBoolFromLocalStorage(LocalStorageKeys.enableMultiSelection, false),
         selectedColor: savedGameState?.[10] ?? CellColor.green,
         initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
         excludedDigits: savedGameState?.[4]
@@ -460,7 +462,7 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
         return newState;
     }
 
-    const result: PartialGameStateEx<CellType, ExType> = isMultiSelection
+    const result: PartialGameStateEx<CellType, ExType> = (isMultiSelection || state.isMultiSelection)
         ? gameStateAddSelectedCell(state, newCell)
         : gameStateSetSelectedCells(state, [newCell]);
     let {loopOffset} = state;

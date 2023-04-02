@@ -112,6 +112,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const {isAnyKeyDown} = useControlKeysState();
 
     // region Pointer events
+    const [isContinuingSelectingCells, setIsContinuingSelectingCells] = useState(false);
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
 
     const [dragStart, setDragStart] = useState<Position | undefined>(undefined);
@@ -129,6 +130,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     useEventListener(window, "pointerup", ({button}: PointerEvent) => {
         // button === 0 is the left mouse button
         onStateChange(applyCurrentMultiLineAction(context, !!button));
+
+        setIsContinuingSelectingCells(false);
 
         setDragStart(undefined);
     });
@@ -406,6 +409,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                         cellPosition={cellPosition}
                         isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
                         onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
+                        isContinuingSelectingCells={isContinuingSelectingCells}
+                        onIsContinuingSelectingCellsChange={setIsContinuingSelectingCells}
                     />)}
                 </Absolute>
 

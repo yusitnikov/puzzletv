@@ -207,6 +207,9 @@ export const translationsExactType = {
     "Open settings": {
         [LanguageCode.ru]: "Открыть настройки",
     },
+    "Multi-selection": {
+        [LanguageCode.ru]: "Выделить несколько клеток",
+    },
     // endregion
     // region RulesSpoiler
     "Spoiler": {
