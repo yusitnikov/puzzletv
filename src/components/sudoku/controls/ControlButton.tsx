@@ -6,6 +6,7 @@ import {Size} from "../../../types/layout/Size";
 import styled from "@emotion/styled";
 import {lightGreyColor, textColor} from "../../app/globals";
 import {EmotionIconBase} from "@emotion-icons/emotion-icon";
+import {isTouchDevice} from "../../../utils/isTouchDevice";
 
 export const controlButtonPaddingCoeff = 0.15;
 
@@ -14,24 +15,28 @@ export const controlButtonOptions = {
         return propName !== "isActive" && propName !== "opacityOnHover";
     }
 } as const;
-export const controlButtonStyles = ({isActive, opacityOnHover}: {isActive?: boolean, opacityOnHover?: boolean}) => ({
-    textAlign: "center",
-    border: 0,
-    padding: 0,
-    margin: 0,
-    fontSize: "inherit",
-    lineHeight: "inherit",
-    cursor: "pointer",
-    color: textColor,
-    backgroundColor: isActive ? lightGreyColor : "white",
-    "&:hover": {
-        backgroundColor: lightGreyColor,
-        opacity: opacityOnHover ? 0.8 : 1,
+export const controlButtonStyles = ({isActive, opacityOnHover}: {isActive?: boolean, opacityOnHover?: boolean}): any => [
+    {
+        textAlign: "center",
+        border: 0,
+        padding: 0,
+        margin: 0,
+        fontSize: "inherit",
+        lineHeight: "inherit",
+        cursor: "pointer",
+        color: textColor,
+        backgroundColor: isActive ? lightGreyColor : "white",
+        [EmotionIconBase.toString()]: {
+            verticalAlign: "top",
+        },
     },
-    [EmotionIconBase.toString()]: {
-        verticalAlign: "top",
+    !isTouchDevice && {
+        "&:hover": {
+            backgroundColor: lightGreyColor,
+            opacity: opacityOnHover ? 0.8 : 1,
+        },
     },
-} as const);
+];
 
 const StyledContainer = styled(Absolute, controlButtonOptions)(controlButtonStyles);
 

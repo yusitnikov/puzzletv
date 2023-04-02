@@ -15,6 +15,7 @@ import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {indexes} from "../../../utils/indexes";
 import {loop} from "../../../utils/math";
+import {isTouchDevice} from "../../../utils/isTouchDevice";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
@@ -25,24 +26,28 @@ const StyledCircleButton = styled("button", {
 })(({count, index, selected}: {count: number, index: number, selected: boolean}) => {
     const size = 100 / count;
 
-    return {
-        position: "absolute",
-        bottom: 0,
-        left: `${index * size}%`,
-        width: `${size}%`,
-        height: `${size}%`,
-        border: "none",
-        outline: "none",
-        background: "transparent",
-        padding: 0,
-        margin: 0,
-        cursor: "pointer",
-        transition: "opacity 0.3s ease",
-        opacity: selected ? 1 : 0.5,
-        "&:hover": {
-            opacity: 1,
+    return [
+        {
+            position: "absolute",
+            bottom: 0,
+            left: `${index * size}%`,
+            width: `${size}%`,
+            height: `${size}%`,
+            border: "none",
+            outline: "none",
+            background: "transparent",
+            padding: 0,
+            margin: 0,
+            cursor: "pointer",
+            transition: "opacity 0.3s ease",
+            opacity: selected ? 1 : 0.5,
         },
-    };
+        !isTouchDevice && {
+            "&:hover": {
+                opacity: 1,
+            },
+        },
+    ];
 });
 const StyledCircle = styled("div")({
     position: "absolute",
