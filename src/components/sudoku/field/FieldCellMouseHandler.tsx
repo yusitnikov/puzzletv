@@ -60,8 +60,8 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         type: CellPart.center,
     };
 
-    const handleCellClick = ({ctrlKey, metaKey, shiftKey, isPrimary}: PointerEvent<any>) => {
-        const isMultiSelection = ctrlKey || metaKey || shiftKey || !isPrimary || state.isMultiSelection;
+    const handleCellClick = ({ctrlKey, metaKey, shiftKey}: PointerEvent<any>) => {
+        const isMultiSelection = ctrlKey || metaKey || shiftKey || state.isMultiSelection;
 
         onIsContinuingSelectingCellsChange(true);
         onIsDeleteSelectedCellsStrokeChange(isMultiSelection && selectedCells.contains(cellPosition));
