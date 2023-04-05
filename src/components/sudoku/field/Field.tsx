@@ -43,6 +43,7 @@ import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCo
 import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
+import {useOutsideClick} from "../../../utils/gestures";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -118,7 +119,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const [dragStart, setDragStart] = useState<Position | undefined>(undefined);
 
     // Handle outside click
-    useEventListener(window, "mousedown", () => {
+    useOutsideClick(() => {
         if (!isAnyKeyDown) {
             onStateChange(gameStateClearSelectedCells);
         }

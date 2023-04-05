@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import {ButtonHTMLAttributes, memo, MouseEvent, ReactNode} from "react";
+import {ButtonHTMLAttributes, memo, ReactNode} from "react";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Position} from "../../../types/layout/Position";
 import {Size} from "../../../types/layout/Size";
@@ -7,6 +7,7 @@ import styled from "@emotion/styled";
 import {lightGreyColor, textColor} from "../../app/globals";
 import {EmotionIconBase} from "@emotion-icons/emotion-icon";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
+import {cancelOutsideClickProps} from "../../../utils/gestures";
 
 export const controlButtonPaddingCoeff = 0.15;
 
@@ -85,7 +86,7 @@ export const ControlButton = memo((
         isActive={checked}
         tabIndex={-1}
         pointerEvents={true}
-        onMouseDown={(ev: MouseEvent<HTMLButtonElement>) => ev.stopPropagation()}
+        {...cancelOutsideClickProps}
         childrenOnTopOfBorders={childrenOnTopOfBorders}
         {...otherProps}
     >

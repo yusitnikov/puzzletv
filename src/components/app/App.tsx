@@ -13,6 +13,7 @@ import {ContactMe} from "./ContactMe";
 import {ForSetters} from "./ForSetters";
 import {FPuzzlesWizardPage, fPuzzlesWizardPageTitle} from "./FPuzzlesWizardPage";
 import {HowToImport} from "./HowToImport";
+import {useGesturesGlobalEvents} from "../../utils/gestures";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -23,6 +24,8 @@ export const App = ({onPageLoaded}: AppProps) => {
 
     const language = useLanguageCode();
     const translate = useTranslate();
+
+    useGesturesGlobalEvents();
 
     const puzzle = useMemo(() => {
         for (const puzzleOrLoader of AllPuzzles) {

@@ -13,6 +13,8 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "./FieldCellShape";
 import {CellExactPosition} from "../../../types/sudoku/CellExactPosition";
 import {CellPart} from "../../../types/sudoku/CellPart";
+import {mergeEventHandlerProps} from "../../../utils/mergeEventHandlerProps";
+import {cancelOutsideClickProps} from "../../../utils/gestures";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
@@ -236,26 +238,23 @@ export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDouble
         cursor: "pointer",
         pointerEvents: "all",
     }}
-    onMouseDown={(ev: MouseEvent<any>) => {
-        // Make sure that clicking on the grid won't be recognized as an outside click and won't try to drag
-        ev.preventDefault();
-        ev.stopPropagation();
-    }}
-    onPointerDown={(ev: PointerEvent<any>) => {
-        if ((ev.target as Element).hasPointerCapture?.(ev.pointerId)) {
-            (ev.target as Element).releasePointerCapture?.(ev.pointerId);
-        }
+    {...mergeEventHandlerProps(
+        // Make sure that clicking on the grid won't be recognized as an outside click
+        cancelOutsideClickProps,
+        {
+            // Make sure that clicking on the grid won't try to drag
+            onMouseDown: (ev) => ev.preventDefault(),
+            onPointerDown: onClick,
+            onDoubleClick,
+            onPointerEnter: (ev) => {
+                if (!ev.buttons) {
+                    return;
+                }
 
-        onClick?.(ev);
-    }}
-    onDoubleClick={onDoubleClick}
-    onPointerEnter={(ev: PointerEvent<any>) => {
-        if (!ev.buttons) {
-            return;
-        }
-
-        onEnter?.(ev);
-    }}
-    onContextMenu={onContextMenu}
+                onEnter?.(ev);
+            },
+            onContextMenu,
+        },
+    )}
     {...rect}
 />;
