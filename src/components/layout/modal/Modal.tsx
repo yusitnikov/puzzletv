@@ -17,7 +17,7 @@ export const Modal = ({cellSize, onClose, textAlign = "center", borderless, chil
 
     const puzzleContainer = usePuzzleContainer();
 
-    useEventListener(window, "keydown", ({code}: KeyboardEvent) => {
+    useEventListener(window, "keydown", ({code}) => {
         if (code === "Escape") {
             onClose?.();
         }

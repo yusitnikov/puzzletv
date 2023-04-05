@@ -139,7 +139,7 @@ interface BackDropProps {
 }
 
 const BackDrop = ({onClose}: BackDropProps) => {
-    useEventListener(window, "keydown", ({code}: KeyboardEvent) => {
+    useEventListener(window, "keydown", ({code}) => {
         if (code === "Escape") {
             onClose();
         }

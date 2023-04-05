@@ -39,7 +39,7 @@ export const QuadInputModeButton = <CellType, ExType extends QuadInputGameState<
         extension: {currentQuad},
     } = state;
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (isShowingSettings) {
             return;
         }

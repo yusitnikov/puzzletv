@@ -25,7 +25,7 @@ export const UndoButton = <CellType, ExType, ProcessedExType>(
 
     const handleUndo = useCallback(() => onStateChange(undoAction()), [onStateChange]);
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 

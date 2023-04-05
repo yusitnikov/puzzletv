@@ -127,7 +127,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         onStateChange(gameStateResetCurrentMultiLine);
     });
 
-    useEventListener(window, "pointerup", ({button}: PointerEvent) => {
+    useEventListener(window, "pointerup", ({button}) => {
         // button === 0 is the left mouse button
         onStateChange(applyCurrentMultiLineAction(context, !!button));
 
@@ -136,7 +136,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         setDragStart(undefined);
     });
 
-    useEventListener(window, "pointerdown", ({screenX, screenY}: PointerEvent) => {
+    useEventListener(window, "pointerdown", ({screenX, screenY}) => {
         if (cellWriteMode === CellWriteMode.move) {
             setDragStart({
                 left: loopOffset.left - screenX / cellSize,
@@ -145,7 +145,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         }
     });
 
-    useEventListener(window, "pointermove", ({screenX, screenY}: PointerEvent) => {
+    useEventListener(window, "pointermove", ({screenX, screenY}) => {
         if (dragStart) {
             onStateChange({
                 loopOffset: gameStateNormalizeLoopOffset(puzzle, {
@@ -162,7 +162,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     // endregion
 
     // Handle arrows
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (isShowingSettings) {
             return;
         }

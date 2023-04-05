@@ -23,7 +23,7 @@ export const DeleteButton = <CellType, ExType, ProcessedExType>(
 
     const handleClear = useCallback(() => onStateChange(clearSelectionAction()), [onStateChange]);
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (!isShowingSettings && deleteHotkeys.includes(ev.code)) {
             handleClear();
             ev.preventDefault();

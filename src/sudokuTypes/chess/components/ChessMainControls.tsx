@@ -33,7 +33,7 @@ export const ChessMainControls = (
         setUsedColorSelectionOnce(true);
     }, [onStateChange, setUsedColorSelectionOnce]);
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (isShowingSettings) {
             return;
         }

@@ -221,7 +221,7 @@ export const useCellWriteModeHotkeys = <CellType, ExType = {}, ProcessedExType =
 
     const setCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode});
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (isShowingSettings) {
             return;
         }

@@ -79,7 +79,7 @@ export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
         [setCurrentButton, onStateChange, digit, index, context]
     );
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (isShowingSettings) {
             return;
         }

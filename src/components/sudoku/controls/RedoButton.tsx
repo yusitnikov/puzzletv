@@ -23,7 +23,7 @@ export const RedoButton = <CellType, ExType, ProcessedExType>(
 
     const handleRedo = useCallback(() => onStateChange(redoAction()), [onStateChange]);
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 

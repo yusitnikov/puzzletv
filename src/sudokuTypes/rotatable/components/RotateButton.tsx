@@ -30,7 +30,7 @@ export const RotateRightButton = (angleDelta: number) => function RotateRightBut
 
     const translate = useTranslate();
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (!isShowingSettings && ev.code === "KeyR") {
             handleRotate(context, ev.shiftKey ? -angleDelta : angleDelta);
             ev.preventDefault();

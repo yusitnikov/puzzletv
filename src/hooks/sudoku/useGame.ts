@@ -343,7 +343,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
     useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);
 
-    useEventListener(window, "beforeunload", (ev: BeforeUnloadEvent) => {
+    useEventListener(window, "beforeunload", (ev) => {
         if (gameState.fieldStateHistory.states.length > 1) {
             ev.preventDefault();
             ev.returnValue = "";

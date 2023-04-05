@@ -84,7 +84,7 @@ export const InfiniteRingsFieldWrapper = <
 
     const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount);
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (isShowingSettings) {
             return;
         }

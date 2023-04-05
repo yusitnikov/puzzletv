@@ -27,7 +27,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
     ) {
         const isDragMode = cellWriteMode === CellWriteMode.move;
 
-        useEventListener(window, "keydown", ({key}: KeyboardEvent) => {
+        useEventListener(window, "keydown", ({key}) => {
             if (isShowingSettings || !isReady) {
                 return;
             }

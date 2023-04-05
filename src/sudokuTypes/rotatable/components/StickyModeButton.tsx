@@ -20,7 +20,7 @@ export const StickyModeButton = <CellType,>(
         onStateChange(({extension: {isStickyMode}}) => ({extension: {isStickyMode: !isStickyMode}}));
     };
 
-    useEventListener(window, "keydown", (ev: KeyboardEvent) => {
+    useEventListener(window, "keydown", (ev) => {
         if (!isShowingSettings && ev.code === "KeyS") {
             handleToggleStickyMode();
             ev.preventDefault();
