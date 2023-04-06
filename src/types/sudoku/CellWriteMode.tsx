@@ -3,12 +3,23 @@ import {PuzzleContext} from "./PuzzleContext";
 import {getDefaultDigitsCount, PuzzleDefinition} from "./PuzzleDefinition";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
-import {gameStateContinueMultiLine, gameStateStartMultiLine} from "./GameState";
+import {
+    gameStateContinueMultiLine,
+    gameStateNormalizeLoopOffset,
+    gameStateResetCurrentMultiLine,
+    gameStateStartMultiLine
+} from "./GameState";
 import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
-import {shadingAction, shadingStartAction} from "./GameStateAction";
+import {applyCurrentMultiLineAction, shadingAction, shadingStartAction} from "./GameStateAction";
 import {incrementArrayItem} from "../../utils/array";
 import {useEventListener} from "../../hooks/useEventListener";
+import {
+    GestureFinishReason,
+    GestureIsValidProps,
+    GestureOnContinueProps,
+    GestureOnEndProps
+} from "../../utils/gestures";
 
 export enum CellWriteMode {
     main,
@@ -37,6 +48,7 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     ) => ReactNode;
     getCurrentButton?: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => (number | undefined);
     setCurrentButton?: (context: PuzzleContext<CellType, ExType, ProcessedExType>, index: number) => void;
+    isValidGesture?(isCurrentCellWriteMode: boolean, props: GestureIsValidProps, context: PuzzleContext<CellType, ExType, ProcessedExType>): boolean;
     onCornerClick?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position: CellExactPosition,
@@ -46,6 +58,8 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position: CellExactPosition
     ) => void;
+    onMove?(props: GestureOnContinueProps, context: PuzzleContext<CellType, ExType, ProcessedExType>): void;
+    onGestureEnd?(props: GestureOnEndProps, context: PuzzleContext<CellType, ExType, ProcessedExType>): void;
 }
 
 export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
@@ -120,6 +134,14 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
                 {...context, state},
                 position
             )),
+        onGestureEnd: (
+            {gesture: {isClick, pointers: [{start: {event: {button}}}]}, reason},
+            context
+        ) => context.onStateChange(
+            reason === GestureFinishReason.pointerUp
+                ? applyCurrentMultiLineAction(context, isClick, !!button)
+                : gameStateResetCurrentMultiLine
+        ),
         digitsCount: ({puzzle: {disableLineColors}}) => disableLineColors ? 0 : 9,
         buttonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
@@ -137,6 +159,15 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         hotKeyStr: ["Alt+Shift"],
         isNoSelectionMode: true,
         digitsCount: 0,
+        isValidGesture: (isCurrentCellWriteMode, {gesture: {pointers}}) =>
+            isCurrentCellWriteMode || pointers.length > 1,
+        onMove: ({prevMetrics, currentMetrics}, {puzzle, cellSize, onStateChange}) =>
+            onStateChange(({loopOffset: {top, left}}) => ({
+                loopOffset: gameStateNormalizeLoopOffset(puzzle, {
+                    left: left + (puzzle.loopHorizontally ? (currentMetrics.x - prevMetrics.x) / cellSize : 0),
+                    top: top + (puzzle.loopVertically ? (currentMetrics.y - prevMetrics.y) / cellSize : 0),
+                }),
+            })),
     },
 ];
 

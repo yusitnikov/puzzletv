@@ -1,6 +1,6 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect, transformRect} from "../../../types/layout/Rect";
-import {emptyPosition, Position} from "../../../types/layout/Position";
+import {emptyPosition, isSamePosition, Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import React, {Fragment, ReactNode, useMemo, useState} from "react";
@@ -13,9 +13,10 @@ import {
     gameStateApplyArrowToSelectedCells,
     gameStateClearSelectedCells,
     gameStateGetCurrentFieldState,
-    gameStateNormalizeLoopOffset,
-    gameStateResetCurrentMultiLine,
+    gameStateHandleCellDoubleClick,
     gameStateSelectAllCells,
+    gameStateSetSelectedCells,
+    gameStateToggleSelectedCells,
 } from "../../../types/sudoku/GameState";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
@@ -27,12 +28,11 @@ import {
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteMode";
 import {HashSet, PlainValueSet} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
-import {applyCurrentMultiLineAction} from "../../../types/sudoku/GameStateAction";
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {PencilmarksCheckerMode} from "../../../types/sudoku/PencilmarksCheckerMode";
 import {resolvePuzzleInitialColors} from "../../../types/sudoku/PuzzleDefinition";
@@ -43,7 +43,14 @@ import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCo
 import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
-import {useOutsideClick} from "../../../utils/gestures";
+import {
+    GestureFinishReason,
+    GestureHandler,
+    GestureIsValidProps,
+    useGestureHandlers,
+    useOutsideClick
+} from "../../../utils/gestures";
+import {isCellGestureExtraData, isCurrentModeByCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -82,6 +89,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         getCellSelectionType = state.highlightSeenCells ? getDefaultCellSelectionType : undefined,
         disableConflictChecker,
         disableArrowLetterShortcuts,
+        hiddenSpecificCellWriteModes = [],
     } = typeManager;
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
@@ -101,7 +109,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         isShowingSettings,
         processed: {
             isReady,
-            cellWriteMode,
             cellWriteModeInfo: {isNoSelectionMode},
         },
         fogDemoFieldStateHistory,
@@ -113,53 +120,118 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const {isAnyKeyDown} = useControlKeysState();
 
     // region Pointer events
-    const [isContinuingSelectingCells, setIsContinuingSelectingCells] = useState(false);
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
-
-    const [dragStart, setDragStart] = useState<Position | undefined>(undefined);
 
     // Handle outside click
     useOutsideClick(() => {
         if (!isAnyKeyDown) {
             onStateChange(gameStateClearSelectedCells);
         }
-
-        setIsDeleteSelectedCellsStroke(false);
-        onStateChange(gameStateResetCurrentMultiLine);
     });
 
-    useEventListener(window, "pointerup", ({button}) => {
-        // button === 0 is the left mouse button
-        onStateChange(applyCurrentMultiLineAction(context, !!button));
+    const cellWriteModeInfos = getAllowedCellWriteModeInfos(puzzle);
+    const cellWriteModeGestureHandlers = useGestureHandlers([...cellWriteModeInfos, ...hiddenSpecificCellWriteModes].map(
+        (
+            {
+                mode,
+                isValidGesture = (isCurrentCellWriteMode: boolean, {gesture: {pointers}}: GestureIsValidProps) =>
+                    isCurrentCellWriteMode && pointers.length === 1,
+                isNoSelectionMode,
+                onMove,
+                onCornerClick,
+                onCornerEnter,
+                onGestureEnd,
+                handlesRightMouseClick,
+            }
+        ): GestureHandler => {
+            const common: Pick<GestureHandler, "isValidGesture"> = {
+                isValidGesture: (props) => isValidGesture(
+                    isCurrentModeByCellGestureExtraData(props.extraData, mode),
+                    props,
+                    context,
+                ),
+            };
 
-        setIsContinuingSelectingCells(false);
+            if (!isNoSelectionMode) {
+                return {
+                    contextId: "cell-selection",
+                    ...common,
+                    onStart: ({extraData, event}) => {
+                        const {ctrlKey, metaKey, shiftKey} = event;
+                        const isMultiSelection = ctrlKey || metaKey || shiftKey || state.isMultiSelection;
 
-        setDragStart(undefined);
-    });
+                        if (!isCellGestureExtraData(extraData)) {
+                            return;
+                        }
 
-    useEventListener(window, "pointerdown", ({screenX, screenY}) => {
-        if (cellWriteMode === CellWriteMode.move) {
-            setDragStart({
-                left: loopOffset.left - screenX / cellSize,
-                top: loopOffset.top - screenY / cellSize,
-            });
+                        const cellPosition = extraData.cell;
+
+                        setIsDeleteSelectedCellsStroke(isMultiSelection && selectedCells.contains(cellPosition));
+                        onStateChange(
+                            gameState => isMultiSelection
+                                ? gameStateToggleSelectedCells(gameState, [cellPosition])
+                                : gameStateSetSelectedCells(gameState, [cellPosition])
+                        );
+                    },
+                    onContinue: ({prevData, currentData}) => {
+                        const [prevCell, currentCell] = [prevData, currentData].map(
+                            ({extraData}) => isCellGestureExtraData(extraData) && !extraData.skipEnter ? extraData.cell : undefined
+                        );
+                        if (currentCell && (!prevCell || !isSamePosition(prevCell, currentCell))) {
+                            onStateChange(gameState => gameStateToggleSelectedCells(gameState, [currentCell], !isDeleteSelectedCellsStroke));
+                        }
+                    },
+                    onEnd: ({reason}) => {
+                        if (reason === GestureFinishReason.startNewGesture) {
+                            onStateChange(gameStateClearSelectedCells);
+                        }
+                    },
+                    onDoubleClick: ({extraData, event: {ctrlKey, metaKey, shiftKey}}) => {
+                        if (!isCellGestureExtraData(extraData) || !isCurrentModeByCellGestureExtraData(extraData, mode)) {
+                            return false;
+                        }
+
+                        onStateChange(gameStateHandleCellDoubleClick(
+                            context,
+                            extraData.cell,
+                            ctrlKey || metaKey || shiftKey
+                        ));
+                        return true;
+                    },
+                }
+            }
+
+            return {
+                contextId: `cell-write-mode-${mode}`,
+                ...common,
+                onStart: ({extraData, event: {button}}) => {
+                    if (isCellGestureExtraData(extraData) && extraData.exact) {
+                        onCornerClick?.(context, extraData.exact, !!button);
+                    }
+                },
+                onContinue: (props) => {
+                    const {prevData: {extraData: prevData}, currentData: {extraData: currentData}} = props;
+
+                    if (
+                        isCellGestureExtraData(currentData) && currentData.exact &&
+                        (!isCellGestureExtraData(prevData) || JSON.stringify(prevData.exact) !== JSON.stringify(currentData.exact))
+                    ) {
+                        onCornerEnter?.(context, currentData.exact);
+                    }
+
+                    onMove?.(props, context);
+                },
+                onEnd: (props) => onGestureEnd?.(props, context),
+                onContextMenu: ({event, extraData}) => {
+                    if (handlesRightMouseClick && isCurrentModeByCellGestureExtraData(extraData, mode)) {
+                        event.preventDefault();
+                        return true;
+                    }
+                    return false;
+                },
+            };
         }
-    });
-
-    useEventListener(window, "pointermove", ({screenX, screenY}) => {
-        if (dragStart) {
-            onStateChange({
-                loopOffset: gameStateNormalizeLoopOffset(puzzle, {
-                    left: loopHorizontally
-                        ? dragStart.left + screenX / cellSize
-                        : loopOffset.left,
-                    top: loopVertically
-                        ? dragStart.top + screenY / cellSize
-                        : loopOffset.top,
-                }),
-            });
-        }
-    });
+    ));
     // endregion
 
     // Handle arrows
@@ -408,10 +480,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
                         context={readOnlySafeContext}
                         cellPosition={cellPosition}
-                        isDeleteSelectedCellsStroke={isDeleteSelectedCellsStroke}
-                        onIsDeleteSelectedCellsStrokeChange={setIsDeleteSelectedCellsStroke}
-                        isContinuingSelectingCells={isContinuingSelectingCells}
-                        onIsContinuingSelectingCellsChange={setIsContinuingSelectingCells}
+                        handlers={cellWriteModeGestureHandlers}
                     />)}
                 </Absolute>
 

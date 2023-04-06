@@ -23,15 +23,21 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
 
     const baseTypeManager = DigitSudokuTypeManager<ExType, ProcessedExType>();
 
+    const arrowsCellWriteModeInfo = safeCrackerArrowsCellWriteModeInfo<ExType, ProcessedExType>();
+
     return {
         ...baseTypeManager,
+        hiddenSpecificCellWriteModes: [
+            ...baseTypeManager.hiddenSpecificCellWriteModes ?? [],
+            arrowsCellWriteModeInfo,
+        ],
         getCellTypeProps({top, left}) {
             switch (top - circleRegionsCount * 2) {
                 case 0: return {};
                 case 1: return {isVisible: left < codeCellsCount};
                 default: return top % 2 === 1 ? {} : {
                     isSelectable: false,
-                    forceCellWriteMode: safeCrackerArrowsCellWriteModeInfo(),
+                    forceCellWriteMode: arrowsCellWriteModeInfo,
                 };
             }
         },

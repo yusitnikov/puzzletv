@@ -105,6 +105,8 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     extraCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
 
+    hiddenSpecificCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
+
     initialCellWriteMode?: CellWriteMode;
 
     digitComponentType?: DigitComponentType;

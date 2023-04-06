@@ -1,4 +1,5 @@
 import {HashSet} from "../struct/Set";
+import {average} from "../../utils/math";
 
 export interface Position {
     left: number;
@@ -132,16 +133,9 @@ export const getAveragePosition = (positions: Position[]): Position => {
         return emptyPosition;
     }
 
-    let top = 0, left = 0;
-
-    for (const position of positions) {
-        top += position.top;
-        left += position.left;
-    }
-
     return {
-        top: top / positions.length,
-        left: left / positions.length,
+        top: average(positions.map(({top}) => top)),
+        left: average(positions.map(({left}) => left)),
     };
 };
 

@@ -341,7 +341,14 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
         [puzzle, cellsIndex, processedGameState, cellSize, cellSizeForSidePanel, multiPlayer, mergeGameState, readOnly]
     );
 
-    useDiffEffect(([prevState]) => applyStateDiffEffect?.(processedGameState, prevState, context), [processedGameState]);
+    useDiffEffect(
+        ([prevState], [currentState]) => {
+            if (currentState) {
+                applyStateDiffEffect?.(currentState, prevState, context);
+            }
+        },
+        [processedGameState]
+    );
 
     useEventListener(window, "beforeunload", (ev) => {
         if (gameState.fieldStateHistory.states.length > 1) {

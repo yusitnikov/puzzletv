@@ -1,56 +1,37 @@
-import {
-    gameStateGetCurrentFieldState,
-    gameStateSetSelectedCells,
-    gameStateToggleSelectedCells
-} from "../../../types/sudoku/GameState";
 import {Position} from "../../../types/layout/Position";
-import {MouseEvent, PointerEvent} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {globalPaddingCoeff} from "../../app/globals";
 import {indexes} from "../../../utils/indexes";
-import {CellState} from "../../../types/sudoku/CellState";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "./FieldCellShape";
 import {CellExactPosition} from "../../../types/sudoku/CellExactPosition";
 import {CellPart} from "../../../types/sudoku/CellPart";
 import {mergeEventHandlerProps} from "../../../utils/mergeEventHandlerProps";
-import {cancelOutsideClickProps} from "../../../utils/gestures";
+import {cancelOutsideClickProps, GestureHandler, getGestureHandlerProps} from "../../../utils/gestures";
+import {CellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
 export interface FieldCellMouseHandlerProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
     cellPosition: Position;
-    isDeleteSelectedCellsStroke: boolean;
-    onIsDeleteSelectedCellsStrokeChange: (newValue: boolean) => void;
-    isContinuingSelectingCells: boolean;
-    onIsContinuingSelectingCellsChange: (newValue: boolean) => void;
+    handlers: GestureHandler[];
 }
 
 export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {}>(
     {
         context,
         cellPosition,
-        isDeleteSelectedCellsStroke,
-        onIsDeleteSelectedCellsStrokeChange,
-        isContinuingSelectingCells,
-        onIsContinuingSelectingCellsChange,
+        handlers,
     }: FieldCellMouseHandlerProps<CellType, ExType, ProcessedExType>
 ) => {
-    const {puzzle, cellsIndex, state, onStateChange} = context;
+    const {puzzle, cellsIndex, state} = context;
+
+    const {processed: {cellWriteModeInfo}} = state;
 
     const {
-        selectedCells,
-        currentMultiLineEnd,
-        initialDigits: stateInitialDigits,
-        processed: {cellWriteModeInfo},
-    } = state;
-
-    const {
-        isNoSelectionMode,
         onCornerClick,
         onCornerEnter,
-        handlesRightMouseClick,
     } = puzzle.typeManager.getCellTypeProps?.(cellPosition, puzzle)?.forceCellWriteMode || cellWriteModeInfo;
 
     const {areCustomBounds, center, borderSegments} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
@@ -60,71 +41,6 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         corner: cellPosition,
         round: center,
         type: CellPart.center,
-    };
-
-    const handleCellClick = ({ctrlKey, metaKey, shiftKey}: PointerEvent<any>) => {
-        const isMultiSelection = ctrlKey || metaKey || shiftKey || state.isMultiSelection;
-
-        onIsContinuingSelectingCellsChange(true);
-        onIsDeleteSelectedCellsStrokeChange(isMultiSelection && selectedCells.contains(cellPosition));
-        onStateChange(
-            gameState => isMultiSelection
-                ? gameStateToggleSelectedCells(gameState, [cellPosition])
-                : gameStateSetSelectedCells(gameState, [cellPosition])
-        );
-    };
-
-    const handleCellDoubleClick = ({ctrlKey, metaKey, shiftKey}: MouseEvent<any>) => {
-        const {initialDigits, typeManager: {areSameCellData}} = puzzle;
-        const {cells} = gameStateGetCurrentFieldState(state);
-
-        const {usersDigit, colors, centerDigits, cornerDigits} = cells[cellPosition.top][cellPosition.left];
-        const mainDigit = initialDigits?.[cellPosition.top]?.[cellPosition.left]
-            || stateInitialDigits?.[cellPosition.top]?.[cellPosition.left]
-            || usersDigit;
-
-        let filter: (cell: CellState<CellType>, initialDigit?: CellType) => boolean;
-        if (mainDigit) {
-            filter = ({usersDigit}, initialDigit) => {
-                const otherMainDigit = initialDigit || usersDigit;
-                return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, undefined, false);
-            };
-        } else if (colors.size) {
-            filter = ({colors: otherColors}) => otherColors.containsOneOf(colors.items);
-        } else if (centerDigits.size) {
-            filter = ({centerDigits: otherCenterDigits}) => otherCenterDigits.containsOneOf(centerDigits.items);
-        } else if (cornerDigits.size) {
-            filter = ({cornerDigits: otherCornerDigits}) => otherCornerDigits.containsOneOf(cornerDigits.items);
-        } else {
-            return;
-        }
-
-        const matchingPositions: Position[] = cells
-            .flatMap((row, top) => row.map((cellState, left) => ({
-                position: {top, left},
-                cellState,
-                initialDigit: initialDigits?.[top]?.[left] || stateInitialDigits?.[top]?.[left],
-            })))
-            .filter(({cellState, initialDigit}) => filter(cellState, initialDigit))
-            .map(({position}) => position);
-
-        onStateChange(
-            gameState => ctrlKey || metaKey || shiftKey || gameState.isMultiSelection
-                ? gameStateToggleSelectedCells(gameState, matchingPositions, true)
-                : gameStateSetSelectedCells(gameState, matchingPositions)
-        );
-    };
-
-    const handleContinueCellSelection = () => {
-        if (isContinuingSelectingCells && !currentMultiLineEnd) {
-            onStateChange(gameState => gameStateToggleSelectedCells(gameState, [cellPosition], !isDeleteSelectedCellsStroke));
-        }
-    };
-
-    const handleContextMenu = (ev: MouseEvent<any>) => {
-        if (handlesRightMouseClick) {
-            ev.preventDefault();
-        }
     };
 
     return <>
@@ -150,13 +66,12 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     key={`draw-corner-${topOffset}-${leftOffset}`}
                     context={context}
                     cellPosition={cellPosition}
+                    cellExactPosition={exactPosition}
+                    handlers={handlers}
                     left={leftOffset * 0.25}
                     top={topOffset * 0.25}
                     width={0.25}
                     height={0.25}
-                    onClick={({button}) => onCornerClick?.(context, exactPosition, !!button)}
-                    onEnter={() => onCornerEnter?.(context, exactPosition)}
-                    onContextMenu={handleContextMenu}
                 />;
             }))}
 
@@ -165,9 +80,8 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     key={"draw-center"}
                     context={context}
                     cellPosition={cellPosition}
-                    onClick={({button}) => onCornerClick?.(context, centerExactPosition, !!button)}
-                    onEnter={() => onCornerEnter?.(context, centerExactPosition)}
-                    onContextMenu={handleContextMenu}
+                    cellExactPosition={centerExactPosition}
+                    handlers={handlers}
                 />
 
                 {Object.entries(borderSegments).map(([key, {line, center: borderCenter}]) => {
@@ -182,24 +96,20 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                         key={`draw-border-${key}`}
                         context={context}
                         cellPosition={cellPosition}
+                        cellExactPosition={exactPosition}
                         line={line}
-                        onClick={({button}) => onCornerClick?.(context, exactPosition, !!button)}
-                        onEnter={() => onCornerEnter?.(context, exactPosition)}
-                        onContextMenu={handleContextMenu}
+                        handlers={handlers}
                     />
                 })}
             </>}
         </>}
 
-        {!isNoSelectionMode && <>
+        {!(onCornerClick || onCornerEnter) && <>
             <MouseHandlerRect
                 key={"cell-selection"}
                 context={context}
                 cellPosition={cellPosition}
-                onClick={handleCellClick}
-                onDoubleClick={handleCellDoubleClick}
-                onEnter={handleContinueCellSelection}
-                onContextMenu={handleContextMenu}
+                handlers={handlers}
             />
 
             {!areCustomBounds && indexes(2).flatMap(topOffset => indexes(2).map(leftOffset => {
@@ -211,26 +121,28 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     top={topOffset * (1 - borderPaddingCoeff)}
                     width={borderPaddingCoeff}
                     height={borderPaddingCoeff}
-                    onClick={handleCellClick}
-                    onDoubleClick={handleCellDoubleClick}
-                    onContextMenu={handleContextMenu}
+                    handlers={handlers}
+                    skipEnter={true}
                 />;
             }))}
         </>}
     </>;
 };
 
-interface MouseHandlerRectProps extends Partial<Rect> {
-    context: PuzzleContext<any, any, any>;
+interface MouseHandlerRectProps<CellType, ExType, ProcessedExType> extends Partial<Rect> {
+    context: PuzzleContext<CellType, ExType, ProcessedExType>;
     cellPosition: Position;
+    cellExactPosition?: CellExactPosition;
     line?: Position[];
-    onClick?: (ev: PointerEvent<any>) => void;
-    onDoubleClick?: (ev: MouseEvent<any>) => void;
-    onEnter?: (ev: PointerEvent<any>) => void;
-    onContextMenu?: (ev: MouseEvent<any>) => void;
+    handlers: GestureHandler[];
+    skipEnter?: boolean;
 }
 
-export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDoubleClick, onEnter, onContextMenu, ...rect}: MouseHandlerRectProps) => <FieldCellShape
+const MouseHandlerRect = <CellType, ExType, ProcessedExType>(
+    {
+        context, cellPosition, cellExactPosition, line, handlers, skipEnter, ...rect
+    }: MouseHandlerRectProps<CellType, ExType, ProcessedExType>
+) => <FieldCellShape
     context={context}
     cellPosition={cellPosition}
     line={line}
@@ -241,20 +153,17 @@ export const MouseHandlerRect = ({context, cellPosition, line, onClick, onDouble
     {...mergeEventHandlerProps(
         // Make sure that clicking on the grid won't be recognized as an outside click
         cancelOutsideClickProps,
+        // Make sure that clicking on the grid won't try to drag
         {
-            // Make sure that clicking on the grid won't try to drag
             onMouseDown: (ev) => ev.preventDefault(),
-            onPointerDown: onClick,
-            onDoubleClick,
-            onPointerEnter: (ev) => {
-                if (!ev.buttons) {
-                    return;
-                }
-
-                onEnter?.(ev);
-            },
-            onContextMenu,
         },
+        getGestureHandlerProps(handlers, (): CellGestureExtraData<CellType, ExType, ProcessedExType> => ({
+            type: "cell",
+            cell: cellPosition,
+            exact: cellExactPosition,
+            cellWriteModeInfo: context.puzzle.typeManager.getCellTypeProps?.(cellPosition, context.puzzle)?.forceCellWriteMode ?? context.state.processed.cellWriteModeInfo,
+            skipEnter,
+        })),
     )}
     {...rect}
 />;

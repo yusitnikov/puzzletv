@@ -1,12 +1,10 @@
-/** @jsxImportSource @emotion/react */
-import React, {useMemo} from "react";
+import {useMemo} from "react";
 import {Size} from "../../../types/layout/Size";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
 import {SidePanel} from "../side-panel/SidePanel";
 import {globalPaddingCoeff} from "../../app/globals";
 import {getControlsSizeCoeff} from "../controls/Controls";
-import styled from "@emotion/styled";
 import {useWindowSize} from "../../../hooks/useWindowSize";
 import {useGame} from "../../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
@@ -15,21 +13,10 @@ import {Title} from "../../layout/title/Title";
 import {RegularDigitComponentType} from "../digit/RegularDigit";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Modal} from "../../layout/modal/Modal";
 import {Rect} from "../../../types/layout/Rect";
 import {profiler} from "../../../utils/profiler";
 import {useControlButtonsManager} from "../controls/ControlButtonsManager";
-
-const StyledContainer = styled("div", {
-    shouldForwardProp(propName) {
-        return propName !== "isDragMode";
-    }
-})(({isDragMode}: {isDragMode: boolean}) => ({
-    position: "absolute",
-    inset: 0,
-    cursor: isDragMode ? "pointer" : undefined,
-}));
 
 export interface PuzzleProps<CellType, ExType = {}, ProcessedExType = {}> {
     puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>;
@@ -97,7 +84,7 @@ export const Puzzle = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const context = useGame(puzzle, cellSize, cellSizeForSidePanel);
 
-    const {state: gameState, multiPlayer} = context;
+    const {multiPlayer} = context;
 
     const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
 
@@ -108,50 +95,46 @@ export const Puzzle = <CellType, ExType = {}, ProcessedExType = {}>(
             {" "}– Puzzle TV
         </Title>
 
-        <StyledContainer
-            isDragMode={gameState.processed.cellWriteMode === CellWriteMode.move}
-        >
-            <PuzzleContainerContext.Provider value={fieldOuterRect}>
-                <Absolute
-                    left={containerLeft}
-                    top={0}
-                    {...containerSize}
-                >
-                    <Field
-                        context={context}
-                        rect={fieldInnerRect}
-                    />
+        <PuzzleContainerContext.Provider value={fieldOuterRect}>
+            <Absolute
+                left={containerLeft}
+                top={0}
+                {...containerSize}
+            >
+                <Field
+                    context={context}
+                    rect={fieldInnerRect}
+                />
 
-                    <SidePanel
-                        context={context}
-                        rect={{
-                            left: isHorizontal ? controlsOffset : padding,
-                            top: isHorizontal ? padding : controlsOffset,
-                            width: isHorizontal ? controlsSize : sudokuSize,
-                            height: isHorizontal ? sudokuSize : controlsSize,
-                        }}
-                        isHorizontal={isHorizontal}
-                    />
-                </Absolute>
+                <SidePanel
+                    context={context}
+                    rect={{
+                        left: isHorizontal ? controlsOffset : padding,
+                        top: isHorizontal ? padding : controlsOffset,
+                        width: isHorizontal ? controlsSize : sudokuSize,
+                        height: isHorizontal ? sudokuSize : controlsSize,
+                    }}
+                    isHorizontal={isHorizontal}
+                />
+            </Absolute>
 
-                {isEnabled && <>
-                    {!isLoaded && <Modal cellSize={cellSizeForSidePanel}>
-                        <div>{translate("Loading")}...</div>
+            {isEnabled && <>
+                {!isLoaded && <Modal cellSize={cellSizeForSidePanel}>
+                    <div>{translate("Loading")}...</div>
+                </Modal>}
+
+                {isLoaded && <>
+                    {isDoubledConnected && <Modal cellSize={cellSizeForSidePanel}>
+                        <div>{translate("You opened this puzzle in more than one tab")}!</div>
+                        <div>{translate("Please leave only one active tab")}.</div>
                     </Modal>}
 
-                    {isLoaded && <>
-                        {isDoubledConnected && <Modal cellSize={cellSizeForSidePanel}>
-                            <div>{translate("You opened this puzzle in more than one tab")}!</div>
-                            <div>{translate("Please leave only one active tab")}.</div>
-                        </Modal>}
-
-                        {!hostData && <Modal cellSize={cellSizeForSidePanel}>
-                            <div>{translate("The host of the game is not connected")}!</div>
-                            <div>{translate("Please wait for them to join")}.</div>
-                        </Modal>}
-                    </>}
+                    {!hostData && <Modal cellSize={cellSizeForSidePanel}>
+                        <div>{translate("The host of the game is not connected")}!</div>
+                        <div>{translate("Please wait for them to join")}.</div>
+                    </Modal>}
                 </>}
-            </PuzzleContainerContext.Provider>
-        </StyledContainer>
+            </>}
+        </PuzzleContainerContext.Provider>
     </DigitComponentTypeContext.Provider>;
 }

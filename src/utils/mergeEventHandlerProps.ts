@@ -1,6 +1,4 @@
-import {DOMAttributes} from "react";
-
-export type EventHandlerProps<T> = Omit<DOMAttributes<T>, "children" | "dangerouslySetInnerHTML">;
+import {EventHandlerProps} from "../types/dom/EventHandlerProps";
 
 export const mergeEventHandlerProps = <T>(...args: EventHandlerProps<T>[]): EventHandlerProps<T> => {
     const result: EventHandlerProps<T> = {};

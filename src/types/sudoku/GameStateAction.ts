@@ -92,24 +92,26 @@ export const enterDigitAction = <CellType, ExType, ProcessedExType>(
 ];
 
 interface ApplyCurrentMultiLineActionParams {
+    isClick?: boolean;
     isRightButton?: boolean;
 }
 export const applyCurrentMultiLineActionType = <CellType, ExType, ProcessedExType>()
     : GameStateActionType<ApplyCurrentMultiLineActionParams, CellType, ExType, ProcessedExType> => ({
     key: "apply-current-multiline",
-    callback: ({isRightButton = false} = {}, context, clientId) =>
-        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, isRightButton, true),
+    callback: ({isClick = false, isRightButton = false} = {}, context, clientId) =>
+        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, isClick, isRightButton, true),
 });
 export const applyCurrentMultiLineAction = <CellType, ExType, ProcessedExType>(
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    isClick = false,
     isRightButton = false
 )
     : GameStateActionOrCallback<ApplyCurrentMultiLineActionParams, CellType, ExType, ProcessedExType>[] => [
     {
         type: applyCurrentMultiLineActionType(),
-        params: {isRightButton},
+        params: {isClick, isRightButton},
     },
-    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isRightButton, false),
+    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isClick, isRightButton, false),
 ];
 
 export interface SetCellMarkActionParams extends Position {

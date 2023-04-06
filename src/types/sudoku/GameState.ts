@@ -405,6 +405,52 @@ export const gameStateToggleSelectedCells = <CellType, ExType>(
         : state.selectedCells.toggleAll(cellPositions, forcedEnable),
 });
 
+export const gameStateHandleCellDoubleClick = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    cellPosition: Position,
+    isAnyKeyDown: boolean,
+): Parameters<typeof context["onStateChange"]>[0] => {
+    const {puzzle, state} = context;
+    const {initialDigits: stateInitialDigits} = state;
+    const {initialDigits, typeManager: {areSameCellData}} = puzzle;
+    const {cells} = gameStateGetCurrentFieldState(state);
+
+    const {usersDigit, colors, centerDigits, cornerDigits} = cells[cellPosition.top][cellPosition.left];
+    const mainDigit = initialDigits?.[cellPosition.top]?.[cellPosition.left]
+        || stateInitialDigits?.[cellPosition.top]?.[cellPosition.left]
+        || usersDigit;
+
+    let filter: (cell: CellState<CellType>, initialDigit?: CellType) => boolean;
+    if (mainDigit) {
+        filter = ({usersDigit}, initialDigit) => {
+            const otherMainDigit = initialDigit || usersDigit;
+            return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, undefined, false);
+        };
+    } else if (colors.size) {
+        filter = ({colors: otherColors}) => otherColors.containsOneOf(colors.items);
+    } else if (centerDigits.size) {
+        filter = ({centerDigits: otherCenterDigits}) => otherCenterDigits.containsOneOf(centerDigits.items);
+    } else if (cornerDigits.size) {
+        filter = ({cornerDigits: otherCornerDigits}) => otherCornerDigits.containsOneOf(cornerDigits.items);
+    } else {
+        return {};
+    }
+
+    const matchingPositions: Position[] = cells
+        .flatMap((row, top) => row.map((cellState, left) => ({
+            position: {top, left},
+            cellState,
+            initialDigit: initialDigits?.[top]?.[left] || stateInitialDigits?.[top]?.[left],
+        })))
+        .filter(({cellState, initialDigit}) => filter(cellState, initialDigit))
+        .map(({position}) => position);
+
+    return (gameState) => isAnyKeyDown || gameState.isMultiSelection
+            ? gameStateToggleSelectedCells(gameState, matchingPositions, true)
+            : gameStateSetSelectedCells(gameState, matchingPositions)
+    ;
+};
+
 export const gameStateSelectAllCells = <CellType, ExType, ProcessedExType>(
     puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
     state: ProcessedGameState<CellType>
@@ -809,9 +855,12 @@ export const gameStateResetCurrentMultiLine = <CellType, ExType>(): PartialGameS
 export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType>(
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
     clientId: string,
+    isClick: boolean,
     isRightButton: boolean,
     isGlobal: boolean
 ): PartialGameStateEx<CellType, ExType> => {
+    // TODO: move all parameters from state to action params
+
     const {puzzle, state} = context;
     const {typeManager, allowDrawing = [], disableLineColors} = puzzle;
     const selectedColor = disableLineColors ? undefined : state.selectedColor;
@@ -824,7 +873,7 @@ export const gameStateApplyCurrentMultiLine = <CellType, ExType, ProcessedExType
                 (fieldState) => {
                     let {marks} = fieldState;
 
-                    if (state.dragStartPoint) {
+                    if (isClick && state.dragStartPoint) {
                         const {type, round} = state.dragStartPoint;
 
                         if (allowDrawing.includes(`${type}-mark`)) {
