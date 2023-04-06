@@ -1,7 +1,7 @@
 import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import {RotatableGameState, RotatableProcessedGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
+import {RotatableGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
 import {FieldSize8, FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {PartiallyTranslatable} from "../../types/translations/Translatable";
@@ -58,7 +58,7 @@ export const EmptyChaosConstructionLoop: PuzzleDefinition<number> = {
     fieldMargin: 0.99,
 };
 
-export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState, RotatableProcessedGameState> = {
+export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState> = {
     noIndex: true,
     title,
     slug: "empty-rotatable",
@@ -96,7 +96,7 @@ export const EmptyCubedoku: PuzzleDefinition<number> = {
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
+export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState> = {
     noIndex: true,
     title,
     slug: "empty-monument-valley",
@@ -110,7 +110,7 @@ export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState, R
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameState, RotatableProcessedGameState> = {
+export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameState> = {
     noIndex: true,
     title,
     slug: "empty-monument-valley-mini",

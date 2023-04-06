@@ -4,11 +4,7 @@ import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {PropsWithChildren} from "react";
 import {blackColor} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
-import {
-    InfiniteRingsGameState,
-    InfiniteRingsProcessedGameState,
-    setInfiniteRingOffset
-} from "../types/InfiniteRingsGameState";
+import {setInfiniteRingOffset} from "../types/InfiniteRingsGameState";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
@@ -56,25 +52,25 @@ const StyledCircle = styled("div")({
     background: "#fff",
 });
 
-export const InfiniteRingsFieldWrapper = <
-    CellType,
-    ExType extends InfiniteRingsGameState,
-    ProcessedExType extends InfiniteRingsProcessedGameState
->(visibleRingsCountArg = 2) => function InfiniteRingsFieldWrapperComponent(
+export const InfiniteRingsFieldWrapper = <CellType, ExType, ProcessedExType>(
+    visibleRingsCountArg = 2
+) => function InfiniteRingsFieldWrapperComponent(
     {context, children}: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
 ) {
     const {
         puzzle: {fieldSize: {rowsCount: fieldSize}},
         state: {
-            extension: {ringOffset},
+            processed: {scaleLog},
             isShowingSettings,
         },
+        onStateChange,
         cellSize,
         isReadonlyContext,
     } = context;
 
     const translate = useTranslate();
 
+    const ringOffset = Math.round(scaleLog);
     const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
     const ringsCount = fieldSize / 2 - 1;
     const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
@@ -92,12 +88,12 @@ export const InfiniteRingsFieldWrapper = <
         switch ((ev.shiftKey ? "Shift+" : "") + ev.code) {
             case "NumpadAdd":
             case "Shift+Equal":
-                setInfiniteRingOffset(context, ringOffset + 1);
+                onStateChange(setInfiniteRingOffset(context, ringOffset + 1));
                 ev.preventDefault();
                 break;
             case "Minus":
             case "NumpadSubtract":
-                setInfiniteRingOffset(context, ringOffset - 1);
+                onStateChange(setInfiniteRingOffset(context, ringOffset - 1));
                 ev.preventDefault();
                 break;
         }
@@ -176,7 +172,7 @@ export const InfiniteRingsFieldWrapper = <
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => setInfiniteRingOffset(context, ringOffset + 1)}
+                        onClick={() => onStateChange(setInfiniteRingOffset(context, ringOffset + 1))}
                         title={translate("zoom in")}
                     >
                         +
@@ -190,7 +186,7 @@ export const InfiniteRingsFieldWrapper = <
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => setInfiniteRingOffset(context, ringOffset - 1)}
+                        onClick={() => onStateChange(setInfiniteRingOffset(context, ringOffset - 1))}
                         title={translate("zoom out")}
                     >
                         -
@@ -201,7 +197,10 @@ export const InfiniteRingsFieldWrapper = <
                         count={ringsCount}
                         index={index}
                         selected={index === loopedRingOffset}
-                        onClick={() => setInfiniteRingOffset(context, loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2)}
+                        onClick={() => onStateChange(setInfiniteRingOffset(
+                            context,
+                            loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2
+                        ))}
                     >
                         <StyledCircle/>
                     </StyledCircleButton>)}

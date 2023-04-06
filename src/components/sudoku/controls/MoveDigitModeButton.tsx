@@ -19,7 +19,7 @@ export const MoveDigitModeButton = <CellType, ExType, ProcessedExType>(
     const translate = useTranslate();
 
     const handleResetPosition = useCallback(
-        () => onStateChange({loopOffset: {top: 0, left: 0}}),
+        () => onStateChange({loopOffset: {top: 0, left: 0}, animatingLoopOffset: false}),
         [onStateChange]
     )
 

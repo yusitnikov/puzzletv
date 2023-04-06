@@ -113,6 +113,7 @@ export class GestureInfo {
 
     private getMetrics(type: "start" | "current"): GestureMetrics {
         const pointers = this.pointers.map(value => value[type].event);
+        const isMultiTouch = pointers.length > 1;
         const x = average(pointers.map(({screenX}) => screenX));
         const y = average(pointers.map(({screenY}) => screenY));
         const relative = pointers.map(({screenX, screenY}) => ({
@@ -123,8 +124,12 @@ export class GestureInfo {
         return {
             x,
             y,
-            scale: average(relative.map(({dx, dy}) => Math.hypot(dx, dy))),
-            rotation: average(relative.map(({dx, dy}) => Math.atan2(dy, dx))),
+            scale: isMultiTouch
+                ? average(relative.map(({dx, dy}) => Math.hypot(dx, dy)))
+                : 1,
+            rotation: isMultiTouch
+                ? Math.atan2(relative[0].dy, relative[0].dx) * 180 / Math.PI
+                : 0,
         };
     }
 

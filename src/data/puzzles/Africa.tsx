@@ -119,6 +119,5 @@ export const Africa: PuzzleDefinition<number, GoogleMapsState> = {
         // Dots are counted twice
         return product === 0 && dots === 18;
     },
-    enableDragMode: true,
     // TODO: allowDrawing: ["border-mark"],
 };

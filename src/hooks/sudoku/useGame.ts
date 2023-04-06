@@ -2,7 +2,10 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import {
     GameStateEx,
     getAllShareState,
-    getEmptyGameState, mergeGameStateWithUpdates,
+    getEmptyGameState,
+    getScaleLog,
+    mergeGameStateWithUpdates,
+    ProcessedGameStateAnimatedValues,
     ProcessedGameStateEx,
     saveGameState,
     setAllShareState
@@ -24,6 +27,7 @@ import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {useDiffEffect} from "../useDiffEffect";
 import {useControlKeysState} from "../useControlKeysState";
 import {SudokuCellsIndex, SudokuCellsIndexForState} from "../../types/sudoku/SudokuCellsIndex";
+import {useAnimatedValue} from "../useAnimatedValue";
 
 const emptyObject: any = {};
 
@@ -83,10 +87,12 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
             multiPlayer: UseMultiPlayerResult,
             gameState: GameStateEx<CellType, ExType>,
             processedGameStateExtension: ProcessedExType,
+            {loopOffset, angle, scale}: ProcessedGameStateAnimatedValues = gameState,
             applyKeys = true
         ): ProcessedGameStateEx<CellType, ExType, ProcessedExType> => {
             const {
                 isReady: isReadyFn = () => true,
+                scaleStep,
             } = puzzle.typeManager;
 
             const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
@@ -125,6 +131,8 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                     isReady,
                     isMyTurn: !isEnabled || gameState.currentPlayer === myClientId || !!puzzle.params?.share,
                     lastPlayerObjects,
+                    scaleLog: getScaleLog(gameState.scale, scaleStep),
+                    animated: {loopOffset, angle, scale, scaleLog: getScaleLog(scale, scaleStep)},
                 },
                 processedExtension: processedGameStateExtension ?? ({} as ProcessedExType),
             };
@@ -155,6 +163,9 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                     lineCenters,
                     dragStart,
                     dragAction,
+                    loopOffset,
+                    angle,
+                    scale,
                     ...otherState
                 },
             } = message;
@@ -174,10 +185,14 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                         isCurrentMultiLineCenters: lineCenters,
                         dragStartPoint: dragStart,
                         dragAction,
+                        loopOffset,
+                        angle,
+                        scale,
                     },
                     puzzle.typeManager.unserializeInternalState?.(puzzle, otherState) ?? {}
                 ),
                 emptyObject,
+                undefined,
                 false
             );
 
@@ -243,9 +258,34 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const processedGameStateExtension: ProcessedExType = useProcessedGameStateExtension(gameState);
 
+    const animatedLoopOffsetTop = useAnimatedValue(
+        gameState.loopOffset.top,
+        gameState.animatingLoopOffset ? gameState.animationSpeed / 2 : 0
+    );
+    const animatedLoopOffsetLeft = useAnimatedValue(
+        gameState.loopOffset.left,
+        gameState.animatingLoopOffset ? gameState.animationSpeed / 2 : 0
+    );
+    const animatedAngle = useAnimatedValue(
+        gameState.angle,
+        gameState.animatingAngle ? gameState.animationSpeed : 0
+    );
+    const animatedScale = useAnimatedValue(
+        gameState.scale,
+        gameState.animatingScale ? gameState.animationSpeed / 2 : 0
+    );
+    const animated = useMemo<ProcessedGameStateAnimatedValues>(() => ({
+        loopOffset: {
+            top: animatedLoopOffsetTop,
+            left: animatedLoopOffsetLeft,
+        },
+        angle: animatedAngle,
+        scale: animatedScale,
+    }), [animatedLoopOffsetTop, animatedLoopOffsetLeft, animatedAngle, animatedScale]);
+
     const processedGameState = useMemo(
-        () => calculateProcessedGameState(multiPlayer, gameState, processedGameStateExtension),
-        [calculateProcessedGameState, multiPlayer, gameState, processedGameStateExtension]
+        () => calculateProcessedGameState(multiPlayer, gameState, processedGameStateExtension, animated),
+        [calculateProcessedGameState, multiPlayer, gameState, processedGameStateExtension, animated]
     );
 
     const mergeGameState = useCallback(
@@ -309,6 +349,9 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                                 lineCenters: state.isCurrentMultiLineCenters,
                                 dragStart: state.dragStartPoint,
                                 dragAction: state.dragAction,
+                                loopOffset: state.loopOffset,
+                                angle: state.angle,
+                                scale: state.scale,
                                 ...puzzle.typeManager.getInternalState?.(puzzle, state),
                             },
                         });

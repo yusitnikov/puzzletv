@@ -8,7 +8,7 @@ import {
 import {darkGreyColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray} from "../../../types/layout/Position";
 import {parseMonumentValleyFieldSize} from "../types/MonumentValleyTypeManager";
-import {RotatableGameState, RotatableProcessedGameState} from "../../rotatable/types/RotatableGameState";
+import {RotatableGameState} from "../../rotatable/types/RotatableGameState";
 
 export const MonumentValleyGridBorders = withFieldLayer(FieldLayer.lines, (
     {
@@ -40,7 +40,7 @@ export const MonumentValleyGridBorders = withFieldLayer(FieldLayer.lines, (
     />;
 }) as ConstraintPropsGenericFc;
 
-export const MonumentValleyGridBordersConstraint = (): Constraint<number, undefined, RotatableGameState, RotatableProcessedGameState> => {
+export const MonumentValleyGridBordersConstraint = (): Constraint<number, undefined, RotatableGameState> => {
     return {
         name: "grid borders",
         cells: [],

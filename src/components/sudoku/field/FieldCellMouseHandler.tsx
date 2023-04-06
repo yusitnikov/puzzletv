@@ -32,7 +32,12 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
     const {
         onCornerClick,
         onCornerEnter,
+        disableCellHandlers,
     } = puzzle.typeManager.getCellTypeProps?.(cellPosition, puzzle)?.forceCellWriteMode || cellWriteModeInfo;
+
+    if (disableCellHandlers) {
+        return null;
+    }
 
     const {areCustomBounds, center, borderSegments} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
 

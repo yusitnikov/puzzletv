@@ -67,7 +67,6 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     hideDeleteButton?: boolean;
     loopHorizontally?: boolean;
     loopVertically?: boolean;
-    enableDragMode?: boolean;
     disableColoring?: boolean;
     enableShading?: boolean;
     lmdLink?: string;

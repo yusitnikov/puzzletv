@@ -14,6 +14,7 @@ import {
     gameStateClearSelectedCells,
     gameStateGetCurrentFieldState,
     gameStateHandleCellDoubleClick,
+    gameStateNormalizeLoopOffset,
     gameStateSelectAllCells,
     gameStateSetSelectedCells,
     gameStateToggleSelectedCells,
@@ -89,7 +90,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         getCellSelectionType = state.highlightSeenCells ? getDefaultCellSelectionType : undefined,
         disableConflictChecker,
         disableArrowLetterShortcuts,
-        hiddenSpecificCellWriteModes = [],
     } = typeManager;
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
@@ -103,16 +103,19 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         selectedCells,
         enableConflictChecker,
         pencilmarksCheckerMode,
-        loopOffset,
         initialDigits: stateInitialDigits,
         excludedDigits,
         isShowingSettings,
         processed: {
             isReady,
             cellWriteModeInfo: {isNoSelectionMode},
+            animated,
         },
         fogDemoFieldStateHistory,
     } = state;
+
+    const loopOffset = gameStateNormalizeLoopOffset(puzzle, animated.loopOffset);
+
     const {cells} = gameStateGetCurrentFieldState(state);
 
     const userDigits = useMemo(() => prepareGivenDigitsMapForConstraints(context, cells), [context, cells]);
@@ -129,8 +132,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         }
     });
 
-    const cellWriteModeInfos = getAllowedCellWriteModeInfos(puzzle);
-    const cellWriteModeGestureHandlers = useGestureHandlers([...cellWriteModeInfos, ...hiddenSpecificCellWriteModes].map(
+    const cellWriteModeGestureHandlers = useGestureHandlers(getAllowedCellWriteModeInfos(puzzle, true).map(
         (
             {
                 mode,
@@ -374,7 +376,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     return <>
         <Absolute
             {...rect}
-            angle={typeManager.getFieldAngle?.(state)}
+            angle={animated.angle}
             style={{
                 backgroundColor: "white",
                 overflow: loopHorizontally || loopVertically ? "hidden" : undefined,

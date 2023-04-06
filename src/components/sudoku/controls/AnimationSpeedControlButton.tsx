@@ -4,22 +4,20 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 import {ControlButtonItemProps} from "./ControlButtonsManager";
 
-export const AnimationSpeedControlButton = <CellType, ExType extends { animationSpeed: AnimationSpeed }, ProcessedExType>(
+export const AnimationSpeedControlButton = <CellType, ExType, ProcessedExType>(
     {
         top,
         left,
         context: {
             cellSizeForSidePanel: cellSize,
-            state: {
-                extension: {animationSpeed},
-            },
+            state: {animationSpeed},
             onStateChange,
         },
     }: ControlButtonItemProps<CellType, ExType, ProcessedExType>
 ) => {
     const translate = useTranslate();
 
-    const handleSetAnimationSpeed = (animationSpeed: AnimationSpeed) => onStateChange({extension: {animationSpeed} as Partial<ExType>});
+    const handleSetAnimationSpeed = (animationSpeed: AnimationSpeed) => onStateChange({animationSpeed});
     const handleAnimationSpeedToggle = () => {
         switch (animationSpeed) {
             case AnimationSpeed.regular:

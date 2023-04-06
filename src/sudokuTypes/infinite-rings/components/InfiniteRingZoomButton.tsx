@@ -1,15 +1,16 @@
 import {ControlButton} from "../../../components/sudoku/controls/ControlButton";
-import {InfiniteRingsGameState, setInfiniteRingOffset} from "../types/InfiniteRingsGameState";
+import {setInfiniteRingOffset} from "../types/InfiniteRingsGameState";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButtonItemProps} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 
 export const InfiniteRingZoomButton = (increment: number, title: PartiallyTranslatable, sign: string) =>
-    function InfiniteRingZoomButtonComponent<CellType, ExType extends InfiniteRingsGameState, ProcessedExType>(
+    function InfiniteRingZoomButtonComponent<CellType, ExType, ProcessedExType>(
         {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
     ) {
         const {
-            state: {extension: {ringOffset}},
+            state: {processed: {scaleLog: ringOffset}},
+            onStateChange,
             cellSizeForSidePanel: cellSize,
         } = context;
 
@@ -19,7 +20,7 @@ export const InfiniteRingZoomButton = (increment: number, title: PartiallyTransl
             top={top}
             left={left}
             cellSize={cellSize}
-            onClick={() => setInfiniteRingOffset(context, ringOffset + increment)}
+            onClick={() => onStateChange(setInfiniteRingOffset(context, ringOffset + increment))}
             title={`${translate(title)} (${sign})`}
         >
             {sign}

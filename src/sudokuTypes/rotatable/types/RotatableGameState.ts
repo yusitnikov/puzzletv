@@ -1,10 +1,3 @@
-import {AnimatableState} from "../../../types/sudoku/AnimationSpeed";
-
-export interface RotatableGameState extends AnimatableState {
-    angle: number;
+export interface RotatableGameState {
     isStickyMode: boolean;
-}
-
-export interface RotatableProcessedGameState {
-    animatedAngle: number;
 }

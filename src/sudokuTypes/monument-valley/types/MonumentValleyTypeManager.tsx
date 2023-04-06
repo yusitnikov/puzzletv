@@ -10,12 +10,12 @@ import {DigitCellDataComponentType} from "../../default/components/DigitCellData
 import {MonumentValleyDigitComponentType} from "../components/MonumentValleyDigit";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
-import {RotatableGameState, RotatableProcessedGameState} from "../../rotatable/types/RotatableGameState";
+import {RotatableGameState} from "../../rotatable/types/RotatableGameState";
 import {RotatableDigitSudokuTypeManagerBase} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
 import {loop} from "../../../utils/math";
 
-export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameState, RotatableProcessedGameState> = {
-    ...DigitSudokuTypeManager<RotatableGameState, RotatableProcessedGameState>(),
+export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameState> = {
+    ...DigitSudokuTypeManager<RotatableGameState>(),
     ...RotatableDigitSudokuTypeManagerBase<number>(0, 120, true, false),
 
     disableDigitShortcuts: true,
@@ -36,7 +36,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         MonumentValleyDigitComponentType.widthCoeff
     ),
 
-    createCellDataByTypedDigit(digit, {puzzle: {fieldSize}, state: {extension: {angle}}}, position) {
+    createCellDataByTypedDigit(digit, {puzzle: {fieldSize}, state: {angle}}, position) {
         if (!position) {
             return digit;
         }
@@ -76,7 +76,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
     },
 
     processCellDataPosition(puzzle, {left, top, angle}, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {
-        const angleDelta = Math.round((state?.processedExtension?.animatedAngle ?? 0) / 90) * Math.PI / 2;
+        const angleDelta = Math.round((state?.processed.animated.angle ?? 0) / 90) * Math.PI / 2;
         const sin = Math.sin(angleDelta);
         const cos = Math.cos(angleDelta);
 
@@ -140,9 +140,9 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
             return defaultPosition;
         };
 
-        cell = rotateCellCoords(cell, processedFieldSize, context.state.extension.angle);
+        cell = rotateCellCoords(cell, processedFieldSize, context.state.angle);
         cell = process(xDirection, yDirection);
-        cell = rotateCellCoords(cell, processedFieldSize, -context.state.extension.angle);
+        cell = rotateCellCoords(cell, processedFieldSize, -context.state.angle);
 
         return {cell};
     },
@@ -257,7 +257,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         ];
     },
 
-    getRegionsForRowsAndColumns({fieldSize}): Constraint<number, any, RotatableGameState, RotatableProcessedGameState>[] {
+    getRegionsForRowsAndColumns({fieldSize}): Constraint<number, any, RotatableGameState>[] {
         const processedFieldSize = parseMonumentValleyFieldSize(fieldSize);
         const {gridSize, intersectionSize, columnsCount} = processedFieldSize;
 
@@ -268,7 +268,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         ];
 
         return cubeFaces.flatMap(({left, top}, index) => {
-            const constraints: Constraint<number, any, RotatableGameState, RotatableProcessedGameState>[] = indexes(gridSize).flatMap(i => [
+            const constraints: Constraint<number, any, RotatableGameState>[] = indexes(gridSize).flatMap(i => [
                 RegionConstraint(
                     indexes(gridSize).map(j => processCellCoords({left: left + i, top: top + j}, processedFieldSize)),
                     false,

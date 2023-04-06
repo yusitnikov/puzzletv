@@ -49,6 +49,7 @@ import {LineWithColor} from "./LineWithColor";
 import {CellPart} from "./CellPart";
 import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
 import {loop} from "../../utils/math";
+import {AnimationSpeed} from "./AnimationSpeed";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -67,7 +68,13 @@ export interface GameState<CellType> {
     dragStartPoint?: CellExactPosition;
     dragAction: DragAction;
 
+    animationSpeed: AnimationSpeed;
     loopOffset: Position;
+    animatingLoopOffset: boolean;
+    angle: number;
+    animatingAngle: boolean;
+    scale: number;
+    animatingScale: boolean;
 
     openedLmdOnce?: boolean;
 
@@ -95,6 +102,8 @@ export type PartialGameStateEx<CellType, ExType> = Partial<GameState<CellType>> 
     extension?: Partial<ExType>;
 }
 
+export type ProcessedGameStateAnimatedValues = Pick<GameState<any>, "loopOffset" | "angle" | "scale">;
+
 export interface ProcessedGameState<CellType> extends GameState<CellType> {
     processed: {
         cellWriteMode: CellWriteMode;
@@ -102,6 +111,10 @@ export interface ProcessedGameState<CellType> extends GameState<CellType> {
         isReady: boolean;
         isMyTurn: boolean;
         lastPlayerObjects: Record<string, boolean>;
+        scaleLog: number;
+        animated: ProcessedGameStateAnimatedValues & {
+            scaleLog: number;
+        },
     },
 }
 
@@ -157,6 +170,9 @@ type SavedGameStates = [
     playerObjects: any,
     lives: any,
     color: CellColor,
+    loopOffset: Position,
+    angle: number,
+    scale: number,
 ][];
 const gameStateStorageKey = "savedGameState";
 const gameStateSerializerVersion = 2;
@@ -183,6 +199,8 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         initialGameStateExtension,
         unserializeGameState,
         initialCellWriteMode,
+        initialAngle = 0,
+        initialScale = 1,
     } = typeManager;
 
     const fullSaveStateKey = getPuzzleFullSaveStateKey(puzzle);
@@ -215,7 +233,14 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         dragStartPoint: undefined,
         dragAction: DragAction.SetUndefined,
 
-        loopOffset: emptyPosition,
+        // TODO: save animation speed in the global settings
+        animationSpeed: AnimationSpeed.regular,
+        loopOffset: savedGameState?.[11] ?? emptyPosition,
+        animatingLoopOffset: false,
+        angle: savedGameState?.[12] ?? initialAngle,
+        animatingAngle: false,
+        scale: savedGameState?.[13] ?? initialScale,
+        animatingScale: false,
 
         lives: savedGameState?.[9] ?? initialLives,
 
@@ -269,6 +294,9 @@ export const saveGameState = <CellType, ExType = {}, ProcessedExType = {}>(
                 state.playerObjects,
                 state.lives,
                 state.selectedColor,
+                state.loopOffset,
+                state.angle,
+                state.scale,
             ],
             ...getSavedGameStates().filter(([key]) => key !== fullSaveStateKey),
         ] as SavedGameStates).slice(0, maxSavedPuzzles),
@@ -511,10 +539,10 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
     const result: PartialGameStateEx<CellType, ExType> = (isMultiSelection || state.isMultiSelection)
         ? gameStateAddSelectedCell(state, newCell)
         : gameStateSetSelectedCells(state, [newCell]);
-    let {loopOffset} = state;
+    let loopOffset = state.loopOffset;
 
     if (loopHorizontally) {
-        const left = (newCell.left + loopOffset.left) % fieldSize.columnsCount;
+        const left = loop(newCell.left + loopOffset.left + 0.5, fieldSize.columnsCount) - 0.5;
         const min = 1;
         const max = fieldSize.columnsCount - 1 - min;
         if (left < min) {
@@ -531,7 +559,7 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
     }
 
     if (loopVertically) {
-        const top = (newCell.top + loopOffset.top) % fieldSize.rowsCount;
+        const top = loop(newCell.top + loopOffset.top + 0.5, fieldSize.rowsCount) - 0.5;
         const min = 1;
         const max = fieldSize.rowsCount - 1 - min;
         if (top < min) {
@@ -542,7 +570,7 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
         } else if (top > max) {
             loopOffset = {
                 ...loopOffset,
-                top: loopOffset.top + fieldSize.rowsCount - (top - max),
+                top: loopOffset.top - (top - max),
             };
         }
     }
@@ -550,7 +578,8 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
     return {
         ...result,
         ...newState,
-        loopOffset: gameStateNormalizeLoopOffset(puzzle, loopOffset),
+        loopOffset,
+        animatingLoopOffset: true,
     };
 };
 
@@ -1080,3 +1109,7 @@ export const gameStateApplyShading = <CellType, ExType, ProcessedExType>(
     };
 };
 // endregion
+
+export const defaultScaleStep = 2;
+export const getScaleLog = (scale: number, step = defaultScaleStep) => Math.log(scale) / Math.log(step);
+export const getAbsoluteScaleByLog = (scaleLog: number, step = defaultScaleStep) => Math.pow(step, scaleLog);

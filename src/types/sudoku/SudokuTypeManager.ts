@@ -105,7 +105,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     extraCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
 
-    hiddenSpecificCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
+    hiddenCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
 
     initialCellWriteMode?: CellWriteMode;
 
@@ -115,13 +115,21 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     initialGameStateExtension?: ExType;
 
+    initialAngle?: number;
+    angleStep?: number;
+    allowRotation?: boolean;
+    isFreeRotation?: boolean;
+
+    initialScale?: number;
+    scaleStep?: number;
+    allowScale?: boolean;
+    isFreeScale?: boolean;
+
     keepStateOnRestart?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): PartialGameStateEx<CellType, ExType>;
 
     isReady?(state: GameStateEx<CellType, ExType>): boolean;
 
     useProcessedGameStateExtension?(state: GameStateEx<CellType, ExType>): ProcessedExType;
-
-    getFieldAngle?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): number;
 
     getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): {
         isVisible?: boolean;

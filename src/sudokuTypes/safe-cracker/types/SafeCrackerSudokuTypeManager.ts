@@ -27,8 +27,8 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
 
     return {
         ...baseTypeManager,
-        hiddenSpecificCellWriteModes: [
-            ...baseTypeManager.hiddenSpecificCellWriteModes ?? [],
+        hiddenCellWriteModes: [
+            ...baseTypeManager.hiddenCellWriteModes ?? [],
             arrowsCellWriteModeInfo,
         ],
         getCellTypeProps({top, left}) {

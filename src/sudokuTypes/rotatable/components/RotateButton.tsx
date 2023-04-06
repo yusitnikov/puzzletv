@@ -2,27 +2,33 @@ import {ControlButtonItemProps} from "../../../components/sudoku/controls/Contro
 import {useTranslate} from "../../../hooks/useTranslate";
 import {RotateLeft, RotateRight} from "@emotion-icons/material";
 import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
-import {RotatableGameState, RotatableProcessedGameState} from "../types/RotatableGameState";
+import {RotatableGameState} from "../types/RotatableGameState";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {loop} from "../../../utils/math";
 
 const handleRotate = <CellType,>(
-    {state: {processed: {isReady}}, onStateChange}: PuzzleContext<CellType, RotatableGameState, RotatableProcessedGameState>,
-    delta: number
-) => onStateChange(({extension: {angle}}) => ({
-    extension: {
-        isAnimating: true,
-        angle: isReady
-            ? angle + delta
-            : (Math.sign(angle) === Math.sign(delta) ? delta : 0)
-    },
-}));
+    {puzzle: {typeManager: {angleStep = 0}}, onStateChange}: PuzzleContext<CellType, RotatableGameState>,
+    direction: number
+) => onStateChange(({angle}) => {
+    let newAngle = angle + direction * angleStep;
+    if (angleStep !== 0) {
+        const mod = loop(newAngle * direction, angleStep);
+        if (mod > 0.1 * angleStep && mod < 0.9 * angleStep) {
+            newAngle -= mod * direction;
+        }
+    }
+    return ({
+        animatingAngle: true,
+        angle: newAngle,
+    });
+});
 
-export const RotateRightButton = (angleDelta: number) => function RotateRightButtonComponent<CellType,>(
-    {context, top, left}: ControlButtonItemProps<CellType, RotatableGameState, RotatableProcessedGameState>
-) {
+export const RotateRightButton = <CellType,>(
+    {context, top, left}: ControlButtonItemProps<CellType, RotatableGameState>
+) => {
     const {
         cellSizeForSidePanel: cellSize,
         state: {isShowingSettings, processed: {isReady}},
@@ -32,7 +38,7 @@ export const RotateRightButton = (angleDelta: number) => function RotateRightBut
 
     useEventListener(window, "keydown", (ev) => {
         if (!isShowingSettings && ev.code === "KeyR") {
-            handleRotate(context, ev.shiftKey ? -angleDelta : angleDelta);
+            handleRotate(context, ev.shiftKey ? -1 : 1);
             ev.preventDefault();
         }
     });
@@ -42,7 +48,7 @@ export const RotateRightButton = (angleDelta: number) => function RotateRightBut
             left={left}
             top={top}
             cellSize={cellSize}
-            onClick={() => handleRotate(context, angleDelta)}
+            onClick={() => handleRotate(context, 1)}
             title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: R)\n${translate("Tip")}: ${translate("use the button from the right side to control the rotation speed")}`}
         >
             <RotateRight/>
@@ -71,9 +77,9 @@ export const RotateRightButton = (angleDelta: number) => function RotateRightBut
     </>;
 };
 
-export const RotateLeftButton = (angleDelta: number) => function RotateLeftButtonComponent<CellType,>(
-    {context, top, left}: ControlButtonItemProps<CellType, RotatableGameState, RotatableProcessedGameState>
-) {
+export const RotateLeftButton = <CellType,>(
+    {context, top, left}: ControlButtonItemProps<CellType, RotatableGameState>
+) => {
     const {cellSizeForSidePanel: cellSize} = context;
 
     const translate = useTranslate();
@@ -82,7 +88,7 @@ export const RotateLeftButton = (angleDelta: number) => function RotateLeftButto
         left={left}
         top={top}
         cellSize={cellSize}
-        onClick={() => handleRotate(context, -angleDelta)}
+        onClick={() => handleRotate(context, -1)}
         title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: Shift+R)\n${translate("Tip")}: ${translate("use the button from the right side to control the rotation speed")}`}
     >
         <RotateLeft/>

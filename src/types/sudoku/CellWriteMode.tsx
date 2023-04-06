@@ -5,9 +5,11 @@ import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
 import {
     gameStateContinueMultiLine,
-    gameStateNormalizeLoopOffset,
     gameStateResetCurrentMultiLine,
-    gameStateStartMultiLine
+    gameStateStartMultiLine,
+    getAbsoluteScaleByLog,
+    getScaleLog,
+    PartialGameStateEx
 } from "./GameState";
 import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
@@ -38,6 +40,7 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     hotKeyStr?: string[];
     isDigitMode?: boolean;
     isNoSelectionMode?: boolean;
+    disableCellHandlers?: boolean;
     digitsCount?: number | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => number);
     handlesRightMouseClick?: boolean;
     buttonContent?: (
@@ -161,13 +164,62 @@ export const allCellWriteModeInfos: CellWriteModeInfo<any, any, any>[] = [
         digitsCount: 0,
         isValidGesture: (isCurrentCellWriteMode, {gesture: {pointers}}) =>
             isCurrentCellWriteMode || pointers.length > 1,
-        onMove: ({prevMetrics, currentMetrics}, {puzzle, cellSize, onStateChange}) =>
-            onStateChange(({loopOffset: {top, left}}) => ({
-                loopOffset: gameStateNormalizeLoopOffset(puzzle, {
-                    left: left + (puzzle.loopHorizontally ? (currentMetrics.x - prevMetrics.x) / cellSize : 0),
-                    top: top + (puzzle.loopVertically ? (currentMetrics.y - prevMetrics.y) / cellSize : 0),
-                }),
+        onMove: (
+            {prevMetrics, currentMetrics},
+            {
+                puzzle: {
+                    loopHorizontally,
+                    loopVertically,
+                    typeManager: {allowRotation, allowScale},
+                },
+                cellSize,
+                onStateChange,
+            }
+        ) =>
+            onStateChange(({loopOffset: {top, left}, angle, scale}) => ({
+                loopOffset: {
+                    left: left + (loopHorizontally ? (currentMetrics.x - prevMetrics.x) / cellSize : 0),
+                    top: top + (loopVertically ? (currentMetrics.y - prevMetrics.y) / cellSize : 0),
+                },
+                animatingLoopOffset: false,
+                angle: angle + (allowRotation ? currentMetrics.rotation - prevMetrics.rotation : 0),
+                animatingAngle: false,
+                scale: scale * (allowScale ? currentMetrics.scale / prevMetrics.scale : 1),
+                animatingScale: false,
             })),
+        onGestureEnd: (
+            props,
+            {
+                puzzle: {
+                    typeManager: {
+                        angleStep,
+                        allowRotation,
+                        isFreeRotation,
+                        scaleStep,
+                        allowScale,
+                        isFreeScale,
+                    },
+                },
+                onStateChange,
+            }
+        ) => onStateChange(({angle, scale}) => {
+            let result: PartialGameStateEx<any, any> = {};
+            if (allowRotation && !isFreeRotation && angleStep) {
+                result = {
+                    ...result,
+                    angle: Math.round(angle / angleStep) * angleStep,
+                    animatingAngle: true,
+                };
+            }
+            if (allowScale && !isFreeScale) {
+                result = {
+                    ...result,
+                    scale: getAbsoluteScaleByLog(Math.round(getScaleLog(scale, scaleStep)), scaleStep),
+                    animatingScale: true,
+                };
+            }
+            return result;
+        }),
     },
 ];
 
@@ -176,12 +228,12 @@ export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
         allowDrawing = [],
         loopHorizontally = false,
         loopVertically = false,
-        enableDragMode = false,
         enableShading = false,
         disableColoring = false,
         digitsCount,
-        typeManager: {extraCellWriteModes = []},
-    }: PuzzleDefinition<CellType, ExType, ProcessedExType>
+        typeManager: {extraCellWriteModes = [], hiddenCellWriteModes = [], allowRotation, allowScale},
+    }: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    includeHidden = false,
 ): CellWriteModeInfo<CellType, ExType, ProcessedExType>[] => [
     ...allCellWriteModeInfos.filter(({mode, isDigitMode}) => {
         if (isDigitMode) {
@@ -196,12 +248,13 @@ export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
             case CellWriteMode.lines:
                 return allowDrawing.length !== 0;
             case CellWriteMode.move:
-                return loopHorizontally || loopVertically || enableDragMode;
+                return loopHorizontally || loopVertically || (includeHidden && (allowRotation || allowScale));
             default:
                 return true;
         }
     }),
     ...extraCellWriteModes,
+    ...(includeHidden ? hiddenCellWriteModes : []),
 ];
 
 export const incrementCellWriteMode = (allowedModes: CellWriteModeInfo<any, any, any>[], mode: CellWriteMode, increment: number): CellWriteMode =>
