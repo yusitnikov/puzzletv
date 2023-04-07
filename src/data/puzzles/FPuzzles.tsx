@@ -1,5 +1,10 @@
 import {ReactNode} from "react";
-import {allDrawingModes, PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {
+    allDrawingModes,
+    isValidFinishedPuzzleByEmbeddedSolution,
+    PuzzleDefinition,
+    PuzzleDefinitionLoader
+} from "../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {decompressFromBase64} from "lz-string";
@@ -17,7 +22,6 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {LittleKillerConstraint} from "../../components/sudoku/constraints/little-killer/LittleKiller";
@@ -72,7 +76,6 @@ import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/
 import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
 import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
 import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
-import {HashSet} from "../../types/struct/Set";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -97,6 +100,7 @@ export interface FPuzzlesImportOptions {
     load: string;
     type?: FPuzzlesImportPuzzleType;
     htmlRules?: boolean;
+    digitsCount?: number;
     tesseract?: boolean;
     fillableDigitalDisplay?: boolean;
     noSpecialRules?: boolean;
@@ -111,10 +115,6 @@ export interface FPuzzlesImportOptions {
     allowOverrideColors?: boolean;
 }
 
-export const getSolutionGridByFPuzzlesObject = ({solution, size}: FPuzzlesPuzzle) => {
-    return solution && splitArrayIntoChunks(solution, size);
-};
-
 export const loadByFPuzzlesObject = (
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
@@ -122,6 +122,7 @@ export const loadByFPuzzlesObject = (
 ): PuzzleDefinition<any, any, any> => {
     const {
         type = FPuzzlesImportPuzzleType.Regular,
+        digitsCount = puzzleJson.size,
         tesseract,
         yajilinFog,
         fillableDigitalDisplay,
@@ -142,8 +143,8 @@ export const loadByFPuzzlesObject = (
         [FPuzzlesImportPuzzleType.Cubedoku]: CubedokuTypeManager,
         [FPuzzlesImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
         [FPuzzlesImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
-            size: puzzleJson.size,
-            circleRegionsCount: Math.floor((puzzleJson.size - 1) / 2),
+            size: Number(digitsCount),
+            circleRegionsCount: Math.ceil((puzzleJson.size - 2) / 2),
             codeCellsCount: Math.min(puzzleJson.size, Number(safeCrackerCodeLength)),
         }),
         [FPuzzlesImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(
@@ -168,6 +169,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
     {
+        digitsCount,
         htmlRules,
         fillableDigitalDisplay,
         noSpecialRules,
@@ -180,6 +182,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
     typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
 ): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
     const initialDigits: GivenDigitsMap<CellType> = {};
+    const initialLetters: GivenDigitsMap<string> = {};
     const initialColors: GivenDigitsMap<CellColorValue[]> = {};
     const items: Constraint<CellType, any, ExType, ProcessedExType>[] = [];
 
@@ -194,11 +197,13 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
             columnsCount: 9,
             regions: [],
         },
+        digitsCount: digitsCount && Number(digitsCount),
         loopHorizontally: loopX,
         loopVertically: loopY,
         fieldMargin: loopX || loopY ? 0.99 : 0,
         allowDrawing: allDrawingModes,
         initialDigits,
+        initialLetters,
         initialColors,
         items,
         allowOverridingInitialColors: allowOverrideColors,
@@ -283,13 +288,22 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 new ObjectParser<FPuzzlesGridCell>({
                     region: undefined,
                     value: (value, {given}) => {
-                        if (typeof value === "number" && given) {
-                            if (fillableDigitalDisplay) {
-                                items.push(FillableCalculatorDigitConstraint<CellType, ExType, ProcessedExType>({top, left}, value));
-                            } else {
-                                initialDigits[top] = initialDigits[top] || {};
-                                initialDigits[top][left] = typeManager.createCellDataByImportedDigit(value);
-                            }
+                        if (!given) {
+                            return;
+                        }
+                        switch (typeof value) {
+                            case "number":
+                                if (fillableDigitalDisplay) {
+                                    items.push(FillableCalculatorDigitConstraint<CellType, ExType, ProcessedExType>({top, left}, value));
+                                } else {
+                                    initialDigits[top] = initialDigits[top] || {};
+                                    initialDigits[top][left] = typeManager.createCellDataByImportedDigit(value);
+                                }
+                                break;
+                            case "string":
+                                initialLetters[top] = initialLetters[top] || {};
+                                initialLetters[top][left] = value;
+                                break;
                         }
                     },
                     given: undefined,
@@ -693,67 +707,14 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         // region Extensions
         solution: (solution, {size}) => {
             if (solution instanceof Array) {
-                const solutionGrid = splitArrayIntoChunks(solution, size);
-
-                puzzle.resultChecker = ({puzzle: {initialDigits}, state}) => {
-                    const {cells} = gameStateGetCurrentFieldState(state, true);
-
-                    let areCorrectDigits = true;
-                    let areCorrectColors = true;
-                    const digitToColorMap: Record<number, string> = {};
-                    for (const [top, row] of cells.entries()) {
-                        for (const [left, {usersDigit, colors}] of row.entries()) {
-                            const expectedDigit = solutionGrid[top][left] || undefined;
-                            const actualDigit = initialDigits?.[top]?.[left] ?? usersDigit;
-                            if (!expectedDigit || !actualDigit || Number(actualDigit) !== Number(expectedDigit)) {
-                                areCorrectDigits = false;
-                            }
-
-                            if (!expectedDigit) {
-                                areCorrectColors = false;
-                            } else {
-                                const expectedColor = digitToColorMap[expectedDigit];
-                                const actualColor = colors.sorted().items.join(",");
-                                if (!expectedColor) {
-                                    digitToColorMap[expectedDigit] = actualColor;
-                                } else if (actualColor !== expectedColor) {
-                                    areCorrectColors = false;
-                                }
-                            }
-
-                            if (!areCorrectDigits && !areCorrectColors) {
-                                return false;
-                            }
-                        }
-                    }
-
-                    if (areCorrectDigits) {
-                        return true;
-                    }
-
-                    if (areCorrectColors) {
-                        const allColors = Object.values(digitToColorMap);
-                        if (new HashSet(allColors).size === allColors.length) {
-                            return {
-                                isCorrectResult: true,
-                                resultPhrase: {
-                                    [LanguageCode.en]: [
-                                        "Congratulations, you solved the puzzle!",
-                                        "No-one cares about the digits.",
-                                        "Fully-colored grid is just enough.",
-                                    ].join("\n"),
-                                    [LanguageCode.ru]: [
-                                        "Поздравляю, Вы решили судоку!",
-                                        "Никого не интересуют цифры.",
-                                        "Полностью разукрашенного поля вполне достаточно.",
-                                    ].join("\n"),
-                                },
-                            };
-                        }
-                    }
-
-                    return false;
-                };
+                puzzle.solution = splitArrayIntoChunks(
+                    solution.map((value) => {
+                        const num = Number(value);
+                        return Number.isFinite(num) ? num : value;
+                    }),
+                    size
+                );
+                puzzle.resultChecker = isValidFinishedPuzzleByEmbeddedSolution;
             }
         },
         disabledlogic: undefined,
@@ -765,7 +726,6 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
     if (puzzleJson.fogofwar || puzzleJson.foglight) {
         items.push(FogConstraint<CellType, ExType, ProcessedExType>(
-            getSolutionGridByFPuzzlesObject(puzzleJson)?.map(row => row.map(typeManager.createCellDataByImportedDigit)),
             puzzleJson.fogofwar,
             puzzleJson.foglight,
             puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),

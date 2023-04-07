@@ -1,6 +1,6 @@
 import {SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {parsePositionLiteral, PositionWithAngle} from "../../../types/layout/Position";
+import {Position, PositionWithAngle} from "../../../types/layout/Position";
 import {
     defaultProcessArrowDirection,
     defaultProcessArrowDirectionForRegularCellBounds,
@@ -10,11 +10,13 @@ import {SafeCrackerStarConstraint} from "../constraints/SafeCrackerStarConstrain
 import {indexes} from "../../../utils/indexes";
 import {safeCrackerArrowsCellWriteModeInfo} from "./LeftRightArrow";
 import {BaseSafeCrackerPuzzle} from "./BaseSafeCrackerPuzzle";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {getDefaultDigitsCount, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
-import {CellMarkType} from "../../../types/sudoku/CellMark";
+import {CellMarkType, parseCellMark} from "../../../types/sudoku/CellMark";
 import {CellColor} from "../../../types/sudoku/CellColor";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
+import {Constraint} from "../../../types/sudoku/Constraint";
+import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 
 export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
     params: SafeCrackerPuzzleParams
@@ -31,7 +33,12 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
             ...baseTypeManager.hiddenCellWriteModes ?? [],
             arrowsCellWriteModeInfo,
         ],
-        getCellTypeProps({top, left}) {
+        getCellTypeProps({top, left}, puzzle) {
+            const {digitsCount = getDefaultDigitsCount(puzzle)} = puzzle;
+            if (left >= digitsCount) {
+                return {isVisible: false};
+            }
+
             switch (top - circleRegionsCount * 2) {
                 case 0: return {};
                 case 1: return {isVisible: left < codeCellsCount};
@@ -79,74 +86,63 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
                 ...BaseSafeCrackerPuzzle(params),
             };
 
+            const items: Constraint<number, any, ExType, ProcessedExType>[] = [];
+            const initialLetters = puzzle.initialLetters ?? {};
+            const initialCellMarks = [...(puzzle.initialCellMarks ?? [])];
+            const cellsIndex = new SudokuCellsIndex(puzzle);
+
+            const processText = (text: string, cells: Position[], layer?: FieldLayer) => {
+                const [{top, left}] = cells;
+                const center = cellsIndex.allCells[top]?.[left]?.center;
+                const mark = parseCellMark(text);
+                if (mark !== undefined && mark !== CellMarkType.O && center) {
+                    initialCellMarks.push({
+                        type: mark,
+                        position: center,
+                        isCenter: true,
+                        color: CellColor.black,
+                    });
+                    return true;
+                }
+
+                if (["s", "star"].includes(text.toLowerCase())) {
+                    items.push(SafeCrackerStarConstraint(cells, layer));
+                    return true;
+                }
+
+                return false;
+            };
+
+            for (const [topStr, row] of Object.entries(initialLetters)) {
+                const top = Number(topStr);
+                for (const [leftStr, text] of Object.entries(row)) {
+                    const left = Number(leftStr);
+                    if (processText(text, [{top, left}])) {
+                        delete initialLetters[top][left];
+                    }
+                }
+            }
+
             const originalItems = puzzle.items;
             if (Array.isArray(originalItems)) {
-                const items: typeof originalItems = [];
-                const initialCellMarks = [...(puzzle.initialCellMarks ?? [])];
-
-                const cellsIndex = new SudokuCellsIndex(puzzle);
-
                 for (const item of originalItems) {
                     if (!(item.tags?.includes(textTag) && item.cells.length === 1)) {
                         items.push(item);
                         continue;
                     }
 
-                    const position = parsePositionLiteral(item.cells[0]);
-                    const center = cellsIndex.allCells[position.top]?.[position.left]?.center;
-                    switch ((item.props as TextProps).text.toLowerCase()) {
-                        case ">":
-                        case "->":
-                        case "=>":
-                        case CellMarkType.RightArrow:
-                            if (center) {
-                                initialCellMarks.push({
-                                    type: CellMarkType.RightArrow,
-                                    position: center,
-                                    isCenter: true,
-                                    color: CellColor.black,
-                                })
-                            }
-                            break;
-                        case "<":
-                        case "<-":
-                        case "<=":
-                        case CellMarkType.LeftArrow:
-                            if (center) {
-                                initialCellMarks.push({
-                                    type: CellMarkType.LeftArrow,
-                                    position: center,
-                                    isCenter: true,
-                                    color: CellColor.black,
-                                })
-                            }
-                            break;
-                        case CellMarkType.X.toLowerCase():
-                            if (center) {
-                                initialCellMarks.push({
-                                    type: CellMarkType.X,
-                                    position: center,
-                                    isCenter: true,
-                                    color: CellColor.black,
-                                })
-                            }
-                            break;
-                        case "s":
-                        case "star":
-                            items.push(SafeCrackerStarConstraint(item.cells, item.layer));
-                            break;
-                        default:
-                            items.push(item);
-                            break;
+                    if (!processText((item.props as TextProps).text, item.cells, item.layer)) {
+                        items.push(item);
                     }
                 }
-
-                puzzle = {
-                    ...puzzle,
-                    items,
-                    initialCellMarks,
-                };
             }
+
+            puzzle = {
+                ...puzzle,
+                items,
+                initialLetters,
+                initialCellMarks,
+            };
 
             return puzzle;
         }

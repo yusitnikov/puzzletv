@@ -63,14 +63,12 @@ export const YajilinFogSudokuTypeManager = <CellType, ExType, ProcessedExType>(
 
                     if (tags?.includes(fogTag)) {
                         const {
-                            solution,
                             startCells3x3,
                             startCells,
                             bulbCells,
                         } = props as FogProps<CellType>;
 
                         items.push(FogConstraint(
-                            solution,
                             startCells3x3,
                             startCells,
                             bulbCells,

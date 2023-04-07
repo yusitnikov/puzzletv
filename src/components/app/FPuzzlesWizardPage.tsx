@@ -1,5 +1,5 @@
 import {buildLink} from "../../utils/link";
-import {FormEvent, useMemo} from "react";
+import {FormEvent, useMemo, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
 import {
     decodeFPuzzlesString,
@@ -33,6 +33,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const puzzle = useMemo(() => decodeFPuzzlesString(load), [load]);
 
     const [type, setType] = useStringFromLocalStorage<FPuzzlesImportPuzzleType>("fpwType", FPuzzlesImportPuzzleType.Regular);
+    const [digitsCount, setDigitsCount] = useState(Math.min(puzzle.size, 9));
     const [areHtmlRules, setAreHtmlRules] = useBoolFromLocalStorage("fpwHtmlRules");
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
@@ -64,6 +65,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const importOptions = usePureMemo<FPuzzlesImportOptions>({
         type: isCalculator && fillableDigitalDisplay ? FPuzzlesImportPuzzleType.Regular : type,
         htmlRules: areHtmlRules,
+        digitsCount: digitsCount === puzzle.size ? undefined : digitsCount,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
@@ -127,6 +129,18 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe cracker</option>
                         </select>
                     </label>
+                </p>
+
+                <p>
+                    Digits count:&nbsp;
+                    <input
+                        type={"number"}
+                        value={digitsCount}
+                        min={1}
+                        max={Math.max(puzzle.size, 9)}
+                        step={1}
+                        onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
+                    />
                 </p>
 
                 <p>

@@ -4,7 +4,7 @@ import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
 import {PartiallyTranslatable} from "../translations/Translatable";
 import {useTranslate} from "../../hooks/useTranslate";
-import {ProcessedGameStateEx} from "./GameState";
+import {gameStateGetCurrentFieldState, ProcessedGameStateEx} from "./GameState";
 import {Constraint} from "./Constraint";
 import {CellColorValue} from "./CellColor";
 import {PuzzleContext, PuzzleContextProps} from "./PuzzleContext";
@@ -21,8 +21,10 @@ import {
     stringifyPosition
 } from "../layout/Position";
 import {PuzzleResultCheck} from "./PuzzleResultCheck";
-import {CellMark} from "./CellMark";
+import {CellMark, getCenterMarksMap, parseCellMark} from "./CellMark";
 import {loop} from "../../utils/math";
+import {HashSet} from "../struct/Set";
+import {LanguageCode} from "../translations/LanguageCode";
 
 export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     title: PartiallyTranslatable;
@@ -52,6 +54,7 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
     initialDigits?: GivenDigitsMap<CellType>;
+    initialLetters?: GivenDigitsMap<string>;
     initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => GivenDigitsMap<CellColorValue[]>);
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
@@ -81,6 +84,7 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     prioritizeSelection?: boolean;
     initialLives?: number;
     decreaseOnlyOneLive?: boolean;
+    solution?: (string | number | undefined)[][];
 }
 
 export const allDrawingModes: PuzzleDefinition<any, any, any>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];
@@ -173,4 +177,83 @@ export const resolvePuzzleInitialColors = (context: PuzzleContext<any, any, any>
     return typeof initialColors === "function"
         ? initialColors(context)
         : initialColors;
+};
+
+export const isValidFinishedPuzzleByEmbeddedSolution = <CellType, ExType, ProcessedExType>(
+    {puzzle, state, cellsIndex}: PuzzleContext<CellType, ExType, ProcessedExType>
+): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
+    const {typeManager: {getCellTypeProps, getDigitByCellData}, initialDigits, initialCellMarks = []} = puzzle;
+
+    const {cells, marks} = gameStateGetCurrentFieldState(state, true);
+
+    const initialCenterMarks = getCenterMarksMap(initialCellMarks, cellsIndex);
+    const userCenterMarks = getCenterMarksMap(marks.items, cellsIndex);
+
+    let areCorrectDigits = true;
+    let areCorrectColors = true;
+    const digitToColorMap: Record<number, string> = {};
+    for (const [top, row] of cells.entries()) {
+        for (const [left, {usersDigit, colors}] of row.entries()) {
+            const cellTypeProps = getCellTypeProps?.({top, left}, puzzle);
+            if (cellTypeProps?.isVisible === false) {
+                continue;
+            }
+            let expectedData = puzzle.solution?.[top]?.[left] ?? undefined;
+            if (typeof expectedData === "string") {
+                const expectedMark = parseCellMark(expectedData);
+                if (expectedMark !== undefined) {
+                    expectedData = expectedMark.toString();
+                }
+            }
+            const actualMark = (initialCenterMarks?.[top]?.[left] ?? userCenterMarks?.[top]?.[left])?.type;
+            const actualDigit = initialDigits?.[top]?.[left] ?? usersDigit;
+            const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, state) : actualMark;
+            if (!expectedData || !actualData || actualData !== expectedData) {
+                areCorrectDigits = false;
+            }
+
+            if (!expectedData) {
+                areCorrectColors = false;
+            } else if (typeof expectedData === "number") {
+                const expectedColor = digitToColorMap[expectedData];
+                const actualColor = colors.sorted().items.join(",");
+                if (!expectedColor) {
+                    digitToColorMap[expectedData] = actualColor;
+                } else if (actualColor !== expectedColor) {
+                    areCorrectColors = false;
+                }
+            }
+
+            if (!areCorrectDigits && !areCorrectColors) {
+                return false;
+            }
+        }
+    }
+
+    if (areCorrectDigits) {
+        return true;
+    }
+
+    if (areCorrectColors) {
+        const allColors = Object.values(digitToColorMap);
+        if (new HashSet(allColors).size === allColors.length) {
+            return {
+                isCorrectResult: true,
+                resultPhrase: {
+                    [LanguageCode.en]: [
+                        "Congratulations, you solved the puzzle!",
+                        "No-one cares about the digits.",
+                        "Fully-colored grid is just enough.",
+                    ].join("\n"),
+                    [LanguageCode.ru]: [
+                        "Поздравляю, Вы решили судоку!",
+                        "Никого не интересуют цифры.",
+                        "Полностью разукрашенного поля вполне достаточно.",
+                    ].join("\n"),
+                },
+            };
+        }
+    }
+
+    return false;
 };

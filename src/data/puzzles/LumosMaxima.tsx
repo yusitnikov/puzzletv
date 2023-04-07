@@ -18,18 +18,6 @@ import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-c
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 
-const solution = [
-    [2, 1, 7, 6, 4, 8, 9, 3, 5],
-    [5, 8, 9, 1, 3, 7, 4, 2, 6],
-    [4, 3, 6, 2, 5, 9, 1, 8, 7],
-    [1, 7, 2, 5, 8, 6, 3, 4, 9],
-    [6, 4, 3, 9, 7, 1, 8, 5, 2],
-    [9, 5, 8, 3, 2, 4, 7, 6, 1],
-    [7, 9, 5, 4, 6, 3, 2, 1, 8],
-    [8, 6, 4, 7, 1, 2, 5, 9, 3],
-    [3, 2, 1, 8, 9, 5, 6, 7, 4],
-];
-
 export const LumosMaximaNoFog: PuzzleDefinition<number> = {
     noIndex: true,
     title: {[LanguageCode.en]: "Lumos Maxima"},
@@ -69,9 +57,20 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     noIndex: false,
     slug: "lumos-maxima",
     saveStateKey: "lumos-maxima-v5",
+    solution: [
+        [2, 1, 7, 6, 4, 8, 9, 3, 5],
+        [5, 8, 9, 1, 3, 7, 4, 2, 6],
+        [4, 3, 6, 2, 5, 9, 1, 8, 7],
+        [1, 7, 2, 5, 8, 6, 3, 4, 9],
+        [6, 4, 3, 9, 7, 1, 8, 5, 2],
+        [9, 5, 8, 3, 2, 4, 7, 6, 1],
+        [7, 9, 5, 4, 6, 3, 2, 1, 8],
+        [8, 6, 4, 7, 1, 2, 5, 9, 3],
+        [3, 2, 1, 8, 9, 5, 6, 7, 4],
+    ],
     items: [
         ...(LumosMaximaNoFog.items as Constraint<number, any>[]),
-        FogConstraint(solution, ["R2C2", "R8C7"]),
+        FogConstraint(["R2C2", "R8C7"]),
     ],
     rules: (translate, context) => <>
         {LumosMaximaNoFog.rules!(translate, context)}
@@ -93,5 +92,5 @@ export const LumosMaxima: PuzzleDefinition<number> = {
     </>,
     prioritizeSelection: true,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000BIU",
-    getLmdSolutionCode: () => solution.map(row => row[8]).join(""),
+    getLmdSolutionCode: ({solution}) => solution!.map(row => row[8]).join(""),
 };

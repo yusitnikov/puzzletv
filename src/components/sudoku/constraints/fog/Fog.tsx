@@ -22,7 +22,6 @@ export const fogTag = "fog";
 const shadowSize = 0.07;
 
 export interface FogProps<CellType> {
-    solution?: CellType[][];
     startCells?: Position[];
     startCells3x3?: Position[];
     bulbCells?: Position[];
@@ -37,7 +36,6 @@ const DarkReaderRectOverride = styled("rect")(({fill}) => ({
 export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
     context: PuzzleContext<CellType, ExType, ProcessedExType>,
     {
-        solution,
         startCells,
         startCells3x3,
         revealByColors,
@@ -51,8 +49,9 @@ export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
     } = context;
 
     const {
+        solution,
         fieldSize: {rowsCount, columnsCount},
-        typeManager: {areSameCellData},
+        typeManager: {getDigitByCellData},
     } = puzzle;
 
     const {cells, lines} = gameStateGetCurrentFieldState(state, true);
@@ -63,7 +62,7 @@ export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
         (top) => indexes(columnsCount).map(
             (left) =>
                 startCells3x3?.some((position) => isSamePosition(position, {top, left})) ||
-                (!!givenDigits[top]?.[left] && (!solution || areSameCellData(solution[top][left], givenDigits[top][left], state, true))) ||
+                (!!givenDigits[top]?.[left] && (typeof solution?.[top]?.[left] !== "number" || getDigitByCellData(givenDigits[top][left], state) === solution[top][left])) ||
                 (revealByColors && cells[top][left].colors.size === 1 && !initialColors[top]?.[left] && (
                     Array.isArray(revealByColors)
                         ? revealByColors.includes(cells[top][left].colors.first()!)
@@ -235,7 +234,6 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
 }) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, FogProps<CellType>, ExType, ProcessedExType>) => ReactElement;
 
 export const FogConstraint = <CellType, ExType, ProcessedExType>(
-    solution?: CellType[][],
     startCell3x3Literals: PositionLiteral[] = [],
     startCellLiterals: PositionLiteral[] = [],
     bulbCellLiterals = startCell3x3Literals,
@@ -246,7 +244,6 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     tags: [fogTag],
     cells: [],
     props: {
-        solution,
         startCells3x3: parsePositionLiterals(startCell3x3Literals),
         startCells: parsePositionLiterals(startCellLiterals),
         bulbCells: parsePositionLiterals(bulbCellLiterals),
@@ -255,19 +252,15 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     },
     component: Fog,
     noPencilmarkCheck: true,
-    isValidCell: solution && ((
+    isCheckingFog: true,
+    isValidCell: (
         {top, left},
         digits,
         _,
-        {puzzle: {typeManager: {areSameCellData}}, state}
-    ) => {
-        return !!state.fogDemoFieldStateHistory || areSameCellData(
-            digits[top][left],
-            solution[top][left],
-            state,
-            true
-        );
-    }),
+        {puzzle: {solution, typeManager: {getDigitByCellData}}, state}
+    ) =>
+        !!state.fogDemoFieldStateHistory || typeof solution?.[top][left] !== "number" ||
+        getDigitByCellData(digits[top][left], state) === solution[top][left],
 });
 
 export const getFogPropsByConstraintsList = <CellType, ExType, ProcessedExType>(
