@@ -1,6 +1,6 @@
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect, transformRect} from "../../../types/layout/Rect";
-import {emptyPosition, isSamePosition, Position} from "../../../types/layout/Position";
+import {emptyPosition, Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import React, {Fragment, ReactNode, useMemo, useState} from "react";
@@ -13,11 +13,8 @@ import {
     gameStateApplyArrowToSelectedCells,
     gameStateClearSelectedCells,
     gameStateGetCurrentFieldState,
-    gameStateHandleCellDoubleClick,
     gameStateNormalizeLoopOffset,
     gameStateSelectAllCells,
-    gameStateSetSelectedCells,
-    gameStateToggleSelectedCells,
 } from "../../../types/sudoku/GameState";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
@@ -29,7 +26,7 @@ import {
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
-import {getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteMode";
+import {getAllowedCellWriteModeInfos, getCellWriteModeGestureHandler} from "../../../types/sudoku/CellWriteMode";
 import {HashSet, PlainValueSet} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
@@ -44,17 +41,7 @@ import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCo
 import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
-import {
-    GestureFinishReason,
-    GestureHandler,
-    GestureIsValidProps,
-    useGestureHandlers,
-    useOutsideClick
-} from "../../../utils/gestures";
-import {
-    getCurrentCellWriteModeInfoByGestureExtraData,
-    isCellGestureExtraData,
-} from "../../../types/sudoku/CellGestureExtraData";
+import {getGestureHandlerProps, useGestureHandlers, useOutsideClick} from "../../../utils/gestures";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -111,7 +98,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         isShowingSettings,
         processed: {
             isReady,
-            cellWriteModeInfo: {isNoSelectionMode},
+            cellWriteModeInfo: {isNoSelectionMode, applyToWholeField},
             animated,
         },
         fogDemoFieldStateHistory,
@@ -135,108 +122,17 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         }
     });
 
-    const cellWriteModeGestureHandlers = useGestureHandlers(getAllowedCellWriteModeInfos(puzzle, true).map(
-        (
-            {
-                mode,
-                isValidGesture = (isCurrentCellWriteMode: boolean, {gesture: {pointers}}: GestureIsValidProps) =>
-                    isCurrentCellWriteMode && pointers.length === 1,
-                isNoSelectionMode,
-                onMove,
-                onCornerClick,
-                onCornerEnter,
-                onGestureEnd,
-                handlesRightMouseClick,
-            }
-        ): GestureHandler => {
-            const common: Pick<GestureHandler, "isValidGesture"> = {
-                isValidGesture: (props) => isValidGesture(
-                    getCurrentCellWriteModeInfoByGestureExtraData(context, props.extraData).mode === mode,
-                    props,
-                    context,
-                ),
-            };
-
-            if (!isNoSelectionMode) {
-                return {
-                    contextId: "cell-selection",
-                    ...common,
-                    onStart: ({extraData, event}) => {
-                        const {ctrlKey, metaKey, shiftKey} = event;
-                        const isMultiSelection = ctrlKey || metaKey || shiftKey || state.isMultiSelection;
-
-                        if (!isCellGestureExtraData(extraData)) {
-                            return;
-                        }
-
-                        const cellPosition = extraData.cell;
-
-                        setIsDeleteSelectedCellsStroke(isMultiSelection && selectedCells.contains(cellPosition));
-                        onStateChange(
-                            gameState => isMultiSelection
-                                ? gameStateToggleSelectedCells(gameState, [cellPosition])
-                                : gameStateSetSelectedCells(gameState, [cellPosition])
-                        );
-                    },
-                    onContinue: ({prevData, currentData}) => {
-                        const [prevCell, currentCell] = [prevData, currentData].map(
-                            ({extraData}) => isCellGestureExtraData(extraData) && !extraData.skipEnter ? extraData.cell : undefined
-                        );
-                        if (currentCell && (!prevCell || !isSamePosition(prevCell, currentCell))) {
-                            onStateChange(gameState => gameStateToggleSelectedCells(gameState, [currentCell], !isDeleteSelectedCellsStroke));
-                        }
-                    },
-                    onEnd: ({reason}) => {
-                        if (reason === GestureFinishReason.startNewGesture) {
-                            onStateChange(gameStateClearSelectedCells);
-                        }
-                    },
-                    onDoubleClick: ({extraData, event: {ctrlKey, metaKey, shiftKey}}) => {
-                        if (!isCellGestureExtraData(extraData) || getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode !== mode) {
-                            return false;
-                        }
-
-                        onStateChange(gameStateHandleCellDoubleClick(
-                            context,
-                            extraData.cell,
-                            ctrlKey || metaKey || shiftKey
-                        ));
-                        return true;
-                    },
-                }
-            }
-
-            return {
-                contextId: `cell-write-mode-${mode}`,
-                ...common,
-                onStart: ({extraData, event: {button}}) => {
-                    if (isCellGestureExtraData(extraData)) {
-                        onCornerClick?.(context, extraData.exact, !!button);
-                    }
-                },
-                onContinue: (props) => {
-                    const {prevData: {extraData: prevData}, currentData: {extraData: currentData}} = props;
-
-                    if (
-                        isCellGestureExtraData(currentData) &&
-                        (!isCellGestureExtraData(prevData) || JSON.stringify(prevData.exact) !== JSON.stringify(currentData.exact))
-                    ) {
-                        onCornerEnter?.(context, currentData.exact);
-                    }
-
-                    onMove?.(props, context);
-                },
-                onEnd: (props) => onGestureEnd?.(props, context),
-                onContextMenu: ({event, extraData}) => {
-                    if (handlesRightMouseClick && getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode === mode) {
-                        event.preventDefault();
-                        return true;
-                    }
-                    return false;
-                },
-            };
-        }
-    ));
+    const cellWriteModesForGestures = getAllowedCellWriteModeInfos(puzzle, true);
+    const createCellWriteModeGestureHandlers = (forField: boolean) => !isReady ? [] : cellWriteModesForGestures
+        .filter(({applyToWholeField = false}) => applyToWholeField === forField)
+        .map((cellWriteModeInfo) => getCellWriteModeGestureHandler(
+            context,
+            cellWriteModeInfo,
+            isDeleteSelectedCellsStroke,
+            setIsDeleteSelectedCellsStroke
+        ));
+    const fieldGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(true));
+    const cellGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(false));
     // endregion
 
     // Handle arrows
@@ -383,7 +279,10 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
             style={{
                 backgroundColor: "white",
                 overflow: loopHorizontally || loopVertically ? "hidden" : undefined,
+                pointerEvents: "all",
+                cursor: applyToWholeField ? "pointer" : undefined,
             }}
+            {...getGestureHandlerProps(fieldGestureHandlers)}
         >
             <FieldWrapper context={context}>
                 <Absolute
@@ -485,7 +384,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
                         context={readOnlySafeContext}
                         cellPosition={cellPosition}
-                        handlers={cellWriteModeGestureHandlers}
+                        handlers={cellGestureHandlers}
                     />)}
                 </Absolute>
 

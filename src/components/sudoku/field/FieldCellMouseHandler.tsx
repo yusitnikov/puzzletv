@@ -33,9 +33,10 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
         onCornerClick,
         onCornerEnter,
         disableCellHandlers,
+        applyToWholeField,
     } = puzzle.typeManager.getCellTypeProps?.(cellPosition, puzzle)?.forceCellWriteMode || cellWriteModeInfo;
 
-    if (disableCellHandlers) {
+    if (disableCellHandlers || applyToWholeField) {
         return null;
     }
 

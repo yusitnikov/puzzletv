@@ -1,13 +1,13 @@
 import {useEventListener} from "../hooks/useEventListener";
-import {EventHandlerProps, NativeEventHandlerProps, wrapNativeEventHandlerProps} from "../types/dom/EventHandlerProps";
+import {EventHandlerProps} from "../types/dom/EventHandlerProps";
 import {useAutoIncrementId} from "../hooks/useAutoIncrementId";
-import {useEffect, useMemo} from "react";
+import {useEffect, useMemo, MouseEvent, PointerEvent} from "react";
 import {useLastValueRef} from "../hooks/useLastValueRef";
 import {average} from "./math";
 import {usePureMemo} from "../hooks/usePureMemo";
 import {useDiffEffect} from "../hooks/useDiffEffect";
 
-const releasePointerCapture = ({target, pointerId}: PointerEvent) => {
+const releasePointerCapture = ({target, pointerId}: PointerEvent<any>) => {
     const element = target as Element;
     if (element?.hasPointerCapture?.(pointerId)) {
         element?.releasePointerCapture?.(pointerId);
@@ -16,13 +16,13 @@ const releasePointerCapture = ({target, pointerId}: PointerEvent) => {
 
 export const useGesturesGlobalEvents = () => {
     // Make sure that the gesture that starts in one element can continue outside of this element
-    useEventListener(window, "pointerdown", releasePointerCapture);
+    useEventListener(window, "pointerdown", (ev) => releasePointerCapture(ev as any));
 
-    const gestureHandler = getGestureHandlerPropsNative();
-    useEventListener(window, "pointerdown", gestureHandler.onPointerDown);
-    useEventListener(window, "pointerup", gestureHandler.onPointerUp);
-    useEventListener(window, "pointermove", gestureHandler.onPointerMove);
-    useEventListener(window, "mousemove", gestureHandler.onMouseMove);
+    const gestureHandler = getGestureHandlerProps();
+    useEventListener(window, "pointerdown", (ev) => gestureHandler.onPointerDown(ev as any));
+    useEventListener(window, "pointerup", (ev) => gestureHandler.onPointerUp(ev as any));
+    useEventListener(window, "pointermove", (ev) => gestureHandler.onPointerMove(ev as any));
+    useEventListener(window, "mousemove", (ev) => gestureHandler.onMouseMove(ev as any));
 };
 
 export const useOutsideClick = (handler: () => void) => useEventListener(window, "mousedown", handler);
@@ -34,7 +34,7 @@ export interface BasePointerStateExtraData {
     tags: string[];
 }
 
-export interface PointerState<EventT = PointerEvent> {
+export interface PointerState<EventT = PointerEvent<any>> {
     event: EventT;
     time: number;
     extraData?: BasePointerStateExtraData;
@@ -76,9 +76,9 @@ export interface GestureOnEndProps {
     reason: GestureFinishReason;
 }
 
-export type GestureOnDoubleClickProps = PointerState<MouseEvent>;
+export type GestureOnDoubleClickProps<ElemT> = PointerState<MouseEvent<ElemT>>;
 
-export type GestureOnContextMenuProps = PointerState<MouseEvent>;
+export type GestureOnContextMenuProps<ElemT> = PointerState<MouseEvent<ElemT>>;
 
 export interface GestureHandler {
     contextId: string | number;
@@ -86,8 +86,8 @@ export interface GestureHandler {
     onStart?(props: GestureOnStartProps): void;
     onContinue?(props: GestureOnContinueProps): void;
     onEnd?(props: GestureOnEndProps): void;
-    onDoubleClick?(props: GestureOnDoubleClickProps): boolean;
-    onContextMenu?(props: GestureOnContextMenuProps): boolean;
+    onDoubleClick?(props: GestureOnDoubleClickProps<any>): boolean;
+    onContextMenu?(props: GestureOnContextMenuProps<any>): boolean;
 }
 
 export interface GestureMetrics {
@@ -184,9 +184,10 @@ const releaseStalePointers = () => {
     }
 };
 
-export const getGestureHandlerPropsNative = (handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent | MouseEvent) => (BasePointerStateExtraData | undefined))
-    : Required<NativeEventHandlerProps<"onPointerDown" | "onPointerUp" | "onPointerMove" | "onMouseMove" | "onDoubleClick" | "onContextMenu">> => ({
+export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent<ElemT> | MouseEvent<ElemT>) => (BasePointerStateExtraData | undefined))
+    : Required<EventHandlerProps<ElemT, "onPointerDown" | "onPointerUp" | "onPointerMove" | "onMouseMove" | "onDoubleClick" | "onContextMenu">> => ({
     onPointerDown: (ev) => {
+        console.warn("pointer down", ev.target, ev.currentTarget, handlers);
         releasePointerCapture(ev);
 
         // pointerId is always the same on desktop, so make sure to release the previous gesture if new gesture started
@@ -287,7 +288,7 @@ export const getGestureHandlerPropsNative = (handlers?: GestureHandler[], getExt
         }
     },
     onDoubleClick: (ev) => {
-        const props: GestureOnDoubleClickProps = {
+        const props: GestureOnDoubleClickProps<ElemT> = {
             event: ev,
             time: Date.now(),
             extraData: getExtraDataByEvent?.(ev),
@@ -301,7 +302,7 @@ export const getGestureHandlerPropsNative = (handlers?: GestureHandler[], getExt
         }
     },
     onContextMenu: (ev) => {
-        const props: GestureOnContextMenuProps = {
+        const props: GestureOnContextMenuProps<ElemT> = {
             event: ev,
             time: Date.now(),
             extraData: getExtraDataByEvent?.(ev),
@@ -315,9 +316,6 @@ export const getGestureHandlerPropsNative = (handlers?: GestureHandler[], getExt
         }
     },
 });
-
-export const getGestureHandlerProps = (handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent | MouseEvent) => (BasePointerStateExtraData | undefined)) =>
-    wrapNativeEventHandlerProps(getGestureHandlerPropsNative(handlers, getExtraDataByEvent));
 
 /*
  * Register context ID as an allowed context. Finish current gesture with this context if the context becomes stale.
