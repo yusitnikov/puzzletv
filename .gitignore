@@ -24,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 
 build-storybook.log
+
+src/components/layout/debugger
