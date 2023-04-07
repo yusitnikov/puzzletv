@@ -3,7 +3,8 @@ import {GoogleMapsState} from "./GoogleMapsState";
 import {emptyPosition, Position} from "../../../types/layout/Position";
 import {mergeGameStateUpdates, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {positionToLatLngLiteral} from "../utils/googleMapsCoords";
-import {allCellWriteModeInfos, CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 
 export const GoogleMapsTypeManager = <CellType>(
     baseTypeManager: SudokuTypeManager<CellType, GoogleMapsState>
@@ -12,7 +13,8 @@ export const GoogleMapsTypeManager = <CellType>(
     extraCellWriteModes: [
         ...baseTypeManager.extraCellWriteModes ?? [],
         {
-            ...allCellWriteModeInfos.find(({mode}) => mode === CellWriteMode.move)!,
+            mode: CellWriteMode.move,
+            ...MoveCellWriteModeInfo,
             disableCellHandlers: true,
         },
     ],
