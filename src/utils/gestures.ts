@@ -30,10 +30,14 @@ export const cancelOutsideClickProps: Pick<EventHandlerProps<any>, "onMouseDown"
     onMouseDown: (ev) => ev.stopPropagation(),
 };
 
+export interface BasePointerStateExtraData {
+    tags: string[];
+}
+
 export interface PointerState<EventT = PointerEvent> {
     event: EventT;
     time: number;
-    extraData?: any;
+    extraData?: BasePointerStateExtraData;
 }
 
 export interface PointerMovementInfo {
@@ -180,7 +184,7 @@ const releaseStalePointers = () => {
     }
 };
 
-export const getGestureHandlerPropsNative = (handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent | MouseEvent) => any)
+export const getGestureHandlerPropsNative = (handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent | MouseEvent) => (BasePointerStateExtraData | undefined))
     : Required<NativeEventHandlerProps<"onPointerDown" | "onPointerUp" | "onPointerMove" | "onMouseMove" | "onDoubleClick" | "onContextMenu">> => ({
     onPointerDown: (ev) => {
         releasePointerCapture(ev);
@@ -312,7 +316,7 @@ export const getGestureHandlerPropsNative = (handlers?: GestureHandler[], getExt
     },
 });
 
-export const getGestureHandlerProps = (handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent | MouseEvent) => any) =>
+export const getGestureHandlerProps = (handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent | MouseEvent) => (BasePointerStateExtraData | undefined)) =>
     wrapNativeEventHandlerProps(getGestureHandlerPropsNative(handlers, getExtraDataByEvent));
 
 /*

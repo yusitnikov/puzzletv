@@ -51,7 +51,10 @@ import {
     useGestureHandlers,
     useOutsideClick
 } from "../../../utils/gestures";
-import {isCellGestureExtraData, isCurrentModeByCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
+import {
+    getCurrentCellWriteModeInfoByGestureExtraData,
+    isCellGestureExtraData,
+} from "../../../types/sudoku/CellGestureExtraData";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -148,7 +151,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         ): GestureHandler => {
             const common: Pick<GestureHandler, "isValidGesture"> = {
                 isValidGesture: (props) => isValidGesture(
-                    isCurrentModeByCellGestureExtraData(props.extraData, mode),
+                    getCurrentCellWriteModeInfoByGestureExtraData(context, props.extraData).mode === mode,
                     props,
                     context,
                 ),
@@ -189,7 +192,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                         }
                     },
                     onDoubleClick: ({extraData, event: {ctrlKey, metaKey, shiftKey}}) => {
-                        if (!isCellGestureExtraData(extraData) || !isCurrentModeByCellGestureExtraData(extraData, mode)) {
+                        if (!isCellGestureExtraData(extraData) || getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode !== mode) {
                             return false;
                         }
 
@@ -207,7 +210,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                 contextId: `cell-write-mode-${mode}`,
                 ...common,
                 onStart: ({extraData, event: {button}}) => {
-                    if (isCellGestureExtraData(extraData) && extraData.exact) {
+                    if (isCellGestureExtraData(extraData)) {
                         onCornerClick?.(context, extraData.exact, !!button);
                     }
                 },
@@ -215,7 +218,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     const {prevData: {extraData: prevData}, currentData: {extraData: currentData}} = props;
 
                     if (
-                        isCellGestureExtraData(currentData) && currentData.exact &&
+                        isCellGestureExtraData(currentData) &&
                         (!isCellGestureExtraData(prevData) || JSON.stringify(prevData.exact) !== JSON.stringify(currentData.exact))
                     ) {
                         onCornerEnter?.(context, currentData.exact);
@@ -225,7 +228,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                 },
                 onEnd: (props) => onGestureEnd?.(props, context),
                 onContextMenu: ({event, extraData}) => {
-                    if (handlesRightMouseClick && isCurrentModeByCellGestureExtraData(extraData, mode)) {
+                    if (handlesRightMouseClick && getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode === mode) {
                         event.preventDefault();
                         return true;
                     }

@@ -8,7 +8,7 @@ import {CellExactPosition} from "../../../types/sudoku/CellExactPosition";
 import {CellPart} from "../../../types/sudoku/CellPart";
 import {mergeEventHandlerProps} from "../../../utils/mergeEventHandlerProps";
 import {cancelOutsideClickProps, GestureHandler, getGestureHandlerProps} from "../../../utils/gestures";
-import {CellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
+import {CellGestureExtraData, cellGestureExtraDataTag} from "../../../types/sudoku/CellGestureExtraData";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
@@ -114,6 +114,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                 key={"cell-selection"}
                 context={context}
                 cellPosition={cellPosition}
+                cellExactPosition={centerExactPosition}
                 handlers={handlers}
             />
 
@@ -122,6 +123,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
                     key={`no-interaction-corner-${topOffset}-${leftOffset}`}
                     context={context}
                     cellPosition={cellPosition}
+                    cellExactPosition={centerExactPosition}
                     left={leftOffset * (1 - borderPaddingCoeff)}
                     top={topOffset * (1 - borderPaddingCoeff)}
                     width={borderPaddingCoeff}
@@ -137,7 +139,7 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
 interface MouseHandlerRectProps<CellType, ExType, ProcessedExType> extends Partial<Rect> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
     cellPosition: Position;
-    cellExactPosition?: CellExactPosition;
+    cellExactPosition: CellExactPosition;
     line?: Position[];
     handlers: GestureHandler[];
     skipEnter?: boolean;
@@ -162,11 +164,10 @@ const MouseHandlerRect = <CellType, ExType, ProcessedExType>(
         {
             onMouseDown: (ev) => ev.preventDefault(),
         },
-        getGestureHandlerProps(handlers, (): CellGestureExtraData<CellType, ExType, ProcessedExType> => ({
-            type: "cell",
+        getGestureHandlerProps(handlers, (): CellGestureExtraData => ({
+            tags: [cellGestureExtraDataTag],
             cell: cellPosition,
             exact: cellExactPosition,
-            cellWriteModeInfo: context.puzzle.typeManager.getCellTypeProps?.(cellPosition, context.puzzle)?.forceCellWriteMode ?? context.state.processed.cellWriteModeInfo,
             skipEnter,
         })),
     )}
