@@ -50,7 +50,6 @@ import {CellPart} from "./CellPart";
 import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
 import {loop} from "../../utils/math";
 import {AnimationSpeed} from "./AnimationSpeed";
-import {getRectCenter, Rect} from "../layout/Rect";
 import {applyMetricsDiff, GestureMetrics} from "../../utils/gestures";
 
 export interface GameState<CellType> {
