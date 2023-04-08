@@ -50,6 +50,8 @@ import {CellPart} from "./CellPart";
 import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
 import {loop} from "../../utils/math";
 import {AnimationSpeed} from "./AnimationSpeed";
+import {getRectCenter, Rect} from "../layout/Rect";
+import {applyMetricsDiff, GestureMetrics} from "../../utils/gestures";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -541,6 +543,7 @@ export const gameStateApplyArrowToSelectedCells = <CellType, ExType, ProcessedEx
         : gameStateSetSelectedCells(state, [newCell]);
     let loopOffset = state.loopOffset;
 
+    // TODO: support moving and scaling for non-looping puzzles
     if (loopHorizontally) {
         const left = loop(newCell.left + loopOffset.left + 0.5, fieldSize.columnsCount) - 0.5;
         const min = 1;
@@ -868,11 +871,16 @@ export const gameStateClearSelectedCellsContent = <CellType, ExType, ProcessedEx
 
 // region Drawing
 export const gameStateNormalizeLoopOffset = <CellType, ExType = {}, ProcessedExType = {}>(
-    {fieldSize: {rowsCount, columnsCount}, fieldMargin = 0}: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    {
+        fieldSize: {rowsCount, columnsCount},
+        fieldMargin = 0,
+        loopHorizontally,
+        loopVertically,
+    }: PuzzleDefinition<CellType, ExType, ProcessedExType>,
     {left, top}: Position
 ): Position => ({
-    left: loop(left + fieldMargin, columnsCount) - fieldMargin,
-    top: loop(top + fieldMargin, rowsCount) - fieldMargin,
+    left: loopHorizontally ? loop(left + fieldMargin, columnsCount) - fieldMargin : left,
+    top: loopVertically ? loop(top + fieldMargin, rowsCount) - fieldMargin : top,
 });
 
 export const gameStateResetCurrentMultiLine = <CellType, ExType>(): PartialGameStateEx<CellType, ExType> => ({
@@ -1110,6 +1118,66 @@ export const gameStateApplyShading = <CellType, ExType, ProcessedExType>(
 };
 // endregion
 
+// region Scale
 export const defaultScaleStep = 2;
 export const getScaleLog = (scale: number, step = defaultScaleStep) => Math.log(scale) / Math.log(step);
 export const getAbsoluteScaleByLog = (scaleLog: number, step = defaultScaleStep) => Math.pow(step, scaleLog);
+
+export const gameStateSetScaleLog = <CellType, ExType, ProcessedExType>(
+    {puzzle: {typeManager: {scaleStep}}, state: {selectedCells}, onStateChange}: PuzzleContext<CellType, ExType, ProcessedExType>,
+    scaleLog: number,
+    resetSelectedCells = true,
+): PartialGameStateEx<CellType, ExType> => ({
+    scale: getAbsoluteScaleByLog(scaleLog, scaleStep),
+    animatingScale: true,
+    ...(resetSelectedCells && {selectedCells: selectedCells.clear()}),
+});
+// endregion
+
+export const gameStateApplyFieldDragGesture = <CellType, ExType, ProcessedExType>(
+    {
+        puzzle: {
+            loopHorizontally,
+            loopVertically,
+            typeManager: {allowMove, allowRotation, allowScale},
+        },
+        onStateChange,
+    }: PuzzleContext<CellType, ExType, ProcessedExType>,
+    prevMetrics: GestureMetrics,
+    currentMetrics: GestureMetrics,
+    animate: boolean,
+    resetSelection: boolean,
+) => {
+    const filterMetrics = ({x, y, rotation, scale}: GestureMetrics): GestureMetrics => ({
+        x: loopHorizontally || allowMove ? x : 0,
+        y: loopVertically || allowMove ? y : 0,
+        rotation: allowRotation ? rotation : 0,
+        scale: allowScale ? scale : 1,
+    });
+    currentMetrics = filterMetrics(currentMetrics);
+    prevMetrics = filterMetrics(prevMetrics);
+    onStateChange(({loopOffset: {top, left}, angle, scale, selectedCells}) => {
+        const {x, y, rotation, scale: newScale} = applyMetricsDiff(
+            {
+                x: left,
+                y: top,
+                scale,
+                rotation: angle,
+            },
+            prevMetrics,
+            currentMetrics
+        );
+        return {
+            loopOffset: {
+                left: loopHorizontally || allowMove ? x : left,
+                top: loopVertically || allowMove ? y : top,
+            },
+            animatingLoopOffset: animate,
+            angle: rotation,
+            animatingAngle: animate,
+            scale: newScale,
+            animatingScale: animate,
+            ...(resetSelection && {selectedCells: selectedCells.clear()})
+        };
+    });
+};

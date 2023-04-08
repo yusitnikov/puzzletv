@@ -90,12 +90,60 @@ export interface GestureHandler {
     onContextMenu?(props: GestureOnContextMenuProps<any>): boolean;
 }
 
-export interface GestureMetrics {
+interface GestureMetricsPoint {
     x: number;
     y: number;
+}
+
+export interface GestureMetrics extends GestureMetricsPoint {
     scale: number;
     rotation: number;
 }
+
+export const emptyGestureMetrics: GestureMetrics = {
+    x: 0,
+    y: 0,
+    scale: 1,
+    rotation: 0,
+};
+
+export const applyMetricsDiff = (current: GestureMetrics, metricsFrom: GestureMetrics, metricsTo: GestureMetrics): GestureMetrics => {
+    // Calculate source metrics point's relative position in the dragged rect
+    const fromInCurrent = transformPointCoordsAbsoluteToMetricsBase(metricsFrom, current);
+    // Apply scale and rotation changes
+    const updated = {
+        scale: current.scale * metricsTo.scale / metricsFrom.scale,
+        rotation: current.rotation + metricsTo.rotation - metricsFrom.rotation,
+    };
+    // Look where the new scale and rotation will put the source metrics point starting from the empty point
+    const fromInUpdated = transformPointCoordsMetricsBaseToAbsolute(fromInCurrent, {x: 0, y: 0, ...updated});
+    // Recalculate the offset to make the source and the destination metrics points match
+    return {
+        x: metricsTo.x - fromInUpdated.x,
+        y: metricsTo.y - fromInUpdated.y,
+        ...updated,
+    };
+};
+
+const transformPointCoordsMetricsBaseToAbsolute = ({x, y}: GestureMetricsPoint, {x: baseX, y: baseY, scale, rotation}: GestureMetrics): GestureMetricsPoint => {
+    rotation *= Math.PI / 180;
+    return {
+        x: baseX + scale * (x * Math.cos(rotation) - y * Math.sin(rotation)),
+        y: baseY + scale * (y * Math.cos(rotation) + x * Math.sin(rotation)),
+    };
+};
+
+const transformPointCoordsAbsoluteToMetricsBase = ({x, y}: GestureMetricsPoint, {x: baseX, y: baseY, scale, rotation}: GestureMetrics): GestureMetricsPoint => {
+    rotation *= Math.PI / 180;
+    x -= baseX;
+    y -= baseY;
+    x /= scale;
+    y /= scale;
+    return {
+        x: x * Math.cos(rotation) + y * Math.sin(rotation),
+        y: y * Math.cos(rotation) - x * Math.sin(rotation),
+    };
+};
 
 export class GestureInfo {
     private pointersMap: Record<number, PointerMovementInfo> = {};
@@ -118,11 +166,11 @@ export class GestureInfo {
     private getMetrics(type: "start" | "current"): GestureMetrics {
         const pointers = this.pointers.map(value => value[type].event);
         const isMultiTouch = pointers.length > 1;
-        const x = average(pointers.map(({screenX}) => screenX));
-        const y = average(pointers.map(({screenY}) => screenY));
-        const relative = pointers.map(({screenX, screenY}) => ({
-            dx: screenX - x,
-            dy: screenY - y,
+        const x = average(pointers.map(({clientX}) => clientX));
+        const y = average(pointers.map(({clientY}) => clientY));
+        const relative = pointers.map(({clientX, clientY}) => ({
+            dx: clientX - x,
+            dy: clientY - y,
         }));
 
         return {
@@ -258,7 +306,7 @@ export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getEx
         }
 
         const prevData = pointer.current;
-        pointer.length += Math.hypot(ev.screenX - prevData.event.screenX, ev.screenY - prevData.event.screenY);
+        pointer.length += Math.hypot(ev.clientX - prevData.event.clientX, ev.clientY - prevData.event.clientY);
         if (pointer.length > 10) {
             currentGesture.isClick = false;
         }
@@ -322,6 +370,7 @@ export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getEx
  *
  * Return the memoized the handler with the updated contextId.
  */
+// noinspection JSUnusedGlobalSymbols
 export const useGestureHandler = (handler?: GestureHandler): GestureHandler => {
     const autoIncrementId = useAutoIncrementId();
     const finalContextId = `${autoIncrementId}-${handler?.contextId}`;

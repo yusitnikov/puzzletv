@@ -115,6 +115,8 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     initialGameStateExtension?: ExType;
 
+    allowMove?: boolean;
+
     initialAngle?: number;
     angleStep?: number;
     allowRotation?: boolean;
@@ -124,6 +126,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
     scaleStep?: number;
     allowScale?: boolean;
     isFreeScale?: boolean;
+    fieldWrapperHandlesScale?: boolean;
 
     keepStateOnRestart?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): PartialGameStateEx<CellType, ExType>;
 

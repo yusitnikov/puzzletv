@@ -4,7 +4,7 @@ import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {PropsWithChildren} from "react";
 import {blackColor} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
-import {setInfiniteRingOffset} from "../types/InfiniteRingsGameState";
+import {gameStateSetScaleLog} from "../../../types/sudoku/GameState";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
@@ -88,12 +88,12 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType, ProcessedExType>(
         switch ((ev.shiftKey ? "Shift+" : "") + ev.code) {
             case "NumpadAdd":
             case "Shift+Equal":
-                onStateChange(setInfiniteRingOffset(context, ringOffset + 1));
+                onStateChange(gameStateSetScaleLog(context, ringOffset + 1));
                 ev.preventDefault();
                 break;
             case "Minus":
             case "NumpadSubtract":
-                onStateChange(setInfiniteRingOffset(context, ringOffset - 1));
+                onStateChange(gameStateSetScaleLog(context, ringOffset - 1));
                 ev.preventDefault();
                 break;
         }
@@ -172,7 +172,7 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType, ProcessedExType>(
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => onStateChange(setInfiniteRingOffset(context, ringOffset + 1))}
+                        onClick={() => onStateChange(gameStateSetScaleLog(context, ringOffset + 1))}
                         title={translate("zoom in")}
                     >
                         +
@@ -186,7 +186,7 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType, ProcessedExType>(
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => onStateChange(setInfiniteRingOffset(context, ringOffset - 1))}
+                        onClick={() => onStateChange(gameStateSetScaleLog(context, ringOffset - 1))}
                         title={translate("zoom out")}
                     >
                         -
@@ -197,7 +197,7 @@ export const InfiniteRingsFieldWrapper = <CellType, ExType, ProcessedExType>(
                         count={ringsCount}
                         index={index}
                         selected={index === loopedRingOffset}
-                        onClick={() => onStateChange(setInfiniteRingOffset(
+                        onClick={() => onStateChange(gameStateSetScaleLog(
                             context,
                             loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2
                         ))}

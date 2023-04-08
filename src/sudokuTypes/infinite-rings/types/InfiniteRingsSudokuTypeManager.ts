@@ -8,15 +8,14 @@ import {Constraint} from "../../../types/sudoku/Constraint";
 import {indexes} from "../../../utils/indexes";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
 import {InfiniteRingsFieldWrapper} from "../components/InfiniteRingsFieldWrapper";
-import {PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {gameStateSetScaleLog, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {loop} from "../../../utils/math";
 import {InfiniteRingsBorderLinesConstraint} from "../components/InfiniteRingsBorderLines";
 import {isShowingAllInfiniteRings} from "./InfiniteRingsLayout";
-import {InfiniteRingZoomButton} from "../components/InfiniteRingZoomButton";
+import {ZoomInButton, ZoomOutButton} from "../../../components/sudoku/controls/ZoomButton";
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
-import {setInfiniteRingOffset} from "./InfiniteRingsGameState";
 
 /*
  * TODO:
@@ -54,16 +53,17 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
         initialScale: Math.pow(2, startRingOffset),
         allowScale: true,
         isFreeScale: false,
+        fieldWrapperHandlesScale: true,
         controlButtons: [
             {
                 key: "zoom-in",
                 region: ControlButtonRegion.additional,
-                Component: InfiniteRingZoomButton(1, "zoom in", "+"),
+                Component: ZoomInButton(),
             },
             {
                 key: "zoom-out",
                 region: ControlButtonRegion.additional,
-                Component: InfiniteRingZoomButton(-1, "zoom out", "-"),
+                Component: ZoomOutButton(),
             },
             {
                 key: "animation-speed",
@@ -126,7 +126,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                         top: coordsRingToPlain(fieldSize, ring, top),
                         left: coordsRingToPlain(fieldSize, ring, left),
                     },
-                    state: setInfiniteRingOffset(context, newRingOffset, false),
+                    state: gameStateSetScaleLog(context, newRingOffset, false),
                 };
             }
 

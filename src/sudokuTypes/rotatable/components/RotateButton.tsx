@@ -2,32 +2,39 @@ import {ControlButtonItemProps} from "../../../components/sudoku/controls/Contro
 import {useTranslate} from "../../../hooks/useTranslate";
 import {RotateLeft, RotateRight} from "@emotion-icons/material";
 import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
-import {RotatableGameState} from "../types/RotatableGameState";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {ArrowCurveDownLeft} from "@emotion-icons/fluentui-system-filled";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {loop} from "../../../utils/math";
+import {gameStateApplyFieldDragGesture} from "../../../types/sudoku/GameState";
+import {emptyGestureMetrics} from "../../../utils/gestures";
 
-const handleRotate = <CellType,>(
-    {puzzle: {typeManager: {angleStep = 0}}, onStateChange}: PuzzleContext<CellType, RotatableGameState>,
+const handleRotate = <CellType, ExType, ProcessedExType>(
+    context: PuzzleContext<CellType, ExType, ProcessedExType>,
     direction: number
-) => onStateChange(({angle}) => {
+) => {
+    const {puzzle: {typeManager: {angleStep = 0, isFreeRotation}}, state: {angle}} = context;
+
     let newAngle = angle + direction * angleStep;
-    if (angleStep !== 0) {
+    if (!isFreeRotation && angleStep !== 0) {
         const mod = loop(newAngle * direction, angleStep);
         if (mod > 0.1 * angleStep && mod < 0.9 * angleStep) {
             newAngle -= mod * direction;
         }
     }
-    return ({
-        animatingAngle: true,
-        angle: newAngle,
-    });
-});
 
-export const RotateRightButton = <CellType,>(
-    {context, top, left}: ControlButtonItemProps<CellType, RotatableGameState>
+    gameStateApplyFieldDragGesture(
+        context,
+        emptyGestureMetrics,
+        {...emptyGestureMetrics, rotation: newAngle - angle},
+        true,
+        false,
+    );
+};
+
+export const RotateRightButton = <CellType, ExType, ProcessedExType>(
+    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
 ) => {
     const {
         cellSizeForSidePanel: cellSize,
@@ -77,8 +84,8 @@ export const RotateRightButton = <CellType,>(
     </>;
 };
 
-export const RotateLeftButton = <CellType,>(
-    {context, top, left}: ControlButtonItemProps<CellType, RotatableGameState>
+export const RotateLeftButton = <CellType, ExType, ProcessedExType>(
+    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
 ) => {
     const {cellSizeForSidePanel: cellSize} = context;
 

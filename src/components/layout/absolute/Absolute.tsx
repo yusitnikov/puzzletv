@@ -1,10 +1,12 @@
 import {ReactNode} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {Line} from "../line/Line";
+import {TransformScaleContextProvider} from "../../../contexts/TransformScaleContext";
 
 export type AbsoluteProps<TagNameT extends keyof JSX.IntrinsicElements = "div"> = Partial<Rect> & JSX.IntrinsicElements[TagNameT] & {
     tagName?: TagNameT;
     angle?: number;
+    scale?: number;
     fitParent?: boolean;
     borderWidth?: number;
     borderColor?: string;
@@ -19,6 +21,7 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
         childrenOnTopOfBorders,
         tagName = "div" as TagNameT,
         angle = 0,
+        scale = 1,
         borderWidth,
         borderColor,
         left = 0,
@@ -33,14 +36,14 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
 ) => {
     const TagName = tagName as any;
 
-    return <TagName
+    const result = <TagName
         style={{
             position: "absolute",
             left: fitParent ? 0 : `${left}px`,
             top: fitParent ? 0 : `${top}px`,
             width: fitParent ? "100%" : `${width}px`,
             height: fitParent ? "100%" : `${height}px`,
-            transform: `rotate(${angle}deg)`,
+            transform: `rotate(${angle}deg) scale(${scale})`,
             pointerEvents: pointerEvents ? "all" : "none",
             ...style,
         }}
@@ -57,4 +60,6 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
 
         {childrenOnTopOfBorders && children}
     </TagName>;
+
+    return scale === 1 ? result : <TransformScaleContextProvider scale={scale}>{result}</TransformScaleContextProvider>;
 };

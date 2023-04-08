@@ -21,6 +21,7 @@ import {
 import {isSamePosition} from "../layout/Position";
 import {GestureFinishReason} from "../../utils/gestures";
 import {getReadOnlySafeOnStateChange} from "../../hooks/sudoku/useReadOnlySafeContext";
+import {Rect} from "../layout/Rect";
 
 export enum CellWriteMode {
     main,
@@ -62,7 +63,11 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
         position: CellExactPosition
     ) => void;
-    onMove?(props: GestureOnContinueProps, context: PuzzleContext<CellType, ExType, ProcessedExType>): void;
+    onMove?(
+        props: GestureOnContinueProps,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
+        fieldRect: Rect,
+    ): void;
     onGestureEnd?(props: GestureOnEndProps, context: PuzzleContext<CellType, ExType, ProcessedExType>): void;
 }
 
@@ -220,6 +225,7 @@ export const getCellWriteModeGestureHandler = <CellType, ExType, ProcessedExType
     }: CellWriteModeInfo<CellType, ExType, ProcessedExType>,
     isDeleteSelectedCellsStroke: boolean,
     setIsDeleteSelectedCellsStroke: (value: boolean) => void,
+    fieldRect: Rect,
 ): GestureHandler => {
     const onStateChange = getReadOnlySafeOnStateChange(context);
 
@@ -298,7 +304,7 @@ export const getCellWriteModeGestureHandler = <CellType, ExType, ProcessedExType
                 onCornerEnter?.(context, currentData.exact);
             }
 
-            onMove?.(props, context);
+            onMove?.(props, context, fieldRect);
         },
         onEnd: (props) => onGestureEnd?.(props, context),
         onContextMenu: ({event, extraData}) => {

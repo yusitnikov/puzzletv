@@ -1,12 +1,12 @@
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getAbsoluteScaleByLog, PartialGameStateEx} from "../../../types/sudoku/GameState";
 
-export const setInfiniteRingOffset = <CellType, ExType, ProcessedExType>(
+export const gameStateSetScaleLog = <CellType, ExType, ProcessedExType>(
     {puzzle: {typeManager: {scaleStep}}, state: {selectedCells}, onStateChange}: PuzzleContext<CellType, ExType, ProcessedExType>,
-    ringOffset: number,
+    scaleLog: number,
     resetSelectedCells = true,
 ): PartialGameStateEx<CellType, ExType> => ({
-    scale: getAbsoluteScaleByLog(ringOffset, scaleStep),
+    scale: getAbsoluteScaleByLog(scaleLog, scaleStep),
     animatingScale: true,
     ...(resetSelectedCells && {selectedCells: selectedCells.clear()}),
 });

@@ -34,7 +34,7 @@ import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeConte
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {PencilmarksCheckerMode} from "../../../types/sudoku/PencilmarksCheckerMode";
 import {resolvePuzzleInitialColors} from "../../../types/sudoku/PuzzleDefinition";
-import {redColor} from "../../app/globals";
+import {headerHeight, redColor} from "../../app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCoordsTransformation";
@@ -42,6 +42,7 @@ import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
 import {getGestureHandlerProps, useGestureHandlers, useOutsideClick} from "../../../utils/gestures";
+import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -80,7 +81,13 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         getCellSelectionType = state.highlightSeenCells ? getDefaultCellSelectionType : undefined,
         disableConflictChecker,
         disableArrowLetterShortcuts,
+        allowMove,
+        allowRotation,
+        allowScale,
+        fieldWrapperHandlesScale,
     } = typeManager;
+
+    const clipField = allowMove || (allowScale && !fieldWrapperHandlesScale);
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
 
@@ -122,6 +129,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         }
     });
 
+    const fieldOuterRect = usePuzzleContainer()!;
+
     const cellWriteModesForGestures = getAllowedCellWriteModeInfos(puzzle, true);
     const createCellWriteModeGestureHandlers = (forField: boolean) => !isReady ? [] : cellWriteModesForGestures
         .filter(({applyToWholeField = false}) => applyToWholeField === forField)
@@ -129,7 +138,11 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
             context,
             cellWriteModeInfo,
             isDeleteSelectedCellsStroke,
-            setIsDeleteSelectedCellsStroke
+            setIsDeleteSelectedCellsStroke,
+            {
+                ...fieldOuterRect,
+                top: fieldOuterRect.top + headerHeight,
+            },
         ));
     const fieldGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(true));
     const cellGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(false));
@@ -205,7 +218,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         <FieldSvg context={readOnlySafeContext} useShadow={useShadow}>
             {({left: leftOffset, top: topOffset}) => <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
                 {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
-                    if (!fieldFitsWrapper && !customCellBounds) {
+                    if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation) {
                         const finalTop = topOffset + loopOffset.top + rowIndex;
                         if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
                             return null;
@@ -275,10 +288,9 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     return <>
         <Absolute
             {...rect}
-            angle={animated.angle}
             style={{
                 backgroundColor: "white",
-                overflow: loopHorizontally || loopVertically ? "hidden" : undefined,
+                overflow: loopHorizontally || loopVertically || clipField ? "hidden" : undefined,
                 pointerEvents: "all",
                 cursor: applyToWholeField ? "pointer" : undefined,
             }}
@@ -288,6 +300,10 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                 <Absolute
                     left={loopOffset.left * cellSize}
                     top={loopOffset.top * cellSize}
+                    width={rect.width}
+                    height={rect.height}
+                    angle={animated.angle}
+                    scale={fieldWrapperHandlesScale ? 1 : animated.scale}
                     fitParent={fieldFitsWrapper}
                 >
                     <FieldSvg context={readOnlySafeContext}>
@@ -388,7 +404,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     />)}
                 </Absolute>
 
-                {loopHorizontally && <>
+                {(loopHorizontally || clipField) && <>
                     <Absolute
                         width={fieldMargin * cellSize}
                         height={rect.height}
@@ -407,7 +423,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     />
                 </>}
 
-                {loopVertically && <>
+                {(loopVertically || clipField) && <>
                     <Absolute
                         width={rect.width}
                         height={fieldMargin * cellSize}

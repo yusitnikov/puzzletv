@@ -1,44 +1,40 @@
 import type {CellWriteModeInfo} from "../CellWriteMode";
-import {getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx} from "../GameState";
+import {gameStateApplyFieldDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx} from "../GameState";
+import {GestureMetrics} from "../../../utils/gestures";
+import {getRectCenter} from "../../layout/Rect";
 
 export const MoveCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mode"> = {
     isActiveForPuzzle: (
         {
             loopHorizontally = false,
             loopVertically = false,
-            typeManager: {allowRotation = false, allowScale = false},
+            typeManager: {allowMove = false, allowRotation = false, allowScale = false},
         },
         includeHidden
-    ) => loopHorizontally || loopVertically || (includeHidden && (allowRotation || allowScale)),
+    ) => loopHorizontally || loopVertically || allowMove || (includeHidden && (allowRotation || allowScale)),
     applyToWholeField: true,
     hotKeyStr: ["Alt+Shift"],
     isNoSelectionMode: true,
     digitsCount: 0,
     isValidGesture: (isCurrentCellWriteMode, {gesture: {pointers}}) =>
         isCurrentCellWriteMode || pointers.length > 1,
-    onMove: (
-        {prevMetrics, currentMetrics},
-        {
-            puzzle: {
-                loopHorizontally,
-                loopVertically,
-                typeManager: {allowRotation, allowScale},
-            },
-            cellSize,
-            onStateChange,
-        }
-    ) =>
-        onStateChange(({loopOffset: {top, left}, angle, scale}) => ({
-            loopOffset: {
-                left: left + (loopHorizontally ? (currentMetrics.x - prevMetrics.x) / cellSize : 0),
-                top: top + (loopVertically ? (currentMetrics.y - prevMetrics.y) / cellSize : 0),
-            },
-            animatingLoopOffset: false,
-            angle: angle + (allowRotation ? currentMetrics.rotation - prevMetrics.rotation : 0),
-            animatingAngle: false,
-            scale: scale * (allowScale ? currentMetrics.scale / prevMetrics.scale : 1),
-            animatingScale: false,
-        })),
+    onMove: ({prevMetrics, currentMetrics}, context, fieldRect) => {
+        const {cellSize} = context;
+        const fieldCenter = getRectCenter(fieldRect);
+        const screenToField = ({x, y, rotation, scale}: GestureMetrics): GestureMetrics => ({
+            x: (x - fieldCenter.left) / cellSize,
+            y: (y - fieldCenter.top) / cellSize,
+            rotation,
+            scale,
+        });
+        gameStateApplyFieldDragGesture(
+            context,
+            screenToField(prevMetrics),
+            screenToField(currentMetrics),
+            false,
+            false,
+        );
+    },
     onGestureEnd: (
         props,
         {
