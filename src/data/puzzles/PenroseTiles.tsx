@@ -119,7 +119,7 @@ export const PenroseTiles: PuzzleDefinition<number> = {
     noIndex: true,
     slug: "penrose-tiles",
     title: {
-        [LanguageCode.en]: "A Nightmare On The Penrose Tiles",
+        [LanguageCode.en]: "A Nightmare On\nThe Penrose Tiles",
         [LanguageCode.ru]: "Кошмар на плитке Пенроуза",
     },
     author: {

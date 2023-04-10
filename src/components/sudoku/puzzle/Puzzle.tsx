@@ -90,7 +90,7 @@ export const Puzzle = <CellType, ExType = {}, ProcessedExType = {}>(
 
     return <DigitComponentTypeContext.Provider value={digitComponentType}>
         <Title>
-            {translate(title)}
+            {translate(title).replace("\n", " ")}
             {author && <> {translate("by")} {translate(author)}</>}
             {" "}– Puzzle TV
         </Title>
