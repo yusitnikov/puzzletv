@@ -263,7 +263,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
                         break;
                     }
 
-                    const lineKey = this.getLineHash({start, end: next});
+                    const lineKey = this.getLineHash({start, end: next}) + ":" + this.getLineHash({start, end: line[1] ?? next});
 
                     for (const cell of cells.items) {
                         this.allCells[cell.top][cell.left].borderSegments[lineKey] = {
