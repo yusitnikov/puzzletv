@@ -52,6 +52,10 @@ export const FieldCellShape = ({context, cellPosition, line, left = 0, top = 0, 
                 opacity={0.5}
                 strokeWidth={Math.max(0.25 * cellTransformedSize, 10 * sizeCoeff)}
                 {...props}
+                style={{
+                    ...props.style,
+                    pointerEvents: "stroke",
+                }}
             />
         </AutoSvg>;
     }
