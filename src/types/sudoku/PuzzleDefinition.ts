@@ -208,7 +208,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <CellType, ExType, Proces
             const actualMark = (initialCenterMarks?.[top]?.[left] ?? userCenterMarks?.[top]?.[left])?.type;
             const actualDigit = initialDigits?.[top]?.[left] ?? usersDigit;
             const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, state) : actualMark;
-            if (!expectedData || !actualData || actualData !== expectedData) {
+            if (actualData !== expectedData) {
                 areCorrectDigits = false;
             }
 
