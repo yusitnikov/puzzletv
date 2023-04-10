@@ -33,6 +33,7 @@ import {ToroidalYinYang} from "./ToroidalYinYang";
 import {TheAngelIslington} from "./TheAngelIslington";
 import {Embark, EmbarkWeirdSlug} from "./Embark";
 import {ToroidalRenbanmometers} from "./ToroidalRenbanmometers";
+import {PenroseTiles} from "./PenroseTiles";
 
 export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
     // region Empty
@@ -59,6 +60,8 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 
     // region Other authors
+    PenroseTiles,
+
     Embark,
     EmbarkWeirdSlug,
 

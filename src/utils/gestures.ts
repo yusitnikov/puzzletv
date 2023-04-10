@@ -235,7 +235,6 @@ const releaseStalePointers = () => {
 export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent<ElemT> | MouseEvent<ElemT>) => (BasePointerStateExtraData | undefined))
     : Required<EventHandlerProps<ElemT, "onPointerDown" | "onPointerUp" | "onPointerMove" | "onMouseMove" | "onDoubleClick" | "onContextMenu">> => ({
     onPointerDown: (ev) => {
-        console.warn("pointer down", ev.target, ev.currentTarget, handlers);
         releasePointerCapture(ev);
 
         // pointerId is always the same on desktop, so make sure to release the previous gesture if new gesture started

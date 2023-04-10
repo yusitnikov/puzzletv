@@ -107,3 +107,10 @@ export const NonRatioNeighborsConstraint = <CellType, ExType, ProcessedExType>(
         },
         excludedTags
     );
+
+export const NonRepeatingNeighborsConstraint = <CellType, ExType, ProcessedExType>()
+    : Constraint<CellType, undefined, ExType, ProcessedExType> =>
+    BaseNeighborsConstraint(
+        "non-repeating neighbors",
+        (digit1, digit2) => digit1 !== digit2,
+    );
