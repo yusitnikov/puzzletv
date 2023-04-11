@@ -1,12 +1,7 @@
 import {buildLink} from "../../utils/link";
 import {FormEvent, useMemo, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
-import {
-    decodeFPuzzlesString,
-    FPuzzles,
-    FPuzzlesImportOptions,
-    FPuzzlesImportPuzzleType
-} from "../../data/puzzles/FPuzzles";
+import {decodeFPuzzlesString, FPuzzles} from "../../data/puzzles/FPuzzles";
 import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {headerPadding, veryDarkGreyColor} from "./globals";
 import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
@@ -14,6 +9,7 @@ import {usePureMemo} from "../../hooks/usePureMemo";
 import {FieldPreview} from "../sudoku/field/FieldPreview";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {PageTitle} from "../layout/page-layout/PageLayout";
+import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
 
 export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
 
@@ -32,7 +28,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
 
     const puzzle = useMemo(() => decodeFPuzzlesString(load), [load]);
 
-    const [type, setType] = useStringFromLocalStorage<FPuzzlesImportPuzzleType>("fpwType", FPuzzlesImportPuzzleType.Regular);
+    const [type, setType] = useStringFromLocalStorage<PuzzleImportPuzzleType>("fpwType", PuzzleImportPuzzleType.Regular);
     const [digitsCount, setDigitsCount] = useState(Math.min(puzzle.size, 9));
     const [areHtmlRules, setAreHtmlRules] = useBoolFromLocalStorage("fpwHtmlRules");
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
@@ -48,22 +44,22 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
 
-    const isCalculator = type === FPuzzlesImportPuzzleType.Calculator;
-    const isSafeCracker = type === FPuzzlesImportPuzzleType.SafeCracker;
-    const isInfiniteRings = type === FPuzzlesImportPuzzleType.InfiniteRings;
+    const isCalculator = type === PuzzleImportPuzzleType.Calculator;
+    const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
+    const isInfiniteRings = type === PuzzleImportPuzzleType.InfiniteRings;
     const isSpecialGrid = [
-        FPuzzlesImportPuzzleType.Cubedoku,
-        FPuzzlesImportPuzzleType.Rotatable,
-        FPuzzlesImportPuzzleType.SafeCracker,
-        FPuzzlesImportPuzzleType.InfiniteRings,
+        PuzzleImportPuzzleType.Cubedoku,
+        PuzzleImportPuzzleType.Rotatable,
+        PuzzleImportPuzzleType.SafeCracker,
+        PuzzleImportPuzzleType.InfiniteRings,
     ].includes(type);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
     const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
     const hasInitialColors = puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length));
 
-    const importOptions = usePureMemo<FPuzzlesImportOptions>({
-        type: isCalculator && fillableDigitalDisplay ? FPuzzlesImportPuzzleType.Regular : type,
+    const importOptions = usePureMemo<PuzzleImportOptions>({
+        type: isCalculator && fillableDigitalDisplay ? PuzzleImportPuzzleType.Regular : type,
         htmlRules: areHtmlRules,
         digitsCount: digitsCount === puzzle.size ? undefined : digitsCount,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
@@ -119,14 +115,14 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                 <p>
                     <label>
                         Type:&nbsp;
-                        <select value={type} onChange={ev => setType(ev.target.value as FPuzzlesImportPuzzleType)} style={{font: "inherit"}}>
-                            <option value={FPuzzlesImportPuzzleType.Regular}>Regular</option>
-                            <option value={FPuzzlesImportPuzzleType.Latin}>Latin digits</option>
-                            <option value={FPuzzlesImportPuzzleType.Calculator}>Calculator digits</option>
-                            <option value={FPuzzlesImportPuzzleType.Cubedoku}>Cubedoku</option>
-                            <option value={FPuzzlesImportPuzzleType.InfiniteRings}>Infinite rings</option>
-                            <option value={FPuzzlesImportPuzzleType.Rotatable}>Rotatable</option>
-                            <option value={FPuzzlesImportPuzzleType.SafeCracker}>Safe cracker</option>
+                        <select value={type} onChange={ev => setType(ev.target.value as PuzzleImportPuzzleType)} style={{font: "inherit"}}>
+                            <option value={PuzzleImportPuzzleType.Regular}>Regular</option>
+                            <option value={PuzzleImportPuzzleType.Latin}>Latin digits</option>
+                            <option value={PuzzleImportPuzzleType.Calculator}>Calculator digits</option>
+                            <option value={PuzzleImportPuzzleType.Cubedoku}>Cubedoku</option>
+                            <option value={PuzzleImportPuzzleType.InfiniteRings}>Infinite rings</option>
+                            <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
+                            <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
                         </select>
                     </label>
                 </p>

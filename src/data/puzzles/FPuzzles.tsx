@@ -76,6 +76,7 @@ import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/
 import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
 import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
 import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
+import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -86,42 +87,13 @@ export const decodeFPuzzlesString = (load: string) => {
     return JSON.parse(jsonStr) as FPuzzlesPuzzle;
 };
 
-export enum FPuzzlesImportPuzzleType {
-    Regular = "regular",
-    Latin = "latin",
-    Calculator = "calculator",
-    Cubedoku = "cubedoku",
-    Rotatable = "rotatable",
-    SafeCracker = "safe-cracker",
-    InfiniteRings = "infinite-rings",
-}
-
-export interface FPuzzlesImportOptions {
-    load: string;
-    type?: FPuzzlesImportPuzzleType;
-    htmlRules?: boolean;
-    digitsCount?: number;
-    tesseract?: boolean;
-    fillableDigitalDisplay?: boolean;
-    noSpecialRules?: boolean;
-    loopX?: boolean;
-    loopY?: boolean;
-    "product-arrow"?: boolean;
-    yajilinFog?: boolean;
-    cosmeticsBehindFog?: boolean;
-    safeCrackerCodeLength?: number;
-    visibleRingsCount?: number;
-    startOffset?: number;
-    allowOverrideColors?: boolean;
-}
-
 export const loadByFPuzzlesObject = (
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
-    importOptions: Omit<FPuzzlesImportOptions, "load">
+    importOptions: Omit<PuzzleImportOptions, "load">
 ): PuzzleDefinition<any, any, any> => {
     const {
-        type = FPuzzlesImportPuzzleType.Regular,
+        type = PuzzleImportPuzzleType.Regular,
         digitsCount = puzzleJson.size,
         tesseract,
         yajilinFog,
@@ -136,18 +108,18 @@ export const loadByFPuzzlesObject = (
             ? RegularCalculatorDigitComponentType
             : RegularDigitComponentType
     );
-    const typesMap: Record<FPuzzlesImportPuzzleType, SudokuTypeManager<any, any, any>> = {
-        [FPuzzlesImportPuzzleType.Regular]: regularTypeManager,
-        [FPuzzlesImportPuzzleType.Latin]: LatinDigitSudokuTypeManager,
-        [FPuzzlesImportPuzzleType.Calculator]: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
-        [FPuzzlesImportPuzzleType.Cubedoku]: CubedokuTypeManager,
-        [FPuzzlesImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
-        [FPuzzlesImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
+    const typesMap: Record<PuzzleImportPuzzleType, SudokuTypeManager<any, any, any>> = {
+        [PuzzleImportPuzzleType.Regular]: regularTypeManager,
+        [PuzzleImportPuzzleType.Latin]: LatinDigitSudokuTypeManager,
+        [PuzzleImportPuzzleType.Calculator]: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
+        [PuzzleImportPuzzleType.Cubedoku]: CubedokuTypeManager,
+        [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
+        [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
             size: Number(digitsCount),
             circleRegionsCount: Math.ceil((puzzleJson.size - 2) / 2),
             codeCellsCount: Math.min(puzzleJson.size, Number(safeCrackerCodeLength)),
         }),
-        [FPuzzlesImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(
+        [PuzzleImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(
             regularTypeManager,
             Number(visibleRingsCount),
             Number(startOffset),
@@ -178,7 +150,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         "product-arrow": productArrow,
         cosmeticsBehindFog,
         allowOverrideColors = false,
-    }: Omit<FPuzzlesImportOptions, "load">,
+    }: Omit<PuzzleImportOptions, "load">,
     typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
 ): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
     const initialDigits: GivenDigitsMap<CellType> = {};
@@ -763,7 +735,7 @@ export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
             visibleRingsCount,
             startOffset,
             allowOverrideColors,
-        } = params as Omit<FPuzzlesImportOptions, "load">;
+        } = params as Omit<PuzzleImportOptions, "load">;
         const sanitizedParams = {
             type,
             htmlRules,
