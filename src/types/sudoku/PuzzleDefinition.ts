@@ -195,6 +195,7 @@ export const normalizePuzzleLine = <LineT extends Line = Line>(
     };
 };
 
+// noinspection JSUnusedGlobalSymbols
 export const getIsSamePuzzleLine = (puzzle: PuzzleDefinition<any, any, any>) =>
     (a: Line, b: Line) => isSameLine(normalizePuzzleLine(a, puzzle), normalizePuzzleLine(b, puzzle));
 

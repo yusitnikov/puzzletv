@@ -15,12 +15,13 @@ import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/contro
 import {StickyModeButton} from "../components/StickyModeButton";
 import {loop} from "../../../utils/math";
 
-const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
+export const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
+export const isSelfRotatableDigit = (digit: number) => [0, 1, 2, 5, 8].includes(digit);
 const isRotatableCellData = ({digit, sticky}: RotatableDigit) => !sticky && isRotatableDigit(digit);
 
-const toggleDigit = (digit: number, upsideDown = true) => upsideDown && isRotatableDigit(digit) ? 15 - digit : digit;
+export const toggleDigit = (digit: number, upsideDown = true) => upsideDown && isRotatableDigit(digit) ? 15 - digit : digit;
 
-const toggleNumber = (digit: number, upsideDown = true) =>
+export const toggleNumber = (digit: number, upsideDown = true) =>
     !upsideDown
         ? digit
         : Number(
@@ -40,12 +41,11 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
     angleDelta: number,
     showBackButton: boolean,
     showStickyMode: boolean
-): Pick<
+): Required<Pick<
     SudokuTypeManager<CellType, RotatableGameState>,
     "initialAngle" | "angleStep" | "allowRotation" | "isFreeRotation" | "serializeGameState" | "unserializeGameState" |
-    "initialGameStateExtension" | "isReady" | "useProcessedGameStateExtension" | "controlButtons" |
-    "getInternalState" | "unserializeInternalState"
-> => ({
+    "initialGameStateExtension" | "isReady" | "controlButtons" | "getInternalState" | "unserializeInternalState"
+>> => ({
     initialAngle: startAngle,
     angleStep: angleDelta,
     allowRotation: true,

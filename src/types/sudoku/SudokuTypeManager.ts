@@ -21,6 +21,10 @@ import {regionTag} from "../../components/sudoku/constraints/region/Region";
 import {ControlButtonItem} from "../../components/sudoku/controls/ControlButtonsManager";
 
 export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> {
+    /*
+     * When `forConstraints` is true, the method should compare actual values of the cell.
+     * Otherwise, compare visual representation that will be rendered into the cell
+     */
     areSameCellData(
         data1: CellType,
         data2: CellType,
