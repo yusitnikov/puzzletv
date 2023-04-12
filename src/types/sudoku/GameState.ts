@@ -51,6 +51,9 @@ import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
 import {loop} from "../../utils/math";
 import {AnimationSpeed} from "./AnimationSpeed";
 import {applyMetricsDiff, GestureMetrics} from "../../utils/gestures";
+import {myClientId, UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
+import {getFinalCellWriteMode} from "../../hooks/sudoku/useFinalCellWriteMode";
+import {ControlKeysState} from "../../hooks/useControlKeysState";
 
 export interface GameState<CellType> {
     fieldStateHistory: FieldStateHistory<CellType>;
@@ -157,6 +160,63 @@ export const mergeProcessedGameStateWithUpdates = <CellType, ExType, ProcessedEx
     processed,
     processedExtension,
 });
+
+export const calculateProcessedGameState = <CellType, ExType, ProcessedExType>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    multiPlayer: UseMultiPlayerResult,
+    gameState: GameStateEx<CellType, ExType>,
+    processedGameStateExtension: ProcessedExType,
+    {loopOffset, angle, scale}: ProcessedGameStateAnimatedValues = gameState,
+    readOnly: boolean,
+    keys?: ControlKeysState,
+): ProcessedGameStateEx<CellType, ExType, ProcessedExType> => {
+    const {
+        isReady: isReadyFn = () => true,
+        scaleStep,
+    } = puzzle.typeManager;
+
+    const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
+
+    const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
+    const cellWriteMode = keys
+        ? getFinalCellWriteMode(keys, gameState.persistentCellWriteMode, allowedCellWriteModes, readOnly)
+        : gameState.persistentCellWriteMode;
+    const cellWriteModeInfo = allowedCellWriteModes.find(({mode}) => mode === cellWriteMode)!;
+    const isReady = !readOnly
+        && !isDoubledConnected
+        && !(isEnabled && (!isLoaded || !hostData))
+        && isReadyFn(gameState);
+
+    let lastPlayerObjects: Record<string, boolean> = {};
+    if (isEnabled) {
+        let sortedPlayerObjects = Object.entries(gameState.playerObjects)
+            .sort(([, a], [, b]) => b.index - a.index);
+        if (sortedPlayerObjects.length) {
+            const [, {clientId: lastClientId}] = sortedPlayerObjects[0];
+            const lastPrevClientIdIndex = sortedPlayerObjects.findIndex(([, {clientId}]) => clientId !== lastClientId);
+            if (lastPrevClientIdIndex >= 0) {
+                sortedPlayerObjects = sortedPlayerObjects.slice(0, lastPrevClientIdIndex);
+            }
+            lastPlayerObjects = Object.fromEntries(
+                sortedPlayerObjects.map(([key]) => [key, true])
+            )
+        }
+    }
+
+    return {
+        ...gameState,
+        processed: {
+            cellWriteMode,
+            cellWriteModeInfo,
+            isReady,
+            isMyTurn: !isEnabled || gameState.currentPlayer === myClientId || !!puzzle.params?.share,
+            lastPlayerObjects,
+            scaleLog: getScaleLog(gameState.scale, scaleStep),
+            animated: {loopOffset, angle, scale, scaleLog: getScaleLog(scale, scaleStep)},
+        },
+        processedExtension: processedGameStateExtension ?? ({} as ProcessedExType),
+    };
+};
 
 // region Serialization & empty state
 type SavedGameStates = [

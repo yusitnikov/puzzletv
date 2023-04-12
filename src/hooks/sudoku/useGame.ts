@@ -1,17 +1,14 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {
+    calculateProcessedGameState,
     GameStateEx,
     getAllShareState,
     getEmptyGameState,
-    getScaleLog,
     mergeGameStateWithUpdates,
     ProcessedGameStateAnimatedValues,
-    ProcessedGameStateEx,
     saveGameState,
     setAllShareState
 } from "../../types/sudoku/GameState";
-import {getAllowedCellWriteModeInfos} from "../../types/sudoku/CellWriteMode";
-import {getFinalCellWriteMode} from "./useFinalCellWriteMode";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {useEventListener} from "../useEventListener";
 import {PositionSet} from "../../types/layout/Position";
@@ -82,61 +79,22 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
         playerObjects: myGameState.playerObjects,
     }), [isHost, params, getSharedState, myGameState]);
 
-    const calculateProcessedGameState = useCallback(
+    const memoizedCalculateProcessedGameState = useCallback(
         (
             multiPlayer: UseMultiPlayerResult,
             gameState: GameStateEx<CellType, ExType>,
             processedGameStateExtension: ProcessedExType,
-            {loopOffset, angle, scale}: ProcessedGameStateAnimatedValues = gameState,
+            animatedValues?: ProcessedGameStateAnimatedValues,
             applyKeys = true
-        ): ProcessedGameStateEx<CellType, ExType, ProcessedExType> => {
-            const {
-                isReady: isReadyFn = () => true,
-                scaleStep,
-            } = puzzle.typeManager;
-
-            const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
-
-            const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
-            const cellWriteMode = applyKeys
-                ? getFinalCellWriteMode(keys, gameState.persistentCellWriteMode, allowedCellWriteModes, readOnly)
-                : gameState.persistentCellWriteMode;
-            const cellWriteModeInfo = allowedCellWriteModes.find(({mode}) => mode === cellWriteMode)!;
-            const isReady = !readOnly
-                && !isDoubledConnected
-                && !(isEnabled && (!isLoaded || !hostData))
-                && isReadyFn(gameState);
-
-            let lastPlayerObjects: Record<string, boolean> = {};
-            if (isEnabled) {
-                let sortedPlayerObjects = Object.entries(gameState.playerObjects)
-                    .sort(([, a], [, b]) => b.index - a.index);
-                if (sortedPlayerObjects.length) {
-                    const [, {clientId: lastClientId}] = sortedPlayerObjects[0];
-                    const lastPrevClientIdIndex = sortedPlayerObjects.findIndex(([, {clientId}]) => clientId !== lastClientId);
-                    if (lastPrevClientIdIndex >= 0) {
-                        sortedPlayerObjects = sortedPlayerObjects.slice(0, lastPrevClientIdIndex);
-                    }
-                    lastPlayerObjects = Object.fromEntries(
-                        sortedPlayerObjects.map(([key]) => [key, true])
-                    )
-                }
-            }
-
-            return {
-                ...gameState,
-                processed: {
-                    cellWriteMode,
-                    cellWriteModeInfo,
-                    isReady,
-                    isMyTurn: !isEnabled || gameState.currentPlayer === myClientId || !!puzzle.params?.share,
-                    lastPlayerObjects,
-                    scaleLog: getScaleLog(gameState.scale, scaleStep),
-                    animated: {loopOffset, angle, scale, scaleLog: getScaleLog(scale, scaleStep)},
-                },
-                processedExtension: processedGameStateExtension ?? ({} as ProcessedExType),
-            };
-        },
+        ) => calculateProcessedGameState(
+            puzzle,
+            multiPlayer,
+            gameState,
+            processedGameStateExtension,
+            animatedValues,
+            readOnly,
+            applyKeys ? keys : undefined,
+        ),
         [puzzle, readOnly, keys]
     );
 
@@ -172,7 +130,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
             const actionType = allActionTypes.find(({key}) => key === type)!;
 
-            const processedGameState = calculateProcessedGameState(
+            const processedGameState = memoizedCalculateProcessedGameState(
                 multiPlayer,
                 mergeGameStateWithUpdates(
                     state,
@@ -222,7 +180,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
         }
 
         return state;
-    }, [puzzle, cellsIndex, cellSize, cellSizeForSidePanel, calculateProcessedGameState, readOnly]);
+    }, [puzzle, cellsIndex, cellSize, cellSizeForSidePanel, memoizedCalculateProcessedGameState, readOnly]);
 
     const multiPlayer = useMultiPlayer(
         `puzzle:${saveStateKey}`,
@@ -284,8 +242,8 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
     }), [animatedLoopOffsetTop, animatedLoopOffsetLeft, animatedAngle, animatedScale]);
 
     const processedGameState = useMemo(
-        () => calculateProcessedGameState(multiPlayer, gameState, processedGameStateExtension, animated),
-        [calculateProcessedGameState, multiPlayer, gameState, processedGameStateExtension, animated]
+        () => memoizedCalculateProcessedGameState(multiPlayer, gameState, processedGameStateExtension, animated),
+        [memoizedCalculateProcessedGameState, multiPlayer, gameState, processedGameStateExtension, animated]
     );
 
     const mergeGameState = useCallback(
@@ -301,7 +259,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                 actionsOrCallbacks = actionsOrCallbacks instanceof Array ? actionsOrCallbacks : [actionsOrCallbacks];
 
                 for (const actionOrCallback of actionsOrCallbacks) {
-                    const processedGameState = calculateProcessedGameState(multiPlayer, state, processedGameStateExtension);
+                    const processedGameState = memoizedCalculateProcessedGameState(multiPlayer, state, processedGameStateExtension);
                     const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
                         puzzle,
                         cellsIndex,
@@ -361,7 +319,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                 return state;
             });
         },
-        [puzzle, cellsIndex, setGameState, mergeMyGameState, calculateProcessedGameState, processedGameStateExtension, cellSize, cellSizeForSidePanel, multiPlayer, readOnly]
+        [puzzle, cellsIndex, setGameState, mergeMyGameState, memoizedCalculateProcessedGameState, processedGameStateExtension, cellSize, cellSizeForSidePanel, multiPlayer, readOnly]
     );
 
     const context: PuzzleContext<CellType, ExType, ProcessedExType> = useMemo(
