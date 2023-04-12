@@ -1,21 +1,13 @@
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {indexesFromTo} from "../../../utils/indexes";
-import {ReactNode} from "react";
-import {Position} from "../../../types/layout/Position";
+import {PropsWithChildren} from "react";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 
-export interface FieldSvgProps extends PuzzleContextProps<any, any, any> {
-    children: ReactNode | ((offset: Position) => ReactNode);
-}
-
-export const FieldSvg = ({context: {puzzle, cellSize}, children}: FieldSvgProps) => {
+export const FieldSvg = ({context: {puzzle, cellSize}, children}: PropsWithChildren<PuzzleContextProps<any, any, any>>) => {
     let {
         fieldSize: {fieldSize, rowsCount, columnsCount},
         fieldMargin: initialFieldMargin = 0,
         fieldFitsWrapper,
         ignoreRowsColumnCountInTheWrapper,
-        loopHorizontally,
-        loopVertically,
     } = puzzle;
 
     if (ignoreRowsColumnCountInTheWrapper) {
@@ -42,23 +34,6 @@ export const FieldSvg = ({context: {puzzle, cellSize}, children}: FieldSvgProps)
             height: totalWidth,
         }}
     >
-        {indexesFromTo(loopVertically ? -1 : 0, loopVertically ? 1 : 0, true).flatMap(
-            topOffset => indexesFromTo(loopHorizontally ? -1 : 0, loopHorizontally ? 1 : 0, true).map(
-                leftOffset => <AutoSvg
-                    key={`${topOffset}-${leftOffset}`}
-                    left={leftOffset * columnsCount}
-                    top={topOffset * rowsCount}
-                >
-                    {
-                        typeof children === "function"
-                            ? children({
-                                left: leftOffset * columnsCount,
-                                top: topOffset * rowsCount
-                            })
-                            : children
-                    }
-                </AutoSvg>
-            )
-        )}
+        {children}
     </AutoSvg>;
 };

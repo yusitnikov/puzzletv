@@ -43,6 +43,7 @@ import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
 import {doesGridRegionContainCell, GridRegion} from "../../../types/sudoku/GridRegion";
 import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 import {FieldItems, FieldItemsProps} from "./FieldItems";
+import {FieldLoop} from "./FieldLoop";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -215,10 +216,9 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const renderCellsLayer = (
         keyPrefix: string,
         renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
-        {left: leftOffset, top: topOffset}: Position,
         region?: GridRegion,
-    ) => <>
-        {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+    ) => <FieldLoop context={readOnlySafeContext}>
+        {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
             const cellPosition: Position = {
                 left: columnIndex,
                 top: rowIndex,
@@ -261,11 +261,11 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     {content}
                 </AutoSvg>;
         }))}
-    </>;
+    </FieldLoop>;
 
     const initialColorsResolved = resolvePuzzleInitialColors(context);
 
-    const selection = (offset: Position, region?: GridRegion) => !isNoSelectionMode && <g data-layer="selection">
+    const selection = (region?: GridRegion) => !isNoSelectionMode && <g data-layer="selection">
         {renderCellsLayer(
             "selection",
             (cellState, cellPosition) => {
@@ -291,7 +291,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     strokeWidth={width}
                 />;
             },
-            offset,
             region,
         )}
     </g>;
@@ -318,9 +317,9 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     fitParent={fieldFitsWrapper}
                 >
                     <FieldSvg context={readOnlySafeContext}>
-                        {(offset) => <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
+                        <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
                             {(region, regionIndex = 0) => {
-                                const shadowFilterId = `field-shadow-${autoIncrementId}-${offset.top}-${offset.left}-${regionIndex}`;
+                                const shadowFilterId = `field-shadow-${autoIncrementId}-${regionIndex}`;
 
                                 return <>
                                     <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
@@ -356,7 +355,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                                 colors={finalColors}
                                                 noOpacity={!!initialCellColors?.length}
                                             />;
-                                        }, offset, region)}
+                                        }, region)}
                                     </g>
 
                                     <g data-layer="items-before-selection" filter={`url(#${shadowFilterId})`}>
@@ -365,7 +364,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                         </FieldLayerContext.Provider>
                                     </g>
 
-                                    {!prioritizeSelection && selection(offset, region)}
+                                    {!prioritizeSelection && selection(region)}
 
                                     <g data-layer="items-regular" filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.regular}>
@@ -373,7 +372,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                         </FieldLayerContext.Provider>
                                     </g>
 
-                                    {prioritizeSelection && selection(offset, region)}
+                                    {prioritizeSelection && selection(region)}
 
                                     <g data-layer="items-lines">
                                         <FieldLayerContext.Provider value={FieldLayer.lines}>
@@ -430,7 +429,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                                             )
                                                     }
                                                 />;
-                                        }, offset, region)}
+                                        }, region)}
                                     </g>
 
                                     {isReady && <g data-layer="mouse-handler">
@@ -441,13 +440,12 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                                 cellPosition={cellPosition}
                                                 handlers={cellGestureHandlers}
                                             />,
-                                            offset,
                                             region
                                         )}
                                     </g>}
                                 </>;
                             }}
-                        </FieldRegionsWithSameCoordsTransformation>}
+                        </FieldRegionsWithSameCoordsTransformation>
                     </FieldSvg>
                 </Absolute>
 

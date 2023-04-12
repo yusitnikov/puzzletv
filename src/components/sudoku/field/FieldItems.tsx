@@ -6,6 +6,7 @@ import {HashSet} from "../../../types/struct/Set";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {FieldLoop} from "./FieldLoop";
 
 export interface FieldItemsProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -14,7 +15,7 @@ export interface FieldItemsProps<CellType, ExType = {}, ProcessedExType = {}> {
 
 export const FieldItems = <CellType, ExType = {}, ProcessedExType = {}>(
     {context, items}: FieldItemsProps<CellType, ExType, ProcessedExType>
-) => <>
+) => <FieldLoop context={context}>
     {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
         if (!Component) {
             return null;
@@ -84,4 +85,4 @@ export const FieldItems = <CellType, ExType = {}, ProcessedExType = {}>(
             {...otherData}
         />;
     })}
-</>;
+</FieldLoop>;
