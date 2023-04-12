@@ -146,7 +146,10 @@ export const loadByFPuzzlesObject = (
 export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedExType>(
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
-    {
+    importOptions: Omit<PuzzleImportOptions, "load">,
+    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
+): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
+    const {
         digitsCount,
         htmlRules,
         fillableDigitalDisplay,
@@ -156,9 +159,8 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         "product-arrow": productArrow,
         cosmeticsBehindFog,
         allowOverrideColors = false,
-    }: Omit<PuzzleImportOptions, "load">,
-    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
-): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
+    } = importOptions;
+
     const initialDigits: GivenDigitsMap<CellType> = {};
     const initialLetters: GivenDigitsMap<string> = {};
     const initialColors: GivenDigitsMap<CellColorValue[]> = {};
@@ -185,6 +187,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         initialColors,
         items,
         allowOverridingInitialColors: allowOverrideColors,
+        importOptions,
     };
 
     if (noSpecialRules && !puzzleJson.solution) {

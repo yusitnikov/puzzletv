@@ -25,6 +25,7 @@ import {CellMark, getCenterMarksMap, parseCellMark} from "./CellMark";
 import {loop} from "../../utils/math";
 import {HashSet} from "../struct/Set";
 import {LanguageCode} from "../translations/LanguageCode";
+import type {PuzzleImportOptions} from "./PuzzleImportOptions";
 
 export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     title: PartiallyTranslatable;
@@ -85,6 +86,7 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     initialLives?: number;
     decreaseOnlyOneLive?: boolean;
     solution?: (string | number | undefined)[][];
+    importOptions?: Omit<PuzzleImportOptions, "load">;
 }
 
 export const allDrawingModes: PuzzleDefinition<any, any, any>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];
