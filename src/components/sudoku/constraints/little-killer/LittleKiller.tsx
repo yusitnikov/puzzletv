@@ -90,21 +90,23 @@ export const LittleKillerConstraint = <CellType, ExType, ProcessedExType>(
             sum,
         },
         component: LittleKiller,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
+        isValidCell(_, digits, cells, context) {
             if (sum === undefined) {
                 return true;
             }
 
+            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+
             let actualSum = 0;
 
-            for (const {top, left} of cells) {
-                const digit = digits[top]?.[left];
+            for (const cell of cells) {
+                const digit = digits[cell.top]?.[cell.left];
 
                 if (digit === undefined) {
                     return true;
                 }
 
-                actualSum += getDigitByCellData(digit, state);
+                actualSum += getDigitByCellData(digit, context, cell);
             }
 
             return actualSum === sum;

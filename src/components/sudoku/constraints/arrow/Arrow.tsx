@@ -129,10 +129,19 @@ export const ArrowConstraint = <CellType, ExType, ProcessedExType>(
         },
         cells: [...circleCells, ...arrowCells],
         component: Arrow,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData, getNumberByDigits = defaultGetDefaultNumberByDigits}}, state}) {
-            const circleDigits = circleCells.map(({top, left}) => {
-                const data = digits[top]?.[left];
-                return data === undefined ? undefined : getDigitByCellData(data, state);
+        isValidCell(cell, digits, cells, context) {
+            const {
+                puzzle: {
+                    typeManager: {
+                        getDigitByCellData,
+                        getNumberByDigits = defaultGetDefaultNumberByDigits,
+                    },
+                },
+            } = context;
+
+            const circleDigits = circleCells.map((circleCell) => {
+                const data = digits[circleCell.top]?.[circleCell.left];
+                return data === undefined ? undefined : getDigitByCellData(data, context, circleCell);
             });
             if (circleDigits.some(digit => digit === undefined)) {
                 return true;
@@ -154,7 +163,7 @@ export const ArrowConstraint = <CellType, ExType, ProcessedExType>(
                     return true;
                 }
 
-                const arrowDigit = getDigitByCellData(arrowData, state);
+                const arrowDigit = getDigitByCellData(arrowData, context, arrowCell);
                 if (product) {
                     arrowNumber *= arrowDigit;
                 } else {

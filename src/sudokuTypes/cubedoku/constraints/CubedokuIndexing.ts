@@ -5,12 +5,13 @@ export const CubedokuIndexingConstraint = <CellType, ExType, ProcessedExType>():
     name: "cubedoku indexing",
     cells: [],
     props: undefined,
-    isValidCell(cell, digits, _, {puzzle: {fieldSize: {fieldSize}, typeManager: {getDigitByCellData}}, state}): boolean {
+    isValidCell(cell, digits, _, context): boolean {
+        const {puzzle: {fieldSize: {fieldSize}, typeManager: {getDigitByCellData}}} = context;
         const realFieldSize = fieldSize / 2;
 
         // x and y are like in the left face of the cube
         const getIndexedCell = ({left, top}: Position, data: CellType): Position3D => {
-            const digit = getDigitByCellData(data, state);
+            const digit = getDigitByCellData(data, context, {top, left});
 
             if (top < realFieldSize) {
                 return {

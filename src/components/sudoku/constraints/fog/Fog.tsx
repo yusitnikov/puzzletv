@@ -62,7 +62,7 @@ export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
         (top) => indexes(columnsCount).map(
             (left) =>
                 startCells3x3?.some((position) => isSamePosition(position, {top, left})) ||
-                (!!givenDigits[top]?.[left] && (typeof solution?.[top]?.[left] !== "number" || getDigitByCellData(givenDigits[top][left], state) === solution[top][left])) ||
+                (!!givenDigits[top]?.[left] && (typeof solution?.[top]?.[left] !== "number" || getDigitByCellData(givenDigits[top][left], context, {top, left}) === solution[top][left])) ||
                 (revealByColors && cells[top][left].colors.size === 1 && !initialColors[top]?.[left] && (
                     Array.isArray(revealByColors)
                         ? revealByColors.includes(cells[top][left].colors.first()!)
@@ -253,14 +253,12 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     component: Fog,
     noPencilmarkCheck: true,
     isCheckingFog: true,
-    isValidCell: (
-        {top, left},
-        digits,
-        _,
-        {puzzle: {solution, typeManager: {getDigitByCellData}}, state}
-    ) =>
-        !!state.fogDemoFieldStateHistory || typeof solution?.[top][left] !== "number" ||
-        getDigitByCellData(digits[top][left], state) === solution[top][left],
+    isValidCell: ({top, left}, digits, _, context) => {
+        const {puzzle: {solution, typeManager: {getDigitByCellData}}, state} = context;
+
+        return !!state.fogDemoFieldStateHistory || typeof solution?.[top][left] !== "number" ||
+            getDigitByCellData(digits[top][left], context, {top, left}) === solution[top][left];
+    },
 });
 
 export const getFogPropsByConstraintsList = <CellType, ExType, ProcessedExType>(

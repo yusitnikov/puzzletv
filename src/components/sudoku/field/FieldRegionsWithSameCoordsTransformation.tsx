@@ -13,10 +13,13 @@ export const FieldRegionsWithSameCoordsTransformation = <CellType, ExType, Proce
         children,
     }: PropsWithChildren<FieldRegionsWithSameCoordsTransformationProps<CellType, ExType, ProcessedExType>>
 ) => {
-    const {puzzle, state, cellSize} = context;
-    const {typeManager: {getRegionsWithSameCoordsTransformation}} = puzzle;
+    const {
+        puzzle: {
+            typeManager: {getRegionsWithSameCoordsTransformation},
+        },
+    } = context;
 
-    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(puzzle, cellSize, state);
+    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(context);
 
     return <>
         {regionsWithSameCoordsTransformation?.map((rect, index) => <FieldRect

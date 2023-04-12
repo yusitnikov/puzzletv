@@ -181,11 +181,13 @@ export const KillerCageConstraint = <CellType, ExType, ProcessedExType>(
         cell,
         digits,
         cells,
-        {puzzle, state},
+        context,
         constraints,
         isFinalCheck,
         onlyObvious
     ) {
+        const {puzzle, state} = context;
+
         if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
             return false;
         }
@@ -203,11 +205,11 @@ export const KillerCageConstraint = <CellType, ExType, ProcessedExType>(
                 return true;
             }
 
-            realSum += puzzle.typeManager.getDigitByCellData(constraintDigit, state);
+            realSum += puzzle.typeManager.getDigitByCellData(constraintDigit, context, constraintCell);
         }
 
-        const expectedSum = puzzle.typeManager.transformDigit
-            ? puzzle.typeManager.transformDigit(sum, puzzle, state)
+        const expectedSum = puzzle.typeManager.transformNumber
+            ? puzzle.typeManager.transformNumber(sum, context, cells[0])
             : sum;
 
         return realSum === expectedSum;

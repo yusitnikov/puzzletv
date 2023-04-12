@@ -74,7 +74,9 @@ export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
         },
         component: KropkiDot,
         isObvious: true,
-        isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
+        isValidCell(cell, digits, [cell1, cell2], context) {
+            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+
             const data1 = digits[cell1.top]?.[cell1.left];
             const data2 = digits[cell2.top]?.[cell2.left];
 
@@ -82,8 +84,8 @@ export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
                 return true;
             }
 
-            const digit1 = getDigitByCellData(data1, state);
-            const digit2 = getDigitByCellData(data2, state);
+            const digit1 = getDigitByCellData(data1, context, cell1);
+            const digit2 = getDigitByCellData(data2, context, cell2);
 
             if (!isRatio) {
                 return Math.abs(digit1 - digit2) === (value ?? 1);

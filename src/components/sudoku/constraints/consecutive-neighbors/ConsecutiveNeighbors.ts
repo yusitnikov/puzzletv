@@ -29,10 +29,10 @@ const BaseNeighborsConstraint = <CellType, ExType, ProcessedExType>(
             constraints
         ) {
             const {top, left} = cell;
-            const {puzzle, cellsIndex, state} = context;
+            const {puzzle, cellsIndex} = context;
             const {typeManager: {getDigitByCellData}} = puzzle;
 
-            const digit = getDigitByCellData(digits[top][left]!, state);
+            const digit = getDigitByCellData(digits[top][left]!, context, cell);
 
             let excludedCellsMap = new PuzzleLineSet(puzzle);
             if (excludedTags.length) {
@@ -55,7 +55,7 @@ const BaseNeighborsConstraint = <CellType, ExType, ProcessedExType>(
 
                 return digit2 === undefined || areValidNeighborDigits(
                     digit,
-                    getDigitByCellData(digit2, state),
+                    getDigitByCellData(digit2, context, cell2),
                     cell,
                     cell2,
                     context

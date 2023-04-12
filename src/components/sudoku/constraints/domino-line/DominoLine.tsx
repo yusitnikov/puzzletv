@@ -27,9 +27,9 @@ export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
         component: display ? LineComponent : undefined,
         isObvious,
         isValidCell(cell, digits, cells, context) {
-            const {puzzle: {typeManager: {getDigitByCellData}}, state} = context;
+            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
 
-            const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
+            const digit = getDigitByCellData(digits[cell.top][cell.left]!, context, cell);
 
             const index = cells.findIndex(constraintCell => isSamePosition(constraintCell, cell));
             const prevCell = cells[index - 1];
@@ -37,8 +37,8 @@ export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
             const prevDigit = prevCell && digits[prevCell.top]?.[prevCell.left];
             const nextDigit = nextCell && digits[nextCell.top]?.[nextCell.left];
 
-            return (prevDigit === undefined || isValidDomino(getDigitByCellData(prevDigit, state), digit, context))
-                && (nextDigit === undefined || isValidDomino(getDigitByCellData(nextDigit, state), digit, context));
+            return (prevDigit === undefined || isValidDomino(getDigitByCellData(prevDigit, context, prevCell), digit, context))
+                && (nextDigit === undefined || isValidDomino(getDigitByCellData(nextDigit, context, nextCell), digit, context));
         },
     };
 };

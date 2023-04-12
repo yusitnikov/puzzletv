@@ -175,12 +175,12 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         return {digit};
     },
 
-    getDigitByCellData(data, {angle}) {
+    getDigitByCellData(data, {state: {angle}}) {
         return toggleData(data, isUpsideDownAngle(angle));
     },
 
-    transformDigit(digit, puzzle, {angle}) {
-        return toggleNumber(digit, isUpsideDownAngle(angle));
+    transformNumber(num, {state: {angle}}) {
+        return toggleNumber(num, isUpsideDownAngle(angle));
     },
 
     processCellDataPosition(

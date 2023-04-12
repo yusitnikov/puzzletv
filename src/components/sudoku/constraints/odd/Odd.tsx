@@ -25,8 +25,10 @@ export const OddConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: Po
         renderSingleCellInUserArea: true,
         props: undefined,
         isObvious: true,
-        isValidCell(cell, digits, _, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
-            const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
+        isValidCell(cell, digits, _, context) {
+            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+
+            const digit = getDigitByCellData(digits[cell.top][cell.left]!, context, cell);
 
             return digit % 2 === 1;
         },

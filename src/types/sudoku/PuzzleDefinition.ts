@@ -208,8 +208,9 @@ export const resolvePuzzleInitialColors = (context: PuzzleContext<any, any, any>
 };
 
 export const isValidFinishedPuzzleByEmbeddedSolution = <CellType, ExType, ProcessedExType>(
-    {puzzle, state, cellsIndex}: PuzzleContext<CellType, ExType, ProcessedExType>
+    context: PuzzleContext<CellType, ExType, ProcessedExType>
 ): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
+    const {puzzle, state, cellsIndex} = context;
     const {typeManager: {getCellTypeProps, getDigitByCellData}, initialDigits, initialCellMarks = []} = puzzle;
 
     const {cells, marks} = gameStateGetCurrentFieldState(state, true);
@@ -235,7 +236,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <CellType, ExType, Proces
             }
             const actualMark = (initialCenterMarks?.[top]?.[left] ?? userCenterMarks?.[top]?.[left])?.type;
             const actualDigit = initialDigits?.[top]?.[left] ?? usersDigit;
-            const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, state) : actualMark;
+            const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, context, {top, left}) : actualMark;
             if (actualData !== expectedData) {
                 areCorrectDigits = false;
             }

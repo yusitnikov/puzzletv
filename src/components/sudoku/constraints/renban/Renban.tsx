@@ -25,11 +25,13 @@ export const RenbanConstraint = <CellType, ExType, ProcessedExType>(
             cell,
             digits,
             cells,
-            {puzzle, state},
+            context,
             constraints,
             isFinalCheck,
             onlyObvious
         ) {
+            const {puzzle, state} = context;
+
             if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
                 return false;
             }
@@ -39,9 +41,9 @@ export const RenbanConstraint = <CellType, ExType, ProcessedExType>(
             }
 
             const actualDigits = cells
-                .map(({top, left}) => digits[top]?.[left])
-                .filter(data => data !== undefined)
-                .map(data => puzzle.typeManager.getDigitByCellData(data, state));
+                .map((cell) => ({cell, data: digits[cell.top]?.[cell.left]}))
+                .filter(({data}) => data !== undefined)
+                .map(({cell, data}) => puzzle.typeManager.getDigitByCellData(data!, context, cell));
 
             return !actualDigits.length || Math.max(...actualDigits) - Math.min(...actualDigits) < cells.length;
         },

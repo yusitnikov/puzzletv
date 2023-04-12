@@ -43,18 +43,19 @@ export const SandwichSumConstraint = <CellType, ExType, ProcessedExType>(
             : indexes(rowsCount).map(top => ({...clueCell, top})),
         props: {clueCell, sum},
         component: SandwichSum,
-        isValidCell(cell, digits, cells, {puzzle, state}, constraints, isFinalCheck) {
+        isValidCell(cell, digits, cells, context, constraints, isFinalCheck) {
+            const {puzzle} = context;
             const {typeManager: {getDigitByCellData}, digitsCount: maxDigit = getDefaultDigitsCount(puzzle)} = puzzle;
 
-            const currentDigit = getDigitByCellData(digits[cell.top][cell.left], state);
+            const currentDigit = getDigitByCellData(digits[cell.top][cell.left], context, cell);
             if (currentDigit !== 1 && currentDigit !== maxDigit) {
                 // Highlight only the bread digits as conflicts if something's wrong
                 return true;
             }
 
-            const cellDigits = cells.map(({top, left}) => {
-                const data = digits[top]?.[left];
-                return data === undefined ? undefined : getDigitByCellData(data, state);
+            const cellDigits = cells.map((cell) => {
+                const data = digits[cell.top]?.[cell.left];
+                return data === undefined ? undefined : getDigitByCellData(data, context, cell);
             });
 
             const [minIndex, maxIndex] = [cellDigits.indexOf(1), cellDigits.indexOf(maxDigit)].sort();

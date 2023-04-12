@@ -197,7 +197,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         }
     },
 
-    getRegionsWithSameCoordsTransformation({fieldSize, fieldMargin = 0}, cellSize): Rect[] {
+    getRegionsWithSameCoordsTransformation({puzzle: {fieldSize, fieldMargin = 0}, cellSize}): Rect[] {
         const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         const fullMargin = fieldMargin + 1;

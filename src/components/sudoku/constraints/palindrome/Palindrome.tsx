@@ -24,16 +24,18 @@ export const BasePalindromeConstraint = <CellType, ExType, ProcessedExType>(
         props: {width},
         component: LineComponent,
         isObvious: true,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
+        isValidCell(cell, digits, cells, context) {
+            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+
             const index = cells.findIndex(position => isSamePosition(cell, position));
             if (index < 0) {
                 return false;
             }
 
-            const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
+            const digit = getDigitByCellData(digits[cell.top][cell.left]!, context, cell);
             const mirrorCell = cells[cells.length - 1 - index];
             const mirrorCellData = digits[mirrorCell.top]?.[mirrorCell.left];
-            const mirrorDigit = mirrorCellData && getDigitByCellData(mirrorCellData, state);
+            const mirrorDigit = mirrorCellData && getDigitByCellData(mirrorCellData, context, mirrorCell);
 
             return mirrorCellData === undefined || digit === mirrorDigit;
         },

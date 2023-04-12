@@ -183,9 +183,13 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
 
             return {top, left};
         },
-        getRegionsWithSameCoordsTransformation({fieldSize: {rowsCount: fieldSize}}, cellSize, state): RectWithTransformation[] {
+        getRegionsWithSameCoordsTransformation(
+            {
+                puzzle: {fieldSize: {rowsCount: fieldSize}},
+                state: {processed: {animated: {scaleLog: ringOffset}}},
+            }
+        ): RectWithTransformation[] {
             const ringsCount = fieldSize / 2 - 1;
-            const ringOffset = state?.processed.animated.scaleLog ?? 0;
             const loopedRingOffset = loop(ringOffset, ringsCount);
             const scaleCoeff = Math.pow(2, loopedRingOffset);
             const unscaleCoeff = Math.pow(2, ringsCount);

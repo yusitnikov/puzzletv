@@ -33,13 +33,15 @@ export const SameParityLineConstraint = <CellType, ExType, ProcessedExType>(
         props: {},
         component: display ? LineComponent : undefined,
         isObvious: true,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {getDigitByCellData}}, state}) {
-            const digit = getDigitByCellData(digits[cell.top][cell.left]!, state);
+        isValidCell(cell, digits, cells, context) {
+            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+
+            const digit = getDigitByCellData(digits[cell.top][cell.left]!, context, cell);
 
             return cells
-                .map(({top, left}) => digits[top]?.[left])
-                .filter(cellData => cellData !== undefined)
-                .map(cellData => getDigitByCellData(cellData!, state))
+                .map((cell) => ({cell, data: digits[cell.top]?.[cell.left]}))
+                .filter(({data}) => data !== undefined)
+                .map(({cell, data}) => getDigitByCellData(data!, context, cell))
                 .every(digit2 => (digit - digit2) % 2 === 0);
         },
     };

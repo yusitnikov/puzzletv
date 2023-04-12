@@ -62,15 +62,16 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     getDigitByCellData(
         data: CellType,
-        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
+        cellPosition: Position,
     ): number;
 
     getNumberByDigits?(digits: number[]): number | undefined;
 
-    transformDigit?(
-        digit: number,
-        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
-        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
+    transformNumber?(
+        num: number,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>,
+        cellPosition: Position,
     ): number;
 
     processCellDataPosition?(
@@ -159,9 +160,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     // Get rectangles of non-modified coords that get the same transformation matrix by transformCoords
     getRegionsWithSameCoordsTransformation?(
-        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
-        cellSize: number,
-        state?: ProcessedGameStateEx<CellType, ExType, ProcessedExType>,
+        context: PuzzleContext<CellType, ExType, ProcessedExType>
     ): RectWithTransformation[];
 
     items?: Constraint<CellType, any, ExType, ProcessedExType>[]

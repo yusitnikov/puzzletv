@@ -69,12 +69,14 @@ const XVConstraint = <CellType, ExType, ProcessedExType>(
         component,
         props: undefined,
         isObvious: true,
-        isValidCell(cell, digits, [cell1, cell2], {puzzle: {typeManager: {getDigitByCellData}}, state}) {
+        isValidCell(cell, digits, [cell1, cell2], context) {
+            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+
             const digit1 = digits[cell1.top]?.[cell1.left];
             const digit2 = digits[cell2.top]?.[cell2.left];
 
             return digit1 === undefined || digit2 === undefined
-                || getDigitByCellData(digit1, state) + getDigitByCellData(digit2, state) === expectedSum;
+                || getDigitByCellData(digit1, context, cell1) + getDigitByCellData(digit2, context, cell2) === expectedSum;
         },
         renderSingleCellInUserArea: true,
     };

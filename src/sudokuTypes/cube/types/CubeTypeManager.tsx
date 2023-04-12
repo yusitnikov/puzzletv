@@ -51,7 +51,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         };
     },
 
-    getRegionsWithSameCoordsTransformation({fieldSize: {fieldSize}, fieldMargin = 0}): Rect[] {
+    getRegionsWithSameCoordsTransformation({puzzle: {fieldSize: {fieldSize}, fieldMargin = 0}}): Rect[] {
         const realFieldSize = fieldSize / 2;
         const fullMargin = fieldMargin + fieldSize;
 
