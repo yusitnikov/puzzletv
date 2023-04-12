@@ -267,34 +267,36 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const initialColorsResolved = resolvePuzzleInitialColors(context);
 
-    const selection = (offset: Position, region?: GridRegion) => !isNoSelectionMode && renderCellsLayer(
-        "selection",
-        (cellState, cellPosition) => {
-            let color = "";
-            let width = 1;
+    const selection = (offset: Position, region?: GridRegion) => !isNoSelectionMode && <g data-layer="selection">
+        {renderCellsLayer(
+            "selection",
+            (cellState, cellPosition) => {
+                let color = "";
+                let width = 1;
 
-            if (selectedCells.contains(cellPosition)) {
-                color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
-                    ? CellSelectionColor.mainCurrent
-                    : CellSelectionColor.mainPrevious;
-            } else {
-                const customSelection = getCellSelectionType?.(cellPosition, context);
-                if (customSelection) {
-                    color = customSelection.color;
-                    width = customSelection.strokeWidth;
+                if (selectedCells.contains(cellPosition)) {
+                    color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
+                        ? CellSelectionColor.mainCurrent
+                        : CellSelectionColor.mainPrevious;
+                } else {
+                    const customSelection = getCellSelectionType?.(cellPosition, context);
+                    if (customSelection) {
+                        color = customSelection.color;
+                        width = customSelection.strokeWidth;
+                    }
                 }
-            }
 
-            return !!color && <CellSelection
-                context={readOnlySafeContext}
-                cellPosition={cellPosition}
-                color={color}
-                strokeWidth={width}
-            />;
-        },
-        offset,
-        region,
-    );
+                return !!color && <CellSelection
+                    context={readOnlySafeContext}
+                    cellPosition={cellPosition}
+                    color={color}
+                    strokeWidth={width}
+                />;
+            },
+            offset,
+            region,
+        )}
+    </g>;
 
     return <>
         <Absolute
@@ -337,27 +339,29 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                         stroke={"none"}
                                     />}
 
-                                    <g filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="items-before-background" filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
                                             <Items {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
-                                    {renderCellsLayer("background", ({colors}, cellPosition) => {
-                                        const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
-                                        const finalColors = allowOverridingInitialColors
-                                            ? (colors?.size ? colors : new PlainValueSet(initialCellColors || []))
-                                            : (initialCellColors ? new PlainValueSet(initialCellColors) : colors);
+                                    <g data-layer="background">
+                                        {renderCellsLayer("background", ({colors}, cellPosition) => {
+                                            const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
+                                            const finalColors = allowOverridingInitialColors
+                                                ? (colors?.size ? colors : new PlainValueSet(initialCellColors || []))
+                                                : (initialCellColors ? new PlainValueSet(initialCellColors) : colors);
 
-                                        return !!finalColors?.size && <CellBackground
-                                            context={readOnlySafeContext}
-                                            cellPosition={cellPosition}
-                                            colors={finalColors}
-                                            noOpacity={!!initialCellColors?.length}
-                                        />;
-                                    }, offset, region)}
+                                            return !!finalColors?.size && <CellBackground
+                                                context={readOnlySafeContext}
+                                                cellPosition={cellPosition}
+                                                colors={finalColors}
+                                                noOpacity={!!initialCellColors?.length}
+                                            />;
+                                        }, offset, region)}
+                                    </g>
 
-                                    <g filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="items-before-selection" filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
                                             <Items {...itemsProps}/>
                                         </FieldLayerContext.Provider>
@@ -365,7 +369,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
                                     {!prioritizeSelection && selection(offset, region)}
 
-                                    <g filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="items-regular" filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.regular}>
                                             <Items {...itemsProps}/>
                                         </FieldLayerContext.Provider>
@@ -373,23 +377,31 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
                                     {prioritizeSelection && selection(offset, region)}
 
-                                    <FieldLayerContext.Provider value={FieldLayer.lines}>
-                                        <Items {...itemsProps}/>
-                                    </FieldLayerContext.Provider>
+                                    <g data-layer="items-lines">
+                                        <FieldLayerContext.Provider value={FieldLayer.lines}>
+                                            <Items {...itemsProps}/>
+                                        </FieldLayerContext.Provider>
+                                    </g>
 
-                                    <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
-                                        <Items {...itemsProps}/>
-                                    </FieldLayerContext.Provider>
+                                    <g data-layer="items-given-user-lines">
+                                        <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
+                                            <Items {...itemsProps}/>
+                                        </FieldLayerContext.Provider>
+                                    </g>
 
-                                    <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
-                                        <Items {...itemsProps}/>
-                                    </FieldLayerContext.Provider>
+                                    <g data-layer="items-new-user-lines">
+                                        <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
+                                            <Items {...itemsProps}/>
+                                        </FieldLayerContext.Provider>
+                                    </g>
 
-                                    <FieldLayerContext.Provider value={FieldLayer.top}>
-                                        <Items {...itemsProps}/>
-                                    </FieldLayerContext.Provider>
+                                    <g data-layer="items-top">
+                                        <FieldLayerContext.Provider value={FieldLayer.top}>
+                                            <Items {...itemsProps}/>
+                                        </FieldLayerContext.Provider>
+                                    </g>
 
-                                    <g filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="digits" filter={`url(#${shadowFilterId})`}>
                                         {renderCellsLayer("digits", (cellState, cell) => {
                                             const initialData = initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left];
                                             const cellExcludedDigits = excludedDigits[cell.top][cell.left];
@@ -423,16 +435,18 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                         }, offset, region)}
                                     </g>
 
-                                    {isReady && renderCellsLayer(
-                                        "mouse-handler",
-                                        (cellState, cellPosition) => <FieldCellMouseHandler
-                                            context={readOnlySafeContext}
-                                            cellPosition={cellPosition}
-                                            handlers={cellGestureHandlers}
-                                        />,
-                                        offset,
-                                        region
-                                    )}
+                                    {isReady && <g data-layer="mouse-handler">
+                                        {renderCellsLayer(
+                                            "mouse-handler",
+                                            (cellState, cellPosition) => <FieldCellMouseHandler
+                                                context={readOnlySafeContext}
+                                                cellPosition={cellPosition}
+                                                handlers={cellGestureHandlers}
+                                            />,
+                                            offset,
+                                            region
+                                        )}
+                                    </g>}
                                 </>;
                             }}
                         </FieldRegionsWithSameCoordsTransformation>}
