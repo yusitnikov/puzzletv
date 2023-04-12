@@ -13,6 +13,7 @@ export const MoveCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mode
         includeHidden
     ) => loopHorizontally || loopVertically || allowMove || (includeHidden && (allowRotation || allowScale)),
     applyToWholeField: true,
+    disableCellHandlers: true,
     hotKeyStr: ["Alt+Shift"],
     isNoSelectionMode: true,
     digitsCount: 0,

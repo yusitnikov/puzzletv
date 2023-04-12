@@ -131,7 +131,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const cellWriteModesForGestures = getAllowedCellWriteModeInfos(puzzle, true);
     const createCellWriteModeGestureHandlers = (forField: boolean) => !isReady ? [] : cellWriteModesForGestures
-        .filter(({applyToWholeField = false}) => applyToWholeField === forField)
+        .filter(({applyToWholeField, disableCellHandlers}) => forField ? applyToWholeField : !disableCellHandlers)
         .map((cellWriteModeInfo) => getCellWriteModeGestureHandler(
             context,
             cellWriteModeInfo,
