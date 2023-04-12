@@ -2,6 +2,7 @@ import type {CellWriteModeInfo} from "../CellWriteMode";
 import {gameStateApplyFieldDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx} from "../GameState";
 import {GestureMetrics} from "../../../utils/gestures";
 import {getRectCenter} from "../../layout/Rect";
+import {isCellGestureExtraData} from "../CellGestureExtraData";
 
 export const MoveCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mode"> = {
     isActiveForPuzzle: (
@@ -18,7 +19,7 @@ export const MoveCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mode
     isNoSelectionMode: true,
     digitsCount: 0,
     isValidGesture: (isCurrentCellWriteMode, {gesture: {pointers}}) =>
-        isCurrentCellWriteMode || pointers.length > 1,
+        isCurrentCellWriteMode || pointers.length > 1 || !isCellGestureExtraData(pointers[0].start.extraData),
     onMove: ({prevMetrics, currentMetrics}, context, fieldRect) => {
         const {cellSize} = context;
         const fieldCenter = getRectCenter(fieldRect);
