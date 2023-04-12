@@ -60,7 +60,7 @@ export const QuadInputSudokuTypeManager = <CellType, ExType extends QuadInputGam
             QuadConstraint(position, digits, [], isRecent, radius),
     } = options;
 
-    const onCornerClick = ({onStateChange}: PuzzleContext<CellType, ExType, ProcessedExType>, {corner}: CellExactPosition) => {
+    const onCornerClick = ({onStateChange}: PuzzleContext<CellType, ExType, ProcessedExType>, cellPosition: Position, {corner}: CellExactPosition) => {
         onStateChange(setQuadPositionAction(corner, options));
     };
 

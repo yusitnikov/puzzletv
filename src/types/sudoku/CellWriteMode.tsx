@@ -18,7 +18,7 @@ import {
     gameStateSetSelectedCells,
     gameStateToggleSelectedCells
 } from "./GameState";
-import {isSamePosition} from "../layout/Position";
+import {isSamePosition, Position} from "../layout/Position";
 import {GestureFinishReason} from "../../utils/gestures";
 import {getReadOnlySafeOnStateChange} from "../../hooks/sudoku/useReadOnlySafeContext";
 import {Rect} from "../layout/Rect";
@@ -56,12 +56,14 @@ export interface CellWriteModeInfo<CellType, ExType, ProcessedExType> {
     isValidGesture?(isCurrentCellWriteMode: boolean, props: GestureIsValidProps, context: PuzzleContext<CellType, ExType, ProcessedExType>): boolean;
     onCornerClick?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
-        position: CellExactPosition,
+        cellPosition: Position,
+        exactPosition: CellExactPosition,
         isRightButton: boolean,
     ) => void;
     onCornerEnter?: (
         context: PuzzleContext<CellType, ExType, ProcessedExType>,
-        position: CellExactPosition
+        cellPosition: Position,
+        exactPosition: CellExactPosition,
     ) => void;
     onMove?(
         props: GestureOnContinueProps,
@@ -291,7 +293,7 @@ export const getCellWriteModeGestureHandler = <CellType, ExType, ProcessedExType
         ...common,
         onStart: ({extraData, event: {button}}) => {
             if (isCellGestureExtraData(extraData)) {
-                onCornerClick?.(context, extraData.exact, !!button);
+                onCornerClick?.(context, extraData.cell, extraData.exact, !!button);
             }
         },
         onContinue: (props) => {
@@ -301,7 +303,7 @@ export const getCellWriteModeGestureHandler = <CellType, ExType, ProcessedExType
                 isCellGestureExtraData(currentData) &&
                 (!isCellGestureExtraData(prevData) || JSON.stringify(prevData.exact) !== JSON.stringify(currentData.exact))
             ) {
-                onCornerEnter?.(context, currentData.exact);
+                onCornerEnter?.(context, currentData.cell, currentData.exact);
             }
 
             onMove?.(props, context, fieldRect);

@@ -9,12 +9,12 @@ export const LinesCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mod
     isActiveForPuzzle: ({allowDrawing = []}) => allowDrawing.length !== 0,
     hotKeyStr: ["Alt"],
     isNoSelectionMode: true,
-    onCornerClick: (context, position) =>
-        context.onStateChange(state => gameStateStartMultiLine({...context, state}, position)),
-    onCornerEnter: (context, position) =>
+    onCornerClick: (context, cellPosition, exactPosition) =>
+        context.onStateChange(state => gameStateStartMultiLine({...context, state}, exactPosition)),
+    onCornerEnter: (context, cellPosition, exactPosition) =>
         context.onStateChange(state => gameStateContinueMultiLine(
             {...context, state},
-            position
+            exactPosition
         )),
     onGestureEnd: (
         {gesture: {isClick, pointers: [{start: {event: {button}}}]}, reason},

@@ -37,7 +37,7 @@ export const safeCrackerArrowsCellWriteModeInfo = <ExType, ProcessedExType>(): C
     digitsCount: 0,
     handlesRightMouseClick: true,
     isNoSelectionMode: true,
-    onCornerClick: (context, position, isRightButton) => {
-        context.onStateChange(safeCrackerArrowsAction(context, position.center, isRightButton));
+    onCornerClick: (context, cellPosition, exactPosition, isRightButton) => {
+        context.onStateChange(safeCrackerArrowsAction(context, exactPosition.center, isRightButton));
     },
 });

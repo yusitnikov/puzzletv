@@ -7,23 +7,8 @@ export const ShadingCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "m
     hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
     handlesRightMouseClick: true,
     isNoSelectionMode: true,
-    onCornerClick: (context, position, isRightButton) => {
-        context.onStateChange(shadingStartAction(
-            context,
-            {
-                top: Math.floor(position.center.top),
-                left: Math.floor(position.center.left),
-            },
-            isRightButton
-        ));
-    },
-    onCornerEnter: (context, position) =>
-        context.onStateChange(shadingAction(
-            context,
-            {
-                top: Math.floor(position.center.top),
-                left: Math.floor(position.center.left),
-            },
-            context.state.dragAction
-        )),
+    onCornerClick: (context, cellPosition, exactPosition, isRightButton) =>
+        context.onStateChange(shadingStartAction(context, cellPosition, isRightButton)),
+    onCornerEnter: (context, cellPosition) =>
+        context.onStateChange(shadingAction(context, cellPosition, context.state.dragAction)),
 };
