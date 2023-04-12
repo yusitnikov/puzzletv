@@ -224,7 +224,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                 top: rowIndex,
             };
 
-            if (region && !doesGridRegionContainCell(region, cellPosition)) {
+            if (region && !customCellBounds && !doesGridRegionContainCell(region, cellPosition)) {
                 return null;
             }
 
