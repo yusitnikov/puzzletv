@@ -82,6 +82,7 @@ import {
     sanitizeImportOptions
 } from "../../types/sudoku/PuzzleImportOptions";
 import {createEmptyContextForPuzzle} from "../../types/sudoku/PuzzleContext";
+import {doesGridRegionContainCell} from "../../types/sudoku/GridRegion";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -240,9 +241,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 height: size,
             }];
             const regions = faces.flatMap(face => {
-                const validFaceCells = validGridCells.filter(
-                    ({top, left}) => top >= face.top && left >= face.left && top < face.top + face.height && left < face.left + face.width
-                );
+                const validFaceCells = validGridCells.filter((cell) => doesGridRegionContainCell(face, cell));
 
                 return indexes(size)
                     .map(regionIndex => validFaceCells.filter(

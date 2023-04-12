@@ -1,17 +1,19 @@
-import React, {PropsWithChildren} from "react";
+import React, {ReactNode} from "react";
 import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {GridRegion} from "../../../types/sudoku/GridRegion";
 
 interface FieldRegionsWithSameCoordsTransformationProps<CellType, ExType, ProcessedExType> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
+    children: ReactNode | ((region?: GridRegion) => ReactNode);
 }
 
 export const FieldRegionsWithSameCoordsTransformation = <CellType, ExType, ProcessedExType>(
     {
         context,
         children,
-    }: PropsWithChildren<FieldRegionsWithSameCoordsTransformationProps<CellType, ExType, ProcessedExType>>
+    }: FieldRegionsWithSameCoordsTransformationProps<CellType, ExType, ProcessedExType>
 ) => {
     const {
         puzzle: {
@@ -22,19 +24,19 @@ export const FieldRegionsWithSameCoordsTransformation = <CellType, ExType, Proce
     const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(context);
 
     return <>
-        {regionsWithSameCoordsTransformation?.map((rect, index) => <FieldRect
+        {regionsWithSameCoordsTransformation?.map((region, index) => <FieldRect
             key={`items-region-${index}`}
             context={context}
             clip={true}
-            {...rect}
+            {...region}
         >
             <AutoSvg
-                left={-rect.left}
-                top={-rect.top}
+                left={-region.left}
+                top={-region.top}
                 width={1}
                 height={1}
             >
-                {children}
+                {typeof children === "function" ? children(region) : children}
             </AutoSvg>
         </FieldRect>)}
 
@@ -43,7 +45,7 @@ export const FieldRegionsWithSameCoordsTransformation = <CellType, ExType, Proce
             top={0}
             left={0}
         >
-            {children}
+            {typeof children === "function" ? children() : children}
         </FieldRect>}
     </>;
 };

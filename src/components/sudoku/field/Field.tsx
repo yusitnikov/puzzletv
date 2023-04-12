@@ -43,6 +43,7 @@ import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
 import {getGestureHandlerProps, useGestureHandlers, useOutsideClick} from "../../../utils/gestures";
 import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
+import {doesGridRegionContainCell} from "../../../types/sudoku/GridRegion";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -215,7 +216,16 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     ) =>
         <FieldSvg context={readOnlySafeContext} useShadow={useShadow}>
             {({left: leftOffset, top: topOffset}) => <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
-                {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+                {(region) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+                    const cellPosition: Position = {
+                        left: columnIndex,
+                        top: rowIndex,
+                    };
+
+                    if (region && !doesGridRegionContainCell(region, cellPosition)) {
+                        return null;
+                    }
+
                     if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation) {
                         const finalTop = topOffset + loopOffset.top + rowIndex;
                         if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
@@ -227,11 +237,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                             return null;
                         }
                     }
-
-                    const cellPosition: Position = {
-                        left: columnIndex,
-                        top: rowIndex,
-                    };
 
                     if (getCellTypeProps?.(cellPosition, puzzle)?.isVisible === false) {
                         return null;
