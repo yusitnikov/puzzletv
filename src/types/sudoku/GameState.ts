@@ -1182,7 +1182,7 @@ export const gameStateApplyShading = <CellType, ExType, ProcessedExType>(
 // endregion
 
 // region Scale
-export const defaultScaleStep = 2;
+export const defaultScaleStep = 1.4;
 export const getScaleLog = (scale: number, step = defaultScaleStep) => Math.log(scale) / Math.log(step);
 export const getAbsoluteScaleByLog = (scaleLog: number, step = defaultScaleStep) => Math.pow(step, scaleLog);
 
