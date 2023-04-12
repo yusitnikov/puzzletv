@@ -2,7 +2,7 @@ import {ControlButton} from "./ControlButton";
 import {FastForward, PlayArrow, Timelapse} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItem, ControlButtonItemProps, ControlButtonRegion} from "./ControlButtonsManager";
 
 export const AnimationSpeedControlButton = <CellType, ExType, ProcessedExType>(
     {
@@ -44,3 +44,9 @@ export const AnimationSpeedControlButton = <CellType, ExType, ProcessedExType>(
         {animationSpeed === AnimationSpeed.slow && <Timelapse/>}
     </ControlButton>;
 };
+
+export const AnimationSpeedControlButtonItem = <CellType, ExType, ProcessedExType>(): ControlButtonItem<CellType, ExType, ProcessedExType> => ({
+    key: "animation-speed",
+    region: ControlButtonRegion.additional,
+    Component: AnimationSpeedControlButton,
+});

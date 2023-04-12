@@ -1,5 +1,5 @@
 import {PartiallyTranslatable} from "../../../types/translations/Translatable";
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItem, ControlButtonItemProps, ControlButtonRegion} from "./ControlButtonsManager";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButton} from "./ControlButton";
 import {defaultScaleStep, gameStateApplyFieldDragGesture} from "../../../types/sudoku/GameState";
@@ -39,3 +39,15 @@ export const ZoomInButton = <CellType, ExType, ProcessedExType>() =>
 
 export const ZoomOutButton = <CellType, ExType, ProcessedExType>() =>
     ZoomButton<CellType, ExType, ProcessedExType>(false, "zoom out", "-");
+
+export const ZoomInButtonItem = <CellType, ExType, ProcessedExType>(): ControlButtonItem<CellType, ExType, ProcessedExType> => ({
+    key: "zoom-in",
+    region: ControlButtonRegion.additional,
+    Component: ZoomInButton(),
+});
+
+export const ZoomOutButtonItem = <CellType, ExType, ProcessedExType>(): ControlButtonItem<CellType, ExType, ProcessedExType> => ({
+    key: "zoom-out",
+    region: ControlButtonRegion.additional,
+    Component: ZoomOutButton(),
+});

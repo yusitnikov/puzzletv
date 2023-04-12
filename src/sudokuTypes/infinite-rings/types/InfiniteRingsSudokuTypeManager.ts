@@ -12,10 +12,9 @@ import {gameStateSetScaleLog, PartialGameStateEx} from "../../../types/sudoku/Ga
 import {loop} from "../../../utils/math";
 import {InfiniteRingsBorderLinesConstraint} from "../components/InfiniteRingsBorderLines";
 import {isShowingAllInfiniteRings} from "./InfiniteRingsLayout";
-import {ZoomInButton, ZoomOutButton} from "../../../components/sudoku/controls/ZoomButton";
+import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
-import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
-import {AnimationSpeedControlButton} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
+import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 
 /*
  * TODO:
@@ -55,21 +54,9 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
         isFreeScale: false,
         fieldWrapperHandlesScale: true,
         controlButtons: [
-            {
-                key: "zoom-in",
-                region: ControlButtonRegion.additional,
-                Component: ZoomInButton(),
-            },
-            {
-                key: "zoom-out",
-                region: ControlButtonRegion.additional,
-                Component: ZoomOutButton(),
-            },
-            {
-                key: "animation-speed",
-                region: ControlButtonRegion.additional,
-                Component: AnimationSpeedControlButton,
-            },
+            ZoomInButtonItem(),
+            ZoomOutButtonItem(),
+            AnimationSpeedControlButtonItem(),
         ],
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
             const quadSize = fieldSize / 2;
