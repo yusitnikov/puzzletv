@@ -87,8 +87,6 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         fieldWrapperHandlesScale,
     } = typeManager;
 
-    const clipField = allowMove || (allowScale && !fieldWrapperHandlesScale);
-
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
 
     const itemsProps: ItemsProps<CellType, ExType, ProcessedExType> = {
@@ -290,7 +288,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
             {...rect}
             style={{
                 backgroundColor: "white",
-                overflow: loopHorizontally || loopVertically || clipField ? "hidden" : undefined,
+                overflow: loopHorizontally || loopVertically || allowMove || (allowScale && !fieldWrapperHandlesScale) ? "hidden" : undefined,
                 pointerEvents: "all",
                 cursor: applyToWholeField ? "pointer" : undefined,
             }}
@@ -404,7 +402,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     />)}
                 </Absolute>
 
-                {(loopHorizontally || clipField) && <>
+                {loopHorizontally && fieldMargin && <>
                     <Absolute
                         width={fieldMargin * cellSize}
                         height={rect.height}
@@ -423,7 +421,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     />
                 </>}
 
-                {(loopVertically || clipField) && <>
+                {loopVertically && fieldMargin && <>
                     <Absolute
                         width={rect.width}
                         height={fieldMargin * cellSize}
