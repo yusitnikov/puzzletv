@@ -59,7 +59,6 @@ export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: bool
                 [LanguageCode.en]: isQuadle ? "Maff and Chameleon" : "Maff",
                 [LanguageCode.ru]: isQuadle ? "Maff и Хамелеона" : "Maff",
             },
-            slug,
             saveState: !isRandom,
             saveStateKey: `${slug}-${fieldSize}-${regionWidth}-${randomSeed}`,
             getNewHostedGameParams: () => ({

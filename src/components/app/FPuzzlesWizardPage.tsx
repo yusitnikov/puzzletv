@@ -10,6 +10,7 @@ import {FieldPreview} from "../sudoku/field/FieldPreview";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {PageTitle} from "../layout/page-layout/PageLayout";
 import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
+import {loadPuzzle} from "../../types/sudoku/PuzzleDefinition";
 
 export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
 
@@ -81,7 +82,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         const version = ++autoIncrement;
         try {
             return {
-                puzzle: FPuzzles.loadPuzzle(importOptions),
+                puzzle: loadPuzzle(FPuzzles, importOptions),
                 version,
             };
         } catch (error: unknown) {

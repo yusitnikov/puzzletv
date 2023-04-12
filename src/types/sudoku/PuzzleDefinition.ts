@@ -92,9 +92,37 @@ export const allDrawingModes: PuzzleDefinition<any, any, any>["allowDrawing"] = 
 export interface PuzzleDefinitionLoader<CellType, ExType = {}, ProcessedExType = {}> {
     slug: string;
     noIndex?: boolean;
-    fulfillParams: (params: any) => any;
-    loadPuzzle: (params: any) => PuzzleDefinition<CellType, ExType, ProcessedExType>;
+    fulfillParams?: (params: any) => any;
+    loadPuzzle: (params: any) => Omit<PuzzleDefinition<CellType, ExType, ProcessedExType>, "noIndex" | "slug"> & {slug?: string};
 }
+
+export const loadPuzzle = <CellType, ExType, ProcessedExType>(
+    puzzleOrLoader: PuzzleDefinition<CellType, ExType, ProcessedExType> | PuzzleDefinitionLoader<CellType, ExType, ProcessedExType>,
+    params: any = {},
+): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
+    const {
+        loadPuzzle,
+        fulfillParams = params => params,
+    } = puzzleOrLoader as PuzzleDefinitionLoader<any, any, any>;
+
+    const fulfilledParams = typeof loadPuzzle === "function"
+        ? fulfillParams(params)
+        : params;
+
+    const puzzle = typeof loadPuzzle === "function"
+        ? loadPuzzle(fulfilledParams)
+        : puzzleOrLoader as PuzzleDefinition<any, any, any>;
+
+    return {
+        ...puzzle,
+        noIndex: puzzleOrLoader.noIndex,
+        slug: puzzleOrLoader.slug,
+        params: {
+            ...puzzle.params,
+            ...fulfilledParams,
+        },
+    };
+};
 
 export const getDefaultDigitsCount = ({typeManager: {maxDigitsCount}, fieldSize: {fieldSize}}: PuzzleDefinition<any, any, any>) =>
     Math.min(maxDigitsCount || fieldSize, fieldSize);

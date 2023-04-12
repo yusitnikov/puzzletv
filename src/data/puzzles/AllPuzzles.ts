@@ -1,4 +1,4 @@
-import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {loadPuzzle, PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
 import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {
@@ -113,10 +113,4 @@ export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoad
     // endregion
 ];
 
-export const getAllPuzzlesWithDefaultParams = () => AllPuzzles.filter(({noIndex}) => !noIndex).map((puzzleOrLoader) => {
-    const loader = puzzleOrLoader as PuzzleDefinitionLoader<any, any, any>;
-
-    return typeof loader.loadPuzzle === "function"
-        ? loader.loadPuzzle(loader.fulfillParams({}))
-        : puzzleOrLoader as PuzzleDefinition<any, any, any>;
-});
+export const getAllPuzzlesWithDefaultParams = () => AllPuzzles.filter(({noIndex}) => !noIndex).map(loadPuzzle);

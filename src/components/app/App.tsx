@@ -6,7 +6,7 @@ import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {PageLayout} from "../layout/page-layout/PageLayout";
 import {PuzzlesList} from "./PuzzlesList";
 import {buildLink} from "../../utils/link";
-import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {loadPuzzle, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {GamesList} from "./GamesList";
 import {HomePage} from "./HomePage";
 import {ContactMe} from "./ContactMe";
@@ -27,31 +27,16 @@ export const App = ({onPageLoaded}: AppProps) => {
 
     useGesturesGlobalEvents();
 
-    const puzzle = useMemo(() => {
+    const puzzle = useMemo<PuzzleDefinition<any, any, any> | undefined>(() => {
         for (const puzzleOrLoader of AllPuzzles) {
             if (slug === puzzleOrLoader.slug) {
-                const loader = puzzleOrLoader as PuzzleDefinitionLoader<any, any, any>;
-
-                const fulfilledParams = typeof loader.loadPuzzle === "function"
-                    ? loader.fulfillParams(params)
-                    : params;
-
-                const puzzle = typeof loader.loadPuzzle === "function"
-                    ? loader.loadPuzzle(fulfilledParams)
-                    : puzzleOrLoader as PuzzleDefinition<any, any, any>;
+                const puzzle = loadPuzzle(puzzleOrLoader, params);
 
                 if (!puzzle.getNewHostedGameParams && params.host && !params.share) {
                     continue;
                 }
 
-                return {
-                    ...puzzle,
-                    slug: puzzleOrLoader.slug,
-                    params: {
-                        ...puzzle.params,
-                        ...fulfilledParams,
-                    },
-                };
+                return puzzle;
             }
         }
 

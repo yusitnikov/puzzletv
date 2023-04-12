@@ -716,7 +716,6 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
     noIndex: true,
     slug: "f-puzzles",
-    fulfillParams: (params) => params,
     loadPuzzle: ({load, ...params}) => {
         if (typeof load !== "string") {
             throw new Error("Missing parameter");
