@@ -134,6 +134,9 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
     isFreeScale?: boolean;
     fieldWrapperHandlesScale?: boolean;
 
+    gridBackgroundColor?: string;
+    regionBackgroundColor?: string;
+
     keepStateOnRestart?(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>): PartialGameStateEx<CellType, ExType>;
 
     isReady?(state: GameStateEx<CellType, ExType>): boolean;

@@ -87,6 +87,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         allowRotation,
         allowScale,
         fieldWrapperHandlesScale,
+        gridBackgroundColor = "#fff",
+        regionBackgroundColor,
     } = typeManager;
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
@@ -298,7 +300,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         <Absolute
             {...rect}
             style={{
-                backgroundColor: "white",
+                backgroundColor: gridBackgroundColor,
                 overflow: loopHorizontally || loopVertically || allowMove || (allowScale && !fieldWrapperHandlesScale) ? "hidden" : undefined,
                 pointerEvents: "all",
                 cursor: applyToWholeField ? "pointer" : undefined,
@@ -324,6 +326,16 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                                     <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
                                         <feDropShadow dx={0} dy={0} stdDeviation={0.05} floodColor={"#fff"} floodOpacity={1}/>
                                     </filter>
+
+                                    {region && regionBackgroundColor && <rect
+                                        x={region.left}
+                                        y={region.top}
+                                        width={region.width}
+                                        height={region.height}
+                                        fill={regionBackgroundColor}
+                                        strokeWidth={0}
+                                        stroke={"none"}
+                                    />}
 
                                     <g filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
