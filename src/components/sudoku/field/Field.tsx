@@ -1,6 +1,6 @@
 import {Absolute} from "../../layout/absolute/Absolute";
-import {Rect, transformRect} from "../../../types/layout/Rect";
-import {emptyPosition, Position} from "../../../types/layout/Position";
+import {Rect} from "../../../types/layout/Rect";
+import {Position} from "../../../types/layout/Position";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useControlKeysState} from "../../../hooks/useControlKeysState";
 import React, {Fragment, ReactNode, useMemo, useState} from "react";
@@ -20,14 +20,13 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {
-    Constraint,
     getAllPuzzleConstraints,
     isValidUserDigit,
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 import {getAllowedCellWriteModeInfos, getCellWriteModeGestureHandler} from "../../../types/sudoku/CellWriteMode";
-import {HashSet, PlainValueSet} from "../../../types/struct/Set";
+import {PlainValueSet} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useReadOnlySafeContext} from "../../../hooks/sudoku/useReadOnlySafeContext";
@@ -38,13 +37,12 @@ import {headerHeight, redColor} from "../../app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCoordsTransformation";
-import {FieldCellUserArea} from "./FieldCellUserArea";
-import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
 import {getGestureHandlerProps, useGestureHandlers, useOutsideClick} from "../../../utils/gestures";
 import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
 import {doesGridRegionContainCell, GridRegion} from "../../../types/sudoku/GridRegion";
 import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
+import {FieldItems, FieldItemsProps} from "./FieldItems";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -93,7 +91,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
 
-    const itemsProps: ItemsProps<CellType, ExType, ProcessedExType> = {
+    const itemsProps: FieldItemsProps<CellType, ExType, ProcessedExType> = {
         context: readOnlySafeContext,
         items,
     };
@@ -341,7 +339,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
                                     <g data-layer="items-before-background" filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                                            <Items {...itemsProps}/>
+                                            <FieldItems {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
@@ -363,7 +361,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
                                     <g data-layer="items-before-selection" filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                                            <Items {...itemsProps}/>
+                                            <FieldItems {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
@@ -371,7 +369,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
                                     <g data-layer="items-regular" filter={`url(#${shadowFilterId})`}>
                                         <FieldLayerContext.Provider value={FieldLayer.regular}>
-                                            <Items {...itemsProps}/>
+                                            <FieldItems {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
@@ -379,25 +377,25 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
                                     <g data-layer="items-lines">
                                         <FieldLayerContext.Provider value={FieldLayer.lines}>
-                                            <Items {...itemsProps}/>
+                                            <FieldItems {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
                                     <g data-layer="items-given-user-lines">
                                         <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
-                                            <Items {...itemsProps}/>
+                                            <FieldItems {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
                                     <g data-layer="items-new-user-lines">
                                         <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
-                                            <Items {...itemsProps}/>
+                                            <FieldItems {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
                                     <g data-layer="items-top">
                                         <FieldLayerContext.Provider value={FieldLayer.top}>
-                                            <Items {...itemsProps}/>
+                                            <FieldItems {...itemsProps}/>
                                         </FieldLayerContext.Provider>
                                     </g>
 
@@ -509,82 +507,3 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
         </Absolute>}
     </>;
 };
-
-interface ItemsProps<CellType, ExType = {}, ProcessedExType = {}> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
-    items: Constraint<CellType, any, ExType, ProcessedExType>[];
-}
-
-const Items = <CellType, ExType = {}, ProcessedExType = {}>(
-    {context, items}: ItemsProps<CellType, ExType, ProcessedExType>
-) => <>
-    {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
-        if (!Component) {
-            return null;
-        }
-
-        if (renderSingleCellInUserArea && cells.length === 1) {
-            const position = cells[0];
-
-            if (position.top % 1 === 0 && position.left % 1 === 0) {
-                const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
-                    context.puzzle,
-                    {...position, angle: 0},
-                    new HashSet<CellType>(),
-                    0,
-                    () => undefined,
-                    position,
-                    context.state
-                );
-
-                return <AutoSvg key={index} {...(context.puzzle.customCellBounds ? {} : position)}>
-                    <FieldCellUserArea context={context} cellPosition={position}>
-                        <AutoSvg top={0.5} left={0.5} angle={processedPosition?.angle}>
-                            <AutoSvg top={-0.5} left={-0.5}>
-                                <Component
-                                    context={context}
-                                    cells={[emptyPosition]}
-                                    {...otherData}
-                                />
-                            </AutoSvg>
-                        </AutoSvg>
-                    </FieldCellUserArea>
-                </AutoSvg>;
-            }
-        }
-
-        if (renderSingleCellInUserArea && cells.length === 2) {
-            const [cell1, cell2] = cells.map(({top, left}) => {
-                const cellInfo = context.cellsIndex.allCells[top]?.[left];
-                return cellInfo
-                    ? {...cellInfo.center, radius: cellInfo.bounds.userArea.width / 2}
-                    : {left: left + 0.5, top: top + 0.5, radius: 0.5};
-            });
-            const centerPoint = {
-                top: (cell1.top + cell2.top) / 2,
-                left: (cell1.left + cell2.left) / 2,
-                radius: (cell1.radius + cell2.radius) / 2,
-            };
-            const centerRect: Rect = {
-                top: centerPoint.top - centerPoint.radius,
-                left: centerPoint.left - centerPoint.radius,
-                width: centerPoint.radius * 2,
-                height: centerPoint.radius * 2,
-            };
-            return <TransformedRectGraphics key={index} rect={transformRect(centerRect)}>
-                <Component
-                    context={context}
-                    cells={[emptyPosition, emptyPosition]}
-                    {...otherData}
-                />
-            </TransformedRectGraphics>
-        }
-
-        return <Component
-            key={index}
-            context={context}
-            cells={cells}
-            {...otherData}
-        />;
-    })}
-</>;
