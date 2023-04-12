@@ -39,10 +39,14 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, i
     return ({
         ...parent,
 
-        initialGameStateExtension: {
-            ...parent.initialGameStateExtension!,
+        initialGameStateExtension: (puzzle) => ({
+            ...(
+                typeof parent.initialGameStateExtension === "function"
+                    ? parent.initialGameStateExtension(puzzle)
+                    : parent.initialGameStateExtension!
+            ),
             isQuadTurn: true,
-        },
+        }),
 
         serializeGameState(data): any {
             return {

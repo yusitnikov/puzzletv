@@ -67,11 +67,15 @@ export const QuadInputSudokuTypeManager = <CellType, ExType extends QuadInputGam
     return {
         ...parent,
 
-        initialGameStateExtension: {
-            ...parent.initialGameStateExtension!,
+        initialGameStateExtension: (puzzle) => ({
+            ...(
+                typeof parent.initialGameStateExtension === "function"
+                    ? parent.initialGameStateExtension(puzzle)
+                    : parent.initialGameStateExtension!
+            ),
             currentQuad: undefined,
             allQuads: [],
-        },
+        }),
 
         serializeGameState(data): any {
             return {

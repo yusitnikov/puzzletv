@@ -319,7 +319,11 @@ export const getEmptyGameState = <CellType, ExType = {}, ProcessedExType = {}>(
         highlightSeenCells: loadBoolFromLocalStorage(LocalStorageKeys.highlightSeenCells, false),
 
         extension: {
-            ...initialGameStateExtension,
+            ...(
+                typeof initialGameStateExtension === "function"
+                    ? (initialGameStateExtension as (puz: typeof puzzle) => ExType)(puzzle)
+                    : initialGameStateExtension
+            ),
             ...(savedGameState && unserializeGameState(savedGameState[2]))
         } as ExType,
     };

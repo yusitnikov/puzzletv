@@ -114,7 +114,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     cellDataComponentType: CellDataComponentType<CellType>;
 
-    initialGameStateExtension?: ExType;
+    initialGameStateExtension?: ExType | ((puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>) => ExType);
 
     allowMove?: boolean;
 
