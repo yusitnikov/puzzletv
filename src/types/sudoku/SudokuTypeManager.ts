@@ -135,6 +135,9 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
 
     useProcessedGameStateExtension?(state: GameStateEx<CellType, ExType>): ProcessedExType;
 
+    // Fallback for useProcessedGameStateExtension() when calling outside a React component
+    getProcessedGameStateExtension?(state: GameStateEx<CellType, ExType>): ProcessedExType;
+
     getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): {
         isVisible?: boolean;
         isVisibleForState?: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => boolean;

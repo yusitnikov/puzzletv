@@ -1,6 +1,6 @@
 import {PuzzleDefinition} from "./PuzzleDefinition";
-import {ProcessedGameStateEx} from "./GameState";
-import {UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
+import {calculateProcessedGameState, getEmptyGameState, ProcessedGameStateEx} from "./GameState";
+import {emptyUseMultiPlayerResult, UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
 import {Dispatch} from "react";
 import {GameStateActionOrCallback} from "./GameStateAction";
 import {SudokuCellsIndex, SudokuCellsIndexForState} from "./SudokuCellsIndex";
@@ -24,3 +24,34 @@ export interface PuzzleContext<CellType, ExType = {}, ProcessedExType = {}> {
 export interface PuzzleContextProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
 }
+
+export const createEmptyContextForPuzzle = <CellType, ExType, ProcessedExType>(
+    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    cellSize = 1,
+): PuzzleContext<CellType, ExType, ProcessedExType> => {
+    const cellsIndex = new SudokuCellsIndex(puzzle);
+    const state = getEmptyGameState(puzzle, false, true);
+
+    const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
+        puzzle,
+        state: calculateProcessedGameState(
+            puzzle,
+            emptyUseMultiPlayerResult,
+            state,
+            puzzle.typeManager.getProcessedGameStateExtension?.(state) ?? ({} as ProcessedExType),
+            undefined,
+            true,
+        ),
+        cellsIndex,
+        cellSize,
+        cellSizeForSidePanel: cellSize,
+        onStateChange: () => {},
+        isReadonlyContext: true,
+        multiPlayer: emptyUseMultiPlayerResult,
+    };
+
+    return {
+        ...contextNoIndex,
+        cellsIndexForState: new SudokuCellsIndexForState<CellType, ExType, ProcessedExType>(cellsIndex, contextNoIndex),
+    };
+};

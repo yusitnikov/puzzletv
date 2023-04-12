@@ -42,6 +42,19 @@ export interface UseMultiPlayerResult {
     sendMessage: (message: any) => void;
 }
 
+export const emptyUseMultiPlayerResult: UseMultiPlayerResult = {
+    isEnabled: false,
+    isLoaded: false,
+    hostId: myClientId,
+    isHost: true,
+    isDoubledConnected: false,
+    allPlayerIds: [],
+    playerNicknames: {},
+    playersDataMap: {},
+    myPendingMessages: [],
+    sendMessage: () => {},
+};
+
 export const useMultiPlayer = (
     gameId: string,
     hostId: string,

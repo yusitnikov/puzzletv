@@ -81,6 +81,7 @@ import {
     PuzzleImportPuzzleType,
     sanitizeImportOptions
 } from "../../types/sudoku/PuzzleImportOptions";
+import {createEmptyContextForPuzzle} from "../../types/sudoku/PuzzleContext";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -231,7 +232,8 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 );
             const validGridCells = allGridCells.filter(isVisibleGridCell);
 
-            const faces = typeManager.getRegionsWithSameCoordsTransformation?.(puzzle, 1) ?? [{
+            const emptyContext = createEmptyContextForPuzzle(puzzle);
+            const faces = typeManager.getRegionsWithSameCoordsTransformation?.(emptyContext) ?? [{
                 top: 0,
                 left: 0,
                 width: size,
