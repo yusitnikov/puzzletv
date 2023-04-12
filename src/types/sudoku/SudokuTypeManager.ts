@@ -105,6 +105,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
     ): Partial<CellStateEx<CellType>>;
 
     extraCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
+    disabledCellWriteModes?: CellWriteMode[];
 
     hiddenCellWriteModes?: CellWriteModeInfo<CellType, ExType, ProcessedExType>[];
 

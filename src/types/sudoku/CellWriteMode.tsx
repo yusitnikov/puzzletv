@@ -120,15 +120,20 @@ export const getAllowedCellWriteModeInfos = <CellType, ExType, ProcessedExType>(
 ): CellWriteModeInfo<CellType, ExType, ProcessedExType>[] => {
     const {
         digitsCount,
-        typeManager: {extraCellWriteModes = [], hiddenCellWriteModes = []},
+        typeManager: {
+            extraCellWriteModes = [],
+            disabledCellWriteModes = [],
+            hiddenCellWriteModes = [],
+        },
     } = puzzle;
 
     return [
         ...allCellWriteModeInfos.filter(
-            ({isDigitMode, isActiveForPuzzle}) =>
+            ({mode, isDigitMode, isActiveForPuzzle}) => !disabledCellWriteModes.includes(mode) && (
                 isDigitMode
                     ? digitsCount !== 0
                     : isActiveForPuzzle?.(puzzle, includeHidden) !== false
+            )
         ),
         ...extraCellWriteModes,
         ...(includeHidden ? hiddenCellWriteModes : []),
