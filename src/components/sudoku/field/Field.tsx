@@ -43,7 +43,8 @@ import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
 import {getGestureHandlerProps, useGestureHandlers, useOutsideClick} from "../../../utils/gestures";
 import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
-import {doesGridRegionContainCell} from "../../../types/sudoku/GridRegion";
+import {doesGridRegionContainCell, GridRegion} from "../../../types/sudoku/GridRegion";
+import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 
 export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
     context: PuzzleContext<CellType, ExType, ProcessedExType>;
@@ -117,6 +118,8 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const userDigits = useMemo(() => prepareGivenDigitsMapForConstraints(context, cells), [context, cells]);
 
     const {isAnyKeyDown} = useControlKeysState();
+
+    const autoIncrementId = useAutoIncrementId();
 
     // region Pointer events
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
@@ -212,81 +215,84 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
     const renderCellsLayer = (
         keyPrefix: string,
         renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
-        {useShadow = false}: {useShadow?: boolean} = {}
-    ) =>
-        <FieldSvg context={readOnlySafeContext} useShadow={useShadow}>
-            {({left: leftOffset, top: topOffset}) => <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
-                {(region) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
-                    const cellPosition: Position = {
-                        left: columnIndex,
-                        top: rowIndex,
-                    };
+        {left: leftOffset, top: topOffset}: Position,
+        region?: GridRegion,
+    ) => <>
+        {cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
+            const cellPosition: Position = {
+                left: columnIndex,
+                top: rowIndex,
+            };
 
-                    if (region && !doesGridRegionContainCell(region, cellPosition)) {
-                        return null;
-                    }
+            if (region && !doesGridRegionContainCell(region, cellPosition)) {
+                return null;
+            }
 
-                    if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation) {
-                        const finalTop = topOffset + loopOffset.top + rowIndex;
-                        if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
-                            return null;
-                        }
+            if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation) {
+                const finalTop = topOffset + loopOffset.top + rowIndex;
+                if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
+                    return null;
+                }
 
-                        const finalLeft = leftOffset + loopOffset.left + columnIndex;
-                        if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
-                            return null;
-                        }
-                    }
+                const finalLeft = leftOffset + loopOffset.left + columnIndex;
+                if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
+                    return null;
+                }
+            }
 
-                    if (getCellTypeProps?.(cellPosition, puzzle)?.isVisible === false) {
-                        return null;
-                    }
+            if (getCellTypeProps?.(cellPosition, puzzle)?.isVisible === false) {
+                return null;
+            }
 
-                    const content = renderer(cellState, cellPosition);
-                    if (!content) {
-                        return null;
-                    }
+            const content = renderer(cellState, cellPosition);
+            if (!content) {
+                return null;
+            }
 
-                    const key = `cell-${keyPrefix}-${rowIndex}-${columnIndex}`;
-                    return customCellBounds
-                        ? <Fragment key={key}>{content}</Fragment>
-                        : <AutoSvg
-                            key={key}
-                            {...cellPosition}
-                            width={1}
-                            height={1}
-                        >
-                            {content}
-                        </AutoSvg>;
-                }))}
-            </FieldRegionsWithSameCoordsTransformation>}
-        </FieldSvg>;
+            const key = `cell-${keyPrefix}-${rowIndex}-${columnIndex}`;
+            return customCellBounds
+                ? <Fragment key={key}>{content}</Fragment>
+                : <AutoSvg
+                    key={key}
+                    {...cellPosition}
+                    width={1}
+                    height={1}
+                >
+                    {content}
+                </AutoSvg>;
+        }))}
+    </>;
 
     const initialColorsResolved = resolvePuzzleInitialColors(context);
 
-    const selection = !isNoSelectionMode && renderCellsLayer("selection", (cellState, cellPosition) => {
-        let color = "";
-        let width = 1;
+    const selection = (offset: Position, region?: GridRegion) => !isNoSelectionMode && renderCellsLayer(
+        "selection",
+        (cellState, cellPosition) => {
+            let color = "";
+            let width = 1;
 
-        if (selectedCells.contains(cellPosition)) {
-            color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
-                ? CellSelectionColor.mainCurrent
-                : CellSelectionColor.mainPrevious;
-        } else {
-            const customSelection = getCellSelectionType?.(cellPosition, context);
-            if (customSelection) {
-                color = customSelection.color;
-                width = customSelection.strokeWidth;
+            if (selectedCells.contains(cellPosition)) {
+                color = selectedCells.last()?.left === cellPosition.left && selectedCells.last()?.top === cellPosition.top
+                    ? CellSelectionColor.mainCurrent
+                    : CellSelectionColor.mainPrevious;
+            } else {
+                const customSelection = getCellSelectionType?.(cellPosition, context);
+                if (customSelection) {
+                    color = customSelection.color;
+                    width = customSelection.strokeWidth;
+                }
             }
-        }
 
-        return !!color && <CellSelection
-            context={readOnlySafeContext}
-            cellPosition={cellPosition}
-            color={color}
-            strokeWidth={width}
-        />;
-    });
+            return !!color && <CellSelection
+                context={readOnlySafeContext}
+                cellPosition={cellPosition}
+                color={color}
+                strokeWidth={width}
+            />;
+        },
+        offset,
+        region,
+    );
 
     return <>
         <Absolute
@@ -310,101 +316,115 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
                     fitParent={fieldFitsWrapper}
                 >
                     <FieldSvg context={readOnlySafeContext}>
-                        <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                            <Items {...itemsProps}/>
-                        </FieldLayerContext.Provider>
+                        {(offset) => <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
+                            {(region, regionIndex = 0) => {
+                                const shadowFilterId = `field-shadow-${autoIncrementId}-${offset.top}-${offset.left}-${regionIndex}`;
+
+                                return <>
+                                    <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
+                                        <feDropShadow dx={0} dy={0} stdDeviation={0.05} floodColor={"#fff"} floodOpacity={1}/>
+                                    </filter>
+
+                                    <g filter={`url(#${shadowFilterId})`}>
+                                        <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
+                                            <Items {...itemsProps}/>
+                                        </FieldLayerContext.Provider>
+                                    </g>
+
+                                    {renderCellsLayer("background", ({colors}, cellPosition) => {
+                                        const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
+                                        const finalColors = allowOverridingInitialColors
+                                            ? (colors?.size ? colors : new PlainValueSet(initialCellColors || []))
+                                            : (initialCellColors ? new PlainValueSet(initialCellColors) : colors);
+
+                                        return !!finalColors?.size && <CellBackground
+                                            context={readOnlySafeContext}
+                                            cellPosition={cellPosition}
+                                            colors={finalColors}
+                                            noOpacity={!!initialCellColors?.length}
+                                        />;
+                                    }, offset, region)}
+
+                                    <g filter={`url(#${shadowFilterId})`}>
+                                        <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
+                                            <Items {...itemsProps}/>
+                                        </FieldLayerContext.Provider>
+                                    </g>
+
+                                    {!prioritizeSelection && selection(offset, region)}
+
+                                    <g filter={`url(#${shadowFilterId})`}>
+                                        <FieldLayerContext.Provider value={FieldLayer.regular}>
+                                            <Items {...itemsProps}/>
+                                        </FieldLayerContext.Provider>
+                                    </g>
+
+                                    {prioritizeSelection && selection(offset, region)}
+
+                                    <FieldLayerContext.Provider value={FieldLayer.lines}>
+                                        <Items {...itemsProps}/>
+                                    </FieldLayerContext.Provider>
+
+                                    <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
+                                        <Items {...itemsProps}/>
+                                    </FieldLayerContext.Provider>
+
+                                    <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
+                                        <Items {...itemsProps}/>
+                                    </FieldLayerContext.Provider>
+
+                                    <FieldLayerContext.Provider value={FieldLayer.top}>
+                                        <Items {...itemsProps}/>
+                                    </FieldLayerContext.Provider>
+
+                                    <g filter={`url(#${shadowFilterId})`}>
+                                        {renderCellsLayer("digits", (cellState, cell) => {
+                                            const initialData = initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left];
+                                            const cellExcludedDigits = excludedDigits[cell.top][cell.left];
+
+                                            return !shouldSkipCellDigits(initialData, cellExcludedDigits, cellState) &&
+                                                <CellDigits
+                                                    context={readOnlySafeContext}
+                                                    data={cellState}
+                                                    initialData={initialData}
+                                                    excludedDigits={cellExcludedDigits}
+                                                    size={1}
+                                                    cellPosition={cell}
+                                                    isValidUserDigit={
+                                                        (digit) =>
+                                                            !(enableConflictChecker || forceEnableConflictChecker) ||
+                                                            disableConflictChecker ||
+                                                            (digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.Off) ||
+                                                            isValidUserDigit(
+                                                                cell,
+                                                                digit === undefined
+                                                                    ? userDigits
+                                                                    : mergeGivenDigitsMaps(userDigits, {[cell.top]: {[cell.left]: digit}}),
+                                                                items,
+                                                                readOnlySafeContext,
+                                                                false,
+                                                                digit !== undefined,
+                                                                digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.CheckObvious
+                                                            )
+                                                    }
+                                                />;
+                                        }, offset, region)}
+                                    </g>
+
+                                    {isReady && renderCellsLayer(
+                                        "mouse-handler",
+                                        (cellState, cellPosition) => <FieldCellMouseHandler
+                                            context={readOnlySafeContext}
+                                            cellPosition={cellPosition}
+                                            handlers={cellGestureHandlers}
+                                        />,
+                                        offset,
+                                        region
+                                    )}
+                                </>;
+                            }}
+                        </FieldRegionsWithSameCoordsTransformation>}
                     </FieldSvg>
-
-                    {renderCellsLayer("background", ({colors}, cellPosition) => {
-                        const initialCellColors = initialColorsResolved[cellPosition.top]?.[cellPosition.left];
-                        const finalColors = allowOverridingInitialColors
-                            ? (colors?.size ? colors : new PlainValueSet(initialCellColors || []))
-                            : (initialCellColors ? new PlainValueSet(initialCellColors) : colors);
-
-                        return !!finalColors?.size && <CellBackground
-                            context={readOnlySafeContext}
-                            cellPosition={cellPosition}
-                            colors={finalColors}
-                            noOpacity={!!initialCellColors?.length}
-                        />;
-                    })}
-
-                    <FieldSvg context={readOnlySafeContext}>
-                        <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                            <Items {...itemsProps}/>
-                        </FieldLayerContext.Provider>
-                    </FieldSvg>
-
-                    {!prioritizeSelection && selection}
-
-                    <FieldSvg context={readOnlySafeContext}>
-                        <FieldLayerContext.Provider value={FieldLayer.regular}>
-                            <Items {...itemsProps}/>
-                        </FieldLayerContext.Provider>
-                    </FieldSvg>
-
-                    {prioritizeSelection && selection}
-
-                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                        <FieldLayerContext.Provider value={FieldLayer.lines}>
-                            <Items {...itemsProps}/>
-                        </FieldLayerContext.Provider>
-                    </FieldSvg>
-
-                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                        <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
-                            <Items {...itemsProps}/>
-                        </FieldLayerContext.Provider>
-                    </FieldSvg>
-
-                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                        <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
-                            <Items {...itemsProps}/>
-                        </FieldLayerContext.Provider>
-                    </FieldSvg>
-
-                    <FieldSvg context={readOnlySafeContext} useShadow={false}>
-                        <FieldLayerContext.Provider value={FieldLayer.top}>
-                            <Items {...itemsProps}/>
-                        </FieldLayerContext.Provider>
-                    </FieldSvg>
-
-                    {renderCellsLayer("digits", (cellState, cell) => {
-                        const initialData = initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left];
-                        const cellExcludedDigits = excludedDigits[cell.top][cell.left];
-
-                        return !shouldSkipCellDigits(initialData, cellExcludedDigits, cellState) && <CellDigits
-                            context={readOnlySafeContext}
-                            data={cellState}
-                            initialData={initialData}
-                            excludedDigits={cellExcludedDigits}
-                            size={1}
-                            cellPosition={cell}
-                            isValidUserDigit={
-                                (digit) =>
-                                    !(enableConflictChecker || forceEnableConflictChecker) ||
-                                    disableConflictChecker ||
-                                    (digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.Off) ||
-                                    isValidUserDigit(
-                                        cell,
-                                        digit === undefined
-                                            ? userDigits
-                                            : mergeGivenDigitsMaps(userDigits, {[cell.top]: {[cell.left]: digit}}),
-                                        items,
-                                        readOnlySafeContext,
-                                        false,
-                                        digit !== undefined,
-                                        digit !== undefined && pencilmarksCheckerMode === PencilmarksCheckerMode.CheckObvious
-                                    )
-                            }
-                        />;
-                    }, {useShadow: true})}
-
-                    {isReady && renderCellsLayer("mouse-handler", (cellState, cellPosition) => <FieldCellMouseHandler
-                        context={readOnlySafeContext}
-                        cellPosition={cellPosition}
-                        handlers={cellGestureHandlers}
-                    />)}
                 </Absolute>
 
                 {loopHorizontally && fieldMargin && <>
@@ -471,7 +491,7 @@ interface ItemsProps<CellType, ExType = {}, ProcessedExType = {}> {
 
 const Items = <CellType, ExType = {}, ProcessedExType = {}>(
     {context, items}: ItemsProps<CellType, ExType, ProcessedExType>
-) => <FieldRegionsWithSameCoordsTransformation context={context}>
+) => <>
     {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
         if (!Component) {
             return null;
@@ -541,4 +561,4 @@ const Items = <CellType, ExType = {}, ProcessedExType = {}>(
             {...otherData}
         />;
     })}
-</FieldRegionsWithSameCoordsTransformation>;
+</>;

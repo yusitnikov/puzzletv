@@ -4,6 +4,7 @@ import {isSamePosition, Position} from "../layout/Position";
 export interface GridRegion extends Rect {
     transformCoords?: (position: Position) => Position;
     cells?: Position[];
+    zIndex?: number;
 }
 
 export const doesGridRegionContainCell = ({cells, top, left, width, height}: GridRegion, cell: Position) =>

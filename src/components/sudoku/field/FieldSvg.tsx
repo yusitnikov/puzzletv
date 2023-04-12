@@ -1,4 +1,3 @@
-import {svgShadowStyle} from "../../app/globals";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {indexesFromTo} from "../../../utils/indexes";
 import {ReactNode} from "react";
@@ -6,11 +5,10 @@ import {Position} from "../../../types/layout/Position";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 
 export interface FieldSvgProps extends PuzzleContextProps<any, any, any> {
-    useShadow?: boolean;
     children: ReactNode | ((offset: Position) => ReactNode);
 }
 
-export const FieldSvg = ({context: {puzzle, cellSize}, useShadow = true, children}: FieldSvgProps) => {
+export const FieldSvg = ({context: {puzzle, cellSize}, children}: FieldSvgProps) => {
     let {
         fieldSize: {fieldSize, rowsCount, columnsCount},
         fieldMargin: initialFieldMargin = 0,
@@ -43,7 +41,6 @@ export const FieldSvg = ({context: {puzzle, cellSize}, useShadow = true, childre
             width: totalWidth,
             height: totalWidth,
         }}
-        style={useShadow ? svgShadowStyle : undefined}
     >
         {indexesFromTo(loopVertically ? -1 : 0, loopVertically ? 1 : 0, true).flatMap(
             topOffset => indexesFromTo(loopHorizontally ? -1 : 0, loopHorizontally ? 1 : 0, true).map(
