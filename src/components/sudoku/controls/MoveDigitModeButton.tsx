@@ -6,11 +6,15 @@ import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {textColor} from "../../app/globals";
 import {ControlButton} from "./ControlButton";
 import {useCallback} from "react";
+import {emptyPosition} from "../../../types/layout/Position";
 
 export const MoveDigitModeButton = <CellType, ExType, ProcessedExType>(
     {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
 ) => {
     const {
+        puzzle: {
+            typeManager: {initialAngle = 0, initialScale = 1},
+        },
         cellSizeForSidePanel: cellSize,
         state: {processed: {cellWriteMode}},
         onStateChange,
@@ -19,8 +23,15 @@ export const MoveDigitModeButton = <CellType, ExType, ProcessedExType>(
     const translate = useTranslate();
 
     const handleResetPosition = useCallback(
-        () => onStateChange({loopOffset: {top: 0, left: 0}, animatingLoopOffset: false}),
-        [onStateChange]
+        () => onStateChange({
+            loopOffset: emptyPosition,
+            animatingLoopOffset: false,
+            angle: initialAngle,
+            animatingAngle: false,
+            scale: initialScale,
+            animatingScale: false,
+        }),
+        [onStateChange, initialAngle, initialScale]
     )
 
     return <>
