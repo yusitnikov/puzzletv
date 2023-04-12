@@ -27,7 +27,7 @@ export const CellBackground = ({context, cellPosition, colors, noOpacity, size =
 
     const customCellRect: Rect = usePureMemo(
         () => areCustomBounds
-            ? getRegionBoundingBox(customBounds.borders.flat())
+            ? getRegionBoundingBox(customBounds.borders.flat(), 0)
             : {
                 left: 0,
                 top: 0,

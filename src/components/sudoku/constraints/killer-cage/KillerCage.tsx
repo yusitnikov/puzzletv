@@ -46,9 +46,9 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
 ) => {
     const {widthCoeff} = useDigitComponentType();
 
-    const points = useMemo(() => getRegionBorders(cells), [cells]);
+    const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
 
-    const boundingBox = useMemo(() => getRegionBoundingBox(cells), [cells]);
+    const boundingBox = useMemo(() => getRegionBoundingBox(cells, 1), [cells]);
     const bottom = boundingBox.top + boundingBox.height;
     const right = useMemo(
         () => Math.max(...cells.filter(cell => cell.top === bottom - 1).map(cell => cell.left)) + 1,

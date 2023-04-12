@@ -11,33 +11,36 @@ export const getRegionMap = <T>(cells: Position[], value: T) => {
     return map;
 };
 
-export const getRegionBoundingBox = (cells: Position[]): Rect => {
+export const getRegionBoundingBox = (cells: Position[], cellWidth: number): Rect => {
     if (!cells.length) {
         return emptyRect;
     }
 
+    const tops = cells.map(cell => cell.top);
+    const lefts = cells.map(cell => cell.left);
+
     const min: Position = {
-        left: Math.min(...cells.map(cell => cell.left)),
-        top: Math.min(...cells.map(cell => cell.top)),
+        top: Math.min(...tops),
+        left: Math.min(...lefts),
     };
     const max: Position = {
-        left: Math.max(...cells.map(cell => cell.left)),
-        top: Math.max(...cells.map(cell => cell.top)),
+        top: Math.max(...tops),
+        left: Math.max(...lefts),
     };
 
     return {
         ...min,
-        width: max.left + 1 - min.left,
-        height: max.top + 1 - min.top,
+        width: max.left + cellWidth - min.left,
+        height: max.top + cellWidth - min.top,
     };
 };
 
-export const getRegionBorders = (cells: Position[], includeLoopedCell = false): Position[] => {
+export const getRegionBorders = (cells: Position[], cellWidth: number, includeLoopedCell = false): Position[] => {
     if (!cells.length) {
         return [];
     }
 
-    const boundingBox = getRegionBoundingBox(cells);
+    const boundingBox = getRegionBoundingBox(cells, cellWidth);
     const cellsMap = getRegionMap(cells, true);
 
     const bordersGraph: Record<string, Position[]> = {};

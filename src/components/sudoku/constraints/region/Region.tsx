@@ -22,7 +22,7 @@ import {ProcessedGameStateEx} from "../../../../types/sudoku/GameState";
 export const regionTag = "region";
 
 export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps) => {
-    const points = useMemo(() => getRegionBorders(cells, true), [cells]);
+    const points = useMemo(() => getRegionBorders(cells, 1, true), [cells]);
 
     return <RoundedPolyLine
         points={points}
