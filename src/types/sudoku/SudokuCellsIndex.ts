@@ -26,6 +26,8 @@ import {PuzzleContext} from "./PuzzleContext";
 export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     public readonly allCells: CellInfo<CellType, ExType, ProcessedExType>[][];
 
+    public readonly cache: Record<string, any> = {};
+
     private readonly realCellPointMap: Record<string, SudokuCellPointInfo> = {};
     private readonly borderLineMap: Record<string, Record<string, SudokuCellBorderInfo>> = {};
 
@@ -518,6 +520,8 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
 }
 
 export class SudokuCellsIndexForState<CellType, ExType, ProcessedExType> {
+    public readonly cache: Record<string, any> = {};
+
     private readonly context: PuzzleContext<CellType, ExType, ProcessedExType>;
     private readonly currentFieldState: FieldState<CellType>;
 

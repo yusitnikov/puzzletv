@@ -6,6 +6,7 @@ export enum PuzzleImportPuzzleType {
     Rotatable = "rotatable",
     SafeCracker = "safe-cracker",
     InfiniteRings = "infinite-rings",
+    Jigsaw = "jigsaw",
 }
 
 export interface PuzzleImportOptions {

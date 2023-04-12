@@ -53,6 +53,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         PuzzleImportPuzzleType.Rotatable,
         PuzzleImportPuzzleType.SafeCracker,
         PuzzleImportPuzzleType.InfiniteRings,
+        PuzzleImportPuzzleType.Jigsaw,
     ].includes(type);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
@@ -124,6 +125,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             <option value={PuzzleImportPuzzleType.InfiniteRings}>Infinite rings</option>
                             <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
                             <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
+                            <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
                         </select>
                     </label>
                 </p>

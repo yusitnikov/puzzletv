@@ -139,6 +139,20 @@ export const getAveragePosition = (positions: Position[]): Position => {
     };
 };
 
+export const rotateVectorClockwise = ({top, left}: Position, angle: number, base = emptyPosition): Position => {
+    angle *= Math.PI / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    top -= base.top;
+    left -= base.left;
+
+    return {
+        top: base.top + top * cos + left * sin,
+        left: base.left + left * cos - top * sin,
+    };
+};
+
 export class PositionSet extends HashSet<Position> {
     constructor(items: Position[] = []) {
         super(items, {hasher: stringifyPosition});

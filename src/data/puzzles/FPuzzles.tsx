@@ -76,6 +76,7 @@ import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/
 import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
 import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
 import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
+import {JigsawSudokuTypeManager} from "../../sudokuTypes/jigsaw/types/JigsawSudokuTypeManager";
 import {
     PuzzleImportOptions,
     PuzzleImportPuzzleType,
@@ -130,6 +131,7 @@ export const loadByFPuzzlesObject = (
             Number(visibleRingsCount),
             Number(startOffset),
         ),
+        [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager,
     };
 
     let typeManager = typesMap[type] ?? regularTypeManager;
