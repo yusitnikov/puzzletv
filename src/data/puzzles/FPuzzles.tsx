@@ -76,7 +76,11 @@ import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/
 import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
 import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
 import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
-import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
+import {
+    PuzzleImportOptions,
+    PuzzleImportPuzzleType,
+    sanitizeImportOptions
+} from "../../types/sudoku/PuzzleImportOptions";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -718,44 +722,11 @@ export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
             throw new Error("Missing parameter");
         }
         const puzzleJson = decodeFPuzzlesString(load);
-        console.log("Importing from f-puzzles:", puzzleJson);
-
-        const {
-            type,
-            htmlRules,
-            tesseract,
-            fillableDigitalDisplay,
-            noSpecialRules,
-            loopX,
-            loopY,
-            "product-arrow": productArrow,
-            yajilinFog,
-            cosmeticsBehindFog,
-            safeCrackerCodeLength,
-            visibleRingsCount,
-            startOffset,
-            allowOverrideColors,
-        } = params as Omit<PuzzleImportOptions, "load">;
-        const sanitizedParams = {
-            type,
-            htmlRules,
-            tesseract,
-            fillableDigitalDisplay,
-            noSpecialRules,
-            loopX,
-            loopY,
-            productArrow,
-            yajilinFog,
-            cosmeticsBehindFog,
-            safeCrackerCodeLength,
-            visibleRingsCount,
-            startOffset,
-            allowOverrideColors,
-        };
+        console.debug("Importing from f-puzzles:", puzzleJson);
 
         return {
             ...loadByFPuzzlesObject(puzzleJson, "f-puzzles", params),
-            saveStateKey: `f-puzzles-${sha1().update(load + JSON.stringify(sanitizedParams)).digest("hex").substring(0, 20)}`,
+            saveStateKey: `f-puzzles-${sha1().update(load + JSON.stringify(sanitizeImportOptions(params))).digest("hex").substring(0, 20)}`,
         };
     }
 };
