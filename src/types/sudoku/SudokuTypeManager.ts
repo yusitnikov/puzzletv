@@ -8,7 +8,7 @@ import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
 import {getIsSamePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
-import {RectWithTransformation} from "../layout/Rect";
+import {GridRegion} from "./GridRegion";
 import {Constraint, getAllPuzzleConstraints} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
@@ -162,9 +162,7 @@ export interface SudokuTypeManager<CellType, ExType = {}, ProcessedExType = {}> 
     isOddTransformCoords?: boolean;
 
     // Get rectangles of non-modified coords that get the same transformation matrix by transformCoords
-    getRegionsWithSameCoordsTransformation?(
-        context: PuzzleContext<CellType, ExType, ProcessedExType>
-    ): RectWithTransformation[];
+    getRegionsWithSameCoordsTransformation?(context: PuzzleContext<CellType, ExType, ProcessedExType>): GridRegion[];
 
     items?: Constraint<CellType, any, ExType, ProcessedExType>[]
         | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => Constraint<CellType, any, ExType, ProcessedExType>[]);

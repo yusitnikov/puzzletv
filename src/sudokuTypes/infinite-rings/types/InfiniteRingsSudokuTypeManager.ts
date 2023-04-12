@@ -2,7 +2,8 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
-import {getRectPoints, Rect, RectWithTransformation} from "../../../types/layout/Rect";
+import {getRectPoints, Rect} from "../../../types/layout/Rect";
+import {GridRegion} from "../../../types/sudoku/GridRegion";
 import {Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {indexes} from "../../../utils/indexes";
@@ -175,7 +176,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 puzzle: {fieldSize: {rowsCount: fieldSize}},
                 state: {processed: {animated: {scaleLog: ringOffset}}},
             }
-        ): RectWithTransformation[] {
+        ): GridRegion[] {
             const ringsCount = fieldSize / 2 - 1;
             const loopedRingOffset = loop(ringOffset, ringsCount);
             const scaleCoeff = Math.pow(2, loopedRingOffset);
