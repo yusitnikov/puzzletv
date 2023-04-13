@@ -90,8 +90,10 @@ export interface PuzzleDefinitionLoader<T extends AnyPTM> {
     loadPuzzle: (params: any) => Omit<PuzzleDefinition<T>, "noIndex" | "slug"> & {slug?: string};
 }
 
+export type PuzzleDefinitionOrLoader<T extends AnyPTM> = PuzzleDefinition<T> | PuzzleDefinitionLoader<T>;
+
 export const loadPuzzle = <T extends AnyPTM>(
-    puzzleOrLoader: PuzzleDefinition<T> | PuzzleDefinitionLoader<T>,
+    puzzleOrLoader: PuzzleDefinitionOrLoader<T>,
     params: any = {},
 ): PuzzleDefinition<T> => {
     const {

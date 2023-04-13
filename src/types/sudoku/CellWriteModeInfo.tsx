@@ -50,7 +50,7 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     onGestureEnd?(props: GestureOnEndProps, context: PuzzleContext<T>): void;
 }
 
-export const allCellWriteModeInfos: CellWriteModeInfo<AnyPTM>[] = [
+export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[] => [
     {
         mode: CellWriteMode.main,
         isDigitMode: true,
@@ -86,9 +86,9 @@ export const allCellWriteModeInfos: CellWriteModeInfo<AnyPTM>[] = [
             size={cellSize}
         />,
     },
-    ShadingCellWriteModeInfo,
-    LinesCellWriteModeInfo,
-    MoveCellWriteModeInfo,
+    ShadingCellWriteModeInfo(),
+    LinesCellWriteModeInfo(),
+    MoveCellWriteModeInfo(),
 ];
 
 export const getAllowedCellWriteModeInfos = <T extends AnyPTM>(
@@ -105,7 +105,7 @@ export const getAllowedCellWriteModeInfos = <T extends AnyPTM>(
     } = puzzle;
 
     return [
-        ...(allCellWriteModeInfos as unknown as CellWriteModeInfo<T>[]).filter(
+        ...allCellWriteModeInfos<T>().filter(
             ({mode, isDigitMode, isActiveForPuzzle}) => !disabledCellWriteModes.includes(mode) && (
                 isDigitMode
                     ? digitsCount !== 0

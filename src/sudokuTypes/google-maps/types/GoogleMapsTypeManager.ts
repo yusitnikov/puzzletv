@@ -3,16 +3,16 @@ import {emptyPosition, Position} from "../../../types/layout/Position";
 import {mergeGameStateUpdates, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {positionToLatLngLiteral} from "../utils/googleMapsCoords";
 import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
-import {GoogleMapsPTM} from "./GoogleMapsPTM";
+import {AnyGoogleMapsPTM} from "./GoogleMapsPTM";
 
-export const GoogleMapsTypeManager = <CellType>(
-    baseTypeManager: SudokuTypeManager<GoogleMapsPTM<CellType>>
-): SudokuTypeManager<GoogleMapsPTM<CellType>> => ({
+export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
+    baseTypeManager: SudokuTypeManager<T>
+): SudokuTypeManager<T> => ({
     ...baseTypeManager,
     extraCellWriteModes: [
         ...baseTypeManager.extraCellWriteModes ?? [],
         {
-            ...MoveCellWriteModeInfo,
+            ...MoveCellWriteModeInfo(),
             disableCellHandlers: true,
         },
     ],
@@ -22,8 +22,8 @@ export const GoogleMapsTypeManager = <CellType>(
         map: undefined as any,
         overlay: undefined as any,
         renderVersion: 0,
-    },
-    keepStateOnRestart(state): PartialGameStateEx<GoogleMapsPTM<CellType>> {
+    } as T["stateEx"],
+    keepStateOnRestart(state): PartialGameStateEx<T> {
         const {extension: {zoom, center, map, overlay, renderVersion}} = state;
 
         return mergeGameStateUpdates(

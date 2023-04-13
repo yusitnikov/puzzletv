@@ -54,7 +54,9 @@ export const givenDigitsMapToArray = <CellType>(map: GivenDigitsMap<CellType>) =
 export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) =>
     processGivenDigitsMaps(([first]) => first, maps);
 
-export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeManager<AnyPTM<CellType>>, map1: GivenDigitsMap<CellType>, map2: GivenDigitsMap<CellType>) => {
+export const areSameGivenDigitsMaps = <T extends AnyPTM>(
+    {areSameCellData}: SudokuTypeManager<T>, map1: GivenDigitsMap<T["cell"]>, map2: GivenDigitsMap<T["cell"]>
+) => {
     const mergedMap = mergeGivenDigitsMaps(map1, map2);
 
     for (const [rowIndexStr, mergedRow] of Object.entries(mergedMap)) {

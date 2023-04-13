@@ -8,14 +8,16 @@ import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData
 import {getRectCenter} from "../../../types/layout/Rect";
 import {JigsawPTM} from "./JigsawPTM";
 
+const base = MoveCellWriteModeInfo<JigsawPTM>();
+
 export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
-    ...MoveCellWriteModeInfo,
+    ...base,
     disableCellHandlers: false,
     handlesRightMouseClick: true,
     onCornerClick(context, cellPosition, exactPosition, isRightClick) {
         const pieceIndex = getJigsawPieceIndexByCell(context.cellsIndex, cellPosition);
         if (pieceIndex === undefined) {
-            MoveCellWriteModeInfo.onCornerClick?.(context, cellPosition, exactPosition, isRightClick);
+            base.onCornerClick?.(context, cellPosition, exactPosition, isRightClick);
             return;
         }
 
@@ -42,7 +44,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
 
         const pieceIndex = getJigsawPieceIndexByGesture(cellsIndex, gesture);
         if (pieceIndex === undefined) {
-            MoveCellWriteModeInfo.onMove?.(props, context, fieldRect);
+            base.onMove?.(props, context, fieldRect);
             return;
         }
 
@@ -87,7 +89,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
 
         const pieceIndex = getJigsawPieceIndexByGesture(cellsIndex, gesture);
         if (pieceIndex === undefined) {
-            MoveCellWriteModeInfo.onGestureEnd?.(props, context);
+            base.onGestureEnd?.(props, context);
             return;
         }
 

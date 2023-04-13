@@ -1,4 +1,4 @@
-import {loadPuzzle, PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {loadPuzzle, PuzzleDefinitionOrLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
 import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {
@@ -36,7 +36,7 @@ import {ToroidalRenbanmometers} from "./ToroidalRenbanmometers";
 import {PenroseTiles} from "./PenroseTiles";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
-export const AllPuzzles: (PuzzleDefinition<AnyPTM> | PuzzleDefinitionLoader<AnyPTM>)[] = [
+export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
     EmptyRegular,
     EmptyChaosConstruction,

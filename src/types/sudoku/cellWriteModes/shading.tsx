@@ -3,7 +3,7 @@ import type {CellWriteModeInfo} from "../CellWriteModeInfo";
 import {shadingAction, shadingStartAction} from "../GameStateAction";
 import {AnyPTM} from "../PuzzleTypeMap";
 
-export const ShadingCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
+export const ShadingCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.shading,
     isActiveForPuzzle: ({enableShading = false}) => enableShading,
     // color and shading are never together, so it's ok to have the same hotkey
@@ -14,4 +14,4 @@ export const ShadingCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
         context.onStateChange(shadingStartAction(context, cellPosition, isRightButton)),
     onCornerEnter: (context, cellPosition) =>
         context.onStateChange(shadingAction(context, cellPosition, context.state.dragAction)),
-};
+});

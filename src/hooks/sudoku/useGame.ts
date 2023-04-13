@@ -19,7 +19,6 @@ import {
     GameStateAction,
     GameStateActionCallback,
     GameStateActionOrCallback,
-    GameStateActionType
 } from "../../types/sudoku/GameStateAction";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {useDiffEffect} from "../useDiffEffect";
@@ -106,7 +105,7 @@ export const useGame = <T extends AnyPTM>(
         messages: MessageWithClientId[]
     ) => {
         const allActionTypes = [
-            ...(coreGameStateActionTypes as unknown as GameStateActionType<any, T>[]),
+            ...coreGameStateActionTypes<T>(),
             ...(puzzle.typeManager.supportedActionTypes || []),
         ];
 

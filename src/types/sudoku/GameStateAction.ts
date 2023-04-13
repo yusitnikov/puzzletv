@@ -150,7 +150,7 @@ export const shadingStartAction = <T extends AnyPTM>(
 }
 // endregion
 
-export const coreGameStateActionTypes: GameStateActionType<any, AnyPTM>[] = [
+export const coreGameStateActionTypes = <T extends AnyPTM>(): GameStateActionType<any, T>[] => [
     undoActionType(),
     redoActionType(),
     clearSelectionActionType(),

@@ -6,7 +6,7 @@ import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {PageLayout} from "../layout/page-layout/PageLayout";
 import {PuzzlesList} from "./PuzzlesList";
 import {buildLink} from "../../utils/link";
-import {loadPuzzle, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {loadPuzzle} from "../../types/sudoku/PuzzleDefinition";
 import {GamesList} from "./GamesList";
 import {HomePage} from "./HomePage";
 import {ContactMe} from "./ContactMe";
@@ -14,7 +14,6 @@ import {ForSetters} from "./ForSetters";
 import {FPuzzlesWizardPage, fPuzzlesWizardPageTitle} from "./FPuzzlesWizardPage";
 import {HowToImport} from "./HowToImport";
 import {useGesturesGlobalEvents} from "../../utils/gestures";
-import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -28,7 +27,7 @@ export const App = ({onPageLoaded}: AppProps) => {
 
     useGesturesGlobalEvents();
 
-    const puzzle = useMemo<PuzzleDefinition<AnyPTM> | undefined>(() => {
+    const puzzle = useMemo(() => {
         for (const puzzleOrLoader of AllPuzzles) {
             if (slug === puzzleOrLoader.slug) {
                 const puzzle = loadPuzzle(puzzleOrLoader, params);

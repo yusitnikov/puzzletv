@@ -7,7 +7,7 @@ import {CellBackground} from "../../../components/sudoku/cell/CellBackground";
 import {CellDataSet} from "../CellDataSet";
 import {AnyPTM} from "../PuzzleTypeMap";
 
-export const LinesCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
+export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.lines,
     isActiveForPuzzle: ({allowDrawing = []}) => allowDrawing.length !== 0,
     hotKeyStr: ["Alt"],
@@ -38,4 +38,4 @@ export const LinesCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
         disableLineColors ? undefined : selectedColor,
     setCurrentButton: ({onStateChange}, index) => onStateChange({selectedColor: index}),
     handlesRightMouseClick: true,
-};
+});

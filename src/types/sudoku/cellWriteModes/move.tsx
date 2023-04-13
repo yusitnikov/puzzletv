@@ -6,7 +6,7 @@ import {getRectCenter} from "../../layout/Rect";
 import {isCellGestureExtraData} from "../CellGestureExtraData";
 import {AnyPTM} from "../PuzzleTypeMap";
 
-export const MoveCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
+export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.move,
     isActiveForPuzzle: (
         {
@@ -56,7 +56,7 @@ export const MoveCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
             onStateChange,
         }
     ) => onStateChange(({angle, scale}) => {
-        let result: PartialGameStateEx<AnyPTM> = {};
+        let result: PartialGameStateEx<T> = {};
         if (allowRotation && !isFreeRotation && angleStep) {
             result = {
                 ...result,
@@ -73,4 +73,4 @@ export const MoveCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
         }
         return result;
     }),
-};
+});
