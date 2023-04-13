@@ -524,7 +524,7 @@ export class SudokuCellsIndexForState<T extends AnyPTM> {
     public readonly cache: Record<string, any> = {};
 
     private readonly context: PuzzleContext<T>;
-    private readonly currentFieldState: FieldState<T["cell"]>;
+    private readonly currentFieldState: FieldState<T>;
 
     public readonly getCenterLineSegments = lazy(
         () => this.puzzleIndex.getCenterLineSegments(this.currentFieldState.lines.items)

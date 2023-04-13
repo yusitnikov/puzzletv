@@ -27,7 +27,7 @@ const corners: Position[] = [
 
 export interface CellDigitsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
-    data: Partial<CellState<T["cell"]>>;
+    data: Partial<CellState<T>>;
     initialData?: T["cell"];
     excludedDigits?: SetInterface<T["cell"]>;
     size: number;
@@ -36,7 +36,11 @@ export interface CellDigitsProps<T extends AnyPTM> {
     isValidUserDigit?: (digit?: T["cell"]) => boolean;
 }
 
-export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, excludedDigits: SetInterface<CellType> | undefined, data: Partial<CellState<CellType>>) =>
+export const shouldSkipCellDigits = <T extends AnyPTM>(
+    initialData: T["cell"] | undefined,
+    excludedDigits: SetInterface<T["cell"]> | undefined,
+    data: Partial<CellState<T>>,
+) =>
     initialData === undefined && !excludedDigits?.size && isEmptyCellState(data, true);
 
 export const CellDigits = <T extends AnyPTM>(

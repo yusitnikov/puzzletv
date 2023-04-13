@@ -94,13 +94,13 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         isGlobal: boolean,
         clientId: string,
         cellWriteMode: CellWriteMode,
-        cellState: CellStateEx<T["cell"]>,
+        cellState: CellStateEx<T>,
         cellData: T["cell"],
         position: Position,
         context: PuzzleContext<T>,
-        defaultResult: Partial<CellStateEx<T["cell"]>>,
+        defaultResult: Partial<CellStateEx<T>>,
         cache: any
-    ): Partial<CellStateEx<T["cell"]>>;
+    ): Partial<CellStateEx<T>>;
 
     extraCellWriteModes?: CellWriteModeInfo<T>[];
     disabledCellWriteModes?: CellWriteMode[];

@@ -100,7 +100,7 @@ export const getAllPuzzleConstraints = <T extends AnyPTM>(
 
 export const prepareGivenDigitsMapForConstraints = <T extends AnyPTM>(
     {puzzle: {initialDigits = {}}, state: {initialDigits: stateInitialDigits = {}}}: PuzzleContext<T>,
-    cells: CellState<T["cell"]>[][]
+    cells: CellState<T>[][]
 ) => mergeGivenDigitsMaps(gameStateGetCurrentGivenDigitsByCells(cells), initialDigits, stateInitialDigits);
 
 export const normalizeConstraintCells = <T extends AnyPTM>(positions: Position[], puzzle: PuzzleDefinition<T>) =>

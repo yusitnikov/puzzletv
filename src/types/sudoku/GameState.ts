@@ -57,12 +57,12 @@ import {getFinalCellWriteMode} from "../../hooks/sudoku/useFinalCellWriteMode";
 import {ControlKeysState} from "../../hooks/useControlKeysState";
 import {AnyPTM} from "./PuzzleTypeMap";
 
-export interface GameState<CellType> {
-    fieldStateHistory: FieldStateHistory<CellType>;
+export interface GameState<T extends AnyPTM> {
+    fieldStateHistory: FieldStateHistory<T>;
     persistentCellWriteMode: CellWriteMode;
 
-    initialDigits: GivenDigitsMap<CellType>;
-    excludedDigits: GivenDigitsMap<SetInterface<CellType>>;
+    initialDigits: GivenDigitsMap<T["cell"]>;
+    excludedDigits: GivenDigitsMap<SetInterface<T["cell"]>>;
 
     isMultiSelection: boolean;
     selectedCells: SetInterface<Position>;
@@ -86,7 +86,7 @@ export interface GameState<CellType> {
 
     lives: number;
 
-    fogDemoFieldStateHistory?: FieldStateHistory<CellType>;
+    fogDemoFieldStateHistory?: FieldStateHistory<T>;
 
     currentPlayer?: string;
     playerObjects: Record<string, PlayerObjectInfo>;
@@ -100,17 +100,17 @@ export interface GameState<CellType> {
     highlightSeenCells: boolean;
 }
 
-export interface GameStateEx<T extends AnyPTM> extends GameState<T["cell"]> {
+export interface GameStateEx<T extends AnyPTM> extends GameState<T> {
     extension: T["stateEx"];
 }
 
-export type PartialGameStateEx<T extends AnyPTM> = Partial<GameState<T["cell"]>> & {
+export type PartialGameStateEx<T extends AnyPTM> = Partial<GameState<T>> & {
     extension?: Partial<T["stateEx"]>;
 }
 
-export type ProcessedGameStateAnimatedValues = Pick<GameState<any>, "loopOffset" | "angle" | "scale">;
+export type ProcessedGameStateAnimatedValues = Pick<GameState<AnyPTM>, "loopOffset" | "angle" | "scale">;
 
-export interface ProcessedGameState<T extends AnyPTM> extends GameState<T["cell"]> {
+export interface ProcessedGameState<T extends AnyPTM> extends GameState<T> {
     processed: {
         cellWriteMode: CellWriteMode;
         cellWriteModeInfo: CellWriteModeInfo<T>;
@@ -407,15 +407,15 @@ export const setAllShareState = <T extends AnyPTM>(
 // endregion
 
 // region History
-export const gameStateGetCurrentFieldState = <CellType>(
-    {fieldStateHistory, fogDemoFieldStateHistory}: GameState<CellType>,
+export const gameStateGetCurrentFieldState = <T extends AnyPTM>(
+    {fieldStateHistory, fogDemoFieldStateHistory}: GameState<T>,
     useFogDemoState = false
 ) => fieldStateHistoryGetCurrent(
     (useFogDemoState ? fogDemoFieldStateHistory : undefined) ?? fieldStateHistory
 );
 
-export const gameStateGetCurrentGivenDigitsByCells = <CellType>(cells: CellState<CellType>[][]) => {
-    const result: GivenDigitsMap<CellType> = {};
+export const gameStateGetCurrentGivenDigitsByCells = <T extends AnyPTM>(cells: CellState<T>[][]) => {
+    const result: GivenDigitsMap<T["cell"]> = {};
 
     cells.forEach(
         (row, rowIndex) => row.forEach(
@@ -431,35 +431,35 @@ export const gameStateGetCurrentGivenDigitsByCells = <CellType>(cells: CellState
     return result;
 };
 
-export const gameStateGetCurrentGivenDigits = <CellType>(state: GameState<CellType>) =>
+export const gameStateGetCurrentGivenDigits = <T extends AnyPTM>(state: GameState<T>) =>
     gameStateGetCurrentGivenDigitsByCells(gameStateGetCurrentFieldState(state).cells);
 
 export const gameStateUndo = <T extends AnyPTM>(
-    {fieldStateHistory}: GameState<T["cell"]>
+    {fieldStateHistory}: GameState<T>
 ): PartialGameStateEx<T> => ({
     fieldStateHistory: fieldStateHistoryUndo(fieldStateHistory),
 });
 
 export const gameStateRedo = <T extends AnyPTM>(
-    {fieldStateHistory}: GameState<T["cell"]>
+    {fieldStateHistory}: GameState<T>
 ): PartialGameStateEx<T> => ({
     fieldStateHistory: fieldStateHistoryRedo(fieldStateHistory),
 });
 // endregion
 
 // region Selected cells
-export const gameStateAreAllSelectedCells = <CellType>(
-    state: GameState<CellType>,
-    predicate: (cellState: CellState<CellType>, position: Position) => boolean
+export const gameStateAreAllSelectedCells = <T extends AnyPTM>(
+    state: GameState<T>,
+    predicate: (cellState: CellState<T>, position: Position) => boolean
 ) => areAllFieldStateCells(
     gameStateGetCurrentFieldState(state),
     state.selectedCells.items,
     predicate
 );
 
-export const gameStateIsAnySelectedCell = <CellType>(
-    state: GameState<CellType>,
-    predicate: (cellState: CellState<CellType>, position: Position) => boolean
+export const gameStateIsAnySelectedCell = <T extends AnyPTM>(
+    state: GameState<T>,
+    predicate: (cellState: CellState<T>, position: Position) => boolean
 ) => isAnyFieldStateCell(
     gameStateGetCurrentFieldState(state),
     state.selectedCells.items,
@@ -509,7 +509,7 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
         || stateInitialDigits?.[cellPosition.top]?.[cellPosition.left]
         || usersDigit;
 
-    let filter: (cell: CellState<T["cell"]>, initialDigit?: T["cell"]) => boolean;
+    let filter: (cell: CellState<T>, initialDigit?: T["cell"]) => boolean;
     if (mainDigit) {
         filter = ({usersDigit}, initialDigit) => {
             const otherMainDigit = initialDigit || usersDigit;
@@ -560,9 +560,7 @@ export const gameStateSelectAllCells = <T extends AnyPTM>(
     );
 };
 
-export const gameStateClearSelectedCells = <T extends AnyPTM>(
-    state: GameState<T["cell"]>
-): PartialGameStateEx<T> => ({
+export const gameStateClearSelectedCells = <T extends AnyPTM>(state: GameState<T>): PartialGameStateEx<T> => ({
     selectedCells: state.selectedCells.clear(),
 });
 
@@ -648,7 +646,7 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
 export const gameStateProcessSelectedCells = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     clientId: string,
-    fieldStateProcessor: (cellState: CellStateEx<T["cell"]>, position: Position) => Partial<CellStateEx<T["cell"]>>
+    fieldStateProcessor: (cellState: CellStateEx<T>, position: Position) => Partial<CellStateEx<T>>
 ): PartialGameStateEx<T> => {
     const {puzzle: {typeManager}, state} = context;
 
@@ -753,7 +751,7 @@ const getDefaultDigitHandler = <T extends AnyPTM>(
     digit: number,
     isGlobal: boolean,
     cellData: (position: Position) => T["cell"]
-): (cellState: CellStateEx<T["cell"]>, position: Position) => Partial<CellStateEx<T["cell"]>> => {
+): (cellState: CellStateEx<T>, position: Position) => Partial<CellStateEx<T>> => {
     if (isGlobal) {
         const isInitialDigit = ({top, left}: Position): boolean =>
             initialDigits?.[top]?.[left] !== undefined || state.initialDigits[top]?.[left] !== undefined;
@@ -1014,7 +1012,7 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
 
 export const gameStateDeleteAllLines = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
-    state: GameState<T["cell"]>
+    state: GameState<T>
 ): PartialGameStateEx<T> => ({
     fieldStateHistory: fieldStateHistoryAddState(
         puzzle.typeManager,
@@ -1128,7 +1126,7 @@ export const gameStateSetCellMark = <T extends AnyPTM>(
     };
 };
 
-export const gameStateGetCellShading = <CellType>({colors}: CellState<CellType>) =>
+export const gameStateGetCellShading = <T extends AnyPTM>({colors}: CellState<T>) =>
     colors.contains(CellColor.shaded)
         ? DragAction.SetTrue
         : colors.contains(CellColor.unshaded)

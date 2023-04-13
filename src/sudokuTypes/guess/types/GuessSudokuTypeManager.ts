@@ -33,7 +33,7 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(
         },
         defaultResult,
         cache
-    ): Partial<CellStateEx<number>> {
+    ): Partial<CellStateEx<T>> {
         const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
 
         if (!isGlobal) {

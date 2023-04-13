@@ -10,7 +10,7 @@ export interface CellWriteModeButtonProps<T extends AnyPTM> {
     cellWriteMode: CellWriteMode;
     top: number;
     left?: number;
-    data: Partial<CellState<T["cell"]>> | ((contentSize: number) => ReactNode);
+    data: Partial<CellState<T>> | ((contentSize: number) => ReactNode);
     title?: string;
 
     context: PuzzleContext<T>;

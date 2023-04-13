@@ -5,29 +5,27 @@ import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellDataSet} from "./CellDataSet";
 import {AnyPTM} from "./PuzzleTypeMap";
 
-export interface CellState<CellType> {
-    usersDigit?: CellType;
-    centerDigits: SetInterface<CellType>;
-    cornerDigits: SetInterface<CellType>;
+export interface CellState<T extends AnyPTM> {
+    usersDigit?: T["cell"];
+    centerDigits: SetInterface<T["cell"]>;
+    cornerDigits: SetInterface<T["cell"]>;
     colors: SetInterface<CellColor>;
 }
 
-export interface CellStateEx<CellType> extends CellState<CellType> {
-    initialDigit?: CellType;
-    excludedDigits: SetInterface<CellType>;
+export interface CellStateEx<T extends AnyPTM> extends CellState<T> {
+    initialDigit?: T["cell"];
+    excludedDigits: SetInterface<T["cell"]>;
     isInvalid?: boolean;
 }
 
-export const createEmptyCellState = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>
-): CellState<T["cell"]> => ({
+export const createEmptyCellState = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>): CellState<T> => ({
     centerDigits: new CellDataSet(puzzle),
     cornerDigits: new CellDataSet(puzzle),
     colors: new PlainValueSet<CellColor>(),
 });
 
 export const serializeCellState = <T extends AnyPTM>(
-    {usersDigit, centerDigits, cornerDigits, colors}: CellState<T["cell"]>,
+    {usersDigit, centerDigits, cornerDigits, colors}: CellState<T>,
     {serializeCellData}: SudokuTypeManager<T>
 ) => ({
     usersDigit: usersDigit ? serializeCellData(usersDigit) : undefined,
@@ -39,19 +37,19 @@ export const serializeCellState = <T extends AnyPTM>(
 export const unserializeCellState = <T extends AnyPTM>(
     {usersDigit, centerDigits, cornerDigits, colors}: any,
     puzzle: PuzzleDefinition<T>
-): CellState<T["cell"]> => ({
+): CellState<T> => ({
     usersDigit: usersDigit ? puzzle.typeManager.unserializeCellData(usersDigit) : undefined,
     centerDigits: CellDataSet.unserialize(puzzle, centerDigits),
     cornerDigits: CellDataSet.unserialize(puzzle, cornerDigits),
     colors: PlainValueSet.unserialize<CellColor>(colors),
 });
 
-export const isEmptyCellState = ({usersDigit, centerDigits, cornerDigits, colors}: Partial<CellState<any>>, ignoreColors = false) =>
+export const isEmptyCellState = <T extends AnyPTM>({usersDigit, centerDigits, cornerDigits, colors}: Partial<CellState<T>>, ignoreColors = false) =>
     usersDigit === undefined && !centerDigits?.size && !cornerDigits?.size && (ignoreColors || !colors?.size);
 
 export const cloneCellState = <T extends AnyPTM>(
     {cloneCellData}: SudokuTypeManager<T>,
-    {usersDigit, centerDigits, cornerDigits, colors}: CellState<T["cell"]>
+    {usersDigit, centerDigits, cornerDigits, colors}: CellState<T>
 ) => ({
     usersDigit: usersDigit && cloneCellData(usersDigit),
     centerDigits: centerDigits.clone(),
@@ -61,8 +59,8 @@ export const cloneCellState = <T extends AnyPTM>(
 
 export const areCellStatesEqual = <T extends AnyPTM>(
     {areSameCellData}: SudokuTypeManager<T>,
-    {usersDigit, centerDigits, cornerDigits, colors}: CellState<T["cell"]>,
-    {usersDigit: usersDigit2, centerDigits: centerDigits2, cornerDigits: cornerDigits2, colors: colors2}: CellState<T["cell"]>
+    {usersDigit, centerDigits, cornerDigits, colors}: CellState<T>,
+    {usersDigit: usersDigit2, centerDigits: centerDigits2, cornerDigits: cornerDigits2, colors: colors2}: CellState<T>
 ) =>
     typeof usersDigit === typeof usersDigit2 && (!usersDigit || areSameCellData(usersDigit, usersDigit2!, undefined, false)) &&
     centerDigits.equals(centerDigits2) && cornerDigits.equals(cornerDigits2) && colors.equals(colors2);

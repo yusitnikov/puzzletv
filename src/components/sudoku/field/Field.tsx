@@ -211,7 +211,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
 
     const renderCellsLayer = (
         keyPrefix: string,
-        renderer: (cellState: CellState<T["cell"]>, cellPosition: Position) => ReactNode,
+        renderer: (cellState: CellState<T>, cellPosition: Position) => ReactNode,
         region?: GridRegion,
     ) => <FieldLoop context={readOnlySafeContext}>
         {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {

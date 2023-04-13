@@ -16,22 +16,22 @@ import {PuzzleLineSet} from "./PuzzleLineSet";
 import {LineWithColor} from "./LineWithColor";
 import {AnyPTM} from "./PuzzleTypeMap";
 
-export interface FieldState<CellType> {
-    cells: CellState<CellType>[][];
+export interface FieldState<T extends AnyPTM> {
+    cells: CellState<T>[][];
     lines: SetInterface<LineWithColor>;
     marks: SetInterface<CellMark>;
 }
 
 export const createEmptyFieldState = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>
-): FieldState<T["cell"]> => ({
+): FieldState<T> => ({
     cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle))),
     lines: new PuzzleLineSet(puzzle),
     marks: new CellMarkSet(puzzle).bulkAdd(puzzle.initialCellMarks ?? []),
 });
 
 export const serializeFieldState = <T extends AnyPTM>(
-    {cells, lines, marks}: FieldState<T["cell"]>,
+    {cells, lines, marks}: FieldState<T>,
     puzzle: PuzzleDefinition<T>
 ) => ({
     cells: cells.map(row => row.map(cell => serializeCellState(cell, puzzle.typeManager))),
@@ -56,17 +56,17 @@ export const unserializeFieldState = <T extends AnyPTM>(
 
 export const cloneFieldState = <T extends AnyPTM>(
     typeManager: SudokuTypeManager<T>,
-    {cells, lines, marks}: FieldState<T["cell"]>
-): FieldState<T["cell"]> => ({
+    {cells, lines, marks}: FieldState<T>
+): FieldState<T> => ({
     cells: cells.map(row => row.map(cellState => cloneCellState(typeManager, cellState))),
     lines: lines.clone(),
     marks: marks.clone(),
 });
 
-export const processFieldStateCells = <CellType>(
-    fieldState: FieldState<CellType>,
+export const processFieldStateCells = <T extends AnyPTM>(
+    fieldState: FieldState<T>,
     affectedCells: Position[],
-    processor: (cellState: CellState<CellType>, position: Position) => CellState<CellType>
+    processor: (cellState: CellState<T>, position: Position) => CellState<T>
 ) => {
     for (const position of affectedCells) {
         const {left: columnIndex, top: rowIndex} = position;
@@ -76,24 +76,24 @@ export const processFieldStateCells = <CellType>(
     return fieldState;
 };
 
-export const areAllFieldStateCells = <CellType>(
-    fieldState: FieldState<CellType>,
+export const areAllFieldStateCells = <T extends AnyPTM>(
+    fieldState: FieldState<T>,
     affectedCells: Position[],
-    predicate: (cellState: CellState<CellType>, position: Position) => boolean
+    predicate: (cellState: CellState<T>, position: Position) => boolean
 ) =>
     affectedCells.every((position) => predicate(fieldState.cells[position.top][position.left], position));
 
-export const isAnyFieldStateCell = <CellType>(
-    fieldState: FieldState<CellType>,
+export const isAnyFieldStateCell = <T extends AnyPTM>(
+    fieldState: FieldState<T>,
     affectedCells: Position[],
-    predicate: (cellState: CellState<CellType>, position: Position) => boolean
+    predicate: (cellState: CellState<T>, position: Position) => boolean
 ) =>
     affectedCells.some((position) => predicate(fieldState.cells[position.top][position.left], position));
 
 export const areFieldStatesEqual = <T extends AnyPTM>(
     typeManager: SudokuTypeManager<T>,
-    {cells, lines, marks}: FieldState<T["cell"]>,
-    {cells: cells2, lines: lines2, marks: marks2}: FieldState<T["cell"]>
+    {cells, lines, marks}: FieldState<T>,
+    {cells: cells2, lines: lines2, marks: marks2}: FieldState<T>
 ) =>
     cells.every(
         (row, rowIndex) => row.every(
