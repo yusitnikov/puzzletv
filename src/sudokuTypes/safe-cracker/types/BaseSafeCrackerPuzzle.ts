@@ -10,7 +10,7 @@ import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCrackerPuzzleParams): Pick<
     PuzzleDefinition<T>,
-    "fieldSize" | "digitsCount" | "customCellBounds" | "ignoreRowsColumnCountInTheWrapper" | "typeManager" | "allowDrawing"
+    "fieldSize" | "regions" | "digitsCount" | "customCellBounds" | "ignoreRowsColumnCountInTheWrapper" | "typeManager" | "allowDrawing"
 > => {
     const {size, circleRegionsCount, codeCellsCount} = params;
 
@@ -41,8 +41,8 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCracke
             fieldSize: size * 2,
             columnsCount: size,
             rowsCount: circleRegionsCount * 2 + 2,
-            regions: [RegionConstraint(indexes(size).map(index => ({top: circleRegionsCount * 2, left: index})), false)],
         },
+        regions: [RegionConstraint(indexes(size).map(index => ({top: circleRegionsCount * 2, left: index})), false)],
         digitsCount: size,
         customCellBounds: createGivenDigitsMapFromArray<CustomCellBounds>([
             ...indexes(circleRegionsCount).flatMap(regionIndex => [

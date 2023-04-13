@@ -2,7 +2,7 @@ import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {createCubeFieldSize, CubeTypeManager} from "../../sudokuTypes/cube/types/CubeTypeManager";
+import {createCubeFieldSize, createCubeRegions, CubeTypeManager} from "../../sudokuTypes/cube/types/CubeTypeManager";
 import {Chameleon} from "../authors";
 import {HeartConstraint, KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
 import {
@@ -21,7 +21,8 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
     author: Chameleon,
     slug: showRatio ? "rational-cube-show-ratio" : "rational-cube",
     typeManager: CubeTypeManager(true),
-    fieldSize: createCubeFieldSize(3, 3, 3),
+    fieldSize: createCubeFieldSize(3),
+    regions: createCubeRegions(3, 3, 3),
     digitsCount: 9,
     rules: translate => <>
         <RulesParagraph>{translate({

@@ -13,7 +13,7 @@ import {JigsawPieceInfo} from "./JigsawPieceInfo";
 import {JigsawPTM} from "./JigsawPTM";
 
 export const getJigsawPieces = (
-    {fieldSize: {regions, rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
+    {regions = [], fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
 ): JigsawPieceInfo[] => {
     // Regions may be not initialized yet during puzzle import, so the code below is a fallback
     if (regions.length === 0) {

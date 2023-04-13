@@ -141,10 +141,12 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
     borderColor: darkGreyColor,
 });
 
-export const createCubeFieldSize = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth): FieldSize<NumberPTM> => ({
+export const createCubeFieldSize = (fieldSize: number): FieldSize => ({
     fieldSize: fieldSize * 2,
     rowsCount: fieldSize * 2,
     columnsCount: fieldSize * 2,
-    regions: createRegularRegions(fieldSize * 2, fieldSize * 2, regionWidth, regionHeight)
-        .filter(([{left, top}]) => left < fieldSize || top >= fieldSize)
 });
+
+export const createCubeRegions = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth) =>
+    createRegularRegions(fieldSize * 2, fieldSize * 2, regionWidth, regionHeight)
+        .filter(([{left, top}]) => left < fieldSize || top >= fieldSize);

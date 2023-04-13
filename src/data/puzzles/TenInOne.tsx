@@ -58,10 +58,7 @@ const keepDigitsAccordingBoxPositionText = {
 const keepDigitsAccordingBoxPositionCallback = ({top, left}: Position) =>
     remainingBoxPositionIndexes.includes(top) && remainingBoxPositionIndexes.includes(left);
 
-const fieldSize = {
-    ...createRegularFieldSize(9, 3),
-    regions: [],
-};
+const fieldSize = createRegularFieldSize(9, 3);
 const resultChecker = isValidFinishedPuzzleByStageConstraints<number>(2);
 
 export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {

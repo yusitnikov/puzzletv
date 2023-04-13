@@ -42,7 +42,8 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     rules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>) => ReactNode;
     aboveRules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>) => ReactNode;
     typeManager: SudokuTypeManager<T>;
-    fieldSize: FieldSize<T>;
+    fieldSize: FieldSize;
+    regions?: (Position[] | Constraint<T, any>)[];
     fieldMargin?: number;
     fieldWrapperComponent?: ComponentType<PuzzleContextProps<T>>;
     fieldFitsWrapper?: boolean;

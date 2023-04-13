@@ -68,7 +68,7 @@ export const getAllPuzzleConstraints = <T extends AnyPTM>(
     const {puzzle, state} = context;
 
     const {
-        fieldSize,
+        regions = [],
         items: puzzleItemsOrFn = [],
         typeManager: {
             items: stateItemsOrFn = [],
@@ -79,7 +79,7 @@ export const getAllPuzzleConstraints = <T extends AnyPTM>(
     return [
         FieldLinesConstraint<T>(),
         ...getRegionsForRowsAndColumns(puzzle, state),
-        ...fieldSize.regions.map(
+        ...regions.map(
             (region): Constraint<T, any> => Array.isArray(region)
                 ? RegionConstraint(region)
                 : region

@@ -150,7 +150,6 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
         fieldSize,
         rowsCount: 1,
         columnsCount: 72,
-        regions: [],
     },
     ignoreRowsColumnCountInTheWrapper: true,
     digitsCount: 8,

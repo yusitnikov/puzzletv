@@ -191,7 +191,6 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
             fieldSize,
             rowsCount: 1,
             columnsCount: bounds.length,
-            regions: [],
         },
         ignoreRowsColumnCountInTheWrapper: true,
         digitsCount: 0,

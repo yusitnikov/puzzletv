@@ -1,5 +1,5 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {FieldSize9} from "../../types/sudoku/FieldSize";
+import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {Chameleon} from "../authors";
@@ -64,6 +64,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     getLmdSolutionCode: () => "colors",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
+    regions: Regions9,
     rules: translate => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)}.</RulesParagraph>

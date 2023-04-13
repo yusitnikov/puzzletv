@@ -7,13 +7,14 @@ import {indexes} from "../../../utils/indexes";
 import {FogConstraint, FogProps, fogTag} from "../../../components/sudoku/constraints/fog/Fog";
 import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager: SudokuTypeManager<T>
 ): SudokuTypeManager<T> => {
     return {
         ...baseTypeManager,
-        postProcessPuzzle(puzzle): typeof puzzle {
+        postProcessPuzzle(puzzle): PuzzleDefinition<T> {
             if (puzzle.fieldSize.rowsCount > 9) {
                 puzzle = {
                     ...puzzle,

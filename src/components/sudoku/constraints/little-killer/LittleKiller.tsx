@@ -72,7 +72,7 @@ export const LittleKiller = withFieldLayer(FieldLayer.regular, <T extends AnyPTM
 export const LittleKillerConstraint = <T extends AnyPTM>(
     startCellLiteral: PositionLiteral,
     directionLiteral: PositionLiteral,
-    {rowsCount, columnsCount}: FieldSize<T>,
+    {rowsCount, columnsCount}: FieldSize,
     sum?: number
 ): Constraint<T, LittleKillerProps> => {
     const startCell = parsePositionLiteral(startCellLiteral);

@@ -13,6 +13,7 @@ import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/Give
 import {RotatableDigitSudokuTypeManagerBase} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
 import {loop} from "../../../utils/math";
 import {MonumentValleyPTM} from "./MonumentValleyPTM";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     ...DigitSudokuTypeManager(),
@@ -197,11 +198,11 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         }
     },
 
-    getRegionsWithSameCoordsTransformation({puzzle: {fieldSize, fieldMargin = 0}, cellSize}): Rect[] {
+    getRegionsWithSameCoordsTransformation({puzzle: {regions, fieldSize, fieldMargin = 0}, cellSize}): Rect[] {
         const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         const fullMargin = fieldMargin + 1;
-        const borderWidth = fieldSize.regions.length
+        const borderWidth = regions?.length
             ? getRegionBorderWidth(cellSize)
             : 1 / cellSize;
 
@@ -326,7 +327,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     borderColor: darkGreyColor,
 };
 
-const processCellCoords = (position: Position, fieldSize: FieldSize<MonumentValleyPTM> | ReturnType<typeof parseMonumentValleyFieldSize>): Position => {
+const processCellCoords = (position: Position, fieldSize: FieldSize | ReturnType<typeof parseMonumentValleyFieldSize>): Position => {
     const {top, left} = position;
     const {gridSize, intersectionSize, columnsCount} = "intersectionSize" in fieldSize
         ? fieldSize
@@ -359,13 +360,13 @@ const rotateDigit = (digit: number, times = 1) => {
 
     return digit;
 };
-const rotateDigitByPosition = (digit: number, {top, left}: Position, fieldSize: FieldSize<MonumentValleyPTM>) => {
+const rotateDigitByPosition = (digit: number, {top, left}: Position, fieldSize: FieldSize) => {
     const {gridSize, intersectionSize} = parseMonumentValleyFieldSize(fieldSize);
     return left >= gridSize - intersectionSize && left < gridSize && top < intersectionSize
         ? rotateDigit(digit)
         : digit;
 };
-const rotateDigitsMap = (map: GivenDigitsMap<number>, fieldSize: FieldSize<MonumentValleyPTM>) => processGivenDigitsMaps(
+const rotateDigitsMap = (map: GivenDigitsMap<number>, fieldSize: FieldSize) => processGivenDigitsMaps(
     ([digit], position) => rotateDigitByPosition(digit, position, fieldSize),
     [map]
 );
@@ -436,38 +437,47 @@ export const createMonumentValleyFieldSize = (
     gridSize: number,
     regionSize: number,
     intersectionSize = regionSize,
-    showBorders = true,
-): FieldSize<MonumentValleyPTM> => {
+): FieldSize => {
     const columnsCount = gridSize * 3 - intersectionSize * 2;
-    const regions = createRegularRegions(gridSize, gridSize, regionSize, regionSize);
 
     return {
         fieldSize: columnsCount,
         columnsCount,
         rowsCount: gridSize * 2 - intersectionSize,
-        regions: regionSize === 1 ? [] : [
-            ...regions.map((region) => RegionConstraint(region, showBorders)),
-            ...regions.map((region) => RegionConstraint(
-                region.map(({top, left}) => ({
-                    top: top + gridSize - intersectionSize,
-                    left: left + gridSize - intersectionSize,
-                })),
-                showBorders
-            )),
-            ...regions.map((region) => fixMonumentValleyDigitForConstraint(RegionConstraint(
-                region.map(({top, left}) => ({
-                    top,
-                    left: top < intersectionSize && left < intersectionSize
-                        ? left + gridSize - intersectionSize
-                        : left + columnsCount - gridSize,
-                })),
-                showBorders
-            ))),
-        ]
     };
 };
 
-export const parseMonumentValleyFieldSize = ({columnsCount, rowsCount}: FieldSize<MonumentValleyPTM>) => ({
+export const createMonumentValleyRegions = (
+    gridSize: number,
+    regionSize: number,
+    intersectionSize = regionSize,
+    showBorders = true,
+): PuzzleDefinition<MonumentValleyPTM>["regions"] => {
+    const columnsCount = gridSize * 3 - intersectionSize * 2;
+    const regions = createRegularRegions(gridSize, gridSize, regionSize, regionSize);
+
+    return regionSize === 1 ? [] : [
+        ...regions.map((region) => RegionConstraint(region, showBorders)),
+        ...regions.map((region) => RegionConstraint(
+            region.map(({top, left}) => ({
+                top: top + gridSize - intersectionSize,
+                left: left + gridSize - intersectionSize,
+            })),
+            showBorders
+        )),
+        ...regions.map((region) => fixMonumentValleyDigitForConstraint(RegionConstraint(
+            region.map(({top, left}) => ({
+                top,
+                left: top < intersectionSize && left < intersectionSize
+                    ? left + gridSize - intersectionSize
+                    : left + columnsCount - gridSize,
+            })),
+            showBorders
+        ))),
+    ];
+};
+
+export const parseMonumentValleyFieldSize = ({columnsCount, rowsCount}: FieldSize) => ({
     columnsCount,
     rowsCount,
     gridSize: rowsCount * 2 - columnsCount,

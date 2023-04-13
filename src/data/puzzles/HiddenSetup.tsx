@@ -1,5 +1,5 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {FieldSize9} from "../../types/sudoku/FieldSize";
+import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
@@ -171,6 +171,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
         },
     },
     fieldSize: FieldSize9,
+    regions: Regions9,
     rules: (translate, {state: {extension: {stage}}}) => {
         return <>
             <RulesParagraph>{translate({

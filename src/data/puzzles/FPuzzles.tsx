@@ -178,7 +178,6 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
             fieldSize: 9,
             rowsCount: 9,
             columnsCount: 9,
-            regions: [],
         },
         digitsCount: digitsCount && Number(digitsCount),
         loopHorizontally: loopX,
@@ -264,7 +263,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
                     .filter(({length}) => length);
             });
             if (regions.length > 1) {
-                puzzle.fieldSize.regions = regions;
+                puzzle.regions = regions;
             }
 
             for (const {top, left, ...cell} of allGridCells) {
@@ -337,12 +336,12 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
             if (littleKillerSum instanceof Array) {
                 puzzle.fieldMargin = puzzle.fieldMargin || 1;
 
-                const fieldSize: FieldSize<T> = {fieldSize: size, rowsCount: size, columnsCount: size, regions: []};
+                const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size};
 
                 items.push(...littleKillerSum.map(({cell, cells: [startCell], direction, value, ...other}: FPuzzlesLittleKillerSum) => {
                     ObjectParser.empty.parse(other, "f-puzzles little killer sum");
 
-                    return LittleKillerConstraint(startCell, direction, fieldSize, parseOptionalNumber(value));
+                    return LittleKillerConstraint<T>(startCell, direction, fieldSize, parseOptionalNumber(value));
                 }));
             }
         },
@@ -471,7 +470,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
             if (sandwichsum instanceof Array) {
                 puzzle.fieldMargin = puzzle.fieldMargin || 1;
 
-                const fieldSize: FieldSize<T> = {fieldSize: size, rowsCount: size, columnsCount: size, regions: []};
+                const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size};
 
                 items.push(...sandwichsum.flatMap(({cell, value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles sandwich sum");

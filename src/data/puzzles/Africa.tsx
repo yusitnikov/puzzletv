@@ -51,7 +51,6 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         fieldSize: 9,
         rowsCount: 1,
         columnsCount: 49,
-        regions: [],
     },
     digitsCount: 5,
     customCellBounds: processGivenDigitsMaps(

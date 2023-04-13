@@ -16,6 +16,7 @@ import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/co
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
 import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 /*
  * TODO:
@@ -205,7 +206,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                 },
             ];
         },
-        postProcessPuzzle(puzzle): typeof puzzle {
+        postProcessPuzzle(puzzle): PuzzleDefinition<T> {
             const fieldSize = puzzle.fieldSize.rowsCount;
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;
@@ -240,8 +241,8 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                 fieldSize: {
                     ...puzzle.fieldSize,
                     fieldSize: 4,
-                    regions: [],
                 },
+                regions: [],
                 customCellBounds,
                 ignoreRowsColumnCountInTheWrapper: true,
                 fieldWrapperComponent: InfiniteRingsFieldWrapper(visibleRingsCountArg),

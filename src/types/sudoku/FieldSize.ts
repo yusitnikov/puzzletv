@@ -5,32 +5,50 @@ import {Constraint} from "./Constraint";
 import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
 import {AnyPTM} from "./PuzzleTypeMap";
 
-export interface FieldSize<T extends AnyPTM> {
+export interface FieldSize {
     fieldSize: number;
     rowsCount: number;
     columnsCount: number;
     regionWidth?: number;
     regionHeight?: number;
-    regions: (Position[] | Constraint<T, any>)[];
 }
 
-export const createRegularRegions = (
+export function createRegularRegions(fieldSize: Required<FieldSize>): Position[][];
+export function createRegularRegions(
     rowsCount: number,
     columnsCount: number,
     regionWidth: number,
-    regionHeight = columnsCount / regionWidth
-): Position[][] => indexes(rowsCount / regionHeight).flatMap(
-    (regionTop) => indexes(columnsCount / regionWidth).map(
-        (regionLeft) => indexes(regionHeight).flatMap(
-            (cellTop) => indexes(regionWidth).map(
-                (cellLeft): Position => ({
-                    left: regionLeft * regionWidth + cellLeft,
-                    top: regionTop * regionHeight + cellTop,
-                })
+    regionHeight?: number
+): Position[][];
+export function createRegularRegions(
+    rowsCountOrFieldSize: Required<FieldSize> | number,
+    columnsCountArg?: number,
+    regionWidthArg?: number,
+    regionHeightArg?: number,
+): Position[][] {
+    let rowsCount: number, columnsCount: number, regionWidth: number, regionHeight: number;
+    if (typeof rowsCountOrFieldSize === "object") {
+        ({rowsCount, columnsCount, regionWidth, regionHeight} = rowsCountOrFieldSize);
+    } else {
+        rowsCount = rowsCountOrFieldSize;
+        columnsCount = columnsCountArg!;
+        regionWidth = regionWidthArg!;
+        regionHeight = regionHeightArg ?? (columnsCount / regionWidth);
+    }
+
+    return indexes(rowsCount / regionHeight).flatMap(
+        (regionTop) => indexes(columnsCount / regionWidth).map(
+            (regionLeft) => indexes(regionHeight).flatMap(
+                (cellTop) => indexes(regionWidth).map(
+                    (cellLeft): Position => ({
+                        left: regionLeft * regionWidth + cellLeft,
+                        top: regionTop * regionHeight + cellTop,
+                    })
+                )
             )
         )
-    )
-);
+    );
+}
 
 export const calculateDefaultRegionWidth = (fieldSize: number) => {
     let bestHeight = 1;
@@ -44,16 +62,23 @@ export const calculateDefaultRegionWidth = (fieldSize: number) => {
     return fieldSize / bestHeight;
 }
 
-export const createRegularFieldSize = <T extends AnyPTM>(fieldSize: number, regionWidth?: number, regionHeight = regionWidth && fieldSize / regionWidth): FieldSize<T> => ({
-    fieldSize,
-    rowsCount: fieldSize,
-    columnsCount: fieldSize,
-    regionWidth,
-    regionHeight,
-    regions: regionWidth && regionHeight
-        ? createRegularRegions(fieldSize, fieldSize, regionWidth, regionHeight)
-        : []
-});
+export function createRegularFieldSize(
+    fieldSize: number, regionWidth: number, regionHeight?: number
+): Required<FieldSize>;
+export function createRegularFieldSize(fieldSize: number): FieldSize;
+export function createRegularFieldSize(
+    fieldSize: number,
+    regionWidth?: number,
+    regionHeight = regionWidth && fieldSize / regionWidth
+): FieldSize {
+    return {
+        fieldSize,
+        rowsCount: fieldSize,
+        columnsCount: fieldSize,
+        regionWidth,
+        regionHeight,
+    };
+}
 
 export const getDefaultRegionsForRowsAndColumns = <T extends AnyPTM>(
     {customCellBounds, fieldSize}: PuzzleDefinition<T>
@@ -71,5 +96,7 @@ export const getDefaultRegionsForRowsAndColumns = <T extends AnyPTM>(
 ];
 
 export const FieldSize9 = createRegularFieldSize(9, 3);
+export const Regions9 = createRegularRegions(FieldSize9);
 
 export const FieldSize8 = createRegularFieldSize(8, 4);
+export const Regions8 = createRegularRegions(FieldSize8);

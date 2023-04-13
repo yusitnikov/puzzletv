@@ -1,5 +1,5 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {createRegularFieldSize} from "../../types/sudoku/FieldSize";
+import {createRegularFieldSize, createRegularRegions} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
@@ -210,6 +210,7 @@ export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
         radius: noteRadius + noteLineWidth / 2,
     }),
     fieldSize,
+    regions: createRegularRegions(fieldSize),
     fieldMargin: 1,
     initialDigits: {
         0: {

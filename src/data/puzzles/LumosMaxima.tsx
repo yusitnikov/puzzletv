@@ -1,5 +1,5 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {FieldSize9} from "../../types/sudoku/FieldSize";
+import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
@@ -26,6 +26,7 @@ export const LumosMaximaNoFog: PuzzleDefinition<NumberPTM> = {
     slug: "lumos-maxima-no-fog",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
+    regions: Regions9,
     rules: (translate) => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         <RulesParagraph>{translate(arrowsExplained)} ({translate({

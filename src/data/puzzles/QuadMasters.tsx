@@ -1,5 +1,5 @@
 import {PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
-import {createRegularFieldSize} from "../../types/sudoku/FieldSize";
+import {createRegularFieldSize, createRegularRegions} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {generateRandomPuzzleDigits, getDailyRandomGeneratorSeed} from "../../utils/random";
 import {QuadMastersSudokuTypeManager} from "../../sudokuTypes/quad-masters/types/QuadMastersSudokuTypeManager";
@@ -69,6 +69,7 @@ export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: bool
             }),
             typeManager: QuadMastersSudokuTypeManager(generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed), isQuadle),
             fieldSize: createRegularFieldSize(fieldSize, regionWidth),
+            regions: createRegularRegions(fieldSize, fieldSize, regionWidth),
             resultChecker: isValidFinishedPuzzleByConstraints,
             forceAutoCheckOnFinish: true,
             fieldMargin: Math.max(0, (7 - fieldSize) / 2),

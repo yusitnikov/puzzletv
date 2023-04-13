@@ -34,7 +34,7 @@ export const SandwichSum = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>
 
 export const SandwichSumConstraint = <T extends AnyPTM>(
     clueCellLiteral: PositionLiteral,
-    {rowsCount, columnsCount}: FieldSize<T>,
+    {rowsCount, columnsCount}: FieldSize,
     sum: number
 ): Constraint<T, SandwichSumProps> => {
     const clueCell = parsePositionLiteral(clueCellLiteral);

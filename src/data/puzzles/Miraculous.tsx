@@ -101,7 +101,7 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
         <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
     </>,
     typeManager: DigitSudokuTypeManager(),
-    fieldSize: {...FieldSize9, regions: []},
+    fieldSize: FieldSize9,
     initialColors: processGivenDigitsMaps((colors) => colors, [initialColors]),
     items: [
         ThermometerConstraint(["R5C2", "R4C1"]),

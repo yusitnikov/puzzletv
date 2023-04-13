@@ -10,7 +10,7 @@ import {SafeCrackerStarConstraint} from "../constraints/SafeCrackerStarConstrain
 import {indexes} from "../../../utils/indexes";
 import {safeCrackerArrowsCellWriteModeInfo} from "./LeftRightArrow";
 import {BaseSafeCrackerPuzzle} from "./BaseSafeCrackerPuzzle";
-import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
+import {getDefaultDigitsCount, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
 import {CellMarkType, parseCellMark} from "../../../types/sudoku/CellMark";
 import {CellColor} from "../../../types/sudoku/CellColor";
@@ -81,7 +81,7 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
             return basePosition;
         },
         items: indexes(codeCellsCount).map(left => SafeCrackerStarConstraint([{top: circleRegionsCount * 2 + 1, left}])),
-        postProcessPuzzle(puzzle): typeof puzzle {
+        postProcessPuzzle(puzzle): PuzzleDefinition<T> {
             puzzle = {
                 ...puzzle,
                 ...BaseSafeCrackerPuzzle(params),
