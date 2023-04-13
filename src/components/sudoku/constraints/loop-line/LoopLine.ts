@@ -1,7 +1,8 @@
 import {Constraint} from "../../../../types/sudoku/Constraint";
 import {Line} from "../../../../types/layout/Position";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const LoopLineConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+export const LoopLineConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "loop line",
     cells: [],
     props: undefined,

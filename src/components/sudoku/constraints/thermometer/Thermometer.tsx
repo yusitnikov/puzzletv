@@ -9,13 +9,14 @@ import {
 } from "../../../../types/sudoku/Constraint";
 import {isSamePosition, parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {splitMultiLine} from "../../../../utils/lines";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const Thermometer = withFieldLayer(FieldLayer.regular, (
+export const Thermometer = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
     {
         cells: points,
         color = darkGreyColor,
         context: {cellsIndex},
-    }: ConstraintProps
+    }: ConstraintProps<T>
 ) => {
     const getPointInfo = ({top, left}: Position, radius: number) => {
         const cellInfo = cellsIndex.allCells[top]?.[left];
@@ -42,11 +43,11 @@ export const Thermometer = withFieldLayer(FieldLayer.regular, (
     </g>;
 }) as ConstraintPropsGenericFc;
 
-export const ThermometerConstraint = <CellType, ExType, ProcessedExType>(
+export const ThermometerConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     color?: string,
     split = true,
-): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+): Constraint<T> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);

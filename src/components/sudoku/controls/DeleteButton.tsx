@@ -5,10 +5,11 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
 import {clearSelectionAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const deleteHotkeys = ["Delete", "Backspace"];
 
-export const DeleteButton = <CellType, ExType, ProcessedExType>(
+export const DeleteButton = <T extends AnyPTM>(
     {
         context: {
             cellSizeForSidePanel: cellSize,
@@ -17,7 +18,7 @@ export const DeleteButton = <CellType, ExType, ProcessedExType>(
         },
         top,
         left,
-    }: ControlButtonItemProps<CellType, ExType, ProcessedExType>
+    }: ControlButtonItemProps<T>
 ) => {
     const translate = useTranslate();
 

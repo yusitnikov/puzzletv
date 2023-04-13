@@ -6,9 +6,10 @@ import {indexes} from "../../../utils/indexes";
 import {createGivenDigitsMapFromArray} from "../../../types/sudoku/GivenDigitsMap";
 import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
 import {SafeCrackerSudokuTypeManager} from "./SafeCrackerSudokuTypeManager";
+import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const BaseSafeCrackerPuzzle = <ExType, ProcessedExType>(params: SafeCrackerPuzzleParams): Pick<
-    PuzzleDefinition<number, ExType, ProcessedExType>,
+export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCrackerPuzzleParams): Pick<
+    PuzzleDefinition<T>,
     "fieldSize" | "digitsCount" | "customCellBounds" | "ignoreRowsColumnCountInTheWrapper" | "typeManager" | "allowDrawing"
 > => {
     const {size, circleRegionsCount, codeCellsCount} = params;

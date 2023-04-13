@@ -4,18 +4,17 @@ import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {buildLink} from "../../utils/link";
 import {FieldPreview} from "../sudoku/field/FieldPreview";
+import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const padding = headerPadding;
 
-export interface PuzzlesListItemProps<CellType, ExType = {}, ProcessedExType = {}> {
-    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>;
+export interface PuzzlesListItemProps<T extends AnyPTM> {
+    puzzle: PuzzleDefinition<T>;
     width: number;
     hide?: boolean;
 }
 
-export const PuzzlesListItem = <CellType, ExType = {}, ProcessedExType = {}>(
-    {puzzle, width, hide}: PuzzlesListItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const PuzzlesListItem = <T extends AnyPTM>({puzzle, width, hide}: PuzzlesListItemProps<T>) => {
     const language = useLanguageCode();
     const translate = useTranslate();
 

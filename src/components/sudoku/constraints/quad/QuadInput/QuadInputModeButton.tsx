@@ -7,17 +7,15 @@ import {QuadByData} from "../Quad";
 import {textColor} from "../../../../app/globals";
 import {useEventListener} from "../../../../../hooks/useEventListener";
 import {QuadleByData, QuadleDigitType} from "../Quadle";
-import {QuadInputGameState} from "./QuadInputGameState";
 import {QuadInputSudokuTypeManagerOptions} from "./QuadInputSudokuTypeManager";
 import {setQuadPositionAction} from "./setQuadPositionAction";
 import {indexesFromTo} from "../../../../../utils/indexes";
 import {ControlButtonItemProps} from "../../../controls/ControlButtonsManager";
+import {AnyQuadInputPTM} from "./QuadInputPTM";
 
-export const QuadInputModeButton = <CellType, ExType extends QuadInputGameState<CellType>, ProcessedExType = {}>(
-    options: QuadInputSudokuTypeManagerOptions<CellType, ExType, ProcessedExType>
-) => function QuadInputModeButtonComponent(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) {
+export const QuadInputModeButton = <T extends AnyQuadInputPTM>(
+    options: QuadInputSudokuTypeManagerOptions<T>
+) => function QuadInputModeButtonComponent({context, top, left}: ControlButtonItemProps<T>) {
     const translate = useTranslate();
 
     const {

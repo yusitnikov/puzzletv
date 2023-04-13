@@ -7,8 +7,9 @@ import {darkGreyColor} from "../../../components/app/globals";
 import {indexes} from "../../../utils/indexes";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
 import {Constraint} from "../../../types/sudoku/Constraint";
+import {NumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuTypeManager<number> => ({
+export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuTypeManager<NumberPTM> => ({
     ...DigitSudokuTypeManager(),
 
     getCellTypeProps({top, left}, {fieldSize: {rowsCount, columnsCount}}) {
@@ -77,7 +78,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         ];
     },
 
-    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}): Constraint<number, any>[] {
+    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}): Constraint<NumberPTM, any>[] {
         const realFieldSize = fieldSize / 2;
 
         if (continuousRowColumnRegions) {
@@ -140,7 +141,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
     borderColor: darkGreyColor,
 });
 
-export const createCubeFieldSize = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth): FieldSize => ({
+export const createCubeFieldSize = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth): FieldSize<NumberPTM> => ({
     fieldSize: fieldSize * 2,
     rowsCount: fieldSize * 2,
     columnsCount: fieldSize * 2,

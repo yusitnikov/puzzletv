@@ -8,6 +8,7 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {moveButtonTip, normalYinYangRulesApply, normalYinYangRulesExplained, toroidalRulesApply} from "../ruleSnippets";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const S = CellColor.shaded;
 const U = CellColor.unshaded;
@@ -37,7 +38,7 @@ const correctAnswer = [
     [U, U, S, U, U, U, U, S, U, U],
 ];
 
-export const ToroidalYinYang: PuzzleDefinition<number> = {
+export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
     author: Chameleon,
     title: {
         [LanguageCode.en]: "No secret rules today",

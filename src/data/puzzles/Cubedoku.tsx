@@ -13,6 +13,7 @@ import {parsePositionLiterals2} from "../../types/layout/Position";
 import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {createCubeFieldSize} from "../../sudokuTypes/cube/types/CubeTypeManager";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const regularFieldSize4 = createCubeFieldSize(4, 2);
 const regularFieldSize5 = createCubeFieldSize(5, 1);
@@ -24,7 +25,7 @@ const Chilly = {
     [LanguageCode.en]: "Chilly",
 };
 
-export const IntroToCubedoku: PuzzleDefinition<number> = {
+export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title: {
         [LanguageCode.en]: "Intro to Cubedoku",
@@ -71,7 +72,7 @@ export const IntroToCubedoku: PuzzleDefinition<number> = {
     resultChecker: isValidFinishedPuzzleByConstraints,
 };
 
-export const CubeIt: PuzzleDefinition<number> = {
+export const CubeIt: PuzzleDefinition<NumberPTM> = {
     title: {
         [LanguageCode.en]: "Cube It",
     },

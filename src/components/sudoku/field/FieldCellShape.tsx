@@ -4,14 +4,15 @@ import {getTransformedRectAverageSize, Rect} from "../../../types/layout/Rect";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {usePureMemo} from "../../../hooks/usePureMemo";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-interface FieldCellShapeProps extends Partial<Rect>, Omit<SVGAttributes<SVGRectElement | SVGPolygonElement | SVGPolylineElement>, keyof Rect> {
-    context?: PuzzleContext<any, any, any>;
+interface FieldCellShapeProps<T extends AnyPTM> extends Partial<Rect>, Omit<SVGAttributes<SVGRectElement | SVGPolygonElement | SVGPolylineElement>, keyof Rect> {
+    context?: PuzzleContext<T>;
     cellPosition?: Position;
     line?: Position[];
 }
 
-export const FieldCellShape = ({context, cellPosition, line, left = 0, top = 0, width = 1, height = 1, ...props}: FieldCellShapeProps) => {
+export const FieldCellShape = <T extends AnyPTM>({context, cellPosition, line, left = 0, top = 0, width = 1, height = 1, ...props}: FieldCellShapeProps<T>) => {
     cellPosition = usePureMemo(cellPosition);
 
     const customCellBounds = useMemo(() => {

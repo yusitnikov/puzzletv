@@ -6,6 +6,7 @@ import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {ReactElement} from "react";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export interface QuadProps<CellType> {
     expectedDigits?: CellType[];
@@ -16,20 +17,20 @@ export interface QuadProps<CellType> {
 
 export const Quad = withFieldLayer(
     FieldLayer.top,
-    <CellType, ExType, ProcessedExType>(
+    <T extends AnyPTM>(
         {
             context,
             cells,
             props,
-        }: ConstraintProps<CellType, QuadProps<CellType>, ExType, ProcessedExType>
+        }: ConstraintProps<T, QuadProps<T["cell"]>>
     ) => <QuadByData
         context={context}
         cells={cells}
         props={props}
     />
-) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, QuadProps<CellType>, ExType, ProcessedExType>) => ReactElement;
+) as <T extends AnyPTM>(props: ConstraintProps<T, QuadProps<T["cell"]>>) => ReactElement;
 
-export const QuadByData = <CellType, ExType, ProcessedExType>(
+export const QuadByData = <T extends AnyPTM>(
     {
         context: {puzzle: {typeManager: {cellDataComponentType: {component: CellData}}}},
         cells: [{top, left}],
@@ -39,9 +40,9 @@ export const QuadByData = <CellType, ExType, ProcessedExType>(
             isRecent,
             radius = 0.3,
         },
-    }: Pick<ConstraintProps<CellType, QuadProps<CellType>, ExType, ProcessedExType>, "context" | "cells" | "props">
+    }: Pick<ConstraintProps<T, QuadProps<T["cell"]>>, "context" | "cells" | "props">
 ) => {
-    const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: CellType, valid?: boolean}[] = [
+    const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: T["cell"], valid?: boolean}[] = [
         ...expectedDigits.map(digit => ({digit, valid: true})),
         ...forbiddenDigits.map(digit => ({digit})),
     ];
@@ -88,13 +89,13 @@ const getQuadCells = ({top, left}: Position): Position[] => [
     {top: top - 1, left: left - 1},
 ];
 
-export const QuadConstraint = <CellType, ExType, ProcessedExType>(
+export const QuadConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    expectedDigits: CellType[],
-    forbiddenDigits: CellType[] = [],
+    expectedDigits: T["cell"][],
+    forbiddenDigits: T["cell"][] = [],
     isRecent = false,
     radius = 0.3
-): Constraint<CellType, QuadProps<CellType>, ExType, ProcessedExType> => {
+): Constraint<T, QuadProps<T["cell"]>> => {
     return ({
         name: "quad",
         cells: getQuadCells(parsePositionLiteral(cellLiteral)),
@@ -139,23 +140,23 @@ export const QuadConstraint = <CellType, ExType, ProcessedExType>(
     });
 };
 
-export const QuadConstraintBySolution = <CellType, ExType, ProcessedExType>(
+export const QuadConstraintBySolution = <T extends AnyPTM>(
     {
         puzzle: {typeManager: {areSameCellData}},
         state
-    }: PuzzleContext<CellType, ExType, ProcessedExType>,
+    }: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
-    digits: CellType[],
-    solution: GivenDigitsMap<CellType>,
+    digits: T["cell"][],
+    solution: GivenDigitsMap<T["cell"]>,
     isRecent = false,
     radius = 0.3
-): Constraint<CellType, QuadProps<CellType>, ExType, ProcessedExType> => {
+): Constraint<T, QuadProps<T["cell"]>> => {
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
         .map(({top, left}) => solution[top]?.[left])
         .filter(value => value !== undefined)
         .map(value => value!);
 
-    const isGoodDigit = (digit: CellType) => actualDigits.some(actualDigit => areSameCellData(digit, actualDigit, state, true))
+    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => areSameCellData(digit, actualDigit, state, true))
 
     return QuadConstraint(
         cellLiteral,

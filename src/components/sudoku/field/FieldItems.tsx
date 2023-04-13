@@ -7,14 +7,15 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {FieldLoop} from "./FieldLoop";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface FieldItemsProps<CellType, ExType = {}, ProcessedExType = {}> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
-    items: Constraint<CellType, any, ExType, ProcessedExType>[];
+export interface FieldItemsProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
+    items: Constraint<T, any>[];
 }
 
-export const FieldItems = <CellType, ExType = {}, ProcessedExType = {}>(
-    {context, items}: FieldItemsProps<CellType, ExType, ProcessedExType>
+export const FieldItems = <T extends AnyPTM>(
+    {context, items}: FieldItemsProps<T>
 ) => <FieldLoop context={context}>
     {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
         if (!Component) {
@@ -28,7 +29,7 @@ export const FieldItems = <CellType, ExType = {}, ProcessedExType = {}>(
                 const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
                     context.puzzle,
                     {...position, angle: 0},
-                    new HashSet<CellType>(),
+                    new HashSet<T["cell"]>(),
                     0,
                     () => undefined,
                     position,

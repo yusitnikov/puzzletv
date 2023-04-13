@@ -1,14 +1,10 @@
 import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import {RotatableGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
 import {FieldSize8, FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {PartiallyTranslatable} from "../../types/translations/Translatable";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
-import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
-import {ChessGameState} from "../../sudokuTypes/chess/types/ChessGameState";
 import {createCubeFieldSize, CubeTypeManager} from "../../sudokuTypes/cube/types/CubeTypeManager";
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {AutoRegionConstraint} from "../../components/sudoku/constraints/auto-region/AutoRegion";
@@ -21,13 +17,17 @@ import {
 import {
     MonumentValleyGridBordersConstraint
 } from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {RotatableDigitPTM} from "../../sudokuTypes/rotatable/types/RotatablePTM";
+import {ChessPTM} from "../../sudokuTypes/chess/types/ChessPTM";
+import {MonumentValleyPTM} from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
     [LanguageCode.ru]: "Пустой",
 };
 
-export const EmptyRegular: PuzzleDefinition<number> = {
+export const EmptyRegular: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-regular",
@@ -36,7 +36,7 @@ export const EmptyRegular: PuzzleDefinition<number> = {
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyChaosConstruction: PuzzleDefinition<number> = {
+export const EmptyChaosConstruction: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-chaos-construction",
@@ -49,7 +49,7 @@ export const EmptyChaosConstruction: PuzzleDefinition<number> = {
     resultChecker: isValidFinishedPuzzleByConstraints,
 };
 
-export const EmptyChaosConstructionLoop: PuzzleDefinition<number> = {
+export const EmptyChaosConstructionLoop: PuzzleDefinition<NumberPTM> = {
     ...EmptyChaosConstruction,
     slug: "empty-chaos-construction-loop",
     saveStateKey: undefined,
@@ -58,7 +58,7 @@ export const EmptyChaosConstructionLoop: PuzzleDefinition<number> = {
     fieldMargin: 0.99,
 };
 
-export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState> = {
+export const EmptyRotatable: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
     title,
     slug: "empty-rotatable",
@@ -67,7 +67,7 @@ export const EmptyRotatable: PuzzleDefinition<RotatableDigit, RotatableGameState
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState> = {
+export const EmptyChess: PuzzleDefinition<ChessPTM> = {
     noIndex: true,
     title,
     slug: "empty-chess",
@@ -76,7 +76,7 @@ export const EmptyChess: PuzzleDefinition<ChessPiece, ChessGameState> = {
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyCube: PuzzleDefinition<number> = {
+export const EmptyCube: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-cube",
@@ -86,7 +86,7 @@ export const EmptyCube: PuzzleDefinition<number> = {
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyCubedoku: PuzzleDefinition<number> = {
+export const EmptyCubedoku: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-cubedoku",
@@ -96,7 +96,7 @@ export const EmptyCubedoku: PuzzleDefinition<number> = {
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState> = {
+export const EmptyMonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     noIndex: true,
     title,
     slug: "empty-monument-valley",
@@ -110,7 +110,7 @@ export const EmptyMonumentValley: PuzzleDefinition<number, RotatableGameState> =
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameState> = {
+export const EmptyMonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     noIndex: true,
     title,
     slug: "empty-monument-valley-mini",
@@ -124,7 +124,7 @@ export const EmptyMonumentValleyMini: PuzzleDefinition<number, RotatableGameStat
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyToroidal: PuzzleDefinition<number> = {
+export const EmptyToroidal: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-toroidal",
@@ -136,7 +136,7 @@ export const EmptyToroidal: PuzzleDefinition<number> = {
     allowDrawing: allDrawingModes,
 };
 
-export const EmptyLatin: PuzzleDefinition<number> = {
+export const EmptyLatin: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-latin",

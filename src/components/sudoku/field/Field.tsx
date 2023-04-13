@@ -25,7 +25,7 @@ import {
     prepareGivenDigitsMapForConstraints
 } from "../../../types/sudoku/Constraint";
 import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
-import {getAllowedCellWriteModeInfos, getCellWriteModeGestureHandler} from "../../../types/sudoku/CellWriteMode";
+import {getAllowedCellWriteModeInfos, getCellWriteModeGestureHandler} from "../../../types/sudoku/CellWriteModeInfo";
 import {PlainValueSet} from "../../../types/struct/Set";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
@@ -44,18 +44,14 @@ import {doesGridRegionContainCell, GridRegion} from "../../../types/sudoku/GridR
 import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 import {FieldItems, FieldItemsProps} from "./FieldItems";
 import {FieldLoop} from "./FieldLoop";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface FieldProps<CellType, ExType = {}, ProcessedExType = {}> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+export interface FieldProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
     rect: Rect;
 }
 
-export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
-    {
-        context,
-        rect,
-    }: FieldProps<CellType, ExType, ProcessedExType>
-) => {
+export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
     const translate = useTranslate();
 
     const readOnlySafeContext = useReadOnlySafeContext(context);
@@ -92,7 +88,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
 
-    const itemsProps: FieldItemsProps<CellType, ExType, ProcessedExType> = {
+    const itemsProps: FieldItemsProps<T> = {
         context: readOnlySafeContext,
         items,
     };
@@ -215,7 +211,7 @@ export const Field = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const renderCellsLayer = (
         keyPrefix: string,
-        renderer: (cellState: CellState<CellType>, cellPosition: Position) => ReactNode,
+        renderer: (cellState: CellState<T["cell"]>, cellPosition: Position) => ReactNode,
         region?: GridRegion,
     ) => <FieldLoop context={readOnlySafeContext}>
         {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {

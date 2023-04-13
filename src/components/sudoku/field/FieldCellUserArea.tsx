@@ -2,14 +2,15 @@ import {Position} from "../../../types/layout/Position";
 import {ReactNode, useMemo} from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-interface FieldCellUserAreaProps {
-    context?: PuzzleContext<any, any, any>;
+interface FieldCellUserAreaProps<T extends AnyPTM> {
+    context?: PuzzleContext<T>;
     cellPosition?: Position;
     children: ReactNode;
 }
 
-export const FieldCellUserArea = ({context, cellPosition, children}: FieldCellUserAreaProps) => {
+export const FieldCellUserArea = <T extends AnyPTM>({context, cellPosition, children}: FieldCellUserAreaProps<T>) => {
     const customRect = useMemo(() => {
         if (!context || !cellPosition) {
             return undefined;

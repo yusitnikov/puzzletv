@@ -2,12 +2,10 @@ import {ControlButtonItemProps} from "../../../components/sudoku/controls/Contro
 import {useTranslate} from "../../../hooks/useTranslate";
 import {PushPin} from "@emotion-icons/material";
 import {ControlButton} from "../../../components/sudoku/controls/ControlButton";
-import {RotatableGameState} from "../types/RotatableGameState";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {AnyRotatablePTM} from "../types/RotatablePTM";
 
-export const StickyModeButton = <CellType,>(
-    {context, top, left}: ControlButtonItemProps<CellType, RotatableGameState>
-) => {
+export const StickyModeButton = <T extends AnyRotatablePTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         cellSizeForSidePanel: cellSize,
         state: {isShowingSettings, extension: {isStickyMode}},

@@ -5,16 +5,15 @@ import {useGame} from "../../../hooks/sudoku/useGame";
 import {ErrorBoundary} from "react-error-boundary";
 import {errorColor} from "../../app/globals";
 import {lightenColorStr} from "../../../utils/color";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface FieldPreviewProps<CellType, ExType, ProcessedExType> {
-    puzzle?: PuzzleDefinition<CellType, ExType, ProcessedExType>;
+export interface FieldPreviewProps<T extends AnyPTM> {
+    puzzle?: PuzzleDefinition<T>;
     width: number;
     hide?: boolean;
 }
 
-export const FieldPreview = <CellType, ExType, ProcessedExType>(
-    {puzzle, width, hide}: FieldPreviewProps<CellType, ExType, ProcessedExType>
-) => {
+export const FieldPreview = <T extends AnyPTM>({puzzle, width, hide}: FieldPreviewProps<T>) => {
     const loadError = <div style={{
         position: "absolute",
         inset: 0,
@@ -39,15 +38,13 @@ export const FieldPreview = <CellType, ExType, ProcessedExType>(
     </div>;
 };
 
-interface FieldPreviewInnerProps<CellType, ExType, ProcessedExType> {
-    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>;
+interface FieldPreviewInnerProps<T extends AnyPTM> {
+    puzzle: PuzzleDefinition<T>;
     width: number;
     hide?: boolean;
 }
 
-const FieldPreviewInner = <CellType, ExType, ProcessedExType>(
-    {puzzle, width}: FieldPreviewInnerProps<CellType, ExType, ProcessedExType>
-) => {
+const FieldPreviewInner = <T extends AnyPTM>({puzzle, width}: FieldPreviewInnerProps<T>) => {
     const cellSize = width / (puzzle.fieldSize.fieldSize + (puzzle.fieldMargin || 0) * 2);
     const context = useGame(puzzle, cellSize, cellSize, true);
 

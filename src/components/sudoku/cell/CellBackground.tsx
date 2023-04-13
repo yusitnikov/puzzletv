@@ -1,3 +1,4 @@
+import {ReactElement} from "react";
 import {SetInterface} from "../../../types/struct/Set";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
@@ -8,16 +9,17 @@ import {getRegionBoundingBox} from "../../../utils/regions";
 import {getTransformedRectCenter, Rect} from "../../../types/layout/Rect";
 import {profiler} from "../../../utils/profiler";
 import {usePureMemo} from "../../../hooks/usePureMemo";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface CellBackgroundProps {
-    context: PuzzleContext<any, any, any>;
+export interface CellBackgroundProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
     cellPosition?: Position;
     colors: SetInterface<CellColorValue>;
     size?: number;
     noOpacity?: boolean;
 }
 
-export const CellBackground = ({context, cellPosition, colors, noOpacity, size = 1}: CellBackgroundProps) => {
+export const CellBackground = <T extends AnyPTM>({context, cellPosition, colors, noOpacity, size = 1}: CellBackgroundProps<T>) => {
     colors = colors.sorted();
     cellPosition = usePureMemo(cellPosition);
 
@@ -70,8 +72,8 @@ export const CellBackground = ({context, cellPosition, colors, noOpacity, size =
     />;
 };
 
-export interface CellBackgroundByDataProps {
-    context: PuzzleContext<any, any, any>;
+export interface CellBackgroundByDataProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
 
     cellPosition?: Position;
     colors: SetInterface<CellColorValue>;
@@ -83,8 +85,8 @@ export interface CellBackgroundByDataProps {
     customCellRadius: number;
 }
 
-export const CellBackgroundByData = profiler.memo("CellBackgroundByData", (
-    {context, cellPosition, colors, size, clip, opacity, customCellRect, customCellCenter, customCellRadius}: CellBackgroundByDataProps
+export const CellBackgroundByData = profiler.memo("CellBackgroundByData", <T extends AnyPTM>(
+    {context, cellPosition, colors, size, clip, opacity, customCellRect, customCellCenter, customCellRadius}: CellBackgroundByDataProps<T>
 ) => {
     return <AutoSvg
         width={size}
@@ -122,4 +124,4 @@ export const CellBackgroundByData = profiler.memo("CellBackgroundByData", (
             />)}
         </>}
     </AutoSvg>;
-});
+}) as <T extends AnyPTM>(props: CellBackgroundByDataProps<T>) => ReactElement;

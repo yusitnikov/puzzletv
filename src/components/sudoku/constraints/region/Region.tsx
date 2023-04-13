@@ -18,10 +18,13 @@ import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
 import {ProcessedGameStateEx} from "../../../../types/sudoku/GameState";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const regionTag = "region";
 
-export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps) => {
+export const Region = withFieldLayer(FieldLayer.lines, <T extends AnyPTM>(
+    {cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps<T>
+) => {
     const points = useMemo(() => getRegionBorders(cells, 1, true), [cells]);
 
     return <RoundedPolyLine
@@ -31,12 +34,12 @@ export const Region = withFieldLayer(FieldLayer.lines, ({cells, context: {cellSi
     />;
 }) as ConstraintPropsGenericFc;
 
-export const isValidCellForRegion = <CellType, ExType, ProcessedExType>(
+export const isValidCellForRegion = <T extends AnyPTM>(
     region: Position[],
     cell: Position,
-    digits: GivenDigitsMap<CellType>,
-    {typeManager: {areSameCellData}}: PuzzleDefinition<CellType, ExType, ProcessedExType>,
-    state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
+    digits: GivenDigitsMap<T["cell"]>,
+    {typeManager: {areSameCellData}}: PuzzleDefinition<T>,
+    state: ProcessedGameStateEx<T>
 ) => {
     const digit = digits[cell.top][cell.left]!;
 
@@ -55,9 +58,9 @@ export const isValidCellForRegion = <CellType, ExType, ProcessedExType>(
     return true;
 };
 
-export const RegionConstraint = <CellType, ExType, ProcessedExType>(
+export const RegionConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[], showBorders = true, name = "region"
-): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+): Constraint<T> => {
     const cells = parsePositionLiterals(cellLiterals);
 
     return {

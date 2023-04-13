@@ -10,8 +10,9 @@ import {
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import {blackKropkiDotsExplained, ratioDotsExplained} from "../ruleSnippets";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
-export const HeartsCube = (showRatio: boolean): PuzzleDefinition<number> => ({
+export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: showRatio,
     title: {
         [LanguageCode.en]: "Rational Cube",

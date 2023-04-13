@@ -26,8 +26,9 @@ import {loop} from "../../utils/math";
 import {HashSet} from "../struct/Set";
 import {LanguageCode} from "../translations/LanguageCode";
 import type {PuzzleImportOptions} from "./PuzzleImportOptions";
+import {AnyPTM} from "./PuzzleTypeMap";
 
-export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
+export interface PuzzleDefinition<T extends AnyPTM> {
     title: PartiallyTranslatable;
     slug: string;
     params?: {
@@ -38,31 +39,25 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     };
     getNewHostedGameParams?: () => any;
     author?: PartiallyTranslatable<ReactNode>;
-    rules?: (
-        translate: ReturnType<typeof useTranslate>,
-        context: PuzzleContext<CellType, ExType, ProcessedExType>
-    ) => ReactNode;
-    aboveRules?: (
-        translate: ReturnType<typeof useTranslate>,
-        context: PuzzleContext<CellType, ExType, ProcessedExType>
-    ) => ReactNode;
-    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>;
-    fieldSize: FieldSize;
+    rules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>) => ReactNode;
+    aboveRules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>) => ReactNode;
+    typeManager: SudokuTypeManager<T>;
+    fieldSize: FieldSize<T>;
     fieldMargin?: number;
-    fieldWrapperComponent?: ComponentType<PuzzleContextProps<CellType, ExType, ProcessedExType>>;
+    fieldWrapperComponent?: ComponentType<PuzzleContextProps<T>>;
     fieldFitsWrapper?: boolean;
     ignoreRowsColumnCountInTheWrapper?: boolean;
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
-    initialDigits?: GivenDigitsMap<CellType>;
+    initialDigits?: GivenDigitsMap<T["cell"]>;
     initialLetters?: GivenDigitsMap<string>;
-    initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<CellType, ExType, ProcessedExType>) => GivenDigitsMap<CellColorValue[]>);
+    initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<T>) => GivenDigitsMap<CellColorValue[]>);
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
-    resultChecker?: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
+    resultChecker?: (context: PuzzleContext<T>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
     forceAutoCheckOnFinish?: boolean;
-    items?: Constraint<CellType, any, ExType, ProcessedExType>[]
-        | ((state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => Constraint<CellType, any, ExType, ProcessedExType>[]);
+    items?: Constraint<T, any>[]
+        | ((state: ProcessedGameStateEx<T>) => Constraint<T, any>[]);
     borderColor?: string;
     allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
     disableDiagonalCenterLines?: boolean;
@@ -74,10 +69,7 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     disableColoring?: boolean;
     enableShading?: boolean;
     lmdLink?: string;
-    getLmdSolutionCode?: (
-        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
-        state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>
-    ) => string;
+    getLmdSolutionCode?: (puzzle: PuzzleDefinition<T>, state: ProcessedGameStateEx<T>) => string;
     noIndex?: boolean;
     saveState?: boolean;
     saveStateKey?: string;
@@ -89,23 +81,23 @@ export interface PuzzleDefinition<CellType, ExType = {}, ProcessedExType = {}> {
     importOptions?: Omit<PuzzleImportOptions, "load">;
 }
 
-export const allDrawingModes: PuzzleDefinition<any, any, any>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];
+export const allDrawingModes: PuzzleDefinition<AnyPTM>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];
 
-export interface PuzzleDefinitionLoader<CellType, ExType = {}, ProcessedExType = {}> {
+export interface PuzzleDefinitionLoader<T extends AnyPTM> {
     slug: string;
     noIndex?: boolean;
     fulfillParams?: (params: any) => any;
-    loadPuzzle: (params: any) => Omit<PuzzleDefinition<CellType, ExType, ProcessedExType>, "noIndex" | "slug"> & {slug?: string};
+    loadPuzzle: (params: any) => Omit<PuzzleDefinition<T>, "noIndex" | "slug"> & {slug?: string};
 }
 
-export const loadPuzzle = <CellType, ExType, ProcessedExType>(
-    puzzleOrLoader: PuzzleDefinition<CellType, ExType, ProcessedExType> | PuzzleDefinitionLoader<CellType, ExType, ProcessedExType>,
+export const loadPuzzle = <T extends AnyPTM>(
+    puzzleOrLoader: PuzzleDefinition<T> | PuzzleDefinitionLoader<T>,
     params: any = {},
-): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
+): PuzzleDefinition<T> => {
     const {
         loadPuzzle,
         fulfillParams = params => params,
-    } = puzzleOrLoader as PuzzleDefinitionLoader<any, any, any>;
+    } = puzzleOrLoader as PuzzleDefinitionLoader<T>;
 
     const fulfilledParams = typeof loadPuzzle === "function"
         ? fulfillParams(params)
@@ -113,7 +105,7 @@ export const loadPuzzle = <CellType, ExType, ProcessedExType>(
 
     const puzzle = typeof loadPuzzle === "function"
         ? loadPuzzle(fulfilledParams)
-        : puzzleOrLoader as PuzzleDefinition<any, any, any>;
+        : puzzleOrLoader as PuzzleDefinition<T>;
 
     return {
         ...puzzle,
@@ -126,16 +118,16 @@ export const loadPuzzle = <CellType, ExType, ProcessedExType>(
     };
 };
 
-export const getDefaultDigitsCount = ({typeManager: {maxDigitsCount}, fieldSize: {fieldSize}}: PuzzleDefinition<any, any, any>) =>
+export const getDefaultDigitsCount = <T extends AnyPTM>({typeManager: {maxDigitsCount}, fieldSize: {fieldSize}}: PuzzleDefinition<T>) =>
     Math.min(maxDigitsCount || fieldSize, fieldSize);
 
-export const normalizePuzzlePosition = (
+export const normalizePuzzlePosition = <T extends AnyPTM>(
     {top, left}: Position,
     {
         fieldSize: {rowsCount, columnsCount},
         loopHorizontally,
         loopVertically,
-    }: PuzzleDefinition<any, any, any>
+    }: PuzzleDefinition<T>
 ): Position => ({
     top: loopVertically
         ? loop(top, rowsCount)
@@ -145,15 +137,15 @@ export const normalizePuzzlePosition = (
         : left,
 });
 
-export const getIsSamePuzzlePosition = (puzzle: PuzzleDefinition<any, any, any>) =>
+export const getIsSamePuzzlePosition = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
     (a: Position, b: Position) => isSamePosition(normalizePuzzlePosition(a, puzzle), normalizePuzzlePosition(b, puzzle));
 
-export const getPuzzlePositionHasher = (puzzle: PuzzleDefinition<any, any, any>) =>
+export const getPuzzlePositionHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
     (position: Position) => stringifyPosition(normalizePuzzlePosition(position, puzzle));
 
-export const normalizePuzzleVector = (
+export const normalizePuzzleVector = <T extends AnyPTM>(
     vector: Position,
-    puzzle: PuzzleDefinition<any, any, any>
+    puzzle: PuzzleDefinition<T>
 ): Position => {
     const {
         fieldSize: {rowsCount, columnsCount},
@@ -173,9 +165,9 @@ export const normalizePuzzleVector = (
     };
 };
 
-export const normalizePuzzleLine = <LineT extends Line = Line>(
+export const normalizePuzzleLine = <T extends AnyPTM, LineT extends Line = Line>(
     line: LineT,
-    puzzle: PuzzleDefinition<any, any, any>
+    puzzle: PuzzleDefinition<T>
 ): LineT => {
     let vector = normalizePuzzleVector(getLineVector(line), puzzle);
     if (vector.top < 0 || (vector.top === 0 && vector.left < 0)) {
@@ -196,13 +188,13 @@ export const normalizePuzzleLine = <LineT extends Line = Line>(
 };
 
 // noinspection JSUnusedGlobalSymbols
-export const getIsSamePuzzleLine = (puzzle: PuzzleDefinition<any, any, any>) =>
+export const getIsSamePuzzleLine = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
     (a: Line, b: Line) => isSameLine(normalizePuzzleLine(a, puzzle), normalizePuzzleLine(b, puzzle));
 
-export const getPuzzleLineHasher = (puzzle: PuzzleDefinition<any, any, any>) =>
+export const getPuzzleLineHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
     (line: Line) => stringifyLine(normalizePuzzleLine(line, puzzle));
 
-export const resolvePuzzleInitialColors = (context: PuzzleContext<any, any, any>): GivenDigitsMap<CellColorValue[]> => {
+export const resolvePuzzleInitialColors = <T extends AnyPTM>(context: PuzzleContext<T>): GivenDigitsMap<CellColorValue[]> => {
     const {puzzle: {initialColors = {}}} = context;
 
     return typeof initialColors === "function"
@@ -210,8 +202,8 @@ export const resolvePuzzleInitialColors = (context: PuzzleContext<any, any, any>
         : initialColors;
 };
 
-export const isValidFinishedPuzzleByEmbeddedSolution = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>
+export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
+    context: PuzzleContext<T>
 ): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
     const {puzzle, state, cellsIndex} = context;
     const {typeManager: {getCellTypeProps, getDigitByCellData}, initialDigits, initialCellMarks = []} = puzzle;

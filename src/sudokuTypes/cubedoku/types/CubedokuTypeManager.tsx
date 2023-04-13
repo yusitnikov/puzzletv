@@ -4,18 +4,19 @@ import {CubeTypeManager} from "../../cube/types/CubeTypeManager";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {CubedokuIndexingConstraint} from "../constraints/CubedokuIndexing";
 import {Constraint} from "../../../types/sudoku/Constraint";
+import {NumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const CubedokuTypeManager: SudokuTypeManager<number> = {
+export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
     ...CubeTypeManager(false),
 
     getCellSelectionType: function ({top, left}, {puzzle: {fieldSize: {fieldSize}}, state: {selectedCells}}) {
         const realFieldSize = fieldSize / 2;
 
-        const tooltipResult: Required<Pick<CellSelectionProps, "color" | "strokeWidth">> = {
+        const tooltipResult: Required<Pick<CellSelectionProps<NumberPTM>, "color" | "strokeWidth">> = {
             color: CellSelectionColor.secondary,
             strokeWidth: 1,
         };
-        const trackResult: Required<Pick<CellSelectionProps, "color" | "strokeWidth">> = {
+        const trackResult: Required<Pick<CellSelectionProps<NumberPTM>, "color" | "strokeWidth">> = {
             color: CellSelectionColor.secondary,
             strokeWidth: 0.5,
         };
@@ -76,8 +77,8 @@ export const CubedokuTypeManager: SudokuTypeManager<number> = {
         return isTrack ? trackResult : undefined;
     },
 
-    postProcessPuzzle({items, ...puzzle}: PuzzleDefinition<number>): PuzzleDefinition<number> {
-        const addConstraint = (items: Constraint<number, any>[]): Constraint<number, any>[] => [
+    postProcessPuzzle({items, ...puzzle}): PuzzleDefinition<NumberPTM> {
+        const addConstraint = (items: Constraint<NumberPTM, any>[]): Constraint<NumberPTM, any>[] => [
             CubedokuIndexingConstraint(),
             ...items,
         ];

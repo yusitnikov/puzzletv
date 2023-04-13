@@ -14,6 +14,7 @@ import {ForSetters} from "./ForSetters";
 import {FPuzzlesWizardPage, fPuzzlesWizardPageTitle} from "./FPuzzlesWizardPage";
 import {HowToImport} from "./HowToImport";
 import {useGesturesGlobalEvents} from "../../utils/gestures";
+import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -27,7 +28,7 @@ export const App = ({onPageLoaded}: AppProps) => {
 
     useGesturesGlobalEvents();
 
-    const puzzle = useMemo<PuzzleDefinition<any, any, any> | undefined>(() => {
+    const puzzle = useMemo<PuzzleDefinition<AnyPTM> | undefined>(() => {
         for (const puzzleOrLoader of AllPuzzles) {
             if (slug === puzzleOrLoader.slug) {
                 const puzzle = loadPuzzle(puzzleOrLoader, params);

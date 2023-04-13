@@ -1,5 +1,4 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {MultiStageGameState} from "../../multi-stage/types/MultiStageGameState";
 import {MultiStageSudokuTypeManager} from "../../multi-stage/types/MultiStageSudokuTypeManager";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {createRegularRegions, getDefaultRegionsForRowsAndColumns} from "../../../types/sudoku/FieldSize";
@@ -11,10 +10,11 @@ import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenD
 import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {MultiStagePTM} from "../../multi-stage/types/MultiStagePTM";
 
 export const TenInOneSudokuTypeManager = (
     isRemainingCell: (cell: Position) => boolean,
-): SudokuTypeManager<number, MultiStageGameState> => ({
+): SudokuTypeManager<MultiStagePTM> => ({
     ...MultiStageSudokuTypeManager({
         getStage: (context) =>
             context.state.extension.stage === 1
@@ -81,7 +81,7 @@ export const TenInOneSudokuTypeManager = (
     getRegionsForRowsAndColumns(
         puzzle,
         {extension: {stage}}
-    ): Constraint<number, any, MultiStageGameState>[] {
+    ): Constraint<MultiStagePTM, any>[] {
         const individualBoxes = stage === 1;
         const {fieldSize: {rowsCount, columnsCount, regionWidth, regionHeight}} = puzzle;
 
@@ -91,10 +91,10 @@ export const TenInOneSudokuTypeManager = (
 
         const regions = createRegularRegions(rowsCount, columnsCount, regionWidth, regionHeight);
         const boxes = regions.map(
-            (region): Constraint<number, any, MultiStageGameState> =>
+            (region): Constraint<MultiStagePTM, any> =>
                 individualBoxes
-                    ? TenInOneRegionConstraint<number, MultiStageGameState, {}>(region)
-                    : RegionConstraint<number, MultiStageGameState, {}>(region)
+                    ? TenInOneRegionConstraint(region)
+                    : RegionConstraint(region)
         );
 
         if (!individualBoxes) {
@@ -114,8 +114,8 @@ export const TenInOneSudokuTypeManager = (
                 return indexes(boxSize).flatMap(boxRightIndex => {
                     const boxRightOffset = boxRightIndex * boxSize;
 
-                    return indexes(boxSize).flatMap(i => [
-                        RegionConstraint<number, MultiStageGameState, {}>(
+                    return indexes(boxSize).flatMap<Constraint<MultiStagePTM, any>>(i => [
+                        RegionConstraint(
                             indexes(boxSize).map(left => ({
                                 left: boxLeftOffset + left,
                                 top: boxRightOffset + i,
@@ -123,7 +123,7 @@ export const TenInOneSudokuTypeManager = (
                             false,
                             "row"
                         ),
-                        RegionConstraint<number, MultiStageGameState, {}>(
+                        RegionConstraint(
                             indexes(boxSize).map(top => ({
                                 left: boxLeftOffset + i,
                                 top: boxRightOffset + top,

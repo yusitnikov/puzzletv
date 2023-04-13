@@ -10,12 +10,12 @@ import {DigitCellDataComponentType} from "../../default/components/DigitCellData
 import {MonumentValleyDigitComponentType} from "../components/MonumentValleyDigit";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
-import {RotatableGameState} from "../../rotatable/types/RotatableGameState";
 import {RotatableDigitSudokuTypeManagerBase} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
 import {loop} from "../../../utils/math";
+import {MonumentValleyPTM} from "./MonumentValleyPTM";
 
-export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameState> = {
-    ...DigitSudokuTypeManager<RotatableGameState>(),
+export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
+    ...DigitSudokuTypeManager(),
     ...RotatableDigitSudokuTypeManagerBase<number>(0, 120, true, false),
 
     disableDigitShortcuts: true,
@@ -257,7 +257,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         ];
     },
 
-    getRegionsForRowsAndColumns({fieldSize}): Constraint<number, any, RotatableGameState>[] {
+    getRegionsForRowsAndColumns({fieldSize}): Constraint<MonumentValleyPTM, any>[] {
         const processedFieldSize = parseMonumentValleyFieldSize(fieldSize);
         const {gridSize, intersectionSize, columnsCount} = processedFieldSize;
 
@@ -268,7 +268,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
         ];
 
         return cubeFaces.flatMap(({left, top}, index) => {
-            const constraints: Constraint<number, any, RotatableGameState>[] = indexes(gridSize).flatMap(i => [
+            const constraints: Constraint<MonumentValleyPTM, any>[] = indexes(gridSize).flatMap(i => [
                 RegionConstraint(
                     indexes(gridSize).map(j => processCellCoords({left: left + i, top: top + j}, processedFieldSize)),
                     false,
@@ -326,7 +326,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<number, RotatableGameS
     borderColor: darkGreyColor,
 };
 
-const processCellCoords = (position: Position, fieldSize: FieldSize | ReturnType<typeof parseMonumentValleyFieldSize>): Position => {
+const processCellCoords = (position: Position, fieldSize: FieldSize<MonumentValleyPTM> | ReturnType<typeof parseMonumentValleyFieldSize>): Position => {
     const {top, left} = position;
     const {gridSize, intersectionSize, columnsCount} = "intersectionSize" in fieldSize
         ? fieldSize
@@ -359,20 +359,20 @@ const rotateDigit = (digit: number, times = 1) => {
 
     return digit;
 };
-const rotateDigitByPosition = (digit: number, {top, left}: Position, fieldSize: FieldSize) => {
+const rotateDigitByPosition = (digit: number, {top, left}: Position, fieldSize: FieldSize<MonumentValleyPTM>) => {
     const {gridSize, intersectionSize} = parseMonumentValleyFieldSize(fieldSize);
     return left >= gridSize - intersectionSize && left < gridSize && top < intersectionSize
         ? rotateDigit(digit)
         : digit;
 };
-const rotateDigitsMap = (map: GivenDigitsMap<number>, fieldSize: FieldSize) => processGivenDigitsMaps(
+const rotateDigitsMap = (map: GivenDigitsMap<number>, fieldSize: FieldSize<MonumentValleyPTM>) => processGivenDigitsMaps(
     ([digit], position) => rotateDigitByPosition(digit, position, fieldSize),
     [map]
 );
 
-export const fixMonumentValleyDigitForConstraint = <DataT, ExType, ProcessedExType>(
-    constraint: Constraint<number, DataT, ExType, ProcessedExType>
-): Constraint<number, DataT, ExType, ProcessedExType> => ({
+export const fixMonumentValleyDigitForConstraint = <DataT,>(
+    constraint: Constraint<MonumentValleyPTM, DataT>
+): Constraint<MonumentValleyPTM, DataT> => ({
     ...constraint,
     isValidCell(cell, digits, regionCells, context, ...args) {
         return constraint.isValidCell?.(
@@ -437,7 +437,7 @@ export const createMonumentValleyFieldSize = (
     regionSize: number,
     intersectionSize = regionSize,
     showBorders = true,
-): FieldSize => {
+): FieldSize<MonumentValleyPTM> => {
     const columnsCount = gridSize * 3 - intersectionSize * 2;
     const regions = createRegularRegions(gridSize, gridSize, regionSize, regionSize);
 
@@ -467,7 +467,7 @@ export const createMonumentValleyFieldSize = (
     };
 };
 
-export const parseMonumentValleyFieldSize = ({columnsCount, rowsCount}: FieldSize) => ({
+export const parseMonumentValleyFieldSize = ({columnsCount, rowsCount}: FieldSize<MonumentValleyPTM>) => ({
     columnsCount,
     rowsCount,
     gridSize: rowsCount * 2 - columnsCount,

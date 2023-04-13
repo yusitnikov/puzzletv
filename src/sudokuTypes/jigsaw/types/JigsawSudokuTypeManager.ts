@@ -20,8 +20,9 @@ import {
 import {JigsawMoveCellWriteModeInfo} from "./JigsawMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {lighterGreyColor} from "../../../components/app/globals";
+import {JigsawPTM} from "./JigsawPTM";
 
-export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawDigit, JigsawGameState, JigsawProcessedGameState> = {
+export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
         {digit: digit1, angle: angle1},
         {digit: digit2, angle: angle2},

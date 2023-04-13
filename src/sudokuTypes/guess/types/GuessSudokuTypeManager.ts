@@ -10,11 +10,12 @@ import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/pla
 import {Position} from "../../../types/layout/Position";
 import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
+import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const GuessSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
+export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(
     solution: GivenDigitsMap<number>
-): SudokuTypeManager<number, ExType, ProcessedExType> => ({
-    ...DigitSudokuTypeManager<ExType, ProcessedExType>(),
+): SudokuTypeManager<T> => ({
+    ...DigitSudokuTypeManager(),
 
     items: [CellOwnershipConstraint()],
 
@@ -84,7 +85,7 @@ export const GuessSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
         puzzle,
         state,
         {initialDigits, excludedDigits}
-    ): GameStateEx<number, ExType> {
+    ): GameStateEx<T> {
         return mergeGameStateWithUpdates(state, {
             initialDigits: unserializeGivenDigitsMap(initialDigits, puzzle.typeManager.unserializeCellData),
             excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),

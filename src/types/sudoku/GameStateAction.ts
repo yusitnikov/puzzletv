@@ -17,73 +17,66 @@ import {Position} from "../layout/Position";
 import {DragAction} from "./DragAction";
 import {CellMarkType} from "./CellMark";
 import {CellColorValue} from "./CellColor";
+import {AnyPTM} from "./PuzzleTypeMap";
 
-export type GameStateActionCallback<CellType, ExType, ProcessedExType> =
-    PartialGameStateEx<CellType, ExType> | ((prevState: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) => PartialGameStateEx<CellType, ExType>);
+export type GameStateActionCallback<T extends AnyPTM> =
+    PartialGameStateEx<T> | ((prevState: ProcessedGameStateEx<T>) => PartialGameStateEx<T>);
 
-export interface GameStateActionType<ParamsType, CellType, ExType, ProcessedExType> {
+export interface GameStateActionType<ParamsType, T extends AnyPTM> {
     key: string;
     callback: (
         params: ParamsType,
-        context: PuzzleContext<CellType, ExType, ProcessedExType>,
+        context: PuzzleContext<T>,
         clientId: string
-    ) => GameStateActionCallback<CellType, ExType, ProcessedExType>;
+    ) => GameStateActionCallback<T>;
 }
 
-export interface GameStateAction<ParamsType, CellType, ExType, ProcessedExType> {
-    type: GameStateActionType<ParamsType, CellType, ExType, ProcessedExType>;
+export interface GameStateAction<ParamsType, T extends AnyPTM> {
+    type: GameStateActionType<ParamsType, T>;
     params: ParamsType;
 }
 
-export type GameStateActionOrCallback<ParamsType, CellType, ExType, ProcessedExType> =
-    GameStateAction<ParamsType, CellType, ExType, ProcessedExType> |
-    GameStateActionCallback<CellType, ExType, ProcessedExType>;
+export type GameStateActionOrCallback<ParamsType, T extends AnyPTM> =
+    GameStateAction<ParamsType, T> | GameStateActionCallback<T>;
 
 // region Specific actions
-export const undoActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
+export const undoActionType = <T extends AnyPTM>(): GameStateActionType<undefined, T> => ({
     key: "undo",
     callback: () => gameStateUndo,
 });
-export const undoAction = <CellType, ExType, ProcessedExType>()
-    : GameStateAction<undefined, CellType, ExType, ProcessedExType> => ({
+export const undoAction = <T extends AnyPTM>(): GameStateAction<undefined, T> => ({
     type: undoActionType(),
     params: undefined,
 });
 
-export const redoActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
+export const redoActionType = <T extends AnyPTM>(): GameStateActionType<undefined, T> => ({
     key: "redo",
     callback: () => gameStateRedo,
 });
-export const redoAction = <CellType, ExType, ProcessedExType>()
-    : GameStateAction<undefined, CellType, ExType, ProcessedExType> => ({
+export const redoAction = <T extends AnyPTM>(): GameStateAction<undefined, T> => ({
     type: redoActionType(),
     params: undefined,
 });
 
-export const clearSelectionActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<undefined, CellType, ExType, ProcessedExType> => ({
+export const clearSelectionActionType = <T extends AnyPTM>(): GameStateActionType<undefined, T> => ({
     key: "clear-selection",
     callback: (_, context, clientId) =>
         state => gameStateClearSelectedCellsContent({...context, state}, clientId),
 });
-export const clearSelectionAction = <CellType, ExType, ProcessedExType>()
-    : GameStateAction<undefined, CellType, ExType, ProcessedExType> => ({
+export const clearSelectionAction = <T extends AnyPTM>(): GameStateAction<undefined, T> => ({
     type: clearSelectionActionType(),
     params: undefined,
 });
 
-export const enterDigitActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<number, CellType, ExType, ProcessedExType> => ({
+export const enterDigitActionType = <T extends AnyPTM>(): GameStateActionType<number, T> => ({
     key: "enter-digit",
     callback: (digit, context, clientId) =>
         state => gameStateHandleDigit({...context, state}, digit, clientId, true),
 });
-export const enterDigitAction = <CellType, ExType, ProcessedExType>(
+export const enterDigitAction = <T extends AnyPTM>(
     digit: number,
-    context: PuzzleContext<CellType, ExType, ProcessedExType>
-): GameStateActionOrCallback<number, CellType, ExType, ProcessedExType>[] => [
+    context: PuzzleContext<T>
+): GameStateActionOrCallback<number, T>[] => [
     state => gameStateHandleDigit({...context, state}, digit, myClientId, false),
     {
         type: enterDigitActionType(),
@@ -95,18 +88,17 @@ interface ApplyCurrentMultiLineActionParams {
     isClick?: boolean;
     isRightButton?: boolean;
 }
-export const applyCurrentMultiLineActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<ApplyCurrentMultiLineActionParams, CellType, ExType, ProcessedExType> => ({
+export const applyCurrentMultiLineActionType = <T extends AnyPTM>()
+    : GameStateActionType<ApplyCurrentMultiLineActionParams, T> => ({
     key: "apply-current-multiline",
     callback: ({isClick = false, isRightButton = false} = {}, context, clientId) =>
         state => gameStateApplyCurrentMultiLine({...context, state}, clientId, isClick, isRightButton, true),
 });
-export const applyCurrentMultiLineAction = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const applyCurrentMultiLineAction = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     isClick = false,
     isRightButton = false
-)
-    : GameStateActionOrCallback<ApplyCurrentMultiLineActionParams, CellType, ExType, ProcessedExType>[] => [
+): GameStateActionOrCallback<ApplyCurrentMultiLineActionParams, T>[] => [
     {
         type: applyCurrentMultiLineActionType(),
         params: {isClick, isRightButton},
@@ -119,8 +111,7 @@ export interface SetCellMarkActionParams extends Position {
     cellMarkType?: CellMarkType;
     color?: CellColorValue;
 }
-export const setCellMarkActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<SetCellMarkActionParams, CellType, ExType, ProcessedExType> => ({
+export const setCellMarkActionType = <T extends AnyPTM>(): GameStateActionType<SetCellMarkActionParams, T> => ({
     key: "set-cell-mark",
     callback: ({isCenter, cellMarkType, color, ...position}, context) =>
         state => gameStateSetCellMark({...context, state}, position, isCenter, cellMarkType, color),
@@ -129,25 +120,24 @@ export const setCellMarkActionType = <CellType, ExType, ProcessedExType>()
 interface ShadingActionParams extends Position {
     action: DragAction;
 }
-export const shadingActionType = <CellType, ExType, ProcessedExType>()
-    : GameStateActionType<ShadingActionParams, CellType, ExType, ProcessedExType> => ({
+export const shadingActionType = <T extends AnyPTM>(): GameStateActionType<ShadingActionParams, T> => ({
     key: "apply-shading",
     callback: ({action, ...position}, context) =>
         state => gameStateApplyShading({...context, state}, position, action),
 });
-export const shadingAction = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const shadingAction = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     position: Position,
     action: DragAction
-): GameStateActionOrCallback<ShadingActionParams, CellType, ExType, ProcessedExType> => ({
+): GameStateActionOrCallback<ShadingActionParams, T> => ({
     type: shadingActionType(),
     params: {...position, action},
 });
-export const shadingStartAction = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const shadingStartAction = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     position: Position,
     isRightButton: boolean
-): GameStateActionOrCallback<ShadingActionParams, CellType, ExType, ProcessedExType>[] => {
+): GameStateActionOrCallback<ShadingActionParams, T>[] => {
     const field = gameStateGetCurrentFieldState(context.state);
     const action = gameStateIncrementShading(
         gameStateGetCellShading(field.cells[position.top][position.left]),
@@ -160,7 +150,7 @@ export const shadingStartAction = <CellType, ExType, ProcessedExType>(
 }
 // endregion
 
-export const coreGameStateActionTypes: GameStateActionType<any, any, any, any>[] = [
+export const coreGameStateActionTypes: GameStateActionType<any, AnyPTM>[] = [
     undoActionType(),
     redoActionType(),
     clearSelectionActionType(),

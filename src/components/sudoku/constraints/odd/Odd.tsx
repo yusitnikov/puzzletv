@@ -7,15 +7,16 @@ import {
     ConstraintProps,
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const Odd = withFieldLayer(FieldLayer.beforeSelection, ({cells: [{left, top}]}: ConstraintProps) => <circle
+export const Odd = withFieldLayer(FieldLayer.beforeSelection, <T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T>) => <circle
     cx={left + 0.5}
     cy={top + 0.5}
     r={0.4}
     fill={lightGreyColor}
 />) as ConstraintPropsGenericFc;
 
-export const OddConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral, visible = true): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+export const OddConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral, visible = true): Constraint<T> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     return {

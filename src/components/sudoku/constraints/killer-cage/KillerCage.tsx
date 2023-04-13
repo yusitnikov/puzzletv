@@ -20,6 +20,7 @@ import {isValidCellForRegion} from "../region/Region";
 import {indexes} from "../../../../utils/indexes";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {incrementArrayItemByIndex} from "../../../../utils/array";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const cageTag = "cage";
 
@@ -31,7 +32,7 @@ export interface KillerCageProps {
     fontColor?: string;
 }
 
-export const KillerCage = withFieldLayer(FieldLayer.regular, (
+export const KillerCage = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
     {
         context: {puzzle: {prioritizeSelection}},
         cells,
@@ -42,7 +43,7 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, (
             lineColor = blackColor,
             fontColor = blackColor,
         },
-    }: ConstraintProps<any, KillerCageProps>
+    }: ConstraintProps<T, KillerCageProps>
 ) => {
     const {widthCoeff} = useDigitComponentType();
 
@@ -145,14 +146,14 @@ const KillerCageSum = ({sum, size, color = blackColor, left, top}: KillerCageSum
     </>;
 };
 
-export const DecorativeCageConstraint = <CellType, ExType, ProcessedExType>(
+export const DecorativeCageConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     sum?: string | number,
     showBottomSum?: boolean,
     sumPointIndex?: number,
     lineColor?: string,
     fontColor?: string
-): Constraint<CellType, KillerCageProps, ExType, ProcessedExType> => ({
+): Constraint<T, KillerCageProps> => ({
     name: "cage",
     tags: [cageTag],
     cells: parsePositionLiterals(cellLiterals),
@@ -166,14 +167,14 @@ export const DecorativeCageConstraint = <CellType, ExType, ProcessedExType>(
     component: KillerCage,
 });
 
-export const KillerCageConstraint = <CellType, ExType, ProcessedExType>(
+export const KillerCageConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     sum?: number,
     showBottomSum?: boolean,
     sumPointIndex?: number,
     lineColor?: string,
     fontColor?: string
-): Constraint<CellType, KillerCageProps, ExType, ProcessedExType> => ({
+): Constraint<T, KillerCageProps> => ({
     ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor),
     name: "killer cage",
     isObvious: true,
@@ -216,7 +217,7 @@ export const KillerCageConstraint = <CellType, ExType, ProcessedExType>(
     },
 });
 
-export const KillerCageConstraintByRect = <CellType, ExType, ProcessedExType>(
+export const KillerCageConstraintByRect = <T extends AnyPTM>(
     topLeft: PositionLiteral,
     width: number,
     height: number,
@@ -226,7 +227,7 @@ export const KillerCageConstraintByRect = <CellType, ExType, ProcessedExType>(
 ) => {
     const {top, left} = parsePositionLiteral(topLeft);
 
-    return KillerCageConstraint<CellType, ExType, ProcessedExType>(
+    return KillerCageConstraint<T>(
         indexes(height).flatMap(dy => indexes(width).map(dx => ({top: top + dy, left: left + dx}))),
         sum,
         showBottomSum,

@@ -1,4 +1,3 @@
-import {JigsawGameState, JigsawProcessedGameState} from "./JigsawGameState";
 import {JigsawDigit} from "./JigsawDigit";
 import {isSamePosition, Position} from "../../../types/layout/Position";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
@@ -11,9 +10,10 @@ import {
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {getRegionBoundingBox} from "../../../utils/regions";
 import {JigsawPieceInfo} from "./JigsawPieceInfo";
+import {JigsawPTM} from "./JigsawPTM";
 
 export const getJigsawPieces = (
-    {fieldSize: {regions, rowsCount, columnsCount}}: PuzzleDefinition<JigsawDigit, JigsawGameState, JigsawProcessedGameState>,
+    {fieldSize: {regions, rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
 ): JigsawPieceInfo[] => {
     // Regions may be not initialized yet during puzzle import, so the code below is a fallback
     if (regions.length === 0) {
@@ -43,13 +43,13 @@ export const getJigsawPieces = (
 };
 
 export const getJigsawPiecesWithCache = (
-    {puzzle, cache}: SudokuCellsIndex<JigsawDigit, JigsawGameState, JigsawProcessedGameState>,
+    {puzzle, cache}: SudokuCellsIndex<JigsawPTM>,
 ): ReturnType<typeof getJigsawPieces> => {
     return cache.jigsawPieces = cache.jigsawPieces ?? getJigsawPieces(puzzle);
 };
 
 export const getJigsawPieceIndexByCell = (
-    cellsIndex: SudokuCellsIndex<JigsawDigit, JigsawGameState, JigsawProcessedGameState>,
+    cellsIndex: SudokuCellsIndex<JigsawPTM>,
     cell: Position,
 ): number | undefined => getJigsawPiecesWithCache(cellsIndex).findIndex(
     ({cells}) => cells.some((regionCell) => isSamePosition(regionCell, cell))

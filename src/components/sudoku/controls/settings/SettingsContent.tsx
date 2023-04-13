@@ -20,15 +20,14 @@ import {SettingsSelect} from "./SettingsSelect";
 import {PencilmarksCheckerMode} from "../../../../types/sudoku/PencilmarksCheckerMode";
 import {LanguageCode} from "../../../../types/translations/LanguageCode";
 import {shortenUrl} from "../../../../services/tinyUrl";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export interface SettingsContentProps<CellType, ExType, ProcessedExType = {}> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+export interface SettingsContentProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
     cellSize: number;
 }
 
-export const SettingsContent = <CellType, ExType, ProcessedExType>(
-    props: SettingsContentProps<CellType, ExType, ProcessedExType>
-) => {
+export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>) => {
     const {
         cellSize,
         context: {

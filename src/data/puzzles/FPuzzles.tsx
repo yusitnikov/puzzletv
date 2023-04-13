@@ -84,6 +84,7 @@ import {
 } from "../../types/sudoku/PuzzleImportOptions";
 import {createEmptyContextForPuzzle} from "../../types/sudoku/PuzzleContext";
 import {doesGridRegionContainCell} from "../../types/sudoku/GridRegion";
+import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -98,7 +99,7 @@ export const loadByFPuzzlesObject = (
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
     importOptions: Omit<PuzzleImportOptions, "load">
-): PuzzleDefinition<any, any, any> => {
+): PuzzleDefinition<AnyPTM> => {
     const {
         type = PuzzleImportPuzzleType.Regular,
         digitsCount = puzzleJson.size,
@@ -115,7 +116,7 @@ export const loadByFPuzzlesObject = (
             ? RegularCalculatorDigitComponentType
             : RegularDigitComponentType
     );
-    const typesMap: Record<PuzzleImportPuzzleType, SudokuTypeManager<any, any, any>> = {
+    const typesMap: Record<PuzzleImportPuzzleType, SudokuTypeManager<AnyPTM>> = {
         [PuzzleImportPuzzleType.Regular]: regularTypeManager,
         [PuzzleImportPuzzleType.Latin]: LatinDigitSudokuTypeManager,
         [PuzzleImportPuzzleType.Calculator]: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
@@ -145,12 +146,12 @@ export const loadByFPuzzlesObject = (
     return loadByFPuzzlesObjectAndTypeManager(puzzleJson, slug, importOptions, {...typeManager});
 };
 
-export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedExType>(
+export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
     puzzleJson: FPuzzlesPuzzle,
     slug: string,
     importOptions: Omit<PuzzleImportOptions, "load">,
-    typeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
-): PuzzleDefinition<CellType, ExType, ProcessedExType> => {
+    typeManager: SudokuTypeManager<T>,
+): PuzzleDefinition<T> => {
     const {
         digitsCount,
         htmlRules,
@@ -163,12 +164,12 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
         allowOverrideColors = false,
     } = importOptions;
 
-    const initialDigits: GivenDigitsMap<CellType> = {};
+    const initialDigits: GivenDigitsMap<T["cell"]> = {};
     const initialLetters: GivenDigitsMap<string> = {};
     const initialColors: GivenDigitsMap<CellColorValue[]> = {};
-    const items: Constraint<CellType, any, ExType, ProcessedExType>[] = [];
+    const items: Constraint<T, any>[] = [];
 
-    const puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType> = {
+    const puzzle: PuzzleDefinition<T> = {
         noIndex: true,
         slug,
         title: {[LanguageCode.en]: "Untitled"},
@@ -276,7 +277,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                         switch (typeof value) {
                             case "number":
                                 if (fillableDigitalDisplay) {
-                                    items.push(FillableCalculatorDigitConstraint<CellType, ExType, ProcessedExType>({top, left}, value));
+                                    items.push(FillableCalculatorDigitConstraint({top, left}, value));
                                 } else {
                                     initialDigits[top] = initialDigits[top] || {};
                                     initialDigits[top][left] = typeManager.createCellDataByImportedDigit(value);
@@ -336,12 +337,12 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
             if (littleKillerSum instanceof Array) {
                 puzzle.fieldMargin = puzzle.fieldMargin || 1;
 
-                const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size, regions: []};
+                const fieldSize: FieldSize<T> = {fieldSize: size, rowsCount: size, columnsCount: size, regions: []};
 
                 items.push(...littleKillerSum.map(({cell, cells: [startCell], direction, value, ...other}: FPuzzlesLittleKillerSum) => {
                     ObjectParser.empty.parse(other, "f-puzzles little killer sum");
 
-                    return LittleKillerConstraint<CellType, ExType, ProcessedExType>(startCell, direction, fieldSize, parseOptionalNumber(value));
+                    return LittleKillerConstraint(startCell, direction, fieldSize, parseOptionalNumber(value));
                 }));
             }
         },
@@ -353,7 +354,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
 
                     return lines.length
-                        ? lines.map(([lineStart, ...line]) => ArrowConstraint<CellType, ExType, ProcessedExType>(
+                        ? lines.map(([lineStart, ...line]) => ArrowConstraint<T>(
                             visibleCells,
                             parsePositionLiterals(line).filter(isVisibleGridCell),
                             false,
@@ -361,7 +362,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                             !!productArrow,
                             false,
                         ))
-                        : ArrowConstraint<CellType, ExType, ProcessedExType>(
+                        : ArrowConstraint<T>(
                             visibleCells,
                             [],
                             false,
@@ -379,7 +380,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
 
-                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(
+                    return KillerCageConstraint<T>(
                         visibleCells,
                         parseOptionalNumber(value),
                         false,
@@ -421,7 +422,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     const [cell1, cell2] = parsePositionLiterals(cells)
                         .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
 
-                    return KropkiDotConstraint<CellType, ExType, ProcessedExType>(cell1, cell2, true, parseOptionalNumber(value));
+                    return KropkiDotConstraint<T>(cell1, cell2, true, parseOptionalNumber(value));
                 }));
             }
         },
@@ -433,7 +434,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     const [cell1, cell2] = parsePositionLiterals(cells)
                         .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
 
-                    return KropkiDotConstraint<CellType, ExType, ProcessedExType>(cell1, cell2, false, parseOptionalNumber(value));
+                    return KropkiDotConstraint<T>(cell1, cell2, false, parseOptionalNumber(value));
                 }));
             }
         },
@@ -446,8 +447,8 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                         .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
 
                     switch (value) {
-                        case "X": return [XMarkConstraint<CellType, ExType, ProcessedExType>(cell1, cell2)];
-                        case "V": return [VMarkConstraint<CellType, ExType, ProcessedExType>(cell1, cell2)];
+                        case "X": return [XMarkConstraint<T>(cell1, cell2)];
+                        case "V": return [VMarkConstraint<T>(cell1, cell2)];
                         default: return [];
                     }
                 }));
@@ -458,7 +459,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...thermometer.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles thermometer");
 
-                    return lines.map((cells) => ThermometerConstraint<CellType, ExType, ProcessedExType>(
+                    return lines.map((cells) => ThermometerConstraint<T>(
                         parsePositionLiterals(cells).filter(isVisibleGridCell),
                         undefined,
                         false,
@@ -470,12 +471,12 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
             if (sandwichsum instanceof Array) {
                 puzzle.fieldMargin = puzzle.fieldMargin || 1;
 
-                const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size, regions: []};
+                const fieldSize: FieldSize<T> = {fieldSize: size, rowsCount: size, columnsCount: size, regions: []};
 
                 items.push(...sandwichsum.flatMap(({cell, value, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
 
-                    return value ? [SandwichSumConstraint<CellType, ExType, ProcessedExType>(cell, fieldSize, Number(value))] : [];
+                    return value ? [SandwichSumConstraint<T>(cell, fieldSize, Number(value))] : [];
                 }));
             }
         },
@@ -484,7 +485,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...even.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles even cell");
 
-                    return EvenConstraint<CellType, ExType, ProcessedExType>(cell);
+                    return EvenConstraint<T>(cell);
                 }));
             }
         },
@@ -493,7 +494,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...odd.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles odd cell");
 
-                    return OddConstraint<CellType, ExType, ProcessedExType>(cell);
+                    return OddConstraint<T>(cell);
                 }));
             }
         },
@@ -504,7 +505,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
 
-                    return KillerCageConstraint<CellType, ExType, ProcessedExType>(visibleCells);
+                    return KillerCageConstraint<T>(visibleCells);
                 }));
             }
         },
@@ -518,7 +519,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                         ...parsePositionLiterals(cloneCells),
                     ].filter(isVisibleGridCell)).items;
 
-                    return uniqueCells.length > 1 ? [CloneConstraint<CellType, ExType, ProcessedExType>(uniqueCells)] : [];
+                    return uniqueCells.length > 1 ? [CloneConstraint<T>(uniqueCells)] : [];
                 }));
             }
         },
@@ -528,7 +529,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     ObjectParser.empty.parse(other, "f-puzzles quadruple");
 
-                    return QuadConstraint<CellType, ExType, ProcessedExType>(cells[3], values.map(typeManager.createCellDataByImportedDigit));
+                    return QuadConstraint<T>(cells[3], values.map(typeManager.createCellDataByImportedDigit));
                 }));
             }
         },
@@ -537,7 +538,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...betweenLine.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles between line");
 
-                    return lines.map((cells) => InBetweenLineConstraint<CellType, ExType, ProcessedExType>(
+                    return lines.map((cells) => InBetweenLineConstraint<T>(
                         parsePositionLiterals(cells).filter(isVisibleGridCell),
                         false
                     ));
@@ -549,7 +550,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...minimum.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles minimum");
 
-                    return MinConstraint<CellType, ExType, ProcessedExType>(cell);
+                    return MinConstraint<T>(cell);
                 }));
             }
         },
@@ -558,7 +559,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...maximum.map(({cell, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles maximum");
 
-                    return MaxConstraint<CellType, ExType, ProcessedExType>(cell);
+                    return MaxConstraint<T>(cell);
                 }));
             }
         },
@@ -567,7 +568,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                 items.push(...palindrome.flatMap(({lines, ...other}) => {
                     ObjectParser.empty.parse(other, "f-puzzles palindrome");
 
-                    return lines.map((cells) => PalindromeConstraint<CellType, ExType, ProcessedExType>(
+                    return lines.map((cells) => PalindromeConstraint<T>(
                         parsePositionLiterals(cells).filter(isVisibleGridCell),
                         false,
                     ));
@@ -580,7 +581,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     ObjectParser.empty.parse(other, "f-puzzles renban line");
 
                     // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((cells) => RenbanConstraint<CellType, ExType, ProcessedExType>(
+                    return lines.map((cells) => RenbanConstraint<T>(
                         parsePositionLiterals(cells).filter(isVisibleGridCell),
                         false,
                         false,
@@ -594,7 +595,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
                     ObjectParser.empty.parse(other, "f-puzzles German whispers line");
 
                     // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((cells) => GermanWhispersConstraint<CellType, ExType, ProcessedExType>(
+                    return lines.map((cells) => GermanWhispersConstraint<T>(
                         parsePositionLiterals(cells).filter(isVisibleGridCell),
                         false,
                         false
@@ -612,7 +613,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                         checkForOutsideCells(visibleCells, size);
 
-                        return LineConstraint<CellType, ExType, ProcessedExType>(
+                        return LineConstraint<T>(
                             visibleCells,
                             outlineC,
                             width === undefined ? undefined : width / 2,
@@ -629,7 +630,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     checkForOutsideCells(cells, size);
 
-                    return RectConstraint<CellType, ExType, ProcessedExType>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
+                    return RectConstraint<T>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
                 }));
             }
         },
@@ -640,7 +641,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     checkForOutsideCells(cells, size);
 
-                    return EllipseConstraint<CellType, ExType, ProcessedExType>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
+                    return EllipseConstraint<T>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
                 }));
             }
         },
@@ -659,7 +660,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     checkForOutsideCells(cells, fieldSize);
 
-                    return [TextConstraint<CellType, ExType, ProcessedExType>(cells, value, fontC, size, angle, cosmeticsLayer)];
+                    return [TextConstraint<T>(cells, value, fontC, size, angle, cosmeticsLayer)];
                 }));
             }
         },
@@ -670,18 +671,18 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
 
                     const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
 
-                    return DecorativeCageConstraint<CellType, ExType, ProcessedExType>(visibleCells, value?.toString(), false, undefined, outlineC, fontC);
+                    return DecorativeCageConstraint<T>(visibleCells, value?.toString(), false, undefined, outlineC, fontC);
                 }));
             }
         },
         "diagonal+": (diagonal, {size}) => {
             if (diagonal) {
-                items.push(PositiveDiagonalConstraint(size));
+                items.push(PositiveDiagonalConstraint<T>(size));
             }
         },
         "diagonal-": (diagonal, {size}) => {
             if (diagonal) {
-                items.push(NegativeDiagonalConstraint(size));
+                items.push(NegativeDiagonalConstraint<T>(size));
             }
         },
         // endregion
@@ -707,7 +708,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
     }, ["size"]).parse(puzzleJson, "f-puzzles data");
 
     if (puzzleJson.fogofwar || puzzleJson.foglight) {
-        items.push(FogConstraint<CellType, ExType, ProcessedExType>(
+        items.push(FogConstraint<T>(
             puzzleJson.fogofwar,
             puzzleJson.foglight,
             puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),
@@ -719,7 +720,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <CellType, ExType, ProcessedEx
     return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 };
 
-export const FPuzzles: PuzzleDefinitionLoader<any, any, any> = {
+export const FPuzzles: PuzzleDefinitionLoader<AnyPTM> = {
     noIndex: true,
     slug: "f-puzzles",
     loadPuzzle: ({load, ...params}) => {

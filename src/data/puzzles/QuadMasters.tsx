@@ -3,7 +3,6 @@ import {createRegularFieldSize} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {generateRandomPuzzleDigits, getDailyRandomGeneratorSeed} from "../../utils/random";
 import {QuadMastersSudokuTypeManager} from "../../sudokuTypes/quad-masters/types/QuadMastersSudokuTypeManager";
-import {QuadMastersGameState} from "../../sudokuTypes/quad-masters/types/QuadMastersGameState";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {getAutoRegionWidth} from "../../utils/regions";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
@@ -24,13 +23,14 @@ import {
 } from "../../sudokuTypes/quad-masters/data/ruleSnippets";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {PartiallyTranslatable} from "../../types/translations/Translatable";
+import {QuadMastersPTM} from "../../sudokuTypes/quad-masters/types/QuadMastersPTM";
 
 export const getQuadMastersTitle = (daily: boolean, isQuadle: boolean, includeRandomWord?: boolean): PartiallyTranslatable => ({
     [LanguageCode.en]: (daily ? "Daily " : (includeRandomWord ? "Random " : "")) + (isQuadle ? "Quadle" : "Quad Masters"),
     [LanguageCode.ru]: (!daily && includeRandomWord ? "Случайный " : "") + (isQuadle ? "Quadle" : "Quad Masters") + (daily ? " дня" : ""),
 });
 
-export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<number, QuadMastersGameState> => ({
+export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<QuadMastersPTM> => ({
     slug,
     noIndex: true,
     fulfillParams: (

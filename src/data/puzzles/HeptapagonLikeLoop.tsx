@@ -10,12 +10,13 @@ import {LoopLineConstraint} from "../../components/sudoku/constraints/loop-line/
 import {TapaCellConstraint} from "../../components/sudoku/constraints/tapa-cell/TapaCell";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {loopRulesApply, tapCluesApply} from "../ruleSnippets";
+import {AnyNumberPTM, NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
-export const BaseHeptapagonLikeLoop = <ExType, ProcessedExType>(
+export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
     fieldSize: number,
     layersCount: number,
-    constraints: Constraint<number, any, ExType, ProcessedExType>[]
-): Omit<PuzzleDefinition<number, ExType, ProcessedExType>, "slug" | "title"> => {
+    constraints: Constraint<T, any>[]
+): Omit<PuzzleDefinition<T>, "slug" | "title"> => {
     const scale = 1;
 
     const round = (value: number) => Math.round(value * 1000) / 1000;
@@ -215,7 +216,7 @@ export const BaseHeptapagonLikeLoop = <ExType, ProcessedExType>(
     };
 };
 
-export const HeptapagonLikeLoop: PuzzleDefinition<number> = {
+export const HeptapagonLikeLoop: PuzzleDefinition<NumberPTM> = {
     ...BaseHeptapagonLikeLoop(
         6.7,
         4,
@@ -238,7 +239,7 @@ export const HeptapagonLikeLoop: PuzzleDefinition<number> = {
     },
 };
 
-export const HeptapagonLikeLoopMini: PuzzleDefinition<number> = {
+export const HeptapagonLikeLoopMini: PuzzleDefinition<NumberPTM> = {
     ...BaseHeptapagonLikeLoop(
         6,
         3,

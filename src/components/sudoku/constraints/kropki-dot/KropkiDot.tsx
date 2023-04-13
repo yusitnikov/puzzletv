@@ -8,6 +8,7 @@ import {
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const KropkiDotTag = "kropki-dot";
 
@@ -18,7 +19,7 @@ export interface KropkiDotProps {
     showValue?: boolean;
 }
 
-export const KropkiDot = withFieldLayer(FieldLayer.top, <CellType,>(
+export const KropkiDot = withFieldLayer(FieldLayer.top, <T extends AnyPTM>(
     {
         cells: [cell1, cell2],
         color = blackColor,
@@ -26,7 +27,7 @@ export const KropkiDot = withFieldLayer(FieldLayer.top, <CellType,>(
             value,
             showValue = true
         },
-    }: ConstraintProps<CellType, KropkiDotProps>
+    }: ConstraintProps<T, KropkiDotProps>
 ) => {
     const top = (cell1.top + cell2.top) / 2 + 0.5;
     const left = (cell1.left + cell2.left) / 2 + 0.5;
@@ -52,14 +53,14 @@ export const KropkiDot = withFieldLayer(FieldLayer.top, <CellType,>(
     </>;
 }) as ConstraintPropsGenericFc<KropkiDotProps>;
 
-export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
+export const KropkiDotConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,
     cellLiteral2: PositionLiteral,
     isRatio: boolean,
     value?: number | [number, number],
     color = isRatio ? blackColor : "white",
     showValue = true
-): Constraint<CellType, KropkiDotProps, ExType, ProcessedExType> => {
+): Constraint<T, KropkiDotProps> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
 
@@ -98,5 +99,5 @@ export const KropkiDotConstraint = <CellType, ExType, ProcessedExType>(
     };
 };
 
-export const HeartConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, showValue = false) =>
-    KropkiDotConstraint<CellType, ExType, ProcessedExType>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", showValue);
+export const HeartConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, showValue = false) =>
+    KropkiDotConstraint<T>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", showValue);

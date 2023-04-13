@@ -3,14 +3,14 @@ import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {GoogleMapsContainer} from "./GoogleMapsContainer";
 import {GoogleMap} from "./GoogleMap";
 import {GoogleMapsPanePortal} from "./GoogleMapsPanePortal";
-import {GoogleMapsState} from "../types/GoogleMapsState";
 import {latLngLiteralToPosition} from "../utils/googleMapsCoords";
 import {GoogleMapsOverlay} from "./GoogleMapsOverlay";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {AnyGoogleMapsPTM} from "../types/GoogleMapsPTM";
 
 export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLiteral) =>
-    function GoogleMapsFieldWrapperComponent<CellType, ExType = {}, ProcessedExType = {}>(
+    function GoogleMapsFieldWrapperComponent<T extends AnyGoogleMapsPTM>(
         {
             context: {
                 puzzle: {fieldSize: {fieldSize}},
@@ -23,7 +23,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                 cellSize,
             },
             children
-        }: PropsWithChildren<PuzzleContextProps<CellType, ExType & GoogleMapsState, ProcessedExType>>
+        }: PropsWithChildren<PuzzleContextProps<T>>
     ) {
         const isDragMode = cellWriteMode === CellWriteMode.move;
 
@@ -62,20 +62,20 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                     onReady={(map) => {
                         map.fitBounds(initialBounds, 0);
                         onStateChange(() => ({
-                            extension: {map} as Partial<ExType & GoogleMapsState>
+                            extension: {map} as Partial<T["stateEx"]>
                         }));
                     }}
                     onOverlayReady={(overlay) => onStateChange({
-                        extension: {overlay} as Partial<ExType & GoogleMapsState>
+                        extension: {overlay} as Partial<T["stateEx"]>
                     })}
                     onRender={(renderVersion) => onStateChange({
-                        extension: {renderVersion} as Partial<ExType & GoogleMapsState>
+                        extension: {renderVersion} as Partial<T["stateEx"]>
                     })}
                     onCenterChanged={(ev) => onStateChange({
-                        extension: {center: latLngLiteralToPosition(ev.center)} as Partial<ExType & GoogleMapsState>
+                        extension: {center: latLngLiteralToPosition(ev.center)} as Partial<T["stateEx"]>
                     })}
                     onZoomChanged={(ev) => onStateChange({
-                        extension: {zoom: ev.zoom} as Partial<ExType & GoogleMapsState>
+                        extension: {zoom: ev.zoom} as Partial<T["stateEx"]>
                     })}
                     // onClick={(ev) => console.log(ev.latLng.toJSON())}
                 >

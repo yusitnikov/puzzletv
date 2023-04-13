@@ -12,6 +12,7 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {indexes} from "../../../utils/indexes";
 import {loop} from "../../../utils/math";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
@@ -52,10 +53,10 @@ const StyledCircle = styled("div")({
     background: "#fff",
 });
 
-export const InfiniteRingsFieldWrapper = <CellType, ExType, ProcessedExType>(
+export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
     visibleRingsCountArg = 2
 ) => function InfiniteRingsFieldWrapperComponent(
-    {context, children}: PropsWithChildren<PuzzleContextProps<CellType, ExType, ProcessedExType>>
+    {context, children}: PropsWithChildren<PuzzleContextProps<T>>
 ) {
     const {
         puzzle: {fieldSize: {rowsCount: fieldSize}},

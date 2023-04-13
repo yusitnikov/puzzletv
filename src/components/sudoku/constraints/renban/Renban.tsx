@@ -3,12 +3,13 @@ import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {isValidCellForRegion} from "../region/Region";
 import {LineComponent, LineProps} from "../line/Line";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const RenbanConstraint = <CellType, ExType, ProcessedExType>(
+export const RenbanConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     display = true,
     split = true,
-): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);

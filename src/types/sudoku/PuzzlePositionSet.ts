@@ -1,19 +1,20 @@
 import {HashSet} from "../struct/Set";
 import {getPuzzlePositionHasher, PuzzleDefinition} from "./PuzzleDefinition";
 import {Position} from "../layout/Position";
+import {AnyPTM} from "./PuzzleTypeMap";
 
-export class PuzzlePositionSet<CellType, ExType, ProcessedExType> extends HashSet<Position> {
+export class PuzzlePositionSet<T extends AnyPTM> extends HashSet<Position> {
     constructor(
-        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        puzzle: PuzzleDefinition<T>,
         items: Position[] = []
     ) {
         super(items, {hasher: getPuzzlePositionHasher(puzzle)});
     }
 
-    static unserialize<CellType, ExType, ProcessedExType>(
-        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    static unserialize<T extends AnyPTM>(
+        puzzle: PuzzleDefinition<T>,
         items: any
-    ): PuzzlePositionSet<CellType, ExType, ProcessedExType> {
+    ): PuzzlePositionSet<T> {
         return new PuzzlePositionSet(puzzle, items);
     }
 }

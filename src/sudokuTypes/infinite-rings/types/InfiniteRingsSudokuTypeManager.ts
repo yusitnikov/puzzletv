@@ -1,5 +1,4 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
 import {getRectPoints, Rect} from "../../../types/layout/Rect";
@@ -16,6 +15,7 @@ import {isShowingAllInfiniteRings} from "./InfiniteRingsLayout";
 import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
 import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 /*
  * TODO:
@@ -42,13 +42,13 @@ const coordsPlainToRing = (fieldSize: number, {top, left}: Position) => {
     };
 }
 
-export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
-    baseTypeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>,
+export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
+    baseTypeManager: SudokuTypeManager<T>,
     visibleRingsCountArg = 2,
     startRingOffset = 0,
-): SudokuTypeManager<CellType, ExType, ProcessedExType> => {
+): SudokuTypeManager<T> => {
     return {
-        ...baseTypeManager as unknown as SudokuTypeManager<CellType, ExType, ProcessedExType>,
+        ...baseTypeManager,
         scaleStep: 2,
         initialScale: Math.pow(2, startRingOffset),
         allowScale: true,
@@ -82,7 +82,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
 
             const ringOffset = Math.round(scaleLog);
 
-            const processRightArrow = (position: Position): {cell: Position, state?: PartialGameStateEx<CellType, ExType>} => {
+            const processRightArrow = (position: Position): {cell: Position, state?: PartialGameStateEx<T>} => {
                 const ringsCount = fieldSize / 2 - 1;
                 const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg) ? ringsCount : visibleRingsCountArg;
 
@@ -205,7 +205,7 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 },
             ];
         },
-        postProcessPuzzle(puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): typeof puzzle {
+        postProcessPuzzle(puzzle): typeof puzzle {
             const fieldSize = puzzle.fieldSize.rowsCount;
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;
@@ -255,10 +255,10 @@ export const InfiniteSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                 left: coordsRingToPlain(fieldSize, ring, left),
             };
         },
-        getRegionsForRowsAndColumns({fieldSize: {rowsCount: fieldSize}}): Constraint<CellType, any, ExType, ProcessedExType>[] {
+        getRegionsForRowsAndColumns({fieldSize: {rowsCount: fieldSize}}): Constraint<T, any>[] {
             const quadsCount = fieldSize / 2 - 1;
             return indexes(quadsCount).flatMap(outerRing => {
-                const createRegion = (cells: (Position & { ring: number })[]) => RegionConstraint<CellType, ExType, ProcessedExType>(
+                const createRegion = (cells: (Position & { ring: number })[]) => RegionConstraint<T>(
                     cells.map(({ring: ringOffset, top, left}) => {
                         const ring = loop(outerRing + ringOffset, quadsCount);
                         return {

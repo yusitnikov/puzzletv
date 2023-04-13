@@ -1,9 +1,10 @@
 import {Constraint} from "../Constraint";
+import {AnyPTM} from "../PuzzleTypeMap";
 
 // TODO: support custom regions
-export const DisjointGroupsConstraint = <CellType, ExType, ProcessedExType>(
+export const DisjointGroupsConstraint = <T extends AnyPTM>(
     intervalX: number, intervalY = intervalX
-): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+): Constraint<T> => ({
     name: "disjoint groups",
     cells: [],
     props: undefined,

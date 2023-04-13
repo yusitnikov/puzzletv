@@ -1,6 +1,7 @@
 import {areFieldStatesEqual, cloneFieldState, FieldState} from "./FieldState";
 import {SetStateAction} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
+import {AnyPTM} from "./PuzzleTypeMap";
 
 export interface FieldStateHistory<CellType> {
     states: FieldState<CellType>[];
@@ -11,7 +12,7 @@ export const fieldStateHistoryGetCurrent = <CellType>({states, currentIndex}: Fi
 
 export const fieldStateHistoryCanUndo = <CellType>({currentIndex}: FieldStateHistory<CellType>) => currentIndex > 0;
 
-export const fieldStateHistoryUndo = <CellType>(history: FieldStateHistory<CellType>) => fieldStateHistoryCanUndo(history)
+export const fieldStateHistoryUndo = <CellType>(history: FieldStateHistory<CellType>): FieldStateHistory<CellType> => fieldStateHistoryCanUndo(history)
     ? {
         ...history,
         currentIndex: Math.max(0, history.currentIndex - 1),
@@ -20,17 +21,17 @@ export const fieldStateHistoryUndo = <CellType>(history: FieldStateHistory<CellT
 
 export const fieldStateHistoryCanRedo = <CellType>({currentIndex, states}: FieldStateHistory<CellType>) => currentIndex < states.length - 1;
 
-export const fieldStateHistoryRedo = <CellType>(history: FieldStateHistory<CellType>) => fieldStateHistoryCanRedo(history)
+export const fieldStateHistoryRedo = <CellType>(history: FieldStateHistory<CellType>): FieldStateHistory<CellType> => fieldStateHistoryCanRedo(history)
     ? {
         ...history,
         currentIndex: Math.min(history.states.length - 1, history.currentIndex + 1),
     }
     : history;
 
-export const fieldStateHistoryAddState = <CellType>(
-    typeManager: SudokuTypeManager<CellType, any, any>,
-    history: FieldStateHistory<CellType>,
-    state: SetStateAction<FieldState<CellType>>
+export const fieldStateHistoryAddState = <T extends AnyPTM>(
+    typeManager: SudokuTypeManager<T>,
+    history: FieldStateHistory<T["cell"]>,
+    state: SetStateAction<FieldState<T["cell"]>>
 ) => {
     const currentState = fieldStateHistoryGetCurrent(history);
 

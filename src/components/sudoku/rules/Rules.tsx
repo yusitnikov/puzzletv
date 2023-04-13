@@ -29,6 +29,7 @@ import {Heart} from "@emotion-icons/fluentui-system-filled";
 import {getFogPropsByContext} from "../constraints/fog/Fog";
 import {Button} from "../../layout/button/Button";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const liveHeartCoeff = 0.3;
 const liveHeartMarginCoeff = 0.1;
@@ -38,12 +39,12 @@ const StyledContainer = styled(Absolute)({
     flexDirection: "column",
 });
 
-export interface RulesProps<CellType> {
-    context: PuzzleContext<CellType, any, any>;
+export interface RulesProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
     rect: Rect;
 }
 
-export const Rules = <CellType,>({rect, context}: RulesProps<CellType>) => {
+export const Rules = <T extends AnyPTM>({rect, context}: RulesProps<T>) => {
     const translate = useTranslate();
 
     const isFullScreen = useIsFullScreen();

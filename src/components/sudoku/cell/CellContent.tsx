@@ -1,13 +1,11 @@
 import {CellBackground} from "./CellBackground";
 import {CellDigits, CellDigitsProps} from "./CellDigits";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface CellContentProps<CellType, ExType = {}, ProcessedExType = {}>
-    extends CellDigitsProps<CellType, ExType, ProcessedExType> {
+export interface CellContentProps<T extends AnyPTM> extends CellDigitsProps<T> {
 }
 
-export const CellContent = <CellType, ExType = {}, ProcessedExType = {}>(
-    {context, data, size, ...otherProps}: CellContentProps<CellType, ExType, ProcessedExType>
-) => <>
+export const CellContent = <T extends AnyPTM>({context, data, size, ...otherProps}: CellContentProps<T>) => <>
     {!!data.colors?.size && <CellBackground context={context} colors={data.colors} size={size}/>}
 
     <CellDigits context={context} data={data} size={size} {...otherProps}/>

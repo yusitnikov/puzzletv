@@ -17,6 +17,7 @@ import {splitMultiLine} from "../../../../utils/lines";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {defaultGetDefaultNumberByDigits} from "../../../../types/sudoku/SudokuTypeManager";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const lineWidth = 0.1;
 const arrowSize = 0.25;
@@ -29,18 +30,18 @@ export interface ArrowProps {
     transparentCircle?: boolean;
 }
 
-const getPointInfo = <CellType, ExType, ProcessedExType>(context: PuzzleContext<CellType, ExType, ProcessedExType>, {top, left}: Position, radius: number) => {
+const getPointInfo = <T extends AnyPTM>(context: PuzzleContext<T>, {top, left}: Position, radius: number) => {
     const cellInfo = context.cellsIndex.allCells[top]?.[left];
     return cellInfo
         ? {...cellInfo.center, radius: radius * cellInfo.bounds.userArea.width}
         : {left: left + 0.5, top: top + 0.5, radius};
 };
 
-export const Arrow = withFieldLayer(FieldLayer.regular, <CellType,>(
+export const Arrow = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
     {
         props: {circleCells, arrowCells, transparentCircle},
         context,
-    }: ConstraintProps<CellType, ArrowProps>
+    }: ConstraintProps<T, ArrowProps>
 ) => {
     const {left, top, radius: scaledCircleRadius} = getPointInfo(context, circleCells[0], circleRadius);
     const {left: left2, top: top2, radius: scaledLineWidth} = getPointInfo(context, circleCells[circleCells.length - 1], lineWidth);
@@ -62,8 +63,8 @@ export const Arrow = withFieldLayer(FieldLayer.regular, <CellType,>(
     </>;
 }) as ConstraintPropsGenericFc<ArrowProps>;
 
-export const ArrowLine = <CellType, ExType, ProcessedExType>(
-    {cells, context}: {cells: Position[], context: PuzzleContext<CellType, ExType, ProcessedExType>}
+export const ArrowLine = <T extends AnyPTM>(
+    {cells, context}: {cells: Position[], context: PuzzleContext<T>}
 ) => {
     if (cells.length < 2) {
         return null;
@@ -101,14 +102,14 @@ export const ArrowLine = <CellType, ExType, ProcessedExType>(
     </>;
 };
 
-export const ArrowConstraint = <CellType, ExType, ProcessedExType>(
+export const ArrowConstraint = <T extends AnyPTM>(
     circleCellLiterals: PositionLiteral | PositionLiteral[],
     arrowCellLiterals: PositionLiteral[] = [],
     transparentCircle = false,
     arrowStartCellLiteral: PositionLiteral | undefined = undefined,
     product = false,
     split = true,
-): Constraint<CellType, ArrowProps, ExType, ProcessedExType> => {
+): Constraint<T, ArrowProps> => {
     circleCellLiterals = Array.isArray(circleCellLiterals) ? circleCellLiterals : [circleCellLiterals];
     const arrowStartCell = parsePositionLiteral(arrowStartCellLiteral ?? circleCellLiterals[0]);
     let circleCells = parsePositionLiterals(circleCellLiterals);

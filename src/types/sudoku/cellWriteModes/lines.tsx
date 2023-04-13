@@ -1,11 +1,14 @@
-import type {CellWriteModeInfo} from "../CellWriteMode";
+import {CellWriteMode} from "../CellWriteMode";
+import type {CellWriteModeInfo} from "../CellWriteModeInfo";
 import {gameStateContinueMultiLine, gameStateResetCurrentMultiLine, gameStateStartMultiLine} from "../GameState";
 import {GestureFinishReason} from "../../../utils/gestures";
 import {applyCurrentMultiLineAction} from "../GameStateAction";
 import {CellBackground} from "../../../components/sudoku/cell/CellBackground";
 import {CellDataSet} from "../CellDataSet";
+import {AnyPTM} from "../PuzzleTypeMap";
 
-export const LinesCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mode"> = {
+export const LinesCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
+    mode: CellWriteMode.lines,
     isActiveForPuzzle: ({allowDrawing = []}) => allowDrawing.length !== 0,
     hotKeyStr: ["Alt"],
     isNoSelectionMode: true,

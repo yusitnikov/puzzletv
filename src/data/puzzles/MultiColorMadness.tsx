@@ -18,8 +18,9 @@ import {GreaterConstraint} from "../../components/sudoku/constraints/greater/Gre
 import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
-export const MultiColorMadness: PuzzleDefinition<number> = {
+export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     slug: "multi-color-madness",
     title: {
         [LanguageCode.en]: "Multi-color Madness",

@@ -2,7 +2,8 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {Position} from "../../../types/layout/Position";
 import {FC, useMemo} from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {CellWriteMode, getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteModeInfo";
 import {ResetButton} from "./ResetButton";
 import {SettingsButton} from "./SettingsButton";
 import {ResultCheckButton} from "./ResultCheckButton";
@@ -18,6 +19,7 @@ import {RedoButton} from "./RedoButton";
 import {DeleteButton} from "./DeleteButton";
 import {MultiSelectionButton} from "./MultiSelectionButton";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export enum ControlButtonRegion {
     // main digit, corner marks, center marks, colors, pen tool, etc.
@@ -32,18 +34,18 @@ export enum ControlButtonRegion {
     custom,
 }
 
-export interface ControlButtonItemProps<CellType, ExType = {}, ProcessedExType = {}> extends Position {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+export interface ControlButtonItemProps<T extends AnyPTM> extends Position {
+    context: PuzzleContext<T>;
 }
 
-export interface ControlButtonItem<CellType, ExType, ProcessedExType> {
+export interface ControlButtonItem<T extends AnyPTM> {
     key: string;
     region: ControlButtonRegion;
-    Component: FC<ControlButtonItemProps<CellType, ExType, ProcessedExType>>;
+    Component: FC<ControlButtonItemProps<T>>;
 }
 
-export class ControlButtonsManager<CellType, ExType, ProcessedExType> {
-    private readonly regions: Record<ControlButtonRegion, Omit<ControlButtonItem<CellType, ExType, ProcessedExType>, "region">[]> = {
+export class ControlButtonsManager<T extends AnyPTM> {
+    private readonly regions: Record<ControlButtonRegion, Omit<ControlButtonItem<T>, "region">[]> = {
         [ControlButtonRegion.modes]: [],
         [ControlButtonRegion.right]: [],
         [ControlButtonRegion.bottom]: [],
@@ -56,7 +58,7 @@ export class ControlButtonsManager<CellType, ExType, ProcessedExType> {
     public readonly height: number;
 
     constructor(
-        private readonly puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+        private readonly puzzle: PuzzleDefinition<T>,
         private readonly isHorizontal: boolean,
     ) {
         const {
@@ -176,7 +178,7 @@ export class ControlButtonsManager<CellType, ExType, ProcessedExType> {
         this.height = (this.isCompact ? 2 : 4) + (hasBottomRowControls ? 1 : 0);
     }
 
-    render(context: PuzzleContext<CellType, ExType, ProcessedExType>) {
+    render(context: PuzzleContext<T>) {
         const {
             [ControlButtonRegion.modes]: modes,
             [ControlButtonRegion.right]: right,
@@ -233,7 +235,7 @@ export class ControlButtonsManager<CellType, ExType, ProcessedExType> {
     }
 }
 
-export const useControlButtonsManager = <CellType, ExType, ProcessedExType>(
-    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+export const useControlButtonsManager = <T extends AnyPTM>(
+    puzzle: PuzzleDefinition<T>,
     isHorizontal: boolean,
 ) => useMemo(() => new ControlButtonsManager(puzzle, isHorizontal), [puzzle, isHorizontal]);

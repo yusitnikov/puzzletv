@@ -1,5 +1,4 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {CellColor} from "../../../types/sudoku/CellColor";
 import {lineTag} from "../../../components/sudoku/constraints/line/Line";
 import {PuzzleLineSet} from "../../../types/sudoku/PuzzleLineSet";
@@ -7,13 +6,14 @@ import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {indexes} from "../../../utils/indexes";
 import {FogConstraint, FogProps, fogTag} from "../../../components/sudoku/constraints/fog/Fog";
 import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const YajilinFogSudokuTypeManager = <CellType, ExType, ProcessedExType>(
-    baseTypeManager: SudokuTypeManager<CellType, ExType, ProcessedExType>
-): SudokuTypeManager<CellType, ExType, ProcessedExType> => {
+export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
+    baseTypeManager: SudokuTypeManager<T>
+): SudokuTypeManager<T> => {
     return {
         ...baseTypeManager,
-        postProcessPuzzle(puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>): typeof puzzle {
+        postProcessPuzzle(puzzle): typeof puzzle {
             if (puzzle.fieldSize.rowsCount > 9) {
                 puzzle = {
                     ...puzzle,
@@ -66,7 +66,7 @@ export const YajilinFogSudokuTypeManager = <CellType, ExType, ProcessedExType>(
                             startCells3x3,
                             startCells,
                             bulbCells,
-                        } = props as FogProps<CellType>;
+                        } = props as FogProps<T>;
 
                         items.push(FogConstraint(
                             startCells3x3,

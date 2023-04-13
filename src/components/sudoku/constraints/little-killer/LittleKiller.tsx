@@ -10,6 +10,7 @@ import {
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const lineWidth = 0.03;
 
@@ -18,8 +19,8 @@ export interface LittleKillerProps {
     sum?: number;
 }
 
-export const LittleKiller = withFieldLayer(FieldLayer.regular, <CellType,>(
-    {cells: [{top, left}], props: {direction, sum}}: ConstraintProps<CellType, LittleKillerProps>
+export const LittleKiller = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
+    {cells: [{top, left}], props: {direction, sum}}: ConstraintProps<T, LittleKillerProps>
 ) => {
     const {
         svgContentComponent: DigitSvgContent,
@@ -68,12 +69,12 @@ export const LittleKiller = withFieldLayer(FieldLayer.regular, <CellType,>(
     </>;
 }) as ConstraintPropsGenericFc<LittleKillerProps>;
 
-export const LittleKillerConstraint = <CellType, ExType, ProcessedExType>(
+export const LittleKillerConstraint = <T extends AnyPTM>(
     startCellLiteral: PositionLiteral,
     directionLiteral: PositionLiteral,
-    {rowsCount, columnsCount}: FieldSize,
+    {rowsCount, columnsCount}: FieldSize<T>,
     sum?: number
-): Constraint<CellType, LittleKillerProps, ExType, ProcessedExType> => {
+): Constraint<T, LittleKillerProps> => {
     const startCell = parsePositionLiteral(startCellLiteral);
     const direction = parsePositionLiteral(directionLiteral);
 

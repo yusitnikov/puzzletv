@@ -8,6 +8,7 @@ import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {Size} from "../../../../types/layout/Size";
 import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {ComponentType, SVGAttributes} from "react";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export interface DecorativeShapeProps extends Size {
     borderColor?: string;
@@ -15,7 +16,7 @@ export interface DecorativeShapeProps extends Size {
     textColor?: string;
 }
 
-const DecorativeShapeComponent = <CellType, >(
+const DecorativeShapeComponent = <T extends AnyPTM>(
     Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>,
     layer = FieldLayer.lines
 ) => {
@@ -31,7 +32,7 @@ const DecorativeShapeComponent = <CellType, >(
             },
             color: backgroundColor = "none",
             angle = 0,
-        }: ConstraintProps<CellType, DecorativeShapeProps>
+        }: ConstraintProps<T, DecorativeShapeProps>
     ) {
         const {widthCoeff} = useDigitComponentType();
 
@@ -72,9 +73,9 @@ export const EllipseComponent = (layer = FieldLayer.lines) => DecorativeShapeCom
     {...props}
 />, layer);
 
-const DecorativeShapeConstraint = <CellType, ExType, ProcessedExType>(
+const DecorativeShapeConstraint = <T extends AnyPTM>(
     name: string,
-    component: ComponentType<ConstraintProps<CellType, DecorativeShapeProps, ExType, ProcessedExType>>,
+    component: ComponentType<ConstraintProps<T, DecorativeShapeProps>>,
     cellLiterals: PositionLiteral[],
     size: Size | number,
     backgroundColor?: string,
@@ -82,7 +83,7 @@ const DecorativeShapeConstraint = <CellType, ExType, ProcessedExType>(
     text?: string,
     textColor?: string,
     angle?: number
-): Constraint<CellType, DecorativeShapeProps, ExType, ProcessedExType> => {
+): Constraint<T, DecorativeShapeProps> => {
     return {
         name,
         cells: [getAveragePosition(parsePositionLiterals(cellLiterals))],
@@ -100,7 +101,7 @@ const DecorativeShapeConstraint = <CellType, ExType, ProcessedExType>(
     };
 };
 
-export const RectConstraint = <CellType, ExType, ProcessedExType>(
+export const RectConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     size: Size | number,
     backgroundColor?: string,
@@ -109,9 +110,9 @@ export const RectConstraint = <CellType, ExType, ProcessedExType>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.lines,
-) => DecorativeShapeConstraint<CellType, ExType, ProcessedExType>("rect", RectComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>("rect", RectComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
 
-export const EllipseConstraint = <CellType, ExType, ProcessedExType>(
+export const EllipseConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     size: Size | number,
     backgroundColor?: string,
@@ -120,4 +121,4 @@ export const EllipseConstraint = <CellType, ExType, ProcessedExType>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.lines,
-) => DecorativeShapeConstraint<CellType, ExType, ProcessedExType>("ellipse", EllipseComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>("ellipse", EllipseComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);

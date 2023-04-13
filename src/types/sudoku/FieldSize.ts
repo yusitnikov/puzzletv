@@ -3,14 +3,15 @@ import {Position} from "../layout/Position";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {Constraint} from "./Constraint";
 import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
+import {AnyPTM} from "./PuzzleTypeMap";
 
-export interface FieldSize {
+export interface FieldSize<T extends AnyPTM> {
     fieldSize: number;
     rowsCount: number;
     columnsCount: number;
     regionWidth?: number;
     regionHeight?: number;
-    regions: (Position[] | Constraint<any, any, any, any>)[];
+    regions: (Position[] | Constraint<T, any>)[];
 }
 
 export const createRegularRegions = (
@@ -43,7 +44,7 @@ export const calculateDefaultRegionWidth = (fieldSize: number) => {
     return fieldSize / bestHeight;
 }
 
-export const createRegularFieldSize = (fieldSize: number, regionWidth?: number, regionHeight = regionWidth && fieldSize / regionWidth): FieldSize => ({
+export const createRegularFieldSize = <T extends AnyPTM>(fieldSize: number, regionWidth?: number, regionHeight = regionWidth && fieldSize / regionWidth): FieldSize<T> => ({
     fieldSize,
     rowsCount: fieldSize,
     columnsCount: fieldSize,
@@ -54,15 +55,15 @@ export const createRegularFieldSize = (fieldSize: number, regionWidth?: number, 
         : []
 });
 
-export const getDefaultRegionsForRowsAndColumns = <CellType, ExType, ProcessedExType>(
-    {customCellBounds, fieldSize}: PuzzleDefinition<CellType, ExType, ProcessedExType>
-): Constraint<CellType, any, ExType, ProcessedExType>[] => customCellBounds ? [] : [
-    ...indexes(fieldSize.rowsCount).map(top => RegionConstraint<CellType, ExType, ProcessedExType>(
+export const getDefaultRegionsForRowsAndColumns = <T extends AnyPTM>(
+    {customCellBounds, fieldSize}: PuzzleDefinition<T>
+): Constraint<T>[] => customCellBounds ? [] : [
+    ...indexes(fieldSize.rowsCount).map(top => RegionConstraint<T>(
         indexes(fieldSize.columnsCount).map(left => ({left, top})),
         false,
         "row"
     )),
-    ...indexes(fieldSize.columnsCount).map(left => RegionConstraint<CellType, ExType, ProcessedExType>(
+    ...indexes(fieldSize.columnsCount).map(left => RegionConstraint<T>(
         indexes(fieldSize.rowsCount).map(top => ({left, top})),
         false,
         "column"

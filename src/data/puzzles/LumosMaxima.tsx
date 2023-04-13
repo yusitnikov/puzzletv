@@ -17,8 +17,9 @@ import React from "react";
 import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
-export const LumosMaximaNoFog: PuzzleDefinition<number> = {
+export const LumosMaximaNoFog: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title: {[LanguageCode.en]: "Lumos Maxima"},
     author: Chameleon,
@@ -52,7 +53,7 @@ export const LumosMaximaNoFog: PuzzleDefinition<number> = {
     allowDrawing: ["center-line", "border-mark", "corner-mark", "center-mark"],
 };
 
-export const LumosMaxima: PuzzleDefinition<number> = {
+export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
     ...LumosMaximaNoFog,
     noIndex: false,
     slug: "lumos-maxima",
@@ -69,7 +70,7 @@ export const LumosMaxima: PuzzleDefinition<number> = {
         [3, 2, 1, 8, 9, 5, 6, 7, 4],
     ],
     items: [
-        ...(LumosMaximaNoFog.items as Constraint<number, any>[]),
+        ...(LumosMaximaNoFog.items as Constraint<NumberPTM, any>[]),
         FogConstraint(["R2C2", "R8C7"]),
     ],
     rules: (translate, context) => <>

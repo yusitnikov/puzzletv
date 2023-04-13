@@ -7,8 +7,9 @@ import {ctrlKeyText} from "../../../utils/os";
 import {undoAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {deleteHotkeys} from "./DeleteButton";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const UndoButton = <CellType, ExType, ProcessedExType>(
+export const UndoButton = <T extends AnyPTM>(
     {
         context: {
             cellSizeForSidePanel: cellSize,
@@ -19,7 +20,7 @@ export const UndoButton = <CellType, ExType, ProcessedExType>(
         },
         top,
         left,
-    }: ControlButtonItemProps<CellType, ExType, ProcessedExType>
+    }: ControlButtonItemProps<T>
 ) => {
     const translate = useTranslate();
 

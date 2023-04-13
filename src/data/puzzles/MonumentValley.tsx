@@ -12,7 +12,7 @@ import React from "react";
 import {
     MonumentValleyGridBordersConstraint
 } from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
-import {RotatableGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
+import {MonumentValleyPTM} from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
 
 const author: PartiallyTranslatable = {
     [LanguageCode.en]: "TrevorTao",
@@ -25,7 +25,7 @@ const rules = (validDigits: string): PartiallyTranslatable => ({
     `,
 });
 
-export const MonumentValley: PuzzleDefinition<number, RotatableGameState> = {
+export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     title: {
         [LanguageCode.en]: "Monument Valley Sudoku",
     },
@@ -132,7 +132,7 @@ export const MonumentValley: PuzzleDefinition<number, RotatableGameState> = {
     resultChecker: isValidFinishedPuzzleByConstraints,
 };
 
-export const MonumentValleyMini: PuzzleDefinition<number, RotatableGameState> = {
+export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     title: {
         [LanguageCode.en]: "Monument Valley Mini",
     },

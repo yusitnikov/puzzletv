@@ -3,17 +3,18 @@ import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {LineComponent, LineProps} from "../line/Line";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const DominoLineConstraint = <CellType, ExType, ProcessedExType>(
+export const DominoLineConstraint = <T extends AnyPTM>(
     name: string,
     isObvious: boolean,
     color: string,
     cellLiterals: PositionLiteral[],
-    isValidDomino: (digit1: number, digit2: number, context: PuzzleContext<CellType, ExType, ProcessedExType>) => boolean,
+    isValidDomino: (digit1: number, digit2: number, context: PuzzleContext<T>) => boolean,
     width: number | undefined = undefined,
     display = true,
     split = true,
-): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);

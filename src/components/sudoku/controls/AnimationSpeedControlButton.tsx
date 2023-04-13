@@ -3,8 +3,9 @@ import {FastForward, PlayArrow, Timelapse} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {AnimationSpeed, animationSpeedToString} from "../../../types/sudoku/AnimationSpeed";
 import {ControlButtonItem, ControlButtonItemProps, ControlButtonRegion} from "./ControlButtonsManager";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const AnimationSpeedControlButton = <CellType, ExType, ProcessedExType>(
+export const AnimationSpeedControlButton = <T extends AnyPTM>(
     {
         top,
         left,
@@ -13,7 +14,7 @@ export const AnimationSpeedControlButton = <CellType, ExType, ProcessedExType>(
             state: {animationSpeed},
             onStateChange,
         },
-    }: ControlButtonItemProps<CellType, ExType, ProcessedExType>
+    }: ControlButtonItemProps<T>
 ) => {
     const translate = useTranslate();
 
@@ -45,7 +46,7 @@ export const AnimationSpeedControlButton = <CellType, ExType, ProcessedExType>(
     </ControlButton>;
 };
 
-export const AnimationSpeedControlButtonItem = <CellType, ExType, ProcessedExType>(): ControlButtonItem<CellType, ExType, ProcessedExType> => ({
+export const AnimationSpeedControlButtonItem = <T extends AnyPTM>(): ControlButtonItem<T> => ({
     key: "animation-speed",
     region: ControlButtonRegion.additional,
     Component: AnimationSpeedControlButton,

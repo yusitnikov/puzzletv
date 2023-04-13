@@ -8,9 +8,7 @@ import {GermanWhispersConstraint} from "../../components/sudoku/constraints/germ
 import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {RotatableDigit} from "../../sudokuTypes/rotatable/types/RotatableDigit";
 import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import {RotatableGameState} from "../../sudokuTypes/rotatable/types/RotatableGameState";
 import {FieldSize9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {Chameleon} from "../authors";
@@ -39,8 +37,9 @@ import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippet
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
+import {RotatableDigitPTM} from "../../sudokuTypes/rotatable/types/RotatablePTM";
 
-export const NorthOrSouth: PuzzleDefinition<RotatableDigit, RotatableGameState> = {
+export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
     title: {
         [LanguageCode.en]: "North or South?",

@@ -1,8 +1,9 @@
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PropsWithChildren} from "react";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const FieldSvg = ({context: {puzzle, cellSize}, children}: PropsWithChildren<PuzzleContextProps<any, any, any>>) => {
+export const FieldSvg = <T extends AnyPTM>({context: {puzzle, cellSize}, children}: PropsWithChildren<PuzzleContextProps<T>>) => {
     let {
         fieldSize: {fieldSize, rowsCount, columnsCount},
         fieldMargin: initialFieldMargin = 0,

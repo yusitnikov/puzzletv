@@ -10,10 +10,11 @@ import {currentPlayerColor, otherPlayerColor} from "../../../components/app/glob
 import {getMainDigitDataHash} from "../../../utils/playerDataHash";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const CellOwnership = withFieldLayer(
     FieldLayer.beforeSelection,
-    (
+    <T extends AnyPTM>(
         {
             context: {
                 puzzle: {
@@ -25,7 +26,7 @@ export const CellOwnership = withFieldLayer(
                 state: {playerObjects},
                 multiPlayer: {isEnabled},
             },
-        }: ConstraintProps
+        }: ConstraintProps<T>
     ) => isEnabled ? <>
         {indexes(rowsCount).flatMap(top => indexes(columnsCount).map(left => {
             const playerObject = playerObjects[getMainDigitDataHash({top, left})];
@@ -60,7 +61,7 @@ export const CellOwnership = withFieldLayer(
     </> : null
 ) as ConstraintPropsGenericFc;
 
-export const CellOwnershipConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+export const CellOwnershipConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "cell-ownership",
     cells: [],
     component: CellOwnership,

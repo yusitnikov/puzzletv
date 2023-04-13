@@ -22,16 +22,17 @@ import {CellColorValue} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
 import {PrioritizedQueue} from "../struct/PrioritizedQueue";
 import {PuzzleContext} from "./PuzzleContext";
+import {AnyPTM} from "./PuzzleTypeMap";
 
-export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
-    public readonly allCells: CellInfo<CellType, ExType, ProcessedExType>[][];
+export class SudokuCellsIndex<T extends AnyPTM> {
+    public readonly allCells: CellInfo<T>[][];
 
     public readonly cache: Record<string, any> = {};
 
     private readonly realCellPointMap: Record<string, SudokuCellPointInfo> = {};
     private readonly borderLineMap: Record<string, Record<string, SudokuCellBorderInfo>> = {};
 
-    constructor(public readonly puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>) {
+    constructor(public readonly puzzle: PuzzleDefinition<T>) {
         const {
             typeManager: {
                 transformCoords = (coords: Position) => coords,
@@ -424,7 +425,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     }
 
     // region Custom regions
-    getCustomRegionsByBorderLines(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>) {
+    getCustomRegionsByBorderLines(state: ProcessedGameStateEx<T>) {
         const map: SudokuCustomRegionsMap = {
             regions: [],
             map: {},
@@ -450,7 +451,7 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
         };
     }
 
-    getCustomRegionByBorderLinesAt(state: ProcessedGameStateEx<CellType, ExType, ProcessedExType>, cell: Position) {
+    getCustomRegionByBorderLinesAt(state: ProcessedGameStateEx<T>, cell: Position) {
         const map: SudokuCustomRegionsMap = {
             regions: [],
             map: {},
@@ -519,11 +520,11 @@ export class SudokuCellsIndex<CellType, ExType, ProcessedExType> {
     //endregion
 }
 
-export class SudokuCellsIndexForState<CellType, ExType, ProcessedExType> {
+export class SudokuCellsIndexForState<T extends AnyPTM> {
     public readonly cache: Record<string, any> = {};
 
-    private readonly context: PuzzleContext<CellType, ExType, ProcessedExType>;
-    private readonly currentFieldState: FieldState<CellType>;
+    private readonly context: PuzzleContext<T>;
+    private readonly currentFieldState: FieldState<T["cell"]>;
 
     public readonly getCenterLineSegments = lazy(
         () => this.puzzleIndex.getCenterLineSegments(this.currentFieldState.lines.items)
@@ -543,8 +544,8 @@ export class SudokuCellsIndexForState<CellType, ExType, ProcessedExType> {
     });
 
     constructor(
-        private puzzleIndex: SudokuCellsIndex<CellType, ExType, ProcessedExType>,
-        contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState">,
+        private puzzleIndex: SudokuCellsIndex<T>,
+        contextNoIndex: Omit<PuzzleContext<T>, "cellsIndexForState">,
     ) {
         this.context = {...contextNoIndex, cellsIndexForState: this};
         this.currentFieldState = gameStateGetCurrentFieldState(contextNoIndex.state);
@@ -570,10 +571,10 @@ export interface SudokuCellBorderSegmentInfo {
     neighbors: SetInterface<Position>;
 }
 
-export interface CellInfo<CellType, ExType, ProcessedExType> {
+export interface CellInfo<T extends AnyPTM> {
     position: Position;
     bounds: CustomCellBounds;
-    getTransformedBounds: (context: PuzzleContext<CellType, ExType, ProcessedExType>) => TransformedCustomCellBounds;
+    getTransformedBounds: (context: PuzzleContext<T>) => TransformedCustomCellBounds;
     areCustomBounds: boolean;
     center: Position;
     neighbors: SetInterface<Position>;
@@ -581,7 +582,7 @@ export interface CellInfo<CellType, ExType, ProcessedExType> {
     borderSegments: Record<string, SudokuCellBorderSegmentInfo>;
 }
 
-export interface CellInfoForState extends Omit<CellInfo<unknown, unknown, unknown>, "getTransformedBounds"> {
+export interface CellInfoForState extends Omit<CellInfo<AnyPTM>, "getTransformedBounds"> {
     transformedBounds: TransformedCustomCellBounds;
     isVisible: boolean;
 }

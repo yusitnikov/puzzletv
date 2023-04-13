@@ -34,8 +34,9 @@ import {TheAngelIslington} from "./TheAngelIslington";
 import {Embark, EmbarkWeirdSlug} from "./Embark";
 import {ToroidalRenbanmometers} from "./ToroidalRenbanmometers";
 import {PenroseTiles} from "./PenroseTiles";
+import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
-export const AllPuzzles: (PuzzleDefinition<any, any, any> | PuzzleDefinitionLoader<any, any, any>)[] = [
+export const AllPuzzles: (PuzzleDefinition<AnyPTM> | PuzzleDefinitionLoader<AnyPTM>)[] = [
     // region Empty
     EmptyRegular,
     EmptyChaosConstruction,

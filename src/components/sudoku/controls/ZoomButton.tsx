@@ -4,11 +4,10 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButton} from "./ControlButton";
 import {defaultScaleStep, gameStateApplyFieldDragGesture} from "../../../types/sudoku/GameState";
 import {emptyGestureMetrics} from "../../../utils/gestures";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-const ZoomButton = <CellType, ExType, ProcessedExType>(increment: boolean, title: PartiallyTranslatable, sign: string) =>
-    function ZoomButtonComponent(
-        {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-    ) {
+const ZoomButton = <T extends AnyPTM>(increment: boolean, title: PartiallyTranslatable, sign: string) =>
+    function ZoomButtonComponent({context, top, left}: ControlButtonItemProps<T>) {
         const {
             puzzle: {typeManager: {scaleStep = defaultScaleStep}},
             cellSizeForSidePanel: cellSize,
@@ -34,19 +33,17 @@ const ZoomButton = <CellType, ExType, ProcessedExType>(increment: boolean, title
     }
 ;
 
-export const ZoomInButton = <CellType, ExType, ProcessedExType>() =>
-    ZoomButton<CellType, ExType, ProcessedExType>(true, "zoom in", "+");
+export const ZoomInButton = <T extends AnyPTM>() => ZoomButton<T>(true, "zoom in", "+");
 
-export const ZoomOutButton = <CellType, ExType, ProcessedExType>() =>
-    ZoomButton<CellType, ExType, ProcessedExType>(false, "zoom out", "-");
+export const ZoomOutButton = <T extends AnyPTM>() => ZoomButton<T>(false, "zoom out", "-");
 
-export const ZoomInButtonItem = <CellType, ExType, ProcessedExType>(): ControlButtonItem<CellType, ExType, ProcessedExType> => ({
+export const ZoomInButtonItem = <T extends AnyPTM>(): ControlButtonItem<T> => ({
     key: "zoom-in",
     region: ControlButtonRegion.additional,
     Component: ZoomInButton(),
 });
 
-export const ZoomOutButtonItem = <CellType, ExType, ProcessedExType>(): ControlButtonItem<CellType, ExType, ProcessedExType> => ({
+export const ZoomOutButtonItem = <T extends AnyPTM>(): ControlButtonItem<T> => ({
     key: "zoom-out",
     region: ControlButtonRegion.additional,
     Component: ZoomOutButton(),

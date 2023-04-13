@@ -1,8 +1,9 @@
 import {Constraint} from "../../../../types/sudoku/Constraint";
 import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
 import {isValidCellForRegion} from "../region/Region";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const AutoRegionConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+export const AutoRegionConstraint = <T extends AnyPTM>(): Constraint<T> => {
     return {
         name: "auto-region",
         cells: [],

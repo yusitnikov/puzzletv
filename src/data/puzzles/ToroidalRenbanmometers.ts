@@ -1,8 +1,9 @@
 import {FPuzzles} from "./FPuzzles";
 import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
 import {PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
-export const ToroidalRenbanmometers: PuzzleDefinitionLoader<number> = {
+export const ToroidalRenbanmometers: PuzzleDefinitionLoader<NumberPTM> = {
     loadPuzzle: () => FPuzzles.loadPuzzle({
         loopX: true,
         loopY: true,

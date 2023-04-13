@@ -1,7 +1,6 @@
 import {PositionWithAngle} from "../../../types/layout/Position";
 import {GameStateActionCallback} from "../../../types/sudoku/GameStateAction";
-import {JigsawDigit} from "./JigsawDigit";
-import {JigsawGameState, JigsawProcessedGameState} from "./JigsawGameState";
+import {JigsawPTM} from "./JigsawPTM";
 
 export interface JigsawPieceState extends PositionWithAngle {
     animating: boolean;
@@ -11,7 +10,7 @@ export interface JigsawPieceState extends PositionWithAngle {
 export const jigsawPieceStateChangeAction = (
     pieceIndex: number,
     updates: Partial<JigsawPieceState> | ((prevPiece: JigsawPieceState, prevPieces: JigsawPieceState[]) => Partial<JigsawPieceState>),
-): GameStateActionCallback<JigsawDigit, JigsawGameState, JigsawProcessedGameState> => ({selectedCells, extension: {pieces}}) => ({
+): GameStateActionCallback<JigsawPTM> => ({selectedCells, extension: {pieces}}) => ({
     extension: {
         pieces: [
             ...pieces.slice(0, pieceIndex),

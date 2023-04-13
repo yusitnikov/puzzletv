@@ -1,10 +1,13 @@
-import type {CellWriteModeInfo} from "../CellWriteMode";
+import {CellWriteMode} from "../CellWriteMode";
+import type {CellWriteModeInfo} from "../CellWriteModeInfo";
 import {gameStateApplyFieldDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx} from "../GameState";
 import {GestureMetrics} from "../../../utils/gestures";
 import {getRectCenter} from "../../layout/Rect";
 import {isCellGestureExtraData} from "../CellGestureExtraData";
+import {AnyPTM} from "../PuzzleTypeMap";
 
-export const MoveCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mode"> = {
+export const MoveCellWriteModeInfo: CellWriteModeInfo<AnyPTM> = {
+    mode: CellWriteMode.move,
     isActiveForPuzzle: (
         {
             loopHorizontally = false,
@@ -53,7 +56,7 @@ export const MoveCellWriteModeInfo: Omit<CellWriteModeInfo<any, any, any>, "mode
             onStateChange,
         }
     ) => onStateChange(({angle, scale}) => {
-        let result: PartialGameStateEx<any, any> = {};
+        let result: PartialGameStateEx<AnyPTM> = {};
         if (allowRotation && !isFreeRotation && angleStep) {
             result = {
                 ...result,

@@ -10,6 +10,7 @@ import {
     NonRepeatingNeighborsConstraint
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import {lighterBlueColor} from "../../components/app/globals";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const coeff = Math.sqrt(3) / 2;
 const areaRadius = 1 / 3;
@@ -115,7 +116,7 @@ const cells = [
     ...triangle(4, 6, -1, [N, 0, N]),
 ];
 
-export const PenroseTiles: PuzzleDefinition<number> = {
+export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "penrose-tiles",
     title: {

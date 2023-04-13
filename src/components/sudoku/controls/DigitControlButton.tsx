@@ -7,15 +7,14 @@ import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {enterDigitAction} from "../../../types/sudoku/GameStateAction";
 import {joinListSemantically} from "../../../utils/array";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface DigitControlButtonProps<CellType, ExType = {}, ProcessedExType = {}> {
+export interface DigitControlButtonProps<T extends AnyPTM> {
     index: number;
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+    context: PuzzleContext<T>;
 }
 
-export const DigitControlButton = <CellType, ExType = {}, ProcessedExType = {}>(
-    {index, context}: DigitControlButtonProps<CellType, ExType, ProcessedExType>
-) => {
+export const DigitControlButton = <T extends AnyPTM>({index, context}: DigitControlButtonProps<T>) => {
     const translate = useTranslate();
 
     const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;

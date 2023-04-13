@@ -8,8 +8,9 @@ import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {ctrlKeyText} from "../../../utils/os";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {ChessMainControls} from "../components/ChessMainControls";
+import {ChessPTM} from "./ChessPTM";
 
-export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameState> = {
+export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     areSameCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
@@ -111,7 +112,7 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPiece, ChessGameStat
     unserializeInternalState(
         puzzle,
         {selectedColor}
-    ): PartialGameStateEx<ChessPiece, ChessGameState> {
+    ): PartialGameStateEx<ChessPTM> {
         return {extension: {selectedColor}};
     }
 };

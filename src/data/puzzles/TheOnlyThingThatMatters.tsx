@@ -21,6 +21,7 @@ import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {SetInterface} from "../../types/struct/Set";
 import {CellColor} from "../../types/sudoku/CellColor";
 import {indexes} from "../../utils/indexes";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const correctAnswer: number[][] = [
     [9, 4, 5, 1, 8, 6, 7, 3, 2],
@@ -34,7 +35,7 @@ const correctAnswer: number[][] = [
     [8, 2, 1, 6, 7, 3, 4, 5, 9],
 ];
 
-const items: Constraint<number, any>[] = [
+const items: Constraint<NumberPTM, any>[] = [
     AntiKnightConstraint(),
     KillerCageConstraintByRect("R2C1", 1, 3, 6),
     KillerCageConstraintByRect("R2C4", 3, 1, 15),
@@ -52,7 +53,7 @@ const items: Constraint<number, any>[] = [
     KillerCageConstraint(["R8C9", "R9C8", "R9C9"], 15),
 ];
 
-export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
+export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     title: {
         [LanguageCode.en]: "The only thing that matters",
         [LanguageCode.ru]: "Важно лишь это",
@@ -130,7 +131,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<number> = {
     },
 };
 
-export const TheOnlyThingThatMattersNoGivens: PuzzleDefinition<number> = {
+export const TheOnlyThingThatMattersNoGivens: PuzzleDefinition<NumberPTM> = {
     ...TheOnlyThingThatMatters,
     noIndex: true,
     slug: TheOnlyThingThatMatters.slug + "-v3",

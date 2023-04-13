@@ -1,9 +1,10 @@
 import {PositionLiteral} from "../../../../types/layout/Position";
 import {DominoLineConstraint} from "../domino-line/DominoLine";
 import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const GermanWhispersConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], display = true, split = true) => {
-    return DominoLineConstraint<CellType, ExType, ProcessedExType>(
+export const GermanWhispersConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], display = true, split = true) => {
+    return DominoLineConstraint<T>(
         "german whispers",
         true,
         "#0f0",

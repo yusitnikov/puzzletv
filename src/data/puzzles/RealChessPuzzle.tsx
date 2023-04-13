@@ -1,8 +1,6 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {FieldSize8} from "../../types/sudoku/FieldSize";
-import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
-import {ChessGameState} from "../../sudokuTypes/chess/types/ChessGameState";
 import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
 import {chessInitialPiecesByCellNames} from "../../sudokuTypes/chess/utils/chessCoords";
 import {ChessPieceType} from "../../sudokuTypes/chess/types/ChessPieceType";
@@ -26,6 +24,7 @@ import {RulesSpoiler} from "../../components/sudoku/rules/RulesSpoiler";
 import {gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
 import {areSameGivenDigitsMaps, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {ValidChessPositionConstraint} from "../../sudokuTypes/chess/constraints/ValidChessPosition";
+import {ChessPTM} from "../../sudokuTypes/chess/types/ChessPTM";
 
 const mandatorySolutionPieces = chessInitialPiecesByCellNames({
     "g8": {color: ChessColor.black, type: ChessPieceType.knight},
@@ -39,7 +38,7 @@ const optionalSolutionPieces = chessInitialPiecesByCellNames({
     "f7": {color: ChessColor.black, type: ChessPieceType.pawn},
 });
 
-export const RealChessPuzzle: PuzzleDefinition<ChessPiece, ChessGameState> = {
+export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
     title: {
         [LanguageCode.en]: "Easy-peasy, Mate in One",
         [LanguageCode.ru]: "Мат в 1 ход",

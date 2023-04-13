@@ -8,14 +8,16 @@ import {
 } from "../../../types/sudoku/GameStateAction";
 import {incrementArrayItem} from "../../../utils/array";
 import {CellMarkType} from "../../../types/sudoku/CellMark";
-import {CellWriteMode, CellWriteModeInfo} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
 import {userDigitColor} from "../../../components/app/globals";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const safeCrackerArrowsAction = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const safeCrackerArrowsAction = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     position: Position,
     isRightButton: boolean
-): GameStateActionOrCallback<SetCellMarkActionParams, CellType, ExType, ProcessedExType> => {
+): GameStateActionOrCallback<SetCellMarkActionParams, T> => {
     const {marks} = gameStateGetCurrentFieldState(context.state);
     return {
         type: setCellMarkActionType(),
@@ -32,7 +34,7 @@ export const safeCrackerArrowsAction = <CellType, ExType, ProcessedExType>(
     };
 };
 
-export const safeCrackerArrowsCellWriteModeInfo = <ExType, ProcessedExType>(): CellWriteModeInfo<number, ExType, ProcessedExType> => ({
+export const safeCrackerArrowsCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.custom,
     digitsCount: 0,
     handlesRightMouseClick: true,

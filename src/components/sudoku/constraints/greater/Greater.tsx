@@ -7,11 +7,12 @@ import {
     ConstraintProps,
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const radius = 0.15;
 const lineWidth = 0.03;
 
-export const Greater = withFieldLayer(FieldLayer.top, ({cells: [greaterCell, lessCell]}: ConstraintProps) => {
+export const Greater = withFieldLayer(FieldLayer.top, <T extends AnyPTM>({cells: [greaterCell, lessCell]}: ConstraintProps<T>) => {
     const {left: dx, top: dy} = getLineVector({start: greaterCell, end: lessCell});
 
     return <g
@@ -37,7 +38,7 @@ export const Greater = withFieldLayer(FieldLayer.top, ({cells: [greaterCell, les
     </g>;
 }) as ConstraintPropsGenericFc;
 
-export const GreaterConstraint = <CellType,>(greaterCellLiteral: PositionLiteral, lessCellLiteral: PositionLiteral): Constraint<CellType> => {
+export const GreaterConstraint = <T extends AnyPTM>(greaterCellLiteral: PositionLiteral, lessCellLiteral: PositionLiteral): Constraint<T> => {
     return ({
         name: "inequality",
         cells: [parsePositionLiteral(greaterCellLiteral), parsePositionLiteral(lessCellLiteral)],

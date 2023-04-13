@@ -5,6 +5,7 @@ import {getTransformedRectAverageSize} from "../../../types/layout/Rect";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const CellSelectionColor = {
     mainCurrent: blueColor,
@@ -12,14 +13,14 @@ export const CellSelectionColor = {
     secondary: yellowColor,
 };
 
-export interface CellSelectionProps {
-    context: PuzzleContext<any, any, any>;
+export interface CellSelectionProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
     cellPosition: Position;
     color?: string;
     strokeWidth?: number;
 }
 
-export const CellSelection = ({context, cellPosition, color = CellSelectionColor.mainCurrent, strokeWidth = 1}: CellSelectionProps) => {
+export const CellSelection = <T extends AnyPTM>({context, cellPosition, color = CellSelectionColor.mainCurrent, strokeWidth = 1}: CellSelectionProps<T>) => {
     const scale = useTransformScale();
 
     let selectionBorderWidth = 0.1 * strokeWidth;

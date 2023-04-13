@@ -1,8 +1,9 @@
 import {Position} from "../layout/Position";
 import {CellExactPosition} from "./CellExactPosition";
-import {CellWriteModeInfo} from "./CellWriteMode";
+import {CellWriteModeInfo} from "./CellWriteModeInfo";
 import {BasePointerStateExtraData} from "../../utils/gestures";
 import {PuzzleContext} from "./PuzzleContext";
+import {AnyPTM} from "./PuzzleTypeMap";
 
 export const cellGestureExtraDataTag = "cell";
 
@@ -16,10 +17,10 @@ export const isCellGestureExtraData = (
     extraData: BasePointerStateExtraData | undefined
 ): extraData is CellGestureExtraData => extraData?.tags.includes(cellGestureExtraDataTag) ?? false;
 
-export const getCurrentCellWriteModeInfoByGestureExtraData = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const getCurrentCellWriteModeInfoByGestureExtraData = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     extraData: BasePointerStateExtraData | undefined,
-): CellWriteModeInfo<CellType, ExType, ProcessedExType> => {
+): CellWriteModeInfo<T> => {
     if (isCellGestureExtraData(extraData)) {
         const forceCellWriteMode = context.puzzle.typeManager.getCellTypeProps?.(extraData.cell, context.puzzle)?.forceCellWriteMode;
         if (forceCellWriteMode) {

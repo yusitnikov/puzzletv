@@ -9,6 +9,7 @@ import {
 } from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {lightGreyColor} from "../../../app/globals";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const lineTag = "line";
 
@@ -16,13 +17,13 @@ export interface LineProps {
     width?: number;
 }
 
-export const LineComponent = withFieldLayer(FieldLayer.regular, <CellType,>(
+export const LineComponent = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
     {
         cells,
         color = lightGreyColor,
         props: {width = 0.15},
         context: {cellsIndex},
-    }: ConstraintProps<CellType, LineProps>
+    }: ConstraintProps<T, LineProps>
 ) => <RoundedPolyLine
     points={cells.map(({left, top}) => {
         const cellInfo = cellsIndex.allCells[top]?.[left];
@@ -34,12 +35,12 @@ export const LineComponent = withFieldLayer(FieldLayer.regular, <CellType,>(
     stroke={color}
 />) as ConstraintPropsGenericFc<LineProps>;
 
-export const LineConstraint = <CellType, ExType, ProcessedExType>(
+export const LineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     color?: string,
     width?: number,
     split = true,
-): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);

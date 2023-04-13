@@ -3,10 +3,9 @@ import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const CornerDigitModeButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const CornerDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         puzzle,
         state,

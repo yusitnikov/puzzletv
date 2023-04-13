@@ -1,8 +1,9 @@
 import {Constraint} from "../Constraint";
 import {isSamePosition} from "../../layout/Position";
 import {loop} from "../../../utils/math";
+import {AnyPTM} from "../PuzzleTypeMap";
 
-export const AntiBishopFromCenterConstraint = <CellType>(regionSize: number): Constraint<CellType> => ({
+export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: number): Constraint<T> => ({
     name: "anti-bishop from center",
     cells: [],
     props: undefined,

@@ -9,13 +9,14 @@ import {
 } from "../../../../types/sudoku/Constraint";
 import {RegularCalculatorDigit} from "../../digit/CalculatorDigit";
 import {mainDigitCoeff} from "../../cell/CellDigits";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 interface FillableCalculatorDigitProps {
     digit: number;
 }
 
-export const FillableCalculatorDigit = withFieldLayer(FieldLayer.beforeSelection, <CellType,>(
-    {cells: [{left, top}], props: {digit}}: ConstraintProps<CellType, FillableCalculatorDigitProps>
+export const FillableCalculatorDigit = withFieldLayer(FieldLayer.beforeSelection, <T extends AnyPTM>(
+    {cells: [{left, top}], props: {digit}}: ConstraintProps<T, FillableCalculatorDigitProps>
 ) => <RegularCalculatorDigit
     left={left + 0.5}
     top={top + 0.5}
@@ -32,9 +33,9 @@ const allowedFillableOptions: Record<number, number[]> = {
     7: [0, 3, 9],
 };
 
-export const FillableCalculatorDigitConstraint = <CellType, ExType, ProcessedExType>(
+export const FillableCalculatorDigitConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral, digit: number
-): Constraint<CellType, FillableCalculatorDigitProps, ExType, ProcessedExType> => {
+): Constraint<T, FillableCalculatorDigitProps> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     return ({

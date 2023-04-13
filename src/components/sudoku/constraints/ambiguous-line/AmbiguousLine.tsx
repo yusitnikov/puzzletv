@@ -3,14 +3,15 @@ import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {LineComponent, LineProps} from "../line/Line";
 import {peachColor} from "../../../app/globals";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const AmbiguousLineConstraint = <CellType, ExType, ProcessedExType>(
+export const AmbiguousLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
-    constraintOptionsConstructors: ((cellLiterals: PositionLiteral[]) => Constraint<CellType, LineProps, ExType, ProcessedExType>)[],
+    constraintOptionsConstructors: ((cellLiterals: PositionLiteral[]) => Constraint<T, LineProps>)[],
     width: number | undefined = undefined,
     color = peachColor,
     split = true,
-): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
+): Constraint<T, LineProps> => {
     const constraintOptions = constraintOptionsConstructors.map(constructor => constructor(cellLiterals));
 
     let cells = parsePositionLiterals(cellLiterals);

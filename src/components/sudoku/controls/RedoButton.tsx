@@ -6,8 +6,9 @@ import {useCallback} from "react";
 import {ctrlKeyText} from "../../../utils/os";
 import {redoAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const RedoButton = <CellType, ExType, ProcessedExType>(
+export const RedoButton = <T extends AnyPTM>(
     {
         context: {
             cellSizeForSidePanel: cellSize,
@@ -17,7 +18,7 @@ export const RedoButton = <CellType, ExType, ProcessedExType>(
         },
         top,
         left,
-    }: ControlButtonItemProps<CellType, ExType, ProcessedExType>
+    }: ControlButtonItemProps<T>
 ) => {
     const translate = useTranslate();
 

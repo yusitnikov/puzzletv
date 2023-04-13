@@ -8,11 +8,12 @@ import {
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
 import {ComponentType} from "react";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const radius = 0.2;
 const lineWidth = 0.03;
 
-export const XMark = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2]}: ConstraintProps) => {
+export const XMark = withFieldLayer(FieldLayer.top, <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
     const left = (cell1.left + cell2.left) / 2 + 0.5;
     const top = (cell1.top + cell2.top) / 2 + 0.5;
 
@@ -37,7 +38,7 @@ export const XMark = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2]}: Co
     </>;
 }) as ConstraintPropsGenericFc;
 
-export const VMark = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2]}: ConstraintProps) => {
+export const VMark = withFieldLayer(FieldLayer.top, <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
     const left = (cell1.left + cell2.left) / 2 + 0.5;
     const top = (cell1.top + cell2.top) / 2 + 0.5;
 
@@ -53,13 +54,13 @@ export const VMark = withFieldLayer(FieldLayer.top, ({cells: [cell1, cell2]}: Co
     />;
 }) as ConstraintPropsGenericFc;
 
-const XVConstraint = <CellType, ExType, ProcessedExType>(
+const XVConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,
     cellLiteral2: PositionLiteral,
     name: string,
-    component: ComponentType<ConstraintProps<CellType, undefined, ExType, ProcessedExType>>,
+    component: ComponentType<ConstraintProps<T>>,
     expectedSum: number
-): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+): Constraint<T> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
 
@@ -82,8 +83,8 @@ const XVConstraint = <CellType, ExType, ProcessedExType>(
     };
 };
 
-export const XMarkConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
-    XVConstraint<CellType, ExType, ProcessedExType>(cellLiteral1, cellLiteral2, "X", XMark, 10);
+export const XMarkConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
+    XVConstraint<T>(cellLiteral1, cellLiteral2, "X", XMark, 10);
 
-export const VMarkConstraint = <CellType, ExType, ProcessedExType>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
-    XVConstraint<CellType, ExType, ProcessedExType>(cellLiteral1, cellLiteral2, "V", VMark, 5);
+export const VMarkConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
+    XVConstraint<T>(cellLiteral1, cellLiteral2, "V", VMark, 5);

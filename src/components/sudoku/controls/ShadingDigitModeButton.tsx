@@ -5,10 +5,9 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {PlainValueSet} from "../../../types/struct/Set";
 import {ctrlKeyText} from "../../../utils/os";
 import {CellColor} from "../../../types/sudoku/CellColor";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const ShadingDigitModeButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const ShadingDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const translate = useTranslate();
 
     return <CellWriteModeButton

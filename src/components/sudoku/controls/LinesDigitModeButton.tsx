@@ -5,10 +5,9 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {UserLinesByData, UserMarkByData} from "../constraints/user-lines/UserLines";
 import {CellMarkType} from "../../../types/sudoku/CellMark";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const LinesDigitModeButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const LinesDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         cellSizeForSidePanel: cellSize,
         puzzle: {allowDrawing = []},

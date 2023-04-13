@@ -3,12 +3,13 @@ import {indexesFromTo} from "../../../utils/indexes";
 import {ReactNode} from "react";
 import {Position} from "../../../types/layout/Position";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface FieldLoopProps extends PuzzleContextProps<any, any, any> {
+export interface FieldLoopProps<T extends AnyPTM> extends PuzzleContextProps<T> {
     children: ReactNode | ((offset: Position) => ReactNode);
 }
 
-export const FieldLoop = ({context: {puzzle}, children}: FieldLoopProps) => {
+export const FieldLoop = <T extends AnyPTM>({context: {puzzle}, children}: FieldLoopProps<T>) => {
     let {
         fieldSize: {fieldSize, rowsCount, columnsCount},
         ignoreRowsColumnCountInTheWrapper,

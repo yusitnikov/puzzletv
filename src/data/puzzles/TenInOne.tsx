@@ -1,6 +1,5 @@
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {LanguageCode} from "../../types/translations/LanguageCode";
-import {MultiStageGameState} from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
 import {TenInOneSudokuTypeManager} from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
 import {createRegularFieldSize} from "../../types/sudoku/FieldSize";
 import {
@@ -47,6 +46,7 @@ import {Position, PositionLiteral} from "../../types/layout/Position";
 import {AmbiguousLineConstraint} from "../../components/sudoku/constraints/ambiguous-line/AmbiguousLine";
 import {SameParityLineConstraint} from "../../components/sudoku/constraints/parity-line/ParityLine";
 import {peachColor} from "../../components/app/globals";
+import {MultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
 
 const remainingBoxPositionIndexes = [0, 4, 8];
 const keepDigitsAccordingBoxPositionText = {
@@ -64,7 +64,7 @@ const fieldSize = {
 };
 const resultChecker = isValidFinishedPuzzleByStageConstraints<number>(2);
 
-export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState> = {
+export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
     author: Raumplaner,
     title: {
         [LanguageCode.en]: "Abstract Killer Dots",
@@ -143,7 +143,7 @@ export const AbstractKillerDots: PuzzleDefinition<number, MultiStageGameState> =
     resultChecker,
 };
 
-export const LegoHouse: PuzzleDefinition<number, MultiStageGameState> = {
+export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
     noIndex: true,
     author: AnalyticalNinja,
     title: {
@@ -214,7 +214,7 @@ export const LegoHouse: PuzzleDefinition<number, MultiStageGameState> = {
     resultChecker,
 };
 
-export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
+export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
     noIndex: true,
     author: AnalyticalNinja,
     title: {
@@ -246,7 +246,7 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
         </RulesIndentedBlock>
     </>,
     items: ({extension: {stage}}) => {
-        let lines: Constraint<number, any, MultiStageGameState>[] = [
+        let lines: Constraint<MultiStagePTM, any>[] = [
             RenbanConstraint(["R3C3", "R2C3", "R1C4", "R2C5"]),
             RenbanConstraint(["R5C6", "R6C6", "R6C7", "R5C8"]),
             GermanWhispersConstraint(["R5C5", "R4C4", "R6C2", "R8C2", "R8C6"]),
@@ -295,14 +295,14 @@ export const DollHouse: PuzzleDefinition<number, MultiStageGameState> = {
     resultChecker,
 };
 
-const MoodyLineConstraint = (cellLiterals: PositionLiteral[], visible = true) => AmbiguousLineConstraint<number, MultiStageGameState, {}>(
+const MoodyLineConstraint = (cellLiterals: PositionLiteral[], visible = true) => AmbiguousLineConstraint<MultiStagePTM>(
     cellLiterals,
     [RenbanConstraint, GermanWhispersConstraint, SameParityLineConstraint],
     visible ? undefined : 0,
     peachColor
 );
 
-export const MoodyLines: PuzzleDefinition<number, MultiStageGameState> = {
+export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
     noIndex: true,
     author: AnalyticalNinja,
     title: {

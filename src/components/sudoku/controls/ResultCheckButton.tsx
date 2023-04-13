@@ -9,10 +9,9 @@ import {useCallback, useMemo, useState} from "react";
 import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
 import {useEffectExceptInit} from "../../../hooks/useEffectExceptInit";
 import {myClientId} from "../../../hooks/useMultiPlayer";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const ResultCheckButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         cellSizeForSidePanel: cellSize,
         puzzle,

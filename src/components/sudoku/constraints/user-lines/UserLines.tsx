@@ -4,7 +4,7 @@ import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     Constraint,
-    ConstraintProps,
+    ConstraintProps, ConstraintPropsGenericFc,
     getAllPuzzleConstraints,
     getInvalidUserLines,
     prepareGivenDigitsMapForConstraints
@@ -22,12 +22,13 @@ import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {HashSet} from "../../../../types/struct/Set";
 import {emptyPositionWithAngle} from "../../../../types/layout/Position";
 import {loop} from "../../../../utils/math";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
 const removingBorderColor = lightGreyColor;
 
-export const UserLines = memo(({context}: ConstraintProps) => {
+export const UserLines = memo(<T extends AnyPTM>({context}: ConstraintProps<T>) => {
     const layer = useFieldLayer();
 
     const {cellSize, puzzle, state} = context;
@@ -71,14 +72,14 @@ export const UserLines = memo(({context}: ConstraintProps) => {
             isAdding={dragAction === DragAction.SetTrue}
         />)}
     </>;
-});
+}) as ConstraintPropsGenericFc;
 
-export interface UserMarkByDataProps extends CellMark {
-    context?: PuzzleContext<any, any, any>;
+export interface UserMarkByDataProps<T extends AnyPTM> extends CellMark {
+    context?: PuzzleContext<T>;
     cellSize: number;
 }
 
-export const UserMarkByData = (
+export const UserMarkByData = <T extends AnyPTM>(
     {
         context,
         cellSize,
@@ -87,7 +88,7 @@ export const UserMarkByData = (
         color,
         // Leaving the defaults only for compatibility
         isCenter = position.left % 1 !== 0 && position.top % 1 !== 0,
-    }: UserMarkByDataProps
+    }: UserMarkByDataProps<T>
 ) => {
     let {top, left} = position;
     let angle = 0;
@@ -196,9 +197,9 @@ export const UserLinesByData = ({cellSize, start, end, color = regularBorderColo
     />;
 };
 
-export const UserLinesConstraint: Constraint<any, any, any, any> = {
+export const UserLinesConstraint = <T extends AnyPTM>(): Constraint<T, any> => ({
     name: "user lines",
     cells: [],
     component: UserLines,
     props: undefined,
-};
+});

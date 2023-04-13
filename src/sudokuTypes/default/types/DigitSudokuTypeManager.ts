@@ -2,10 +2,11 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {DigitCellDataComponentType} from "../components/DigitCellData";
 import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponentType";
+import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const DigitSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
+export const DigitSudokuTypeManager = <T extends AnyNumberPTM>(
     digitComponentType: DigitComponentType = RegularDigitComponentType
-): SudokuTypeManager<number, ExType, ProcessedExType> => ({
+): SudokuTypeManager<T> => ({
     areSameCellData(digit1: number, digit2: number): boolean {
         return digit1 === digit2;
     },
@@ -34,7 +35,7 @@ export const DigitSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
         return {};
     },
 
-    unserializeGameState(): Partial<ExType> {
+    unserializeGameState(): Partial<T["stateEx"]> {
         return {};
     },
 

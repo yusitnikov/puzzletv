@@ -4,10 +4,9 @@ import {CellWriteModeButton} from "./CellWriteModeButton";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {ctrlKeyText} from "../../../utils/os";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const CenterDigitModeButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const CenterDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         puzzle,
         state,

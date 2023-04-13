@@ -8,14 +8,12 @@ import {Absolute} from "../../layout/absolute/Absolute";
 import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
 import {useControlButtonsManager} from "../controls/ControlButtonsManager";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface SidePanelProps<CellType, ExType = {}, ProcessedExType = {}>
-    extends ControlsProps<CellType, ExType, ProcessedExType> {
+export interface SidePanelProps<T extends AnyPTM> extends ControlsProps<T> {
 }
 
-export const SidePanel = <CellType, ExType = {}, ProcessedExType = {}>(
-    {context, rect, isHorizontal}: SidePanelProps<CellType, ExType, ProcessedExType>
-) => {
+export const SidePanel = <T extends AnyPTM>({context, rect, isHorizontal}: SidePanelProps<T>) => {
     const {puzzle, cellSizeForSidePanel: cellSize} = context;
 
     const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);

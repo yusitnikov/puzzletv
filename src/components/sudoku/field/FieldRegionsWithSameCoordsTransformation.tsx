@@ -3,17 +3,18 @@ import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-interface FieldRegionsWithSameCoordsTransformationProps<CellType, ExType, ProcessedExType> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
     children: ReactNode | ((region?: GridRegion, index?: number) => ReactNode);
 }
 
-export const FieldRegionsWithSameCoordsTransformation = <CellType, ExType, ProcessedExType>(
+export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
     {
         context,
         children,
-    }: FieldRegionsWithSameCoordsTransformationProps<CellType, ExType, ProcessedExType>
+    }: FieldRegionsWithSameCoordsTransformationProps<T>
 ) => {
     const {
         puzzle: {

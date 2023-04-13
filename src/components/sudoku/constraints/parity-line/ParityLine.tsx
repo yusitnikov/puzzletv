@@ -4,9 +4,11 @@ import {peachColor} from "../../../app/globals";
 import {LineComponent, LineProps} from "../line/Line";
 import {splitMultiLine} from "../../../../utils/lines";
 import {Constraint} from "../../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const AlternatingParityLineConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], display = true, split = true) => {
-    return DominoLineConstraint<CellType, ExType, ProcessedExType>(
+// noinspection JSUnusedGlobalSymbols
+export const AlternatingParityLineConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], display = true, split = true) =>
+    DominoLineConstraint<T>(
         "alternating parity line",
         true,
         peachColor,
@@ -16,11 +18,10 @@ export const AlternatingParityLineConstraint = <CellType, ExType, ProcessedExTyp
         display,
         split,
     );
-};
 
-export const SameParityLineConstraint = <CellType, ExType, ProcessedExType>(
+export const SameParityLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[], display = true, split = true
-): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);

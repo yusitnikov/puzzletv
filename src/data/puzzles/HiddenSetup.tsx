@@ -29,13 +29,13 @@ import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedLi
 import React from "react";
 import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
 import {Raumplaner} from "../authors";
-import {MultiStageGameState} from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
 import {
     isValidFinishedPuzzleByStageConstraints,
     MultiStageSudokuTypeManager
 } from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {Constraint} from "../../types/sudoku/Constraint";
+import {MultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
 
 const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     switch (stage) {
@@ -99,7 +99,7 @@ const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     return {};
 };
 
-const getStage = ({state}: PuzzleContext<number, MultiStageGameState>) => {
+const getStage = ({state}: PuzzleContext<MultiStagePTM>) => {
     const {cells} = gameStateGetCurrentFieldState(state);
 
     if (
@@ -148,7 +148,7 @@ const getStage = ({state}: PuzzleContext<number, MultiStageGameState>) => {
     return 5;
 };
 
-export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState> = {
+export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
     author: Raumplaner,
     title: {
         [LanguageCode.en]: "Hidden Setup",
@@ -161,7 +161,7 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState> = {
         getCellSelectionType(
             {top, left},
             {state: {extension: {stage}}}
-        ): Required<Pick<CellSelectionProps, "color" | "strokeWidth">> | undefined {
+        ): Required<Pick<CellSelectionProps<MultiStagePTM>, "color" | "strokeWidth">> | undefined {
             const colors = getStageCellsMap(stage);
 
             return colors[top]?.[left] === undefined ? undefined : {
@@ -197,7 +197,7 @@ export const HiddenSetup: PuzzleDefinition<number, MultiStageGameState> = {
         </>;
     },
     items: ({extension: {stage}}) => {
-        const result: Constraint<any, any, MultiStageGameState, {}>[] = [
+        const result: Constraint<MultiStagePTM, any>[] = [
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
             RenbanConstraint(["R1C6", "R4C6", "R4C9"]),

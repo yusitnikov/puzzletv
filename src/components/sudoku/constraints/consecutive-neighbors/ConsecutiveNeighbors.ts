@@ -4,18 +4,19 @@ import {Position} from "../../../../types/layout/Position";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 import {KropkiDotTag} from "../kropki-dot/KropkiDot";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-const BaseNeighborsConstraint = <CellType, ExType, ProcessedExType>(
+const BaseNeighborsConstraint = <T extends AnyPTM>(
     name: string,
     areValidNeighborDigits: (
         digit1: number,
         digit2: number,
         position1: Position,
         position2: Position,
-        context: PuzzleContext<CellType, ExType, ProcessedExType>
+        context: PuzzleContext<T>
     ) => boolean,
     excludedTags: string[] = [],
-): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+): Constraint<T> => {
     return ({
         name,
         cells: [],
@@ -65,11 +66,11 @@ const BaseNeighborsConstraint = <CellType, ExType, ProcessedExType>(
     });
 };
 
-const BaseConsecutiveNeighborsConstraint = <CellType, ExType, ProcessedExType>(
+const BaseConsecutiveNeighborsConstraint = <T extends AnyPTM>(
     invert: boolean,
     allowLoop = false,
     excludedTags: string[] = invert ? [KropkiDotTag] : []
-): Constraint<CellType, undefined, ExType, ProcessedExType> =>
+): Constraint<T> =>
     BaseNeighborsConstraint(
         invert ? "non-consecutive neighbors" : "consecutive neighbors",
         (digit1, digit2, position1, position2, {puzzle}) => {
@@ -84,33 +85,31 @@ const BaseConsecutiveNeighborsConstraint = <CellType, ExType, ProcessedExType>(
         excludedTags
     );
 
-export const ConsecutiveNeighborsConstraint = <CellType, ExType, ProcessedExType>(allowLoop = false) =>
-    BaseConsecutiveNeighborsConstraint<CellType, ExType, ProcessedExType>(false, allowLoop);
+export const ConsecutiveNeighborsConstraint = <T extends AnyPTM>(allowLoop = false) =>
+    BaseConsecutiveNeighborsConstraint<T>(false, allowLoop);
 
-export const NonConsecutiveNeighborsConstraint = <CellType, ExType, ProcessedExType>(allowLoop = false, excludedTags: string[] = [KropkiDotTag]) =>
-    BaseConsecutiveNeighborsConstraint<CellType, ExType, ProcessedExType>(true, allowLoop, excludedTags);
+export const NonConsecutiveNeighborsConstraint = <T extends AnyPTM>(allowLoop = false, excludedTags: string[] = [KropkiDotTag]) =>
+    BaseConsecutiveNeighborsConstraint<T>(true, allowLoop, excludedTags);
 
-export const NonRatioNeighborsConstraint = <CellType, ExType, ProcessedExType>(
+export const NonRatioNeighborsConstraint = <T extends AnyPTM>(
     excludedRatios: [number, number][] = [[1, 2]],
     excludedTags: string[] = [KropkiDotTag]
-): Constraint<CellType, undefined, ExType, ProcessedExType> =>
-    BaseNeighborsConstraint(
-        "negative ratio neighbors",
-        (digit1, digit2) => {
-            for (const [ratio1, ratio2] of excludedRatios) {
-                if (digit1 * ratio1 === digit2 * ratio2 || digit2 * ratio1 === digit1 * ratio2) {
-                    return false;
-                }
+) => BaseNeighborsConstraint<T>(
+    "negative ratio neighbors",
+    (digit1, digit2) => {
+        for (const [ratio1, ratio2] of excludedRatios) {
+            if (digit1 * ratio1 === digit2 * ratio2 || digit2 * ratio1 === digit1 * ratio2) {
+                return false;
             }
+        }
 
-            return true;
-        },
-        excludedTags
-    );
+        return true;
+    },
+    excludedTags
+);
 
-export const NonRepeatingNeighborsConstraint = <CellType, ExType, ProcessedExType>()
-    : Constraint<CellType, undefined, ExType, ProcessedExType> =>
-    BaseNeighborsConstraint(
+export const NonRepeatingNeighborsConstraint = <T extends AnyPTM>() =>
+    BaseNeighborsConstraint<T>(
         "non-repeating neighbors",
         (digit1, digit2) => digit1 !== digit2,
     );

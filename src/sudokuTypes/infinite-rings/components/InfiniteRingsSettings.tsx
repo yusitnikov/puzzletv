@@ -4,9 +4,10 @@ import {isShowingAllInfiniteRingsAllowed, useIsShowingAllInfiniteRings} from "..
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {SettingsItem} from "../../../components/sudoku/controls/settings/SettingsItem";
 import {SettingsCheckbox} from "../../../components/sudoku/controls/settings/SettingsCheckbox";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => function InfiniteRingsSettingsComponent<CellType, ExType, ProcessedExType>(
-    {context, cellSize}: SettingsContentProps<CellType, ExType, ProcessedExType>
+export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => function InfiniteRingsSettingsComponent<T extends AnyPTM>(
+    {context, cellSize}: SettingsContentProps<T>
 ) {
     const translate = useTranslate();
 

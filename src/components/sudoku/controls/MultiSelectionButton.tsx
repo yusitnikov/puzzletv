@@ -5,10 +5,9 @@ import {saveBoolToLocalStorage} from "../../../utils/localStorage";
 import {LocalStorageKeys} from "../../../data/LocalStorageKeys";
 import {Grid} from "@emotion-icons/fluentui-system-filled";
 import {CellSelectionColor} from "../cell/CellSelection";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const MultiSelectionButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const MultiSelectionButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         cellSizeForSidePanel: cellSize,
         state: {isMultiSelection},

@@ -8,10 +8,11 @@ import {moveButtonTip, normalSudokuRulesApply, thermometersExplained, toroidalRu
 import {darkGreyColor} from "../../components/app/globals";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {Position} from "../../types/layout/Position";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const regularFieldSize = createRegularFieldSize(8, 2);
 
-export const MeteorShower = (colorful: boolean): PuzzleDefinition<number> => ({
+export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: true,
     slug: colorful ? "meteor-shower" : "meteor-shower-no-colors",
     title: {

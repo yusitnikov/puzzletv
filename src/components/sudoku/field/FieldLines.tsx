@@ -2,19 +2,20 @@ import {indexes} from "../../../utils/indexes";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {darkGreyColor, textColor} from "../../app/globals";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../types/sudoku/Constraint";
 import {formatSvgPointsArray} from "../../../types/layout/Position";
 import {concatContinuousLines} from "../../../utils/lines";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const FieldLines = withFieldLayer(FieldLayer.lines, (
+export const FieldLines = withFieldLayer(FieldLayer.lines, <T extends AnyPTM>(
     {
         context: {
             puzzle,
             cellsIndexForState,
             state: {processed: {isMyTurn}},
         }
-    }: ConstraintProps
+    }: ConstraintProps<T>
 ) => {
     const {
         typeManager: {
@@ -80,11 +81,11 @@ export const FieldLines = withFieldLayer(FieldLayer.lines, (
             />)
         )}
     </>;
-});
+}) as ConstraintPropsGenericFc;
 
-export const FieldLinesConstraint: Constraint<any, any, any, any> = {
+export const FieldLinesConstraint = <T extends AnyPTM>(): Constraint<T, any> => ({
     name: "field lines",
     cells: [],
     component: FieldLines,
     props: undefined,
-}
+});

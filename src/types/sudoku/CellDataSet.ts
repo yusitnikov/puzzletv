@@ -1,12 +1,13 @@
 import {HashSet} from "../struct/Set";
 import {PuzzleDefinition} from "./PuzzleDefinition";
+import {AnyPTM} from "./PuzzleTypeMap";
 
-export class CellDataSet<CellType, ExType, ProcessedExType> extends HashSet<CellType> {
+export class CellDataSet<T extends AnyPTM> extends HashSet<T["cell"]> {
     constructor(
         {
             typeManager: {areSameCellData, cloneCellData, serializeCellData, getCellDataHash}
-        }: PuzzleDefinition<CellType, ExType, ProcessedExType>,
-        items: CellType[] = []
+        }: PuzzleDefinition<T>,
+        items: T["cell"][] = []
     ) {
         super(
             items,
@@ -19,8 +20,8 @@ export class CellDataSet<CellType, ExType, ProcessedExType> extends HashSet<Cell
         );
     }
 
-    static unserialize<CellType, ExType, ProcessedExType>(
-        puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+    static unserialize<T extends AnyPTM>(
+        puzzle: PuzzleDefinition<T>,
         items: any
     ) {
         return new CellDataSet(puzzle, (items as any[]).map(puzzle.typeManager.unserializeCellData));

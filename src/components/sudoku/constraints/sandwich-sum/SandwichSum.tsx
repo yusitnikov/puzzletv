@@ -10,13 +10,16 @@ import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeCont
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {indexes} from "../../../../utils/indexes";
 import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export interface SandwichSumProps {
     clueCell: Position;
     sum: number;
 }
 
-export const SandwichSum = withFieldLayer(FieldLayer.regular, ({props: {clueCell: {top, left}, sum}}: ConstraintProps<unknown, SandwichSumProps>) => {
+export const SandwichSum = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
+    {props: {clueCell: {top, left}, sum}}: ConstraintProps<T, SandwichSumProps>
+) => {
     const {
         svgContentComponent: DigitSvgContent,
     } = useDigitComponentType();
@@ -29,11 +32,11 @@ export const SandwichSum = withFieldLayer(FieldLayer.regular, ({props: {clueCell
     />;
 }) as ConstraintPropsGenericFc<SandwichSumProps>;
 
-export const SandwichSumConstraint = <CellType, ExType, ProcessedExType>(
+export const SandwichSumConstraint = <T extends AnyPTM>(
     clueCellLiteral: PositionLiteral,
-    {rowsCount, columnsCount}: FieldSize,
+    {rowsCount, columnsCount}: FieldSize<T>,
     sum: number
-): Constraint<CellType, SandwichSumProps, ExType, ProcessedExType> => {
+): Constraint<T, SandwichSumProps> => {
     const clueCell = parsePositionLiteral(clueCellLiteral);
 
     return ({

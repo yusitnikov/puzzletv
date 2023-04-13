@@ -3,7 +3,6 @@ import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {Chameleon} from "../authors";
 import {GoogleMapsFieldWrapper} from "../../sudokuTypes/google-maps/components/GoogleMapsFieldWrapper";
-import {GoogleMapsState} from "../../sudokuTypes/google-maps/types/GoogleMapsState";
 import {
     AfricaCountriesAreas,
     AfricaCountriesBounds,
@@ -18,8 +17,9 @@ import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedLi
 import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
 import {GoogleMapsTypeManager} from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
+import {GoogleMapsPTM} from "../../sudokuTypes/google-maps/types/GoogleMapsPTM";
 
-export const Africa: PuzzleDefinition<number, GoogleMapsState> = {
+export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
     slug: "africa",
     title: {
         [LanguageCode.en]: "Africa",

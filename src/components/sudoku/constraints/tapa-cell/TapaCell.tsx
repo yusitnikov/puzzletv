@@ -16,13 +16,14 @@ import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {textColor} from "../../../app/globals";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export interface TapaCellProps {
     clues: (number | undefined)[];
 }
 
-export const TapaCell = withFieldLayer(FieldLayer.regular, (
-    {props: {clues}}: ConstraintProps<unknown, TapaCellProps>
+export const TapaCell = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
+    {props: {clues}}: ConstraintProps<T, TapaCellProps>
 ) => {
     const radius = clues.length === 1 ? 0 : 0.3;
     const size = clues.length === 1 ? 0.8 : 0.4;
@@ -44,7 +45,9 @@ export const TapaCell = withFieldLayer(FieldLayer.regular, (
     </>;
 }) as ConstraintPropsGenericFc<TapaCellProps>;
 
-export const TapaCellConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral, ...clues: (number | undefined)[]): Constraint<CellType, TapaCellProps, ExType, ProcessedExType> => {
+export const TapaCellConstraint = <T extends AnyPTM>(
+    cellLiteral: PositionLiteral, ...clues: (number | undefined)[]
+): Constraint<T, TapaCellProps> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     const cluesMap: Record<number, number> = {};
@@ -53,13 +56,13 @@ export const TapaCellConstraint = <CellType, ExType, ProcessedExType>(cellLitera
         cluesMap[key] = (cluesMap[key] || 0) + 1;
     }
 
-    const getCellInfo = ({cellsIndex: {allCells}}: PuzzleContext<CellType, any, any>) => allCells[cell.top][cell.left];
+    const getCellInfo = ({cellsIndex: {allCells}}: PuzzleContext<T>) => allCells[cell.top][cell.left];
 
-    const getNeighborCenters = (context: PuzzleContext<CellType, any, any>) => getCellInfo(context).neighbors.map(
+    const getNeighborCenters = (context: PuzzleContext<T>) => getCellInfo(context).neighbors.map(
         ({top, left}) => context.cellsIndex.allCells[top][left].center
     );
 
-    const getLineSegments = ({cellsIndexForState}: PuzzleContext<CellType, any, any>) =>
+    const getLineSegments = ({cellsIndexForState}: PuzzleContext<T>) =>
         cellsIndexForState.getCenterLineSegments();
 
     return {

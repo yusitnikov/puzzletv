@@ -7,8 +7,9 @@ import {
     ConstraintProps,
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const Clone = withFieldLayer(FieldLayer.beforeSelection, ({cells}: ConstraintProps) => <>
+export const Clone = withFieldLayer(FieldLayer.beforeSelection, <T extends AnyPTM>({cells}: ConstraintProps<T>) => <>
     {cells.map(({top, left}, index) => <rect
         key={index}
         x={left}
@@ -19,7 +20,7 @@ export const Clone = withFieldLayer(FieldLayer.beforeSelection, ({cells}: Constr
     />)}
 </>) as ConstraintPropsGenericFc;
 
-export const CloneConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[]): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+export const CloneConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[]): Constraint<T> => ({
     name: "clone",
     cells: parsePositionLiterals(cellLiterals),
     component: Clone,

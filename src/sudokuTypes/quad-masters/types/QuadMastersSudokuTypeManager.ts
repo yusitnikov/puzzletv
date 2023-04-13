@@ -17,10 +17,11 @@ import {indexes} from "../../../utils/indexes";
 import {getNextPlayerId} from "../../../hooks/useMultiPlayer";
 import {QuadleConstraintBySolution} from "../../../components/sudoku/constraints/quad/Quadle";
 import {QuadInputSudokuTypeManager} from "../../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
+import {QuadMastersPTM} from "./QuadMastersPTM";
 
-export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, isQuadle: boolean): SudokuTypeManager<number, QuadMastersGameState> => {
-    const parent = QuadInputSudokuTypeManager<number, QuadMastersGameState>({
-        parent: GuessSudokuTypeManager<QuadMastersGameState>(solution),
+export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, isQuadle: boolean): SudokuTypeManager<QuadMastersPTM> => {
+    const parent = QuadInputSudokuTypeManager<QuadMastersPTM>({
+        parent: GuessSudokuTypeManager(solution),
         isQuadle,
         allowRepeat: isQuadle,
         allowOverflow: !isQuadle,
@@ -76,7 +77,7 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, i
             context,
             cellData,
             defaultResult
-        ): PartialGameStateEx<number, QuadMastersGameState> {
+        ): PartialGameStateEx<QuadMastersPTM> {
             defaultResult = parent.handleDigitGlobally?.(isGlobal, clientId, context, cellData, defaultResult) || defaultResult;
 
             if (!isGlobal) {
@@ -148,7 +149,7 @@ export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, i
             puzzle,
             state,
             newState
-        ): GameStateEx<number, QuadMastersGameState> {
+        ): GameStateEx<QuadMastersPTM> {
             const {isQuadTurn} = newState;
 
             return mergeGameStateWithUpdates(

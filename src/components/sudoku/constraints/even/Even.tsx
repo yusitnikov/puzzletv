@@ -10,10 +10,11 @@ import {
     ConstraintProps,
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const width = 0.8;
 
-export const Even = withFieldLayer(FieldLayer.beforeSelection, ({cells: [{left, top}]}: ConstraintProps) => <rect
+export const Even = withFieldLayer(FieldLayer.beforeSelection, <T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T>) => <rect
     x={left + 0.5 - width / 2}
     y={top + 0.5 - width / 2}
     width={width}
@@ -21,7 +22,7 @@ export const Even = withFieldLayer(FieldLayer.beforeSelection, ({cells: [{left, 
     fill={lightGreyColor}
 />) as ConstraintPropsGenericFc;
 
-export const EvenConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+export const EvenConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral): Constraint<T> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     return {

@@ -9,11 +9,9 @@ import {useEventListener} from "../../../hooks/useEventListener";
 import {loop} from "../../../utils/math";
 import {gameStateApplyFieldDragGesture} from "../../../types/sudoku/GameState";
 import {emptyGestureMetrics} from "../../../utils/gestures";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-const handleRotate = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
-    direction: number
-) => {
+const handleRotate = <T extends AnyPTM>(context: PuzzleContext<T>, direction: number) => {
     const {puzzle: {typeManager: {angleStep = 0, isFreeRotation}}, state: {angle}} = context;
 
     let newAngle = angle + direction * angleStep;
@@ -33,9 +31,7 @@ const handleRotate = <CellType, ExType, ProcessedExType>(
     );
 };
 
-export const RotateRightButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const RotateRightButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         cellSizeForSidePanel: cellSize,
         state: {isShowingSettings, processed: {isReady}},
@@ -84,9 +80,7 @@ export const RotateRightButton = <CellType, ExType, ProcessedExType>(
     </>;
 };
 
-export const RotateLeftButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const RotateLeftButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {cellSizeForSidePanel: cellSize} = context;
 
     const translate = useTranslate();

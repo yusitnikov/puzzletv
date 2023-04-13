@@ -5,7 +5,8 @@ import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {CenteredText} from "../../../components/svg/centered-text/CenteredText";
 import {ComponentType} from "react";
-import {ConstraintProps} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const chessBoardIndexesMargin = 0.5;
 const chessBoardIndexesFontSize = chessBoardIndexesMargin * 0.8;
@@ -56,9 +57,9 @@ export const ChessBoardIndexes = withFieldLayer(FieldLayer.regular, ({shifted}: 
     </CenteredText>)}
 </>);
 
-export const ChessBoardIndexesConstraint = <CellType, ExType, ProcessedExType>() => ({
+export const ChessBoardIndexesConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "chess board indexes",
     cells: [],
-    component: ChessBoardIndexes as ComponentType<ConstraintProps<CellType, undefined, ExType, ProcessedExType>>,
+    component: ChessBoardIndexes as ComponentType<ConstraintProps<T>>,
     props: undefined,
 });

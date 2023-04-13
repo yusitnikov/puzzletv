@@ -9,21 +9,22 @@ import {CellPart} from "../../../types/sudoku/CellPart";
 import {mergeEventHandlerProps} from "../../../utils/mergeEventHandlerProps";
 import {cancelOutsideClickProps, GestureHandler, getGestureHandlerProps} from "../../../utils/gestures";
 import {CellGestureExtraData, cellGestureExtraDataTag} from "../../../types/sudoku/CellGestureExtraData";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
-export interface FieldCellMouseHandlerProps<CellType, ExType = {}, ProcessedExType = {}> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+export interface FieldCellMouseHandlerProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
     cellPosition: Position;
     handlers: GestureHandler[];
 }
 
-export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {}>(
+export const FieldCellMouseHandler = <T extends AnyPTM>(
     {
         context,
         cellPosition,
         handlers,
-    }: FieldCellMouseHandlerProps<CellType, ExType, ProcessedExType>
+    }: FieldCellMouseHandlerProps<T>
 ) => {
     const {puzzle, cellsIndex, state} = context;
 
@@ -136,8 +137,8 @@ export const FieldCellMouseHandler = <CellType, ExType = {}, ProcessedExType = {
     </>;
 };
 
-interface MouseHandlerRectProps<CellType, ExType, ProcessedExType> extends Partial<Rect> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
+    context: PuzzleContext<T>;
     cellPosition: Position;
     cellExactPosition: CellExactPosition;
     line?: Position[];
@@ -145,10 +146,10 @@ interface MouseHandlerRectProps<CellType, ExType, ProcessedExType> extends Parti
     skipEnter?: boolean;
 }
 
-const MouseHandlerRect = <CellType, ExType, ProcessedExType>(
+const MouseHandlerRect = <T extends AnyPTM>(
     {
         context, cellPosition, cellExactPosition, line, handlers, skipEnter, ...rect
-    }: MouseHandlerRectProps<CellType, ExType, ProcessedExType>
+    }: MouseHandlerRectProps<T>
 ) => <FieldCellShape
     context={context}
     cellPosition={cellPosition}

@@ -10,22 +10,23 @@ import {SafeCrackerStarConstraint} from "../constraints/SafeCrackerStarConstrain
 import {indexes} from "../../../utils/indexes";
 import {safeCrackerArrowsCellWriteModeInfo} from "./LeftRightArrow";
 import {BaseSafeCrackerPuzzle} from "./BaseSafeCrackerPuzzle";
-import {getDefaultDigitsCount, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
 import {CellMarkType, parseCellMark} from "../../../types/sudoku/CellMark";
 import {CellColor} from "../../../types/sudoku/CellColor";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
+import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
+export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
     params: SafeCrackerPuzzleParams
-): SudokuTypeManager<number, ExType, ProcessedExType> => {
+): SudokuTypeManager<T> => {
     const {size, circleRegionsCount, codeCellsCount} = params;
 
-    const baseTypeManager = DigitSudokuTypeManager<ExType, ProcessedExType>();
+    const baseTypeManager = DigitSudokuTypeManager<T>();
 
-    const arrowsCellWriteModeInfo = safeCrackerArrowsCellWriteModeInfo<ExType, ProcessedExType>();
+    const arrowsCellWriteModeInfo = safeCrackerArrowsCellWriteModeInfo<T>();
 
     return {
         ...baseTypeManager,
@@ -80,13 +81,13 @@ export const SafeCrackerSudokuTypeManager = <ExType = {}, ProcessedExType = {}>(
             return basePosition;
         },
         items: indexes(codeCellsCount).map(left => SafeCrackerStarConstraint([{top: circleRegionsCount * 2 + 1, left}])),
-        postProcessPuzzle(puzzle: PuzzleDefinition<number, ExType, ProcessedExType>): typeof puzzle {
+        postProcessPuzzle(puzzle): typeof puzzle {
             puzzle = {
                 ...puzzle,
                 ...BaseSafeCrackerPuzzle(params),
             };
 
-            const items: Constraint<number, any, ExType, ProcessedExType>[] = [];
+            const items: Constraint<T, any>[] = [];
             const initialLetters = puzzle.initialLetters ?? {};
             const initialCellMarks = [...(puzzle.initialCellMarks ?? [])];
             const cellsIndex = new SudokuCellsIndex(puzzle);

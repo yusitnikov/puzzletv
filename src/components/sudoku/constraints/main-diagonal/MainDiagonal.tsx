@@ -3,11 +3,14 @@ import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {ConstraintProps, ConstraintPropsGenericFc} from "../../../../types/sudoku/Constraint";
 import {getLineVector, PositionLiteral} from "../../../../types/layout/Position";
 import {RenbanConstraint} from "../renban/Renban";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const diagonalColor = "#34bbe6";
 const diagonalWidth = 0.03;
 
-export const DiagonalComponent = withFieldLayer(FieldLayer.regular, <CellType,>({cells, color = diagonalColor, context: {cellSize}}: ConstraintProps<CellType>) => {
+export const DiagonalComponent = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
+    {cells, color = diagonalColor, context: {cellSize}}: ConstraintProps<T>
+) => {
     cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
     const [first, second] = cells;
@@ -24,20 +27,20 @@ export const DiagonalComponent = withFieldLayer(FieldLayer.regular, <CellType,>(
     />;
 }) as ConstraintPropsGenericFc;
 
-const BaseDiagonalConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[]) => ({
-    ...RenbanConstraint<CellType, ExType, ProcessedExType>(cellLiterals, false),
+const BaseDiagonalConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[]) => ({
+    ...RenbanConstraint<T>(cellLiterals, false),
     name: "main diagonal",
     color: diagonalColor,
     width: diagonalWidth,
     component: DiagonalComponent,
 });
 
-export const PositiveDiagonalConstraint = <CellType, ExType, ProcessedExType>(fieldSize: number) => ({
-    ...BaseDiagonalConstraint<CellType, ExType, ProcessedExType>([{top: fieldSize - 1, left: 0}, {top: 0, left: fieldSize - 1}]),
+export const PositiveDiagonalConstraint = <T extends AnyPTM>(fieldSize: number) => ({
+    ...BaseDiagonalConstraint<T>([{top: fieldSize - 1, left: 0}, {top: 0, left: fieldSize - 1}]),
     name: "main positive diagonal",
 });
 
-export const NegativeDiagonalConstraint = <CellType, ExType, ProcessedExType>(fieldSize: number) => ({
-    ...BaseDiagonalConstraint<CellType, ExType, ProcessedExType>([{top: 0, left: 0}, {top: fieldSize - 1, left: fieldSize - 1}]),
+export const NegativeDiagonalConstraint = <T extends AnyPTM>(fieldSize: number) => ({
+    ...BaseDiagonalConstraint<T>([{top: 0, left: 0}, {top: fieldSize - 1, left: fieldSize - 1}]),
     name: "main negative diagonal",
 });

@@ -7,14 +7,15 @@ import {TransformedRect, transformRect} from "../../../types/layout/Rect";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {getRegionBorders} from "../../../utils/regions";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-interface FieldRectProps<CellType, ExType, ProcessedExType> extends Omit<GridRegion, keyof Size>, Partial<Size> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+interface FieldRectProps<T extends AnyPTM> extends Omit<GridRegion, keyof Size>, Partial<Size> {
+    context: PuzzleContext<T>;
     clip?: boolean;
     children: ReactNode;
 }
 
-export const FieldRect = <CellType, ExType, ProcessedExType>(
+export const FieldRect = <T extends AnyPTM>(
     {
         context,
         clip,
@@ -23,7 +24,7 @@ export const FieldRect = <CellType, ExType, ProcessedExType>(
         height = 1,
         children,
         ...position
-    }: FieldRectProps<CellType, ExType, ProcessedExType>
+    }: FieldRectProps<T>
 ) => {
     const transformedRect = getFieldRectTransform(context, position);
 
@@ -58,8 +59,8 @@ export const FieldRect = <CellType, ExType, ProcessedExType>(
     </TransformedRectGraphics>;
 };
 
-export const getFieldRectTransform = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const getFieldRectTransform = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     {top, left, transformCoords: transformCoordsArg}: Omit<GridRegion, keyof Size>,
 ): TransformedRect => {
     const {

@@ -1,10 +1,11 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {getTesseractCellSelectionType} from "./TesseractSelection";
 import {TesseractSettings} from "../components/TesseractSettings";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const TesseractSudokuTypeManager = <CellType, ExType, ProcessedExType>(
-    {getCellSelectionType, settingsComponents = [], ...baseTypeManager}: SudokuTypeManager<CellType, ExType, ProcessedExType>
-): SudokuTypeManager<CellType, ExType, ProcessedExType> => ({
+export const TesseractSudokuTypeManager = <T extends AnyPTM>(
+    {getCellSelectionType, settingsComponents = [], ...baseTypeManager}: SudokuTypeManager<T>
+): SudokuTypeManager<T> => ({
     ...baseTypeManager,
     getCellSelectionType: (...args) => getTesseractCellSelectionType?.(...args) ?? getCellSelectionType?.(...args),
     settingsComponents: [...settingsComponents, TesseractSettings],

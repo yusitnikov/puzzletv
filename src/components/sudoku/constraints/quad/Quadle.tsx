@@ -7,6 +7,7 @@ import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
 import {Fragment, ReactElement} from "react";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const radius = 0.3;
 
@@ -29,25 +30,25 @@ export interface QuadleProps<CellType> {
 
 export const Quadle = withFieldLayer(
     FieldLayer.top,
-    <CellType, ExType, ProcessedExType>(
+    <T extends AnyPTM>(
         {
             context,
             cells,
             props,
-        }: ConstraintProps<CellType, QuadleProps<CellType>, ExType, ProcessedExType>
+        }: ConstraintProps<T, QuadleProps<T["cell"]>>
     ) => <QuadleByData
         context={context}
         cells={cells}
         props={props}
     />
-) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, QuadleProps<CellType>, ExType, ProcessedExType>) => ReactElement;
+) as <T extends AnyPTM>(props: ConstraintProps<T, QuadleProps<T["cell"]>>) => ReactElement;
 
-export const QuadleByData = <CellType, ExType, ProcessedExType>(
+export const QuadleByData = <T extends AnyPTM>(
     {
         context: {puzzle: {typeManager: {cellDataComponentType: {component: CellData}}}},
         cells,
         props: {digits, isRecent},
-    }: Pick<ConstraintProps<CellType, QuadleProps<CellType>, ExType, ProcessedExType>, "context" | "cells" | "props">
+    }: Pick<ConstraintProps<T, QuadleProps<T["cell"]>>, "context" | "cells" | "props">
 ) => {
     const id = "clipPath" + useAutoIncrementId();
 
@@ -143,11 +144,11 @@ const getQuadCells = ({top, left}: Position): Position[] => [
     {top, left},
 ];
 
-export const QuadleConstraint = <CellType, ExType, ProcessedExType>(
+export const QuadleConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    digits: QuadleDigit<CellType>[],
+    digits: QuadleDigit<T["cell"]>[],
     isRecent = false
-): Constraint<CellType, QuadleProps<CellType>, ExType, ProcessedExType> => {
+): Constraint<T, QuadleProps<T["cell"]>> => {
     return ({
         name: "quadle",
         cells: getQuadCells(parsePositionLiteral(cellLiteral)),
@@ -183,22 +184,22 @@ export const QuadleConstraint = <CellType, ExType, ProcessedExType>(
     });
 };
 
-export const QuadleConstraintBySolution = <CellType, ExType, ProcessedExType>(
+export const QuadleConstraintBySolution = <T extends AnyPTM>(
     {
         puzzle: {typeManager: {areSameCellData}},
         state
-    }: PuzzleContext<CellType, ExType, ProcessedExType>,
+    }: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
-    digits: CellType[],
-    solution: GivenDigitsMap<CellType>,
+    digits: T["cell"][],
+    solution: GivenDigitsMap<T["cell"]>,
     isRecent = false
-): Constraint<CellType, QuadleProps<CellType>, ExType, ProcessedExType> => {
+): Constraint<T, QuadleProps<T["cell"]>> => {
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
         .map(({top, left}) => solution[top]?.[left]);
 
     const hasEmptyDigits = actualDigits.some(digit => digit === undefined);
 
-    const getDigitType = (digit: CellType, index: number) => {
+    const getDigitType = (digit: T["cell"], index: number) => {
         if (digits.length < 4) {
             return QuadleDigitType.unknown;
         }

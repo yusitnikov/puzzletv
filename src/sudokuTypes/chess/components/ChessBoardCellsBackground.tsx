@@ -2,8 +2,8 @@ import {indexes} from "../../../utils/indexes";
 import {lightGreyColor} from "../../../components/app/globals";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {ComponentType} from "react";
-import {ConstraintProps} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintPropsGenericFc} from "../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export interface ChessBoardCellsBackgroundProps {
     shifted?: boolean;
@@ -43,9 +43,9 @@ export const ChessBoardCellsBackground = withFieldLayer(FieldLayer.beforeBackgro
     )}
 </>);
 
-export const ChessBoardCellsBackgroundConstraint = <CellType, ExType, ProcessedExType>() => ({
+export const ChessBoardCellsBackgroundConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "chess board cells background",
     cells: [],
-    component: ChessBoardCellsBackground as ComponentType<ConstraintProps<CellType, undefined, ExType, ProcessedExType>>,
+    component: ChessBoardCellsBackground as ConstraintPropsGenericFc,
     props: undefined,
 });

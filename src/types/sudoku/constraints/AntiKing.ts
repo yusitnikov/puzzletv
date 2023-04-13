@@ -1,7 +1,8 @@
 import {Constraint} from "../Constraint";
 import {normalizePuzzlePosition} from "../PuzzleDefinition";
+import {AnyPTM} from "../PuzzleTypeMap";
 
-export const AntiKingConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+export const AntiKingConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "anti-king",
     cells: [],
     props: undefined,

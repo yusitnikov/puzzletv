@@ -6,6 +6,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
 import {FieldCellUserArea} from "../field/FieldCellUserArea";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const mainDigitCoeff = 0.7;
 
@@ -24,22 +25,22 @@ const corners: Position[] = [
     {left: 0, top: 0},
 ];
 
-export interface CellDigitsProps<CellType, ExType = {}, ProcessedExType = {}> {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
-    data: Partial<CellState<CellType>>;
-    initialData?: CellType;
-    excludedDigits?: SetInterface<CellType>;
+export interface CellDigitsProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
+    data: Partial<CellState<T["cell"]>>;
+    initialData?: T["cell"];
+    excludedDigits?: SetInterface<T["cell"]>;
     size: number;
     cellPosition?: Position;
     mainColor?: boolean;
-    isValidUserDigit?: (digit?: CellType) => boolean;
+    isValidUserDigit?: (digit?: T["cell"]) => boolean;
 }
 
 export const shouldSkipCellDigits = <CellType,>(initialData: CellType | undefined, excludedDigits: SetInterface<CellType> | undefined, data: Partial<CellState<CellType>>) =>
     initialData === undefined && !excludedDigits?.size && isEmptyCellState(data, true);
 
-export const CellDigits = <CellType, ExType = {}, ProcessedExType = {}>(
-    {context, data, initialData, excludedDigits, size, cellPosition, mainColor, isValidUserDigit = () => true}: CellDigitsProps<CellType, ExType, ProcessedExType>
+export const CellDigits = <T extends AnyPTM>(
+    {context, data, initialData, excludedDigits, size, cellPosition, mainColor, isValidUserDigit = () => true}: CellDigitsProps<T>
 ) => {
     if (shouldSkipCellDigits(initialData, excludedDigits, data)) {
         return null;
@@ -74,12 +75,12 @@ export const CellDigits = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const renderAnimatedDigitsSet = (
         keyPrefix: string,
-        digits: SetInterface<CellType>,
+        digits: SetInterface<T["cell"]>,
         digitSize: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         isInitial = false,
-        isValid: boolean | ((cellData: CellType) => boolean) = true,
-        isRecent: boolean | ((cellData: CellType) => boolean) = false
+        isValid: boolean | ((cellData: T["cell"]) => boolean) = true,
+        isRecent: boolean | ((cellData: T["cell"]) => boolean) = false
     ) => {
         const straightIndexes = getCellDataSortIndexes(digits, (a, b) => compareCellData(a, b, undefined, false));
 

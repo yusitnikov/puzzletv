@@ -7,10 +7,9 @@ import {textColor} from "../../app/globals";
 import {ControlButton} from "./ControlButton";
 import {useCallback} from "react";
 import {emptyPosition} from "../../../types/layout/Position";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const MoveDigitModeButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         puzzle: {
             typeManager: {initialAngle = 0, initialScale = 1},

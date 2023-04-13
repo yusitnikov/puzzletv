@@ -1,11 +1,11 @@
-import {ReactElement} from "react";
 import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../types/sudoku/Constraint";
 import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const getInfiniteLoopRegionBorderWidth = (cellSize: number, visibleRingsCount: number) =>
     Math.ceil(getRegionBorderWidth(cellSize) * cellSize / Math.pow(2, visibleRingsCount / 4) / 2) * 2;
@@ -14,11 +14,11 @@ interface InfiniteRingsBorderLinesProps {
     visibleRingsCount: number;
 }
 
-export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <CellType, ExType, ProcessedExType>(
+export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <T extends AnyPTM>(
     {
         context,
         props: {visibleRingsCount: visibleRingsCountArg},
-    }: ConstraintProps<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType>
+    }: ConstraintProps<T, InfiniteRingsBorderLinesProps>
 ) => {
     const {
         puzzle: {fieldSize: {rowsCount: fieldSize}},
@@ -49,10 +49,10 @@ export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <CellTy
             strokeWidth={borderWidth}
         />
     </>;
-}) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType>) => ReactElement;
+}) as ConstraintPropsGenericFc<InfiniteRingsBorderLinesProps>;
 
-export const InfiniteRingsBorderLinesConstraint = <CellType, ExType, ProcessedExType>(visibleRingsCount: number)
-    : Constraint<CellType, InfiniteRingsBorderLinesProps, ExType, ProcessedExType> => ({
+export const InfiniteRingsBorderLinesConstraint = <T extends AnyPTM>(visibleRingsCount: number)
+    : Constraint<T, InfiniteRingsBorderLinesProps> => ({
     name: "region borders",
     cells: [],
     component: InfiniteRingsBorderLines,

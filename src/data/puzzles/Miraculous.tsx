@@ -21,6 +21,7 @@ import {GivenDigitsMap, processGivenDigitsMaps} from "../../types/sudoku/GivenDi
 import {
     ConsecutiveNeighborsConstraint
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
+import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const initialColors: GivenDigitsMap<CellColorValue> = {
     1: {
@@ -53,7 +54,7 @@ const initialColors: GivenDigitsMap<CellColorValue> = {
     },
 };
 
-const SameColorRegionConstraint: Constraint<number, undefined, {}, {}> = {
+const SameColorRegionConstraint: Constraint<NumberPTM> = {
     name: "same color regions",
     cells: Object.entries(initialColors).flatMap(
         ([top, row]) => Object.keys(row).map(
@@ -73,7 +74,7 @@ const SameColorRegionConstraint: Constraint<number, undefined, {}, {}> = {
     },
 };
 
-export const Miraculous: PuzzleDefinition<number> = {
+export const Miraculous: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "miraculous",
     saveStateKey: "miraculous-v2",

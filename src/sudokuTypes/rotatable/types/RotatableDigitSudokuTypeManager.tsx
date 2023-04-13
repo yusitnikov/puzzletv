@@ -1,7 +1,6 @@
 import {isStickyRotatableDigit, RotatableDigit} from "./RotatableDigit";
 import {isUpsideDownAngle} from "../utils/rotation";
 import {RotatableDigitCellDataComponentType} from "../components/RotatableDigitCellData";
-import {RotatableGameState} from "./RotatableGameState";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 import {PositionWithAngle} from "../../../types/layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
@@ -14,6 +13,7 @@ import {RotateLeftButton, RotateRightButton} from "../components/RotateButton";
 import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {StickyModeButton} from "../components/StickyModeButton";
 import {loop} from "../../../utils/math";
+import {RotatableDigitPTM, RotatablePTM} from "./RotatablePTM";
 
 export const isRotatableDigit = (digit: number) => [6, 9].includes(digit);
 export const isSelfRotatableDigit = (digit: number) => [0, 1, 2, 5, 8].includes(digit);
@@ -42,7 +42,7 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
     showBackButton: boolean,
     showStickyMode: boolean
 ): Required<Pick<
-    SudokuTypeManager<CellType, RotatableGameState>,
+    SudokuTypeManager<RotatablePTM<CellType>>,
     "initialAngle" | "angleStep" | "allowRotation" | "isFreeRotation" | "serializeGameState" | "unserializeGameState" |
     "initialGameStateExtension" | "isReady" | "controlButtons" | "getInternalState" | "unserializeInternalState"
 >> => ({
@@ -96,12 +96,12 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
     unserializeInternalState(
         puzzle,
         {isStickyMode}: any
-    ): PartialGameStateEx<CellType, RotatableGameState> {
+    ): PartialGameStateEx<RotatablePTM<CellType>> {
         return {extension: {isStickyMode}};
     }
 });
 
-export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, RotatableGameState> = {
+export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPTM> = {
     ...RotatableDigitSudokuTypeManagerBase<RotatableDigit>(-90, 180, false, true),
 
     areSameCellData(
@@ -236,7 +236,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigit, 
         );
     },
 
-    postProcessPuzzle({items = [], ...puzzle}): PuzzleDefinition<RotatableDigit, RotatableGameState> {
+    postProcessPuzzle({items = [], ...puzzle}): PuzzleDefinition<RotatableDigitPTM> {
         return {
             ...puzzle,
             items: (state) => (typeof items === "function" ? items(state) : items).map(

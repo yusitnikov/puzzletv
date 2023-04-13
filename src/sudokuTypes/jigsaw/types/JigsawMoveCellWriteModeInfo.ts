@@ -1,16 +1,14 @@
-import {CellWriteMode, CellWriteModeInfo} from "../../../types/sudoku/CellWriteMode";
+import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
 import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
 import {getJigsawPieceIndexByCell, getJigsawPiecesWithCache} from "./helpers";
 import {jigsawPieceStateChangeAction} from "./JigsawPieceState";
-import {JigsawDigit} from "./JigsawDigit";
-import {JigsawGameState, JigsawProcessedGameState} from "./JigsawGameState";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {applyMetricsDiff, GestureInfo, GestureMetrics} from "../../../utils/gestures";
 import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
 import {getRectCenter} from "../../../types/layout/Rect";
+import {JigsawPTM} from "./JigsawPTM";
 
-export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawDigit, JigsawGameState, JigsawProcessedGameState> = {
-    mode: CellWriteMode.move,
+export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     ...MoveCellWriteModeInfo,
     disableCellHandlers: false,
     handlesRightMouseClick: true,
@@ -106,7 +104,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawDigit, JigsawG
 };
 
 export const getJigsawPieceIndexByGesture = (
-    cellsIndex: SudokuCellsIndex<JigsawDigit, JigsawGameState, JigsawProcessedGameState>,
+    cellsIndex: SudokuCellsIndex<JigsawPTM>,
     {pointers}: GestureInfo,
 ): number | undefined => {
     const indexes = pointers.map(

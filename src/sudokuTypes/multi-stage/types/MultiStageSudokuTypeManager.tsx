@@ -19,21 +19,22 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 import {processTranslations} from "../../../utils/translate";
+import {MultiStagePTM} from "./MultiStagePTM";
 
 interface MultiStageSudokuOptions {
-    getStage: (context: PuzzleContext<number, MultiStageGameState>) => number;
-    onStageChange?: (context: PuzzleContext<number, MultiStageGameState>, stage: number)
-        => PartialGameStateEx<number, MultiStageGameState>;
-    getStageCompletionText?: (context: PuzzleContext<number, MultiStageGameState>)
+    getStage: (context: PuzzleContext<MultiStagePTM>) => number;
+    onStageChange?: (context: PuzzleContext<MultiStagePTM>, stage: number)
+        => PartialGameStateEx<MultiStagePTM>;
+    getStageCompletionText?: (context: PuzzleContext<MultiStagePTM>)
         => PartiallyTranslatable<ReactNode> | undefined;
-    getStageButtonText?: (context: PuzzleContext<number, MultiStageGameState>)
+    getStageButtonText?: (context: PuzzleContext<MultiStagePTM>)
         => PartiallyTranslatable<ReactNode> | undefined;
 }
 
 export const MultiStageSudokuTypeManager = (
     {getStage, onStageChange, getStageCompletionText, getStageButtonText}: MultiStageSudokuOptions
-): SudokuTypeManager<number, MultiStageGameState> => ({
-    ...DigitSudokuTypeManager<MultiStageGameState>(),
+): SudokuTypeManager<MultiStagePTM> => ({
+    ...DigitSudokuTypeManager(),
 
     initialGameStateExtension: {
         stage: 1,
@@ -102,7 +103,7 @@ export const MultiStageSudokuTypeManager = (
 });
 
 export const isValidFinishedPuzzleByStageConstraints = <CellType,>(stage: number) =>
-    (context: PuzzleContext<CellType, MultiStageGameState>) => isValidFinishedPuzzleByConstraints({
+    (context: PuzzleContext<MultiStagePTM<CellType>>) => isValidFinishedPuzzleByConstraints({
         ...context,
         state: mergeProcessedGameStateWithUpdates(context.state, {extension: {stage}}),
     });

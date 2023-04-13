@@ -7,10 +7,9 @@ import {globalPaddingCoeff} from "../../app/globals";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
 import {SettingsContent} from "./settings/SettingsContent";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const SettingsButton = <CellType, ExType, ProcessedExType>(
-    {context, top, left}: ControlButtonItemProps<CellType, ExType, ProcessedExType>
-) => {
+export const SettingsButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
     const {
         cellSizeForSidePanel: cellSize,
         state: {isShowingSettings},
@@ -47,10 +46,7 @@ export const SettingsButton = <CellType, ExType, ProcessedExType>(
                 }}
             >
                 <div>
-                    <SettingsContent
-                        cellSize={cellSize}
-                        context={context}
-                    />
+                    <SettingsContent cellSize={cellSize} context={context}/>
                 </div>
                 <div>
                     <Button

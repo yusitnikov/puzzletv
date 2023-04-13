@@ -1,5 +1,6 @@
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {Position} from "../layout/Position";
+import {AnyPTM} from "./PuzzleTypeMap";
 
 export type GivenDigitsMap<CellType> = Record<number, Record<number, CellType>>;
 
@@ -53,7 +54,7 @@ export const givenDigitsMapToArray = <CellType>(map: GivenDigitsMap<CellType>) =
 export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) =>
     processGivenDigitsMaps(([first]) => first, maps);
 
-export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeManager<CellType, any, any>, map1: GivenDigitsMap<CellType>, map2: GivenDigitsMap<CellType>) => {
+export const areSameGivenDigitsMaps = <CellType>({areSameCellData}: SudokuTypeManager<AnyPTM<CellType>>, map1: GivenDigitsMap<CellType>, map2: GivenDigitsMap<CellType>) => {
     const mergedMap = mergeGivenDigitsMaps(map1, map2);
 
     for (const [rowIndexStr, mergedRow] of Object.entries(mergedMap)) {

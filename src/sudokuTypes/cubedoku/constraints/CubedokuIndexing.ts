@@ -1,7 +1,8 @@
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {isSamePosition, Position, Position3D} from "../../../types/layout/Position";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const CubedokuIndexingConstraint = <CellType, ExType, ProcessedExType>(): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+export const CubedokuIndexingConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "cubedoku indexing",
     cells: [],
     props: undefined,
@@ -10,7 +11,7 @@ export const CubedokuIndexingConstraint = <CellType, ExType, ProcessedExType>():
         const realFieldSize = fieldSize / 2;
 
         // x and y are like in the left face of the cube
-        const getIndexedCell = ({left, top}: Position, data: CellType): Position3D => {
+        const getIndexedCell = ({left, top}: Position, data: T["cell"]): Position3D => {
             const digit = getDigitByCellData(data, context, {top, left});
 
             if (top < realFieldSize) {

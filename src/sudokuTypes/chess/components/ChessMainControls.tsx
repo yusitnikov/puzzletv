@@ -1,7 +1,5 @@
 import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {ChessPiece} from "../types/ChessPiece";
-import {ChessGameState} from "../types/ChessGameState";
 import {ChessColor} from "../types/ChessColor";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
@@ -9,6 +7,7 @@ import {ArrowLeft} from "@emotion-icons/fluentui-system-filled";
 import {useCallback, useState} from "react";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButtonItemProps} from "../../../components/sudoku/controls/ControlButtonsManager";
+import {ChessPTM} from "../types/ChessPTM";
 
 export const ChessMainControls = (
     {
@@ -17,7 +16,7 @@ export const ChessMainControls = (
             state: {isShowingSettings, processed: {cellWriteMode}, extension: {selectedColor}},
             onStateChange,
         },
-    }: ControlButtonItemProps<ChessPiece, ChessGameState>
+    }: ControlButtonItemProps<ChessPTM>
 ) => {
     const translate = useTranslate();
 

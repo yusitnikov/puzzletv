@@ -4,10 +4,9 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {SettingsSelect} from "../../../components/sudoku/controls/settings/SettingsSelect";
 import {TesseractSelectionType, useTesseractSelectionType} from "../types/TesseractSelection";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const TesseractSettings = <CellType, ExType, ProcessedExType>(
-    {cellSize}: SettingsContentProps<CellType, ExType, ProcessedExType>
-) => {
+export const TesseractSettings = <T extends AnyPTM>({cellSize}: SettingsContentProps<T>) => {
     const translate = useTranslate();
 
     const [selectionType, setSelectionType] = useTesseractSelectionType();

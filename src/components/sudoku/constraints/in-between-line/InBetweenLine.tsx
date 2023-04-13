@@ -14,12 +14,13 @@ import {
 } from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {darkGreyColor, lighterGreyColor} from "../../../app/globals";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const lineWidth = 0.1;
 const circleRadius = 0.4;
 const backgroundColor = lighterGreyColor;
 
-export const InBetweenLine = withFieldLayer(FieldLayer.regular, ({cells}: ConstraintProps) => {
+export const InBetweenLine = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>({cells}: ConstraintProps<T>) => {
     cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
     const edge1 = cells[0];
@@ -55,10 +56,10 @@ export const InBetweenLine = withFieldLayer(FieldLayer.regular, ({cells}: Constr
     </>;
 }) as ConstraintPropsGenericFc;
 
-export const InBetweenLineConstraint = <CellType, ExType, ProcessedExType>(
+export const InBetweenLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
-): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+): Constraint<T> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);

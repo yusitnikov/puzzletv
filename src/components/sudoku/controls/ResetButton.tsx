@@ -8,8 +8,9 @@ import {globalPaddingCoeff, textHeightCoeff} from "../../app/globals";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback, useState} from "react";
 import {getEmptyGameState, mergeGameStateWithUpdates} from "../../../types/sudoku/GameState";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const ResetButton = <CellType, ExType, ProcessedExType>(
+export const ResetButton = <T extends AnyPTM>(
     {
         context: {
             cellSizeForSidePanel: cellSize,
@@ -19,7 +20,7 @@ export const ResetButton = <CellType, ExType, ProcessedExType>(
         },
         top,
         left,
-    }: ControlButtonItemProps<CellType, ExType, ProcessedExType>
+    }: ControlButtonItemProps<T>
 ) => {
     const {typeManager: {keepStateOnRestart}} = puzzle;
     const canRestart = !isEnabled || isHost;

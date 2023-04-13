@@ -14,10 +14,10 @@ import {CenteredText} from "../../components/svg/centered-text/CenteredText";
 import {
     QuadInputSudokuTypeManager
 } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
-import {QuadInputGameState} from "../../components/sudoku/constraints/quad/QuadInput/QuadInputGameState";
 import {CSSProperties, useState} from "react";
 import {Modal} from "../../components/layout/modal/Modal";
 import {headerHeight} from "../../components/app/globals";
+import {QuadInputPTM} from "../../components/sudoku/constraints/quad/QuadInput/QuadInputPTM";
 
 const noteRadius = 0.2;
 const noteLineWidth = 0.05;
@@ -194,7 +194,7 @@ const shadedRow = {
 
 const fieldSize = createRegularFieldSize(7, 7);
 
-export const SonataSemplice: PuzzleDefinition<number, QuadInputGameState<number>, QuadInputGameState<number>> = {
+export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
     noIndex: true,
     slug: "rockratzero-sonata-semplice",
     title: {

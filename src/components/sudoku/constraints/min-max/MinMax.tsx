@@ -9,11 +9,12 @@ import {
     PositionLiteral
 } from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const arrowWidth = 0.1;
 const arrowHeight = 0.05;
 
-export const MinMax = memo(({cells: [{left, top}], coeff}: ConstraintProps & {coeff: number}) => {
+export const MinMax = memo(<T extends AnyPTM>({cells: [{left, top}], coeff}: ConstraintProps<T> & {coeff: number}) => {
     const layer = useFieldLayer();
 
     left += 0.5;
@@ -36,12 +37,12 @@ export const MinMax = memo(({cells: [{left, top}], coeff}: ConstraintProps & {co
             <Arrow cx={left} cy={top} dx={0} dy={-1} coeff={coeff}/>
         </>}
     </>;
-}) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, undefined, ExType, ProcessedExType> & {coeff: number}) => ReactElement;
+}) as <T extends AnyPTM>(props: ConstraintProps<T> & {coeff: number}) => ReactElement;
 
-export const Min = <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, undefined, ExType, ProcessedExType>) =>
+export const Min = <T extends AnyPTM>(props: ConstraintProps<T>) =>
     <MinMax coeff={-1} {...props}/>;
 
-export const Max = <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, undefined, ExType, ProcessedExType>) =>
+export const Max = <T extends AnyPTM>(props: ConstraintProps<T>) =>
     <MinMax coeff={1} {...props}/>;
 
 interface ArrowProps {
@@ -80,12 +81,12 @@ const Arrow = ({cx, cy, dx, dy, coeff}: ArrowProps) => {
     />;
 };
 
-export const MinMaxConstraint = <CellType, ExType, ProcessedExType>(
+export const MinMaxConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
     name: string,
-    component: ComponentType<ConstraintProps<CellType, undefined, ExType, ProcessedExType>>,
+    component: ComponentType<ConstraintProps<T>>,
     coeff: number
-): Constraint<CellType, undefined, ExType, ProcessedExType> => {
+): Constraint<T> => {
     const mainCell = parsePositionLiteral(cellLiteral);
 
     return ({
@@ -119,7 +120,7 @@ export const MinMaxConstraint = <CellType, ExType, ProcessedExType>(
     });
 };
 
-export const MinConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral) =>
-    MinMaxConstraint<CellType, ExType, ProcessedExType>(cellLiteral, "min", Min, -1);
-export const MaxConstraint = <CellType, ExType, ProcessedExType>(cellLiteral: PositionLiteral) =>
-    MinMaxConstraint<CellType, ExType, ProcessedExType>(cellLiteral, "max", Max, 1);
+export const MinConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral) =>
+    MinMaxConstraint<T>(cellLiteral, "min", Min, -1);
+export const MaxConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral) =>
+    MinMaxConstraint<T>(cellLiteral, "max", Max, 1);

@@ -3,6 +3,7 @@ import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager
 import {LatinDigitComponentType} from "../../../components/sudoku/digit/LatinDigit";
 import {DigitCellDataComponentType} from "../../default/components/DigitCellData";
 import {areSameArrays} from "../../../utils/array";
+import {NumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const map: Record<number, number> = {
     1: 1,
@@ -16,7 +17,7 @@ const map: Record<number, number> = {
     9: 1000,
 }
 
-export const LatinDigitSudokuTypeManager: SudokuTypeManager<number> = {
+export const LatinDigitSudokuTypeManager: SudokuTypeManager<NumberPTM> = {
     ...DigitSudokuTypeManager(),
 
     disableCellModeLetterShortcuts: true,

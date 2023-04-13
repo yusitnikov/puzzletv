@@ -17,15 +17,16 @@ import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {resolvePuzzleInitialColors} from "../../../../types/sudoku/PuzzleDefinition";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const fogTag = "fog";
 const shadowSize = 0.07;
 
-export interface FogProps<CellType> {
+export interface FogProps<T extends AnyPTM> {
     startCells?: Position[];
     startCells3x3?: Position[];
     bulbCells?: Position[];
-    revealByCenterLines?: boolean | PuzzleLineSet<CellType, any, any>;
+    revealByCenterLines?: boolean | PuzzleLineSet<T>;
     revealByColors?: CellColor[] | GivenDigitsMap<CellColor>;
 }
 
@@ -33,14 +34,14 @@ const DarkReaderRectOverride = styled("rect")(({fill}) => ({
     "--darkreader-inline-fill": `${fill} !important`,
 }));
 
-export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const getFogVisibleCells = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     {
         startCells,
         startCells3x3,
         revealByColors,
         revealByCenterLines,
-    }: FogProps<CellType>
+    }: FogProps<T>
 ) => {
     const {
         puzzle,
@@ -108,8 +109,8 @@ export const getFogVisibleCells = <CellType, ExType, ProcessedExType>(
     );
 };
 
-export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
-    {context, props}: ConstraintProps<CellType, FogProps<CellType>>
+export const Fog = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
+    {context, props}: ConstraintProps<T, FogProps<T>>
 ) => {
     const {bulbCells} = props;
 
@@ -231,15 +232,15 @@ export const Fog = withFieldLayer(FieldLayer.regular, <CellType,>(
             transform={`translate(${left} ${top})`}
         />)}
     </>;
-}) as <CellType, ExType, ProcessedExType>(props: ConstraintProps<CellType, FogProps<CellType>, ExType, ProcessedExType>) => ReactElement;
+}) as <T extends AnyPTM>(props: ConstraintProps<T, FogProps<T>>) => ReactElement;
 
-export const FogConstraint = <CellType, ExType, ProcessedExType>(
+export const FogConstraint = <T extends AnyPTM>(
     startCell3x3Literals: PositionLiteral[] = [],
     startCellLiterals: PositionLiteral[] = [],
     bulbCellLiterals = startCell3x3Literals,
-    revealByCenterLines: boolean | PuzzleLineSet<CellType, any, any> = false,
+    revealByCenterLines: boolean | PuzzleLineSet<T> = false,
     revealByColors: CellColor[] | GivenDigitsMap<CellColor> = {},
-): Constraint<CellType, FogProps<CellType>, ExType, ProcessedExType> => ({
+): Constraint<T, FogProps<T>> => ({
     name: "fog",
     tags: [fogTag],
     cells: [],
@@ -261,13 +262,13 @@ export const FogConstraint = <CellType, ExType, ProcessedExType>(
     },
 });
 
-export const getFogPropsByConstraintsList = <CellType, ExType, ProcessedExType>(
-    constraints: Constraint<CellType, any, ExType, ProcessedExType>[]
-): FogProps<CellType> | undefined =>
+export const getFogPropsByConstraintsList = <T extends AnyPTM>(
+    constraints: Constraint<T, any>[]
+): FogProps<T> | undefined =>
     constraints
         .find(({tags}) => tags?.includes(fogTag))
         ?.props;
 
-export const getFogPropsByContext = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>
+export const getFogPropsByContext = <T extends AnyPTM>(
+    context: PuzzleContext<T>
 ) => getFogPropsByConstraintsList(getAllPuzzleConstraints(context));

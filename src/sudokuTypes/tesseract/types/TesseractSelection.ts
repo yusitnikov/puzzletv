@@ -5,6 +5,7 @@ import {CellSelectionColor} from "../../../components/sudoku/cell/CellSelection"
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {getAllPuzzleConstraints} from "../../../types/sudoku/Constraint";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export enum TesseractSelectionType {
     Always = "always",
@@ -27,10 +28,10 @@ export const useTesseractSelectionType = (): [TesseractSelectionType, (type: Tes
     return [type, handleSetType];
 };
 
-export const getTesseractCellSelectionType: SudokuTypeManager<any, any, any>["getCellSelectionType"] = <CellType, ExType, ProcessedExType>(
+export const getTesseractCellSelectionType = <T extends AnyPTM>(
     cell: Position,
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
-) => {
+    context: PuzzleContext<T>,
+): ReturnType<Required<SudokuTypeManager<T>>["getCellSelectionType"]> => {
     const {state: {selectedCells}} = context;
 
     if (selectedCells.size !== 1) {

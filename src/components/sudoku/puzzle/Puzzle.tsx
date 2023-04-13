@@ -17,14 +17,13 @@ import {Modal} from "../../layout/modal/Modal";
 import {Rect} from "../../../types/layout/Rect";
 import {profiler} from "../../../utils/profiler";
 import {useControlButtonsManager} from "../controls/ControlButtonsManager";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface PuzzleProps<CellType, ExType = {}, ProcessedExType = {}> {
-    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>;
+export interface PuzzleProps<T extends AnyPTM> {
+    puzzle: PuzzleDefinition<T>;
 }
 
-export const Puzzle = <CellType, ExType = {}, ProcessedExType = {}>(
-    {puzzle}: PuzzleProps<CellType, ExType, ProcessedExType>
-) => {
+export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
     profiler.flush();
 
     const {

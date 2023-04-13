@@ -4,22 +4,23 @@ import {ReactNode, useCallback} from "react";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface CellWriteModeButtonProps<CellType, ExType = {}, ProcessedExType = {}> {
+export interface CellWriteModeButtonProps<T extends AnyPTM> {
     cellWriteMode: CellWriteMode;
     top: number;
     left?: number;
-    data: Partial<CellState<CellType>> | ((contentSize: number) => ReactNode);
+    data: Partial<CellState<T["cell"]>> | ((contentSize: number) => ReactNode);
     title?: string;
 
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+    context: PuzzleContext<T>;
 
     noBorders?: boolean;
     childrenOnTopOfBorders?: boolean;
     fullHeight?: boolean;
 }
 
-export const CellWriteModeButton = <CellType, ExType = {}, ProcessedExType = {}>(
+export const CellWriteModeButton = <T extends AnyPTM>(
     {
         cellWriteMode,
         top,
@@ -30,7 +31,7 @@ export const CellWriteModeButton = <CellType, ExType = {}, ProcessedExType = {}>
         noBorders,
         childrenOnTopOfBorders,
         fullHeight,
-    }: CellWriteModeButtonProps<CellType, ExType, ProcessedExType>
+    }: CellWriteModeButtonProps<T>
 ) => {
     const {
         state,

@@ -3,15 +3,16 @@ import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {LineComponent, LineProps} from "../line/Line";
 import {lightGreyColor} from "../../../app/globals";
+import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-export const BasePalindromeConstraint = <CellType, ExType, ProcessedExType>(
+export const BasePalindromeConstraint = <T extends AnyPTM>(
     name: string,
     color: string,
     cellLiterals: PositionLiteral[],
     compareDigits = (digit1: number, digit2: number) => digit1 === digit2,
     width: number | undefined = undefined,
     split = true,
-): Constraint<CellType, LineProps, ExType, ProcessedExType> => {
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);
@@ -42,7 +43,7 @@ export const BasePalindromeConstraint = <CellType, ExType, ProcessedExType>(
     };
 };
 
-export const PalindromeConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[], split = true) => BasePalindromeConstraint<CellType, ExType, ProcessedExType>(
+export const PalindromeConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], split = true) => BasePalindromeConstraint<T>(
     "palindrome",
     lightGreyColor,
     cellLiterals,

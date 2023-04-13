@@ -18,22 +18,24 @@ import {
     coreGameStateActionTypes,
     GameStateAction,
     GameStateActionCallback,
-    GameStateActionOrCallback, GameStateActionType
+    GameStateActionOrCallback,
+    GameStateActionType
 } from "../../types/sudoku/GameStateAction";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {useDiffEffect} from "../useDiffEffect";
 import {useControlKeysState} from "../useControlKeysState";
 import {SudokuCellsIndex, SudokuCellsIndexForState} from "../../types/sudoku/SudokuCellsIndex";
 import {useAnimatedValue} from "../useAnimatedValue";
+import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const emptyObject: any = {};
 
-export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
-    puzzle: PuzzleDefinition<CellType, ExType, ProcessedExType>,
+export const useGame = <T extends AnyPTM>(
+    puzzle: PuzzleDefinition<T>,
     cellSize: number,
     cellSizeForSidePanel: number,
     readOnly = false
-): PuzzleContext<CellType, ExType, ProcessedExType> => {
+): PuzzleContext<T> => {
     const {
         slug,
         params = emptyObject,
@@ -42,7 +44,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
     } = puzzle;
 
     const {
-        useProcessedGameStateExtension = () => emptyObject,
+        useProcessedGameStateExtension = () => emptyObject as T["processedStateEx"],
         getSharedState,
         setSharedState,
         applyStateDiffEffect,
@@ -56,7 +58,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const [myGameState, setGameState] = useState(() => getEmptyGameState(puzzle, true, readOnly));
 
-    const mergeMyGameState = useCallback((myGameState: GameStateEx<CellType, ExType>, multiPlayer: UseMultiPlayerResult) => {
+    const mergeMyGameState = useCallback((myGameState: GameStateEx<T>, multiPlayer: UseMultiPlayerResult) => {
         const finalSetSharedState = puzzle.params?.share ? setAllShareState : setSharedState;
 
         if (multiPlayer.isHost || !multiPlayer.isEnabled || !multiPlayer.isLoaded || !multiPlayer.hostData || !finalSetSharedState) {
@@ -82,8 +84,8 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
     const memoizedCalculateProcessedGameState = useCallback(
         (
             multiPlayer: UseMultiPlayerResult,
-            gameState: GameStateEx<CellType, ExType>,
-            processedGameStateExtension: ProcessedExType,
+            gameState: GameStateEx<T>,
+            processedGameStateExtension: T["processedStateEx"],
             animatedValues?: ProcessedGameStateAnimatedValues,
             applyKeys = true
         ) => calculateProcessedGameState(
@@ -100,11 +102,11 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const processMessages = useCallback((
         multiPlayer: UseMultiPlayerResult,
-        state: GameStateEx<CellType, ExType>,
+        state: GameStateEx<T>,
         messages: MessageWithClientId[]
     ) => {
-        const allActionTypes: GameStateActionType<any, CellType, ExType, ProcessedExType>[] = [
-            ...coreGameStateActionTypes,
+        const allActionTypes = [
+            ...(coreGameStateActionTypes as unknown as GameStateActionType<any, T>[]),
             ...(puzzle.typeManager.supportedActionTypes || []),
         ];
 
@@ -154,7 +156,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                 false
             );
 
-            const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
+            const contextNoIndex: Omit<PuzzleContext<T>, "cellsIndexForState"> = {
                 puzzle,
                 cellsIndex,
                 cellSize,
@@ -214,7 +216,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
         [readOnly, puzzle, gameState]
     );
 
-    const processedGameStateExtension: ProcessedExType = useProcessedGameStateExtension(gameState);
+    const processedGameStateExtension = useProcessedGameStateExtension(gameState);
 
     const animatedLoopOffsetTop = useAnimatedValue(
         gameState.loopOffset.top,
@@ -248,8 +250,8 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
     const mergeGameState = useCallback(
         (
-            actionsOrCallbacks: GameStateActionOrCallback<any, CellType, ExType, ProcessedExType>
-                | GameStateActionOrCallback<any, CellType, ExType, ProcessedExType>[]
+            actionsOrCallbacks: GameStateActionOrCallback<any, T>
+                | GameStateActionOrCallback<any, T>[]
         ) => {
             return setGameState((myState) => {
                 let state = mergeMyGameState(myState, multiPlayer);
@@ -260,7 +262,7 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
 
                 for (const actionOrCallback of actionsOrCallbacks) {
                     const processedGameState = memoizedCalculateProcessedGameState(multiPlayer, state, processedGameStateExtension);
-                    const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
+                    const contextNoIndex: Omit<PuzzleContext<T>, "cellsIndexForState"> = {
                         puzzle,
                         cellsIndex,
                         cellSize,
@@ -278,13 +280,13 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
                         cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, contextNoIndex),
                     };
 
-                    const asAction = actionOrCallback as GameStateAction<any, CellType, ExType, ProcessedExType>;
+                    const asAction = actionOrCallback as GameStateAction<any, T>;
                     const isAction = typeof asAction.type === "object";
 
                     if (!isAction || !isEnabled || isHost || (!puzzle.params?.share && !puzzle.typeManager.isGlobalAction?.(asAction, context))) {
                         const callback = isAction
                             ? asAction.type.callback(asAction.params, context, myClientId)
-                            : actionOrCallback as GameStateActionCallback<CellType, ExType, ProcessedExType>;
+                            : actionOrCallback as GameStateActionCallback<T>;
 
                         const updates = typeof callback === "function" ? callback(processedGameState) : callback;
                         if (updates.selectedCells) {
@@ -322,9 +324,9 @@ export const useGame = <CellType, ExType = {}, ProcessedExType = {}>(
         [puzzle, cellsIndex, setGameState, mergeMyGameState, memoizedCalculateProcessedGameState, processedGameStateExtension, cellSize, cellSizeForSidePanel, multiPlayer, readOnly]
     );
 
-    const context: PuzzleContext<CellType, ExType, ProcessedExType> = useMemo(
+    const context: PuzzleContext<T> = useMemo(
         () => {
-            const contextNoIndex: Omit<PuzzleContext<CellType, ExType, ProcessedExType>, "cellsIndexForState"> = {
+            const contextNoIndex: Omit<PuzzleContext<T>, "cellsIndexForState"> = {
                 puzzle,
                 cellsIndex,
                 state: processedGameState,

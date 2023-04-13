@@ -1,10 +1,9 @@
 import {Constraint} from "../../../types/sudoku/Constraint";
-import {ChessPiece} from "../types/ChessPiece";
-import {ChessGameState} from "../types/ChessGameState";
 import {ChessPieceType} from "../types/ChessPieceType";
 import {isSamePosition, Position} from "../../../types/layout/Position";
+import {ChessPTM} from "../types/ChessPTM";
 
-export const ValidChessPositionConstraint: Constraint<ChessPiece, undefined, ChessGameState, {}> = {
+export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
     name: "valid chess position",
     cells: [],
     props: undefined,

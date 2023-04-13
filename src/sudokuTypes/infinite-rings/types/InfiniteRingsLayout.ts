@@ -1,24 +1,25 @@
 import {loadBoolFromLocalStorage, useBoolFromLocalStorage} from "../../../utils/localStorage";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const localStorageKey = "infiniteRingsShowAllRings";
 
 export const isShowingAllInfiniteRingsAllowed = (visibleRingsCount: number) => visibleRingsCount <= 2;
 
-const calcIsShowingAllInfiniteRings = <CellType, ExType, ProcessedExType>(
-    {isReadonlyContext}: PuzzleContext<CellType, ExType, ProcessedExType>,
+const calcIsShowingAllInfiniteRings = <T extends AnyPTM>(
+    {isReadonlyContext}: PuzzleContext<T>,
     isShowingBySettings: boolean,
     visibleRingsCount: number,
 ) => !isReadonlyContext && isShowingAllInfiniteRingsAllowed(visibleRingsCount) && isShowingBySettings;
 
 // TODO: make it part of the state extension
-export const isShowingAllInfiniteRings = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const isShowingAllInfiniteRings = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     visibleRingsCount: number,
 ) => calcIsShowingAllInfiniteRings(context, loadBoolFromLocalStorage(localStorageKey, false), visibleRingsCount);
 
-export const useIsShowingAllInfiniteRings = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+export const useIsShowingAllInfiniteRings = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
     visibleRingsCount: number,
 ): [boolean, (isShowing: boolean) => void] => {
     const [isShowingBySettings, setIsShowingBySettings] = useBoolFromLocalStorage(localStorageKey, false);

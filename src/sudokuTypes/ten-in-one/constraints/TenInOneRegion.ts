@@ -2,8 +2,9 @@ import {parsePositionLiterals, PositionLiteral} from "../../../types/layout/Posi
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {Region} from "../../../components/sudoku/constraints/region/Region";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const TenInOneRegionConstraint = <CellType, ExType, ProcessedExType>(cellLiterals: PositionLiteral[]): Constraint<CellType, undefined, ExType, ProcessedExType> => ({
+export const TenInOneRegionConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[]): Constraint<T> => ({
     name: "10-in-1 region",
     cells: parsePositionLiterals(cellLiterals),
     component: Region,

@@ -3,7 +3,7 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {indexesFromTo} from "../../../utils/indexes";
 import {lightGreyColor} from "../../../components/app/globals";
-import {QuadMastersGameState} from "../types/QuadMastersGameState";
+import {QuadMastersPTM} from "../types/QuadMastersPTM";
 
 export const QuadsHint = withFieldLayer(
     FieldLayer.top,
@@ -18,7 +18,7 @@ export const QuadsHint = withFieldLayer(
                 },
                 state: {processed: {isMyTurn}, extension: {isQuadTurn}},
             },
-        }: ConstraintProps<number, undefined, QuadMastersGameState, {}>
+        }: ConstraintProps<QuadMastersPTM>
     ) => isMyTurn && isQuadTurn ? <>
         {indexesFromTo(1, rowsCount).flatMap(y => indexesFromTo(1, columnsCount).map(x => <circle
             key={`circle-${y}-${x}`}
@@ -33,7 +33,7 @@ export const QuadsHint = withFieldLayer(
     </> : null
 );
 
-export const QuadsHintConstraint: Constraint<number, undefined, QuadMastersGameState, {}> = {
+export const QuadsHintConstraint: Constraint<QuadMastersPTM> = {
     name: "quads-hint",
     cells: [],
     component: QuadsHint,

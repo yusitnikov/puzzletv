@@ -13,14 +13,15 @@ import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 import {LineWithColor} from "./LineWithColor";
 import {getFogPropsByConstraintsList} from "../../components/sudoku/constraints/fog/Fog";
 import {FieldLayer} from "./FieldLayer";
+import {AnyPTM} from "./PuzzleTypeMap";
 
-export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType = {}> = {
+export type Constraint<T extends AnyPTM, DataT = undefined> = {
     name: string;
     tags?: string[];
     cells: Position[];
     renderSingleCellInUserArea?: boolean;
     layer?: FieldLayer;
-    component?: ComponentType<ConstraintProps<CellType, DataT, ExType, ProcessedExType>>;
+    component?: ComponentType<ConstraintProps<T, DataT>>;
     color?: string;
     angle?: number;
     isObvious?: boolean;
@@ -28,42 +29,42 @@ export type Constraint<CellType, DataT = undefined, ExType = {}, ProcessedExType
     noPencilmarkCheck?: boolean;
     isValidCell?(
         cell: Position,
-        digits: GivenDigitsMap<CellType>,
+        digits: GivenDigitsMap<T["cell"]>,
         regionCells: Position[],
-        context: PuzzleContext<CellType, ExType, ProcessedExType>,
-        constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
+        context: PuzzleContext<T>,
+        constraints: Constraint<T, any>[],
         isFinalCheck?: boolean,
         onlyObvious?: boolean,
     ): boolean;
     isValidPuzzle?(
         lines: SetInterface<Line>,
-        digits: GivenDigitsMap<CellType>,
+        digits: GivenDigitsMap<T["cell"]>,
         regionCells: Position[],
-        context: PuzzleContext<CellType, ExType, ProcessedExType>
+        context: PuzzleContext<T>
     ): boolean;
     getInvalidUserLines?(
         lines: SetInterface<Line>,
-        digits: GivenDigitsMap<CellType>,
+        digits: GivenDigitsMap<T["cell"]>,
         regionCells: Position[],
-        context: PuzzleContext<CellType, ExType, ProcessedExType>,
+        context: PuzzleContext<T>,
         isFinalCheck?: boolean
     ): Line[];
     props: DataT;
 };
 
-export type ConstraintProps<CellType = unknown, DataT = undefined, ExType = {}, ProcessedExType = {}> =
-    Omit<Constraint<CellType, DataT, ExType, ProcessedExType>, "component"> & {
-    context: PuzzleContext<CellType, ExType, ProcessedExType>;
+export type ConstraintProps<T extends AnyPTM, DataT = undefined> =
+    Omit<Constraint<T, DataT>, "component"> & {
+    context: PuzzleContext<T>;
 }
 
-export type ConstraintPropsGenericFc<DataT = undefined> = <CellType, ExType, ProcessedExType>(
-    props: ConstraintProps<CellType, DataT, ExType, ProcessedExType>
+export type ConstraintPropsGenericFc<DataT = undefined> = <T extends AnyPTM>(
+    props: ConstraintProps<T, DataT>
 ) => ReactElement;
 
 // region Helper methods
-export const getAllPuzzleConstraints = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>
-): Constraint<CellType, any, ExType, ProcessedExType>[] => {
+export const getAllPuzzleConstraints = <T extends AnyPTM>(
+    context: PuzzleContext<T>
+): Constraint<T, any>[] => {
     const {puzzle, state} = context;
 
     const {
@@ -76,40 +77,40 @@ export const getAllPuzzleConstraints = <CellType, ExType, ProcessedExType>(
     } = puzzle;
 
     return [
-        FieldLinesConstraint,
+        FieldLinesConstraint<T>(),
         ...getRegionsForRowsAndColumns(puzzle, state),
         ...fieldSize.regions.map(
-            (region): Constraint<CellType, any, ExType, ProcessedExType> => Array.isArray(region)
+            (region): Constraint<T, any> => Array.isArray(region)
                 ? RegionConstraint(region)
                 : region
         ),
-        UserLinesConstraint,
+        UserLinesConstraint<T>(),
         ...(
             typeof puzzleItemsOrFn === "function"
                 ? puzzleItemsOrFn(state)
-                : puzzleItemsOrFn as Constraint<CellType, any, ExType, ProcessedExType>[]
+                : puzzleItemsOrFn as Constraint<T, any>[]
         ),
         ...(
             typeof stateItemsOrFn === "function"
                 ? stateItemsOrFn(context)
-                : stateItemsOrFn as Constraint<CellType, any, ExType, ProcessedExType>[]
+                : stateItemsOrFn as Constraint<T, any>[]
         ),
-    ].filter(v => v);
+    ].filter(Boolean);
 };
 
-export const prepareGivenDigitsMapForConstraints = <CellType>(
-    {puzzle: {initialDigits = {}}, state: {initialDigits: stateInitialDigits = {}}}: PuzzleContext<CellType, any, any>,
-    cells: CellState<CellType>[][]
+export const prepareGivenDigitsMapForConstraints = <T extends AnyPTM>(
+    {puzzle: {initialDigits = {}}, state: {initialDigits: stateInitialDigits = {}}}: PuzzleContext<T>,
+    cells: CellState<T["cell"]>[][]
 ) => mergeGivenDigitsMaps(gameStateGetCurrentGivenDigitsByCells(cells), initialDigits, stateInitialDigits);
 
-export const normalizeConstraintCells = (positions: Position[], puzzle: PuzzleDefinition<any, any, any>) =>
+export const normalizeConstraintCells = <T extends AnyPTM>(positions: Position[], puzzle: PuzzleDefinition<T>) =>
     positions.map(position => normalizePuzzlePosition(position, puzzle));
 
-export const isValidUserDigit = <CellType, ExType, ProcessedExType>(
+export const isValidUserDigit = <T extends AnyPTM>(
     cell: Position,
-    userDigits: GivenDigitsMap<CellType>,
-    constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    userDigits: GivenDigitsMap<T["cell"]>,
+    constraints: Constraint<T, any>[],
+    context: PuzzleContext<T>,
     isFinalCheck = false,
     isPencilmark = false,
     onlyObvious = false
@@ -152,11 +153,11 @@ export const isValidUserDigit = <CellType, ExType, ProcessedExType>(
     return true;
 };
 
-export const getInvalidUserLines = <CellType, ExType, ProcessedExType>(
+export const getInvalidUserLines = <T extends AnyPTM>(
     lines: SetInterface<LineWithColor>,
-    userDigits: GivenDigitsMap<CellType>,
-    constraints: Constraint<CellType, any, ExType, ProcessedExType>[],
-    context: PuzzleContext<CellType, ExType, ProcessedExType>,
+    userDigits: GivenDigitsMap<T["cell"]>,
+    constraints: Constraint<T, any>[],
+    context: PuzzleContext<T>,
     isFinalCheck = false
 ): SetInterface<LineWithColor> => {
     let result = lines.clear();
@@ -174,9 +175,7 @@ export const getInvalidUserLines = <CellType, ExType, ProcessedExType>(
     return result;
 };
 
-export const isValidFinishedPuzzleByConstraints = <CellType, ExType, ProcessedExType>(
-    context: PuzzleContext<CellType, ExType, ProcessedExType>
-) => {
+export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: PuzzleContext<T>) => {
     const {puzzle, state} = context;
     const {typeManager: {getCellTypeProps}, digitsCount} = puzzle;
     const constraints = getAllPuzzleConstraints(context);

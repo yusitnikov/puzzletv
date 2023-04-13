@@ -5,6 +5,7 @@ import {CellColorValue} from "./CellColor";
 import {GivenDigitsMap} from "./GivenDigitsMap";
 import {SudokuCellsIndex} from "./SudokuCellsIndex";
 import {CellPart} from "./CellPart";
+import {AnyPTM} from "./PuzzleTypeMap";
 
 export enum CellMarkType {
     Any = "",
@@ -21,15 +22,15 @@ export interface CellMark {
     isCenter?: boolean;
 }
 
-export const getMarkHasher = (puzzle: PuzzleDefinition<any, any, any>) => {
+export const getMarkHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) => {
     const positionHasher = getPuzzlePositionHasher(puzzle);
 
     return ({position, isCenter = false}: CellMark) => `${positionHasher(position)}:${isCenter}`;
 };
 
-export class CellMarkSet extends HashSet<CellMark> {
+export class CellMarkSet<T extends AnyPTM> extends HashSet<CellMark> {
     constructor(
-        puzzle: PuzzleDefinition<any, any, any>,
+        puzzle: PuzzleDefinition<T>,
         items: CellMark[] = []
     ) {
         const hasher = getMarkHasher(puzzle);
@@ -40,17 +41,17 @@ export class CellMarkSet extends HashSet<CellMark> {
         });
     }
 
-    static unserialize(
-        puzzle: PuzzleDefinition<any, any, any>,
+    static unserialize<T extends AnyPTM>(
+        puzzle: PuzzleDefinition<T>,
         items: any
     ) {
         return new CellMarkSet(puzzle, items);
     }
 }
 
-export const getCenterMarksMap = <CellType, ExType, ProcessedExType>(
+export const getCenterMarksMap = <T extends AnyPTM>(
     marks: CellMark[],
-    cellsIndex: SudokuCellsIndex<CellType, ExType, ProcessedExType>,
+    cellsIndex: SudokuCellsIndex<T>,
 ): GivenDigitsMap<CellMark> => {
     const map: GivenDigitsMap<CellMark> = {};
 
