@@ -48,6 +48,7 @@ const JigsawPieceHighlightHandler = ({context: {cellsIndex, state: {selectedCell
                 jigsawPieceBringOnTopAction(newActivePieceIndex),
                 selectedCells.size !== 0
                     ? {
+                        // TODO: select the top-left-most cell according to the current angle
                         selectedCells: selectedCells.set(pieces[newActivePieceIndex].cells.slice(0, 1)),
                     }
                     : {},

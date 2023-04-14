@@ -1,7 +1,7 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
+import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {JigsawGameState, JigsawProcessedGameState} from "./JigsawGameState";
 import {JigsawDigit} from "./JigsawDigit";
-import {PositionWithAngle, rotateVectorClockwise} from "../../../types/layout/Position";
+import {isSamePosition, Position, PositionWithAngle, rotateVectorClockwise} from "../../../types/layout/Position";
 import {loop, roundToStep} from "../../../utils/math";
 import {JigsawDigitCellDataComponentType} from "../components/JigsawDigitCellData";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
@@ -24,6 +24,7 @@ import {RegularDigitComponentType} from "../../../components/sudoku/digit/Regula
 import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
 import {mixColorsStr} from "../../../utils/color";
 import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
+import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -178,10 +179,49 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         return {pieces};
     },
 
-    // TODO
-    // processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard): { cell?: Position; state?: PartialGameStateEx<JigsawDigit, JigsawGameState> } {
-    //     return {cell: currentCell};
-    // },
+    processArrowDirection(currentCell, xDirection, yDirection, context, ...args): { cell?: Position; state?: PartialGameStateEx<JigsawPTM> } {
+        const {cellsIndex, puzzle, state: {extension: {pieces}}} = context;
+
+        const regionIndex = getJigsawPieceIndexByCell(cellsIndex, currentCell);
+        if (regionIndex === undefined) {
+            return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, ...args);
+        }
+
+        const angle = loop(roundToStep(pieces[regionIndex].angle, 90), 360);
+        const {cells} = getJigsawPiecesWithCache(cellsIndex)[regionIndex];
+
+        if (angle >= 180) {
+            xDirection = -xDirection;
+            yDirection = -yDirection;
+        }
+        if (angle % 180 === 90) {
+            const tmpXDirection = xDirection;
+            xDirection = yDirection;
+            yDirection = -tmpXDirection;
+        }
+
+        return defaultProcessArrowDirection(
+            currentCell,
+            xDirection,
+            yDirection,
+            // Substitute the context with a hacked type manager to treat only the cells of the active region as selectable
+            {
+                ...context,
+                puzzle: {
+                    ...puzzle,
+                    typeManager: {
+                        ...puzzle.typeManager,
+                        getCellTypeProps(cell) {
+                            return {
+                                isSelectable: cells.some((cell2) => isSamePosition(cell, cell2)),
+                            };
+                        },
+                    },
+                },
+            },
+            ...args
+        );
+    },
 
     transformCoords: transformCoordsByRegions,
 
