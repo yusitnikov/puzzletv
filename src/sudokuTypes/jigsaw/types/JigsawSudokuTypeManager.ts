@@ -10,6 +10,7 @@ import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/co
 import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {
+    getActiveJigsawPieceIndex,
     getJigsawPieceIndexByCell,
     getJigsawPieces,
     getJigsawPiecesWithCache,
@@ -21,6 +22,8 @@ import {lighterGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
+import {mixColorsStr} from "../../../utils/color";
+import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -53,12 +56,12 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         return {digit, angle};
     },
 
-    serializeGameState({pieces}): any {
-        return {pieces};
+    serializeGameState({pieces, highlightCurrentPiece}): any {
+        return {pieces, highlightCurrentPiece};
     },
 
-    unserializeGameState({pieces}): Partial<JigsawGameState> {
-        return {pieces};
+    unserializeGameState({pieces, highlightCurrentPiece = false}): Partial<JigsawGameState> {
+        return {pieces, highlightCurrentPiece};
     },
 
     createCellDataByDisplayDigit(digit): JigsawDigit {
@@ -147,6 +150,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
                     animating: false,
                 };
             }),
+            highlightCurrentPiece: false,
         };
     },
 
@@ -181,7 +185,23 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     transformCoords: transformCoordsByRegions,
 
-    getRegionsWithSameCoordsTransformation({cellsIndex, state: {extension: {pieces}, processedExtension: {pieces: animatedPieces}}}): GridRegion[] {
+    getRegionsWithSameCoordsTransformation(
+        {
+            cellsIndex,
+            puzzle: {
+                typeManager: {
+                    gridBackgroundColor = "#fff",
+                    regionBackgroundColor = "#fff",
+                },
+            },
+            state: {
+                extension: {pieces, highlightCurrentPiece},
+                processedExtension: {pieces: animatedPieces},
+            },
+        }
+    ): GridRegion[] {
+        const activePieceIndex = getActiveJigsawPieceIndex(pieces);
+
         return getJigsawPiecesWithCache(cellsIndex).map(({cells, boundingRect}, index) => {
             const {zIndex} = pieces[index];
             const {top, left, angle} = animatedPieces[index];
@@ -198,6 +218,9 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
                         left: rotated.left + left,
                     };
                 },
+                backgroundColor: highlightCurrentPiece && index === activePieceIndex
+                    ? regionBackgroundColor
+                    : mixColorsStr(regionBackgroundColor, gridBackgroundColor, 0.8),
             };
         });
     },
@@ -210,6 +233,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         ZoomInButtonItem(),
         ZoomOutButtonItem(),
         AnimationSpeedControlButtonItem(),
+        JigsawPieceHighlightHandlerControlButtonItem,
     ],
 
     disabledCellWriteModes: [CellWriteMode.move],

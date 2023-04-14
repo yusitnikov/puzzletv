@@ -7,6 +7,7 @@ export interface GridRegion extends Rect {
     transformCoords?: (position: Position) => Position;
     cells?: Position[];
     zIndex?: number;
+    backgroundColor?: string;
 }
 
 export const doesGridRegionContainCell = ({cells, top, left, width, height}: GridRegion, cell: Position) =>

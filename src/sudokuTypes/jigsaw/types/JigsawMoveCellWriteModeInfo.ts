@@ -1,7 +1,7 @@
 import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
 import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
 import {getJigsawPieceIndexByCell, getJigsawPiecesWithCache} from "./helpers";
-import {jigsawPieceStateChangeAction} from "./JigsawPieceState";
+import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "./JigsawPieceState";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {applyMetricsDiff, GestureInfo, GestureMetrics} from "../../../utils/gestures";
 import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
@@ -17,20 +17,20 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     ...base,
     disableCellHandlers: false,
     handlesRightMouseClick: true,
-    onCornerClick(context, cellPosition, exactPosition, isRightClick) {
-        const pieceIndex = getJigsawPieceIndexByCell(context.cellsIndex, cellPosition);
+    onGestureStart(props, context, ...args) {
+        const cellPosition = isCellGestureExtraData(props.extraData) ? props.extraData.cell : undefined;
+        const pieceIndex = cellPosition && getJigsawPieceIndexByCell(context.cellsIndex, cellPosition);
         if (pieceIndex === undefined) {
-            base.onCornerClick?.(context, cellPosition, exactPosition, isRightClick);
+            context.onStateChange({extension: {highlightCurrentPiece: false}});
+            base.onGestureStart?.(props, context, ...args);
             return;
         }
 
         // Bring the clicked piece to the top
-        context.onStateChange(jigsawPieceStateChangeAction(
-            pieceIndex,
-            (prevPiece, prevPieces) => ({
-                zIndex: Math.max(...prevPieces.map(({zIndex}) => zIndex)) + 1,
-            }),
-        ));
+        context.onStateChange(jigsawPieceBringOnTopAction(pieceIndex));
+    },
+    onOutsideClick({onStateChange}) {
+        onStateChange({extension: {highlightCurrentPiece: false}});
     },
     onMove(props, context, fieldRect) {
         const {gesture, prevMetrics, currentMetrics} = props;

@@ -121,13 +121,6 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
     // region Pointer events
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
 
-    // Handle outside click
-    useOutsideClick(() => {
-        if (!isAnyKeyDown) {
-            onStateChange(gameStateClearSelectedCells);
-        }
-    });
-
     const fieldOuterRect = usePuzzleContainer()!;
 
     const cellWriteModesForGestures = getAllowedCellWriteModeInfos(puzzle, true);
@@ -145,6 +138,17 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
         ));
     const fieldGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(true));
     const cellGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(false));
+
+    // Handle outside click
+    useOutsideClick(() => {
+        if (!isAnyKeyDown) {
+            onStateChange(gameStateClearSelectedCells);
+        }
+
+        for (const {onOutsideClick} of cellWriteModesForGestures) {
+            onOutsideClick?.(context);
+        }
+    });
     // endregion
 
     // Handle arrows
@@ -317,17 +321,19 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                             {(region, regionIndex = 0) => {
                                 const shadowFilterId = `field-shadow-${autoIncrementId}-${regionIndex}`;
 
+                                const {backgroundColor = regionBackgroundColor} = region ?? {};
+
                                 return <>
                                     <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
                                         <feDropShadow dx={0} dy={0} stdDeviation={0.05} floodColor={"#fff"} floodOpacity={1}/>
                                     </filter>
 
-                                    {region && regionBackgroundColor && <rect
+                                    {region && backgroundColor && <rect
                                         x={region.left}
                                         y={region.top}
                                         width={region.width}
                                         height={region.height}
-                                        fill={regionBackgroundColor}
+                                        fill={backgroundColor}
                                         strokeWidth={0}
                                         stroke={"none"}
                                     />}

@@ -7,6 +7,7 @@ import {getRegionBoundingBox} from "../../../utils/regions";
 import {JigsawPieceInfo} from "./JigsawPieceInfo";
 import {JigsawPTM} from "./JigsawPTM";
 import {isRotatableDigit, rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
+import {JigsawPieceState} from "./JigsawPieceState";
 
 export const getJigsawPieces = (
     {regions = [], fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
@@ -60,4 +61,13 @@ export const normalizeJigsawDigit = (puzzle: PuzzleDefinition<JigsawPTM>, {digit
         };
     }
     return {digit, angle};
+};
+
+export const getActiveJigsawPieceIndex = (pieces: JigsawPieceState[]) => {
+    if (pieces.length === 0) {
+        return 0;
+    }
+    const zIndexes = pieces.map(({zIndex}) => zIndex);
+    const maxZIndex = Math.max(...zIndexes);
+    return zIndexes.indexOf(maxZIndex);
 };

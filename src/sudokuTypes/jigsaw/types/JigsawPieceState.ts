@@ -10,6 +10,7 @@ export interface JigsawPieceState extends PositionWithAngle {
 export const jigsawPieceStateChangeAction = (
     pieceIndex: number,
     updates: Partial<JigsawPieceState> | ((prevPiece: JigsawPieceState, prevPieces: JigsawPieceState[]) => Partial<JigsawPieceState>),
+    resetSelectedCells = true,
 ): GameStateActionCallback<JigsawPTM> => ({selectedCells, extension: {pieces}}) => ({
     extension: {
         pieces: [
@@ -20,6 +21,15 @@ export const jigsawPieceStateChangeAction = (
             },
             ...pieces.slice(pieceIndex + 1),
         ],
+        highlightCurrentPiece: true,
     },
-    selectedCells: selectedCells.clear(),
+    ...(resetSelectedCells && {selectedCells: selectedCells.clear()}),
 });
+
+export const jigsawPieceBringOnTopAction = (pieceIndex: number, resetSelectedCells = true) => jigsawPieceStateChangeAction(
+    pieceIndex,
+    (prevPiece, prevPieces) => ({
+        zIndex: Math.max(...prevPieces.map(({zIndex}) => zIndex)) + 1,
+    }),
+    resetSelectedCells,
+);

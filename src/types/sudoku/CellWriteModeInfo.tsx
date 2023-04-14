@@ -7,7 +7,13 @@ import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
 import {incrementArrayItem} from "../../utils/array";
 import {useEventListener} from "../../hooks/useEventListener";
-import type {GestureHandler, GestureIsValidProps, GestureOnContinueProps, GestureOnEndProps} from "../../utils/gestures";
+import type {
+    GestureHandler,
+    GestureIsValidProps,
+    GestureOnContinueProps,
+    GestureOnEndProps,
+    GestureOnStartProps
+} from "../../utils/gestures";
 import {LinesCellWriteModeInfo} from "./cellWriteModes/lines";
 import {MoveCellWriteModeInfo} from "./cellWriteModes/move";
 import {ShadingCellWriteModeInfo} from "./cellWriteModes/shading";
@@ -46,8 +52,10 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
         isRightButton: boolean,
     ) => void;
     onCornerEnter?: (context: PuzzleContext<T>, cellPosition: Position, exactPosition: CellExactPosition) => void;
+    onGestureStart?(props: GestureOnStartProps, context: PuzzleContext<T>, isRightButton: boolean): void;
     onMove?(props: GestureOnContinueProps, context: PuzzleContext<T>, fieldRect: Rect): void;
     onGestureEnd?(props: GestureOnEndProps, context: PuzzleContext<T>): void;
+    onOutsideClick?(context: PuzzleContext<T>): void;
 }
 
 export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[] => [
@@ -200,6 +208,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
         onMove,
         onCornerClick,
         onCornerEnter,
+        onGestureStart,
         onGestureEnd,
         handlesRightMouseClick,
     }: CellWriteModeInfo<T>,
@@ -269,7 +278,9 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
     return {
         contextId: `cell-write-mode-${mode}`,
         ...common,
-        onStart: ({extraData, event: {button}}) => {
+        onStart: (props) => {
+            const {extraData, event: {button}} = props;
+            onGestureStart?.(props, context, !!button);
             if (isCellGestureExtraData(extraData)) {
                 onCornerClick?.(context, extraData.cell, extraData.exact, !!button);
             }

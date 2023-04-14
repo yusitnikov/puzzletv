@@ -10,30 +10,29 @@ export const colorStrToRgb = (color: string): RGB => {
     color = normalizeColorStr(color);
 
     return processRgb(
+        str => parseInt(str, 16),
         {
             red: color.substring(1, 3),
             green: color.substring(3, 5),
             blue: color.substring(5, 7),
         },
-        str => parseInt(str, 16)
     );
 };
 
-export const processRgb = <T1, T2>({red, green, blue}: RGB<T1>, processor: (color: T1) => T2): RGB<T2> => ({
-    red: processor(red),
-    green: processor(green),
-    blue: processor(blue),
+export const processRgb = <T1, T2>(processor: (...values: T1[]) => T2, ...colors: RGB<T1>[]): RGB<T2> => ({
+    red: processor(...colors.map(({red}) => red)),
+    green: processor(...colors.map(({green}) => green)),
+    blue: processor(...colors.map(({blue}) => blue)),
 });
 
 export const rgbToColorStr = (color: RGB) => {
-    const {red, green, blue} = processRgb(color, num => Math.round(num).toString(16).padStart(2, "0"));
+    const {red, green, blue} = processRgb(num => Math.round(num).toString(16).padStart(2, "0"), color);
 
     return `#${red}${green}${blue}`;
 };
 
-export const lightenColorStr = (color: string) => rgbToColorStr(
-    processRgb(
-        colorStrToRgb(color),
-        num => (num + 255) / 2
-    )
+export const mixColorsStr = (color1: string, color2: string, coeff = 0.5) => rgbToColorStr(
+    processRgb((value1, value2) => value1 * coeff + value2 * (1 - coeff), colorStrToRgb(color1), colorStrToRgb(color2))
 );
+
+export const lightenColorStr = (color: string, coeff = 0.5) => mixColorsStr(color, "#fff", coeff);
