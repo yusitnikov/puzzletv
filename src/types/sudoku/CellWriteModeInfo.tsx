@@ -41,9 +41,9 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     applyToWholeField?: boolean;
     digitsCount?: number | ((context: PuzzleContext<T>) => number);
     handlesRightMouseClick?: boolean;
-    buttonContent?: (context: PuzzleContext<T>, cellData: T["cell"], cellSize: number, index: number) => ReactNode;
-    getCurrentButton?: (context: PuzzleContext<T>) => (number | undefined);
-    setCurrentButton?: (context: PuzzleContext<T>, index: number) => void;
+    secondaryButtonContent?: (context: PuzzleContext<T>, cellData: T["cell"], cellSize: number, index: number) => ReactNode;
+    getCurrentSecondaryButton?: (context: PuzzleContext<T>) => (number | undefined);
+    setCurrentSecondaryButton?: (context: PuzzleContext<T>, index: number) => void;
     isValidGesture?(isCurrentCellWriteMode: boolean, props: GestureIsValidProps, context: PuzzleContext<T>): boolean;
     onCornerClick?: (
         context: PuzzleContext<T>,
@@ -67,7 +67,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         mode: CellWriteMode.corner,
         hotKeyStr: ["Shift"],
         isDigitMode: true,
-        buttonContent: (context, cellData, cellSize) => <CellDigits
+        secondaryButtonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
             data={{cornerDigits: new CellDataSet(context.puzzle, [cellData])}}
             size={cellSize}
@@ -77,7 +77,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         mode: CellWriteMode.center,
         hotKeyStr: ["Ctrl"],
         isDigitMode: true,
-        buttonContent: (context, cellData, cellSize) => <CellDigits
+        secondaryButtonContent: (context, cellData, cellSize) => <CellDigits
             context={context}
             data={{centerDigits: new CellDataSet(context.puzzle, [cellData])}}
             size={cellSize}
@@ -88,7 +88,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
         digitsCount: 10,
         isActiveForPuzzle: ({disableColoring, enableShading}) => !disableColoring && !enableShading,
-        buttonContent: (context, _, cellSize, index) => <CellBackground
+        secondaryButtonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
             colors={new CellDataSet(context.puzzle, [index])}
             size={cellSize}

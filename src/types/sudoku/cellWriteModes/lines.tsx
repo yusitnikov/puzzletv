@@ -28,14 +28,14 @@ export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T>
             : gameStateResetCurrentMultiLine
     ),
     digitsCount: ({puzzle: {disableLineColors}}) => disableLineColors ? 0 : 9,
-    buttonContent: (context, _, cellSize, index) => <CellBackground
+    secondaryButtonContent: (context, _, cellSize, index) => <CellBackground
         context={context}
         colors={new CellDataSet(context.puzzle, [index])}
         size={cellSize}
         noOpacity={true}
     />,
-    getCurrentButton: ({puzzle: {disableLineColors}, state: {selectedColor}}) =>
+    getCurrentSecondaryButton: ({puzzle: {disableLineColors}, state: {selectedColor}}) =>
         disableLineColors ? undefined : selectedColor,
-    setCurrentButton: ({onStateChange}, index) => onStateChange({selectedColor: index}),
+    setCurrentSecondaryButton: ({onStateChange}, index) => onStateChange({selectedColor: index}),
     handlesRightMouseClick: true,
 });

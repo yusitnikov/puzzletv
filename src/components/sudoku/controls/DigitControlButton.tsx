@@ -36,14 +36,14 @@ export const DigitControlButton = <T extends AnyPTM>({index, context}: DigitCont
             cellWriteMode,
             cellWriteModeInfo: {
                 isDigitMode,
-                buttonContent: ButtonContent,
-                getCurrentButton,
-                setCurrentButton,
+                secondaryButtonContent: ButtonContent,
+                getCurrentSecondaryButton,
+                setCurrentSecondaryButton,
             },
         },
     } = state;
 
-    const currentButton = getCurrentButton?.(context);
+    const currentButton = getCurrentSecondaryButton?.(context);
     const selectableButtonContent = currentButton !== undefined;
 
     const digit = index + 1;
@@ -69,13 +69,13 @@ export const DigitControlButton = <T extends AnyPTM>({index, context}: DigitCont
 
     const handleDigit = useCallback(
         () => {
-            if (setCurrentButton) {
-                setCurrentButton(context, index);
+            if (setCurrentSecondaryButton) {
+                setCurrentSecondaryButton(context, index);
             } else {
                 onStateChange(enterDigitAction(digit, context));
             }
         },
-        [setCurrentButton, onStateChange, digit, index, context]
+        [setCurrentSecondaryButton, onStateChange, digit, index, context]
     );
 
     useEventListener(window, "keydown", (ev) => {
