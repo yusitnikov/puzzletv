@@ -44,7 +44,8 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
 ): Required<Pick<
     SudokuTypeManager<RotatablePTM<CellType>>,
     "initialAngle" | "angleStep" | "allowRotation" | "isFreeRotation" | "serializeGameState" | "unserializeGameState" |
-    "initialGameStateExtension" | "isReady" | "controlButtons" | "getInternalState" | "unserializeInternalState"
+    "initialGameStateExtension" | "isReady" | "controlButtons" | "getInternalState" | "unserializeInternalState" |
+    "rotationallySymmetricDigits"
 >> => ({
     initialAngle: startAngle,
     angleStep: angleDelta,
@@ -98,7 +99,9 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
         {isStickyMode}: any
     ): PartialGameStateEx<RotatablePTM<CellType>> {
         return {extension: {isStickyMode}};
-    }
+    },
+
+    rotationallySymmetricDigits: true,
 });
 
 export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPTM> = {

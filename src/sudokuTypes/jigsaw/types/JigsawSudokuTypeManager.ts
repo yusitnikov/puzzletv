@@ -129,6 +129,8 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     cellDataComponentType: JigsawDigitCellDataComponentType,
 
+    rotationallySymmetricDigits: true,
+
     // TODO: shuffle the pieces
     initialGameStateExtension: (puzzle) => {
         const centerTop = puzzle.fieldSize.rowsCount / 2;

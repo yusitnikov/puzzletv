@@ -20,12 +20,13 @@ export const RegularDigit = profiler.memo("RegularDigit", <T extends AnyPTM>({pu
 </AutoSvg>) as DigitPropsGenericFc;
 
 export const RegularDigitSvgContent = profiler.memo("RegularDigitSvgContent", <T extends AnyPTM>(
-    {digit, size, color, left = 0, top = 0}: DigitProps<T>
+    {puzzle: {typeManager: {rotationallySymmetricDigits}}, digit, size, color, left = 0, top = 0}: DigitProps<T>
 ) => <CenteredText
     left={left}
     top={top}
     size={size}
     fill={color}
+    style={{fontFamily: rotationallySymmetricDigits ? "Lato8, Lato" : undefined}}
 >
     {digit}
 </CenteredText>) as DigitPropsGenericFc;
