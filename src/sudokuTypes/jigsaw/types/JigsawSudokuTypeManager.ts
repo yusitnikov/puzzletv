@@ -15,7 +15,7 @@ import {
     getJigsawPiecesWithCache,
     normalizeJigsawDigit
 } from "./helpers";
-import {JigsawMoveCellWriteModeInfo} from "./JigsawMoveCellWriteModeInfo";
+import {JigsawMoveCellWriteModeInfo, roundStep} from "./JigsawMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {lighterGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
@@ -140,8 +140,8 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
             pieces: getJigsawPieces(puzzle).map(({boundingRect}, index) => {
                 const {top, left} = getRectCenter(boundingRect);
                 return {
-                    top: (top - centerTop) * 0.1,
-                    left: (left - centerLeft) * 0.1,
+                    top: roundToStep((top - centerTop) * 0.4, roundStep),
+                    left: roundToStep((left - centerLeft) * 0.4, roundStep),
                     angle: 0,
                     zIndex: index + 1,
                     animating: false,
@@ -155,7 +155,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     allowScale: true,
     isFreeScale: true,
     // initial scale to contain the shuffled pieces
-    initialScale: 0.9,
+    initialScale: 0.7,
 
     useProcessedGameStateExtension({animationSpeed, extension: {pieces}}): JigsawProcessedGameState {
         return {
