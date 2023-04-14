@@ -6,9 +6,11 @@ import {getRectCenter} from "../../layout/Rect";
 import {isCellGestureExtraData} from "../CellGestureExtraData";
 import {AnyPTM} from "../PuzzleTypeMap";
 import {roundToStep} from "../../../utils/math";
+import {MoveDigitModeButton} from "../../../components/sudoku/controls/MoveDigitModeButton";
 
 export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.move,
+    mainButtonContent: MoveDigitModeButton,
     isActiveForPuzzle: (
         {
             loopHorizontally = false,

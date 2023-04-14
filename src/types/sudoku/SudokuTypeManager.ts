@@ -105,9 +105,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     ): Partial<CellStateEx<T>>;
 
     extraCellWriteModes?: CellWriteModeInfo<T>[];
-    disabledCellWriteModes?: CellWriteMode[];
 
-    hiddenCellWriteModes?: CellWriteModeInfo<T>[];
+    disabledCellWriteModes?: CellWriteMode[];
 
     initialCellWriteMode?: CellWriteMode;
 

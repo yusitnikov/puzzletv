@@ -1,4 +1,4 @@
-import {ReactNode} from "react";
+import {ComponentType, ReactNode} from "react";
 import {PuzzleContext} from "./PuzzleContext";
 import {getDefaultDigitsCount, PuzzleDefinition} from "./PuzzleDefinition";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
@@ -30,6 +30,11 @@ import {getReadOnlySafeOnStateChange} from "../../hooks/sudoku/useReadOnlySafeCo
 import {Rect} from "../layout/Rect";
 import {CellWriteMode} from "./CellWriteMode";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {ControlButtonItemProps} from "../../components/sudoku/controls/ControlButtonsManager";
+import {MainDigitModeButton} from "../../components/sudoku/controls/MainDigitModeButton";
+import {CornerDigitModeButton} from "../../components/sudoku/controls/CornerDigitModeButton";
+import {CenterDigitModeButton} from "../../components/sudoku/controls/CenterDigitModeButton";
+import {ColorDigitModeButton} from "../../components/sudoku/controls/ColorDigitModeButton";
 
 export interface CellWriteModeInfo<T extends AnyPTM> {
     mode: CellWriteMode | number;
@@ -41,6 +46,7 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     applyToWholeField?: boolean;
     digitsCount?: number | ((context: PuzzleContext<T>) => number);
     handlesRightMouseClick?: boolean;
+    mainButtonContent?: ComponentType<ControlButtonItemProps<T>>;
     secondaryButtonContent?: (context: PuzzleContext<T>, cellData: T["cell"], cellSize: number, index: number) => ReactNode;
     getCurrentSecondaryButton?: (context: PuzzleContext<T>) => (number | undefined);
     setCurrentSecondaryButton?: (context: PuzzleContext<T>, index: number) => void;
@@ -61,10 +67,12 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
 export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[] => [
     {
         mode: CellWriteMode.main,
+        mainButtonContent: MainDigitModeButton,
         isDigitMode: true,
     },
     {
         mode: CellWriteMode.corner,
+        mainButtonContent: CornerDigitModeButton,
         hotKeyStr: ["Shift"],
         isDigitMode: true,
         secondaryButtonContent: (context, cellData, cellSize) => <CellDigits
@@ -75,6 +83,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
     },
     {
         mode: CellWriteMode.center,
+        mainButtonContent: CenterDigitModeButton,
         hotKeyStr: ["Ctrl"],
         isDigitMode: true,
         secondaryButtonContent: (context, cellData, cellSize) => <CellDigits
@@ -85,6 +94,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
     },
     {
         mode: CellWriteMode.color,
+        mainButtonContent: ColorDigitModeButton,
         hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
         digitsCount: 10,
         isActiveForPuzzle: ({disableColoring, enableShading}) => !disableColoring && !enableShading,
@@ -108,7 +118,6 @@ export const getAllowedCellWriteModeInfos = <T extends AnyPTM>(
         typeManager: {
             extraCellWriteModes = [],
             disabledCellWriteModes = [],
-            hiddenCellWriteModes = [],
         },
     } = puzzle;
 
@@ -120,8 +129,7 @@ export const getAllowedCellWriteModeInfos = <T extends AnyPTM>(
                     : isActiveForPuzzle?.(puzzle, includeHidden) !== false
             )
         ),
-        ...extraCellWriteModes,
-        ...(includeHidden ? hiddenCellWriteModes : []),
+        ...extraCellWriteModes.filter(({mainButtonContent}) => mainButtonContent || includeHidden),
     ];
 };
 

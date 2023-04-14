@@ -17,7 +17,6 @@ import {CellWriteMode} from "../../../../../types/sudoku/CellWriteMode";
 import {setQuadPositionAction, setQuadPositionActionType, setQuadPositionActionTypeKey} from "./setQuadPositionAction";
 import {QuadInputModeButton} from "./QuadInputModeButton";
 import {CellExactPosition} from "../../../../../types/sudoku/CellExactPosition";
-import {ControlButtonRegion} from "../../../controls/ControlButtonsManager";
 import {AnyQuadInputPTM} from "./QuadInputPTM";
 
 // TODO: support CellType operations!
@@ -250,18 +249,11 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
             );
         },
 
-        controlButtons: [
-            {
-                key: "mode-quads",
-                region: ControlButtonRegion.modes,
-                Component: QuadInputModeButton(options),
-            }
-        ],
-
         extraCellWriteModes: [
             ...(parent.extraCellWriteModes || []),
             {
                 mode: CellWriteMode.quads,
+                mainButtonContent: QuadInputModeButton(options),
                 isDigitMode: true,
                 isNoSelectionMode: true,
                 onCornerClick,

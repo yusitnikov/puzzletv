@@ -6,9 +6,11 @@ import {applyCurrentMultiLineAction} from "../GameStateAction";
 import {CellBackground} from "../../../components/sudoku/cell/CellBackground";
 import {CellDataSet} from "../CellDataSet";
 import {AnyPTM} from "../PuzzleTypeMap";
+import {LinesDigitModeButton} from "../../../components/sudoku/controls/LinesDigitModeButton";
 
 export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.lines,
+    mainButtonContent: LinesDigitModeButton,
     isActiveForPuzzle: ({allowDrawing = []}) => allowDrawing.length !== 0,
     hotKeyStr: ["Alt"],
     isNoSelectionMode: true,

@@ -30,8 +30,8 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
 
     return {
         ...baseTypeManager,
-        hiddenCellWriteModes: [
-            ...baseTypeManager.hiddenCellWriteModes ?? [],
+        extraCellWriteModes: [
+            ...baseTypeManager.extraCellWriteModes ?? [],
             arrowsCellWriteModeInfo,
         ],
         getCellTypeProps({top, left}, puzzle) {

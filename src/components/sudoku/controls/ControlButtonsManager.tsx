@@ -1,19 +1,12 @@
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {Position} from "../../../types/layout/Position";
-import {FC, useMemo} from "react";
+import {ComponentType, useMemo} from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteModeInfo";
 import {ResetButton} from "./ResetButton";
 import {SettingsButton} from "./SettingsButton";
 import {ResultCheckButton} from "./ResultCheckButton";
-import {MainDigitModeButton} from "./MainDigitModeButton";
-import {CornerDigitModeButton} from "./CornerDigitModeButton";
-import {CenterDigitModeButton} from "./CenterDigitModeButton";
-import {ColorDigitModeButton} from "./ColorDigitModeButton";
-import {ShadingDigitModeButton} from "./ShadingDigitModeButton";
-import {LinesDigitModeButton} from "./LinesDigitModeButton";
-import {MoveDigitModeButton} from "./MoveDigitModeButton";
 import {UndoButton} from "./UndoButton";
 import {RedoButton} from "./RedoButton";
 import {DeleteButton} from "./DeleteButton";
@@ -41,7 +34,7 @@ export interface ControlButtonItemProps<T extends AnyPTM> extends Position {
 export interface ControlButtonItem<T extends AnyPTM> {
     key: string;
     region: ControlButtonRegion;
-    Component: FC<ControlButtonItemProps<T>>;
+    Component: ComponentType<ControlButtonItemProps<T>>;
 }
 
 export class ControlButtonsManager<T extends AnyPTM> {
@@ -79,38 +72,12 @@ export class ControlButtonsManager<T extends AnyPTM> {
 
         if (allowedCellWriteModes.length > 1) {
             modes.push(
-                ...[
-                    {
-                        mode: CellWriteMode.main,
-                        Component: MainDigitModeButton,
-                    },
-                    {
-                        mode: CellWriteMode.corner,
-                        Component: CornerDigitModeButton,
-                    },
-                    {
-                        mode: CellWriteMode.center,
-                        Component: CenterDigitModeButton,
-                    },
-                    {
-                        mode: CellWriteMode.color,
-                        Component: ColorDigitModeButton,
-                    },
-                    {
-                        mode: CellWriteMode.shading,
-                        Component: ShadingDigitModeButton,
-                    },
-                    {
-                        mode: CellWriteMode.lines,
-                        Component: LinesDigitModeButton,
-                    },
-                    {
-                        mode: CellWriteMode.move,
-                        Component: MoveDigitModeButton,
-                    },
-                ]
-                    .filter(({mode}) => allowedCellWriteModes.find((item) => item.mode === mode))
-                    .map(({mode, Component}) => ({key: `mode-${mode}`, Component}))
+                ...allowedCellWriteModes
+                    .filter(({mode, mainButtonContent}) => mainButtonContent)
+                    .map<Omit<ControlButtonItem<T>, "region">>(({mode, mainButtonContent}) => ({
+                        key: `mode-${mode}`,
+                        Component: mainButtonContent!,
+                    }))
             );
         }
 
