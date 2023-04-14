@@ -75,7 +75,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     transformNumber?(num: number, context: PuzzleContext<T>, cellPosition: Position): number;
 
     processCellDataPosition?(
-        puzzle: PuzzleDefinition<T>,
+        puzzle: PuzzleContext<T>,
         basePosition: PositionWithAngle,
         dataSet: SetInterface<T["cell"]>,
         dataIndex: number,

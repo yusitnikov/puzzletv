@@ -117,7 +117,7 @@ export const UserMarkByData = <T extends AnyPTM>(
                 const {bounds: {userArea}} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
                 userAreaSize = (userArea.width + userArea.height) / 2;
                 angle = processCellDataPosition?.(
-                    puzzle,
+                    context,
                     emptyPositionWithAngle,
                     new HashSet(),
                     0,

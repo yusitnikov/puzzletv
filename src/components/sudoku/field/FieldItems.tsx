@@ -27,7 +27,7 @@ export const FieldItems = <T extends AnyPTM>(
 
             if (position.top % 1 === 0 && position.left % 1 === 0) {
                 const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
-                    context.puzzle,
+                    context,
                     {...position, angle: 0},
                     new HashSet<T["cell"]>(),
                     0,

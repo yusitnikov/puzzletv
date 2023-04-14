@@ -97,7 +97,7 @@ export const CellDigits = <T extends AnyPTM>(
             }
 
             if (processCellDataPosition) {
-                position = processCellDataPosition(puzzle, position, digits, index, positionFunction, cellPosition, state);
+                position = processCellDataPosition(context, position, digits, index, positionFunction, cellPosition, state);
                 if (!position) {
                     return undefined;
                 }

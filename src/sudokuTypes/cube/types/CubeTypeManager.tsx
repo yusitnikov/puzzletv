@@ -17,7 +17,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
     },
 
     processCellDataPosition(
-        {fieldSize: {fieldSize}},
+        {puzzle: {fieldSize: {fieldSize}}},
         basePosition,
         dataSet,
         dataIndex,

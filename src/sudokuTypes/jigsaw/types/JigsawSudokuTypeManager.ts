@@ -125,7 +125,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         return num;
     },
 
-    processCellDataPosition(puzzle, basePosition): PositionWithAngle | undefined {
+    processCellDataPosition(context, basePosition): PositionWithAngle | undefined {
         // TODO
         return basePosition;
     },

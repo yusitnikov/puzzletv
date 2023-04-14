@@ -75,7 +75,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         return {};
     },
 
-    processCellDataPosition(puzzle, {left, top, angle}, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {
+    processCellDataPosition(context, {left, top, angle}, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {
         const angleDelta = roundToStep(state?.processed.animated.angle ?? 0, 90) * Math.PI / 180;
         const sin = Math.sin(angleDelta);
         const cos = Math.cos(angleDelta);

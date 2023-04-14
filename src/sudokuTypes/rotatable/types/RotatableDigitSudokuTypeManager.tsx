@@ -165,7 +165,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
     },
 
     processCellDataPosition(
-        puzzle,
+        {puzzle},
         basePosition,
         dataSet,
         dataIndex,
