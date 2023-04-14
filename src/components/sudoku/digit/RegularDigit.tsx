@@ -5,6 +5,7 @@ import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {CenteredText} from "../../svg/centered-text/CenteredText";
 import {profiler} from "../../../utils/profiler";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {DigitRotationInfo} from "./DigitRotationInfo";
 
 export const RegularDigit = profiler.memo("RegularDigit", <T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) => <AutoSvg
     width={size}
@@ -35,4 +36,10 @@ export const RegularDigitComponentType = <T extends AnyPTM>(): DigitComponentTyp
     component: RegularDigit,
     svgContentComponent: RegularDigitSvgContent,
     widthCoeff: 0.6,
+    getDigitRotationInfo(digit): DigitRotationInfo {
+        return {
+            isRotatable: [0, 6, 8, 9].includes(digit),
+            rotatesInto: [6, 9].includes(digit) ? 15 - digit : undefined,
+        };
+    },
 });

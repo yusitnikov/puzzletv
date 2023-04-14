@@ -58,9 +58,9 @@ export const cloneCellState = <T extends AnyPTM>(
 });
 
 export const areCellStatesEqual = <T extends AnyPTM>(
-    {areSameCellData}: SudokuTypeManager<T>,
+    puzzle: PuzzleDefinition<T>,
     {usersDigit, centerDigits, cornerDigits, colors}: CellState<T>,
     {usersDigit: usersDigit2, centerDigits: centerDigits2, cornerDigits: cornerDigits2, colors: colors2}: CellState<T>
 ) =>
-    typeof usersDigit === typeof usersDigit2 && (!usersDigit || areSameCellData(usersDigit, usersDigit2!, undefined, false)) &&
+    typeof usersDigit === typeof usersDigit2 && (!usersDigit || puzzle.typeManager.areSameCellData(usersDigit, usersDigit2!, puzzle, undefined, false)) &&
     centerDigits.equals(centerDigits2) && cornerDigits.equals(cornerDigits2) && colors.equals(colors2);

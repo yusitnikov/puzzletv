@@ -11,6 +11,7 @@ import {TapaCellConstraint} from "../../components/sudoku/constraints/tapa-cell/
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {loopRulesApply, tapCluesApply} from "../ruleSnippets";
 import {AnyNumberPTM, NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {roundToStep} from "../../utils/math";
 
 export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
     fieldSize: number,
@@ -19,7 +20,7 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
 ): Omit<PuzzleDefinition<T>, "slug" | "title"> => {
     const scale = 1;
 
-    const round = (value: number) => Math.round(value * 1000) / 1000;
+    const round = (value: number) => roundToStep(value, 0.001);
 
     const point = (y: number, angle: number): Position => {
         angle *= 2 * Math.PI / 7;

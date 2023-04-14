@@ -1,7 +1,7 @@
 import {areFieldStatesEqual, cloneFieldState, FieldState} from "./FieldState";
 import {SetStateAction} from "react";
-import {SudokuTypeManager} from "./SudokuTypeManager";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {PuzzleDefinition} from "./PuzzleDefinition";
 
 export interface FieldStateHistory<T extends AnyPTM> {
     states: FieldState<T>[];
@@ -29,17 +29,17 @@ export const fieldStateHistoryRedo = <T extends AnyPTM>(history: FieldStateHisto
     : history;
 
 export const fieldStateHistoryAddState = <T extends AnyPTM>(
-    typeManager: SudokuTypeManager<T>,
+    puzzle: PuzzleDefinition<T>,
     history: FieldStateHistory<T>,
     state: SetStateAction<FieldState<T>>
 ) => {
     const currentState = fieldStateHistoryGetCurrent(history);
 
     if (typeof state === "function") {
-        state = state(cloneFieldState(typeManager, currentState));
+        state = state(cloneFieldState(puzzle.typeManager, currentState));
     }
 
-    if (areFieldStatesEqual(typeManager, state, currentState)) {
+    if (areFieldStatesEqual(puzzle, state, currentState)) {
         return history;
     }
 

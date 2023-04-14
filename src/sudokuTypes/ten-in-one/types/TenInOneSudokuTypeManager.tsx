@@ -21,13 +21,8 @@ export const TenInOneSudokuTypeManager = (
                 ? (isValidFinishedPuzzleByConstraints(context) ? 2 : 1)
                 : 3,
         onStageChange: (context, stage) => {
-            const {
-                puzzle: {
-                    fieldSize: {rowsCount, columnsCount},
-                    typeManager,
-                },
-                state,
-            } = context;
+            const {puzzle, state} = context;
+            const {fieldSize: {rowsCount, columnsCount}} = puzzle;
 
             if (stage === 2) {
                 const {cells} = gameStateGetCurrentFieldState(state);
@@ -48,7 +43,7 @@ export const TenInOneSudokuTypeManager = (
 
             return {
                 fieldStateHistory: fieldStateHistoryAddState(
-                    typeManager,
+                    puzzle,
                     state.fieldStateHistory,
                     (state) => ({
                         ...state,

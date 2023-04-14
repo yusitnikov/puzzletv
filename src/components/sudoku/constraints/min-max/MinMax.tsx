@@ -102,7 +102,8 @@ export const MinMaxConstraint = <T extends AnyPTM>(
         renderSingleCellInUserArea: true,
         props: undefined,
         isObvious: true,
-        isValidCell(cell, digits, [mainCell, ...neighborCells], {puzzle: {typeManager: {compareCellData}}, state}) {
+        isValidCell(cell, digits, [mainCell, ...neighborCells], {puzzle, state}) {
+            const {typeManager: {compareCellData}} = puzzle;
             const digit = digits[cell.top][cell.left]!;
 
             const mainDigit = digits[mainCell.top]?.[mainCell.left];
@@ -113,9 +114,9 @@ export const MinMaxConstraint = <T extends AnyPTM>(
             return isSamePosition(cell, mainCell)
                 ? neighborCells.every(({left, top}) => {
                     const neighborDigit = digits[top]?.[left];
-                    return neighborDigit === undefined || compareCellData(mainDigit, neighborDigit, state, true) * coeff > 0;
+                    return neighborDigit === undefined || compareCellData(mainDigit, neighborDigit, puzzle, state, true) * coeff > 0;
                 })
-                : compareCellData(mainDigit, digit, state, true) * coeff > 0;
+                : compareCellData(mainDigit, digit, puzzle, state, true) * coeff > 0;
         },
     });
 };

@@ -73,7 +73,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
                 for (const neighbor of neighbors.items) {
                     const digit2 = digits[neighbor.top]?.[neighbor.left];
 
-                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, state, true)) {
+                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, puzzle, state, true)) {
                         return false;
                     }
                 }

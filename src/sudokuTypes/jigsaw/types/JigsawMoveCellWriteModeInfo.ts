@@ -7,6 +7,7 @@ import {applyMetricsDiff, GestureInfo, GestureMetrics} from "../../../utils/gest
 import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
 import {getRectCenter} from "../../../types/layout/Rect";
 import {JigsawPTM} from "./JigsawPTM";
+import {roundToStep} from "../../../utils/math";
 
 const base = MoveCellWriteModeInfo<JigsawPTM>();
 
@@ -82,7 +83,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     onGestureEnd(props, context) {
         const {gesture} = props;
         const {
-            puzzle: {typeManager: {angleStep}},
+            puzzle: {typeManager: {angleStep = 0}},
             cellsIndex,
             onStateChange,
         } = context;
@@ -97,9 +98,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         // TODO: round the position, glue pieces together if possible
 
         onStateChange(jigsawPieceStateChangeAction(pieceIndex, ({angle}) => ({
-            angle: angleStep
-                ? Math.round(angle / angleStep + (!isClick ? 0 : isRightButton ? -1 : 1)) * angleStep
-                : angle,
+            angle: roundToStep(angle, angleStep) + angleStep * (!isClick ? 0 : isRightButton ? -1 : 1),
             animating: true,
         })));
     },

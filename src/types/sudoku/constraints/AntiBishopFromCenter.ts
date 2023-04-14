@@ -12,16 +12,15 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
         {left, top},
         digits,
         _,
-        {
-            puzzle: {
-                typeManager: {areSameCellData},
-                loopHorizontally,
-                loopVertically,
-                fieldSize: {rowsCount, columnsCount, fieldSize},
-            },
-            state,
-        }
+        {puzzle, state}
     ) {
+        const {
+            typeManager: {areSameCellData},
+            loopHorizontally,
+            loopVertically,
+            fieldSize: {rowsCount, columnsCount, fieldSize},
+        } = puzzle;
+
         const digit = digits[top][left]!;
 
         const isCenterIndex = (index: number) => (index % regionSize) * 2 + 1 === regionSize;
@@ -52,7 +51,7 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
                 }
 
                 const digit2 = digits[y]?.[x];
-                if (digit2 !== undefined && areSameCellData(digit2, digit, state, true)) {
+                if (digit2 !== undefined && areSameCellData(digit2, digit, puzzle, state, true)) {
                     return false;
                 }
             }

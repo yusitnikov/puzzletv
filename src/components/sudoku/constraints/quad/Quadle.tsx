@@ -161,7 +161,9 @@ export const QuadleConstraint = <T extends AnyPTM>(
         },
         component: Quadle,
         isObvious: true,
-        isValidCell(cell, digitsMap, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
+        isValidCell(cell, digitsMap, cells, {puzzle, state}) {
+            const {typeManager: {areSameCellData}} = puzzle;
+
             const data = digitsMap[cell.top][cell.left];
 
             const digitIndex = cells.findIndex(constraintCell => isSamePosition(constraintCell, cell));
@@ -170,11 +172,11 @@ export const QuadleConstraint = <T extends AnyPTM>(
                 return true;
             }
 
-            const isHere = areSameCellData(data, digit.digit, state, true);
+            const isHere = areSameCellData(data, digit.digit, puzzle, state, true);
             const hasEmpty = cells.some(({top, left}) => digitsMap[top]?.[left] === undefined);
             const isSomewhere = cells.some(({top, left}) => {
                 const data = digitsMap[top]?.[left];
-                return data !== undefined && areSameCellData(data, digit.digit, state, true);
+                return data !== undefined && areSameCellData(data, digit.digit, puzzle, state, true);
             });
 
             switch (digit.type) {
@@ -188,15 +190,14 @@ export const QuadleConstraint = <T extends AnyPTM>(
 };
 
 export const QuadleConstraintBySolution = <T extends AnyPTM>(
-    {
-        puzzle: {typeManager: {areSameCellData}},
-        state
-    }: PuzzleContext<T>,
+    {puzzle, state}: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
     digits: T["cell"][],
     solution: GivenDigitsMap<T["cell"]>,
     isRecent = false
 ): Constraint<T, QuadleProps<T["cell"]>> => {
+    const {typeManager: {areSameCellData}} = puzzle;
+
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
         .map(({top, left}) => solution[top]?.[left]);
 
@@ -208,11 +209,11 @@ export const QuadleConstraintBySolution = <T extends AnyPTM>(
         }
 
         const actualDigit = actualDigits[index];
-        if (actualDigit !== undefined && areSameCellData(actualDigit, digit, state, true)) {
+        if (actualDigit !== undefined && areSameCellData(actualDigit, digit, puzzle, state, true)) {
             return QuadleDigitType.here;
         }
 
-        if (actualDigits.some(actualDigit => actualDigit !== undefined && areSameCellData(actualDigit, digit, state, true))) {
+        if (actualDigits.some(actualDigit => actualDigit !== undefined && areSameCellData(actualDigit, digit, puzzle, state, true))) {
             return QuadleDigitType.elsewhere;
         }
 

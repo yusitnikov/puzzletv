@@ -26,11 +26,11 @@ export const CloneConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[
     component: Clone,
     props: undefined,
     isObvious: true,
-    isValidCell({top, left}, digits, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
+    isValidCell({top, left}, digits, cells, {puzzle, state}) {
         const digit = digits[top][left]!;
 
         return cells
             .map((cell2) => digits[cell2.top]?.[cell2.left])
-            .every((digit2) => digit2 === undefined || areSameCellData(digit, digit2, state, true));
+            .every((digit2) => digit2 === undefined || puzzle.typeManager.areSameCellData(digit, digit2, puzzle, state, true));
     },
 });

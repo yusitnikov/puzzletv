@@ -88,7 +88,7 @@ export const CellDigits = <T extends AnyPTM>(
         isValid: boolean | ((cellData: T["cell"]) => boolean) = true,
         isRecent: boolean | ((cellData: T["cell"]) => boolean) = false
     ) => {
-        const straightIndexes = getCellDataSortIndexes(digits, (a, b) => compareCellData(a, b, undefined, false));
+        const straightIndexes = getCellDataSortIndexes(digits, (a, b) => compareCellData(a, b, puzzle, undefined, false));
 
         return digits.items.map((cellData, index) => {
             let position = positionFunction(straightIndexes[index]);
@@ -104,7 +104,7 @@ export const CellDigits = <T extends AnyPTM>(
             }
 
             return <CellData
-                key={`${keyPrefix}-${getCellDataHash(cellData)}`}
+                key={`${keyPrefix}-${getCellDataHash(cellData, puzzle)}`}
                 puzzle={puzzle}
                 data={cellData}
                 size={digitSize}

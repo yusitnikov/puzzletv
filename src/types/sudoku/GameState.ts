@@ -394,7 +394,7 @@ export const setAllShareState = <T extends AnyPTM>(
     const result: GameStateEx<T> = mergeGameStateWithUpdates(
         state,
         {
-            fieldStateHistory: fieldStateHistoryAddState(typeManager, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
+            fieldStateHistory: fieldStateHistoryAddState(puzzle, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
             initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
             excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
             lives,
@@ -513,7 +513,7 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
     if (mainDigit) {
         filter = ({usersDigit}, initialDigit) => {
             const otherMainDigit = initialDigit || usersDigit;
-            return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, undefined, false);
+            return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, puzzle, undefined, false);
         };
     } else if (colors.size) {
         filter = ({colors: otherColors}) => otherColors.containsOneOf(colors.items);
@@ -648,7 +648,7 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
     clientId: string,
     fieldStateProcessor: (cellState: CellStateEx<T>, position: Position) => Partial<CellStateEx<T>>
 ): PartialGameStateEx<T> => {
-    const {puzzle: {typeManager}, state} = context;
+    const {puzzle, state} = context;
 
     const currentState = gameStateGetCurrentFieldState(state);
 
@@ -711,7 +711,7 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
 
     if (!state.processed.cellWriteModeInfo.isNoSelectionMode) {
         fieldStateHistory = fieldStateHistoryAddState(
-            typeManager,
+            puzzle,
             fieldStateHistory,
             state => processFieldStateCells(
                 state,
@@ -809,7 +809,8 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
     clientId: string,
     isGlobal: boolean
 ) => {
-    const {puzzle: {typeManager, initialLives, decreaseOnlyOneLive}, state} = context;
+    const {puzzle, state} = context;
+    const {typeManager, initialLives, decreaseOnlyOneLive} = puzzle;
 
     const cellData = (position?: Position) => typeManager.createCellDataByTypedDigit(digit, context, position);
 
@@ -845,7 +846,7 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
                 const digit = digits[digits.length - 2];
                 const newDigit = digits[digits.length - 1];
                 return newDigit !== undefined
-                    && (digit === undefined || !areSameCellData(digit, newDigit, newState, true))
+                    && (digit === undefined || !areSameCellData(digit, newDigit, puzzle, newState, true))
                     && !isValidUserDigit(position, newDigits, items, context);
             },
             [digits, newDigits]
@@ -956,13 +957,13 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
     // TODO: move all parameters from state to action params
 
     const {puzzle, state} = context;
-    const {typeManager, allowDrawing = [], disableLineColors} = puzzle;
+    const {allowDrawing = [], disableLineColors} = puzzle;
     const selectedColor = disableLineColors ? undefined : state.selectedColor;
 
     if (isGlobal) {
         return {
             fieldStateHistory: fieldStateHistoryAddState(
-                typeManager,
+                puzzle,
                 state.fieldStateHistory,
                 (fieldState) => {
                     let {marks} = fieldState;
@@ -1015,7 +1016,7 @@ export const gameStateDeleteAllLines = <T extends AnyPTM>(
     state: GameState<T>
 ): PartialGameStateEx<T> => ({
     fieldStateHistory: fieldStateHistoryAddState(
-        puzzle.typeManager,
+        puzzle,
         state.fieldStateHistory,
         (fieldState) => ({
             ...fieldState,
@@ -1104,7 +1105,7 @@ export const gameStateSetCellMark = <T extends AnyPTM>(
 
     return {
         fieldStateHistory: fieldStateHistoryAddState(
-            puzzle.typeManager,
+            puzzle,
             fieldStateHistory,
             (fieldState) => {
                 const {marks} = fieldState;
@@ -1143,10 +1144,8 @@ export const gameStateApplyShading = <T extends AnyPTM>(
     position: Position,
     action: DragAction,
 ): PartialGameStateEx<T> => {
-    const {
-        puzzle: {typeManager, initialColors: initialColorsFunc, allowOverridingInitialColors},
-        state: {fieldStateHistory},
-    } = context;
+    const {puzzle, state: {fieldStateHistory}} = context;
+    const {initialColors: initialColorsFunc, allowOverridingInitialColors} = puzzle;
 
     const initialColors = typeof initialColorsFunc === "function" ? initialColorsFunc(context) : initialColorsFunc;
 
@@ -1156,7 +1155,7 @@ export const gameStateApplyShading = <T extends AnyPTM>(
 
     return {
         fieldStateHistory: fieldStateHistoryAddState(
-            typeManager,
+            puzzle,
             fieldStateHistory,
             fieldState => processFieldStateCells(
                 fieldState,

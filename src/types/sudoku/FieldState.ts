@@ -91,13 +91,13 @@ export const isAnyFieldStateCell = <T extends AnyPTM>(
     affectedCells.some((position) => predicate(fieldState.cells[position.top][position.left], position));
 
 export const areFieldStatesEqual = <T extends AnyPTM>(
-    typeManager: SudokuTypeManager<T>,
+    puzzle: PuzzleDefinition<T>,
     {cells, lines, marks}: FieldState<T>,
     {cells: cells2, lines: lines2, marks: marks2}: FieldState<T>
 ) =>
     cells.every(
         (row, rowIndex) => row.every(
-            (cell, columnIndex) => areCellStatesEqual(typeManager, cell, cells2[rowIndex][columnIndex])
+            (cell, columnIndex) => areCellStatesEqual(puzzle, cell, cells2[rowIndex][columnIndex])
         )
     ) &&
     lines.equals(lines2) &&

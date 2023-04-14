@@ -307,6 +307,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
                         switch (typeof value) {
                             case "number":
                                 if (fillableDigitalDisplay) {
+                                    // TODO: extract to a type manager
                                     items.push(FillableCalculatorDigitConstraint({top, left}, value));
                                 } else {
                                     initialDigits[top] = initialDigits[top] || {};

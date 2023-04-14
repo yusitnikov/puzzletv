@@ -70,26 +70,28 @@ export const InBetweenLineConstraint = <T extends AnyPTM>(
         cells,
         component: InBetweenLine,
         props: undefined,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {areSameCellData, compareCellData}}, state}) {
+        isValidCell(cell, digits, cells, {puzzle, state}) {
+            const {typeManager: {areSameCellData, compareCellData}} = puzzle;
+
             const digit = digits[cell.top][cell.left]!;
 
             const edgeCells = [cells[0], cells[cells.length - 1]];
             const [edgeDigit1, edgeDigit2] = edgeCells
                 .map(({top, left}) => digits[top]?.[left])
                 .filter(digit => digit !== undefined)
-                .sort((a, b) => compareCellData(a, b, state, true));
+                .sort((a, b) => compareCellData(a, b, puzzle, state, true));
 
             // The current cell is an edge cell
             if (edgeCells.some(position => isSamePosition(position, cell))) {
                 // Other edge cells shouldn't be the same
-                return edgeDigit2 === undefined || !areSameCellData(edgeDigit1, edgeDigit2, state, true);
+                return edgeDigit2 === undefined || !areSameCellData(edgeDigit1, edgeDigit2, puzzle, state, true);
             } else {
                 // The current cell is on the between line
                 if (edgeDigit1 !== undefined && edgeDigit2 !== undefined) {
-                    return compareCellData(digit, edgeDigit1, state, true) > 0
-                        && compareCellData(edgeDigit2, digit, state, true) > 0;
+                    return compareCellData(digit, edgeDigit1, puzzle, state, true) > 0
+                        && compareCellData(edgeDigit2, digit, puzzle, state, true) > 0;
                 } else if (edgeDigit1 !== undefined) {
-                    return !areSameCellData(digit, edgeDigit1, state, true);
+                    return !areSameCellData(digit, edgeDigit1, puzzle, state, true);
                 }
             }
 

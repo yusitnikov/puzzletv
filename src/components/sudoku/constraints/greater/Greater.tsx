@@ -45,12 +45,12 @@ export const GreaterConstraint = <T extends AnyPTM>(greaterCellLiteral: Position
         component: Greater,
         props: undefined,
         isObvious: true,
-        isValidCell(cell, digits, [greaterCell, lessCell], {puzzle: {typeManager: {compareCellData}}, state}) {
+        isValidCell(cell, digits, [greaterCell, lessCell], {puzzle, state}) {
             const greaterDigit = digits[greaterCell.top]?.[greaterCell.left];
             const lessDigit = digits[lessCell.top]?.[lessCell.left];
 
             return greaterDigit === undefined || lessDigit === undefined
-                || compareCellData(greaterDigit, lessDigit, state, true) > 0;
+                || puzzle.typeManager.compareCellData(greaterDigit, lessDigit, puzzle, state, true) > 0;
         },
     });
 };

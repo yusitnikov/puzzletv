@@ -5,6 +5,7 @@ import {GestureMetrics} from "../../../utils/gestures";
 import {getRectCenter} from "../../layout/Rect";
 import {isCellGestureExtraData} from "../CellGestureExtraData";
 import {AnyPTM} from "../PuzzleTypeMap";
+import {roundToStep} from "../../../utils/math";
 
 export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.move,
@@ -60,7 +61,7 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
         if (allowRotation && !isFreeRotation && angleStep) {
             result = {
                 ...result,
-                angle: Math.round(angle / angleStep) * angleStep,
+                angle: roundToStep(angle, angleStep),
                 animatingAngle: true,
             };
         }

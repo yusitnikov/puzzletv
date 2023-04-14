@@ -2,15 +2,11 @@ import {JigsawDigit} from "./JigsawDigit";
 import {isSamePosition, Position} from "../../../types/layout/Position";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {loop} from "../../../utils/math";
-import {
-    isRotatableDigit,
-    isSelfRotatableDigit,
-    toggleDigit
-} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {getRegionBoundingBox} from "../../../utils/regions";
 import {JigsawPieceInfo} from "./JigsawPieceInfo";
 import {JigsawPTM} from "./JigsawPTM";
+import {isRotatableDigit, rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
 
 export const getJigsawPieces = (
     {regions = [], fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
@@ -55,11 +51,11 @@ export const getJigsawPieceIndexByCell = (
     ({cells}) => cells.some((regionCell) => isSamePosition(regionCell, cell))
 );
 
-export const normalizeJigsawDigit = ({digit, angle}: JigsawDigit): JigsawDigit => {
+export const normalizeJigsawDigit = (puzzle: PuzzleDefinition<JigsawPTM>, {digit, angle}: JigsawDigit): JigsawDigit => {
     angle = loop(angle, 360);
-    if (angle >= 180 && (isRotatableDigit(digit) || isSelfRotatableDigit(digit))) {
+    if (angle >= 180 && isRotatableDigit(puzzle, digit)) {
         return {
-            digit: toggleDigit(digit),
+            digit: rotateDigit(puzzle, digit, 180),
             angle: angle - 180,
         };
     }

@@ -1,1 +1,3 @@
-export const isUpsideDownAngle = (angle: number) => angle % 360 !== 0;
+import {loop, roundToStep} from "../../../utils/math";
+
+export const isUpsideDownAngle = (angle: number) => loop(roundToStep(angle, 180), 360) !== 0;

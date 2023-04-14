@@ -2,8 +2,7 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {JigsawGameState, JigsawProcessedGameState} from "./JigsawGameState";
 import {JigsawDigit} from "./JigsawDigit";
 import {PositionWithAngle, rotateVectorClockwise} from "../../../types/layout/Position";
-import {loop} from "../../../utils/math";
-import {toggleNumber} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
+import {loop, roundToStep} from "../../../utils/math";
 import {JigsawDigitCellDataComponentType} from "../components/JigsawDigitCellData";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {getRectCenter} from "../../../types/layout/Rect";
@@ -21,6 +20,7 @@ import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRe
 import {lighterGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
+import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -67,13 +67,13 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     createCellDataByTypedDigit(
         digit,
-        {cellsIndex, state: {extension: {pieces}}},
+        {cellsIndex, puzzle, state: {extension: {pieces}}},
         position,
     ): JigsawDigit {
         if (position) {
             const regionIndex = getJigsawPieceIndexByCell(cellsIndex, position);
             if (regionIndex) {
-                return normalizeJigsawDigit({
+                return normalizeJigsawDigit(puzzle, {
                     digit,
                     angle: -pieces[regionIndex].angle,
                 });
@@ -89,13 +89,13 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     getDigitByCellData(
         data,
-        {cellsIndex, state: {extension: {pieces}}},
+        {cellsIndex, puzzle, state: {extension: {pieces}}},
         cellPosition,
     ): number {
         const regionIndex = getJigsawPieceIndexByCell(cellsIndex, cellPosition);
         if (regionIndex) {
             // TODO: return NaN if it's not a valid digit
-            data = normalizeJigsawDigit({
+            data = normalizeJigsawDigit(puzzle, {
                 digit: data.digit,
                 angle: data.angle + pieces[regionIndex].angle,
             });
@@ -106,15 +106,15 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     transformNumber(
         num,
-        {cellsIndex, state: {extension: {pieces}}},
+        {cellsIndex, puzzle, state: {extension: {pieces}}},
         cellPosition
     ): number {
         const regionIndex = getJigsawPieceIndexByCell(cellsIndex, cellPosition);
         if (regionIndex) {
-            const angle = loop(pieces[regionIndex].angle, 360);
+            const angle = loop(roundToStep(pieces[regionIndex].angle, 90), 360);
             // TODO: return NaN if it's not a valid angle
             if (angle === 180) {
-                return toggleNumber(num);
+                return rotateNumber(puzzle, num);
             }
         }
         return num;

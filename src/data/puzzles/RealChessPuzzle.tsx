@@ -107,7 +107,7 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
             optionalSolutionPieces
         );
 
-        return areSameGivenDigitsMaps(puzzle.typeManager, currentFinalDigits, correctFinalDigits);
+        return areSameGivenDigitsMaps(puzzle, currentFinalDigits, correctFinalDigits);
     },
     items: [
         ChessBoardCellsBackgroundConstraint(),

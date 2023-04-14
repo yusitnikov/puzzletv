@@ -4,18 +4,20 @@ import {AnyPTM} from "./PuzzleTypeMap";
 
 export class CellDataSet<T extends AnyPTM> extends HashSet<T["cell"]> {
     constructor(
-        {
-            typeManager: {areSameCellData, cloneCellData, serializeCellData, getCellDataHash}
-        }: PuzzleDefinition<T>,
+        puzzle: PuzzleDefinition<T>,
         items: T["cell"][] = []
     ) {
+        const {
+            typeManager: {areSameCellData, cloneCellData, serializeCellData, getCellDataHash}
+        } = puzzle;
+
         super(
             items,
             {
-                comparer: (a, b) => areSameCellData(a, b, undefined, false),
+                comparer: (a, b) => areSameCellData(a, b, puzzle, undefined, false),
                 cloner: cloneCellData,
                 serializer: serializeCellData,
-                hasher: getCellDataHash,
+                hasher: (data) => getCellDataHash(data, puzzle),
             }
         );
     }

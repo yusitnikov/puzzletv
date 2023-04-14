@@ -7,6 +7,7 @@ import {createGivenDigitsMapFromArray} from "../../../types/sudoku/GivenDigitsMa
 import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
 import {SafeCrackerSudokuTypeManager} from "./SafeCrackerSudokuTypeManager";
 import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {roundToStep} from "../../../utils/math";
 
 export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCrackerPuzzleParams): Pick<
     PuzzleDefinition<T>,
@@ -14,7 +15,7 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCracke
 > => {
     const {size, circleRegionsCount, codeCellsCount} = params;
 
-    const round = (value: number) => Math.round(value * 1000) / 1000;
+    const round = (value: number) => roundToStep(value, 0.001);
 
     const circleCellsCount = circleRegionsCount * size;
     const cellAngle = 2 * Math.PI / circleCellsCount;

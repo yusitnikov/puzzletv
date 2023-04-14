@@ -6,6 +6,7 @@ import {profiler} from "../../../utils/profiler";
 import {Record} from "@emotion-icons/fluentui-system-filled";
 import {ReactElement} from "react";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {DigitRotationInfo} from "./DigitRotationInfo";
 
 const width = 0.12;
 const height = 0.1;
@@ -253,4 +254,7 @@ export const LatinDigitComponentType = <T extends AnyPTM>(): DigitComponentType<
     component: LatinDigit,
     svgContentComponent: LatinDigitSvgContent,
     widthCoeff: 0.6,
+    getDigitRotationInfo(digit): DigitRotationInfo {
+        return {isRotatable: [1, 2, 3, 5].includes(digit)};
+    }
 });

@@ -30,6 +30,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     areSameCellData(
         data1: T["cell"],
         data2: T["cell"],
+        puzzle: PuzzleDefinition<T>,
         state: ProcessedGameStateEx<T> | undefined,
         forConstraints: boolean
     ): boolean;
@@ -37,11 +38,12 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     compareCellData(
         data1: T["cell"],
         data2: T["cell"],
+        puzzle: PuzzleDefinition<T>,
         state: ProcessedGameStateEx<T> | undefined,
         forConstraints: boolean
     ): number;
 
-    getCellDataHash(data: T["cell"]): string;
+    getCellDataHash(data: T["cell"], puzzle: PuzzleDefinition<T>): string;
 
     cloneCellData(data: T["cell"]): T["cell"];
 

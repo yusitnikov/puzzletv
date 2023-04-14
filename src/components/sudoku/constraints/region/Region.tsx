@@ -38,7 +38,7 @@ export const isValidCellForRegion = <T extends AnyPTM>(
     region: Position[],
     cell: Position,
     digits: GivenDigitsMap<T["cell"]>,
-    {typeManager: {areSameCellData}}: PuzzleDefinition<T>,
+    puzzle: PuzzleDefinition<T>,
     state: ProcessedGameStateEx<T>
 ) => {
     const digit = digits[cell.top][cell.left]!;
@@ -50,7 +50,7 @@ export const isValidCellForRegion = <T extends AnyPTM>(
             continue;
         }
 
-        if (areSameCellData(constraintDigit, digit, state, true)) {
+        if (puzzle.typeManager.areSameCellData(constraintDigit, digit, puzzle, state, true)) {
             return false;
         }
     }

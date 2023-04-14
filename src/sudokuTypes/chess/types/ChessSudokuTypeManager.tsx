@@ -15,6 +15,7 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     areSameCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
+        puzzle,
         state,
         forConstraints
     ): boolean {
@@ -24,6 +25,7 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     compareCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
+        puzzle,
         state,
         forConstraints
     ): number {

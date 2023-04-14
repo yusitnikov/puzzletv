@@ -11,9 +11,10 @@ import {MonumentValleyDigitComponentType} from "../components/MonumentValleyDigi
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {RotatableDigitSudokuTypeManagerBase} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
-import {loop} from "../../../utils/math";
+import {loop, roundToStep} from "../../../utils/math";
 import {MonumentValleyPTM} from "./MonumentValleyPTM";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
 
 export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     ...DigitSudokuTypeManager(),
@@ -35,21 +36,21 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     digitComponentType: MonumentValleyDigitComponentType,
     cellDataComponentType: DigitCellDataComponentType(),
 
-    createCellDataByTypedDigit(digit, {puzzle: {fieldSize}, state: {angle}}, position) {
+    createCellDataByTypedDigit(digit, {puzzle, state: {angle}}, position) {
         if (!position) {
             return digit;
         }
 
-        const processedFieldSize = parseMonumentValleyFieldSize(fieldSize);
+        const processedFieldSize = parseMonumentValleyFieldSize(puzzle.fieldSize);
         const {gridSize, intersectionSize} = processedFieldSize;
         const {top, left} = rotateCellCoords(position, processedFieldSize, 120 - angle);
         const isTopLeftGrid = top < gridSize && left < gridSize && (top < gridSize - intersectionSize || left < gridSize - intersectionSize);
 
         switch (loop(angle, 360)) {
             case 120:
-                return rotateDigit(digit, isTopLeftGrid ? 2 : 3);
+                return rotateDigit(puzzle, digit, isTopLeftGrid ? -180 : -90);
             case 240:
-                return rotateDigit(digit, isTopLeftGrid ? 2 : 1);
+                return rotateDigit(puzzle, digit, isTopLeftGrid ? 180 : 90);
             default:
                 return digit;
         }
@@ -75,7 +76,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     },
 
     processCellDataPosition(puzzle, {left, top, angle}, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {
-        const angleDelta = Math.round((state?.processed.animated.angle ?? 0) / 90) * Math.PI / 2;
+        const angleDelta = roundToStep(state?.processed.animated.angle ?? 0, 90) * Math.PI / 180;
         const sin = Math.sin(angleDelta);
         const cos = Math.cos(angleDelta);
 
@@ -340,34 +341,17 @@ const processCellCoords = (position: Position, fieldSize: FieldSize | ReturnType
         : position;
 };
 
-const digitRotationMap = [
-    1,
-    3,
-    2,
-    5,
-    4,
-    9,
-    6,
-    7,
-    8,
-];
-const rotateDigit = (digit: number, times = 1) => {
-    for (let i = 0; i < times; i++) {
-        digit = digitRotationMap[digit - 1];
-    }
+const rotateDigitsMap = (map: GivenDigitsMap<number>, puzzle: PuzzleDefinition<MonumentValleyPTM>) => {
+    const {gridSize, intersectionSize} = parseMonumentValleyFieldSize(puzzle.fieldSize);
 
-    return digit;
+    return processGivenDigitsMaps(
+        ([digit], {top, left}) =>
+            left >= gridSize - intersectionSize && left < gridSize && top < intersectionSize
+                ? rotateDigit(puzzle, digit, 90)
+                : digit,
+        [map]
+    );
 };
-const rotateDigitByPosition = (digit: number, {top, left}: Position, fieldSize: FieldSize) => {
-    const {gridSize, intersectionSize} = parseMonumentValleyFieldSize(fieldSize);
-    return left >= gridSize - intersectionSize && left < gridSize && top < intersectionSize
-        ? rotateDigit(digit)
-        : digit;
-};
-const rotateDigitsMap = (map: GivenDigitsMap<number>, fieldSize: FieldSize) => processGivenDigitsMaps(
-    ([digit], position) => rotateDigitByPosition(digit, position, fieldSize),
-    [map]
-);
 
 export const fixMonumentValleyDigitForConstraint = <DataT,>(
     constraint: Constraint<MonumentValleyPTM, DataT>
@@ -376,7 +360,7 @@ export const fixMonumentValleyDigitForConstraint = <DataT,>(
     isValidCell(cell, digits, regionCells, context, ...args) {
         return constraint.isValidCell?.(
             cell,
-            rotateDigitsMap(digits, context.puzzle.fieldSize),
+            rotateDigitsMap(digits, context.puzzle),
             regionCells,
             context,
             ...args
@@ -385,7 +369,7 @@ export const fixMonumentValleyDigitForConstraint = <DataT,>(
     isValidPuzzle(lines, digits, regionCells, context) {
         return constraint.isValidPuzzle?.(
             lines,
-            rotateDigitsMap(digits, context.puzzle.fieldSize),
+            rotateDigitsMap(digits, context.puzzle),
             regionCells,
             context
         ) ?? true;

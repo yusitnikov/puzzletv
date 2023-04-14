@@ -110,10 +110,12 @@ export const QuadConstraint = <T extends AnyPTM>(
         },
         component: Quad,
         isObvious: true,
-        isValidCell({top, left}, digitsMap, cells, {puzzle: {typeManager: {areSameCellData}}, state}) {
+        isValidCell({top, left}, digitsMap, cells, {puzzle, state}) {
+            const {typeManager: {areSameCellData}} = puzzle;
+
             const data = digitsMap[top][left];
 
-            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, state, true))) {
+            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, puzzle, state, true))) {
                 return false;
             }
 
@@ -126,7 +128,7 @@ export const QuadConstraint = <T extends AnyPTM>(
                         continue;
                     }
 
-                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, state, true));
+                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, puzzle, state, true));
                     if (matchingIndex < 0) {
                         return false;
                     }
@@ -137,17 +139,14 @@ export const QuadConstraint = <T extends AnyPTM>(
 
             return cells.some(({top, left}) => digitsMap[top]?.[left] === undefined)
                 || expectedDigits.every(expectedData => cells.some(
-                ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, state, true)
+                ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, puzzle, state, true)
             ));
         },
     });
 };
 
 export const QuadConstraintBySolution = <T extends AnyPTM>(
-    {
-        puzzle: {typeManager: {areSameCellData}},
-        state
-    }: PuzzleContext<T>,
+    {puzzle, state}: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
     digits: T["cell"][],
     solution: GivenDigitsMap<T["cell"]>,
@@ -159,7 +158,7 @@ export const QuadConstraintBySolution = <T extends AnyPTM>(
         .filter(value => value !== undefined)
         .map(value => value!);
 
-    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => areSameCellData(digit, actualDigit, state, true))
+    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => puzzle.typeManager.areSameCellData(digit, actualDigit, puzzle, state, true))
 
     return QuadConstraint(
         cellLiteral,

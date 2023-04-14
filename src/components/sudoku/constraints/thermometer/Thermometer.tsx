@@ -60,7 +60,7 @@ export const ThermometerConstraint = <T extends AnyPTM>(
         props: undefined,
         color,
         isObvious: true,
-        isValidCell(cell, digits, cells, {puzzle: {typeManager: {compareCellData}}, state}) {
+        isValidCell(cell, digits, cells, {puzzle, state}) {
             const digit = digits[cell.top][cell.left]!;
 
             let isBeforeCurrentCell = true;
@@ -76,7 +76,7 @@ export const ThermometerConstraint = <T extends AnyPTM>(
                     continue;
                 }
 
-                const comparison = compareCellData(constraintDigit, digit, state, true);
+                const comparison = puzzle.typeManager.compareCellData(constraintDigit, digit, puzzle, state, true);
                 if (comparison === 0) {
                     return false;
                 }

@@ -29,7 +29,7 @@ export const DisjointGroupsConstraint = <T extends AnyPTM>(
                 }
 
                 const digit2 = digits[top2]?.[left2];
-                if (digit2 !== undefined && areSameCellData(digit2, digit, state, true)) {
+                if (digit2 !== undefined && areSameCellData(digit2, digit, puzzle, state, true)) {
                     return false;
                 }
             }

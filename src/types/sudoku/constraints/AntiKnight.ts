@@ -20,7 +20,7 @@ export const AntiKnightConstraint = <T extends AnyPTM>(): Constraint<T> => ({
                 if (Math.abs(dx * dy) === 2) {
                     const otherCell = normalizePuzzlePosition({top: top + dy, left: left + dx}, puzzle);
                     const digit2 = digits[otherCell.top]?.[otherCell.left];
-                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit2, digit, state, true)) {
+                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit2, digit, puzzle, state, true)) {
                         return false;
                     }
                 }

@@ -5,6 +5,7 @@ import {DigitProps, DigitPropsGenericFc} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {DigitRotationInfo} from "./DigitRotationInfo";
 
 const T = true;
 const F = false;
@@ -185,9 +186,15 @@ export const CenteredCalculatorDigitComponentType = <T extends AnyPTM>(): DigitC
     component: CenteredCalculatorDigit,
     svgContentComponent: CenteredCalculatorDigitSvgContent,
     widthCoeff: digitWidthCoeff + lineWidthCoeff,
+    getDigitRotationInfo(digit): DigitRotationInfo {
+        return {
+            isRotatable: ![3, 4, 7].includes(digit),
+            rotatesInto: [6, 9].includes(digit) ? 15 - digit : undefined,
+        };
+    },
 });
 export const RegularCalculatorDigitComponentType = <T extends AnyPTM>(): DigitComponentType<T> => ({
+    ...CenteredCalculatorDigitComponentType(),
     component: RegularCalculatorDigit,
     svgContentComponent: RegularCalculatorDigitSvgContent,
-    widthCoeff: digitWidthCoeff + lineWidthCoeff,
 });

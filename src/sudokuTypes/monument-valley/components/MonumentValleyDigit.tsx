@@ -6,6 +6,8 @@ import {textColor} from "../../../components/app/globals";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponentType";
 import {MonumentValleyPTM} from "../types/MonumentValleyPTM";
+import {DigitRotationInfo} from "../../../components/sudoku/digit/DigitRotationInfo";
+import {loop} from "../../../utils/math";
 
 const width = 0.12;
 
@@ -195,8 +197,32 @@ export const MonumentValleyDigitSvgContent = profiler.memo<DigitProps<MonumentVa
     </g>;
 });
 
+const digitRotationMap = [
+    1,
+    3,
+    2,
+    5,
+    4,
+    9,
+    6,
+    7,
+    8,
+];
 export const MonumentValleyDigitComponentType: DigitComponentType<MonumentValleyPTM> = {
     component: MonumentValleyDigit,
     svgContentComponent: MonumentValleyDigitSvgContent,
     widthCoeff: 0.8,
+    getDigitRotationInfo(digit): DigitRotationInfo {
+        return {
+            isRotatable: true,
+            rotatesInto: (angle) => {
+                let result = digit;
+                const times = Math.round(loop(angle, 360) / 90);
+                for (let i = 0; i < times; i++) {
+                    result = digitRotationMap[result - 1];
+                }
+                return result;
+            },
+        };
+    }
 };

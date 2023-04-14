@@ -11,13 +11,14 @@ import {
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import {lighterBlueColor} from "../../components/app/globals";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {roundToStep} from "../../utils/math";
 
 const coeff = Math.sqrt(3) / 2;
 const areaRadius = 1 / 3;
 const fieldSize = Math.ceil(11 * coeff);
 const exampleColor = lighterBlueColor;
 
-const round = (value: number) => Math.round(value * 1000) / 1000;
+const round = (value: number) => roundToStep(value, 0.001);
 
 const point = (x: number, y: number): Position => ({
     left: round(fieldSize / 2 + (x + 0.5) * coeff),
