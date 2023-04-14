@@ -76,7 +76,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     ): JigsawDigit {
         if (position) {
             const regionIndex = getJigsawPieceIndexByCell(cellsIndex, position);
-            if (regionIndex) {
+            if (regionIndex !== undefined) {
                 return normalizeJigsawDigit(puzzle, {
                     digit,
                     angle: -pieces[regionIndex].angle,
