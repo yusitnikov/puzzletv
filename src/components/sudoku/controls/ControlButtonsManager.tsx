@@ -13,6 +13,7 @@ import {DeleteButton} from "./DeleteButton";
 import {MultiSelectionButton} from "./MultiSelectionButton";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 
 export enum ControlButtonRegion {
     // main digit, corner marks, center marks, colors, pen tool, etc.
@@ -29,12 +30,14 @@ export enum ControlButtonRegion {
 
 export interface ControlButtonItemProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
+    title?: PartiallyTranslatable;
 }
 
 export interface ControlButtonItem<T extends AnyPTM> {
     key: string;
     region: ControlButtonRegion;
     Component: ComponentType<ControlButtonItemProps<T>>;
+    title?: PartiallyTranslatable;
 }
 
 export class ControlButtonsManager<T extends AnyPTM> {
@@ -74,9 +77,10 @@ export class ControlButtonsManager<T extends AnyPTM> {
             modes.push(
                 ...allowedCellWriteModes
                     .filter(({mode, mainButtonContent}) => mainButtonContent)
-                    .map<Omit<ControlButtonItem<T>, "region">>(({mode, mainButtonContent}) => ({
+                    .map<Omit<ControlButtonItem<T>, "region">>(({mode, mainButtonContent, title}) => ({
                         key: `mode-${mode}`,
                         Component: mainButtonContent!,
+                        title,
                     }))
             );
         }
@@ -164,39 +168,44 @@ export class ControlButtonsManager<T extends AnyPTM> {
         const rightColumn = this.isCompact ? 1 : 4;
 
         return <>
-            {modes.slice(0, realHeight).map(({key, Component}, index) => <Component
+            {modes.slice(0, realHeight).map(({key, Component, title}, index) => <Component
                 key={key}
                 context={context}
                 top={index}
                 left={3}
+                title={title}
             />)}
 
-            {[...right, ...modes.slice(realHeight)].map(({key, Component}, index) => <Component
+            {[...right, ...modes.slice(realHeight)].map(({key, Component, title}, index) => <Component
                 key={key}
                 context={context}
                 top={isRevertedRight ? rightColumn : index}
                 left={isRevertedRight ? index : rightColumn}
+                title={title}
             />)}
 
-            {bottom.map(({key, Component}, index) => (!isColorMode || index !== 1) && <Component
+            {bottom.map(({key, Component, title}, index) => (!isColorMode || index !== 1) && <Component
                 key={key}
                 context={context}
                 top={isRevertedBottom ? index : bottomRow}
                 left={isRevertedBottom ? bottomRow : index}
+                title={title}
             />)}
 
-            {additional.map(({key, Component}, index) => <Component
+            {additional.map(({key, Component, title}, index) => <Component
                 key={key}
                 context={context}
                 top={realHeight - 1}
                 left={index}
+                title={title}
             />)}
 
-            {custom.map(({key, Component}) => <Component
+            {custom.map(({key, Component, title}) => <Component
                 key={key}
                 context={context}
                 top={0}
                 left={0}
+                title={title}
             />)}
         </>;
     }

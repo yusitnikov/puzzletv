@@ -35,9 +35,11 @@ import {MainDigitModeButton} from "../../components/sudoku/controls/MainDigitMod
 import {CornerDigitModeButton} from "../../components/sudoku/controls/CornerDigitModeButton";
 import {CenterDigitModeButton} from "../../components/sudoku/controls/CenterDigitModeButton";
 import {ColorDigitModeButton} from "../../components/sudoku/controls/ColorDigitModeButton";
+import {PartiallyTranslatable} from "../translations/Translatable";
 
 export interface CellWriteModeInfo<T extends AnyPTM> {
     mode: CellWriteMode | number;
+    title?: PartiallyTranslatable;
     hotKeyStr?: string[];
     isActiveForPuzzle?: (puzzle: PuzzleDefinition<T>, includeHidden: boolean) => boolean;
     isDigitMode?: boolean;

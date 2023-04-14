@@ -8,6 +8,7 @@ import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData
 import {getRectCenter} from "../../../types/layout/Rect";
 import {JigsawPTM} from "./JigsawPTM";
 import {roundToStep} from "../../../utils/math";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 export const roundStep = 0.5;
 
@@ -15,6 +16,10 @@ const base = MoveCellWriteModeInfo<JigsawPTM>();
 
 export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     ...base,
+    title: {
+        [LanguageCode.en]: "Move the grid and the jigsaw pieces",
+        [LanguageCode.ru]: "Двигать поле и куски пазла",
+    },
     disableCellHandlers: false,
     handlesRightMouseClick: true,
     onGestureStart(props, context, ...args) {
