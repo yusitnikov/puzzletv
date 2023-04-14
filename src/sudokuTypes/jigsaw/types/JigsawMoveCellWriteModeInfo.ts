@@ -33,7 +33,10 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     onMove(props, context, fieldRect) {
         const {gesture, prevMetrics, currentMetrics} = props;
         const {
-            puzzle: {fieldSize: {fieldSize}},
+            puzzle: {
+                fieldSize: {fieldSize},
+                importOptions: {angleStep} = {},
+            },
             cellsIndex,
             cellSize,
             state: {
@@ -56,7 +59,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         const screenToPiece = ({x, y, rotation}: GestureMetrics): GestureMetrics => ({
             x: ((x - fieldCenter.left) / cellSize - loopOffset.left) / scale + fieldSize / 2 - pieceCenter.left,
             y: ((y - fieldCenter.top) / cellSize - loopOffset.top) / scale + fieldSize / 2 - pieceCenter.top,
-            rotation,
+            rotation: angleStep ? rotation : 0,
             scale: 1,
         });
 
@@ -83,7 +86,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     onGestureEnd(props, context) {
         const {gesture} = props;
         const {
-            puzzle: {typeManager: {angleStep = 0}},
+            puzzle: {importOptions: {angleStep = 0} = {}},
             cellsIndex,
             onStateChange,
         } = context;

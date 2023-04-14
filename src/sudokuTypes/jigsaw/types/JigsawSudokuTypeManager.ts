@@ -111,7 +111,8 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     ): number {
         const regionIndex = getJigsawPieceIndexByCell(cellsIndex, cellPosition);
         if (regionIndex) {
-            const angle = loop(roundToStep(pieces[regionIndex].angle, 90), 360);
+            const {importOptions: {angleStep = 0} = {}} = puzzle;
+            const angle = loop(roundToStep(pieces[regionIndex].angle, angleStep), 360);
             // TODO: return NaN if it's not a valid angle
             if (angle === 180) {
                 return rotateNumber(puzzle, num);
@@ -150,9 +151,6 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     },
 
     allowMove: true,
-
-    // TODO: it doesn't belong here! move to import options!
-    angleStep: 90,
 
     allowScale: true,
     isFreeScale: true,

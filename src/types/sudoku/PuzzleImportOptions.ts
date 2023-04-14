@@ -33,6 +33,7 @@ export interface PuzzleImportOptions {
     visibleRingsCount?: number;
     startOffset?: number;
     allowOverrideColors?: boolean;
+    angleStep?: number;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -57,6 +58,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         startOffset,
         allowOverrideColors,
         digitsCount,
+        angleStep,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -78,6 +80,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         startOffset,
         allowOverrideColors,
         digitsCount,
+        angleStep,
     };
 
     return result;

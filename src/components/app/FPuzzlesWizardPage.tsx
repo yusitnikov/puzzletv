@@ -49,10 +49,12 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
+    const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
     const isInfiniteRings = type === PuzzleImportPuzzleType.InfiniteRings;
+    const isJigsaw = type === PuzzleImportPuzzleType.Jigsaw;
     const isSpecialGrid = [
         PuzzleImportPuzzleType.Cubedoku,
         PuzzleImportPuzzleType.Rotatable,
@@ -82,6 +84,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         startOffset: isInfiniteRings ? startOffset : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
         allowOverrideColors: hasInitialColors && allowOverrideColors,
+        angleStep: isJigsaw ? angleStep || undefined : undefined,
         load,
     });
 
@@ -266,6 +269,17 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             step={1}
                             onChange={ev => setStartOffset(ev.target.valueAsNumber)}
                         />
+                    </p>
+                </>}
+
+                {isJigsaw && <>
+                    <p>
+                        Rotation:&nbsp;
+                        <select value={angleStep} onChange={ev => setAngleStep(Number(ev.target.value))} style={{font: "inherit"}}>
+                            <option value={0}>no rotation</option>
+                            <option value={90}>90 degrees</option>
+                            <option value={180}>180 degrees</option>
+                        </select>
                     </p>
                 </>}
 
