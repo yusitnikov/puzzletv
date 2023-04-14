@@ -125,9 +125,19 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         return num;
     },
 
-    processCellDataPosition(context, basePosition): PositionWithAngle | undefined {
-        // TODO
-        return basePosition;
+    processCellDataPosition({cellsIndex}, basePosition, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {
+        if (!state) {
+            return basePosition;
+        }
+
+        const regionIndex = cellPosition && getJigsawPieceIndexByCell(cellsIndex, cellPosition);
+        if (regionIndex === undefined) {
+            return basePosition;
+        }
+
+        // TODO: re-order values according to the angle
+
+        return rotateVectorClockwise(basePosition, -state.processedExtension.pieces[regionIndex].angle);
     },
 
     digitComponentType: RegularDigitComponentType(),

@@ -29,4 +29,8 @@ export const JigsawDigitCellData = (props: CellDataProps<JigsawPTM>) => {
     />;
 };
 
-export const JigsawDigitCellDataComponentType: CellDataComponentType<JigsawPTM> = {component: JigsawDigitCellData};
+export const JigsawDigitCellDataComponentType: CellDataComponentType<JigsawPTM> = {
+    component: JigsawDigitCellData,
+    // centermarks could be horizontal, so need to give space for them
+    widthCoeff: 1.1,
+};
