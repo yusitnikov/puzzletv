@@ -9,9 +9,16 @@ export enum PuzzleImportPuzzleType {
     Jigsaw = "jigsaw",
 }
 
+export enum PuzzleImportDigitType {
+    Regular = "regular",
+    Latin = "latin",
+    Calculator = "calculator",
+}
+
 export interface PuzzleImportOptions {
     load: string;
     type?: PuzzleImportPuzzleType;
+    digitType?: PuzzleImportDigitType;
     htmlRules?: boolean;
     digitsCount?: number;
     tesseract?: boolean;
@@ -35,6 +42,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
     const {
         load,
         type,
+        digitType,
         htmlRules,
         tesseract,
         fillableDigitalDisplay,
@@ -55,6 +63,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
     const result: Required<PuzzleImportOptions> = {
         load,
         type,
+        digitType,
         htmlRules,
         tesseract,
         fillableDigitalDisplay,

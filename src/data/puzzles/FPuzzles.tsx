@@ -78,6 +78,7 @@ import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/Tess
 import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
 import {JigsawSudokuTypeManager} from "../../sudokuTypes/jigsaw/types/JigsawSudokuTypeManager";
 import {
+    PuzzleImportDigitType,
     PuzzleImportOptions,
     PuzzleImportPuzzleType,
     sanitizeImportOptions
@@ -100,8 +101,22 @@ export const loadByFPuzzlesObject = (
     slug: string,
     importOptions: Omit<PuzzleImportOptions, "load">
 ): PuzzleDefinition<AnyPTM> => {
-    const {
+    let {
         type = PuzzleImportPuzzleType.Regular,
+        digitType = PuzzleImportDigitType.Regular,
+    } = importOptions;
+    switch (type) {
+        case PuzzleImportPuzzleType.Calculator:
+            type = PuzzleImportPuzzleType.Regular;
+            digitType = PuzzleImportDigitType.Calculator;
+            break;
+        case PuzzleImportPuzzleType.Latin:
+            type = PuzzleImportPuzzleType.Regular;
+            digitType = PuzzleImportDigitType.Latin;
+            break;
+    }
+
+    const {
         digitsCount = puzzleJson.size,
         tesseract,
         yajilinFog,
@@ -111,15 +126,11 @@ export const loadByFPuzzlesObject = (
         startOffset = 0,
     } = importOptions;
 
-    const regularTypeManager = DigitSudokuTypeManager(
-        fillableDigitalDisplay
-            ? RegularCalculatorDigitComponentType()
-            : RegularDigitComponentType()
-    );
+    const regularTypeManager = DigitSudokuTypeManager();
     const typesMap: Record<PuzzleImportPuzzleType, SudokuTypeManager<AnyPTM>> = {
         [PuzzleImportPuzzleType.Regular]: regularTypeManager,
-        [PuzzleImportPuzzleType.Latin]: LatinDigitSudokuTypeManager,
-        [PuzzleImportPuzzleType.Calculator]: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType()),
+        [PuzzleImportPuzzleType.Latin]: regularTypeManager,
+        [PuzzleImportPuzzleType.Calculator]: regularTypeManager,
         [PuzzleImportPuzzleType.Cubedoku]: CubedokuTypeManager,
         [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
         [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
@@ -141,6 +152,26 @@ export const loadByFPuzzlesObject = (
     }
     if (yajilinFog) {
         typeManager = YajilinFogSudokuTypeManager(typeManager);
+    }
+
+    switch (digitType) {
+        case PuzzleImportDigitType.Regular:
+            typeManager = {
+                ...typeManager,
+                digitComponentType: RegularDigitComponentType(),
+            };
+            break;
+        case PuzzleImportDigitType.Calculator:
+            typeManager = {
+                ...typeManager,
+                digitComponentType: fillableDigitalDisplay
+                    ? RegularCalculatorDigitComponentType()
+                    : CenteredCalculatorDigitComponentType(),
+            };
+            break;
+        case PuzzleImportDigitType.Latin:
+            typeManager = LatinDigitSudokuTypeManager(typeManager);
+            break;
     }
 
     return loadByFPuzzlesObjectAndTypeManager(puzzleJson, slug, importOptions, {...typeManager});

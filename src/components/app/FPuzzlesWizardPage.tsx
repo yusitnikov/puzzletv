@@ -9,7 +9,11 @@ import {usePureMemo} from "../../hooks/usePureMemo";
 import {FieldPreview} from "../sudoku/field/FieldPreview";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {PageTitle} from "../layout/page-layout/PageLayout";
-import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
+import {
+    PuzzleImportDigitType,
+    PuzzleImportOptions,
+    PuzzleImportPuzzleType
+} from "../../types/sudoku/PuzzleImportOptions";
 import {loadPuzzle} from "../../types/sudoku/PuzzleDefinition";
 
 export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
@@ -30,6 +34,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const puzzle = useMemo(() => decodeFPuzzlesString(load), [load]);
 
     const [type, setType] = useStringFromLocalStorage<PuzzleImportPuzzleType>("fpwType", PuzzleImportPuzzleType.Regular);
+    const [digitType, setDigitType] = useStringFromLocalStorage<PuzzleImportDigitType>("fpwDigitType", PuzzleImportDigitType.Regular);
     const [digitsCount, setDigitsCount] = useState(Math.min(puzzle.size, 9));
     const [areHtmlRules, setAreHtmlRules] = useBoolFromLocalStorage("fpwHtmlRules");
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
@@ -45,7 +50,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
 
-    const isCalculator = type === PuzzleImportPuzzleType.Calculator;
+    const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
     const isInfiniteRings = type === PuzzleImportPuzzleType.InfiniteRings;
     const isSpecialGrid = [
@@ -61,7 +66,8 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const hasInitialColors = puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length));
 
     const importOptions = usePureMemo<PuzzleImportOptions>({
-        type: isCalculator && fillableDigitalDisplay ? PuzzleImportPuzzleType.Regular : type,
+        type,
+        digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
         digitsCount: digitsCount === puzzle.size ? undefined : digitsCount,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
@@ -116,16 +122,25 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             <form onSubmit={handleSubmit}>
                 <p>
                     <label>
-                        Type:&nbsp;
+                        Grid type:&nbsp;
                         <select value={type} onChange={ev => setType(ev.target.value as PuzzleImportPuzzleType)} style={{font: "inherit"}}>
                             <option value={PuzzleImportPuzzleType.Regular}>Regular</option>
-                            <option value={PuzzleImportPuzzleType.Latin}>Latin digits</option>
-                            <option value={PuzzleImportPuzzleType.Calculator}>Calculator digits</option>
                             <option value={PuzzleImportPuzzleType.Cubedoku}>Cubedoku</option>
                             <option value={PuzzleImportPuzzleType.InfiniteRings}>Infinite rings</option>
                             <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
                             <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
                             <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
+                        </select>
+                    </label>
+                </p>
+
+                <p>
+                    <label>
+                        Digit type:&nbsp;
+                        <select value={digitType} onChange={ev => setDigitType(ev.target.value as PuzzleImportDigitType)} style={{font: "inherit"}}>
+                            <option value={PuzzleImportDigitType.Regular}>Regular</option>
+                            <option value={PuzzleImportDigitType.Calculator}>Calculator</option>
+                            <option value={PuzzleImportDigitType.Latin}>Latin</option>
                         </select>
                     </label>
                 </p>

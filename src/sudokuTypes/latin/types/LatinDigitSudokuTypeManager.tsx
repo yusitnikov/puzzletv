@@ -1,9 +1,7 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {LatinDigitComponentType} from "../../../components/sudoku/digit/LatinDigit";
-import {DigitCellDataComponentType} from "../../default/components/DigitCellData";
 import {areSameArrays} from "../../../utils/array";
-import {NumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const map: Record<number, number> = {
     1: 1,
@@ -17,8 +15,8 @@ const map: Record<number, number> = {
     9: 1000,
 }
 
-export const LatinDigitSudokuTypeManager: SudokuTypeManager<NumberPTM> = {
-    ...DigitSudokuTypeManager(),
+export const LatinDigitSudokuTypeManager = <T extends AnyPTM>(baseTypeManager: SudokuTypeManager<T>): SudokuTypeManager<T> => ({
+    ...baseTypeManager,
 
     disableCellModeLetterShortcuts: true,
     disableArrowLetterShortcuts: true,
@@ -37,13 +35,12 @@ export const LatinDigitSudokuTypeManager: SudokuTypeManager<NumberPTM> = {
 
     cellDataDigitComponentType: LatinDigitComponentType(),
 
-    cellDataComponentType: DigitCellDataComponentType(),
-
-    getDigitByCellData(data) {
-        return map[data] ?? data;
+    getDigitByCellData(data, ...args) {
+        const digit = baseTypeManager.getDigitByCellData(data, ...args);
+        return map[digit] ?? digit;
     },
 
-    getNumberByDigits(digits: number[]) {
+    getNumberByDigits(digits) {
         digits = normalizeLatinDigits(digits);
 
         const num = naiveLatinDigitsToNumber(digits);
@@ -53,7 +50,7 @@ export const LatinDigitSudokuTypeManager: SudokuTypeManager<NumberPTM> = {
             ? num
             : undefined;
     },
-};
+});
 
 const normalizeLatinDigits = (digits: number[]) => digits.flatMap(digit => {
     switch (digit) {

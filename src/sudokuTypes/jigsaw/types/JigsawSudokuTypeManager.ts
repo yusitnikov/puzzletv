@@ -4,7 +4,6 @@ import {JigsawDigit} from "./JigsawDigit";
 import {PositionWithAngle, rotateVectorClockwise} from "../../../types/layout/Position";
 import {loop} from "../../../utils/math";
 import {toggleNumber} from "../../rotatable/types/RotatableDigitSudokuTypeManager";
-import {CenteredCalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 import {JigsawDigitCellDataComponentType} from "../components/JigsawDigitCellData";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {getRectCenter} from "../../../types/layout/Rect";
@@ -21,6 +20,7 @@ import {JigsawMoveCellWriteModeInfo} from "./JigsawMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {lighterGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
+import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -125,7 +125,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         return basePosition;
     },
 
-    digitComponentType: CenteredCalculatorDigitComponentType(),
+    digitComponentType: RegularDigitComponentType(),
 
     cellDataComponentType: JigsawDigitCellDataComponentType,
 

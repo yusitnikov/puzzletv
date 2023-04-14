@@ -147,7 +147,7 @@ export const EmptyLatin: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-latin",
-    typeManager: LatinDigitSudokuTypeManager,
+    typeManager: LatinDigitSudokuTypeManager(DigitSudokuTypeManager()),
     fieldSize: FieldSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,
