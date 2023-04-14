@@ -6,7 +6,6 @@ import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../..
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {Size} from "../../../../types/layout/Size";
-import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {ComponentType, SVGAttributes} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
@@ -22,6 +21,7 @@ const DecorativeShapeComponent = <T extends AnyPTM>(
 ) => {
     return withFieldLayer(layer, function DecorativeShapeComponent(
         {
+            context: {puzzle: {typeManager: {digitComponentType: {widthCoeff}}}},
             cells: [{top, left}],
             props: {
                 width,
@@ -34,8 +34,6 @@ const DecorativeShapeComponent = <T extends AnyPTM>(
             angle = 0,
         }: ConstraintProps<T, DecorativeShapeProps>
     ) {
-        const {widthCoeff} = useDigitComponentType();
-
         return <AutoSvg
             top={top + 0.5}
             left={left + 0.5}

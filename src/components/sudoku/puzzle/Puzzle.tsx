@@ -8,9 +8,7 @@ import {getControlsSizeCoeff} from "../controls/Controls";
 import {useWindowSize} from "../../../hooks/useWindowSize";
 import {useGame} from "../../../hooks/sudoku/useGame";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {DigitComponentTypeContext} from "../../../contexts/DigitComponentTypeContext";
 import {Title} from "../../layout/title/Title";
-import {RegularDigitComponentType} from "../digit/RegularDigit";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
 import {Modal} from "../../layout/modal/Modal";
@@ -29,9 +27,6 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
     const {
         title,
         author,
-        typeManager: {
-            digitComponentType = RegularDigitComponentType,
-        },
         fieldSize: {fieldSize},
         fieldMargin = 0,
     } = puzzle;
@@ -87,7 +82,7 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
 
     const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
 
-    return <DigitComponentTypeContext.Provider value={digitComponentType}>
+    return <>
         <Title>
             {translate(title).replace("\n", " ")}
             {author && <> {translate("by")} {translate(author)}</>}
@@ -135,5 +130,5 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
                 </>}
             </>}
         </PuzzleContainerContext.Provider>
-    </DigitComponentTypeContext.Provider>;
+    </>;
 }

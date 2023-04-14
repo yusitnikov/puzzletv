@@ -35,7 +35,9 @@ export const LatinDigitSudokuTypeManager: SudokuTypeManager<NumberPTM> = {
         ["M"],
     ],
 
-    cellDataComponentType: DigitCellDataComponentType(LatinDigitComponentType.component, LatinDigitComponentType.widthCoeff),
+    cellDataDigitComponentType: LatinDigitComponentType(),
+
+    cellDataComponentType: DigitCellDataComponentType(),
 
     getDigitByCellData(data) {
         return map[data] ?? data;

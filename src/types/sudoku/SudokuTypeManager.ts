@@ -109,9 +109,11 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     initialCellWriteMode?: CellWriteMode;
 
-    digitComponentType?: DigitComponentType;
+    digitComponentType: DigitComponentType<T>;
 
-    cellDataComponentType: CellDataComponentType<T["cell"]>;
+    cellDataDigitComponentType?: DigitComponentType<T>;
+
+    cellDataComponentType: CellDataComponentType<T>;
 
     initialGameStateExtension?: T["stateEx"] | ((puzzle: PuzzleDefinition<T>) => T["stateEx"]);
 

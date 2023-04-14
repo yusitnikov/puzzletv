@@ -5,6 +5,7 @@ import {DigitProps} from "../../../components/sudoku/digit/DigitProps";
 import {textColor} from "../../../components/app/globals";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponentType";
+import {MonumentValleyPTM} from "../types/MonumentValleyPTM";
 
 const width = 0.12;
 
@@ -168,19 +169,24 @@ const svgMap: Record<number, ReactElement> = {
     </>,
 };
 
-export const MonumentValleyDigit = profiler.memo<DigitProps>("MonumentValleyDigit", ({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+export const MonumentValleyDigit = profiler.memo<DigitProps<MonumentValleyPTM>>("MonumentValleyDigit", (
+    {puzzle, digit, size, color = textColor, ...containerProps}
+) => <AutoSvg
     width={size}
     height={size}
     {...containerProps}
 >
     <MonumentValleyDigitSvgContent
+        puzzle={puzzle}
         digit={digit}
         size={size}
         color={color}
     />
 </AutoSvg>);
 
-export const MonumentValleyDigitSvgContent = profiler.memo<DigitProps>("MonumentValleyDigitSvgContent", ({digit, size, color, left = 0, top = 0}: DigitProps) => {
+export const MonumentValleyDigitSvgContent = profiler.memo<DigitProps<MonumentValleyPTM>>("MonumentValleyDigitSvgContent", (
+    {digit, size, color, left = 0, top = 0}
+) => {
     return <g
         transform={`translate(${left} ${top}) scale(${size * 0.7})`}
         color={color}
@@ -189,7 +195,7 @@ export const MonumentValleyDigitSvgContent = profiler.memo<DigitProps>("Monument
     </g>;
 });
 
-export const MonumentValleyDigitComponentType: DigitComponentType = {
+export const MonumentValleyDigitComponentType: DigitComponentType<MonumentValleyPTM> = {
     component: MonumentValleyDigit,
     svgContentComponent: MonumentValleyDigitSvgContent,
     widthCoeff: 0.8,

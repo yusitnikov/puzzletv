@@ -125,7 +125,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         return basePosition;
     },
 
-    digitComponentType: CenteredCalculatorDigitComponentType,
+    digitComponentType: CenteredCalculatorDigitComponentType(),
 
     cellDataComponentType: JigsawDigitCellDataComponentType,
 

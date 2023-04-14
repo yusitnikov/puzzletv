@@ -1,9 +1,12 @@
 import {AutoSvgProps} from "../../svg/auto-svg/AutoSvg";
 import {Size} from "../../../types/layout/Size";
 import {errorColor, recentInfoColor, textColor, userDigitColor} from "../../app/globals";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
-export interface CellDataProps<CellType> extends Omit<AutoSvgProps, keyof Size> {
-    data: CellType;
+export interface CellDataProps<T extends AnyPTM> extends Omit<AutoSvgProps, keyof Size> {
+    puzzle: PuzzleDefinition<T>;
+    data: T["cell"];
     size: number;
     isInitial?: boolean;
     isValid?: boolean;
@@ -11,7 +14,7 @@ export interface CellDataProps<CellType> extends Omit<AutoSvgProps, keyof Size> 
     customColor?: string;
 }
 
-export const getDefaultCellDataColor = <CellType>(
-    {isInitial, isValid, isRecent, customColor}: CellDataProps<CellType>,
+export const getDefaultCellDataColor = <T extends AnyPTM>(
+    {isInitial, isValid, isRecent, customColor}: CellDataProps<T>,
     regularColor = userDigitColor
 ) => customColor || (isRecent ? recentInfoColor : (!isValid ? errorColor : (isInitial ? textColor : regularColor)));

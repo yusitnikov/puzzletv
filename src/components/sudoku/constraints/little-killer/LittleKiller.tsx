@@ -8,7 +8,6 @@ import {
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
-import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
@@ -20,11 +19,9 @@ export interface LittleKillerProps {
 }
 
 export const LittleKiller = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
-    {cells: [{top, left}], props: {direction, sum}}: ConstraintProps<T, LittleKillerProps>
+    {context: {puzzle}, cells: [{top, left}], props: {direction, sum}}: ConstraintProps<T, LittleKillerProps>
 ) => {
-    const {
-        svgContentComponent: DigitSvgContent,
-    } = useDigitComponentType();
+    const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent}}} = puzzle;
 
     top += 0.5;
     left += 0.5;
@@ -61,6 +58,7 @@ export const LittleKiller = withFieldLayer(FieldLayer.regular, <T extends AnyPTM
         />
 
         {sum !== undefined && <DigitSvgContent
+            puzzle={puzzle}
             digit={sum}
             size={0.5}
             left={left - 0.5 * direction.left}

@@ -1,9 +1,10 @@
 import {memo} from "react";
 import {textColor} from "../../app/globals";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
-import {DigitProps} from "./DigitProps";
+import {DigitProps, DigitPropsGenericFc} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const T = true;
 const F = false;
@@ -99,30 +100,32 @@ const lineSpacingCoeff = lineWidthCoeff * 0.3;
 const squareSizeCoeff = (1 - lineWidthCoeff) / 2;
 const digitWidthCoeff = squareSizeCoeff + lineWidthCoeff;
 
-export const CenteredCalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+export const CenteredCalculatorDigit = memo(<T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) => <AutoSvg
     width={size}
     height={size}
     {...containerProps}
 >
     <CenteredCalculatorDigitSvgContent
+        puzzle={puzzle}
         digit={digit}
         size={size}
         color={color}
     />
-</AutoSvg>);
-export const RegularCalculatorDigit = memo<DigitProps>(({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+</AutoSvg>) as DigitPropsGenericFc;
+export const RegularCalculatorDigit = memo(<T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) => <AutoSvg
     width={size}
     height={size}
     {...containerProps}
 >
     <RegularCalculatorDigitSvgContent
+        puzzle={puzzle}
         digit={digit}
         size={size}
         color={color}
     />
-</AutoSvg>);
+</AutoSvg>) as DigitPropsGenericFc;
 
-export const getCalculatorDigitSvgContent = (centerOne: boolean) => memo<DigitProps>(({digit, size, color, left = 0, top = 0}: DigitProps) => <>
+export const getCalculatorDigitSvgContent = (centerOne: boolean) => (memo(<T extends AnyPTM>({digit, size, color, left = 0, top = 0}: DigitProps<T>) => <>
     {(centerOne ? matricesCentered : matricesRegular)[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
         key={`${rowIndex}-${columnIndex}`}
         left={left + size * (columnIndex - 1) * squareSizeCoeff / 2}
@@ -131,7 +134,7 @@ export const getCalculatorDigitSvgContent = (centerOne: boolean) => memo<DigitPr
         vertical={!!(rowIndex % 2)}
         color={color}
     />))}
-</>);
+</>) as DigitPropsGenericFc);
 const CenteredCalculatorDigitSvgContent = getCalculatorDigitSvgContent(true);
 const RegularCalculatorDigitSvgContent = getCalculatorDigitSvgContent(false);
 
@@ -178,13 +181,13 @@ const DigitLine = memo(({left, top, size, vertical, color = "currentColor"}: Dig
     fill={color}
 />);
 
-export const CenteredCalculatorDigitComponentType: DigitComponentType = {
+export const CenteredCalculatorDigitComponentType = <T extends AnyPTM>(): DigitComponentType<T> => ({
     component: CenteredCalculatorDigit,
     svgContentComponent: CenteredCalculatorDigitSvgContent,
     widthCoeff: digitWidthCoeff + lineWidthCoeff,
-};
-export const RegularCalculatorDigitComponentType: DigitComponentType = {
+});
+export const RegularCalculatorDigitComponentType = <T extends AnyPTM>(): DigitComponentType<T> => ({
     component: RegularCalculatorDigit,
     svgContentComponent: RegularCalculatorDigitSvgContent,
     widthCoeff: digitWidthCoeff + lineWidthCoeff,
-};
+});

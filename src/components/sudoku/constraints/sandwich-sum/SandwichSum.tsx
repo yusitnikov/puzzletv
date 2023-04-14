@@ -6,7 +6,6 @@ import {
     ConstraintProps,
     ConstraintPropsGenericFc
 } from "../../../../types/sudoku/Constraint";
-import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {indexes} from "../../../../utils/indexes";
 import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
@@ -18,13 +17,12 @@ export interface SandwichSumProps {
 }
 
 export const SandwichSum = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
-    {props: {clueCell: {top, left}, sum}}: ConstraintProps<T, SandwichSumProps>
+    {context: {puzzle}, props: {clueCell: {top, left}, sum}}: ConstraintProps<T, SandwichSumProps>
 ) => {
-    const {
-        svgContentComponent: DigitSvgContent,
-    } = useDigitComponentType();
+    const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent}}} = puzzle;
 
     return <DigitSvgContent
+        puzzle={puzzle}
         digit={sum}
         size={0.5}
         left={left + 0.5}

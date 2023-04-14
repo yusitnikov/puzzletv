@@ -7,7 +7,6 @@ import {
     Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {useDigitComponentType} from "../../../../contexts/DigitComponentTypeContext";
 import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
@@ -21,6 +20,7 @@ import {indexes} from "../../../../utils/indexes";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {incrementArrayItemByIndex} from "../../../../utils/array";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
 
 export const cageTag = "cage";
 
@@ -34,7 +34,7 @@ export interface KillerCageProps {
 
 export const KillerCage = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
     {
-        context: {puzzle: {prioritizeSelection}},
+        context: {puzzle},
         cells,
         props: {
             sum,
@@ -45,7 +45,12 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
         },
     }: ConstraintProps<T, KillerCageProps>
 ) => {
-    const {widthCoeff} = useDigitComponentType();
+    const {
+        prioritizeSelection,
+        typeManager: {
+            digitComponentType: {widthCoeff},
+        },
+    } = puzzle;
 
     const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
 
@@ -86,6 +91,7 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
 
         {sum && <>
             <KillerCageSum
+                puzzle={puzzle}
                 sum={sum}
                 size={sumDigitSize}
                 left={points[sumPointIndex].left + sumPadding - sumDigitSize * widthCoeff / 2}
@@ -94,6 +100,7 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
             />
 
             {showBottomSum && <KillerCageSum
+                puzzle={puzzle}
                 sum={sum}
                 size={sumDigitSize}
                 left={right - sumPadding - sumDigitSize * widthCoeff * (sum.toString().length - 0.5)}
@@ -104,17 +111,22 @@ export const KillerCage = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
     </>;
 }) as ConstraintPropsGenericFc<KillerCageProps>;
 
-interface KillerCageSumProps extends Position {
+interface KillerCageSumProps<T extends AnyPTM> extends Position {
+    puzzle: PuzzleDefinition<T>;
     sum: string | number;
     size: number;
     color?: string;
 }
 
-const KillerCageSum = ({sum, size, color = blackColor, left, top}: KillerCageSumProps) => {
+const KillerCageSum = <T extends AnyPTM>({puzzle, sum, size, color = blackColor, left, top}: KillerCageSumProps<T>) => {
     const {
-        svgContentComponent: DigitSvgContent,
-        widthCoeff,
-    } = useDigitComponentType();
+        typeManager: {
+            digitComponentType: {
+                svgContentComponent: DigitSvgContent,
+                widthCoeff,
+            },
+        },
+    } = puzzle;
 
     return <>
         <rect
@@ -127,6 +139,7 @@ const KillerCageSum = ({sum, size, color = blackColor, left, top}: KillerCageSum
 
         {typeof sum === "number" && sum.toString().split("").map((digit, index) => <DigitSvgContent
             key={`digit-${index}`}
+            puzzle={puzzle}
             digit={Number(digit)}
             size={size}
             left={left + size * widthCoeff * (index + 0.5)}

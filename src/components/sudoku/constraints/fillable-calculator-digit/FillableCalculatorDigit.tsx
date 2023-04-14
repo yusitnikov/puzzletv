@@ -16,8 +16,9 @@ interface FillableCalculatorDigitProps {
 }
 
 export const FillableCalculatorDigit = withFieldLayer(FieldLayer.beforeSelection, <T extends AnyPTM>(
-    {cells: [{left, top}], props: {digit}}: ConstraintProps<T, FillableCalculatorDigitProps>
+    {context: {puzzle}, cells: [{left, top}], props: {digit}}: ConstraintProps<T, FillableCalculatorDigitProps>
 ) => <RegularCalculatorDigit
+    puzzle={puzzle}
     left={left + 0.5}
     top={top + 0.5}
     size={mainDigitCoeff}

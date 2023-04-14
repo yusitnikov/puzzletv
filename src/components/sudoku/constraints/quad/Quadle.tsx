@@ -45,11 +45,13 @@ export const Quadle = withFieldLayer(
 
 export const QuadleByData = <T extends AnyPTM>(
     {
-        context: {puzzle: {typeManager: {cellDataComponentType: {component: CellData}}}},
+        context: {puzzle},
         cells,
         props: {digits, isRecent},
     }: Pick<ConstraintProps<T, QuadleProps<T["cell"]>>, "context" | "cells" | "props">
 ) => {
+    const {typeManager: {cellDataComponentType: {component: CellData}}} = puzzle;
+
     const id = "clipPath" + useAutoIncrementId();
 
     const {top, left} = cells[cells.length - 1];
@@ -98,6 +100,7 @@ export const QuadleByData = <T extends AnyPTM>(
                     />
 
                     <CellData
+                        puzzle={puzzle}
                         data={digit}
                         size={fontSize}
                         top={top + offset * topOffset}

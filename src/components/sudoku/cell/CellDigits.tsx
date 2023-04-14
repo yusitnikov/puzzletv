@@ -57,9 +57,11 @@ export const CellDigits = <T extends AnyPTM>(
     const {
         params,
         typeManager: {
+            digitComponentType,
+            cellDataDigitComponentType = digitComponentType,
             cellDataComponentType: {
                 component: CellData,
-                widthCoeff,
+                widthCoeff = cellDataDigitComponentType.widthCoeff,
             },
             processCellDataPosition,
             getCellDataHash,
@@ -103,6 +105,7 @@ export const CellDigits = <T extends AnyPTM>(
 
             return <CellData
                 key={`${keyPrefix}-${getCellDataHash(cellData)}`}
+                puzzle={puzzle}
                 data={cellData}
                 size={digitSize}
                 {...position}

@@ -211,9 +211,9 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
         };
     },
 
-    digitComponentType: CenteredCalculatorDigitComponentType,
+    digitComponentType: CenteredCalculatorDigitComponentType(),
 
-    cellDataComponentType: RotatableDigitCellDataComponentType,
+    cellDataComponentType: RotatableDigitCellDataComponentType(),
 
     processArrowDirection(
         currentCell,

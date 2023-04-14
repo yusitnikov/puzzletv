@@ -1,20 +1,32 @@
 import {CellDataProps, getDefaultCellDataColor} from "../../../components/sudoku/cell/CellDataProps";
-import {CenteredCalculatorDigit, CenteredCalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
-import {JigsawDigit} from "../types/JigsawDigit";
+import {JigsawPTM} from "../types/JigsawPTM";
 
-export const JigsawDigitCellData = (props: CellDataProps<JigsawDigit>) => {
-    const {data, size, isInitial, isValid, ...absoluteProps} = props;
+export const JigsawDigitCellData = (props: CellDataProps<JigsawPTM>) => {
+    const {
+        puzzle,
+        data,
+        size,
+        isInitial,
+        isValid,
+        ...absoluteProps
+    } = props;
+    const {
+        typeManager: {
+            digitComponentType,
+            cellDataDigitComponentType: {
+                component: DigitComponent,
+            } = digitComponentType,
+        },
+    } = puzzle;
 
-    return <CenteredCalculatorDigit
+    return <DigitComponent
         {...absoluteProps}
         {...data}
+        puzzle={puzzle}
         size={size}
         color={getDefaultCellDataColor(props)}
     />;
 };
 
-export const JigsawDigitCellDataComponentType: CellDataComponentType<JigsawDigit> = {
-    component: JigsawDigitCellData,
-    widthCoeff: CenteredCalculatorDigitComponentType.widthCoeff,
-};
+export const JigsawDigitCellDataComponentType: CellDataComponentType<JigsawPTM> = {component: JigsawDigitCellData};

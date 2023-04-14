@@ -5,7 +5,7 @@ import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponen
 import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const DigitSudokuTypeManager = <T extends AnyNumberPTM>(
-    digitComponentType: DigitComponentType = RegularDigitComponentType
+    digitComponentType: DigitComponentType<T> = RegularDigitComponentType()
 ): SudokuTypeManager<T> => ({
     areSameCellData(digit1: number, digit2: number): boolean {
         return digit1 === digit2;
@@ -57,5 +57,5 @@ export const DigitSudokuTypeManager = <T extends AnyNumberPTM>(
 
     digitComponentType,
 
-    cellDataComponentType: DigitCellDataComponentType(digitComponentType.component),
+    cellDataComponentType: DigitCellDataComponentType(),
 });

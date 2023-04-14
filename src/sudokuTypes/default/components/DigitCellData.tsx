@@ -1,26 +1,39 @@
 import {CellDataProps, getDefaultCellDataColor} from "../../../components/sudoku/cell/CellDataProps";
 import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
-import {RegularDigit, RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
-import {ComponentType} from "react";
-import {DigitProps} from "../../../components/sudoku/digit/DigitProps";
+import {ReactElement} from "react";
 import {profiler} from "../../../utils/profiler";
+import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const DigitCellData = (DigitComponent: ComponentType<DigitProps> = RegularDigit) =>
-    profiler.memo("DigitCellData", (props: CellDataProps<number>) => {
-        const {data: digit, size, isInitial, isValid, ...absoluteProps} = props;
+export const DigitCellData = profiler.memo(
+    "DigitCellData",
+    <T extends AnyNumberPTM>(props: CellDataProps<T>) => {
+        const {
+            puzzle,
+            data: digit,
+            size,
+            isInitial,
+            isValid,
+            ...absoluteProps
+        } = props;
+        const {
+            typeManager: {
+                digitComponentType,
+                cellDataDigitComponentType: {
+                    component: DigitComponent
+                } = digitComponentType,
+            }
+        } = puzzle;
 
         return <DigitComponent
             {...absoluteProps}
+            puzzle={puzzle}
             digit={digit}
             size={size}
             color={getDefaultCellDataColor(props)}
         />;
-    });
+    }
+) as <T extends AnyNumberPTM>(props: CellDataProps<T>) => ReactElement;
 
-export const DigitCellDataComponentType = (
-    DigitComponent: ComponentType<DigitProps> = RegularDigit,
-    widthCoeff = RegularDigitComponentType.widthCoeff,
-): CellDataComponentType<number> => ({
-    component: DigitCellData(DigitComponent),
-    widthCoeff,
+export const DigitCellDataComponentType = <T extends AnyNumberPTM>(): CellDataComponentType<T> => ({
+    component: DigitCellData,
 });

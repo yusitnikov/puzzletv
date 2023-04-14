@@ -1,7 +1,8 @@
 import {ComponentType} from "react";
 import {CellDataProps} from "./CellDataProps";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export interface CellDataComponentType<CellType> {
-    component: ComponentType<CellDataProps<CellType>>;
-    widthCoeff: number;
+export interface CellDataComponentType<T extends AnyPTM> {
+    component: ComponentType<CellDataProps<T>>;
+    widthCoeff?: number;
 }

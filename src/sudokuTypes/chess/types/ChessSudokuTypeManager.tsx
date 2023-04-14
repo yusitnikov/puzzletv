@@ -9,6 +9,7 @@ import {ctrlKeyText} from "../../../utils/os";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {ChessMainControls} from "../components/ChessMainControls";
 import {ChessPTM} from "./ChessPTM";
+import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 
 export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     areSameCellData(
@@ -78,6 +79,8 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     getDigitByCellData(data: ChessPiece) {
         return data.type;
     },
+
+    digitComponentType: RegularDigitComponentType(),
 
     cellDataComponentType: ChessPieceCellDataComponentType,
 

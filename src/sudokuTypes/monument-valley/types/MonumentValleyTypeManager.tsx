@@ -32,10 +32,8 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         ["9"],
     ],
 
-    cellDataComponentType: DigitCellDataComponentType(
-        MonumentValleyDigitComponentType.component,
-        MonumentValleyDigitComponentType.widthCoeff
-    ),
+    digitComponentType: MonumentValleyDigitComponentType,
+    cellDataComponentType: DigitCellDataComponentType(),
 
     createCellDataByTypedDigit(digit, {puzzle: {fieldSize}, state: {angle}}, position) {
         if (!position) {

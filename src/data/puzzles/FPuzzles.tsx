@@ -113,13 +113,13 @@ export const loadByFPuzzlesObject = (
 
     const regularTypeManager = DigitSudokuTypeManager(
         fillableDigitalDisplay
-            ? RegularCalculatorDigitComponentType
-            : RegularDigitComponentType
+            ? RegularCalculatorDigitComponentType()
+            : RegularDigitComponentType()
     );
     const typesMap: Record<PuzzleImportPuzzleType, SudokuTypeManager<AnyPTM>> = {
         [PuzzleImportPuzzleType.Regular]: regularTypeManager,
         [PuzzleImportPuzzleType.Latin]: LatinDigitSudokuTypeManager,
-        [PuzzleImportPuzzleType.Calculator]: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType),
+        [PuzzleImportPuzzleType.Calculator]: DigitSudokuTypeManager(CenteredCalculatorDigitComponentType()),
         [PuzzleImportPuzzleType.Cubedoku]: CubedokuTypeManager,
         [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
         [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({

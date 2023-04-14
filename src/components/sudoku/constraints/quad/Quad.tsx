@@ -32,7 +32,7 @@ export const Quad = withFieldLayer(
 
 export const QuadByData = <T extends AnyPTM>(
     {
-        context: {puzzle: {typeManager: {cellDataComponentType: {component: CellData}}}},
+        context: {puzzle},
         cells: [{top, left}],
         props: {
             expectedDigits = [],
@@ -42,6 +42,8 @@ export const QuadByData = <T extends AnyPTM>(
         },
     }: Pick<ConstraintProps<T, QuadProps<T["cell"]>>, "context" | "cells" | "props">
 ) => {
+    const {typeManager: {cellDataComponentType: {component: CellData}}} = puzzle;
+
     const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: T["cell"], valid?: boolean}[] = [
         ...expectedDigits.map(digit => ({digit, valid: true})),
         ...forbiddenDigits.map(digit => ({digit})),
@@ -71,6 +73,7 @@ export const QuadByData = <T extends AnyPTM>(
 
             return <CellData
                 key={`digit-${index}`}
+                puzzle={puzzle}
                 data={digit}
                 size={fontSize}
                 top={top + offset * Math.cos(angle)}

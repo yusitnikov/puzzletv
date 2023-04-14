@@ -1,10 +1,11 @@
 import {textColor} from "../../app/globals";
-import {DigitProps} from "./DigitProps";
+import {DigitProps, DigitPropsGenericFc} from "./DigitProps";
 import {DigitComponentType} from "./DigitComponentType";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {profiler} from "../../../utils/profiler";
 import {Record} from "@emotion-icons/fluentui-system-filled";
 import {ReactElement} from "react";
+import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 const width = 0.12;
 const height = 0.1;
@@ -208,19 +209,20 @@ const svgMap: Record<number, ReactElement> = {
     </>,
 };
 
-export const LatinDigit = profiler.memo<DigitProps>("LatinDigit", ({digit, size, color = textColor, ...containerProps}: DigitProps) => <AutoSvg
+export const LatinDigit = profiler.memo("LatinDigit", <T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) => <AutoSvg
     width={size}
     height={size}
     {...containerProps}
 >
     <LatinDigitSvgContent
+        puzzle={puzzle}
         digit={digit}
         size={size}
         color={color}
     />
-</AutoSvg>);
+</AutoSvg>) as DigitPropsGenericFc;
 
-export const LatinDigitSvgContent = profiler.memo<DigitProps>("LatinDigitSvgContent", ({digit, size, color, left = 0, top = 0}: DigitProps) => {
+export const LatinDigitSvgContent = profiler.memo("LatinDigitSvgContent", <T extends AnyPTM>({digit, size, color, left = 0, top = 0}: DigitProps<T>) => {
     const width = widthMap[digit] ?? 0.7;
 
     return <g
@@ -245,10 +247,10 @@ export const LatinDigitSvgContent = profiler.memo<DigitProps>("LatinDigitSvgCont
             strokeWidth={0}
         />
     </g>;
-});
+}) as DigitPropsGenericFc;
 
-export const LatinDigitComponentType: DigitComponentType = {
+export const LatinDigitComponentType = <T extends AnyPTM>(): DigitComponentType<T> => ({
     component: LatinDigit,
     svgContentComponent: LatinDigitSvgContent,
     widthCoeff: 0.6,
-};
+});
