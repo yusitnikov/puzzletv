@@ -75,8 +75,10 @@ export const setQuadPositionActionType = <T extends AnyQuadInputPTM>(
 
 export const setQuadPositionAction = <T extends AnyQuadInputPTM>(
     position: Position | undefined,
-    options: QuadInputSudokuTypeManagerOptions<T>
+    options: QuadInputSudokuTypeManagerOptions<T>,
+    actionId: string,
 ): GameStateAction<Position | undefined, T> => ({
     type: setQuadPositionActionType(options),
     params: position,
+    actionId,
 });

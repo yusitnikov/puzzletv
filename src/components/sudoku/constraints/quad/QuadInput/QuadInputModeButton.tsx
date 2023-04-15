@@ -12,6 +12,7 @@ import {setQuadPositionAction} from "./setQuadPositionAction";
 import {indexesFromTo} from "../../../../../utils/indexes";
 import {ControlButtonItemProps} from "../../../controls/ControlButtonsManager";
 import {AnyQuadInputPTM} from "./QuadInputPTM";
+import {getNextActionId} from "../../../../../types/sudoku/GameStateAction";
 
 export const QuadInputModeButton = <T extends AnyQuadInputPTM>(
     options: QuadInputSudokuTypeManagerOptions<T>
@@ -64,7 +65,7 @@ export const QuadInputModeButton = <T extends AnyQuadInputPTM>(
                 break;
             case "Escape":
                 if (isMyTurn && isQuadAllowedFn(state) && cellWriteMode === CellWriteMode.quads && currentQuad && (onQuadFinish || !currentQuad.digits.length)) {
-                    onStateChange(setQuadPositionAction(undefined, options));
+                    onStateChange(setQuadPositionAction(undefined, options, getNextActionId()));
                     ev.preventDefault();
                 }
                 break;

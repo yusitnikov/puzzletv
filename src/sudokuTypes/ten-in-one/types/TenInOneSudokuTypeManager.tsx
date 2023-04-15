@@ -11,6 +11,7 @@ import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {MultiStagePTM} from "../../multi-stage/types/MultiStagePTM";
+import {myClientId} from "../../../hooks/useMultiPlayer";
 
 export const TenInOneSudokuTypeManager = (
     isRemainingCell: (cell: Position) => boolean,
@@ -42,9 +43,12 @@ export const TenInOneSudokuTypeManager = (
             }
 
             return {
+                // TODO support shared games
                 fieldStateHistory: fieldStateHistoryAddState(
                     puzzle,
                     state.fieldStateHistory,
+                    myClientId,
+                    "ten-in-one-reset-field",
                     (state) => ({
                         ...state,
                         cells: state.cells.map(cellsRow => cellsRow.map(
@@ -55,7 +59,7 @@ export const TenInOneSudokuTypeManager = (
                                 colors: colors.clear(),
                             })
                         )),
-                    })
+                    }),
                 ),
             };
         },

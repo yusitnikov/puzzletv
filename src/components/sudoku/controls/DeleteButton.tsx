@@ -3,7 +3,7 @@ import {ControlButton} from "./ControlButton";
 import {Clear} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
-import {clearSelectionAction} from "../../../types/sudoku/GameStateAction";
+import {clearSelectionAction, getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
@@ -22,7 +22,7 @@ export const DeleteButton = <T extends AnyPTM>(
 ) => {
     const translate = useTranslate();
 
-    const handleClear = useCallback(() => onStateChange(clearSelectionAction()), [onStateChange]);
+    const handleClear = useCallback(() => onStateChange(clearSelectionAction(getNextActionId())), [onStateChange]);
 
     useEventListener(window, "keydown", (ev) => {
         if (!isShowingSettings && deleteHotkeys.includes(ev.code)) {

@@ -27,60 +27,70 @@ export interface GameStateActionType<ParamsType, T extends AnyPTM> {
     callback: (
         params: ParamsType,
         context: PuzzleContext<T>,
-        clientId: string
+        clientId: string,
+        actionId: string,
     ) => GameStateActionCallback<T>;
 }
 
 export interface GameStateAction<ParamsType, T extends AnyPTM> {
     type: GameStateActionType<ParamsType, T>;
     params: ParamsType;
+    actionId: string;
 }
 
 export type GameStateActionOrCallback<ParamsType, T extends AnyPTM> =
     GameStateAction<ParamsType, T> | GameStateActionCallback<T>;
+
+let autoIncrementActionId = 0;
+export const getNextActionId = (prefix = "single") => `${prefix}-${++autoIncrementActionId}`;
 
 // region Specific actions
 export const undoActionType = <T extends AnyPTM>(): GameStateActionType<undefined, T> => ({
     key: "undo",
     callback: () => gameStateUndo,
 });
-export const undoAction = <T extends AnyPTM>(): GameStateAction<undefined, T> => ({
+export const undoAction = <T extends AnyPTM>(actionId: string): GameStateAction<undefined, T> => ({
     type: undoActionType(),
     params: undefined,
+    actionId,
 });
 
 export const redoActionType = <T extends AnyPTM>(): GameStateActionType<undefined, T> => ({
     key: "redo",
     callback: () => gameStateRedo,
 });
-export const redoAction = <T extends AnyPTM>(): GameStateAction<undefined, T> => ({
+export const redoAction = <T extends AnyPTM>(actionId: string): GameStateAction<undefined, T> => ({
     type: redoActionType(),
     params: undefined,
+    actionId,
 });
 
 export const clearSelectionActionType = <T extends AnyPTM>(): GameStateActionType<undefined, T> => ({
     key: "clear-selection",
-    callback: (_, context, clientId) =>
-        state => gameStateClearSelectedCellsContent({...context, state}, clientId),
+    callback: (_, context, clientId, actionId) =>
+        state => gameStateClearSelectedCellsContent({...context, state}, clientId, actionId),
 });
-export const clearSelectionAction = <T extends AnyPTM>(): GameStateAction<undefined, T> => ({
+export const clearSelectionAction = <T extends AnyPTM>(actionId: string): GameStateAction<undefined, T> => ({
     type: clearSelectionActionType(),
     params: undefined,
+    actionId,
 });
 
 export const enterDigitActionType = <T extends AnyPTM>(): GameStateActionType<number, T> => ({
     key: "enter-digit",
-    callback: (digit, context, clientId) =>
-        state => gameStateHandleDigit({...context, state}, digit, clientId, true),
+    callback: (digit, context, clientId, actionId) =>
+        state => gameStateHandleDigit({...context, state}, digit, clientId, actionId, true),
 });
 export const enterDigitAction = <T extends AnyPTM>(
     digit: number,
-    context: PuzzleContext<T>
+    context: PuzzleContext<T>,
+    actionId: string,
 ): GameStateActionOrCallback<number, T>[] => [
-    state => gameStateHandleDigit({...context, state}, digit, myClientId, false),
+    state => gameStateHandleDigit({...context, state}, digit, myClientId, actionId, false),
     {
         type: enterDigitActionType(),
         params: digit,
+        actionId,
     },
 ];
 
@@ -91,19 +101,21 @@ interface ApplyCurrentMultiLineActionParams {
 export const applyCurrentMultiLineActionType = <T extends AnyPTM>()
     : GameStateActionType<ApplyCurrentMultiLineActionParams, T> => ({
     key: "apply-current-multiline",
-    callback: ({isClick = false, isRightButton = false} = {}, context, clientId) =>
-        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, isClick, isRightButton, true),
+    callback: ({isClick = false, isRightButton = false} = {}, context, clientId, actionId) =>
+        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, isClick, isRightButton, true, actionId),
 });
 export const applyCurrentMultiLineAction = <T extends AnyPTM>(
     context: PuzzleContext<T>,
+    actionId: string,
     isClick = false,
     isRightButton = false
 ): GameStateActionOrCallback<ApplyCurrentMultiLineActionParams, T>[] => [
     {
         type: applyCurrentMultiLineActionType(),
         params: {isClick, isRightButton},
+        actionId,
     },
-    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isClick, isRightButton, false),
+    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isClick, isRightButton, false, actionId),
 ];
 
 export interface SetCellMarkActionParams extends Position {
@@ -113,8 +125,8 @@ export interface SetCellMarkActionParams extends Position {
 }
 export const setCellMarkActionType = <T extends AnyPTM>(): GameStateActionType<SetCellMarkActionParams, T> => ({
     key: "set-cell-mark",
-    callback: ({isCenter, cellMarkType, color, ...position}, context) =>
-        state => gameStateSetCellMark({...context, state}, position, isCenter, cellMarkType, color),
+    callback: ({isCenter, cellMarkType, color, ...position}, context, clientId, actionId) =>
+        state => gameStateSetCellMark({...context, state}, position, isCenter, clientId, actionId, cellMarkType, color),
 });
 
 interface ShadingActionParams extends Position {
@@ -122,21 +134,24 @@ interface ShadingActionParams extends Position {
 }
 export const shadingActionType = <T extends AnyPTM>(): GameStateActionType<ShadingActionParams, T> => ({
     key: "apply-shading",
-    callback: ({action, ...position}, context) =>
-        state => gameStateApplyShading({...context, state}, position, action),
+    callback: ({action, ...position}, context, clientId, actionId) =>
+        state => gameStateApplyShading({...context, state}, position, action, clientId, actionId),
 });
 export const shadingAction = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     position: Position,
-    action: DragAction
+    action: DragAction,
+    actionId: string,
 ): GameStateActionOrCallback<ShadingActionParams, T> => ({
     type: shadingActionType(),
     params: {...position, action},
+    actionId,
 });
 export const shadingStartAction = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     position: Position,
-    isRightButton: boolean
+    isRightButton: boolean,
+    actionId: string,
 ): GameStateActionOrCallback<ShadingActionParams, T>[] => {
     const field = gameStateGetCurrentFieldState(context.state);
     const action = gameStateIncrementShading(
@@ -145,7 +160,7 @@ export const shadingStartAction = <T extends AnyPTM>(
     );
     return [
         () => ({dragAction: action}),
-        shadingAction(context, position, action),
+        shadingAction(context, position, action, actionId),
     ];
 }
 // endregion

@@ -54,12 +54,13 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     setCurrentSecondaryButton?: (context: PuzzleContext<T>, index: number) => void;
     isValidGesture?(isCurrentCellWriteMode: boolean, props: GestureIsValidProps, context: PuzzleContext<T>): boolean;
     onCornerClick?: (
+        props: GestureOnStartProps,
         context: PuzzleContext<T>,
         cellPosition: Position,
         exactPosition: CellExactPosition,
         isRightButton: boolean,
     ) => void;
-    onCornerEnter?: (context: PuzzleContext<T>, cellPosition: Position, exactPosition: CellExactPosition) => void;
+    onCornerEnter?: (props: GestureOnContinueProps, context: PuzzleContext<T>, cellPosition: Position, exactPosition: CellExactPosition) => void;
     onGestureStart?(props: GestureOnStartProps, context: PuzzleContext<T>, isRightButton: boolean): void;
     onMove?(props: GestureOnContinueProps, context: PuzzleContext<T>, fieldRect: Rect): void;
     onGestureEnd?(props: GestureOnEndProps, context: PuzzleContext<T>): void;
@@ -292,7 +293,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
             const {extraData, event: {button}} = props;
             onGestureStart?.(props, context, !!button);
             if (isCellGestureExtraData(extraData)) {
-                onCornerClick?.(context, extraData.cell, extraData.exact, !!button);
+                onCornerClick?.(props, context, extraData.cell, extraData.exact, !!button);
             }
         },
         onContinue: (props) => {
@@ -302,7 +303,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
                 isCellGestureExtraData(currentData) &&
                 (!isCellGestureExtraData(prevData) || JSON.stringify(prevData.exact) !== JSON.stringify(currentData.exact))
             ) {
-                onCornerEnter?.(context, currentData.cell, currentData.exact);
+                onCornerEnter?.(props, context, currentData.cell, currentData.exact);
             }
 
             onMove?.(props, context, fieldRect);

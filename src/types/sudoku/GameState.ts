@@ -276,7 +276,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
         fieldStateHistory: {
             states: [
                 savedGameState
-                    ? unserializeFieldState(savedGameState[1], puzzle)
+                    ? {...unserializeFieldState(savedGameState[1], puzzle), actionId: ""}
                     : createEmptyFieldState(puzzle)
             ],
             currentIndex: 0,
@@ -390,11 +390,18 @@ export const setAllShareState = <T extends AnyPTM>(
     const {typeManager} = puzzle;
     const {setSharedState, unserializeGameState, unserializeCellData} = typeManager;
     const {field, extension, initialDigits, excludedDigits, lives} = newState;
+    const unserializedFieldState = unserializeFieldState(field, puzzle);
 
     const result: GameStateEx<T> = mergeGameStateWithUpdates(
         state,
         {
-            fieldStateHistory: fieldStateHistoryAddState(puzzle, state.fieldStateHistory, unserializeFieldState(field, puzzle)),
+            fieldStateHistory: fieldStateHistoryAddState(
+                puzzle,
+                state.fieldStateHistory,
+                unserializedFieldState.clientId,
+                unserializedFieldState.actionId,
+                unserializedFieldState,
+            ),
             initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
             excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
             lives,
@@ -646,6 +653,7 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
 export const gameStateProcessSelectedCells = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     clientId: string,
+    actionId: string,
     fieldStateProcessor: (cellState: CellStateEx<T>, position: Position) => Partial<CellStateEx<T>>
 ): PartialGameStateEx<T> => {
     const {puzzle, state} = context;
@@ -713,6 +721,8 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
         fieldStateHistory = fieldStateHistoryAddState(
             puzzle,
             fieldStateHistory,
+            clientId,
+            actionId,
             state => processFieldStateCells(
                 state,
                 selectedCells,
@@ -728,7 +738,7 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
                         ...cellStateUpdates,
                     };
                 }
-            )
+            ),
         );
     }
 
@@ -807,7 +817,8 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     digit: number,
     clientId: string,
-    isGlobal: boolean
+    actionId: string,
+    isGlobal: boolean,
 ) => {
     const {puzzle, state} = context;
     const {typeManager, initialLives, decreaseOnlyOneLive} = puzzle;
@@ -826,6 +837,7 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
     let result = gameStateProcessSelectedCells(
         context,
         clientId,
+        actionId,
         (cell, position) => handleDigitInCell(
             isGlobal, clientId, state.processed.cellWriteMode, cell, cellData(position), position, context, defaultHandler(cell, position), cache
         )
@@ -867,7 +879,8 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
 
 export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
     context: PuzzleContext<T>,
-    clientId: string
+    clientId: string,
+    actionId: string,
 ): PartialGameStateEx<T> => {
     const {puzzle, state} = context;
     const {typeManager, hideDeleteButton} = puzzle;
@@ -876,21 +889,21 @@ export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
         return {};
     }
 
-    const clearCenter = () => gameStateProcessSelectedCells(context, clientId, cell => ({
+    const clearCenter = () => gameStateProcessSelectedCells(context, clientId, actionId, cell => ({
         centerDigits: cell.centerDigits.clear()
     }));
-    const clearCorner = () => gameStateProcessSelectedCells(context, clientId, cell => ({
+    const clearCorner = () => gameStateProcessSelectedCells(context, clientId, actionId, cell => ({
         cornerDigits: cell.cornerDigits.clear()
     }));
-    const clearColor = () => gameStateProcessSelectedCells(context, clientId, cell => ({
+    const clearColor = () => gameStateProcessSelectedCells(context, clientId, actionId, cell => ({
         colors: cell.colors.clear()
     }));
-    const clearLines = () => gameStateDeleteAllLines(puzzle, state);
+    const clearLines = () => gameStateDeleteAllLines(puzzle, state, clientId, actionId);
 
     switch (state.processed.cellWriteMode) {
         case CellWriteMode.main:
             if (gameStateIsAnySelectedCell(state, cell => !!cell.usersDigit)) {
-                return gameStateProcessSelectedCells(context, clientId, () => ({
+                return gameStateProcessSelectedCells(context, clientId, actionId, () => ({
                     usersDigit: undefined
                 }));
             }
@@ -952,7 +965,8 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
     clientId: string,
     isClick: boolean,
     isRightButton: boolean,
-    isGlobal: boolean
+    isGlobal: boolean,
+    actionId: string,
 ): PartialGameStateEx<T> => {
     // TODO: move all parameters from state to action params
 
@@ -965,6 +979,8 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
             fieldStateHistory: fieldStateHistoryAddState(
                 puzzle,
                 state.fieldStateHistory,
+                clientId,
+                actionId,
                 (fieldState) => {
                     let {marks} = fieldState;
 
@@ -1013,11 +1029,15 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
 
 export const gameStateDeleteAllLines = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
-    state: GameState<T>
+    state: GameState<T>,
+    clientId: string,
+    actionId: string,
 ): PartialGameStateEx<T> => ({
     fieldStateHistory: fieldStateHistoryAddState(
         puzzle,
         state.fieldStateHistory,
+        clientId,
+        actionId,
         (fieldState) => ({
             ...fieldState,
             lines: fieldState.lines.clear(),
@@ -1095,6 +1115,8 @@ export const gameStateSetCellMark = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     position: Position,
     isCenter: boolean,
+    clientId: string,
+    actionId: string,
     cellMarkType?: CellMarkType,
     color: CellColorValue = CellColor.black
 ): PartialGameStateEx<T> => {
@@ -1107,6 +1129,8 @@ export const gameStateSetCellMark = <T extends AnyPTM>(
         fieldStateHistory: fieldStateHistoryAddState(
             puzzle,
             fieldStateHistory,
+            clientId,
+            actionId,
             (fieldState) => {
                 const {marks} = fieldState;
 
@@ -1143,6 +1167,8 @@ export const gameStateApplyShading = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     position: Position,
     action: DragAction,
+    clientId: string,
+    actionId: string,
 ): PartialGameStateEx<T> => {
     const {puzzle, state: {fieldStateHistory}} = context;
     const {initialColors: initialColorsFunc, allowOverridingInitialColors} = puzzle;
@@ -1157,6 +1183,8 @@ export const gameStateApplyShading = <T extends AnyPTM>(
         fieldStateHistory: fieldStateHistoryAddState(
             puzzle,
             fieldStateHistory,
+            clientId,
+            actionId,
             fieldState => processFieldStateCells(
                 fieldState,
                 [position],

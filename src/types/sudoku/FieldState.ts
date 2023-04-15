@@ -15,11 +15,14 @@ import {CellMark, CellMarkSet, CellMarkType} from "./CellMark";
 import {PuzzleLineSet} from "./PuzzleLineSet";
 import {LineWithColor} from "./LineWithColor";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {myClientId} from "../../hooks/useMultiPlayer";
 
 export interface FieldState<T extends AnyPTM> {
     cells: CellState<T>[][];
     lines: SetInterface<LineWithColor>;
     marks: SetInterface<CellMark>;
+    clientId: string;
+    actionId: string;
 }
 
 export const createEmptyFieldState = <T extends AnyPTM>(
@@ -28,21 +31,25 @@ export const createEmptyFieldState = <T extends AnyPTM>(
     cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle))),
     lines: new PuzzleLineSet(puzzle),
     marks: new CellMarkSet(puzzle).bulkAdd(puzzle.initialCellMarks ?? []),
+    clientId: myClientId,
+    actionId: "",
 });
 
 export const serializeFieldState = <T extends AnyPTM>(
-    {cells, lines, marks}: FieldState<T>,
+    {cells, lines, marks, clientId, actionId}: FieldState<T>,
     puzzle: PuzzleDefinition<T>
-) => ({
+): any => ({
     cells: cells.map(row => row.map(cell => serializeCellState(cell, puzzle.typeManager))),
     lines: lines.serialize(),
     marks: marks.bulkRemove(puzzle.initialCellMarks ?? []).serialize(),
+    clientId,
+    actionId,
 });
 
 export const unserializeFieldState = <T extends AnyPTM>(
-    {cells = [], lines = [], marks = []}: any,
+    {cells = [], lines = [], marks = [], clientId = myClientId, actionId = ""}: any,
     puzzle: PuzzleDefinition<T>
-) => ({
+): FieldState<T> => ({
     cells: (cells as any[][]).map(row => row.map(cell => unserializeCellState(cell, puzzle))),
     lines: PuzzleLineSet.unserialize(puzzle, lines),
     marks: CellMarkSet.unserialize(
@@ -52,15 +59,21 @@ export const unserializeFieldState = <T extends AnyPTM>(
             type: type ?? (isCircle ? CellMarkType.O : CellMarkType.X),
         }))
     ).bulkAdd(puzzle.initialCellMarks ?? []),
+    clientId,
+    actionId,
 });
 
 export const cloneFieldState = <T extends AnyPTM>(
     typeManager: SudokuTypeManager<T>,
-    {cells, lines, marks}: FieldState<T>
+    {cells, lines, marks}: FieldState<T>,
+    clientId: string,
+    actionId: string,
 ): FieldState<T> => ({
     cells: cells.map(row => row.map(cellState => cloneCellState(typeManager, cellState))),
     lines: lines.clone(),
     marks: marks.clone(),
+    clientId,
+    actionId,
 });
 
 export const processFieldStateCells = <T extends AnyPTM>(

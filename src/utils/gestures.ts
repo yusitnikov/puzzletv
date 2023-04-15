@@ -145,11 +145,22 @@ const transformPointCoordsAbsoluteToMetricsBase = ({x, y}: GestureMetricsPoint, 
     };
 };
 
+let autoIncrementGestureId = 0;
+
 export class GestureInfo {
     private pointersMap: Record<number, PointerMovementInfo> = {};
     public get pointers() { return Object.values(this.pointersMap); }
     public isClick = true;
     public handler?: GestureHandler;
+    public id = 0;
+
+    constructor() {
+        this.incrementId();
+    }
+
+    public incrementId() {
+        this.id = ++autoIncrementGestureId;
+    }
 
     public getPointer(pointerId: number): PointerMovementInfo | undefined {
         return this.pointersMap[pointerId];
@@ -272,6 +283,7 @@ export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getEx
             ...state,
         };
         if (!currentGesture.handler || currentGesture.handler.isValidGesture?.(isValidGestureProps) === false) {
+            currentGesture.incrementId();
             currentGesture.handler = undefined;
             for (const handler of handlers ?? []) {
                 if (handler && handler.isValidGesture?.(isValidGestureProps) !== false) {

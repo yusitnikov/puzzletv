@@ -5,7 +5,7 @@ import {useEventListener} from "../../../hooks/useEventListener";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {enterDigitAction} from "../../../types/sudoku/GameStateAction";
+import {enterDigitAction, getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {joinListSemantically} from "../../../utils/array";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
@@ -72,7 +72,7 @@ export const DigitControlButton = <T extends AnyPTM>({index, context}: DigitCont
             if (setCurrentSecondaryButton) {
                 setCurrentSecondaryButton(context, index);
             } else {
-                onStateChange(enterDigitAction(digit, context));
+                onStateChange(enterDigitAction(digit, context, getNextActionId()));
             }
         },
         [setCurrentSecondaryButton, onStateChange, digit, index, context]

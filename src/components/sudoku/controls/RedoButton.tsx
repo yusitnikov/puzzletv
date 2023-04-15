@@ -4,7 +4,7 @@ import {Redo} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
 import {ctrlKeyText} from "../../../utils/os";
-import {redoAction} from "../../../types/sudoku/GameStateAction";
+import {getNextActionId, redoAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
@@ -22,7 +22,7 @@ export const RedoButton = <T extends AnyPTM>(
 ) => {
     const translate = useTranslate();
 
-    const handleRedo = useCallback(() => onStateChange(redoAction()), [onStateChange]);
+    const handleRedo = useCallback(() => onStateChange(redoAction(getNextActionId())), [onStateChange]);
 
     useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;

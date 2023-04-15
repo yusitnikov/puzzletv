@@ -16,7 +16,8 @@ import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 export const safeCrackerArrowsAction = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     position: Position,
-    isRightButton: boolean
+    isRightButton: boolean,
+    actionId: string,
 ): GameStateActionOrCallback<SetCellMarkActionParams, T> => {
     const {marks} = gameStateGetCurrentFieldState(context.state);
     return {
@@ -31,6 +32,7 @@ export const safeCrackerArrowsAction = <T extends AnyPTM>(
                 isRightButton ? -1 : 1,
             ),
         },
+        actionId,
     };
 };
 
@@ -39,7 +41,7 @@ export const safeCrackerArrowsCellWriteModeInfo = <T extends AnyPTM>(): CellWrit
     digitsCount: 0,
     handlesRightMouseClick: true,
     isNoSelectionMode: true,
-    onCornerClick: (context, cellPosition, exactPosition, isRightButton) => {
-        context.onStateChange(safeCrackerArrowsAction(context, exactPosition.center, isRightButton));
+    onCornerClick: ({gesture: {id}}, context, cellPosition, exactPosition, isRightButton) => {
+        context.onStateChange(safeCrackerArrowsAction(context, exactPosition.center, isRightButton, `gesture-${id}`));
     },
 });

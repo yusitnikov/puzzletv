@@ -12,8 +12,8 @@ export const ShadingCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<
     hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
     handlesRightMouseClick: true,
     isNoSelectionMode: true,
-    onCornerClick: (context, cellPosition, exactPosition, isRightButton) =>
-        context.onStateChange(shadingStartAction(context, cellPosition, isRightButton)),
-    onCornerEnter: (context, cellPosition) =>
-        context.onStateChange(shadingAction(context, cellPosition, context.state.dragAction)),
+    onCornerClick: ({gesture: {id}}, context, cellPosition, exactPosition, isRightButton) =>
+        context.onStateChange(shadingStartAction(context, cellPosition, isRightButton, `gesture-${id}`)),
+    onCornerEnter: ({gesture: {id}}, context, cellPosition) =>
+        context.onStateChange(shadingAction(context, cellPosition, context.state.dragAction, `gesture-${id}`)),
 });

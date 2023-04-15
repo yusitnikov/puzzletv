@@ -14,19 +14,19 @@ export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T>
     isActiveForPuzzle: ({allowDrawing = []}) => allowDrawing.length !== 0,
     hotKeyStr: ["Alt"],
     isNoSelectionMode: true,
-    onCornerClick: (context, cellPosition, exactPosition) =>
+    onCornerClick: ({gesture: {id}}, context, cellPosition, exactPosition) =>
         context.onStateChange(state => gameStateStartMultiLine({...context, state}, exactPosition)),
-    onCornerEnter: (context, cellPosition, exactPosition) =>
+    onCornerEnter: ({gesture: {id}}, context, cellPosition, exactPosition) =>
         context.onStateChange(state => gameStateContinueMultiLine(
             {...context, state},
             exactPosition
         )),
     onGestureEnd: (
-        {gesture: {isClick, pointers: [{start: {event: {button}}}]}, reason},
+        {gesture: {id, isClick, pointers: [{start: {event: {button}}}]}, reason},
         context
     ) => context.onStateChange(
         reason === GestureFinishReason.pointerUp
-            ? applyCurrentMultiLineAction(context, isClick, !!button)
+            ? applyCurrentMultiLineAction(context, `gesture-${id}`, isClick, !!button)
             : gameStateResetCurrentMultiLine
     ),
     digitsCount: ({puzzle: {disableLineColors}}) => disableLineColors ? 0 : 9,

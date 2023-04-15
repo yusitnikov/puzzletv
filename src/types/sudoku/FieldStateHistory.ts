@@ -31,12 +31,30 @@ export const fieldStateHistoryRedo = <T extends AnyPTM>(history: FieldStateHisto
 export const fieldStateHistoryAddState = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
     history: FieldStateHistory<T>,
+    clientId: string,
+    actionId: string,
     state: SetStateAction<FieldState<T>>
-) => {
+): FieldStateHistory<T> => {
     const currentState = fieldStateHistoryGetCurrent(history);
 
     if (typeof state === "function") {
-        state = state(cloneFieldState(puzzle.typeManager, currentState));
+        state = state(cloneFieldState(puzzle.typeManager, currentState, clientId, actionId));
+    }
+
+    state = {...state, clientId, actionId};
+
+    if (currentState.clientId === clientId && currentState.actionId === actionId && history.currentIndex > 0) {
+        // Replace the last state of the same action by the current action
+        return fieldStateHistoryAddState(
+            puzzle,
+            {
+                states: history.states.slice(0, history.currentIndex),
+                currentIndex: history.currentIndex - 1,
+            },
+            clientId,
+            actionId,
+            state,
+        );
     }
 
     if (areFieldStatesEqual(puzzle, state, currentState)) {
@@ -44,7 +62,6 @@ export const fieldStateHistoryAddState = <T extends AnyPTM>(
     }
 
     return {
-        ...history,
         states: [...history.states.slice(0, history.currentIndex + 1), state],
         currentIndex: history.currentIndex + 1,
     };

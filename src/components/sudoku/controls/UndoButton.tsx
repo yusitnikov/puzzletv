@@ -4,7 +4,7 @@ import {Undo} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
 import {ctrlKeyText} from "../../../utils/os";
-import {undoAction} from "../../../types/sudoku/GameStateAction";
+import {getNextActionId, undoAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {deleteHotkeys} from "./DeleteButton";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
@@ -24,7 +24,7 @@ export const UndoButton = <T extends AnyPTM>(
 ) => {
     const translate = useTranslate();
 
-    const handleUndo = useCallback(() => onStateChange(undoAction()), [onStateChange]);
+    const handleUndo = useCallback(() => onStateChange(undoAction(getNextActionId())), [onStateChange]);
 
     useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;

@@ -112,6 +112,7 @@ export const useGame = <T extends AnyPTM>(
         for (const {data: message, clientId} of messages) {
             const {
                 type,
+                actionId,
                 params,
                 state: {
                     mode,
@@ -171,7 +172,8 @@ export const useGame = <T extends AnyPTM>(
                     ...contextNoIndex,
                     cellsIndexForState: new SudokuCellsIndexForState(cellsIndex, contextNoIndex),
                 },
-                clientId
+                clientId,
+                actionId,
             );
 
             state = mergeGameStateWithUpdates(
@@ -284,7 +286,7 @@ export const useGame = <T extends AnyPTM>(
 
                     if (!isAction || !isEnabled || isHost || (!puzzle.params?.share && !puzzle.typeManager.isGlobalAction?.(asAction, context))) {
                         const callback = isAction
-                            ? asAction.type.callback(asAction.params, context, myClientId)
+                            ? asAction.type.callback(asAction.params, context, myClientId, asAction.actionId)
                             : actionOrCallback as GameStateActionCallback<T>;
 
                         const updates = typeof callback === "function" ? callback(processedGameState) : callback;
@@ -298,6 +300,7 @@ export const useGame = <T extends AnyPTM>(
                     } else {
                         sendMessage({
                             type: asAction.type.key,
+                            actionId: asAction.actionId,
                             params: asAction.params,
                             state: {
                                 mode: processedGameState.processed.cellWriteMode,
