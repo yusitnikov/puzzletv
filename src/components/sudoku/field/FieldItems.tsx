@@ -60,8 +60,8 @@ export const FieldItems = <T extends AnyPTM>(
                     : {left: left + 0.5, top: top + 0.5, radius: 0.5};
             });
             const centerPoint = {
-                top: (cell1.top + cell2.top) / 2,
-                left: (cell1.left + cell2.left) / 2,
+                top: (cell1.top * cell2.radius + cell2.top * cell1.radius) / (cell1.radius + cell2.radius),
+                left: (cell1.left * cell2.radius + cell2.left * cell1.radius) / (cell1.radius + cell2.radius),
                 radius: (cell1.radius + cell2.radius) / 2,
             };
             const centerRect: Rect = {
