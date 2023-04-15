@@ -25,6 +25,7 @@ import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType"
 import {mixColorsStr} from "../../../utils/color";
 import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -125,8 +126,18 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         return num;
     },
 
-    processCellDataPosition({cellsIndex}, basePosition, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {
-        if (!state) {
+    processCellDataPosition(
+        {cellsIndex, puzzle},
+        basePosition,
+        dataSet,
+        dataIndex,
+        positionFunction,
+        cellPosition,
+        state,
+    ): PositionWithAngle | undefined {
+        const {importOptions: {angleStep} = {}} = puzzle;
+
+        if (!state || !angleStep) {
             return basePosition;
         }
 
@@ -135,9 +146,30 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
             return basePosition;
         }
 
-        // TODO: re-order values according to the angle
+        const {angle: pieceAngle} = state.processedExtension.pieces[regionIndex];
+        const roundedAngle = loop(roundToStep(pieceAngle, angleStep), 360);
+        const processDigit = ({digit, angle}: JigsawDigit): JigsawDigit => normalizeJigsawDigit(
+            puzzle,
+            {digit, angle: angle + roundedAngle}
+        );
+        const rotatedIndexes = getCellDataSortIndexes<JigsawDigit>(
+            dataSet,
+            (a, b) => puzzle.typeManager.compareCellData(
+                processDigit(a),
+                processDigit(b),
+                puzzle,
+                undefined,
+                false
+            ),
+            `sortRotatedIndexes-${roundedAngle}`
+        );
 
-        return rotateVectorClockwise(basePosition, -state.processedExtension.pieces[regionIndex].angle);
+        const rotatedPosition = positionFunction(rotatedIndexes[dataIndex]);
+        if (!rotatedPosition) {
+            return undefined;
+        }
+
+        return rotateVectorClockwise(rotatedPosition, -pieceAngle);
     },
 
     digitComponentType: RegularDigitComponentType(),
