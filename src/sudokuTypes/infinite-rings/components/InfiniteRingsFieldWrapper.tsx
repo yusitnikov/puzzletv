@@ -53,7 +53,8 @@ const StyledCircle = styled("div")({
 });
 
 export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
-    visibleRingsCountArg = 2
+    visibleRingsCountArg = 2,
+    startRingOffset = 0,
 ) => function InfiniteRingsFieldWrapperComponent(
     {context, children}: PropsWithChildren<PuzzleContextProps<T>>
 ) {
@@ -71,7 +72,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
     const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
     const ringsCount = fieldSize / 2 - 1;
     const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
-    const loopedRingOffset = loop(ringOffset, ringsCount);
+    const loopedRingOffset = loop(ringOffset - startRingOffset, ringsCount);
 
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);
 
@@ -177,7 +178,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
                         selected={index === loopedRingOffset}
                         onClick={() => onStateChange(gameStateSetScaleLog(
                             context,
-                            loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2
+                            loop(index + startRingOffset - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2
                         ))}
                     >
                         <StyledCircle/>
