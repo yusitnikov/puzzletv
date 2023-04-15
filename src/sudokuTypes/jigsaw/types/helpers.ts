@@ -49,9 +49,12 @@ export const getJigsawPiecesWithCache = (
 export const getJigsawPieceIndexByCell = (
     cellsIndex: SudokuCellsIndex<JigsawPTM>,
     cell: Position,
-): number | undefined => getJigsawPiecesWithCache(cellsIndex).findIndex(
-    ({cells}) => cells.some((regionCell) => isSamePosition(regionCell, cell))
-);
+): number | undefined => {
+    const index = getJigsawPiecesWithCache(cellsIndex).findIndex(
+        ({cells}) => cells.some((regionCell) => isSamePosition(regionCell, cell))
+    );
+    return index >= 0 ? index : undefined;
+};
 
 export const normalizeJigsawDigit = (puzzle: PuzzleDefinition<JigsawPTM>, {digit, angle}: JigsawDigit): JigsawDigit => {
     angle = loop(angle, 360);

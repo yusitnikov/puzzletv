@@ -83,14 +83,16 @@ export const areSameGivenDigitsMaps = <T extends AnyPTM>(
     return true;
 };
 
-export const createGivenDigitsMapFromArray = <CellType>(array: CellType[][]): GivenDigitsMap<CellType> => {
+export const createGivenDigitsMapFromArray = <CellType>(array: (CellType | undefined)[][]): GivenDigitsMap<CellType> => {
     const map: GivenDigitsMap<CellType> = {};
 
     array.forEach((row, rowIndex) => {
         map[rowIndex] = {};
 
         row.forEach((cell, columnIndex) => {
-            map[rowIndex][columnIndex] = cell;
+            if (cell !== undefined) {
+                map[rowIndex][columnIndex] = cell;
+            }
         });
     });
 
