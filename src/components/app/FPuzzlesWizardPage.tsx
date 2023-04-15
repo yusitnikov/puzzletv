@@ -50,6 +50,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
+    const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
@@ -85,6 +86,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         noSpecialRules: !hasSolution && noSpecialRules,
         allowOverrideColors: hasInitialColors && allowOverrideColors,
         angleStep: isJigsaw ? angleStep || undefined : undefined,
+        shuffle: isJigsaw && shuffle,
         load,
     });
 
@@ -280,6 +282,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             <option value={90}>90 degrees</option>
                             <option value={180}>180 degrees</option>
                         </select>
+                    </p>
+
+                    <p>
+                        <label>
+                            Shuffle:&nbsp;
+                            <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>
+                        </label>
                     </p>
                 </>}
 

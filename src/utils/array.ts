@@ -32,3 +32,13 @@ export const incrementArrayItem = <T>(array: T[], currentItem: T | ((item: T) =>
             : array.indexOf(currentItem),
         increment
     );
+
+export const getReverseIndexMap = (indexes: number[]) => {
+    const result = Array(indexes.length);
+
+    for (const [index1, index2] of indexes.entries()) {
+        result[index2] = index1;
+    }
+
+    return result;
+};

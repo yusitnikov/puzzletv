@@ -1,5 +1,5 @@
 import {JigsawDigit} from "./JigsawDigit";
-import {isSamePosition, Position} from "../../../types/layout/Position";
+import {isSamePosition, Position, PositionWithAngle} from "../../../types/layout/Position";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {loop} from "../../../utils/math";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
@@ -8,6 +8,7 @@ import {JigsawPieceInfo} from "./JigsawPieceInfo";
 import {JigsawPTM} from "./JigsawPTM";
 import {isRotatableDigit, rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
 import {JigsawPieceState} from "./JigsawPieceState";
+import {getRectCenter} from "../../../types/layout/Rect";
 
 export const getJigsawPieces = (
     {regions = [], fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
@@ -71,3 +72,16 @@ export const getActiveJigsawPieceIndex = (pieces: JigsawPieceState[]) => {
     const maxZIndex = Math.max(...zIndexes);
     return zIndexes.indexOf(maxZIndex);
 };
+
+export const sortJigsawPiecesByPosition = (pieces: JigsawPieceInfo[], piecePositions: PositionWithAngle[]) =>
+    piecePositions
+        .map(({top, left}, index) => {
+            const center = getRectCenter(pieces[index].boundingRect);
+            return {
+                index,
+                top: top + center.top,
+                left: left + center.left,
+            };
+        })
+        .sort((a, b) => Math.sign(a.top - b.top) || Math.sign(a.left - b.left) || (a.index - b.index))
+        .map(({index}) => index);

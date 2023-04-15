@@ -14,9 +14,10 @@ import {
     getJigsawPieceIndexByCell,
     getJigsawPieces,
     getJigsawPiecesWithCache,
-    normalizeJigsawDigit
+    normalizeJigsawDigit,
+    sortJigsawPiecesByPosition
 } from "./helpers";
-import {JigsawMoveCellWriteModeInfo, roundStep} from "./JigsawMoveCellWriteModeInfo";
+import {JigsawMoveCellWriteModeInfo} from "./JigsawMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {lightGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
@@ -27,6 +28,9 @@ import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/Jigsaw
 import {gameStateGetCurrentFieldState, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 import {JigsawFieldState} from "./JigsawFieldState";
+import {createEmptyFieldState} from "../../../types/sudoku/FieldState";
+import {getReverseIndexMap} from "../../../utils/array";
+import {createRandomGenerator} from "../../../utils/random";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -184,29 +188,44 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     rotationallySymmetricDigits: true,
 
-    // TODO: shuffle the pieces
     initialGameStateExtension: (puzzle) => {
+        const pieces = getJigsawPieces(puzzle)
+        const {extension: {pieces: piecePositions}} = createEmptyFieldState(puzzle);
+        const pieceSortIndexesByPosition = getReverseIndexMap(sortJigsawPiecesByPosition(pieces, piecePositions));
+
         return {
-            pieces: getJigsawPieces(puzzle).map((_, index) => {
+            pieces: pieceSortIndexesByPosition.map((index) => {
                 return {
-                    zIndex: index + 1,
+                    zIndex: pieces.length - index,
                     animating: false,
                 };
             }),
             highlightCurrentPiece: false,
         };
     },
-    // TODO: shuffle the pieces
     initialFieldStateExtension: (puzzle) => {
+        const {
+            importOptions: {shuffle, angleStep} = {},
+            typeManager: {initialScale = 1},
+        } = puzzle;
+        const randomizer = createRandomGenerator(0);
         const centerTop = puzzle.fieldSize.rowsCount / 2;
         const centerLeft = puzzle.fieldSize.columnsCount / 2;
+
         return {
             pieces: getJigsawPieces(puzzle).map(({boundingRect}) => {
                 const {top, left} = getRectCenter(boundingRect);
+
                 return {
-                    top: roundToStep((top - centerTop) * 0.4, roundStep),
-                    left: roundToStep((left - centerLeft) * 0.4, roundStep),
-                    angle: 0,
+                    top: shuffle
+                        ? centerTop - top + (centerTop / initialScale - boundingRect.height / 2) * (randomizer() * 2 - 1)
+                        : 0,
+                    left: shuffle
+                        ? centerLeft - left + (centerLeft / initialScale - boundingRect.width / 2) * (randomizer() * 2 - 1)
+                        : 0,
+                    angle: shuffle && angleStep
+                        ? roundToStep(randomizer() * 360, angleStep)
+                        : 0,
                 };
             }),
         };

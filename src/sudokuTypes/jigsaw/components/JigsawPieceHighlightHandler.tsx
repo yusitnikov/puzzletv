@@ -6,9 +6,13 @@ import {
 import {JigsawPTM} from "../types/JigsawPTM";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useEffect} from "react";
-import {getActiveJigsawPieceIndex, getJigsawPieceIndexByCell, getJigsawPiecesWithCache} from "../types/helpers";
+import {
+    getActiveJigsawPieceIndex,
+    getJigsawPieceIndexByCell,
+    getJigsawPiecesWithCache,
+    sortJigsawPiecesByPosition
+} from "../types/helpers";
 import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "../types/JigsawPieceState";
-import {getRectCenter} from "../../../types/layout/Rect";
 import {incrementArrayItem} from "../../../utils/array";
 import {useLastValueRef} from "../../../hooks/useLastValueRef";
 import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
@@ -51,21 +55,12 @@ const JigsawPieceHighlightHandler = (
         switch (code) {
             case "Tab":
                 const pieces = getJigsawPiecesWithCache(cellsIndex);
-                const sortedPieceCoords = piecePositions
-                    .map(({top, left}, index) => {
-                        const center = getRectCenter(pieces[index].boundingRect);
-                        return {
-                            index,
-                            top: top + center.top,
-                            left: left + center.left,
-                        };
-                    })
-                    .sort((a, b) => Math.sign(a.top - b.top) || Math.sign(a.left - b.left) || (a.index - b.index));
+                const sortedPieceCoords = sortJigsawPiecesByPosition(pieces, piecePositions);
                 const newActivePieceIndex = incrementArrayItem(
                     sortedPieceCoords,
-                    ({index}) => index === activePieceIndex,
+                    activePieceIndex,
                     shiftKey ? -1 : 1
-                ).index;
+                );
                 // TODO: scroll the active piece into view
                 onStateChange([
                     jigsawPieceBringOnTopAction(puzzle, getNextActionId(), newActivePieceIndex),
