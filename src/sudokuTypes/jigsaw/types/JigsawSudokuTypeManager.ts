@@ -24,8 +24,9 @@ import {RegularDigitComponentType} from "../../../components/sudoku/digit/Regula
 import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
 import {mixColorsStr} from "../../../utils/color";
 import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
-import {PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
+import {JigsawFieldState} from "./JigsawFieldState";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -72,12 +73,14 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     createCellDataByTypedDigit(
         digit,
-        {cellsIndex, puzzle, state: {extension: {pieces}}},
+        {cellsIndex, puzzle, state},
         position,
     ): JigsawDigit {
         if (position) {
             const regionIndex = getJigsawPieceIndexByCell(cellsIndex, position);
             if (regionIndex !== undefined) {
+                const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
+
                 return normalizeJigsawDigit(puzzle, {
                     digit,
                     angle: -pieces[regionIndex].angle,
@@ -94,11 +97,13 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     getDigitByCellData(
         data,
-        {cellsIndex, puzzle, state: {extension: {pieces}}},
+        {cellsIndex, puzzle, state},
         cellPosition,
     ): number {
         const regionIndex = getJigsawPieceIndexByCell(cellsIndex, cellPosition);
         if (regionIndex) {
+            const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
+
             // TODO: return NaN if it's not a valid digit
             data = normalizeJigsawDigit(puzzle, {
                 digit: data.digit,
@@ -111,11 +116,12 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     transformNumber(
         num,
-        {cellsIndex, puzzle, state: {extension: {pieces}}},
+        {cellsIndex, puzzle, state},
         cellPosition
     ): number {
         const regionIndex = getJigsawPieceIndexByCell(cellsIndex, cellPosition);
         if (regionIndex) {
+            const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
             const {importOptions: {angleStep = 0} = {}} = puzzle;
             const angle = loop(roundToStep(pieces[regionIndex].angle, angleStep), 360);
             // TODO: return NaN if it's not a valid angle
@@ -180,20 +186,42 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     // TODO: shuffle the pieces
     initialGameStateExtension: (puzzle) => {
-        const centerTop = puzzle.fieldSize.rowsCount / 2;
-        const centerLeft = puzzle.fieldSize.columnsCount / 2;
         return {
-            pieces: getJigsawPieces(puzzle).map(({boundingRect}, index) => {
-                const {top, left} = getRectCenter(boundingRect);
+            pieces: getJigsawPieces(puzzle).map((_, index) => {
                 return {
-                    top: roundToStep((top - centerTop) * 0.4, roundStep),
-                    left: roundToStep((left - centerLeft) * 0.4, roundStep),
-                    angle: 0,
                     zIndex: index + 1,
                     animating: false,
                 };
             }),
             highlightCurrentPiece: false,
+        };
+    },
+    // TODO: shuffle the pieces
+    initialFieldStateExtension: (puzzle) => {
+        const centerTop = puzzle.fieldSize.rowsCount / 2;
+        const centerLeft = puzzle.fieldSize.columnsCount / 2;
+        return {
+            pieces: getJigsawPieces(puzzle).map(({boundingRect}) => {
+                const {top, left} = getRectCenter(boundingRect);
+                return {
+                    top: roundToStep((top - centerTop) * 0.4, roundStep),
+                    left: roundToStep((left - centerLeft) * 0.4, roundStep),
+                    angle: 0,
+                };
+            }),
+        };
+    },
+
+    areFieldStateExtensionsEqual(a, b): boolean {
+        return a.pieces.every((pieceA, index) => {
+            const pieceB = b.pieces[index];
+            return isSamePosition(pieceA, pieceB) && pieceA.angle === pieceB.angle;
+        })
+    },
+
+    cloneFieldStateExtension({pieces}): JigsawFieldState {
+        return {
+            pieces: pieces.map((position) => ({...position})),
         };
     },
 
@@ -204,31 +232,40 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     // initial scale to contain the shuffled pieces
     initialScale: 0.7,
 
-    useProcessedGameStateExtension({animationSpeed, extension: {pieces}}): JigsawProcessedGameState {
+    useProcessedGameStateExtension(state): JigsawProcessedGameState {
+        const {animationSpeed, extension: {pieces: pieceAnimations}} = state;
+        const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
+
         return {
-            pieces: pieces.map(({top, left, angle, animating}) => ({
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                top: useAnimatedValue(top, animating ? animationSpeed / 2 : 0),
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                left: useAnimatedValue(left, animating ? animationSpeed / 2 : 0),
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                angle: useAnimatedValue(angle, animating ? animationSpeed : 0),
-            })),
+            pieces: piecePositions.map(({top, left, angle}, index) => {
+                const {animating} = pieceAnimations[index];
+
+                return {
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    top: useAnimatedValue(top, animating ? animationSpeed / 2 : 0),
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    left: useAnimatedValue(left, animating ? animationSpeed / 2 : 0),
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    angle: useAnimatedValue(angle, animating ? animationSpeed : 0),
+                };
+            }),
         };
     },
 
-    getProcessedGameStateExtension({extension: {pieces}}): JigsawProcessedGameState {
+    getProcessedGameStateExtension(state): JigsawProcessedGameState {
+        const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
         return {pieces};
     },
 
     processArrowDirection(currentCell, xDirection, yDirection, context, ...args): { cell?: Position; state?: PartialGameStateEx<JigsawPTM> } {
-        const {cellsIndex, puzzle, state: {extension: {pieces}}} = context;
+        const {cellsIndex, puzzle, state} = context;
 
         const regionIndex = getJigsawPieceIndexByCell(cellsIndex, currentCell);
         if (regionIndex === undefined) {
             return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, ...args);
         }
 
+        const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
         const angle = loop(roundToStep(pieces[regionIndex].angle, 90), 360);
         const {cells} = getJigsawPiecesWithCache(cellsIndex)[regionIndex];
 
@@ -326,5 +363,3 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
     // TODO: support shared games
 };
-
-// TODO: make the jigsaw pieces a part of the history management system, and support undo/redo actions for them

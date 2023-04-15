@@ -1,17 +1,18 @@
-export interface PuzzleTypeMap<CellType, GameStateExType = {}, ProcessedGameStateExType = {}> {
+export interface PuzzleTypeMap<CellType, GameStateExType = {}, ProcessedGameStateExType = {}, FieldStateEx = {}> {
     cell: CellType;
     stateEx: GameStateExType;
     processedStateEx: ProcessedGameStateExType;
+    fieldStateEx: FieldStateEx;
 }
 
-export type PTM<CellType, GameStateExType = {}, ProcessedGameStateExType = {}> =
-    PuzzleTypeMap<CellType, GameStateExType, ProcessedGameStateExType>;
+export type PTM<CellType, GameStateExType = {}, ProcessedGameStateExType = {}, FieldStateEx = {}> =
+    PuzzleTypeMap<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx>;
 
-export type AnyPTM<CellType = any, GameStateExType = any, ProcessedGameStateExType = any> =
-    PTM<CellType, GameStateExType, ProcessedGameStateExType>;
+export type AnyPTM<CellType = any, GameStateExType = any, ProcessedGameStateExType = any, FieldStateEx = any> =
+    PTM<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx>;
 
-export type NumberPTM<GameStateExType = {}, ProcessedGameStateExType = {}> =
-    PuzzleTypeMap<number, GameStateExType, ProcessedGameStateExType>;
+export type NumberPTM<GameStateExType = {}, ProcessedGameStateExType = {}, FieldStateEx = {}> =
+    PuzzleTypeMap<number, GameStateExType, ProcessedGameStateExType, FieldStateEx>;
 
-export type AnyNumberPTM<GameStateExType = any, ProcessedGameStateExType = any> =
-    NumberPTM<GameStateExType, ProcessedGameStateExType>;
+export type AnyNumberPTM<GameStateExType = any, ProcessedGameStateExType = any, FieldStateEx = any> =
+    NumberPTM<GameStateExType, ProcessedGameStateExType, FieldStateEx>;

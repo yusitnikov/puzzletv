@@ -238,7 +238,7 @@ type SavedGameStates = [
     scale: number,
 ][];
 const gameStateStorageKey = "savedGameState";
-const gameStateSerializerVersion = 2;
+const gameStateSerializerVersion = 3;
 const maxSavedPuzzles = 10;
 
 const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(gameStateStorageKey, gameStateSerializerVersion) || [];

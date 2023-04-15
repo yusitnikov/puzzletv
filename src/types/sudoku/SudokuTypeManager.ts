@@ -55,6 +55,14 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     unserializeGameState(data: any): Partial<T["stateEx"]>;
 
+    serializeFieldStateExtension?(data: Partial<T["fieldStateEx"]>): any;
+
+    unserializeFieldStateExtension?(data: any): Partial<T["fieldStateEx"]>;
+
+    cloneFieldStateExtension?(data: T["fieldStateEx"]): T["fieldStateEx"];
+
+    areFieldStateExtensionsEqual?(a: T["fieldStateEx"], b: T["fieldStateEx"]): boolean;
+
     createCellDataByDisplayDigit(
         digit: number,
         gameState: ProcessedGameStateEx<T>
@@ -117,6 +125,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     cellDataComponentType: CellDataComponentType<T>;
 
     initialGameStateExtension?: T["stateEx"] | ((puzzle: PuzzleDefinition<T>) => T["stateEx"]);
+
+    initialFieldStateExtension?: T["fieldStateEx"] | ((puzzle: PuzzleDefinition<T>) => T["fieldStateEx"]);
 
     allowMove?: boolean;
 

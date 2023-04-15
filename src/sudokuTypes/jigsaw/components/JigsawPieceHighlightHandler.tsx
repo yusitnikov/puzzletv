@@ -11,28 +11,35 @@ import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "../type
 import {getRectCenter} from "../../../types/layout/Rect";
 import {incrementArrayItem} from "../../../utils/array";
 import {useLastValueRef} from "../../../hooks/useLastValueRef";
+import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
+import {myClientId} from "../../../hooks/useMultiPlayer";
+import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 
 const JigsawPieceHighlightHandler = (
     {
         context: {
             cellsIndex,
-            puzzle: {importOptions: {angleStep} = {}},
-            state: {selectedCells, extension: {pieces: piecesState, highlightCurrentPiece}},
+            puzzle,
+            state: {fieldStateHistory, selectedCells, extension: {pieces: pieceIndexes, highlightCurrentPiece}},
             onStateChange,
         },
     }: ControlButtonItemProps<JigsawPTM>
 ) => {
     const onStateChangeRef = useLastValueRef(onStateChange);
+
+    const {importOptions: {angleStep} = {}} = puzzle;
+    const {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
+
     // TODO: make sure that the last selected cell with Ctrl+A is the bottom-right-most cell according to the pieces' state
     const selectedCell = selectedCells.last();
     const selectedRegionIndex = selectedCell && getJigsawPieceIndexByCell(cellsIndex, selectedCell);
     useEffect(() => {
         if (selectedRegionIndex !== undefined) {
-            onStateChangeRef.current(jigsawPieceBringOnTopAction(selectedRegionIndex, false));
+            onStateChangeRef.current(jigsawPieceBringOnTopAction(puzzle, getNextActionId(), selectedRegionIndex, false));
         }
-    }, [selectedRegionIndex, onStateChangeRef]);
+    }, [puzzle, selectedRegionIndex, onStateChangeRef]);
 
-    const activePieceIndex = getActiveJigsawPieceIndex(piecesState);
+    const activePieceIndex = getActiveJigsawPieceIndex(pieceIndexes);
 
     useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey, metaKey, altKey, shiftKey} = ev;
@@ -44,7 +51,7 @@ const JigsawPieceHighlightHandler = (
         switch (code) {
             case "Tab":
                 const pieces = getJigsawPiecesWithCache(cellsIndex);
-                const sortedPieceCoords = piecesState
+                const sortedPieceCoords = piecePositions
                     .map(({top, left}, index) => {
                         const center = getRectCenter(pieces[index].boundingRect);
                         return {
@@ -61,7 +68,7 @@ const JigsawPieceHighlightHandler = (
                 ).index;
                 // TODO: scroll the active piece into view
                 onStateChange([
-                    jigsawPieceBringOnTopAction(newActivePieceIndex),
+                    jigsawPieceBringOnTopAction(puzzle, getNextActionId(), newActivePieceIndex),
                     selectedCells.size !== 0
                         ? {
                             // TODO: select the top-left-most cell according to the current angle
@@ -74,10 +81,17 @@ const JigsawPieceHighlightHandler = (
                 break;
             case "KeyR":
                 if (highlightCurrentPiece && angleStep) {
-                    onStateChange(jigsawPieceStateChangeAction(activePieceIndex, ({angle}) => ({
-                        angle: angle + angleStep * (shiftKey ? -1 : 1),
-                        animating: true,
-                    }), false));
+                    onStateChange(jigsawPieceStateChangeAction(
+                        puzzle,
+                        myClientId,
+                        getNextActionId(),
+                        activePieceIndex,
+                        ({angle}) => ({
+                            position: {angle: angle + angleStep * (shiftKey ? -1 : 1)},
+                            state: {animating: true},
+                        }),
+                        false
+                    ));
                 }
                 ev.preventDefault();
                 break;
