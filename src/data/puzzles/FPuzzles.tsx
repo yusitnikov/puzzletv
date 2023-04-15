@@ -661,7 +661,16 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
 
                     checkForOutsideCells(cells, size);
 
-                    return RectConstraint<T>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
+                    return RectConstraint<T>(
+                        parsePositionLiterals(cells).map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell),
+                        {width, height},
+                        baseC,
+                        outlineC,
+                        value,
+                        fontC,
+                        angle,
+                        cosmeticsLayer
+                    );
                 }));
             }
         },
@@ -672,7 +681,16 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
 
                     checkForOutsideCells(cells, size);
 
-                    return EllipseConstraint<T>(cells, {width, height}, baseC, outlineC, value, fontC, angle, cosmeticsLayer);
+                    return EllipseConstraint<T>(
+                        parsePositionLiterals(cells).map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell),
+                        {width, height},
+                        baseC,
+                        outlineC,
+                        value,
+                        fontC,
+                        angle,
+                        cosmeticsLayer
+                    );
                 }));
             }
         },
@@ -691,7 +709,14 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
 
                     checkForOutsideCells(cells, fieldSize);
 
-                    return [TextConstraint<T>(cells, value, fontC, size, angle, cosmeticsLayer)];
+                    return [TextConstraint<T>(
+                        parsePositionLiterals(cells).map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell),
+                        value,
+                        fontC,
+                        size,
+                        angle,
+                        cosmeticsLayer,
+                    )];
                 }));
             }
         },
