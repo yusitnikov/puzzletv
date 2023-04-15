@@ -76,6 +76,7 @@ const JigsawPieceHighlightHandler = (
                 if (highlightCurrentPiece && angleStep) {
                     onStateChange(jigsawPieceStateChangeAction(activePieceIndex, ({angle}) => ({
                         angle: angle + angleStep * (shiftKey ? -1 : 1),
+                        animating: true,
                     }), false));
                 }
                 ev.preventDefault();
