@@ -18,7 +18,7 @@ import {
 } from "./helpers";
 import {JigsawMoveCellWriteModeInfo, roundStep} from "./JigsawMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
-import {lighterGreyColor} from "../../../components/app/globals";
+import {lightGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
@@ -339,7 +339,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
                 },
                 backgroundColor: highlightCurrentPiece && index === activePieceIndex
                     ? regionBackgroundColor
-                    : mixColorsStr(regionBackgroundColor, gridBackgroundColor, 0.8),
+                    : mixColorsStr(regionBackgroundColor, gridBackgroundColor, 0.7),
             };
         });
     },
@@ -358,7 +358,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     disabledCellWriteModes: [CellWriteMode.move],
     extraCellWriteModes: [JigsawMoveCellWriteModeInfo],
 
-    gridBackgroundColor: lighterGreyColor,
+    gridBackgroundColor: lightGreyColor,
     regionBackgroundColor: "#fff",
 
     // TODO: support shared games
