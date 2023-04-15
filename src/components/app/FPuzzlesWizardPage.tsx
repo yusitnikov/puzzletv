@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+import styled from "@emotion/styled";
 import {buildLink} from "../../utils/link";
 import {FormEvent, useMemo, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
@@ -19,6 +21,10 @@ import {loadPuzzle} from "../../types/sudoku/PuzzleDefinition";
 export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
 
 let autoIncrement = 0;
+
+const Paragraph = styled("div")({margin: "1em 0"});
+const Details = styled("div")({marginTop: "0.25em", color: veryDarkGreyColor});
+const Select = styled("select")({font: "inherit"});
 
 interface FPuzzlesWizardPageProps {
     load: string;
@@ -125,32 +131,32 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             <PageTitle>{translate(fPuzzlesWizardPageTitle)}</PageTitle>
 
             <form onSubmit={handleSubmit}>
-                <p>
+                <Paragraph>
                     <label>
                         Grid type:&nbsp;
-                        <select value={type} onChange={ev => setType(ev.target.value as PuzzleImportPuzzleType)} style={{font: "inherit"}}>
+                        <Select value={type} onChange={ev => setType(ev.target.value as PuzzleImportPuzzleType)}>
                             <option value={PuzzleImportPuzzleType.Regular}>Regular</option>
                             <option value={PuzzleImportPuzzleType.Cubedoku}>Cubedoku</option>
                             <option value={PuzzleImportPuzzleType.InfiniteRings}>Infinite rings</option>
                             <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
                             <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
                             <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
-                        </select>
+                        </Select>
                     </label>
-                </p>
+                </Paragraph>
 
-                <p>
+                <Paragraph>
                     <label>
                         Digit type:&nbsp;
-                        <select value={digitType} onChange={ev => setDigitType(ev.target.value as PuzzleImportDigitType)} style={{font: "inherit"}}>
+                        <Select value={digitType} onChange={ev => setDigitType(ev.target.value as PuzzleImportDigitType)}>
                             <option value={PuzzleImportDigitType.Regular}>Regular</option>
                             <option value={PuzzleImportDigitType.Calculator}>Calculator</option>
                             <option value={PuzzleImportDigitType.Latin}>Latin</option>
-                        </select>
+                        </Select>
                     </label>
-                </p>
+                </Paragraph>
 
-                <p>
+                <Paragraph>
                     Digits count:&nbsp;
                     <input
                         type={"number"}
@@ -160,14 +166,14 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         step={1}
                         onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
                     />
-                </p>
+                </Paragraph>
 
-                <p>
+                <Paragraph>
                     <label>
                         Rules are HTML:&nbsp;
                         <input type={"checkbox"} checked={areHtmlRules} onChange={ev => setAreHtmlRules(ev.target.checked)}/>
                     </label>
-                    {areHtmlRules && <div style={{marginTop: "0.25em", color: veryDarkGreyColor}}>
+                    {areHtmlRules && <Details>
                         Notes:
                         <ul style={{margin: 0}}>
                             <li>
@@ -182,64 +188,64 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                                 to add support for other tags or attributes.
                             </li>
                         </ul>
-                    </div>}
-                </p>
+                    </Details>}
+                </Paragraph>
 
-                {isCalculator && <p>
+                {isCalculator && <Paragraph>
                     <label>
                         Fillable digital display:&nbsp;
                         <input type={"checkbox"} checked={fillableDigitalDisplay} onChange={ev => setFillableDigitalDisplay(ev.target.checked)}/>
                     </label>
-                </p>}
+                </Paragraph>}
 
                 {!isSpecialGrid && <>
-                    <p>
+                    <Paragraph>
                         <label>
                             Loop horizontally:&nbsp;
                             <input type={"checkbox"} checked={loopX} onChange={ev => setLoopX(ev.target.checked)}/>
                         </label>
-                    </p>
+                    </Paragraph>
 
-                    <p>
+                    <Paragraph>
                         <label>
                             Loop vertically:&nbsp;
                             <input type={"checkbox"} checked={loopY} onChange={ev => setLoopY(ev.target.checked)}/>
                         </label>
-                    </p>
+                    </Paragraph>
 
-                    <p>
+                    <Paragraph>
                         <label>
                             Tesseract constraint:&nbsp;
                             <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
                         </label>
-                    </p>
+                    </Paragraph>
                 </>}
 
-                {!!puzzle.arrow && <p>
+                {!!puzzle.arrow && <Paragraph>
                     <label>
                         Arrow circle is a product instead of a sum:&nbsp;
                         <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
                     </label>
-                </p>}
+                </Paragraph>}
 
                 {hasFog && <>
-                    <p>
+                    <Paragraph>
                         <label>
                             Yajilin fog:&nbsp;
                             <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
                         </label>
-                    </p>
+                    </Paragraph>
 
-                    {hasCosmeticElements && <p>
+                    {hasCosmeticElements && <Paragraph>
                         <label>
                             Hide cosmetic elements behind the fog:&nbsp;
                             <input type={"checkbox"} checked={cosmeticsBehindFog}
                                    onChange={ev => setCosmeticsBehindFog(ev.target.checked)}/>
                         </label>
-                    </p>}
+                    </Paragraph>}
                 </>}
 
-                {isSafeCracker && <p>
+                {isSafeCracker && <Paragraph>
                     Safe cracker code length:&nbsp;
                     <input
                         type={"number"}
@@ -249,19 +255,19 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         step={1}
                         onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
                     />
-                </p>}
+                </Paragraph>}
 
                 {isInfiniteRings && <>
-                    <p>
+                    <Paragraph>
                         Visible rings count:&nbsp;
-                        <select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))} style={{font: "inherit"}}>
+                        <Select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))}>
                             <option value={2}>2</option>
                             <option value={3}>3</option>
                             <option value={0}>all (preview only)</option>
-                        </select>
-                    </p>
+                        </Select>
+                    </Paragraph>
 
-                    <p>
+                    <Paragraph>
                         Initial zooming:&nbsp;
                         <input
                             type={"number"}
@@ -271,53 +277,53 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             step={1}
                             onChange={ev => setStartOffset(ev.target.valueAsNumber)}
                         />
-                    </p>
+                    </Paragraph>
                 </>}
 
                 {isJigsaw && <>
-                    <p>
+                    <Paragraph>
                         Rotation:&nbsp;
-                        <select value={angleStep} onChange={ev => setAngleStep(Number(ev.target.value))} style={{font: "inherit"}}>
+                        <Select value={angleStep} onChange={ev => setAngleStep(Number(ev.target.value))}>
                             <option value={0}>no rotation</option>
                             <option value={90}>90 degrees</option>
                             <option value={180}>180 degrees</option>
-                        </select>
-                    </p>
+                        </Select>
+                    </Paragraph>
 
-                    <p>
+                    <Paragraph>
                         <label>
                             Shuffle:&nbsp;
                             <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>
                         </label>
-                    </p>
+                    </Paragraph>
                 </>}
 
-                {hasInitialColors && <p>
+                {hasInitialColors && <Paragraph>
                     <label>
                         Allow overriding initial colors:&nbsp;
                         <input type={"checkbox"} checked={allowOverrideColors} onChange={ev => setAllowOverrideColors(ev.target.checked)}/>
                     </label>
-                </p>}
+                </Paragraph>}
 
-                {!hasSolution && <p>
+                {!hasSolution && <Paragraph>
                     <label>
                         Verify the solution based on the conflict checker:&nbsp;
                         <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
                     </label>
-                    <div style={{marginTop: "0.25em", color: veryDarkGreyColor}}>
+                    <Details>
                         When enabled, the software will say that the puzzle was solved correctly as soon as all digits are fulfilled
                         and there are no conflicts for the standard constraints included in the puzzle.
-                    </div>
-                    <div style={{marginTop: "0.25em", color: veryDarkGreyColor}}>
+                    </Details>
+                    <Details>
                         Please don't enable it when the puzzle contains non-standard constraints or rules
                         that cannot be verified by the conflict checker!
                         (also, it's recommended to include the embedded solution in this case)
-                    </div>
-                </p>}
+                    </Details>
+                </Paragraph>}
 
-                <p>
+                <Paragraph>
                     <button type={"submit"} disabled={!isValidForm}>Load</button>
-                </p>
+                </Paragraph>
             </form>
         </div>
 
