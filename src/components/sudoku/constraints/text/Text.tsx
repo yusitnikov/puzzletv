@@ -17,19 +17,23 @@ export interface TextProps {
 }
 
 export const TextComponent = (layer = FieldLayer.lines) => withFieldLayer(layer, <T extends AnyPTM>(
-    {cells: [{top, left}], angle = 0, color = textColor, props: {text, size = 0.5}}: ConstraintProps<T, TextProps>
-) => <AutoSvg
-    top={top + 0.5}
-    left={left + 0.5}
-    angle={angle}
->
-    <CenteredText
-        size={size}
-        fill={color}
+    {cells, angle = 0, color = textColor, props: {text, size = 0.5}}: ConstraintProps<T, TextProps>
+) => {
+    const {top, left} = getAveragePosition(cells);
+
+    return <AutoSvg
+        top={top + 0.5}
+        left={left + 0.5}
+        angle={angle}
     >
-        {text}
-    </CenteredText>
-</AutoSvg>) as ConstraintPropsGenericFc<TextProps>;
+        <CenteredText
+            size={size}
+            fill={color}
+        >
+            {text}
+        </CenteredText>
+    </AutoSvg>;
+}) as ConstraintPropsGenericFc<TextProps>;
 
 export const textTag = "text";
 
@@ -44,7 +48,7 @@ export const TextConstraint = <T extends AnyPTM>(
     return {
         name: `text: ${text}`,
         tags: [textTag],
-        cells: [getAveragePosition(parsePositionLiterals(cellLiterals))],
+        cells: parsePositionLiterals(cellLiterals),
         props: {text, size},
         color,
         angle,

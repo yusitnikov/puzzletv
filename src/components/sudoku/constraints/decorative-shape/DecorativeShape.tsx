@@ -22,7 +22,7 @@ const DecorativeShapeComponent = <T extends AnyPTM>(
     return withFieldLayer(layer, function DecorativeShapeComponent(
         {
             context: {puzzle: {typeManager: {digitComponentType: {widthCoeff}}}},
-            cells: [{top, left}],
+            cells,
             props: {
                 width,
                 height,
@@ -34,6 +34,8 @@ const DecorativeShapeComponent = <T extends AnyPTM>(
             angle = 0,
         }: ConstraintProps<T, DecorativeShapeProps>
     ) {
+        const {top, left} = getAveragePosition(cells);
+
         return <AutoSvg
             top={top + 0.5}
             left={left + 0.5}
@@ -84,7 +86,7 @@ const DecorativeShapeConstraint = <T extends AnyPTM>(
 ): Constraint<T, DecorativeShapeProps> => {
     return {
         name,
-        cells: [getAveragePosition(parsePositionLiterals(cellLiterals))],
+        cells: parsePositionLiterals(cellLiterals),
         props: {
             width: typeof size === "number" ? size : size.width,
             height: typeof size === "number" ? size : size.height,
