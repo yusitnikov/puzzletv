@@ -4,8 +4,7 @@ import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {PropsWithChildren} from "react";
 import {blackColor} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
-import {gameStateSetScaleLog} from "../../../types/sudoku/GameState";
-import {useEventListener} from "../../../hooks/useEventListener";
+import {gameStateHandleZoomClick, gameStateSetScaleLog} from "../../../types/sudoku/GameState";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {useTranslate} from "../../../hooks/useTranslate";
@@ -60,10 +59,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
 ) {
     const {
         puzzle: {fieldSize: {rowsCount: fieldSize}},
-        state: {
-            processed: {scaleLog},
-            isShowingSettings,
-        },
+        state: {processed: {scaleLog}},
         onStateChange,
         cellSize,
         isReadonlyContext,
@@ -80,25 +76,6 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);
 
     const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount);
-
-    useEventListener(window, "keydown", (ev) => {
-        if (isShowingSettings) {
-            return;
-        }
-
-        switch ((ev.shiftKey ? "Shift+" : "") + ev.code) {
-            case "NumpadAdd":
-            case "Shift+Equal":
-                onStateChange(gameStateSetScaleLog(context, ringOffset + 1));
-                ev.preventDefault();
-                break;
-            case "Minus":
-            case "NumpadSubtract":
-                onStateChange(gameStateSetScaleLog(context, ringOffset - 1));
-                ev.preventDefault();
-                break;
-        }
-    });
 
     return <div style={{
         position: "absolute",
@@ -173,7 +150,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => onStateChange(gameStateSetScaleLog(context, ringOffset + 1))}
+                        onClick={() => gameStateHandleZoomClick(context, true)}
                         title={translate("zoom in")}
                     >
                         +
@@ -187,7 +164,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => onStateChange(gameStateSetScaleLog(context, ringOffset - 1))}
+                        onClick={() => gameStateHandleZoomClick(context, false)}
                         title={translate("zoom out")}
                     >
                         -

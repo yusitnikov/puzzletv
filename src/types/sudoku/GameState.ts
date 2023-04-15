@@ -51,7 +51,7 @@ import {CellPart} from "./CellPart";
 import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
 import {loop} from "../../utils/math";
 import {AnimationSpeed} from "./AnimationSpeed";
-import {applyMetricsDiff, GestureMetrics} from "../../utils/gestures";
+import {applyMetricsDiff, emptyGestureMetrics, GestureMetrics} from "../../utils/gestures";
 import {myClientId, UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
 import {getFinalCellWriteMode} from "../../hooks/sudoku/useFinalCellWriteMode";
 import {ControlKeysState} from "../../hooks/useControlKeysState";
@@ -1236,4 +1236,16 @@ export const gameStateApplyFieldDragGesture = <T extends AnyPTM>(
             ...(resetSelection && {selectedCells: selectedCells.clear()})
         };
     });
+};
+
+export const gameStateHandleZoomClick = <T extends AnyPTM>(context: PuzzleContext<T>, increment: boolean) => {
+    const {puzzle: {typeManager: {scaleStep = defaultScaleStep}}} = context;
+
+    return gameStateApplyFieldDragGesture(
+        context,
+        emptyGestureMetrics,
+        {...emptyGestureMetrics, scale: increment ? scaleStep : 1 / scaleStep},
+        true,
+        true,
+    );
 };

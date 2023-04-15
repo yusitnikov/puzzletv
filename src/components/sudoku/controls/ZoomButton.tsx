@@ -2,40 +2,39 @@ import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 import {ControlButtonItem, ControlButtonItemProps, ControlButtonRegion} from "./ControlButtonsManager";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButton} from "./ControlButton";
-import {defaultScaleStep, gameStateApplyFieldDragGesture} from "../../../types/sudoku/GameState";
-import {emptyGestureMetrics} from "../../../utils/gestures";
+import {gameStateHandleZoomClick} from "../../../types/sudoku/GameState";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {useEventListener} from "../../../hooks/useEventListener";
 
-const ZoomButton = <T extends AnyPTM>(increment: boolean, title: PartiallyTranslatable, sign: string) =>
+const ZoomButton = <T extends AnyPTM>(increment: boolean, title: PartiallyTranslatable, hotkeys: string[], sign: string) =>
     function ZoomButtonComponent({context, top, left}: ControlButtonItemProps<T>) {
-        const {
-            puzzle: {typeManager: {scaleStep = defaultScaleStep}},
-            cellSizeForSidePanel: cellSize,
-        } = context;
+        const {state: {isShowingSettings}, cellSizeForSidePanel: cellSize} = context;
 
         const translate = useTranslate();
+
+        const handleAction = () => gameStateHandleZoomClick(context, increment);
+
+        useEventListener(window, "keydown", (ev) => {
+            if (!isShowingSettings && hotkeys.includes((ev.shiftKey ? "Shift+" : "") + ev.code)) {
+                handleAction();
+                ev.preventDefault();
+            }
+        });
 
         return <ControlButton
             top={top}
             left={left}
             cellSize={cellSize}
-            onClick={() => gameStateApplyFieldDragGesture(
-                context,
-                emptyGestureMetrics,
-                {...emptyGestureMetrics, scale: increment ? scaleStep : 1 / scaleStep},
-                true,
-                true,
-            )}
+            onClick={handleAction}
             title={`${translate(title)} (${sign})`}
         >
             {sign}
         </ControlButton>;
-    }
-;
+    };
 
-export const ZoomInButton = <T extends AnyPTM>() => ZoomButton<T>(true, "zoom in", "+");
+export const ZoomInButton = <T extends AnyPTM>() => ZoomButton<T>(true, "zoom in", ["NumpadAdd", "Shift+Equal"], "+");
 
-export const ZoomOutButton = <T extends AnyPTM>() => ZoomButton<T>(false, "zoom out", "-");
+export const ZoomOutButton = <T extends AnyPTM>() => ZoomButton<T>(false, "zoom out", ["Minus", "NumpadSubtract"], "-");
 
 export const ZoomInButtonItem = <T extends AnyPTM>(): ControlButtonItem<T> => ({
     key: "zoom-in",
