@@ -230,6 +230,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
     const initialDigits: GivenDigitsMap<T["cell"]> = {};
     const initialLetters: GivenDigitsMap<string> = {};
     const initialColors: GivenDigitsMap<CellColorValue[]> = {};
+    const solutionColors: GivenDigitsMap<CellColorValue[]> = {};
     const items: Constraint<T, any>[] = [];
 
     const puzzle: PuzzleDefinition<T> = {
@@ -250,16 +251,17 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
         initialDigits,
         initialLetters,
         initialColors,
+        solutionColors,
         items,
         allowOverridingInitialColors: allowOverrideColors,
         importOptions,
     };
 
-    const processInitialColors = (colors: CellColorValue[]) => typeManager.mapImportedColors
+    const processInitialColors = (colors: CellColorValue[], forceMapping: boolean) => forceMapping || typeManager.mapImportedColors
         ? colors.map((color) => fPuzzleColorsMap[color as string as FPuzzleColor] ?? color)
         : colors;
 
-    if (noSpecialRules && !puzzleJson.solution) {
+    if (noSpecialRules) {
         puzzle.resultChecker = isValidFinishedPuzzleByConstraints;
     }
 
@@ -360,16 +362,27 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
                     c: (color) => {
                         if (typeof color === "string") {
                             initialColors[top] = initialColors[top] || {};
-                            initialColors[top][left] = processInitialColors([color]);
+                            initialColors[top][left] = processInitialColors([color], false);
                         }
                     },
                     cArray: (colors) => {
                         if (Array.isArray(colors) && colors.length) {
                             initialColors[top] = initialColors[top] || {};
-                            initialColors[top][left] = processInitialColors(colors);
+                            initialColors[top][left] = processInitialColors(colors, false);
                         }
                     },
-                    highlight: undefined,
+                    highlight: (color) => {
+                        if (typeof color === "string") {
+                            solutionColors[top] = solutionColors[top] || {};
+                            solutionColors[top][left] = processInitialColors([color], true);
+                        }
+                    },
+                    highlightArray: (colors) => {
+                        if (Array.isArray(colors) && colors.length) {
+                            solutionColors[top] = solutionColors[top] || {};
+                            solutionColors[top][left] = processInitialColors(colors, true);
+                        }
+                    },
                     givenPencilMarks: undefined,
                     centerPencilMarks: (value) => value === undefined || value === null,
                     cornerPencilMarks: (value) => value === undefined || value === null,
@@ -789,7 +802,6 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
                     }),
                     size
                 ));
-                puzzle.resultChecker = isValidFinishedPuzzleByEmbeddedSolution;
             }
         },
         disabledlogic: undefined,
@@ -798,6 +810,10 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
         foglight: undefined,
         // endregion
     }, ["size"]).parse(puzzleJson, "f-puzzles data");
+
+    if (Object.keys(puzzle.solution ?? {}).length || Object.keys(puzzle.solutionColors ?? {}).length) {
+        puzzle.resultChecker = isValidFinishedPuzzleByEmbeddedSolution;
+    }
 
     if (puzzleJson.fogofwar || puzzleJson.foglight) {
         items.push(FogConstraint<T>(

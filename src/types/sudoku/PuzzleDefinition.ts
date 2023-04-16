@@ -81,6 +81,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     initialLives?: number;
     decreaseOnlyOneLive?: boolean;
     solution?: GivenDigitsMap<string | number>;
+    solutionColors?: GivenDigitsMap<CellColorValue[]>;
     importOptions?: Omit<PuzzleImportOptions, "load">;
 }
 
@@ -211,7 +212,15 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     context: PuzzleContext<T>
 ): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
     const {puzzle, state, cellsIndex} = context;
-    const {typeManager: {getCellTypeProps, getDigitByCellData}, initialDigits, initialCellMarks = []} = puzzle;
+    const {
+        typeManager: {getCellTypeProps, getDigitByCellData},
+        initialDigits,
+        initialCellMarks = [],
+        solution = {},
+        solutionColors = {},
+    } = puzzle;
+
+    const hasSolutionColors = Object.keys(solutionColors).length !== 0;
 
     const {cells, marks} = gameStateGetCurrentFieldState(state, true);
 
@@ -219,14 +228,17 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const userCenterMarks = getCenterMarksMap(marks.items, cellsIndex);
 
     let areCorrectDigits = true;
-    let areCorrectColors = true;
+    let areCorrectColorsByDigits = true;
+    let unshadedCellColor: string | undefined = undefined;
+    let usedSolutionColors: Record<string, true> = {};
     const digitToColorMap: Record<number, string> = {};
     for (const [top, row] of cells.entries()) {
         for (const [left, {usersDigit, colors}] of row.entries()) {
             if (!isInteractableCell(getCellTypeProps?.({top, left}, puzzle))) {
                 continue;
             }
-            let expectedData = puzzle.solution?.[top]?.[left] ?? undefined;
+
+            let expectedData = solution[top]?.[left] ?? undefined;
             if (typeof expectedData === "string") {
                 const expectedMark = parseCellMark(expectedData);
                 if (expectedMark !== undefined) {
@@ -240,19 +252,39 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                 areCorrectDigits = false;
             }
 
+            let expectedColor = [...solutionColors[top]?.[left] ?? []].sort().join(",");
+            const actualColor = colors.sorted().items.join(",");
+
             if (!expectedData) {
-                areCorrectColors = false;
+                areCorrectColorsByDigits = false;
             } else if (typeof expectedData === "number") {
-                const expectedColor = digitToColorMap[expectedData];
-                const actualColor = colors.sorted().items.join(",");
-                if (!expectedColor) {
+                const expectedColorByDigit = digitToColorMap[expectedData];
+                if (!expectedColorByDigit) {
                     digitToColorMap[expectedData] = actualColor;
-                } else if (actualColor !== expectedColor) {
-                    areCorrectColors = false;
+                } else if (actualColor !== expectedColorByDigit) {
+                    areCorrectColorsByDigits = false;
                 }
             }
 
-            if (!areCorrectDigits && !areCorrectColors) {
+            if (hasSolutionColors) {
+                if (expectedColor) {
+                    usedSolutionColors[expectedColor] = true;
+                } else if (unshadedCellColor !== undefined) {
+                    expectedColor = unshadedCellColor;
+                } else {
+                    expectedColor = unshadedCellColor = actualColor;
+                }
+
+                if (actualColor !== expectedColor) {
+                    return false;
+                }
+
+                if (unshadedCellColor !== undefined && usedSolutionColors[unshadedCellColor]) {
+                    return false;
+                }
+            }
+
+            if (!areCorrectDigits && !areCorrectColorsByDigits) {
                 return false;
             }
         }
@@ -262,7 +294,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         return true;
     }
 
-    if (areCorrectColors) {
+    if (areCorrectColorsByDigits) {
         const allColors = Object.values(digitToColorMap);
         if (new HashSet(allColors).size === allColors.length) {
             return {
