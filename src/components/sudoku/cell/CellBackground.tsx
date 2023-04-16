@@ -20,6 +20,10 @@ export interface CellBackgroundProps<T extends AnyPTM> {
 }
 
 export const CellBackground = <T extends AnyPTM>({context, cellPosition, colors, noOpacity, size = 1}: CellBackgroundProps<T>) => {
+    if (context.puzzle.disableBackgroundColorOpacity) {
+        noOpacity = true;
+    }
+
     colors = colors.sorted();
     cellPosition = usePureMemo(cellPosition);
 

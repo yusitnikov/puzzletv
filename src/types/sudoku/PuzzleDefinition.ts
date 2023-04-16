@@ -55,6 +55,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<T>) => GivenDigitsMap<CellColorValue[]>);
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
+    disableBackgroundColorOpacity?: boolean;
     resultChecker?: (context: PuzzleContext<T>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
     forceAutoCheckOnFinish?: boolean;
     items?: Constraint<T, any>[]

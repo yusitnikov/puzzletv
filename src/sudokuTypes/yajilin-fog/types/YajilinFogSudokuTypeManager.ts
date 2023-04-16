@@ -15,6 +15,11 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
     return {
         ...baseTypeManager,
         postProcessPuzzle(puzzle): PuzzleDefinition<T> {
+            puzzle = {
+                ...puzzle,
+                disableBackgroundColorOpacity: true,
+            };
+
             if (puzzle.fieldSize.rowsCount > 9) {
                 puzzle = {
                     ...puzzle,

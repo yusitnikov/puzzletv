@@ -38,6 +38,7 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                 resultChecker,
                 forceAutoCheckOnFinish,
                 forceEnableConflictChecker,
+                disableBackgroundColorOpacity,
                 typeManager: {disableConflictChecker, settingsComponents = [], getCellSelectionType},
             },
             state: {
@@ -239,7 +240,7 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
             />
         </SettingsItem>}
 
-        <SettingsItem>
+        {!disableBackgroundColorOpacity && <SettingsItem>
             {translate("Background color's opacity")}:<br/>
 
             <InputSlider
@@ -250,7 +251,7 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                 xstep={0.1}
                 onChange={({x}) => handleChangeBackgroundOpacity(x)}
             />
-        </SettingsItem>
+        </SettingsItem>}
 
         {!getCellSelectionType && <SettingsItem>
             {translate("Highlight cells seen by selection")}:
