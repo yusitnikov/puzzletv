@@ -40,17 +40,22 @@ export const FieldItems = <T extends AnyPTM>(
                     context.state
                 );
 
+                let component = <Component
+                    context={context}
+                    cells={[emptyPosition]}
+                    {...otherData}
+                />;
+                if (processedPosition?.angle) {
+                    component = <AutoSvg top={0.5} left={0.5} angle={processedPosition.angle}>
+                        <AutoSvg top={-0.5} left={-0.5}>
+                            {component}
+                        </AutoSvg>
+                    </AutoSvg>;
+                }
+
                 return <AutoSvg key={index} {...(context.puzzle.customCellBounds ? {} : position)}>
                     <FieldCellUserArea context={context} cellPosition={position}>
-                        <AutoSvg top={0.5} left={0.5} angle={processedPosition?.angle}>
-                            <AutoSvg top={-0.5} left={-0.5}>
-                                <Component
-                                    context={context}
-                                    cells={[emptyPosition]}
-                                    {...otherData}
-                                />
-                            </AutoSvg>
-                        </AutoSvg>
+                        {component}
                     </FieldCellUserArea>
                 </AutoSvg>;
             }
