@@ -1,6 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {isSamePosition, parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
+import {
+    arrayContainsPosition,
+    parsePositionLiterals,
+    Position,
+    PositionLiteral
+} from "../../../../types/layout/Position";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps, getAllPuzzleConstraints} from "../../../../types/sudoku/Constraint";
 import {Fragment} from "react";
@@ -61,7 +66,7 @@ export const getFogVisibleCells = <T extends AnyPTM>(
     const visible3x3Centers = indexes(rowsCount).map(
         (top) => indexes(columnsCount).map(
             (left) =>
-                startCells3x3?.some((position) => isSamePosition(position, {top, left})) ||
+                arrayContainsPosition(startCells3x3 ?? [], {top, left}) ||
                 (!!givenDigits[top]?.[left] && (typeof solution?.[top]?.[left] !== "number" || getDigitByCellData(givenDigits[top][left], context, {top, left}) === solution[top][left])) ||
                 (revealByColors && cells[top][left].colors.size === 1 && !initialColors[top]?.[left] && (
                     Array.isArray(revealByColors)
@@ -102,7 +107,7 @@ export const getFogVisibleCells = <T extends AnyPTM>(
     return indexes(rowsCount).map(
         (top) => indexes(columnsCount).map(
             (left) =>
-                startCells?.some((position) => isSamePosition(position, {top, left})) ||
+                arrayContainsPosition(startCells ?? [], {top, left}) ||
                 visible3x3[top][left] || visibleCross[top][left]
         )
     );

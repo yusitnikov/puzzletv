@@ -1,5 +1,5 @@
 import {JigsawDigit} from "./JigsawDigit";
-import {isSamePosition, Position, PositionWithAngle} from "../../../types/layout/Position";
+import {arrayContainsPosition, Position, PositionWithAngle} from "../../../types/layout/Position";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {loop} from "../../../utils/math";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
@@ -51,7 +51,7 @@ export const getJigsawPieceIndexByCell = (
     cell: Position,
 ): number | undefined => {
     const index = getJigsawPiecesWithCache(cellsIndex).findIndex(
-        ({cells}) => cells.some((regionCell) => isSamePosition(regionCell, cell))
+        ({cells}) => arrayContainsPosition(cells, cell)
     );
     return index >= 0 ? index : undefined;
 };

@@ -84,6 +84,9 @@ export const parsePositionLiterals = (positions: PositionLiteral[]): Position[] 
 export const parsePositionLiterals2 = (positions: PositionLiteral[][]): Position[][] => positions.map(parsePositionLiterals);
 
 export const isSamePosition = (p1: Position, p2: Position) => p1.left === p2.left && p1.top === p2.top;
+export const arrayContainsPosition = (positions: Position[], position: Position) =>
+    positions.some((position2) => isSamePosition(position, position2));
+
 export const isSameLine = (line1: Line, line2: Line) =>
     (isSamePosition(line1.start, line2.start) && isSamePosition(line1.end, line2.end)) ||
     (isSamePosition(line1.start, line2.end) && isSamePosition(line1.end, line2.start));

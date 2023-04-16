@@ -6,7 +6,7 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
-import {isSamePosition, parsePositionLiterals2} from "../../types/layout/Position";
+import {arrayContainsPosition, parsePositionLiterals2} from "../../types/layout/Position";
 
 const ctc = {
     "id": "penpabe03a5e39ee5fca861c7872e05ca86d4",
@@ -5293,7 +5293,7 @@ export const MakeAPictureJigsaw: PuzzleDefinition<JigsawPTM> = {
         ...JigsawSudokuTypeManager,
         getCellTypeProps(cell) {
             return {
-                isVisible: regions.flat().some((cell2) => isSamePosition(cell, cell2)),
+                isVisible: arrayContainsPosition(regions.flat(), cell),
             };
         },
     },

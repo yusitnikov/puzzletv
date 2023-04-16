@@ -1,8 +1,8 @@
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
+    arrayContainsPosition,
     getCircleConnectionPoint,
-    isSamePosition,
     parsePositionLiterals,
     PositionLiteral
 } from "../../../../types/layout/Position";
@@ -79,7 +79,7 @@ export const InBetweenLineConstraint = <T extends AnyPTM>(
                 .sort((a, b) => compareCellData(a, b, puzzle, state, true));
 
             // The current cell is an edge cell
-            if (edgeCells.some(position => isSamePosition(position, cell))) {
+            if (arrayContainsPosition(edgeCells, cell)) {
                 // Other edge cells shouldn't be the same
                 return edgeDigit2 === undefined || !areSameCellData(edgeDigit1, edgeDigit2, puzzle, state, true);
             } else {

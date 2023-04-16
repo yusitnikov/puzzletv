@@ -1,7 +1,13 @@
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {JigsawGameState, JigsawProcessedGameState} from "./JigsawGameState";
 import {JigsawDigit} from "./JigsawDigit";
-import {isSamePosition, Position, PositionWithAngle, rotateVectorClockwise} from "../../../types/layout/Position";
+import {
+    arrayContainsPosition,
+    isSamePosition,
+    Position,
+    PositionWithAngle,
+    rotateVectorClockwise
+} from "../../../types/layout/Position";
 import {loop, roundToStep} from "../../../utils/math";
 import {JigsawDigitCellDataComponentType} from "../components/JigsawDigitCellData";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
@@ -311,7 +317,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
                         ...puzzle.typeManager,
                         getCellTypeProps(cell) {
                             return {
-                                isSelectable: cells.some((cell2) => isSamePosition(cell, cell2)),
+                                isSelectable: arrayContainsPosition(cells, cell),
                             };
                         },
                     },

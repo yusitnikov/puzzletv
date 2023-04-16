@@ -1,5 +1,5 @@
 import {Rect} from "../layout/Rect";
-import {isSamePosition, Position} from "../layout/Position";
+import {arrayContainsPosition, Position} from "../layout/Position";
 import {PuzzleContext} from "./PuzzleContext";
 import {AnyPTM} from "./PuzzleTypeMap";
 
@@ -12,7 +12,7 @@ export interface GridRegion extends Rect {
 
 export const doesGridRegionContainCell = ({cells, top, left, width, height}: GridRegion, cell: Position) =>
     cells
-        ? cells.some((cell2) => isSamePosition(cell2, cell))
+        ? arrayContainsPosition(cells, cell)
         : cell.top >= top && cell.left >= left && cell.top < top + height && cell.left < left + width;
 
 export const transformCoordsByRegions = <T extends AnyPTM>(coords: Position, context: PuzzleContext<T>): Position => {

@@ -1,5 +1,5 @@
 import {ComponentType, ReactElement} from "react";
-import {isSamePosition, Line, Position} from "../layout/Position";
+import {arrayContainsPosition, Line, Position} from "../layout/Position";
 import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "./GameState";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
@@ -140,7 +140,7 @@ export const isValidUserDigit = <T extends AnyPTM>(
             if (!isFinalCheck && normalizedConstraintCells.some(({top, left}) => !context.cellsIndexForState.getAllCells()[top]?.[left]?.isVisible)) {
                 continue;
             }
-            if (!normalizedConstraintCells.some((constraintCell) => isSamePosition(constraintCell, cell))) {
+            if (!arrayContainsPosition(normalizedConstraintCells, cell)) {
                 continue;
             }
         }
