@@ -2,10 +2,11 @@ import {indexes} from "../../../utils/indexes";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {darkGreyColor, textColor} from "../../app/globals";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
-import {formatSvgPointsArray} from "../../../types/layout/Position";
+import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {concatContinuousLines} from "../../../utils/lines";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {isCellWithBorders} from "../../../types/sudoku/CellTypeProps";
 
 export const FieldLines = {
     [FieldLayer.lines]: <T extends AnyPTM>(
@@ -32,14 +33,13 @@ export const FieldLines = {
         const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
         const borderWidth = 1 / scale;
 
+        const cellHasBorders = (position: Position) => isCellWithBorders(getCellTypeProps?.(position, puzzle));
+
         if (customCellBounds) {
             return <>
                 {cellsIndexForState.getAllCells().flatMap(
                     (row, top) => row.flatMap(
-                        ({transformedBounds: {borders}}, left) => getCellTypeProps?.({
-                            top,
-                            left
-                        }, puzzle)?.isVisible !== false ? borders.map(
+                        ({transformedBounds: {borders}}, left) => cellHasBorders({top, left}) ? borders.map(
                             (border, partIndex) => <polygon
                                 key={`${top}-${left}-${partIndex}`}
                                 points={formatSvgPointsArray(border)}
@@ -56,8 +56,8 @@ export const FieldLines = {
         return <>
             {indexes(rowsCount, true).flatMap(
                 top => concatContinuousLines(indexes(columnsCount).filter(
-                    left => getCellTypeProps?.({top, left}, puzzle)?.isVisible !== false
-                        || (top > 0 && getCellTypeProps?.({top: top - 1, left}, puzzle)?.isVisible !== false)
+                    left => cellHasBorders({top, left})
+                        || (top > 0 && cellHasBorders({top: top - 1, left}))
                 )).map(({start, end}) => <line
                     key={`h-line-${top}-${start}`}
                     x1={start}
@@ -71,8 +71,8 @@ export const FieldLines = {
 
             {indexes(columnsCount, true).flatMap(
                 left => concatContinuousLines(indexes(rowsCount).filter(
-                    top => getCellTypeProps?.({top, left}, puzzle)?.isVisible !== false
-                        || (left > 0 && getCellTypeProps?.({top, left: left - 1}, puzzle)?.isVisible !== false)
+                    top => cellHasBorders({top, left})
+                        || (left > 0 && cellHasBorders({top, left: left - 1}))
                 )).map(({start, end}) => <line
                     key={`v-line-${left}-${start}`}
                     x1={left}

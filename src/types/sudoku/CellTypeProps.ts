@@ -8,6 +8,7 @@ export interface CellTypeProps<T extends AnyPTM> {
     isSelectable?: boolean;
     forceCellWriteMode?: CellWriteModeInfo<T>;
     noInteraction?: boolean;
+    noBorders?: boolean;
 }
 
 export const isVisibleCell = <T extends AnyPTM>({isVisible = true}: CellTypeProps<T> = {}): boolean => isVisible;
@@ -17,3 +18,6 @@ export const isInteractableCell = <T extends AnyPTM>(props: CellTypeProps<T> = {
 
 export const isSelectableCell = <T extends AnyPTM>(props: CellTypeProps<T> = {}): boolean =>
     isInteractableCell(props) && props.isSelectable !== false;
+
+export const isCellWithBorders = <T extends AnyPTM>(props: CellTypeProps<T> = {}): boolean =>
+    isVisibleCell(props) && !props.noBorders;
