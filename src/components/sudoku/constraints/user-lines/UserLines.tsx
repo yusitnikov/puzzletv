@@ -1,10 +1,9 @@
-import {memo, useMemo} from "react";
+import {useMemo} from "react";
 import {getRegionBorderWidth, lightGreyColor} from "../../../app/globals";
-import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     Constraint,
-    ConstraintProps, ConstraintPropsGenericFc,
+    ConstraintProps,
     getAllPuzzleConstraints,
     getInvalidUserLines,
     prepareGivenDigitsMapForConstraints
@@ -28,51 +27,52 @@ const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
 const removingBorderColor = lightGreyColor;
 
-export const UserLines = memo(<T extends AnyPTM>({context}: ConstraintProps<T>) => {
-    const layer = useFieldLayer();
+export const UserLines = {
+    [FieldLayer.givenUserLines]: <T extends AnyPTM>({context}: ConstraintProps<T>) => {
+        const {cellSize, puzzle, state} = context;
 
-    const {cellSize, puzzle, state} = context;
+        const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
 
-    const {currentMultiLine, dragAction} = state;
+        const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
 
-    const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
+        const invalidLines = useMemo(() => getInvalidUserLines(
+            lines,
+            prepareGivenDigitsMapForConstraints(context, cells),
+            getAllPuzzleConstraints(context),
+            context
+        ), [context, lines, cells]);
 
-    const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
+        return <>
+            {lines.items.map((line, index) => {
+                line = normalizePuzzleLine(line, puzzle);
 
-    const invalidLines = useMemo(() => getInvalidUserLines(
-        lines,
-        prepareGivenDigitsMapForConstraints(context, cells),
-        getAllPuzzleConstraints(context),
-        context
-    ), [context, lines, cells]);
+                return <RoundedPolyLine
+                    key={`existing-line-${index}`}
+                    points={[line.start, line.end]}
+                    stroke={invalidLines.contains(line) ? errorBorderColor : resolveCellColorValue(line.color ?? regularBorderColor)}
+                    strokeWidth={borderWidth}
+                />;
+            })}
 
-    return <>
-        {layer === FieldLayer.givenUserLines && lines.items.map((line, index) => {
-            line = normalizePuzzleLine(line, puzzle);
-
-            return <RoundedPolyLine
-                key={`existing-line-${index}`}
-                points={[line.start, line.end]}
-                stroke={invalidLines.contains(line) ? errorBorderColor : resolveCellColorValue(line.color ?? regularBorderColor)}
-                strokeWidth={borderWidth}
-            />;
-        })}
-
-        {layer === FieldLayer.givenUserLines && marks.items.map((mark, index) => <UserMarkByData
-            key={`mark-${index}`}
-            context={context}
-            cellSize={cellSize}
-            {...mark}
-        />)}
-
-        {layer === FieldLayer.newUserLines && currentMultiLine.map((line, index) => <UserLinesByData
-            key={`new-line-${index}`}
-            cellSize={cellSize}
-            {...line}
-            isAdding={dragAction === DragAction.SetTrue}
-        />)}
-    </>;
-}) as ConstraintPropsGenericFc;
+            {marks.items.map((mark, index) => <UserMarkByData
+                key={`mark-${index}`}
+                context={context}
+                cellSize={cellSize}
+                {...mark}
+            />)}
+        </>;
+    },
+    [FieldLayer.newUserLines]: <T extends AnyPTM>({context: {cellSize, state: {currentMultiLine, dragAction}}}: ConstraintProps<T>) => {
+        return <>
+            {currentMultiLine.map((line, index) => <UserLinesByData
+                key={`new-line-${index}`}
+                cellSize={cellSize}
+                {...line}
+                isAdding={dragAction === DragAction.SetTrue}
+            />)}
+        </>;
+    },
+};
 
 export interface UserMarkByDataProps<T extends AnyPTM> extends CellMark {
     context?: PuzzleContext<T>;

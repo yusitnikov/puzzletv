@@ -1,12 +1,7 @@
 import {blackColor, textColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
@@ -19,39 +14,41 @@ export interface KropkiDotProps {
     showValue?: boolean;
 }
 
-export const KropkiDot = withFieldLayer(FieldLayer.top, <T extends AnyPTM>(
-    {
-        cells: [cell1, cell2],
-        color = blackColor,
-        props: {
-            value,
-            showValue = true
-        },
-    }: ConstraintProps<T, KropkiDotProps>
-) => {
-    const top = (cell1.top + cell2.top) / 2 + 0.5;
-    const left = (cell1.left + cell2.left) / 2 + 0.5;
+export const KropkiDot = {
+    [FieldLayer.top]: <T extends AnyPTM>(
+        {
+            cells: [cell1, cell2],
+            color = blackColor,
+            props: {
+                value,
+                showValue = true
+            },
+        }: ConstraintProps<T, KropkiDotProps>
+    ) => {
+        const top = (cell1.top + cell2.top) / 2 + 0.5;
+        const left = (cell1.left + cell2.left) / 2 + 0.5;
 
-    return <>
-        <circle
-            cx={left}
-            cy={top}
-            r={radius}
-            strokeWidth={0.02}
-            stroke={blackColor}
-            fill={color}
-        />
+        return <>
+            <circle
+                cx={left}
+                cy={top}
+                r={radius}
+                strokeWidth={0.02}
+                stroke={blackColor}
+                fill={color}
+            />
 
-        {value && showValue && <CenteredText
-            top={top}
-            left={left}
-            size={radius * (typeof value === "number" ? 1.75 : 1.25)}
-            fill={[blackColor, textColor, "black", "#000", "#000000"].includes(color) ? "white" : blackColor}
-        >
-            {typeof value === "number" ? value : value.join(":")}
-        </CenteredText>}
-    </>;
-}) as ConstraintPropsGenericFc<KropkiDotProps>;
+            {value && showValue && <CenteredText
+                top={top}
+                left={left}
+                size={radius * (typeof value === "number" ? 1.75 : 1.25)}
+                fill={[blackColor, textColor, "black", "#000", "#000000"].includes(color) ? "white" : blackColor}
+            >
+                {typeof value === "number" ? value : value.join(":")}
+            </CenteredText>}
+        </>;
+    },
+};
 
 export const KropkiDotConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,

@@ -1,5 +1,4 @@
 import {textColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {getAveragePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../../types/sudoku/Constraint";
@@ -16,10 +15,9 @@ export interface DecorativeShapeProps extends Size {
 }
 
 const DecorativeShapeComponent = <T extends AnyPTM>(
-    Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>,
-    layer = FieldLayer.lines
+    Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>
 ) => {
-    return withFieldLayer(layer, function DecorativeShapeComponent(
+    return function DecorativeShapeComponent(
         {
             context: {puzzle: {typeManager: {digitComponentType: {widthCoeff}}}},
             cells,
@@ -56,25 +54,26 @@ const DecorativeShapeComponent = <T extends AnyPTM>(
                 {text}
             </CenteredText>}
         </AutoSvg>;
-    }) as ConstraintPropsGenericFc<DecorativeShapeProps>;
+    } as ConstraintPropsGenericFc<DecorativeShapeProps>;
 };
 
-export const RectComponent = (layer = FieldLayer.lines) => DecorativeShapeComponent((props) => <rect
+const RectComponent = DecorativeShapeComponent((props) => <rect
     x={-props.width / 2}
     y={-props.height / 2}
     {...props}
-/>, layer);
+/>);
 
-export const EllipseComponent = (layer = FieldLayer.lines) => DecorativeShapeComponent(({width, height, ...props}) => <ellipse
+const EllipseComponent = DecorativeShapeComponent(({width, height, ...props}) => <ellipse
     cx={0}
     cy={0}
     rx={width / 2}
     ry={height / 2}
     {...props}
-/>, layer);
+/>);
 
 const DecorativeShapeConstraint = <T extends AnyPTM>(
     name: string,
+    layer: FieldLayer,
     component: ComponentType<ConstraintProps<T, DecorativeShapeProps>>,
     cellLiterals: PositionLiteral[],
     size: Size | number,
@@ -96,7 +95,7 @@ const DecorativeShapeConstraint = <T extends AnyPTM>(
         },
         color: backgroundColor,
         angle,
-        component,
+        component: {[layer]: component},
         renderSingleCellInUserArea: true,
     };
 };
@@ -110,7 +109,7 @@ export const RectConstraint = <T extends AnyPTM>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.lines,
-) => DecorativeShapeConstraint<T>("rect", RectComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>("rect", layer, RectComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
 
 export const EllipseConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
@@ -121,4 +120,4 @@ export const EllipseConstraint = <T extends AnyPTM>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.lines,
-) => DecorativeShapeConstraint<T>("ellipse", EllipseComponent(layer), cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>("ellipse", layer, EllipseComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);

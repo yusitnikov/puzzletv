@@ -1,12 +1,7 @@
 import {textColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {getAveragePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
@@ -16,7 +11,7 @@ export interface TextProps {
     size?: number;
 }
 
-export const TextComponent = (layer = FieldLayer.lines) => withFieldLayer(layer, <T extends AnyPTM>(
+export const TextComponent = <T extends AnyPTM>(
     {cells, angle = 0, color = textColor, props: {text, size = 0.5}}: ConstraintProps<T, TextProps>
 ) => {
     const {top, left} = getAveragePosition(cells);
@@ -33,7 +28,7 @@ export const TextComponent = (layer = FieldLayer.lines) => withFieldLayer(layer,
             {text}
         </CenteredText>
     </AutoSvg>;
-}) as ConstraintPropsGenericFc<TextProps>;
+};
 
 export const textTag = "text";
 
@@ -53,7 +48,7 @@ export const TextConstraint = <T extends AnyPTM>(
         color,
         angle,
         layer,
-        component: TextComponent(layer),
+        component: {[layer]: TextComponent},
         renderSingleCellInUserArea: true,
     };
 };

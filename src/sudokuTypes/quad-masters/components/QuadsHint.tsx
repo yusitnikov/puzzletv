@@ -1,13 +1,11 @@
-import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {indexesFromTo} from "../../../utils/indexes";
 import {lightGreyColor} from "../../../components/app/globals";
 import {QuadMastersPTM} from "../types/QuadMastersPTM";
 
-export const QuadsHint = withFieldLayer(
-    FieldLayer.top,
-    (
+export const QuadsHint = {
+    [FieldLayer.top]: (
         {
             context: {
                 puzzle: {
@@ -30,8 +28,8 @@ export const QuadsHint = withFieldLayer(
             stroke={"none"}
             strokeWidth={0}
         />))}
-    </> : null
-);
+    </> : null,
+};
 
 export const QuadsHintConstraint: Constraint<QuadMastersPTM> = {
     name: "quads-hint",

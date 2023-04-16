@@ -1,12 +1,11 @@
 import {recentInfoColor, textColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {isSamePosition, parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
-import {Fragment, ReactElement} from "react";
+import {Fragment} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const radius = 0.3;
@@ -28,9 +27,8 @@ export interface QuadleProps<CellType> {
     isRecent?: boolean;
 }
 
-export const Quadle = withFieldLayer(
-    FieldLayer.top,
-    <T extends AnyPTM>(
+export const Quadle = {
+    [FieldLayer.top]: <T extends AnyPTM>(
         {
             context,
             cells,
@@ -40,8 +38,8 @@ export const Quadle = withFieldLayer(
         context={context}
         cells={cells}
         props={props}
-    />
-) as <T extends AnyPTM>(props: ConstraintProps<T, QuadleProps<T["cell"]>>) => ReactElement;
+    />,
+};
 
 export const QuadleByData = <T extends AnyPTM>(
     {

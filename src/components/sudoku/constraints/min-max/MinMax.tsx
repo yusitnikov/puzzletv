@@ -1,6 +1,4 @@
 import {lightGreyColor, textColor} from "../../../app/globals";
-import {ComponentType, memo, ReactElement} from "react";
-import {useFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     formatSvgPointsArray,
@@ -14,36 +12,33 @@ import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 const arrowWidth = 0.1;
 const arrowHeight = 0.05;
 
-export const MinMax = memo(<T extends AnyPTM>({cells: [{left, top}], coeff}: ConstraintProps<T> & {coeff: number}) => {
-    const layer = useFieldLayer();
+export interface MinMaxProps {
+    coeff: number;
+}
 
-    left += 0.5;
-    top += 0.5;
-
-    return <>
-        {layer === FieldLayer.beforeSelection && <rect
-            x={left - 0.5}
-            y={top - 0.5}
+export const MinMax = {
+    [FieldLayer.beforeSelection]: <T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T, MinMaxProps>) => {
+        return <rect
+            x={left}
+            y={top}
             width={1}
             height={1}
             fill={lightGreyColor}
             fillOpacity={0.5}
-        />}
+        />;
+    },
+    [FieldLayer.regular]: <T extends AnyPTM>({cells: [{left, top}], props: {coeff}}: ConstraintProps<T, MinMaxProps>) => {
+        left += 0.5;
+        top += 0.5;
 
-        {layer === FieldLayer.regular && <>
+        return <>
             <Arrow cx={left} cy={top} dx={1} dy={0} coeff={coeff}/>
             <Arrow cx={left} cy={top} dx={-1} dy={0} coeff={coeff}/>
             <Arrow cx={left} cy={top} dx={0} dy={1} coeff={coeff}/>
             <Arrow cx={left} cy={top} dx={0} dy={-1} coeff={coeff}/>
-        </>}
-    </>;
-}) as <T extends AnyPTM>(props: ConstraintProps<T> & {coeff: number}) => ReactElement;
-
-export const Min = <T extends AnyPTM>(props: ConstraintProps<T>) =>
-    <MinMax coeff={-1} {...props}/>;
-
-export const Max = <T extends AnyPTM>(props: ConstraintProps<T>) =>
-    <MinMax coeff={1} {...props}/>;
+        </>;
+    },
+}
 
 interface ArrowProps {
     cx: number;
@@ -81,12 +76,11 @@ const Arrow = ({cx, cy, dx, dy, coeff}: ArrowProps) => {
     />;
 };
 
-export const MinMaxConstraint = <T extends AnyPTM>(
+const MinMaxConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
     name: string,
-    component: ComponentType<ConstraintProps<T>>,
     coeff: number
-): Constraint<T> => {
+): Constraint<T, MinMaxProps> => {
     const mainCell = parsePositionLiteral(cellLiteral);
 
     return ({
@@ -98,9 +92,9 @@ export const MinMaxConstraint = <T extends AnyPTM>(
             {left: mainCell.left, top: mainCell.top - 1},
             {left: mainCell.left, top: mainCell.top + 1},
         ],
-        component,
+        component: MinMax,
         renderSingleCellInUserArea: true,
-        props: undefined,
+        props: {coeff},
         isObvious: true,
         isValidCell(cell, digits, [mainCell, ...neighborCells], {puzzle, state}) {
             const {typeManager: {compareCellData}} = puzzle;
@@ -122,6 +116,6 @@ export const MinMaxConstraint = <T extends AnyPTM>(
 };
 
 export const MinConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral) =>
-    MinMaxConstraint<T>(cellLiteral, "min", Min, -1);
+    MinMaxConstraint<T>(cellLiteral, "min", -1);
 export const MaxConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral) =>
-    MinMaxConstraint<T>(cellLiteral, "max", Max, 1);
+    MinMaxConstraint<T>(cellLiteral, "max", 1);

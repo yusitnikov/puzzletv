@@ -21,7 +21,7 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
     cells: Position[];
     renderSingleCellInUserArea?: boolean;
     layer?: FieldLayer;
-    component?: ComponentType<ConstraintProps<T, DataT>>;
+    component?: Partial<Record<FieldLayer, ComponentType<ConstraintProps<T, DataT>>>>;
     color?: string;
     angle?: number;
     isObvious?: boolean;

@@ -1,10 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
 import {isSamePosition, parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps, getAllPuzzleConstraints} from "../../../../types/sudoku/Constraint";
-import {Fragment, ReactElement} from "react";
+import {Fragment} from "react";
 import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "../../../../types/sudoku/GameState";
 import {darkGreyColor} from "../../../app/globals";
 import {CellBackground} from "../../cell/CellBackground";
@@ -109,55 +108,54 @@ export const getFogVisibleCells = <T extends AnyPTM>(
     );
 };
 
-export const Fog = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
-    {context, props}: ConstraintProps<T, FogProps<T>>
-) => {
-    const {bulbCells} = props;
+export const Fog = {
+    [FieldLayer.regular]: <T extends AnyPTM>({context, props}: ConstraintProps<T, FogProps<T>>) => {
+        const {bulbCells} = props;
 
-    const {
-        puzzle: {fieldSize: {rowsCount, columnsCount}},
-        state,
-    } = context;
+        const {
+            puzzle: {fieldSize: {rowsCount, columnsCount}},
+            state,
+        } = context;
 
-    const {cells} = gameStateGetCurrentFieldState(state);
+        const {cells} = gameStateGetCurrentFieldState(state);
 
-    const visible = getFogVisibleCells(context, props);
+        const visible = getFogVisibleCells(context, props);
 
-    const id = useAutoIncrementId();
-    const blurFilterId = `blur-filter-${id}`;
-    const fogMaskId = `fog-mask-${id}`;
-    const fogBulbId = `fog-bulb-${id}`;
+        const id = useAutoIncrementId();
+        const blurFilterId = `blur-filter-${id}`;
+        const fogMaskId = `fog-mask-${id}`;
+        const fogBulbId = `fog-bulb-${id}`;
 
-    return <>
-        <defs>
-            <filter id={blurFilterId}>
-                <feGaussianBlur stdDeviation={shadowSize}/>
-            </filter>
-            <mask id={fogMaskId}>
-                <g filter={`url(#${blurFilterId})`}>
-                    <DarkReaderRectOverride
-                        width={columnsCount}
-                        height={rowsCount}
-                        fill={"#000"}
-                        strokeWidth={0}
-                    />
-
-                    {visible.flatMap((row, top) => row.map((vis, left) => !vis && <Fragment key={`${top}-${left}`}>
+        return <>
+            <defs>
+                <filter id={blurFilterId}>
+                    <feGaussianBlur stdDeviation={shadowSize}/>
+                </filter>
+                <mask id={fogMaskId}>
+                    <g filter={`url(#${blurFilterId})`}>
                         <DarkReaderRectOverride
-                            y={top - shadowSize}
-                            x={left - shadowSize}
-                            width={1 + 2 * shadowSize}
-                            height={1 + 2 * shadowSize}
-                            fill={"#fff"}
+                            width={columnsCount}
+                            height={rowsCount}
+                            fill={"#000"}
                             strokeWidth={0}
                         />
-                    </Fragment>))}
-                </g>
-            </mask>
 
-            <path
-                id={fogBulbId}
-                d={`
+                        {visible.flatMap((row, top) => row.map((vis, left) => !vis && <Fragment key={`${top}-${left}`}>
+                            <DarkReaderRectOverride
+                                y={top - shadowSize}
+                                x={left - shadowSize}
+                                width={1 + 2 * shadowSize}
+                                height={1 + 2 * shadowSize}
+                                fill={"#fff"}
+                                strokeWidth={0}
+                            />
+                        </Fragment>))}
+                    </g>
+                </mask>
+
+                <path
+                    id={fogBulbId}
+                    d={`
                     M 0.4 0.68
                     H 0.6
                     V 0.8
@@ -195,44 +193,45 @@ export const Fog = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
                     M 0.323 0.273
                     L 0.217 0.167
                 `}
-                fill={"#ff8"}
-                stroke={"#ff0"}
-                strokeWidth={0.02}
-            />
-        </defs>
+                    fill={"#ff8"}
+                    stroke={"#ff0"}
+                    strokeWidth={0.02}
+                />
+            </defs>
 
-        <g mask={`url(#${fogMaskId})`}>
-            <rect
-                width={columnsCount}
-                height={rowsCount}
-                fill={darkGreyColor}
-                strokeWidth={0}
-            />
+            <g mask={`url(#${fogMaskId})`}>
+                <rect
+                    width={columnsCount}
+                    height={rowsCount}
+                    fill={darkGreyColor}
+                    strokeWidth={0}
+                />
 
-            {indexes(rowsCount).map((top) => indexes(columnsCount).map((left) => {
-                const {colors} = cells[top][left];
+                {indexes(rowsCount).map((top) => indexes(columnsCount).map((left) => {
+                    const {colors} = cells[top][left];
 
-                return colors.size !== 0 && <AutoSvg
-                    key={`${top}-${left}`}
-                    top={top}
-                    left={left}
-                >
-                    <CellBackground
-                        context={context}
-                        cellPosition={{top, left}}
-                        colors={colors}
-                    />
-                </AutoSvg>;
-            }))}
-        </g>
+                    return colors.size !== 0 && <AutoSvg
+                        key={`${top}-${left}`}
+                        top={top}
+                        left={left}
+                    >
+                        <CellBackground
+                            context={context}
+                            cellPosition={{top, left}}
+                            colors={colors}
+                        />
+                    </AutoSvg>;
+                }))}
+            </g>
 
-        {bulbCells?.map(({top, left}) => <use
-            key={`light-${top}-${left}`}
-            href={`#${fogBulbId}`}
-            transform={`translate(${left} ${top})`}
-        />)}
-    </>;
-}) as <T extends AnyPTM>(props: ConstraintProps<T, FogProps<T>>) => ReactElement;
+            {bulbCells?.map(({top, left}) => <use
+                key={`light-${top}-${left}`}
+                href={`#${fogBulbId}`}
+                transform={`translate(${left} ${top})`}
+            />)}
+        </>;
+    },
+};
 
 export const FogConstraint = <T extends AnyPTM>(
     startCell3x3Literals: PositionLiteral[] = [],

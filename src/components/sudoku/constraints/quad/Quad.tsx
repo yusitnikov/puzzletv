@@ -1,11 +1,9 @@
 import {recentInfoColor, textColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
-import {ReactElement} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export interface QuadProps<CellType> {
@@ -15,9 +13,8 @@ export interface QuadProps<CellType> {
     radius?: number;
 }
 
-export const Quad = withFieldLayer(
-    FieldLayer.top,
-    <T extends AnyPTM>(
+export const Quad = {
+    [FieldLayer.top]: <T extends AnyPTM>(
         {
             context,
             cells,
@@ -27,8 +24,8 @@ export const Quad = withFieldLayer(
         context={context}
         cells={cells}
         props={props}
-    />
-) as <T extends AnyPTM>(props: ConstraintProps<T, QuadProps<T["cell"]>>) => ReactElement;
+    />,
+};
 
 export const QuadByData = <T extends AnyPTM>(
     {

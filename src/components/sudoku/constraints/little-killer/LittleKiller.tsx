@@ -1,12 +1,7 @@
 import {textColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {Line, parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
@@ -18,54 +13,56 @@ export interface LittleKillerProps {
     sum?: number;
 }
 
-export const LittleKiller = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
-    {context: {puzzle}, cells: [{top, left}], props: {direction, sum}}: ConstraintProps<T, LittleKillerProps>
-) => {
-    const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent}}} = puzzle;
+export const LittleKiller = {
+    [FieldLayer.regular]: <T extends AnyPTM>(
+        {context: {puzzle}, cells: [{top, left}], props: {direction, sum}}: ConstraintProps<T, LittleKillerProps>
+    ) => {
+        const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent}}} = puzzle;
 
-    top += 0.5;
-    left += 0.5;
-    top -= 0.5 * direction.top;
-    left -= 0.5 * direction.left;
+        top += 0.5;
+        left += 0.5;
+        top -= 0.5 * direction.top;
+        left -= 0.5 * direction.left;
 
-    const line: Line = {
-        start: {
-            top: top - 0.25 * direction.top,
-            left: left - 0.25 * direction.left,
-        },
-        end: {
-            top: top - 0.05 * direction.top,
-            left: left - 0.05 * direction.left,
-        },
-    };
+        const line: Line = {
+            start: {
+                top: top - 0.25 * direction.top,
+                left: left - 0.25 * direction.left,
+            },
+            end: {
+                top: top - 0.05 * direction.top,
+                left: left - 0.05 * direction.left,
+            },
+        };
 
-    return <>
-        <line
-            x1={line.start.left}
-            y1={line.start.top}
-            x2={line.end.left}
-            y2={line.end.top}
-            strokeWidth={lineWidth}
-            stroke={textColor}
-        />
+        return <>
+            <line
+                x1={line.start.left}
+                y1={line.start.top}
+                x2={line.end.left}
+                y2={line.end.top}
+                strokeWidth={lineWidth}
+                stroke={textColor}
+            />
 
-        <ArrowEnd
-            position={line.end}
-            direction={direction}
-            arrowSize={0.1}
-            lineWidth={lineWidth}
-            color={textColor}
-        />
+            <ArrowEnd
+                position={line.end}
+                direction={direction}
+                arrowSize={0.1}
+                lineWidth={lineWidth}
+                color={textColor}
+            />
 
-        {sum !== undefined && <DigitSvgContent
-            puzzle={puzzle}
-            digit={sum}
-            size={0.5}
-            left={left - 0.5 * direction.left}
-            top={top - 0.5 * direction.top}
-        />}
-    </>;
-}) as ConstraintPropsGenericFc<LittleKillerProps>;
+            {sum !== undefined && <DigitSvgContent
+                puzzle={puzzle}
+                digit={sum}
+                size={0.5}
+                left={left - 0.5 * direction.left}
+                top={top - 0.5 * direction.top}
+            />}
+        </>;
+    },
+};
 
 export const LittleKillerConstraint = <T extends AnyPTM>(
     startCellLiteral: PositionLiteral,

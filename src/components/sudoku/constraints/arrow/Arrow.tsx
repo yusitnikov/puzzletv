@@ -1,6 +1,5 @@
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {darkGreyColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     getCircleConnectionPoint,
@@ -8,11 +7,7 @@ import {
     parsePositionLiterals, Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {defaultGetDefaultNumberByDigits} from "../../../../types/sudoku/SudokuTypeManager";
@@ -37,31 +32,37 @@ const getPointInfo = <T extends AnyPTM>(context: PuzzleContext<T>, {top, left}: 
         : {left: left + 0.5, top: top + 0.5, radius};
 };
 
-export const Arrow = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
-    {
-        props: {circleCells, arrowCells, transparentCircle},
-        context,
-    }: ConstraintProps<T, ArrowProps>
-) => {
-    const {left, top, radius: scaledCircleRadius} = getPointInfo(context, circleCells[0], circleRadius);
-    const {left: left2, top: top2, radius: scaledLineWidth} = getPointInfo(context, circleCells[circleCells.length - 1], lineWidth);
+export const Arrow = {
+    [FieldLayer.regular]: <T extends AnyPTM>(
+        {
+            props: {circleCells, arrowCells, transparentCircle},
+            context,
+        }: ConstraintProps<T, ArrowProps>
+    ) => {
+        const {left, top, radius: scaledCircleRadius} = getPointInfo(context, circleCells[0], circleRadius);
+        const {
+            left: left2,
+            top: top2,
+            radius: scaledLineWidth
+        } = getPointInfo(context, circleCells[circleCells.length - 1], lineWidth);
 
-    return <>
-        <ArrowLine cells={arrowCells} context={context}/>
+        return <>
+            <ArrowLine cells={arrowCells} context={context}/>
 
-        <rect
-            x={Math.min(left, left2) - scaledCircleRadius}
-            y={Math.min(top, top2) - scaledCircleRadius}
-            width={Math.abs(left - left2) + 2 * scaledCircleRadius}
-            height={Math.abs(top - top2) + 2 * scaledCircleRadius}
-            rx={scaledCircleRadius}
-            ry={scaledCircleRadius}
-            strokeWidth={scaledLineWidth}
-            stroke={darkGreyColor}
-            fill={transparentCircle ? "none" : "#fff"}
-        />
-    </>;
-}) as ConstraintPropsGenericFc<ArrowProps>;
+            <rect
+                x={Math.min(left, left2) - scaledCircleRadius}
+                y={Math.min(top, top2) - scaledCircleRadius}
+                width={Math.abs(left - left2) + 2 * scaledCircleRadius}
+                height={Math.abs(top - top2) + 2 * scaledCircleRadius}
+                rx={scaledCircleRadius}
+                ry={scaledCircleRadius}
+                strokeWidth={scaledLineWidth}
+                stroke={darkGreyColor}
+                fill={transparentCircle ? "none" : "#fff"}
+            />
+        </>;
+    },
+};
 
 export const ArrowLine = <T extends AnyPTM>(
     {cells, context}: {cells: Position[], context: PuzzleContext<T>}

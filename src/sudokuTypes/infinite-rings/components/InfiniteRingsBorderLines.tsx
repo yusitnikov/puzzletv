@@ -1,6 +1,5 @@
-import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
@@ -14,42 +13,44 @@ interface InfiniteRingsBorderLinesProps {
     visibleRingsCount: number;
 }
 
-export const InfiniteRingsBorderLines = withFieldLayer(FieldLayer.lines, <T extends AnyPTM>(
-    {
-        context,
-        props: {visibleRingsCount: visibleRingsCountArg},
-    }: ConstraintProps<T, InfiniteRingsBorderLinesProps>
-) => {
-    const {
-        puzzle: {fieldSize: {rowsCount: fieldSize}},
-        cellSize,
-    } = context;
-    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
-    const scale = useTransformScale();
-    const ringsCount = fieldSize / 2 - 1;
-    const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
-    const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount) / scale;
+export const InfiniteRingsBorderLines = {
+    [FieldLayer.lines]: <T extends AnyPTM>(
+        {
+            context,
+            props: {visibleRingsCount: visibleRingsCountArg},
+        }: ConstraintProps<T, InfiniteRingsBorderLinesProps>
+    ) => {
+        const {
+            puzzle: {fieldSize: {rowsCount: fieldSize}},
+            cellSize,
+        } = context;
+        const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
+        const scale = useTransformScale();
+        const ringsCount = fieldSize / 2 - 1;
+        const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
+        const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount) / scale;
 
-    return <>
-        <RoundedPolyLine
-            points={[
-                {top: 0, left: 2},
-                {top: 4, left: 2},
-            ]}
-            stroke={blackColor}
-            strokeWidth={borderWidth}
-        />
+        return <>
+            <RoundedPolyLine
+                points={[
+                    {top: 0, left: 2},
+                    {top: 4, left: 2},
+                ]}
+                stroke={blackColor}
+                strokeWidth={borderWidth}
+            />
 
-        <RoundedPolyLine
-            points={[
-                {top: 2, left: 0},
-                {top: 2, left: 4},
-            ]}
-            stroke={blackColor}
-            strokeWidth={borderWidth}
-        />
-    </>;
-}) as ConstraintPropsGenericFc<InfiniteRingsBorderLinesProps>;
+            <RoundedPolyLine
+                points={[
+                    {top: 2, left: 0},
+                    {top: 2, left: 4},
+                ]}
+                stroke={blackColor}
+                strokeWidth={borderWidth}
+            />
+        </>;
+    },
+};
 
 export const InfiniteRingsBorderLinesConstraint = <T extends AnyPTM>(visibleRingsCount: number)
     : Constraint<T, InfiniteRingsBorderLinesProps> => ({

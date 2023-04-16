@@ -1,10 +1,5 @@
-import {withFieldLayer} from "../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {indexes} from "../../../utils/indexes";
 import {currentPlayerColor, otherPlayerColor} from "../../../components/app/globals";
 import {getMainDigitDataHash} from "../../../utils/playerDataHash";
@@ -12,9 +7,8 @@ import {myClientId} from "../../../hooks/useMultiPlayer";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const CellOwnership = withFieldLayer(
-    FieldLayer.beforeSelection,
-    <T extends AnyPTM>(
+export const CellOwnership = {
+    [FieldLayer.beforeSelection]: <T extends AnyPTM>(
         {
             context: {
                 puzzle: {
@@ -58,8 +52,8 @@ export const CellOwnership = withFieldLayer(
                 />
             </AutoSvg>;
         }))}
-    </> : null
-) as ConstraintPropsGenericFc;
+    </> : null,
+};
 
 export const CellOwnershipConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "cell-ownership",

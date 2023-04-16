@@ -6,13 +6,8 @@ import {
     Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders} from "../../../../utils/regions";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
@@ -22,17 +17,19 @@ import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const regionTag = "region";
 
-export const Region = withFieldLayer(FieldLayer.lines, <T extends AnyPTM>(
-    {cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps<T>
-) => {
-    const points = useMemo(() => getRegionBorders(cells, 1, true), [cells]);
+export const Region = {
+    [FieldLayer.lines]: <T extends AnyPTM>(
+        {cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps<T>
+    ) => {
+        const points = useMemo(() => getRegionBorders(cells, 1, true), [cells]);
 
-    return <RoundedPolyLine
-        points={points}
-        stroke={isMyTurn ? textColor : darkGreyColor}
-        strokeWidth={getRegionBorderWidth(cellSize)}
-    />;
-}) as ConstraintPropsGenericFc;
+        return <RoundedPolyLine
+            points={points}
+            stroke={isMyTurn ? textColor : darkGreyColor}
+            strokeWidth={getRegionBorderWidth(cellSize)}
+        />;
+    },
+};
 
 export const isValidCellForRegion = <T extends AnyPTM>(
     region: Position[],

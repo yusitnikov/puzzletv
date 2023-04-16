@@ -7,13 +7,8 @@ import {
     Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions";
 import {isValidCellForRegion} from "../region/Region";
 import {indexes} from "../../../../utils/indexes";
@@ -32,84 +27,86 @@ export interface KillerCageProps {
     fontColor?: string;
 }
 
-export const KillerCage = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
-    {
-        context: {puzzle},
-        cells,
-        props: {
-            sum,
-            showBottomSum,
-            sumPointIndex = 0,
-            lineColor = blackColor,
-            fontColor = blackColor,
-        },
-    }: ConstraintProps<T, KillerCageProps>
-) => {
-    const {
-        prioritizeSelection,
-        typeManager: {
-            digitComponentType: {widthCoeff},
-        },
-    } = puzzle;
+export const KillerCage = {
+    [FieldLayer.regular]: <T extends AnyPTM>(
+        {
+            context: {puzzle},
+            cells,
+            props: {
+                sum,
+                showBottomSum,
+                sumPointIndex = 0,
+                lineColor = blackColor,
+                fontColor = blackColor,
+            },
+        }: ConstraintProps<T, KillerCageProps>
+    ) => {
+        const {
+            prioritizeSelection,
+            typeManager: {
+                digitComponentType: {widthCoeff},
+            },
+        } = puzzle;
 
-    const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
+        const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
 
-    const boundingBox = useMemo(() => getRegionBoundingBox(cells, 1), [cells]);
-    const bottom = boundingBox.top + boundingBox.height;
-    const right = useMemo(
-        () => Math.max(...cells.filter(cell => cell.top === bottom - 1).map(cell => cell.left)) + 1,
-        [cells, bottom]
-    );
+        const boundingBox = useMemo(() => getRegionBoundingBox(cells, 1), [cells]);
+        const bottom = boundingBox.top + boundingBox.height;
+        const right = useMemo(
+            () => Math.max(...cells.filter(cell => cell.top === bottom - 1).map(cell => cell.left)) + 1,
+            [cells, bottom]
+        );
 
-    const borderPadding = prioritizeSelection ? 0.15 : 0.1;
-    const sumPadding = prioritizeSelection ? 0.17 : borderPadding;
-    const sumDigitSize = prioritizeSelection ? 0.25 : 0.15;
+        const borderPadding = prioritizeSelection ? 0.15 : 0.1;
+        const sumPadding = prioritizeSelection ? 0.17 : borderPadding;
+        const sumDigitSize = prioritizeSelection ? 0.25 : 0.15;
 
-    return <>
-        <polygon
-            points={formatSvgPointsArray(
-                points
-                    .map(({left: x, top: y}, index) => {
-                        const {left: prevX, top: prevY} = incrementArrayItemByIndex(points, index, -1);
-                        const {left: nextX, top: nextY} = incrementArrayItemByIndex(points, index);
-                        const prevDirX = Math.sign(x - prevX);
-                        const prevDirY = Math.sign(y - prevY);
-                        const nextDirX = Math.sign(nextX - x);
-                        const nextDirY = Math.sign(nextY - y);
+        return <>
+            <polygon
+                points={formatSvgPointsArray(
+                    points
+                        .map(({left: x, top: y}, index) => {
+                            const {left: prevX, top: prevY} = incrementArrayItemByIndex(points, index, -1);
+                            const {left: nextX, top: nextY} = incrementArrayItemByIndex(points, index);
+                            const prevDirX = Math.sign(x - prevX);
+                            const prevDirY = Math.sign(y - prevY);
+                            const nextDirX = Math.sign(nextX - x);
+                            const nextDirY = Math.sign(nextY - y);
 
-                        return {
-                            left: x + borderPadding * (nextDirY + prevDirY),
-                            top: y - borderPadding * (nextDirX + prevDirX)
-                        };
-                    })
-            )}
-            strokeWidth={0.02}
-            strokeDasharray={0.15}
-            stroke={lineColor}
-            fill={"none"}
-        />
-
-        {sum && <>
-            <KillerCageSum
-                puzzle={puzzle}
-                sum={sum}
-                size={sumDigitSize}
-                left={points[sumPointIndex].left + sumPadding - sumDigitSize * widthCoeff / 2}
-                top={points[sumPointIndex].top + sumPadding}
-                color={fontColor}
+                            return {
+                                left: x + borderPadding * (nextDirY + prevDirY),
+                                top: y - borderPadding * (nextDirX + prevDirX)
+                            };
+                        })
+                )}
+                strokeWidth={0.02}
+                strokeDasharray={0.15}
+                stroke={lineColor}
+                fill={"none"}
             />
 
-            {showBottomSum && <KillerCageSum
-                puzzle={puzzle}
-                sum={sum}
-                size={sumDigitSize}
-                left={right - sumPadding - sumDigitSize * widthCoeff * (sum.toString().length - 0.5)}
-                top={bottom - sumPadding}
-                color={fontColor}
-            />}
-        </>}
-    </>;
-}) as ConstraintPropsGenericFc<KillerCageProps>;
+            {sum && <>
+                <KillerCageSum
+                    puzzle={puzzle}
+                    sum={sum}
+                    size={sumDigitSize}
+                    left={points[sumPointIndex].left + sumPadding - sumDigitSize * widthCoeff / 2}
+                    top={points[sumPointIndex].top + sumPadding}
+                    color={fontColor}
+                />
+
+                {showBottomSum && <KillerCageSum
+                    puzzle={puzzle}
+                    sum={sum}
+                    size={sumDigitSize}
+                    left={right - sumPadding - sumDigitSize * widthCoeff * (sum.toString().length - 0.5)}
+                    top={bottom - sumPadding}
+                    color={fontColor}
+                />}
+            </>}
+        </>;
+    },
+};
 
 interface KillerCageSumProps<T extends AnyPTM> extends Position {
     puzzle: PuzzleDefinition<T>;

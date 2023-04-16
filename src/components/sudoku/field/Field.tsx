@@ -17,7 +17,6 @@ import {
     gameStateSelectAllCells,
 } from "../../../types/sudoku/GameState";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {FieldLayerContext} from "../../../contexts/FieldLayerContext";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {
     getAllPuzzleConstraints,
@@ -87,11 +86,6 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
     } = typeManager;
 
     const items = useMemo(() => getAllPuzzleConstraints(context), [context]);
-
-    const itemsProps: FieldItemsProps<T> = {
-        context: readOnlySafeContext,
-        items,
-    };
 
     const {
         selectedCells,
@@ -321,6 +315,12 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                             {(region, regionIndex = 0) => {
                                 const shadowFilterId = `field-shadow-${autoIncrementId}-${regionIndex}`;
 
+                                const itemsProps: Omit<FieldItemsProps<T>, "layer"> = {
+                                    context: readOnlySafeContext,
+                                    items,
+                                    region,
+                                };
+
                                 const {backgroundColor = regionBackgroundColor} = region ?? {};
 
                                 return <>
@@ -339,9 +339,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                     />}
 
                                     <g data-layer="items-before-background" filter={`url(#${shadowFilterId})`}>
-                                        <FieldLayerContext.Provider value={FieldLayer.beforeBackground}>
-                                            <FieldItems {...itemsProps}/>
-                                        </FieldLayerContext.Provider>
+                                        <FieldItems layer={FieldLayer.beforeBackground} {...itemsProps}/>
                                     </g>
 
                                     <g data-layer="background">
@@ -361,43 +359,31 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                     </g>
 
                                     <g data-layer="items-before-selection" filter={`url(#${shadowFilterId})`}>
-                                        <FieldLayerContext.Provider value={FieldLayer.beforeSelection}>
-                                            <FieldItems {...itemsProps}/>
-                                        </FieldLayerContext.Provider>
+                                        <FieldItems layer={FieldLayer.beforeSelection} {...itemsProps}/>
                                     </g>
 
                                     {!prioritizeSelection && selection(region)}
 
                                     <g data-layer="items-regular" filter={`url(#${shadowFilterId})`}>
-                                        <FieldLayerContext.Provider value={FieldLayer.regular}>
-                                            <FieldItems {...itemsProps}/>
-                                        </FieldLayerContext.Provider>
+                                        <FieldItems layer={FieldLayer.regular} {...itemsProps}/>
                                     </g>
 
                                     {prioritizeSelection && selection(region)}
 
                                     <g data-layer="items-lines">
-                                        <FieldLayerContext.Provider value={FieldLayer.lines}>
-                                            <FieldItems {...itemsProps}/>
-                                        </FieldLayerContext.Provider>
+                                        <FieldItems layer={FieldLayer.lines} {...itemsProps}/>
                                     </g>
 
                                     <g data-layer="items-given-user-lines">
-                                        <FieldLayerContext.Provider value={FieldLayer.givenUserLines}>
-                                            <FieldItems {...itemsProps}/>
-                                        </FieldLayerContext.Provider>
+                                        <FieldItems layer={FieldLayer.givenUserLines} {...itemsProps}/>
                                     </g>
 
                                     <g data-layer="items-new-user-lines">
-                                        <FieldLayerContext.Provider value={FieldLayer.newUserLines}>
-                                            <FieldItems {...itemsProps}/>
-                                        </FieldLayerContext.Provider>
+                                        <FieldItems layer={FieldLayer.newUserLines} {...itemsProps}/>
                                     </g>
 
                                     <g data-layer="items-top">
-                                        <FieldLayerContext.Provider value={FieldLayer.top}>
-                                            <FieldItems {...itemsProps}/>
-                                        </FieldLayerContext.Provider>
+                                        <FieldItems layer={FieldLayer.top} {...itemsProps}/>
                                     </g>
 
                                     <g data-layer="digits" filter={`url(#${shadowFilterId})`}>

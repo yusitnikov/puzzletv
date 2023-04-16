@@ -8,16 +8,20 @@ import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {FieldLoop} from "./FieldLoop";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {FieldLayer} from "../../../types/sudoku/FieldLayer";
+import {GridRegion} from "../../../types/sudoku/GridRegion";
 
 export interface FieldItemsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     items: Constraint<T, any>[];
+    layer: FieldLayer;
+    region?: GridRegion;
 }
 
 export const FieldItems = <T extends AnyPTM>(
-    {context, items}: FieldItemsProps<T>
+    {context, items, layer}: FieldItemsProps<T>
 ) => <FieldLoop context={context}>
-    {items.map(({component: Component, cells, renderSingleCellInUserArea, ...otherData}, index) => {
+    {items.map(({component: {[layer]: Component} = {}, cells, renderSingleCellInUserArea, ...otherData}, index) => {
         if (!Component) {
             return null;
         }

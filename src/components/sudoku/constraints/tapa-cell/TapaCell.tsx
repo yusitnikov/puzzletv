@@ -1,8 +1,4 @@
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {
     Line,
     parsePositionLiteral,
@@ -11,7 +7,6 @@ import {
 } from "../../../../types/layout/Position";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {getIsSamePuzzlePosition} from "../../../../types/sudoku/PuzzleDefinition";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {textColor} from "../../../app/globals";
@@ -22,28 +17,28 @@ export interface TapaCellProps {
     clues: (number | undefined)[];
 }
 
-export const TapaCell = withFieldLayer(FieldLayer.regular, <T extends AnyPTM>(
-    {props: {clues}}: ConstraintProps<T, TapaCellProps>
-) => {
-    const radius = clues.length === 1 ? 0 : 0.3;
-    const size = clues.length === 1 ? 0.8 : 0.4;
+export const TapaCell = {
+    [FieldLayer.regular]: <T extends AnyPTM>({props: {clues}}: ConstraintProps<T, TapaCellProps>) => {
+        const radius = clues.length === 1 ? 0 : 0.3;
+        const size = clues.length === 1 ? 0.8 : 0.4;
 
-    return <>
-        {clues.map((value, index) => {
-            const angle = 2 * Math.PI * ((index + 0.5) / clues.length + 3 / 8);
+        return <>
+            {clues.map((value, index) => {
+                const angle = 2 * Math.PI * ((index + 0.5) / clues.length + 3 / 8);
 
-            return <CenteredText
-                key={index}
-                top={0.5 + radius * Math.sin(angle)}
-                left={0.5 + radius * Math.cos(angle)}
-                size={size}
-                fill={textColor}
-            >
-                {value ?? "?"}
-            </CenteredText>;
-        })}
-    </>;
-}) as ConstraintPropsGenericFc<TapaCellProps>;
+                return <CenteredText
+                    key={index}
+                    top={0.5 + radius * Math.sin(angle)}
+                    left={0.5 + radius * Math.cos(angle)}
+                    size={size}
+                    fill={textColor}
+                >
+                    {value ?? "?"}
+                </CenteredText>;
+            })}
+        </>;
+    },
+};
 
 export const TapaCellConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral, ...clues: (number | undefined)[]

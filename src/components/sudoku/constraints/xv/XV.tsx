@@ -1,19 +1,14 @@
 import {formatSvgPointsArray, parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
 import {blackColor} from "../../../app/globals";
-import {withFieldLayer} from "../../../../contexts/FieldLayerContext";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {ComponentType} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 const radius = 0.2;
 const lineWidth = 0.03;
 
-export const XMark = withFieldLayer(FieldLayer.top, <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
+export const XMark = <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
     const left = (cell1.left + cell2.left) / 2 + 0.5;
     const top = (cell1.top + cell2.top) / 2 + 0.5;
 
@@ -36,9 +31,9 @@ export const XMark = withFieldLayer(FieldLayer.top, <T extends AnyPTM>({cells: [
             stroke={blackColor}
         />
     </>;
-}) as ConstraintPropsGenericFc;
+};
 
-export const VMark = withFieldLayer(FieldLayer.top, <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
+export const VMark = <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
     const left = (cell1.left + cell2.left) / 2 + 0.5;
     const top = (cell1.top + cell2.top) / 2 + 0.5;
 
@@ -52,7 +47,7 @@ export const VMark = withFieldLayer(FieldLayer.top, <T extends AnyPTM>({cells: [
         stroke={blackColor}
         fill={"none"}
     />;
-}) as ConstraintPropsGenericFc;
+};
 
 const XVConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,
@@ -67,7 +62,7 @@ const XVConstraint = <T extends AnyPTM>(
     return {
         name,
         cells: [cell1, cell2],
-        component,
+        component: {[FieldLayer.top]: component},
         props: undefined,
         isObvious: true,
         isValidCell(cell, digits, [cell1, cell2], context) {
