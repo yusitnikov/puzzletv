@@ -2,7 +2,6 @@ import {recentInfoColor, textColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
-import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
@@ -146,12 +145,11 @@ export const QuadConstraintBySolution = <T extends AnyPTM>(
     {puzzle, state}: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
     digits: T["cell"][],
-    solution: GivenDigitsMap<T["cell"]>,
     isRecent = false,
     radius = 0.3
 ): Constraint<T, QuadProps<T["cell"]>> => {
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
-        .map(({top, left}) => solution[top]?.[left])
+        .map(({top, left}) => puzzle.solution?.[top]?.[left])
         .filter(value => value !== undefined)
         .map(value => value!);
 

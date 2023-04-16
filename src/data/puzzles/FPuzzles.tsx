@@ -19,7 +19,7 @@ import {
 } from "../../types/layout/Position";
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
+import {createGivenDigitsMapFromArray, GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {CellColor, CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {splitArrayIntoChunks} from "../../utils/array";
@@ -782,13 +782,13 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
         // region Extensions
         solution: (solution, {size}) => {
             if (solution instanceof Array) {
-                puzzle.solution = splitArrayIntoChunks(
+                puzzle.solution = createGivenDigitsMapFromArray(splitArrayIntoChunks(
                     solution.map((value) => {
                         const num = Number(value);
                         return Number.isFinite(num) ? num : value;
                     }),
                     size
-                );
+                ));
                 puzzle.resultChecker = isValidFinishedPuzzleByEmbeddedSolution;
             }
         },

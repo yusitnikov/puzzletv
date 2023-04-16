@@ -18,6 +18,8 @@ import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-c
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {createGivenDigitsMapFromArray} from "../../types/sudoku/GivenDigitsMap";
+import {indexes} from "../../utils/indexes";
 
 export const LumosMaximaNoFog: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
@@ -59,7 +61,7 @@ export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
     noIndex: false,
     slug: "lumos-maxima",
     saveStateKey: "lumos-maxima-v5",
-    solution: [
+    solution: createGivenDigitsMapFromArray([
         [2, 1, 7, 6, 4, 8, 9, 3, 5],
         [5, 8, 9, 1, 3, 7, 4, 2, 6],
         [4, 3, 6, 2, 5, 9, 1, 8, 7],
@@ -69,7 +71,7 @@ export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
         [7, 9, 5, 4, 6, 3, 2, 1, 8],
         [8, 6, 4, 7, 1, 2, 5, 9, 3],
         [3, 2, 1, 8, 9, 5, 6, 7, 4],
-    ],
+    ]),
     items: [
         ...(LumosMaximaNoFog.items as Constraint<NumberPTM, any>[]),
         FogConstraint(["R2C2", "R8C7"]),
@@ -94,5 +96,5 @@ export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
     </>,
     prioritizeSelection: true,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000BIU",
-    getLmdSolutionCode: ({solution}) => solution!.map(row => row[8]).join(""),
+    getLmdSolutionCode: ({solution}) => indexes(9).map(index => solution![8][index]).join(""),
 };

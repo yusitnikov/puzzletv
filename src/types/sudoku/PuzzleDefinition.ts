@@ -80,7 +80,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     prioritizeSelection?: boolean;
     initialLives?: number;
     decreaseOnlyOneLive?: boolean;
-    solution?: (string | number | undefined)[][];
+    solution?: GivenDigitsMap<string | number>;
     importOptions?: Omit<PuzzleImportOptions, "load">;
 }
 

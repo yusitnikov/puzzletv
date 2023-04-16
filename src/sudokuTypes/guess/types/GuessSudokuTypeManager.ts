@@ -1,7 +1,7 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {CellStateEx} from "../../../types/sudoku/CellState";
-import {GivenDigitsMap, serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {serializeGivenDigitsMap, unserializeGivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {GameStateEx, mergeGameStateWithUpdates} from "../../../types/sudoku/GameState";
 import {CellOwnershipConstraint} from "../components/CellOwnership";
@@ -12,9 +12,7 @@ import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(
-    solution: GivenDigitsMap<number>
-): SudokuTypeManager<T> => ({
+export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeManager<T> => ({
     ...DigitSudokuTypeManager(),
 
     items: [CellOwnershipConstraint()],
@@ -27,7 +25,7 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(
         cellData,
         {top, left},
         {
-            puzzle: {params = {}},
+            puzzle: {solution = {}, params = {}},
             state: {currentPlayer, selectedCells, initialDigits},
             multiPlayer: {isEnabled},
         },

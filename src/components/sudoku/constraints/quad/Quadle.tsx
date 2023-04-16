@@ -2,7 +2,6 @@ import {recentInfoColor, textColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {isSamePosition, parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
-import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
 import {Fragment} from "react";
@@ -191,10 +190,9 @@ export const QuadleConstraintBySolution = <T extends AnyPTM>(
     {puzzle, state}: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
     digits: T["cell"][],
-    solution: GivenDigitsMap<T["cell"]>,
     isRecent = false
 ): Constraint<T, QuadleProps<T["cell"]>> => {
-    const {typeManager: {areSameCellData}} = puzzle;
+    const {solution = {}, typeManager: {areSameCellData}} = puzzle;
 
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
         .map(({top, left}) => solution[top]?.[left]);

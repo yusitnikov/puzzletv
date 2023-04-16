@@ -1,5 +1,4 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {GuessSudokuTypeManager} from "../../guess/types/GuessSudokuTypeManager";
 import {QuadMastersGameState} from "./QuadMastersGameState";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
@@ -19,19 +18,15 @@ import {QuadleConstraintBySolution} from "../../../components/sudoku/constraints
 import {QuadInputSudokuTypeManager} from "../../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
 import {QuadMastersPTM} from "./QuadMastersPTM";
 
-export const QuadMastersSudokuTypeManager = (solution: GivenDigitsMap<number>, isQuadle: boolean): SudokuTypeManager<QuadMastersPTM> => {
+export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManager<QuadMastersPTM> => {
     const parent = QuadInputSudokuTypeManager<QuadMastersPTM>({
-        parent: GuessSudokuTypeManager(solution),
+        parent: GuessSudokuTypeManager(),
         isQuadle,
         allowRepeat: isQuadle,
         allowOverflow: !isQuadle,
-        getReadyQuadConstraint: (
-            context,
-            position, digits,
-            isRecent
-        ) => isQuadle
-            ? QuadleConstraintBySolution(context, position, digits, solution, isRecent)
-            : QuadConstraintBySolution(context, position, digits, solution, isRecent),
+        getReadyQuadConstraint: (context, position, digits, isRecent) => isQuadle
+            ? QuadleConstraintBySolution(context, position, digits, isRecent)
+            : QuadConstraintBySolution(context, position, digits, isRecent),
         isQuadAllowedFn: ({processed: {cellWriteMode}, extension: {isQuadTurn}}) => isQuadTurn && cellWriteMode === CellWriteMode.quads,
         onQuadFinish: (defaultResult) => mergeGameStateUpdates(defaultResult, {extension: {isQuadTurn: false}})
     });

@@ -162,7 +162,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
                 .filter(([, digit]) => digit > 0)
         )
     },
-    solution: [cells.slice(0, 64).map(({digit}) => Math.abs(digit))],
+    solution: createGivenDigitsMapFromArray([cells.slice(0, 64).map(({digit}) => Math.abs(digit))]),
     initialColors: {
         0: {
             64: [exampleColor],
