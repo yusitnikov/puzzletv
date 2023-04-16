@@ -8,11 +8,12 @@ import {indexes} from "../../../utils/indexes";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {NumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 
 export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuTypeManager<NumberPTM> => ({
     ...DigitSudokuTypeManager(),
 
-    getCellTypeProps({top, left}, {fieldSize: {rowsCount, columnsCount}}) {
+    getCellTypeProps({top, left}, {fieldSize: {rowsCount, columnsCount}}): CellTypeProps<NumberPTM> {
         return {isVisible: left * 2 < columnsCount || top * 2 >= rowsCount};
     },
 

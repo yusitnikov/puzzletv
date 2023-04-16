@@ -21,6 +21,7 @@ import {SettingsContentProps} from "../../components/sudoku/controls/settings/Se
 import {regionTag} from "../../components/sudoku/constraints/region/Region";
 import {ControlButtonItem} from "../../components/sudoku/controls/ControlButtonsManager";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -153,12 +154,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     // Fallback for useProcessedGameStateExtension() when calling outside a React component
     getProcessedGameStateExtension?(state: GameStateEx<T>): T["processedStateEx"];
 
-    getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<T>): {
-        isVisible?: boolean;
-        isVisibleForState?: (context: PuzzleContext<T>) => boolean;
-        isSelectable?: boolean;
-        forceCellWriteMode?: CellWriteModeInfo<T>;
-    };
+    getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<T>): CellTypeProps<T>;
 
     processArrowDirection?(
         currentCell: Position,
@@ -284,8 +280,7 @@ export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPT
         if (top < 0 || top >= rowsCount || left < 0 || left >= columnsCount) {
             return false;
         }
-        const cellTypeProps = getCellTypeProps?.(position, puzzle);
-        return cellTypeProps?.isVisible !== false && cellTypeProps?.isSelectable !== false;
+        return isSelectableCell(getCellTypeProps?.(position, puzzle));
     };
 
     // Try moving in the requested direction naively
@@ -326,8 +321,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
     let bestCell: Position | undefined = undefined;
 
     for (const neighbor of neighbors.items) {
-        const cellTypeProps = getCellTypeProps?.(neighbor, puzzle);
-        if (cellTypeProps?.isVisible === false || cellTypeProps?.isSelectable === false) {
+        if (!isSelectableCell(getCellTypeProps?.(neighbor, puzzle))) {
             continue;
         }
 

@@ -17,6 +17,7 @@ import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
 import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 
 /*
  * TODO:
@@ -60,7 +61,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
             ZoomOutButtonItem(),
             AnimationSpeedControlButtonItem(),
         ],
-        getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}) {
+        getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}): CellTypeProps<T> {
             const quadSize = fieldSize / 2;
             const ringsCount = quadSize - 1;
             const {ring} = coordsPlainToRing(fieldSize, {top, left});

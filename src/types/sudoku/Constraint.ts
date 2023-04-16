@@ -14,6 +14,7 @@ import {LineWithColor} from "./LineWithColor";
 import {getFogPropsByConstraintsList} from "../../components/sudoku/constraints/fog/Fog";
 import {FieldLayer} from "./FieldLayer";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {isSelectableCell} from "./CellTypeProps";
 
 export type Constraint<T extends AnyPTM, DataT = undefined> = {
     name: string;
@@ -196,8 +197,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
             const position: Position = {left, top};
             const digit = userDigits[top]?.[left];
 
-            const cellTypeProps = getCellTypeProps?.(position, puzzle);
-            return (cellTypeProps?.isVisible === false || cellTypeProps?.isSelectable === false)
+            return !isSelectableCell(getCellTypeProps?.(position, puzzle))
                 || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
         }))
     ) && getInvalidUserLines(lines, userDigits, constraints, context, true).size === 0;

@@ -37,6 +37,7 @@ import {JigsawFieldState} from "./JigsawFieldState";
 import {createEmptyFieldState} from "../../../types/sudoku/FieldState";
 import {getReverseIndexMap} from "../../../utils/array";
 import {createRandomGenerator} from "../../../utils/random";
+import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 
 export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     areSameCellData(
@@ -315,7 +316,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
                     ...puzzle,
                     typeManager: {
                         ...puzzle.typeManager,
-                        getCellTypeProps(cell) {
+                        getCellTypeProps(cell): CellTypeProps<JigsawPTM> {
                             return {
                                 isSelectable: arrayContainsPosition(cells, cell),
                             };

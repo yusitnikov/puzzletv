@@ -44,6 +44,7 @@ import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 import {FieldItems, FieldItemsProps} from "./FieldItems";
 import {FieldLoop} from "./FieldLoop";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {isInteractableCell, isVisibleCell} from "../../../types/sudoku/CellTypeProps";
 
 export interface FieldProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -211,6 +212,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
         keyPrefix: string,
         renderer: (cellState: CellState<T>, cellPosition: Position) => ReactNode,
         region?: GridRegion,
+        isInteractionMode = false,
     ) => <FieldLoop context={readOnlySafeContext}>
         {({left: leftOffset, top: topOffset}) => cells.flatMap((row, rowIndex) => row.map((cellState, columnIndex) => {
             const cellPosition: Position = {
@@ -234,7 +236,8 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                 }
             }
 
-            if (getCellTypeProps?.(cellPosition, puzzle)?.isVisible === false) {
+            const cellTypeProps = getCellTypeProps?.(cellPosition, puzzle);
+            if (!(isInteractionMode ? isInteractableCell(cellTypeProps) : isVisibleCell(cellTypeProps))) {
                 return null;
             }
 
@@ -428,7 +431,8 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                                 cellPosition={cellPosition}
                                                 handlers={cellGestureHandlers}
                                             />,
-                                            region
+                                            region,
+                                            true,
                                         )}
                                     </g>}
                                 </>;

@@ -12,6 +12,7 @@ import {
 import {lighterBlueColor} from "../../components/app/globals";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {roundToStep} from "../../utils/math";
+import {CellTypeProps} from "../../types/sudoku/CellTypeProps";
 
 const coeff = Math.sqrt(3) / 2;
 const areaRadius = 1 / 3;
@@ -145,7 +146,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
     </>,
     typeManager: {
         ...DigitSudokuTypeManager(),
-        getCellTypeProps: ({left}) => ({isSelectable: left < 64}),
+        getCellTypeProps: ({left}): CellTypeProps<NumberPTM> => ({noInteraction: left >= 64}),
     },
     fieldSize: {
         fieldSize,

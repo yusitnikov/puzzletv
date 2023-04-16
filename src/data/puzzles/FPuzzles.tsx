@@ -87,6 +87,7 @@ import {createEmptyContextForPuzzle} from "../../types/sudoku/PuzzleContext";
 import {doesGridRegionContainCell} from "../../types/sudoku/GridRegion";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {JssSudokuTypeManager} from "../../sudokuTypes/jss/types/JssSudokuTypeManager";
+import {isVisibleCell} from "../../types/sudoku/CellTypeProps";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -283,7 +284,7 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
 
     const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.lines;
 
-    const isVisibleGridCell = (cell: Position) => typeManager.getCellTypeProps?.(cell, puzzle)?.isVisible !== false;
+    const isVisibleGridCell = (cell: Position) => isVisibleCell(typeManager.getCellTypeProps?.(cell, puzzle));
 
     // TODO: go over rangsk solver and populate constraints from there
     new ObjectParser<FPuzzlesPuzzle>({

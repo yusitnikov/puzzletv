@@ -15,6 +15,7 @@ import {loop, roundToStep} from "../../../utils/math";
 import {MonumentValleyPTM} from "./MonumentValleyPTM";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
+import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 
 export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     ...DigitSudokuTypeManager(),
@@ -56,7 +57,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         }
     },
 
-    getCellTypeProps({top, left}, {fieldSize}) {
+    getCellTypeProps({top, left}, {fieldSize}): CellTypeProps<MonumentValleyPTM> {
         const {gridSize, intersectionSize, columnsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         if (top >= gridSize && (left < gridSize - intersectionSize || left >= columnsCount - gridSize + intersectionSize)) {

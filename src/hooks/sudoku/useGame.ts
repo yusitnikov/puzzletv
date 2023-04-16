@@ -26,6 +26,7 @@ import {useControlKeysState} from "../useControlKeysState";
 import {SudokuCellsIndex, SudokuCellsIndexForState} from "../../types/sudoku/SudokuCellsIndex";
 import {useAnimatedValue} from "../useAnimatedValue";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {isSelectableCell} from "../../types/sudoku/CellTypeProps";
 
 const emptyObject: any = {};
 
@@ -291,10 +292,8 @@ export const useGame = <T extends AnyPTM>(
 
                         const updates = typeof callback === "function" ? callback(processedGameState) : callback;
                         if (updates.selectedCells) {
-                            updates.selectedCells = updates.selectedCells.filter((cell) => {
-                                const cellTypeProps = puzzle.typeManager.getCellTypeProps?.(cell, puzzle);
-                                return cellTypeProps?.isVisible !== false && cellTypeProps?.isSelectable !== false;
-                            });
+                            updates.selectedCells = updates.selectedCells.filter((cell) =>
+                                isSelectableCell(puzzle.typeManager.getCellTypeProps?.(cell, puzzle)));
                         }
                         state = mergeGameStateWithUpdates(state, updates);
                     } else {

@@ -7,6 +7,7 @@ import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {arrayContainsPosition, parsePositionLiterals2} from "../../types/layout/Position";
+import {CellTypeProps} from "../../types/sudoku/CellTypeProps";
 
 const ctc = {
     "id": "penpabe03a5e39ee5fca861c7872e05ca86d4",
@@ -5291,7 +5292,7 @@ export const MakeAPictureJigsaw: PuzzleDefinition<JigsawPTM> = {
     rules: () => rulesReact,
     typeManager: {
         ...JigsawSudokuTypeManager,
-        getCellTypeProps(cell) {
+        getCellTypeProps(cell): CellTypeProps<JigsawPTM> {
             return {
                 isVisible: arrayContainsPosition(regions.flat(), cell),
             };

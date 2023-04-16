@@ -18,6 +18,7 @@ import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 
 export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
     params: SafeCrackerPuzzleParams
@@ -34,7 +35,7 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
             ...baseTypeManager.extraCellWriteModes ?? [],
             arrowsCellWriteModeInfo,
         ],
-        getCellTypeProps({top, left}, puzzle) {
+        getCellTypeProps({top, left}, puzzle): CellTypeProps<T> {
             const {digitsCount = getDefaultDigitsCount(puzzle)} = puzzle;
             if (left >= digitsCount) {
                 return {isVisible: false};

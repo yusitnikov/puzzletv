@@ -27,6 +27,7 @@ import {HashSet} from "../struct/Set";
 import {LanguageCode} from "../translations/LanguageCode";
 import type {PuzzleImportOptions} from "./PuzzleImportOptions";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {isInteractableCell} from "./CellTypeProps";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
     title: PartiallyTranslatable;
@@ -222,8 +223,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const digitToColorMap: Record<number, string> = {};
     for (const [top, row] of cells.entries()) {
         for (const [left, {usersDigit, colors}] of row.entries()) {
-            const cellTypeProps = getCellTypeProps?.({top, left}, puzzle);
-            if (cellTypeProps?.isVisible === false) {
+            if (!isInteractableCell(getCellTypeProps?.({top, left}, puzzle))) {
                 continue;
             }
             let expectedData = puzzle.solution?.[top]?.[left] ?? undefined;

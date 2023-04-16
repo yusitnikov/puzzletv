@@ -56,6 +56,7 @@ import {myClientId, UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
 import {getFinalCellWriteMode} from "../../hooks/sudoku/useFinalCellWriteMode";
 import {ControlKeysState} from "../../hooks/useControlKeysState";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {isSelectableCell} from "./CellTypeProps";
 
 export interface GameState<T extends AnyPTM> {
     fieldStateHistory: FieldStateHistory<T>;
@@ -560,10 +561,7 @@ export const gameStateSelectAllCells = <T extends AnyPTM>(
         state,
         indexes(rowsCount)
             .flatMap(top => indexes(columnsCount).map(left => ({left, top})))
-            .filter(cell => {
-                const cellTypeProps = getCellTypeProps?.(cell, puzzle);
-                return cellTypeProps?.isVisible !== false && cellTypeProps?.isSelectable !== false;
-            })
+            .filter(cell => isSelectableCell(getCellTypeProps?.(cell, puzzle)))
     );
 };
 
