@@ -156,6 +156,7 @@ export const loadByFPuzzlesObject = (
         safeCrackerCodeLength = 6,
         visibleRingsCount = 2,
         startOffset = 0,
+        jss,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager();
@@ -184,6 +185,9 @@ export const loadByFPuzzlesObject = (
     }
     if (yajilinFog) {
         typeManager = YajilinFogSudokuTypeManager(typeManager);
+    }
+    if (jss) {
+        typeManager = JssSudokuTypeManager(typeManager);
     }
 
     switch (digitType) {

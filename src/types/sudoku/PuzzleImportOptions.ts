@@ -26,6 +26,7 @@ export interface PuzzleImportOptions {
     noSpecialRules?: boolean;
     loopX?: boolean;
     loopY?: boolean;
+    jss?: boolean;
     "product-arrow"?: boolean;
     yajilinFog?: boolean;
     cosmeticsBehindFog?: boolean;
@@ -51,6 +52,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         noSpecialRules,
         loopX,
         loopY,
+        jss,
         "product-arrow": productArrow,
         yajilinFog,
         cosmeticsBehindFog,
@@ -74,6 +76,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         noSpecialRules,
         loopX,
         loopY,
+        jss,
         "product-arrow": productArrow,
         yajilinFog,
         cosmeticsBehindFog,

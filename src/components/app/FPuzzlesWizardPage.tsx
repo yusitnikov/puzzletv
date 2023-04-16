@@ -45,6 +45,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [areHtmlRules, setAreHtmlRules] = useBoolFromLocalStorage("fpwHtmlRules");
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
+    const [isJss, setIsJss] = useBoolFromLocalStorage("fpwIsJss");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
@@ -62,13 +63,16 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
     const isInfiniteRings = type === PuzzleImportPuzzleType.InfiniteRings;
     const isJigsaw = type === PuzzleImportPuzzleType.Jigsaw;
-    const isSpecialGrid = [
-        PuzzleImportPuzzleType.Cubedoku,
+    const isRotatableGrid = [
         PuzzleImportPuzzleType.Rotatable,
-        PuzzleImportPuzzleType.SafeCracker,
-        PuzzleImportPuzzleType.InfiniteRings,
         PuzzleImportPuzzleType.Jigsaw,
     ].includes(type);
+    const isSpecialGrid = isRotatableGrid || [
+        PuzzleImportPuzzleType.Cubedoku,
+        PuzzleImportPuzzleType.SafeCracker,
+        PuzzleImportPuzzleType.InfiniteRings,
+    ].includes(type);
+    const supportsJss = isRotatableGrid || (!isSpecialGrid && !loopX && !loopY);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
     const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
@@ -82,6 +86,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
+        jss: supportsJss && isJss,
         tesseract: !isSpecialGrid && tesseract,
         "product-arrow": !!puzzle.arrow && productArrow,
         yajilinFog: hasFog && yajilinFog,
@@ -217,6 +222,15 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         <label>
                             Tesseract constraint:&nbsp;
                             <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
+                        </label>
+                    </Paragraph>
+                </>}
+
+                {supportsJss && <>
+                    <Paragraph>
+                        <label>
+                            JSS:&nbsp;
+                            <input type={"checkbox"} checked={isJss} onChange={ev => setIsJss(ev.target.checked)}/>
                         </label>
                     </Paragraph>
                 </>}
