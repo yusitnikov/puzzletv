@@ -14,6 +14,7 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
 ): SudokuTypeManager<T> => {
     return {
         ...baseTypeManager,
+        mapImportedColors: true,
         postProcessPuzzle(puzzle): PuzzleDefinition<T> {
             puzzle = {
                 ...puzzle,
@@ -38,7 +39,7 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                     const top = Number(topStr);
                     for (const [leftStr, colors] of Object.entries(row)) {
                         const left = Number(leftStr);
-                        if (colors.includes("#A8A8A8")) {
+                        if (colors.includes(CellColor.darkGrey)) {
                             yajilinFogShadeSolution[top] = yajilinFogShadeSolution[top] || {};
                             yajilinFogShadeSolution[top][left] = CellColor.black;
 

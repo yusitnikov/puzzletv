@@ -264,6 +264,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     fixCellPosition?(position: Position, puzzle: PuzzleDefinition<T>): Position | undefined;
 
     rotationallySymmetricDigits?: boolean;
+
+    mapImportedColors?: boolean;
 }
 
 export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPTM>(

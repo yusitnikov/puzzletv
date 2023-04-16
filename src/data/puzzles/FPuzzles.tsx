@@ -20,7 +20,7 @@ import {
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
-import {CellColorValue} from "../../types/sudoku/CellColor";
+import {CellColor, CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
@@ -86,6 +86,37 @@ import {
 import {createEmptyContextForPuzzle} from "../../types/sudoku/PuzzleContext";
 import {doesGridRegionContainCell} from "../../types/sudoku/GridRegion";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {JssSudokuTypeManager} from "../../sudokuTypes/jss/types/JssSudokuTypeManager";
+
+export enum FPuzzleColor {
+    white = "#FFFFFF",
+    grey = "#A8A8A8",
+    black = "#000000",
+    red = "#FFA0A0",
+    orange = "#FFE060",
+    yellow = "#FFFFB0",
+    lightGreen = "#B0FFB0",
+    darkGreen = "#60D060",
+    lightBlue = "#D0D0FF",
+    darkBlue = "#8080F0",
+    purple = "#FF80FF",
+    pink = "#FFD0D0",
+}
+
+const fPuzzleColorsMap: Record<FPuzzleColor, CellColor> = {
+    [FPuzzleColor.white]: CellColor.white,
+    [FPuzzleColor.grey]: CellColor.darkGrey,
+    [FPuzzleColor.black]: CellColor.black,
+    [FPuzzleColor.red]: CellColor.red,
+    [FPuzzleColor.orange]: CellColor.orange,
+    [FPuzzleColor.yellow]: CellColor.yellow,
+    [FPuzzleColor.lightGreen]: CellColor.green,
+    [FPuzzleColor.darkGreen]: CellColor.green,
+    [FPuzzleColor.lightBlue]: CellColor.blue,
+    [FPuzzleColor.darkBlue]: CellColor.blue,
+    [FPuzzleColor.purple]: CellColor.purple,
+    [FPuzzleColor.pink]: CellColor.purple,
+};
 
 export const decodeFPuzzlesString = (load: string) => {
     load = decodeURIComponent(load);
@@ -223,6 +254,10 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
         importOptions,
     };
 
+    const processInitialColors = (colors: CellColorValue[]) => typeManager.mapImportedColors
+        ? colors.map((color) => fPuzzleColorsMap[color as string as FPuzzleColor] ?? color)
+        : colors;
+
     if (noSpecialRules && !puzzleJson.solution) {
         puzzle.resultChecker = isValidFinishedPuzzleByConstraints;
     }
@@ -324,13 +359,13 @@ export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
                     c: (color) => {
                         if (typeof color === "string") {
                             initialColors[top] = initialColors[top] || {};
-                            initialColors[top][left] = [color];
+                            initialColors[top][left] = processInitialColors([color]);
                         }
                     },
                     cArray: (colors) => {
                         if (Array.isArray(colors) && colors.length) {
                             initialColors[top] = initialColors[top] || {};
-                            initialColors[top][left] = colors;
+                            initialColors[top][left] = processInitialColors(colors);
                         }
                     },
                     highlight: undefined,
