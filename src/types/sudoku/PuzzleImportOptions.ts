@@ -36,6 +36,7 @@ export interface PuzzleImportOptions {
     allowOverrideColors?: boolean;
     angleStep?: number;
     shuffle?: boolean;
+    stickyDigits?: boolean;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -63,6 +64,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         digitsCount,
         angleStep,
         shuffle,
+        stickyDigits,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -87,6 +89,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         digitsCount,
         angleStep,
         shuffle,
+        stickyDigits,
     };
 
     return result;

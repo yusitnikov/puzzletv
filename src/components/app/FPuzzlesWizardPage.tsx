@@ -58,6 +58,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
+    const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
@@ -98,6 +99,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         allowOverrideColors: hasInitialColors && allowOverrideColors,
         angleStep: isJigsaw ? angleStep || undefined : undefined,
         shuffle: isJigsaw && shuffle,
+        stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
         load,
     });
 
@@ -296,13 +298,20 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
 
                 {isJigsaw && <>
                     <Paragraph>
-                        Rotation:&nbsp;
+                        Jigsaw piece rotation:&nbsp;
                         <Select value={angleStep} onChange={ev => setAngleStep(Number(ev.target.value))}>
                             <option value={0}>no rotation</option>
                             <option value={90}>90 degrees</option>
                             <option value={180}>180 degrees</option>
                         </Select>
                     </Paragraph>
+
+                    {angleStep !== 0 && <Paragraph>
+                        <label>
+                            Digits should stay vertical:&nbsp;
+                            <input type={"checkbox"} checked={stickyDigits} onChange={ev => setStickyDigits(ev.target.checked)}/>
+                        </label>
+                    </Paragraph>}
 
                     <Paragraph>
                         <label>

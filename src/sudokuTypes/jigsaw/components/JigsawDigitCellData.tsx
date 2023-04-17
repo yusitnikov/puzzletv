@@ -9,6 +9,7 @@ export const JigsawDigitCellData = (props: CellDataProps<JigsawPTM>) => {
         size,
         isInitial,
         isValid,
+        angle = 0,
         ...absoluteProps
     } = props;
     const {
@@ -22,15 +23,16 @@ export const JigsawDigitCellData = (props: CellDataProps<JigsawPTM>) => {
 
     return <DigitComponent
         {...absoluteProps}
-        {...data}
+        digit={data.digit}
+        angle={data.angle + angle}
         puzzle={puzzle}
         size={size}
         color={getDefaultCellDataColor(props)}
     />;
 };
 
-export const JigsawDigitCellDataComponentType: CellDataComponentType<JigsawPTM> = {
+export const JigsawDigitCellDataComponentType = (supportRotation90: boolean): CellDataComponentType<JigsawPTM> => ({
     component: JigsawDigitCellData,
     // centermarks could be horizontal, so need to give space for them
-    widthCoeff: 1.1,
-};
+    widthCoeff: supportRotation90 ? 1.1 : undefined,
+});

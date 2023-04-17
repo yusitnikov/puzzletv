@@ -176,7 +176,7 @@ export const loadByFPuzzlesObject = (
             Number(visibleRingsCount),
             Number(startOffset),
         ),
-        [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager,
+        [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager(importOptions),
     };
 
     let typeManager = typesMap[type] ?? regularTypeManager;

@@ -38,8 +38,9 @@ import {createEmptyFieldState} from "../../../types/sudoku/FieldState";
 import {getReverseIndexMap} from "../../../utils/array";
 import {createRandomGenerator} from "../../../utils/random";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
+import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 
-export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
+export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit<PuzzleImportOptions, "load">): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
         {digit: digit1, angle: angle1},
         {digit: digit2, angle: angle2},
@@ -94,7 +95,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
                 return normalizeJigsawDigit(puzzle, {
                     digit,
-                    angle: -pieces[regionIndex].angle,
+                    angle: stickyDigits ? 0 : -pieces[regionIndex].angle,
                 });
             }
         }
@@ -118,7 +119,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
             // TODO: return NaN if it's not a valid digit
             data = normalizeJigsawDigit(puzzle, {
                 digit: data.digit,
-                angle: data.angle + pieces[regionIndex].angle,
+                angle: stickyDigits ? 0 : data.angle + pieces[regionIndex].angle,
             });
         }
 
@@ -134,7 +135,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         if (regionIndex) {
             const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
             const {importOptions: {angleStep = 0} = {}} = puzzle;
-            const angle = loop(roundToStep(pieces[regionIndex].angle, angleStep), 360);
+            const angle = loop(roundToStep(stickyDigits ? 0 : pieces[regionIndex].angle, angleStep), 360);
             // TODO: return NaN if it's not a valid angle
             if (angle === 180) {
                 return rotateNumber(puzzle, num);
@@ -167,7 +168,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         const roundedAngle = loop(roundToStep(pieceAngle, angleStep), 360);
         const processDigit = ({digit, angle}: JigsawDigit): JigsawDigit => normalizeJigsawDigit(
             puzzle,
-            {digit, angle: angle + roundedAngle}
+            {digit, angle: stickyDigits ? 0 : angle + roundedAngle}
         );
         const rotatedIndexes = getCellDataSortIndexes<JigsawDigit>(
             dataSet,
@@ -186,12 +187,15 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
             return undefined;
         }
 
-        return rotateVectorClockwise(rotatedPosition, -pieceAngle);
+        return {
+            ...rotateVectorClockwise(rotatedPosition, -pieceAngle),
+            angle: rotatedPosition.angle - (stickyDigits ? pieceAngle : 0),
+        };
     },
 
     digitComponentType: RegularDigitComponentType(),
 
-    cellDataComponentType: JigsawDigitCellDataComponentType,
+    cellDataComponentType: JigsawDigitCellDataComponentType(angleStep === 90 && !stickyDigits),
 
     rotationallySymmetricDigits: true,
 
@@ -256,7 +260,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     allowScale: true,
     isFreeScale: true,
     // initial scale to contain the shuffled pieces
-    initialScale: 0.7,
+    initialScale: shuffle ? 0.7 : 1,
 
     useProcessedGameStateExtension(state): JigsawProcessedGameState {
         const {animationSpeed, extension: {pieces: pieceAnimations}} = state;
@@ -408,4 +412,4 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     regionBackgroundColor: "#fff",
 
     // TODO: support shared games
-};
+});
