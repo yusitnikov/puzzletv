@@ -7,6 +7,7 @@ export interface GridRegion extends Rect {
     transformCoords?: (position: Position) => Position;
     cells?: Position[];
     zIndex?: number;
+    highlighted?: boolean;
     backgroundColor?: string;
     noInteraction?: boolean;
     noBorders?: boolean;

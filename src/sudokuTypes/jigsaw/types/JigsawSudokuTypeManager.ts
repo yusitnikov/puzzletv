@@ -29,7 +29,6 @@ import {lightGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
-import {mixColorsStr} from "../../../utils/color";
 import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
 import {gameStateGetCurrentFieldState, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
@@ -339,10 +338,6 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
             cellsIndex,
             puzzle: {
                 fieldSize: {rowsCount, columnsCount},
-                typeManager: {
-                    gridBackgroundColor = "#fff",
-                    regionBackgroundColor = "#fff",
-                },
             },
             state: {
                 extension: {pieces: pieceIndexes, highlightCurrentPiece},
@@ -369,9 +364,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
                         left: rotated.left + left,
                     };
                 },
-                backgroundColor: highlightCurrentPiece && index === activePieceIndex
-                    ? regionBackgroundColor
-                    : mixColorsStr(regionBackgroundColor, gridBackgroundColor, 0.7),
+                highlighted: highlightCurrentPiece && index === activePieceIndex,
             };
         });
 
@@ -383,7 +376,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
                 height: rowsCount,
                 cells: otherCells,
                 transformCoords: (position) => position,
-                backgroundColor: gridBackgroundColor,
+                backgroundColor: "transparent",
                 noInteraction: true,
                 noBorders: true,
                 noClip: true,

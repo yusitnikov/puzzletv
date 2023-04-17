@@ -1,4 +1,4 @@
-import React, {ReactNode} from "react";
+import React, {Fragment, ReactNode} from "react";
 import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
@@ -34,21 +34,45 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                         {region: {zIndex: zIndex2 = -1}, index: index2}
                     ) => (zIndex - zIndex2) || (index - index2)
                 )
-                .map(({region, index}) => <FieldRect
-                    key={`items-region-${index}`}
-                    context={context}
-                    clip={!region.noClip}
-                    {...region}
-                >
-                    <AutoSvg
-                        left={-region.left}
-                        top={-region.top}
-                        width={1}
-                        height={1}
+                .map(({region, index}) => <Fragment key={`items-region-${index}`}>
+                    {region.highlighted && <FieldRect
+                        context={context}
+                        {...region}
                     >
-                        {typeof children === "function" ? children(region, index) : children}
-                    </AutoSvg>
-                </FieldRect>)
+                        <AutoSvg
+                            left={-region.left}
+                            top={-region.top}
+                            width={1}
+                            height={1}
+                        >
+                            {region.cells?.map(({top, left}) => <rect
+                                key={`cell-${top}-${left}`}
+                                x={left}
+                                y={top}
+                                width={1}
+                                height={1}
+                                fill={"none"}
+                                stroke={"#fe4"}
+                                strokeWidth={0.2}
+                            />)}
+                        </AutoSvg>
+                    </FieldRect>}
+
+                    <FieldRect
+                        context={context}
+                        clip={!region.noClip}
+                        {...region}
+                    >
+                        <AutoSvg
+                            left={-region.left}
+                            top={-region.top}
+                            width={1}
+                            height={1}
+                        >
+                            {typeof children === "function" ? children(region, index) : children}
+                        </AutoSvg>
+                    </FieldRect>
+                </Fragment>)
         }
 
         {!regionsWithSameCoordsTransformation && <FieldRect
