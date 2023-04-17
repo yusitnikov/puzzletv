@@ -1,12 +1,11 @@
-import {ReactNode, useMemo} from "react";
-import {emptyPosition, formatSvgPointsArray} from "../../../types/layout/Position";
+import {ReactNode} from "react";
+import {emptyPosition} from "../../../types/layout/Position";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {Size} from "../../../types/layout/Size";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {TransformedRect, transformRect} from "../../../types/layout/Rect";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
-import {getRegionBorders} from "../../../utils/regions";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 interface FieldRectProps<T extends AnyPTM> extends Omit<GridRegion, keyof Size>, Partial<Size> {
@@ -28,31 +27,24 @@ export const FieldRect = <T extends AnyPTM>(
 ) => {
     const transformedRect = getFieldRectTransform(context, position);
 
-    const clipBorders = useMemo(
-        // TODO: support custom cell bounds
-        () => cells && getRegionBorders(
-            cells.map(({top, left}) => ({
-                top: top - position.top,
-                left: left - position.left,
-            })),
-            1
-        ),
-        [cells, position.top, position.left]
-    );
-
     return <TransformedRectGraphics rect={transformedRect}>
         <AutoSvg
             width={width}
             height={height}
-            clip={
-                clipBorders
-                    ? <polygon
-                        points={formatSvgPointsArray(clipBorders)}
-                        strokeWidth={0}
-                        stroke={"none"}
-                    />
-                    : clip
-            }
+            clip={clip && (
+                cells
+                    ? <>
+                        {cells.map(({top, left}) => <rect
+                            key={`cell-${top}-${left}`}
+                            x={left - position.left}
+                            y={top - position.top}
+                            width={1}
+                            height={1}
+                            strokeWidth={0}
+                        />)}
+                    </>
+                    : true
+            )}
         >
             {children}
         </AutoSvg>

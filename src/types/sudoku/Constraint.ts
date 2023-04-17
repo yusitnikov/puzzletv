@@ -15,6 +15,7 @@ import {getFogPropsByConstraintsList} from "../../components/sudoku/constraints/
 import {FieldLayer} from "./FieldLayer";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {isSelectableCell} from "./CellTypeProps";
+import {GridRegion} from "./GridRegion";
 
 export type Constraint<T extends AnyPTM, DataT = undefined> = {
     name: string;
@@ -56,6 +57,7 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
 export type ConstraintProps<T extends AnyPTM, DataT = undefined> =
     Omit<Constraint<T, DataT>, "component"> & {
     context: PuzzleContext<T>;
+    region?: GridRegion;
 }
 
 export type ConstraintPropsGenericFc<DataT = undefined> = <T extends AnyPTM>(

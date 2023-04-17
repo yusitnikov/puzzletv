@@ -7,6 +7,7 @@ import {concatContinuousLines} from "../../../utils/lines";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {isCellWithBorders} from "../../../types/sudoku/CellTypeProps";
+import {doesGridRegionContainCell} from "../../../types/sudoku/GridRegion";
 
 export const FieldLines = {
     [FieldLayer.lines]: <T extends AnyPTM>(
@@ -15,7 +16,8 @@ export const FieldLines = {
                 puzzle,
                 cellsIndexForState,
                 state: {processed: {isMyTurn}},
-            }
+            },
+            region,
         }: ConstraintProps<T>
     ) => {
         const {
@@ -33,7 +35,8 @@ export const FieldLines = {
         const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
         const borderWidth = 1 / scale;
 
-        const cellHasBorders = (position: Position) => isCellWithBorders(getCellTypeProps?.(position, puzzle));
+        const cellHasBorders = (position: Position) => isCellWithBorders(getCellTypeProps?.(position, puzzle))
+            && (!region || (customCellBounds && !region.cells) || doesGridRegionContainCell(region, position));
 
         if (customCellBounds) {
             return <>

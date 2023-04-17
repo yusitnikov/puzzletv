@@ -9,7 +9,7 @@ import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {FieldLoop} from "./FieldLoop";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {GridRegion} from "../../../types/sudoku/GridRegion";
+import {doesGridRegionContainCell, GridRegion} from "../../../types/sudoku/GridRegion";
 
 export interface FieldItemsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -19,10 +19,20 @@ export interface FieldItemsProps<T extends AnyPTM> {
 }
 
 export const FieldItems = <T extends AnyPTM>(
-    {context, items, layer}: FieldItemsProps<T>
+    {context, items, layer, region}: FieldItemsProps<T>
 ) => <FieldLoop context={context}>
     {items.map(({component: {[layer]: Component} = {}, cells, renderSingleCellInUserArea, ...otherData}, index) => {
         if (!Component) {
+            return null;
+        }
+
+        if (
+            region &&
+            (!context.puzzle.customCellBounds || region.cells) &&
+            cells.length &&
+            cells.every(({top, left}) => top % 1 === 0 && left % 1 === 0) &&
+            !cells.some((cell) => doesGridRegionContainCell(region, cell))
+        ) {
             return null;
         }
 
@@ -42,6 +52,7 @@ export const FieldItems = <T extends AnyPTM>(
 
                 let component = <Component
                     context={context}
+                    region={region}
                     cells={[emptyPosition]}
                     {...otherData}
                 />;
@@ -82,6 +93,7 @@ export const FieldItems = <T extends AnyPTM>(
             return <TransformedRectGraphics key={index} rect={transformRect(centerRect)}>
                 <Component
                     context={context}
+                    region={region}
                     cells={[emptyPosition, emptyPosition]}
                     {...otherData}
                 />
@@ -91,6 +103,7 @@ export const FieldItems = <T extends AnyPTM>(
         return <Component
             key={index}
             context={context}
+            region={region}
             cells={cells}
             {...otherData}
         />;

@@ -62,6 +62,7 @@ export const AutoSvg = ({children, viewBox, clip, style, ...props}: AutoSvgProps
                         y={0}
                         width={width}
                         height={height}
+                        strokeWidth={0}
                     />}
                 </clipPath>
             </defs>
