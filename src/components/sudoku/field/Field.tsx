@@ -328,7 +328,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
 
                                 return <>
                                     <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
-                                        <feDropShadow dx={0} dy={0} stdDeviation={0.05} floodColor={"#fff"} floodOpacity={1}/>
+                                        <feDropShadow dx={0} dy={0} stdDeviation={0.02} floodColor={"#fff"} floodOpacity={1}/>
                                     </filter>
 
                                     {region && backgroundColor && <rect
