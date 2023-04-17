@@ -13,6 +13,8 @@ export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, title
     const {
         puzzle: {
             typeManager: {initialAngle = 0, initialScale = 1},
+            loopHorizontally,
+            loopVertically,
         },
         cellSizeForSidePanel: cellSize,
         state: {processed: {cellWriteMode}},
@@ -60,7 +62,7 @@ export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, title
             context={context}
         />
 
-        {cellWriteMode === CellWriteMode.move && <ControlButton
+        {cellWriteMode === CellWriteMode.move && (loopHorizontally || loopVertically) && <ControlButton
             cellSize={cellSize}
             left={0}
             top={0}
