@@ -10,6 +10,7 @@ import {JigsawPTM} from "./JigsawPTM";
 import {roundToStep} from "../../../utils/math";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {myClientId} from "../../../hooks/useMultiPlayer";
+import {JigsawMoveButtonHint} from "../components/JigsawMoveButtonHint";
 
 export const roundStep = 0.5;
 
@@ -21,6 +22,10 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         [LanguageCode.en]: "Move the grid and the jigsaw pieces",
         [LanguageCode.ru]: "Двигать поле и куски пазла",
     },
+    mainButtonContent: (props) => <>
+        {base.mainButtonContent && <base.mainButtonContent {...props}/>}
+        <JigsawMoveButtonHint {...props}/>
+    </>,
     disableCellHandlers: false,
     handlesRightMouseClick: true,
     onGestureStart(props, context, ...args) {
