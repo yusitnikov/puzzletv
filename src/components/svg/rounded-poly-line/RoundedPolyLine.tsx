@@ -1,5 +1,11 @@
-import {Fragment, memo} from "react";
-import {formatSvgPointsArray, getLineVector, normalizeVector, Position} from "../../../types/layout/Position";
+import {memo} from "react";
+import {
+    formatSvgPointsArray,
+    getLineVector,
+    isSamePosition,
+    normalizeVector,
+    Position
+} from "../../../types/layout/Position";
 
 export interface PolyLinePoint extends Position {
     radius?: number;
@@ -23,12 +29,19 @@ export const RoundedPolyLine = ({points, strokeWidth, stroke, rounded = true}: R
     const areAllSameWidth = points.every(({radius = defaultRadius}) => radius === firstRadius)
 
     if (areAllSameWidth && !rounded) {
-        return <polyline
-            points={formatSvgPointsArray(points)}
-            strokeWidth={firstRadius * 2}
-            stroke={stroke}
-            fill={"none"}
-        />;
+        return isSamePosition(points[0], points[points.length - 1])
+            ? <polygon
+                points={formatSvgPointsArray(points.slice(1))}
+                strokeWidth={firstRadius * 2}
+                stroke={stroke}
+                fill={"none"}
+            />
+            : <polyline
+                points={formatSvgPointsArray(points)}
+                strokeWidth={firstRadius * 2}
+                stroke={stroke}
+                fill={"none"}
+            />;
     }
 
     return <>
