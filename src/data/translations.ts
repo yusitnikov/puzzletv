@@ -153,6 +153,12 @@ export const translationsExactType = {
     "Redo the last action": {
         [LanguageCode.ru]: "Повторить последнее действие",
     },
+    "Undo": {
+        [LanguageCode.ru]: "Отмена",
+    },
+    "Redo": {
+        [LanguageCode.ru]: "Повтор",
+    },
     "Check the result": {
         [LanguageCode.ru]: "Проверить результат",
     },

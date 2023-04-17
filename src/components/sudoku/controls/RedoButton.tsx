@@ -45,6 +45,20 @@ export const RedoButton = <T extends AnyPTM>(
         onClick={handleRedo}
         title={`${translate("Redo the last action")} (${translate("shortcut")}: ${ctrlKeyText}+Y)`}
     >
-        <Redo/>
+        <div style={{position: "absolute", top: "-10%", width: "100%"}}>
+            <Redo/>
+        </div>
+
+        <div style={{
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            width: "100%",
+            fontSize: "30%",
+            lineHeight: "normal",
+            textAlign: "center",
+        }}>
+            {translate("Redo")}
+        </div>
     </ControlButton>;
 };
