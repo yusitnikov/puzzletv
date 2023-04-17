@@ -196,7 +196,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
     rotationallySymmetricDigits: true,
 
     initialGameStateExtension: (puzzle) => {
-        const pieces = getJigsawPieces(puzzle)
+        const {pieces} = getJigsawPieces(puzzle)
         const {extension: {pieces: piecePositions}} = createEmptyFieldState(puzzle);
         const pieceSortIndexesByPosition = getReverseIndexMap(sortJigsawPiecesByPosition(pieces, piecePositions));
 
@@ -220,7 +220,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         const centerLeft = puzzle.fieldSize.columnsCount / 2;
 
         return {
-            pieces: getJigsawPieces(puzzle).map(({boundingRect}) => {
+            pieces: getJigsawPieces(puzzle).pieces.map(({boundingRect}) => {
                 const {top, left} = getRectCenter(boundingRect);
 
                 return {
@@ -293,7 +293,7 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
 
         const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
         const angle = loop(roundToStep(pieces[regionIndex].angle, 90), 360);
-        const {cells} = getJigsawPiecesWithCache(cellsIndex)[regionIndex];
+        const {cells} = getJigsawPiecesWithCache(cellsIndex).pieces[regionIndex];
 
         if (angle >= 180) {
             xDirection = -xDirection;
@@ -334,21 +334,23 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
         {
             cellsIndex,
             puzzle: {
+                fieldSize: {rowsCount, columnsCount},
                 typeManager: {
                     gridBackgroundColor = "#fff",
                     regionBackgroundColor = "#fff",
                 },
             },
             state: {
-                extension: {pieces, highlightCurrentPiece},
+                extension: {pieces: pieceIndexes, highlightCurrentPiece},
                 processedExtension: {pieces: animatedPieces},
             },
         }
     ): GridRegion[] {
-        const activePieceIndex = getActiveJigsawPieceIndex(pieces);
+        const {pieces, otherCells} = getJigsawPiecesWithCache(cellsIndex);
+        const activePieceIndex = getActiveJigsawPieceIndex(pieceIndexes);
 
-        return getJigsawPiecesWithCache(cellsIndex).map(({cells, boundingRect}, index) => {
-            const {zIndex} = pieces[index];
+        const regions: GridRegion[] = pieces.map(({cells, boundingRect}, index) => {
+            const {zIndex} = pieceIndexes[index];
             const {top, left, angle} = animatedPieces[index];
             const center = getRectCenter(boundingRect);
             return {
@@ -368,6 +370,24 @@ export const JigsawSudokuTypeManager: SudokuTypeManager<JigsawPTM> = {
                     : mixColorsStr(regionBackgroundColor, gridBackgroundColor, 0.7),
             };
         });
+
+        if (otherCells.length) {
+            regions.push({
+                top: 0,
+                left: 0,
+                width: columnsCount,
+                height: rowsCount,
+                cells: otherCells,
+                transformCoords: (position) => position,
+                backgroundColor: gridBackgroundColor,
+                noInteraction: true,
+                noBorders: true,
+                noClip: true,
+                zIndex: 0,
+            });
+        }
+
+        return regions;
     },
 
     getRegionsForRowsAndColumns() {

@@ -64,7 +64,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
             return;
         }
 
-        const {boundingRect} = getJigsawPiecesWithCache(cellsIndex)[pieceIndex];
+        const {boundingRect} = getJigsawPiecesWithCache(cellsIndex).pieces[pieceIndex];
         const pieceCenter = getRectCenter(boundingRect);
         const fieldCenter = getRectCenter(fieldRect);
 

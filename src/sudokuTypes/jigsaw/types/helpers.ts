@@ -1,5 +1,5 @@
 import {JigsawDigit} from "./JigsawDigit";
-import {arrayContainsPosition, Position, PositionWithAngle} from "../../../types/layout/Position";
+import {arrayContainsPosition, Position, PositionSet, PositionWithAngle} from "../../../types/layout/Position";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {loop} from "../../../utils/math";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
@@ -9,35 +9,34 @@ import {JigsawPTM} from "./JigsawPTM";
 import {isRotatableDigit, rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
 import {JigsawPieceState} from "./JigsawPieceState";
 import {getRectCenter} from "../../../types/layout/Rect";
+import {indexes} from "../../../utils/indexes";
 
 export const getJigsawPieces = (
     {regions = [], fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
-): JigsawPieceInfo[] => {
+): { pieces: JigsawPieceInfo[], otherCells: Position[] } => {
+    let otherCells = new PositionSet(indexes(rowsCount).flatMap(
+        (top) => indexes(columnsCount).map((left) => ({top, left}))
+    ));
+
     // Regions may be not initialized yet during puzzle import, so the code below is a fallback
     if (regions.length === 0) {
-        return [
-            {
-                boundingRect: {
-                    top: 0,
-                    left: 0,
-                    width: columnsCount,
-                    height: rowsCount,
-                },
-                cells: [],
-            },
-        ];
+        return {pieces: [], otherCells: otherCells.items};
     }
 
     // TODO: other region creation modes
 
-    return regions.map((region) => {
+    const pieces: JigsawPieceInfo[] = regions.map((region) => {
         const cells = Array.isArray(region) ? region : region.cells;
+
+        otherCells = otherCells.bulkRemove(cells);
 
         return {
             cells,
             boundingRect: getRegionBoundingBox(cells, 1),
         };
     });
+
+    return {pieces, otherCells: otherCells.items};
 };
 
 export const getJigsawPiecesWithCache = (
@@ -50,7 +49,7 @@ export const getJigsawPieceIndexByCell = (
     cellsIndex: SudokuCellsIndex<JigsawPTM>,
     cell: Position,
 ): number | undefined => {
-    const index = getJigsawPiecesWithCache(cellsIndex).findIndex(
+    const index = getJigsawPiecesWithCache(cellsIndex).pieces.findIndex(
         ({cells}) => arrayContainsPosition(cells, cell)
     );
     return index >= 0 ? index : undefined;

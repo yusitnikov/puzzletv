@@ -54,7 +54,7 @@ const JigsawPieceHighlightHandler = (
 
         switch (code) {
             case "Tab":
-                const pieces = getJigsawPiecesWithCache(cellsIndex);
+                const {pieces} = getJigsawPiecesWithCache(cellsIndex);
                 const sortedPieceCoords = sortJigsawPiecesByPosition(pieces, piecePositions);
                 const newActivePieceIndex = incrementArrayItem(
                     sortedPieceCoords,

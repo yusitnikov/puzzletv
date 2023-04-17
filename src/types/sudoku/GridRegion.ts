@@ -8,6 +8,9 @@ export interface GridRegion extends Rect {
     cells?: Position[];
     zIndex?: number;
     backgroundColor?: string;
+    noInteraction?: boolean;
+    noBorders?: boolean;
+    noClip?: boolean;
 }
 
 export const doesGridRegionContainCell = ({cells, top, left, width, height}: GridRegion, cell: Position) =>

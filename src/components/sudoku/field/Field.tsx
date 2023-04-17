@@ -423,7 +423,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                         }, region)}
                                     </g>
 
-                                    {isReady && <g data-layer="mouse-handler">
+                                    {isReady && !region?.noInteraction && <g data-layer="mouse-handler">
                                         {renderCellsLayer(
                                             "mouse-handler",
                                             (cellState, cellPosition) => <FieldCellMouseHandler

@@ -37,7 +37,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                 .map(({region, index}) => <FieldRect
                     key={`items-region-${index}`}
                     context={context}
-                    clip={true}
+                    clip={!region.noClip}
                     {...region}
                 >
                     <AutoSvg

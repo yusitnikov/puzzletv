@@ -32,6 +32,10 @@ export const FieldLines = {
 
         const scale = useTransformScale();
 
+        if (region?.noBorders) {
+            return null;
+        }
+
         const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
         const borderWidth = 1 / scale;
 
