@@ -38,6 +38,7 @@ export const InfiniteRingsBorderLines = {
                 ]}
                 stroke={blackColor}
                 strokeWidth={borderWidth}
+                rounded={false}
             />
 
             <RoundedPolyLine
@@ -47,6 +48,7 @@ export const InfiniteRingsBorderLines = {
                 ]}
                 stroke={blackColor}
                 strokeWidth={borderWidth}
+                rounded={false}
             />
         </>;
     },

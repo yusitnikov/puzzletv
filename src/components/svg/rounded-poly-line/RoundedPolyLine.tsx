@@ -9,26 +9,41 @@ export interface RoundedPolyLineProps {
     points: PolyLinePoint[];
     strokeWidth: number;
     stroke: string;
+    rounded?: boolean;
 }
 
-export const RoundedPolyLine = ({points, strokeWidth, stroke}: RoundedPolyLineProps) => {
+export const RoundedPolyLine = ({points, strokeWidth, stroke, rounded = true}: RoundedPolyLineProps) => {
+    if (points.length === 0) {
+        return null;
+    }
+
     const defaultRadius = strokeWidth / 2;
 
-    return <>
-        <circle key={"first-circle"} cx={points[0].left} cy={points[0].top}
-                r={points[0].radius ?? defaultRadius} fill={stroke}/>
+    const firstRadius = points[0].radius ?? defaultRadius;
+    const areAllSameWidth = points.every(({radius = defaultRadius}) => radius === firstRadius)
 
+    if (areAllSameWidth && !rounded) {
+        return <polyline
+            points={formatSvgPointsArray(points)}
+            strokeWidth={firstRadius * 2}
+            stroke={stroke}
+            fill={"none"}
+        />;
+    }
+
+    return <>
         {points.map((start, index) => {
             const end = points[index + 1];
             if (!end) {
                 return undefined;
             }
 
-            return <Fragment key={`line-${index}`}>
-                <RoundedLineSegment start={start} end={end} defaultRadius={defaultRadius} color={stroke}/>
+            return <RoundedLineSegment key={`line-${index}`} start={start} end={end} defaultRadius={defaultRadius} color={stroke}/>;
+        })}
 
-                <circle cx={end.left} cy={end.top} r={end.radius ?? defaultRadius} fill={stroke}/>
-            </Fragment>;
+        {/*note: rendering circles even if `rounded` is false is intended, because it's the case when the line widths are different*/}
+        {points.map(({top, left, radius = defaultRadius}, index) => {
+            return <circle key={`circle-${index}`} cx={left} cy={top} r={radius} fill={stroke}/>;
         })}
     </>;
 };

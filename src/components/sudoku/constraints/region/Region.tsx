@@ -27,6 +27,7 @@ export const Region = {
             points={points}
             stroke={isMyTurn ? textColor : darkGreyColor}
             strokeWidth={getRegionBorderWidth(cellSize)}
+            rounded={false}
         />;
     },
 };
