@@ -549,19 +549,13 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
 };
 
 export const gameStateSelectAllCells = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>,
-    state: ProcessedGameState<T>
+    {cellsIndex, puzzle: {fieldSize: {rowsCount, columnsCount}}, state}: PuzzleContext<T>
 ) => {
-    const {
-        fieldSize: {rowsCount, columnsCount},
-        typeManager: {getCellTypeProps},
-    } = puzzle;
-
     return gameStateSetSelectedCells<T>(
         state,
         indexes(rowsCount)
             .flatMap(top => indexes(columnsCount).map(left => ({left, top})))
-            .filter(cell => isSelectableCell(getCellTypeProps?.(cell, puzzle)))
+            .filter(cell => isSelectableCell(cellsIndex.getCellTypeProps(cell)))
     );
 };
 

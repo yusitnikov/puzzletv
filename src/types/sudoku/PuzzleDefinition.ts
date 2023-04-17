@@ -213,7 +213,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
 ): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
     const {puzzle, state, cellsIndex} = context;
     const {
-        typeManager: {getCellTypeProps, getDigitByCellData},
+        typeManager: {getDigitByCellData},
         initialDigits,
         initialCellMarks = [],
         solution = {},
@@ -234,7 +234,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const digitToColorMap: Record<number, string> = {};
     for (const [top, row] of cells.entries()) {
         for (const [left, {usersDigit, colors}] of row.entries()) {
-            if (!isInteractableCell(getCellTypeProps?.({top, left}, puzzle))) {
+            if (!isInteractableCell(cellsIndex.getCellTypeProps({top, left}))) {
                 continue;
             }
 

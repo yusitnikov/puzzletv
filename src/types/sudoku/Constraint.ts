@@ -179,8 +179,8 @@ export const getInvalidUserLines = <T extends AnyPTM>(
 };
 
 export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: PuzzleContext<T>) => {
-    const {puzzle, state} = context;
-    const {typeManager: {getCellTypeProps}, digitsCount} = puzzle;
+    const {cellsIndex, puzzle, state} = context;
+    const {digitsCount} = puzzle;
     const constraints = getAllPuzzleConstraints(context);
     const {cells, lines} = gameStateGetCurrentFieldState(state);
     const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
@@ -199,7 +199,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
             const position: Position = {left, top};
             const digit = userDigits[top]?.[left];
 
-            return !isSelectableCell(getCellTypeProps?.(position, puzzle))
+            return !isSelectableCell(cellsIndex.getCellTypeProps(position))
                 || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
         }))
     ) && getInvalidUserLines(lines, userDigits, constraints, context, true).size === 0;

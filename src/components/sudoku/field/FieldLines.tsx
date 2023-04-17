@@ -14,6 +14,7 @@ export const FieldLines = {
         {
             context: {
                 puzzle,
+                cellsIndex,
                 cellsIndexForState,
                 state: {processed: {isMyTurn}},
             },
@@ -21,10 +22,7 @@ export const FieldLines = {
         }: ConstraintProps<T>
     ) => {
         const {
-            typeManager: {
-                borderColor: typeBorderColor,
-                getCellTypeProps,
-            },
+            typeManager: {borderColor: typeBorderColor},
             fieldSize: {columnsCount, rowsCount},
             borderColor: puzzleBorderColor,
             customCellBounds,
@@ -39,7 +37,7 @@ export const FieldLines = {
         const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
         const borderWidth = 1 / scale;
 
-        const cellHasBorders = (position: Position) => isCellWithBorders(getCellTypeProps?.(position, puzzle))
+        const cellHasBorders = (position: Position) => isCellWithBorders(cellsIndex.getCellTypeProps(position))
             && (!region || (customCellBounds && !region.cells) || doesGridRegionContainCell(region, position));
 
         if (customCellBounds) {

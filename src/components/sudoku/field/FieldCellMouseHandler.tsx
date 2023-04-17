@@ -26,7 +26,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
         handlers,
     }: FieldCellMouseHandlerProps<T>
 ) => {
-    const {puzzle, cellsIndex, state} = context;
+    const {cellsIndex, state} = context;
 
     const {processed: {cellWriteModeInfo}} = state;
 
@@ -34,7 +34,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
         onCornerClick,
         onCornerEnter,
         disableCellHandlers,
-    } = puzzle.typeManager.getCellTypeProps?.(cellPosition, puzzle)?.forceCellWriteMode || cellWriteModeInfo;
+    } = cellsIndex.getCellTypeProps(cellPosition).forceCellWriteMode ?? cellWriteModeInfo;
 
     if (disableCellHandlers) {
         return null;

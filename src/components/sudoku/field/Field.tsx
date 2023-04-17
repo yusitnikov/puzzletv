@@ -56,7 +56,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
 
     const readOnlySafeContext = useReadOnlySafeContext(context);
 
-    const {puzzle, state, onStateChange, cellSize} = readOnlySafeContext;
+    const {cellsIndex, puzzle, state, onStateChange, cellSize} = readOnlySafeContext;
 
     const {
         typeManager,
@@ -74,7 +74,6 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
     } = puzzle;
 
     const {
-        getCellTypeProps,
         getCellSelectionType = state.highlightSeenCells ? getDefaultCellSelectionType : undefined,
         disableConflictChecker,
         disableArrowLetterShortcuts,
@@ -177,7 +176,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                 break;
             case "KeyA":
                 if (ctrlKey && !shiftKey) {
-                    onStateChange(gameState => gameStateSelectAllCells(puzzle, gameState));
+                    onStateChange(state => gameStateSelectAllCells({...readOnlySafeContext, state}));
                     ev.preventDefault();
                 }
                 if (!disableArrowLetterShortcuts) {
@@ -236,7 +235,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                 }
             }
 
-            const cellTypeProps = getCellTypeProps?.(cellPosition, puzzle);
+            const cellTypeProps = cellsIndex.getCellTypeProps(cellPosition);
             if (!(isInteractionMode ? isInteractableCell(cellTypeProps) : isVisibleCell(cellTypeProps))) {
                 return null;
             }

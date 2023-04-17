@@ -293,7 +293,7 @@ export const useGame = <T extends AnyPTM>(
                         const updates = typeof callback === "function" ? callback(processedGameState) : callback;
                         if (updates.selectedCells) {
                             updates.selectedCells = updates.selectedCells.filter((cell) =>
-                                isSelectableCell(puzzle.typeManager.getCellTypeProps?.(cell, puzzle)));
+                                isSelectableCell(cellsIndex.getCellTypeProps(cell)));
                         }
                         state = mergeGameStateWithUpdates(state, updates);
                     } else {

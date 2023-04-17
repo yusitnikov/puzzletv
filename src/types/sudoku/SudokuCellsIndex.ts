@@ -23,6 +23,7 @@ import {LineWithColor} from "./LineWithColor";
 import {PrioritizedQueue} from "../struct/PrioritizedQueue";
 import {PuzzleContext} from "./PuzzleContext";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {CellTypeProps} from "./CellTypeProps";
 
 export class SudokuCellsIndex<T extends AnyPTM> {
     public readonly allCells: CellInfo<T>[][];
@@ -424,7 +425,14 @@ export class SudokuCellsIndex<T extends AnyPTM> {
         return result;
     }
 
+    getCellTypeProps(cell: Position): CellTypeProps<T> {
+        const cache = this.cache.cellTypeProps = this.cache.cellTypeProps ?? {};
+        const key = stringifyPosition(cell);
+        return cache[key] = cache[key] ?? this.puzzle.typeManager.getCellTypeProps?.(cell, this.puzzle) ?? {};
+    }
+
     // region Custom regions
+    // noinspection JSUnusedGlobalSymbols
     getCustomRegionsByBorderLines(state: ProcessedGameStateEx<T>) {
         const map: SudokuCustomRegionsMap = {
             regions: [],
@@ -443,6 +451,7 @@ export class SudokuCellsIndex<T extends AnyPTM> {
             }
         }
 
+        // noinspection JSUnusedGlobalSymbols
         return {
             regions: map.regions,
             getRegionByCell: (cell: Position) => {
@@ -531,14 +540,11 @@ export class SudokuCellsIndexForState<T extends AnyPTM> {
     );
 
     public readonly getAllCells = lazy(() => {
-        const {puzzle} = this.puzzleIndex;
-        const {typeManager: {getCellTypeProps}} = puzzle;
-
         return this.puzzleIndex.allCells.map((row, top) => row.map(
             ({getTransformedBounds, ...cell}, left): CellInfoForState => ({
                 ...cell,
                 transformedBounds: getTransformedBounds(this.context),
-                isVisible: getCellTypeProps?.({top, left}, puzzle)?.isVisibleForState?.(this.context) !== false,
+                isVisible: this.puzzleIndex.getCellTypeProps({top, left}).isVisibleForState?.(this.context) !== false,
             })
         ));
     });

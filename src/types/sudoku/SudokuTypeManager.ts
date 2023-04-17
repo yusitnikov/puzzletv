@@ -268,19 +268,14 @@ export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPT
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {puzzle}: PuzzleContext<T>
+    {cellsIndex, puzzle: {fieldSize: {rowsCount, columnsCount}}}: PuzzleContext<T>
 ): {cell?: Position, state?: undefined} => {
-    const {
-        fieldSize: {rowsCount, columnsCount},
-        typeManager: {getCellTypeProps},
-    } = puzzle;
-
     const isTotallyValidCell = (position: Position) => {
         const {top, left} = position;
         if (top < 0 || top >= rowsCount || left < 0 || left >= columnsCount) {
             return false;
         }
-        return isSelectableCell(getCellTypeProps?.(position, puzzle));
+        return isSelectableCell(cellsIndex.getCellTypeProps(position));
     };
 
     // Try moving in the requested direction naively
@@ -309,19 +304,17 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {puzzle, cellsIndex}: PuzzleContext<T>,
+    {cellsIndex}: PuzzleContext<T>,
     isMainKeyboard?: boolean,
     enableBackwardSteps = true,
 ): {cell?: Position, state?: undefined} => {
-    const {typeManager: {getCellTypeProps}} = puzzle;
-
     const {center, neighbors} = cellsIndex.allCells[top][left];
 
     let bestDist: number | undefined = undefined;
     let bestCell: Position | undefined = undefined;
 
     for (const neighbor of neighbors.items) {
-        if (!isSelectableCell(getCellTypeProps?.(neighbor, puzzle))) {
+        if (!isSelectableCell(cellsIndex.getCellTypeProps(neighbor))) {
             continue;
         }
 
