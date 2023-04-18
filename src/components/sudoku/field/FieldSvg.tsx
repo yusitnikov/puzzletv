@@ -2,7 +2,7 @@ import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PropsWithChildren} from "react";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {getPointsBoundingBox, getRectPoints} from "../../../types/layout/Rect";
+import {getPointsBoundingBox, getRectByBounds, getRectPoints} from "../../../types/layout/Rect";
 import {getFieldRectTransform} from "./FieldRect";
 
 export const FieldSvg = <T extends AnyPTM>({context, children}: PropsWithChildren<PuzzleContextProps<T>>) => {
@@ -44,12 +44,16 @@ export const FieldSvg = <T extends AnyPTM>({context, children}: PropsWithChildre
     }
 
     const extraMargin = loopHorizontally || loopVertically ? fieldSize : 0.5;
-    viewBox = {
-        top: viewBox.top - extraMargin,
-        left: viewBox.left - extraMargin,
-        width: viewBox.width + 2 * extraMargin,
-        height: viewBox.height + 2 * extraMargin,
-    };
+    viewBox = getRectByBounds(
+        {
+            top: Math.floor(viewBox.top - extraMargin),
+            left: Math.floor(viewBox.left - extraMargin),
+        },
+        {
+            top: Math.ceil(viewBox.top + viewBox.height + extraMargin),
+            left: Math.ceil(viewBox.left + viewBox.width + extraMargin),
+        }
+    );
 
     return <AutoSvg
         left={cellSize * (fieldMargin + (fieldSize - columnsCount) / 2 + viewBox.left)}

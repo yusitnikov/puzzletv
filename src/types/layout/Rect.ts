@@ -15,6 +15,13 @@ export const emptyRect: Rect = {
     ...emptySize,
 };
 
+export const getRectByBounds = ({top, left}: Position, {top: bottom, left: right}: Position): Rect => ({
+    top,
+    left,
+    width: right - left,
+    height: bottom - top,
+});
+
 export const transformRect = (
     {top, left, width, height}: Rect,
     transformCoords: (position: Position) => Position = position => position,
@@ -62,17 +69,17 @@ export const getPointsBoundingBox = (...points: Position[]): Rect => {
     const tops = points.map(({top}) => top);
     const lefts = points.map(({left}) => left);
 
-    const top = Math.min(...tops);
-    const left = Math.min(...lefts);
-    const bottom = Math.max(...tops);
-    const right = Math.max(...lefts);
-
-    return {
-        top,
-        left,
-        width: right - left,
-        height: bottom - top,
-    };
+    return getRectByBounds(
+        {
+            top: Math.min(...tops),
+            left: Math.min(...lefts),
+        },
+        {
+            top: Math.max(...tops),
+            left: Math.max(...lefts),
+        }
+    );
 };
 
+// noinspection JSUnusedGlobalSymbols
 export const getRectsBoundingBox = (...rects: Rect[]) => getPointsBoundingBox(...rects.flatMap(getRectPoints));
