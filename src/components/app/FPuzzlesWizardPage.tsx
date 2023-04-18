@@ -110,7 +110,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         extraGrids: !supportsExtraGrids ? undefined : extraGrids
             .map((grid) => ({
                 ...grid,
-                load: grid.load.split("?load=")[1] ?? "",
+                load: grid.load.split("?load=")[1] ?? grid.load,
             }))
             .filter(({load}) => load),
     });
@@ -140,6 +140,9 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     };
 
     const isValidForm = !isInfiniteRings || visibleRingsCount !== 0;
+
+    // eslint-disable-next-line no-script-url
+    const copyIdBookmarkletCode = "javascript:(()=>{const d=document,b=d.body,e=d.createElement('input');e.value=exportPuzzle();b.append(e);e.select();d.execCommand('copy');e.remove();})()";
 
     return <div style={{
         display: "flex",
@@ -372,7 +375,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             return <li key={`extra-grid-${index}`}>
                                 <Paragraph>
                                     <label>
-                                        F-Puzzles link:&nbsp;
+                                        F-Puzzles link or ID:&nbsp;
                                         <input type={"text"} value={grid.load}
                                                onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
                                     </label>
@@ -411,7 +414,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         <li key={`extra-grid-${extraGrids.length}`}>
                             <Paragraph>
                                 <label>
-                                    F-Puzzles link:&nbsp;
+                                    F-Puzzles link or ID:&nbsp;
                                     <input type={"text"} value={""} onChange={ev => setExtraGrids([
                                         ...extraGrids,
                                         {
@@ -426,8 +429,10 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                                     Copy the link of the page that opened in the tab to here.
                                 </Details>
                                 <Details>
-                                    <strong>Important!</strong> Please don't copy the "compressed" link, it will not
-                                    work!
+                                    Alternative: copy the f-puzzles ID to the clipboard by installing and using this bookmarklet: <a href={copyIdBookmarkletCode}>Copy f-puzzles ID</a>.
+                                </Details>
+                                <Details>
+                                    <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
                                     Also, If you edited the puzzle, it's a must to use the "open with link" feature
                                     (because the link of the current f-puzzles tab doesn't include the latest
                                     information).
