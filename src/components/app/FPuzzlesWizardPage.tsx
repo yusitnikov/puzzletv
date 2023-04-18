@@ -59,6 +59,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
+    const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
 
@@ -117,6 +118,12 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         allowOverrideColors: hasInitialColors && allowOverrideColors,
         angleStep: isJigsaw ? angleStep || undefined : undefined,
         shuffle: isJigsaw && shuffle,
+        stickyRegion: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid ? {
+            top: globalOffsetY,
+            left: globalOffsetX,
+            width: puzzle.size,
+            height: puzzle.size,
+        } : undefined,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
@@ -339,6 +346,16 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             Digits should stay vertical:&nbsp;
                             <input type={"checkbox"} checked={stickyDigits} onChange={ev => setStickyDigits(ev.target.checked)}/>
                         </label>
+                    </Paragraph>}
+
+                    {filteredExtraGrids.length !== 0 && <Paragraph>
+                        <label>
+                            The first grid is sticky:&nbsp;
+                            <input type={"checkbox"} checked={isFirstStickyGrid} onChange={ev => setIsFirstStickyGrid(ev.target.checked)}/>
+                        </label>
+                        <Details>
+                            When enabled, the first grid will be treated as a regular sudoku grid instead of being split into jigsaw pieces.
+                        </Details>
                     </Paragraph>}
 
                     <Paragraph>

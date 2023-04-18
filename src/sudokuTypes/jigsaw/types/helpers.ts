@@ -14,9 +14,15 @@ import {indexes} from "../../../utils/indexes";
 const getJigsawPieces = (
     cellsIndex: SudokuCellsIndex<JigsawPTM>
 ): { pieces: JigsawPieceInfo[], otherCells: Position[] } => {
-    const {puzzle: {regions = [], fieldSize: {rowsCount, columnsCount}}} = cellsIndex;
+    const {
+        puzzle: {
+            regions = [],
+            fieldSize: {rowsCount, columnsCount},
+            importOptions: {stickyRegion} = {},
+        },
+    } = cellsIndex;
 
-    const regionCells = regions.map((region) => Array.isArray(region) ? region : region.cells);
+    let regionCells = regions.map((region) => Array.isArray(region) ? region : region.cells);
 
     let otherCells = new PositionSet(indexes(rowsCount).flatMap(
         (top) => indexes(columnsCount).map((left) => ({top, left}))
@@ -27,6 +33,14 @@ const getJigsawPieces = (
 
     if (otherActiveCells.size) {
         regionCells.push(otherActiveCells.items);
+    }
+
+    if (stickyRegion) {
+        regionCells = regionCells.filter(([{top, left}]) => {
+            top -= Number(stickyRegion.top);
+            left -= Number(stickyRegion.left);
+            return top < 0 || left < 0 || top >= Number(stickyRegion.height) || left >= Number(stickyRegion.width);
+        });
     }
 
     // TODO: other region creation modes

@@ -1,3 +1,5 @@
+import {Rect} from "../layout/Rect";
+
 export enum PuzzleImportPuzzleType {
     Regular = "regular",
     Latin = "latin",
@@ -42,6 +44,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     allowOverrideColors?: boolean;
     angleStep?: number;
     shuffle?: boolean;
+    stickyRegion?: Rect;
     stickyDigits?: boolean;
 }
 
@@ -73,6 +76,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         digitsCount,
         angleStep,
         shuffle,
+        stickyRegion,
         stickyDigits,
     } = importOptions as Required<PuzzleImportOptions>;
 
@@ -104,6 +108,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         digitsCount,
         angleStep,
         shuffle,
+        stickyRegion,
         stickyDigits,
     };
 

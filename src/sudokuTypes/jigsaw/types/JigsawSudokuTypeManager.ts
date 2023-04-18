@@ -338,6 +338,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
             cellsIndex,
             puzzle: {
                 fieldSize: {rowsCount, columnsCount},
+                importOptions: {stickyRegion} = {},
             },
             state: {
                 extension: {pieces: pieceIndexes, highlightCurrentPiece},
@@ -392,6 +393,16 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
                 noInteraction: true,
                 noBorders: true,
                 noClip: true,
+                zIndex: -1,
+            });
+        }
+
+        if (stickyRegion) {
+            regions.push({
+                top: Number(stickyRegion.top),
+                left: Number(stickyRegion.left),
+                width: Number(stickyRegion.width),
+                height: Number(stickyRegion.height),
                 zIndex: 0,
             });
         }
