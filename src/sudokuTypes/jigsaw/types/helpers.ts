@@ -22,6 +22,13 @@ const getJigsawPieces = (
         (top) => indexes(columnsCount).map((left) => ({top, left}))
     )).bulkRemove(regionCells.flat());
 
+    const otherActiveCells = otherCells.filter(({top, left}) => cellsIndex.allCells[top]?.[left]?.isActive);
+    otherCells = otherCells.bulkRemove(otherActiveCells.items);
+
+    if (otherActiveCells.size) {
+        regionCells.push(otherActiveCells.items);
+    }
+
     // TODO: other region creation modes
 
     const pieces: JigsawPieceInfo[] = regionCells.map((cells) => {
