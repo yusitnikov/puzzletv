@@ -435,7 +435,11 @@ export class SudokuCellsIndex<T extends AnyPTM> {
             let props = this.puzzle.typeManager.getCellTypeProps?.(cell, this.puzzle) ?? {};
             const cellInfo = this.allCells[cell.top]?.[cell.left];
             if (cellInfo && !cellInfo.isActive) {
-                props = {...props, isVisible: false};
+                props = {
+                    ...props,
+                    noInteraction: true,
+                    noBorders: true,
+                };
             }
             cache[key] = props;
         }
