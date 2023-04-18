@@ -26,7 +26,7 @@ export const useRaf = (tickHandler: (delta: number, now: number) => void) => use
 export const useRafValue = <T>(value: T) => {
     const [state, setState] = useState(value);
 
-    useRaf(() => setState(value));
+    useRaf(() => setState((prevValue) => JSON.stringify(value) === JSON.stringify(prevValue) ? prevValue : value));
 
     return state;
 };

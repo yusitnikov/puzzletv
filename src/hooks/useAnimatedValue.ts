@@ -1,7 +1,15 @@
 import {useEffect, useState} from "react";
 import {useRafValue} from "./useRaf";
 
-export const useAnimatedValue = (targetValue: number, animationTime: number) => {
+export const mixAnimatedValue = (a: number, b: number, coeff: number) => a + (b - a) * Math.max(0, Math.min(1, coeff));
+
+export function useAnimatedValue(targetValue: number, animationTime: number): number;
+export function useAnimatedValue<T>(targetValue: T, animationTime: number, valueMixer: (a: T, b: T, coeff: number) => T): T;
+export function useAnimatedValue<T>(
+    targetValue: T,
+    animationTime: number,
+    valueMixer: (a: T, b: T, coeff: number) => T = mixAnimatedValue as any
+): T {
     const now = Date.now();
 
     const [{lastStartValue, lastTargetValue, lastStartTime, lastAnimationTime}, setLastState] = useState({
@@ -12,7 +20,7 @@ export const useAnimatedValue = (targetValue: number, animationTime: number) => 
     });
 
     const coeff = lastAnimationTime ? Math.min((now - lastStartTime) / lastAnimationTime, 1) : 1;
-    const value = lastStartValue + (lastTargetValue - lastStartValue) * coeff;
+    const value = valueMixer(lastStartValue, lastTargetValue, coeff);
 
     useEffect(
         () => setLastState({
@@ -22,8 +30,8 @@ export const useAnimatedValue = (targetValue: number, animationTime: number) => 
             lastAnimationTime: animationTime,
         }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [targetValue, animationTime]
+        [JSON.stringify(targetValue), animationTime]
     );
 
     return useRafValue(value);
-};
+}

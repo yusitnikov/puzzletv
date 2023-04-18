@@ -10,7 +10,7 @@ import {
 } from "../../../types/layout/Position";
 import {loop, roundToStep} from "../../../utils/math";
 import {JigsawDigitCellDataComponentType} from "../components/JigsawDigitCellData";
-import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
+import {mixAnimatedValue, useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {getRectCenter} from "../../../types/layout/Rect";
 import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
 import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
@@ -266,17 +266,19 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
 
         return {
-            pieces: piecePositions.map(({top, left, angle}, index) => {
+            pieces: piecePositions.map((position, index) => {
                 const {animating} = pieceAnimations[index];
 
-                return {
-                    // eslint-disable-next-line react-hooks/rules-of-hooks
-                    top: useAnimatedValue(top, animating ? animationSpeed / 2 : 0),
-                    // eslint-disable-next-line react-hooks/rules-of-hooks
-                    left: useAnimatedValue(left, animating ? animationSpeed / 2 : 0),
-                    // eslint-disable-next-line react-hooks/rules-of-hooks
-                    angle: useAnimatedValue(angle, animating ? animationSpeed : 0),
-                };
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                return useAnimatedValue(
+                    position,
+                    animating ? animationSpeed : 0,
+                    (a, b, coeff) => ({
+                        top: mixAnimatedValue(a.top, b.top, coeff * 2),
+                        left: mixAnimatedValue(a.left, b.left, coeff * 2),
+                        angle: mixAnimatedValue(a.angle, b.angle, coeff),
+                    })
+                );
             }),
         };
     },

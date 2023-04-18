@@ -24,7 +24,7 @@ import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {useDiffEffect} from "../useDiffEffect";
 import {useControlKeysState} from "../useControlKeysState";
 import {SudokuCellsIndex, SudokuCellsIndexForState} from "../../types/sudoku/SudokuCellsIndex";
-import {useAnimatedValue} from "../useAnimatedValue";
+import {mixAnimatedValue, useAnimatedValue} from "../useAnimatedValue";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {isSelectableCell} from "../../types/sudoku/CellTypeProps";
 
@@ -220,30 +220,22 @@ export const useGame = <T extends AnyPTM>(
 
     const processedGameStateExtension = useProcessedGameStateExtension(gameState);
 
-    const animatedLoopOffsetTop = useAnimatedValue(
-        gameState.loopOffset.top,
-        gameState.animating ? gameState.animationSpeed / 2 : 0
-    );
-    const animatedLoopOffsetLeft = useAnimatedValue(
-        gameState.loopOffset.left,
-        gameState.animating ? gameState.animationSpeed / 2 : 0
-    );
-    const animatedAngle = useAnimatedValue(
-        gameState.angle,
-        gameState.animating ? gameState.animationSpeed : 0
-    );
-    const animatedScale = useAnimatedValue(
-        gameState.scale,
-        gameState.animating ? gameState.animationSpeed / 2 : 0
-    );
-    const animated = useMemo<ProcessedGameStateAnimatedValues>(() => ({
-        loopOffset: {
-            top: animatedLoopOffsetTop,
-            left: animatedLoopOffsetLeft,
+    const animated = useAnimatedValue<ProcessedGameStateAnimatedValues>(
+        {
+            loopOffset: gameState.loopOffset,
+            angle: gameState.angle,
+            scale: gameState.scale,
         },
-        angle: animatedAngle,
-        scale: animatedScale,
-    }), [animatedLoopOffsetTop, animatedLoopOffsetLeft, animatedAngle, animatedScale]);
+        gameState.animating ? gameState.animationSpeed : 0,
+        (a, b, coeff) => ({
+            loopOffset: {
+                top: mixAnimatedValue(a.loopOffset.top, b.loopOffset.top, coeff * 2),
+                left: mixAnimatedValue(a.loopOffset.left, b.loopOffset.left, coeff * 2),
+            },
+            angle: mixAnimatedValue(a.angle, b.angle, coeff),
+            scale: mixAnimatedValue(a.scale, b.scale, coeff * 2),
+        })
+    );
 
     const processedGameState = useMemo(
         () => memoizedCalculateProcessedGameState(multiPlayer, gameState, processedGameStateExtension, animated),
