@@ -173,7 +173,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     isOddTransformCoords?: boolean;
 
     // Get rectangles of non-modified coords that get the same transformation matrix by transformCoords
-    getRegionsWithSameCoordsTransformation?(context: PuzzleContext<T>): GridRegion[];
+    getRegionsWithSameCoordsTransformation?(context: PuzzleContext<T>, isImportingPuzzle?: boolean): GridRegion[];
 
     items?: Constraint<T, any>[]
         | ((context: PuzzleContext<T>) => Constraint<T, any>[]);

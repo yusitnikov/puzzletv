@@ -15,8 +15,15 @@ export enum PuzzleImportDigitType {
     Calculator = "calculator",
 }
 
+export interface PuzzleGridImportOptions {
+    load: string;
+    offsetX: number;
+    offsetY: number;
+}
+
 export interface PuzzleImportOptions {
     load: string;
+    extraGrids?: PuzzleGridImportOptions[] | Record<string | number, PuzzleGridImportOptions>;
     type?: PuzzleImportPuzzleType;
     digitType?: PuzzleImportDigitType;
     htmlRules?: boolean;
@@ -45,6 +52,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
 
     const {
         load,
+        extraGrids = {},
         type,
         digitType,
         htmlRules,
@@ -70,6 +78,10 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
     // noinspection UnnecessaryLocalVariableJS
     const result: Required<PuzzleImportOptions> = {
         load,
+        extraGrids: Object.fromEntries(
+            [...(Array.isArray(extraGrids) ? extraGrids.entries() : Object.entries(extraGrids))]
+                .map(([key, {load, offsetX, offsetY}]) => [key, {load, offsetX, offsetY}]),
+        ),
         type,
         digitType,
         htmlRules,

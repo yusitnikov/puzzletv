@@ -1,6 +1,12 @@
 import {textColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Line, parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
+import {
+    Line,
+    parsePositionLiteral,
+    parsePositionLiterals,
+    Position,
+    PositionLiteral
+} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
@@ -64,12 +70,11 @@ export const LittleKiller = {
     },
 };
 
-export const LittleKillerConstraint = <T extends AnyPTM>(
+export const getLittleKillerCellsByStartAndDirection = (
     startCellLiteral: PositionLiteral,
     directionLiteral: PositionLiteral,
     {rowsCount, columnsCount}: FieldSize,
-    sum?: number
-): Constraint<T, LittleKillerProps> => {
+) => {
     const startCell = parsePositionLiteral(startCellLiteral);
     const direction = parsePositionLiteral(directionLiteral);
 
@@ -78,34 +83,51 @@ export const LittleKillerConstraint = <T extends AnyPTM>(
         cells.push({top, left});
     }
 
-    return ({
-        name: "arrow",
-        cells,
-        props: {
-            direction,
-            sum,
-        },
-        component: LittleKiller,
-        isValidCell(_, digits, cells, context) {
-            if (sum === undefined) {
+    return cells;
+};
+
+export const LittleKillerConstraint = <T extends AnyPTM>(
+    startCell: PositionLiteral,
+    direction: PositionLiteral,
+    fieldSize: FieldSize,
+    sum?: number
+) => LittleKillerConstraintByCells<T>(
+    getLittleKillerCellsByStartAndDirection(startCell, direction, fieldSize),
+    direction,
+    sum
+);
+
+export const LittleKillerConstraintByCells = <T extends AnyPTM>(
+    cellLiterals: PositionLiteral[],
+    directionLiteral: PositionLiteral,
+    sum?: number
+): Constraint<T, LittleKillerProps> => ({
+    name: "little killer",
+    cells: parsePositionLiterals(cellLiterals),
+    props: {
+        direction: parsePositionLiteral(directionLiteral),
+        sum,
+    },
+    component: LittleKiller,
+    isValidCell(_, digits, cells, context) {
+        if (sum === undefined) {
+            return true;
+        }
+
+        const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+
+        let actualSum = 0;
+
+        for (const cell of cells) {
+            const digit = digits[cell.top]?.[cell.left];
+
+            if (digit === undefined) {
                 return true;
             }
 
-            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+            actualSum += getDigitByCellData(digit, context, cell);
+        }
 
-            let actualSum = 0;
-
-            for (const cell of cells) {
-                const digit = digits[cell.top]?.[cell.left];
-
-                if (digit === undefined) {
-                    return true;
-                }
-
-                actualSum += getDigitByCellData(digit, context, cell);
-            }
-
-            return actualSum === sum;
-        },
-    });
-};
+        return actualSum === sum;
+    },
+});

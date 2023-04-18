@@ -77,7 +77,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                     onZoomChanged={(ev) => onStateChange({
                         extension: {zoom: ev.zoom} as Partial<T["stateEx"]>
                     })}
-                    // onClick={(ev) => console.log(ev.latLng.toJSON())}
+                    onClick={(ev) => console.debug("google maps click", ev.latLng.toJSON())}
                 >
                     <GoogleMapsPanePortal pane={"overlayMouseTarget"}>
                         <div style={{pointerEvents: "none"}}>

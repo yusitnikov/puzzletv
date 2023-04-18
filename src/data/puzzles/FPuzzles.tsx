@@ -11,7 +11,7 @@ import {decompressFromBase64} from "lz-string";
 import {sha1} from "hash.js";
 import {indexes} from "../../utils/indexes";
 import {
-    parsePositionLiterals,
+    parsePositionLiteral,
     Position,
     PositionLiteral,
     PositionSet,
@@ -19,12 +19,15 @@ import {
 } from "../../types/layout/Position";
 import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {createGivenDigitsMapFromArray, GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
+import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {CellColor, CellColorValue} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {LittleKillerConstraint} from "../../components/sudoku/constraints/little-killer/LittleKiller";
+import {
+    getLittleKillerCellsByStartAndDirection,
+    LittleKillerConstraintByCells
+} from "../../components/sudoku/constraints/little-killer/LittleKiller";
 import {
     DecorativeCageConstraint,
     KillerCageConstraint
@@ -128,15 +131,40 @@ export const decodeFPuzzlesString = (load: string) => {
     return JSON.parse(jsonStr) as FPuzzlesPuzzle;
 };
 
-export const loadByFPuzzlesObject = (
-    puzzleJson: FPuzzlesPuzzle,
+const loadByImportOptions = (
     slug: string,
-    importOptions: Omit<PuzzleImportOptions, "load">
+    importOptions: PuzzleImportOptions
 ): PuzzleDefinition<AnyPTM> => {
     let {
+        load,
+        extraGrids: extraGridLoad = {},
         type = PuzzleImportPuzzleType.Regular,
         digitType = PuzzleImportDigitType.Regular,
     } = importOptions;
+
+    const puzzleJson = decodeFPuzzlesString(load);
+
+    const extraGrids = (Array.isArray(extraGridLoad) ? extraGridLoad : Object.values(extraGridLoad))
+        .map(({load, offsetX, offsetY}) => ({
+            json: decodeFPuzzlesString(load),
+            offsetX: Number(offsetX),
+            offsetY: Number(offsetY),
+        }));
+    const minOffsetX = Math.min(0, ...extraGrids.map(({offsetX}) => offsetX));
+    const minOffsetY = Math.min(0, ...extraGrids.map(({offsetY}) => offsetY));
+    let allGrids = [
+        {json: puzzleJson, offsetX: -minOffsetX, offsetY: -minOffsetY},
+        ...extraGrids.map(({json, offsetX, offsetY}) => ({
+            json,
+            offsetX: offsetX - minOffsetX,
+            offsetY: offsetY - minOffsetY,
+        })),
+    ];
+    const columnsCount = Math.max(...allGrids.map(({offsetX, json: {size}}) => offsetX + size));
+    const rowsCount = Math.max(...allGrids.map(({offsetY, json: {size}}) => offsetY + size));
+
+    console.debug("Importing from f-puzzles:", puzzleJson, ...extraGrids);
+
     switch (type) {
         case PuzzleImportPuzzleType.Calculator:
             type = PuzzleImportPuzzleType.Regular;
@@ -210,641 +238,693 @@ export const loadByFPuzzlesObject = (
             break;
     }
 
-    return loadByFPuzzlesObjectAndTypeManager(puzzleJson, slug, importOptions, {...typeManager});
+    const importer = new FPuzzlesImporter(slug, importOptions, typeManager, {
+        fieldSize: Math.max(rowsCount, columnsCount),
+        rowsCount,
+        columnsCount,
+    });
+    for (const {json, offsetX, offsetY} of allGrids) {
+        importer.addGrid(json, offsetX, offsetY);
+    }
+    return importer.finalize();
 };
 
-export const loadByFPuzzlesObjectAndTypeManager = <T extends AnyPTM>(
-    puzzleJson: FPuzzlesPuzzle,
-    slug: string,
-    importOptions: Omit<PuzzleImportOptions, "load">,
-    typeManager: SudokuTypeManager<T>,
-): PuzzleDefinition<T> => {
-    const {
-        digitsCount,
-        htmlRules,
-        fillableDigitalDisplay,
-        noSpecialRules,
-        loopX,
-        loopY,
-        "product-arrow": productArrow,
-        cosmeticsBehindFog,
-        allowOverrideColors = false,
-    } = importOptions;
+class FPuzzlesImporter<T extends AnyPTM> {
+    private readonly regions: Position[][] = [];
+    private readonly initialDigits: GivenDigitsMap<T["cell"]> = {};
+    private readonly initialLetters: GivenDigitsMap<string> = {};
+    private readonly initialColors: GivenDigitsMap<CellColorValue[]> = {};
+    private readonly solutionColors: GivenDigitsMap<CellColorValue[]> = {};
+    private readonly items: Constraint<T, any>[] = [];
+    private readonly puzzle: PuzzleDefinition<T>;
+    private inactiveCells: PositionSet;
+    private importedTitle = false;
 
-    const initialDigits: GivenDigitsMap<T["cell"]> = {};
-    const initialLetters: GivenDigitsMap<string> = {};
-    const initialColors: GivenDigitsMap<CellColorValue[]> = {};
-    const solutionColors: GivenDigitsMap<CellColorValue[]> = {};
-    const items: Constraint<T, any>[] = [];
+    constructor(
+        slug: string,
+        private readonly importOptions: Omit<PuzzleImportOptions, "load">,
+        private readonly typeManager: SudokuTypeManager<T>,
+        fieldSize: FieldSize,
+    ) {
+        const {
+            digitsCount,
+            noSpecialRules,
+            loopX,
+            loopY,
+            allowOverrideColors = false,
+        } = importOptions;
 
-    const puzzle: PuzzleDefinition<T> = {
-        noIndex: true,
-        slug,
-        title: {[LanguageCode.en]: "Untitled"},
-        typeManager,
-        fieldSize: {
-            fieldSize: 9,
-            rowsCount: 9,
-            columnsCount: 9,
-        },
-        digitsCount: digitsCount && Number(digitsCount),
-        loopHorizontally: loopX,
-        loopVertically: loopY,
-        fieldMargin: loopX || loopY ? 0.99 : 0,
-        allowDrawing: allDrawingModes,
-        initialDigits,
-        initialLetters,
-        initialColors,
-        solutionColors,
-        items,
-        allowOverridingInitialColors: allowOverrideColors,
-        importOptions,
-    };
+        this.puzzle = {
+            noIndex: true,
+            slug,
+            title: {[LanguageCode.en]: "Untitled"},
+            typeManager,
+            fieldSize,
+            regions: this.regions,
+            digitsCount: digitsCount && Number(digitsCount),
+            loopHorizontally: loopX,
+            loopVertically: loopY,
+            fieldMargin: loopX || loopY ? 0.99 : 0,
+            allowDrawing: allDrawingModes,
+            initialDigits: this.initialDigits,
+            initialLetters: this.initialLetters,
+            initialColors: this.initialColors,
+            solutionColors: this.solutionColors,
+            items: this.items,
+            allowOverridingInitialColors: allowOverrideColors,
+            importOptions,
+            resultChecker: noSpecialRules ? isValidFinishedPuzzleByConstraints : undefined,
+        };
 
-    const processInitialColors = (colors: CellColorValue[], forceMapping: boolean) => forceMapping || typeManager.mapImportedColors
-        ? colors.map((color) => fPuzzleColorsMap[color as string as FPuzzleColor] ?? color)
-        : colors;
-
-    if (noSpecialRules) {
-        puzzle.resultChecker = isValidFinishedPuzzleByConstraints;
+        this.inactiveCells = new PositionSet(indexes(fieldSize.rowsCount).flatMap(
+            (top) => indexes(fieldSize.columnsCount).map((left) => ({top, left}))
+        ));
     }
 
-    const parseOptionalNumber = (value?: string | number) => value === undefined ? undefined : Number(value);
+    addGrid(puzzleJson: FPuzzlesPuzzle, offsetX: number, offsetY: number) {
+        const {
+            htmlRules,
+            fillableDigitalDisplay,
+            "product-arrow": productArrow,
+            cosmeticsBehindFog,
+        } = this.importOptions;
 
-    const checkForOutsideCells = (cellLiterals: PositionLiteral[], fieldSize: number) => {
-        const margin = Math.max(0, ...parsePositionLiterals(cellLiterals).flatMap(({top, left}) => [
-            -top,
-            -left,
-            top + 1 - fieldSize,
-            left + 1 - fieldSize,
-        ]));
+        const offsetCoords = (position: PositionLiteral): Position => {
+            const {top, left} = parsePositionLiteral(position);
+            return {
+                top: top + offsetY,
+                left: left + offsetX,
+            };
+        };
+        const offsetCoordsArray = (positions: PositionLiteral[]) => positions.map(offsetCoords);
 
-        if (margin > 0) {
-            puzzle.fieldMargin = Math.max(puzzle.fieldMargin || 0, margin);
-        }
-    };
+        this.inactiveCells = this.inactiveCells.bulkRemove(offsetCoordsArray(indexes(puzzleJson.size).flatMap(
+            (top) => indexes(puzzleJson.size).map((left) => ({top, left}))
+        )));
 
-    const isFowText = ({cells, value}: FPuzzlesText) => value === "💡"
-        && cells.length === 1
-        && puzzleJson.fogofwar?.includes(cells[0]);
+        const processInitialColors = (colors: CellColorValue[], forceMapping: boolean) => forceMapping || this.typeManager.mapImportedColors
+            ? colors.map((color) => fPuzzleColorsMap[color as string as FPuzzleColor] ?? color)
+            : colors;
 
-    const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.lines;
+        const parseOptionalNumber = (value?: string | number) => value === undefined ? undefined : Number(value);
 
-    const isVisibleGridCell = (cell: Position) => isVisibleCell(typeManager.getCellTypeProps?.(cell, puzzle));
+        const checkForOutsideCells = (cells: Position[]) => {
+            const margin = Math.max(0, ...cells.flatMap(({top, left}) => [
+                -top,
+                -left,
+                top + 1 - this.puzzle.fieldSize.rowsCount,
+                left + 1 - this.puzzle.fieldSize.columnsCount,
+            ]));
 
-    // TODO: go over rangsk solver and populate constraints from there
-    new ObjectParser<FPuzzlesPuzzle>({
-        // region Core fields
-        size: (size) => {
-            puzzle.fieldSize = {...puzzle.fieldSize, fieldSize: size, rowsCount: size, columnsCount: size};
-        },
-        grid: (grid, {size}) => {
-            const defaultRegionWidth = calculateDefaultRegionWidth(size);
-            const defaultRegionHeight = size / defaultRegionWidth;
-            const defaultRegionColumnsCount = size / defaultRegionWidth;
-
-            const allGridCells: (FPuzzlesGridCell & Position)[] = grid
-                .flatMap(
-                    (row, top) => row.map(
-                        (cell, left) => ({top, left, ...cell})
-                    )
-                );
-            const validGridCells = allGridCells.filter(isVisibleGridCell);
-
-            const emptyContext = createEmptyContextForPuzzle(puzzle);
-            const faces = typeManager.getRegionsWithSameCoordsTransformation?.(emptyContext) ?? [{
-                top: 0,
-                left: 0,
-                width: size,
-                height: size,
-            }];
-            const regions = faces.flatMap(face => {
-                const validFaceCells = validGridCells.filter((cell) => doesGridRegionContainCell(face, cell));
-
-                return indexes(size)
-                    .map(regionIndex => validFaceCells.filter(
-                        ({top, left, region}) => {
-                            if (region === undefined) {
-                                const topIndex = Math.floor(top / defaultRegionHeight);
-                                const leftIndex = Math.floor(left / defaultRegionWidth);
-                                region = leftIndex + topIndex * defaultRegionColumnsCount;
-                            }
-
-                            return region === regionIndex;
-                        }
-                    ))
-                    .filter(({length}) => length);
-            });
-            if (regions.length > 1) {
-                puzzle.regions = regions;
+            if (margin > 0) {
+                this.puzzle.fieldMargin = Math.max(this.puzzle.fieldMargin || 0, margin);
             }
+        };
 
-            for (const {top, left, ...cell} of allGridCells) {
-                new ObjectParser<FPuzzlesGridCell>({
-                    region: undefined,
-                    value: (value, {given}) => {
-                        if (!given) {
-                            return;
-                        }
-                        switch (typeof value) {
-                            case "number":
-                                if (fillableDigitalDisplay) {
-                                    // TODO: extract to a type manager
-                                    items.push(FillableCalculatorDigitConstraint({top, left}, value));
-                                } else {
-                                    initialDigits[top] = initialDigits[top] || {};
-                                    initialDigits[top][left] = typeManager.createCellDataByImportedDigit(value);
-                                }
-                                break;
-                            case "string":
-                                initialLetters[top] = initialLetters[top] || {};
-                                initialLetters[top][left] = value;
-                                break;
-                        }
-                    },
-                    given: undefined,
-                    c: (color) => {
-                        if (typeof color === "string") {
-                            initialColors[top] = initialColors[top] || {};
-                            initialColors[top][left] = processInitialColors([color], false);
-                        }
-                    },
-                    cArray: (colors) => {
-                        if (Array.isArray(colors) && colors.length) {
-                            initialColors[top] = initialColors[top] || {};
-                            initialColors[top][left] = processInitialColors(colors, false);
-                        }
-                    },
-                    highlight: (color) => {
-                        if (typeof color === "string") {
-                            solutionColors[top] = solutionColors[top] || {};
-                            solutionColors[top][left] = processInitialColors([color], true);
-                        }
-                    },
-                    highlightArray: (colors) => {
-                        if (Array.isArray(colors) && colors.length) {
-                            solutionColors[top] = solutionColors[top] || {};
-                            solutionColors[top][left] = processInitialColors(colors, true);
-                        }
-                    },
-                    givenPencilMarks: undefined,
-                    centerPencilMarks: (value) => value === undefined || value === null,
-                    cornerPencilMarks: (value) => value === undefined || value === null,
-                }).parse(cell, `f-puzzles cell ${stringifyCellCoords({top, left})}`);
-            }
-        },
-        title: (title) => {
-            if (title) {
-                puzzle.title = {[LanguageCode.en]: title};
-            }
-        },
-        author: (author) => {
-            if (author) {
-                puzzle.author = {[LanguageCode.en]: author};
-            }
-        },
-        ruleset: (ruleset) => {
-            if (ruleset) {
-                let parsedRules: ReactNode;
-                if (htmlRules) {
-                    parsedRules = <ParsedRulesHtml>{ruleset}</ParsedRulesHtml>;
-                } else {
-                    parsedRules = <>{ruleset.split("\n").map(
-                        (line, index) => <RulesParagraph key={index}>{line || <span>&nbsp;</span>}</RulesParagraph>
-                    )}</>;
-                }
-                puzzle.rules = () => parsedRules;
-            }
-        },
-        // region Constraints
-        littlekillersum: (littleKillerSum, {size}) => {
-            if (littleKillerSum instanceof Array) {
-                puzzle.fieldMargin = puzzle.fieldMargin || 1;
+        const isFowText = ({cells, value}: FPuzzlesText) => value === "💡"
+            && cells.length === 1
+            && puzzleJson.fogofwar?.includes(cells[0]);
 
-                const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size};
+        const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.lines;
 
-                items.push(...littleKillerSum.map(({cell, cells: [startCell], direction, value, ...other}: FPuzzlesLittleKillerSum) => {
-                    ObjectParser.empty.parse(other, "f-puzzles little killer sum");
+        const isVisibleGridCell = (cell: Position) => isVisibleCell(this.typeManager.getCellTypeProps?.(cell, this.puzzle));
 
-                    return LittleKillerConstraint<T>(startCell, direction, fieldSize, parseOptionalNumber(value));
-                }));
-            }
-        },
-        arrow: (arrow) => {
-            if (arrow instanceof Array) {
-                items.push(...arrow.flatMap(({cells, lines, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles arrow");
+        // TODO: go over rangsk solver and populate constraints from there
+        new ObjectParser<FPuzzlesPuzzle>({
+            // region Core fields
+            size: undefined,
+            grid: (grid, {size}) => {
+                const defaultRegionWidth = calculateDefaultRegionWidth(size);
+                const defaultRegionHeight = size / defaultRegionWidth;
+                const defaultRegionColumnsCount = size / defaultRegionWidth;
 
-                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
-
-                    return lines.length
-                        ? lines.map(([lineStart, ...line]) => ArrowConstraint<T>(
-                            visibleCells,
-                            parsePositionLiterals(line).filter(isVisibleGridCell),
-                            false,
-                            lineStart,
-                            !!productArrow,
-                            false,
-                        ))
-                        : ArrowConstraint<T>(
-                            visibleCells,
-                            [],
-                            false,
-                            undefined,
-                            !!productArrow,
-                            false,
-                        );
-                }));
-            }
-        },
-        killercage: (cage) => {
-            if (cage instanceof Array) {
-                items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles killer cage");
-
-                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
-
-                    return KillerCageConstraint<T>(
-                        visibleCells,
-                        parseOptionalNumber(value),
-                        false,
-                        undefined,
-                        outlineC,
-                        fontC,
+                const allGridCells: (FPuzzlesGridCell & Position)[] = grid
+                    .flatMap(
+                        (row, top) => row.map(
+                            (cell, left) => ({...offsetCoords({top, left}), ...cell})
+                        )
                     );
-                }));
-            }
-        },
-        antiknight: (antiKnight) => {
-            if (antiKnight) {
-                items.push(AntiKnightConstraint());
-            }
-        },
-        antiking: (antiKing) => {
-            if (antiKing) {
-                items.push(AntiKingConstraint());
-            }
-        },
-        disjointgroups: (disjointGroups, {size}) => {
-            if (disjointGroups) {
-                // TODO: support custom regions
-                const regionWidth = calculateDefaultRegionWidth(size);
-                const regionHeight = size / regionWidth;
-                items.push(DisjointGroupsConstraint(regionWidth, regionHeight));
-            }
-        },
-        nonconsecutive: (nonConsecutive) => {
-            if (nonConsecutive) {
-                items.push(NonConsecutiveNeighborsConstraint());
-            }
-        },
-        ratio: (ratio) => {
-            if (ratio instanceof Array) {
-                items.push(...ratio.map(({cells, value, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles ratio");
+                const validGridCells = allGridCells.filter(isVisibleGridCell);
 
-                    const [cell1, cell2] = parsePositionLiterals(cells)
-                        .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
+                const emptyContext = createEmptyContextForPuzzle(this.puzzle);
+                const faces = this.typeManager.getRegionsWithSameCoordsTransformation?.(emptyContext, true) ?? [{
+                    top: offsetY,
+                    left: offsetX,
+                    width: size,
+                    height: size,
+                }];
+                const regions = faces.flatMap(face => {
+                    const validFaceCells = validGridCells.filter((cell) => doesGridRegionContainCell(face, cell));
 
-                    return KropkiDotConstraint<T>(cell1, cell2, true, parseOptionalNumber(value));
-                }));
-            }
-        },
-        difference: (difference) => {
-            if (difference instanceof Array) {
-                items.push(...difference.map(({cells, value, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles difference");
+                    return indexes(size)
+                        .map(regionIndex => validFaceCells.filter(
+                            ({top, left, region}) => {
+                                if (region === undefined) {
+                                    const topIndex = Math.floor((top - offsetY) / defaultRegionHeight);
+                                    const leftIndex = Math.floor((left - offsetX) / defaultRegionWidth);
+                                    region = leftIndex + topIndex * defaultRegionColumnsCount;
+                                }
 
-                    const [cell1, cell2] = parsePositionLiterals(cells)
-                        .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
+                                return region === regionIndex;
+                            }
+                        ))
+                        .filter(({length}) => length);
+                });
+                if (regions.length > 1) {
+                    this.regions.push(...regions);
+                }
 
-                    return KropkiDotConstraint<T>(cell1, cell2, false, parseOptionalNumber(value));
-                }));
-            }
-        },
-        xv: (xv) => {
-            if (xv instanceof Array) {
-                items.push(...xv.flatMap(({cells, value, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles XV");
-
-                    const [cell1, cell2] = parsePositionLiterals(cells)
-                        .map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell);
-
-                    switch (value) {
-                        case "X": return [XMarkConstraint<T>(cell1, cell2)];
-                        case "V": return [VMarkConstraint<T>(cell1, cell2)];
-                        default: return [];
+                for (const {top, left, ...cell} of allGridCells) {
+                    new ObjectParser<FPuzzlesGridCell>({
+                        region: undefined,
+                        value: (value, {given}) => {
+                            if (!given) {
+                                return;
+                            }
+                            switch (typeof value) {
+                                case "number":
+                                    if (fillableDigitalDisplay) {
+                                        // TODO: extract to a type manager
+                                        this.items.push(FillableCalculatorDigitConstraint({top, left}, value));
+                                    } else {
+                                        this.initialDigits[top] = this.initialDigits[top] || {};
+                                        this.initialDigits[top][left] = this.typeManager.createCellDataByImportedDigit(value);
+                                    }
+                                    break;
+                                case "string":
+                                    this.initialLetters[top] = this.initialLetters[top] || {};
+                                    this.initialLetters[top][left] = value;
+                                    break;
+                            }
+                        },
+                        given: undefined,
+                        c: (color) => {
+                            if (typeof color === "string") {
+                                this.initialColors[top] = this.initialColors[top] || {};
+                                this.initialColors[top][left] = processInitialColors([color], false);
+                            }
+                        },
+                        cArray: (colors) => {
+                            if (Array.isArray(colors) && colors.length) {
+                                this.initialColors[top] = this.initialColors[top] || {};
+                                this.initialColors[top][left] = processInitialColors(colors, false);
+                            }
+                        },
+                        highlight: (color) => {
+                            if (typeof color === "string") {
+                                this.solutionColors[top] = this.solutionColors[top] || {};
+                                this.solutionColors[top][left] = processInitialColors([color], true);
+                            }
+                        },
+                        highlightArray: (colors) => {
+                            if (Array.isArray(colors) && colors.length) {
+                                this.solutionColors[top] = this.solutionColors[top] || {};
+                                this.solutionColors[top][left] = processInitialColors(colors, true);
+                            }
+                        },
+                        givenPencilMarks: undefined,
+                        centerPencilMarks: (value) => value === undefined || value === null,
+                        cornerPencilMarks: (value) => value === undefined || value === null,
+                    }).parse(cell, `f-puzzles cell ${stringifyCellCoords({top, left})}`);
+                }
+            },
+            title: (title) => {
+                if (title && !this.importedTitle) {
+                    this.puzzle.title = {[LanguageCode.en]: title};
+                    this.importedTitle = true;
+                }
+            },
+            author: (author) => {
+                if (author) {
+                    this.puzzle.author = this.puzzle.author ?? {[LanguageCode.en]: author};
+                }
+            },
+            ruleset: (ruleset) => {
+                if (ruleset && !this.puzzle.rules) {
+                    let parsedRules: ReactNode;
+                    if (htmlRules) {
+                        parsedRules = <ParsedRulesHtml>{ruleset}</ParsedRulesHtml>;
+                    } else {
+                        parsedRules = <>{ruleset.split("\n").map(
+                            (line, index) => <RulesParagraph key={index}>{line || <span>&nbsp;</span>}</RulesParagraph>
+                        )}</>;
                     }
-                }));
-            }
-        },
-        thermometer: (thermometer) => {
-            if (thermometer instanceof Array) {
-                items.push(...thermometer.flatMap(({lines, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles thermometer");
+                    this.puzzle.rules = () => parsedRules;
+                }
+            },
+            // region Constraints
+            littlekillersum: (littleKillerSum, {size}) => {
+                if (littleKillerSum instanceof Array) {
+                    this.puzzle.fieldMargin = this.puzzle.fieldMargin || 1;
 
-                    return lines.map((cells) => ThermometerConstraint<T>(
-                        parsePositionLiterals(cells).filter(isVisibleGridCell),
-                        undefined,
-                        false,
-                    ));
-                }));
-            }
-        },
-        sandwichsum: (sandwichsum, {size}) => {
-            if (sandwichsum instanceof Array) {
-                puzzle.fieldMargin = puzzle.fieldMargin || 1;
+                    const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size};
 
-                const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size};
+                    this.items.push(...littleKillerSum.map(({cell, cells: [startCell], direction, value, ...other}: FPuzzlesLittleKillerSum) => {
+                        ObjectParser.empty.parse(other, "f-puzzles little killer sum");
 
-                items.push(...sandwichsum.flatMap(({cell, value, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
-
-                    return value ? [SandwichSumConstraint<T>(cell, fieldSize, Number(value))] : [];
-                }));
-            }
-        },
-        even: (even) => {
-            if (even instanceof Array) {
-                items.push(...even.map(({cell, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles even cell");
-
-                    return EvenConstraint<T>(cell);
-                }));
-            }
-        },
-        odd: (odd) => {
-            if (odd instanceof Array) {
-                items.push(...odd.map(({cell, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles odd cell");
-
-                    return OddConstraint<T>(cell);
-                }));
-            }
-        },
-        extraregion: (extraregion) => {
-            if (extraregion instanceof Array) {
-                items.push(...extraregion.map(({cells, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles extra region");
-
-                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
-
-                    return KillerCageConstraint<T>(visibleCells);
-                }));
-            }
-        },
-        clone: (clone) => {
-            if (clone instanceof Array) {
-                items.push(...clone.flatMap(({cells, cloneCells, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles clone");
-
-                    const uniqueCells = new PositionSet([
-                        ...parsePositionLiterals(cells),
-                        ...parsePositionLiterals(cloneCells),
-                    ].filter(isVisibleGridCell)).items;
-
-                    return uniqueCells.length > 1 ? [CloneConstraint<T>(uniqueCells)] : [];
-                }));
-            }
-        },
-        quadruple: (quadruple) => {
-            if (quadruple instanceof Array) {
-                items.push(...quadruple.map(({cells, values, ...other}) => {
-
-                    ObjectParser.empty.parse(other, "f-puzzles quadruple");
-
-                    return QuadConstraint<T>(cells[3], values.map(typeManager.createCellDataByImportedDigit));
-                }));
-            }
-        },
-        betweenline: (betweenLine) => {
-            if (betweenLine instanceof Array) {
-                items.push(...betweenLine.flatMap(({lines, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles between line");
-
-                    return lines.map((cells) => InBetweenLineConstraint<T>(
-                        parsePositionLiterals(cells).filter(isVisibleGridCell),
-                        false
-                    ));
-                }));
-            }
-        },
-        minimum: (minimum) => {
-            if (minimum instanceof Array) {
-                items.push(...minimum.map(({cell, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles minimum");
-
-                    return MinConstraint<T>(cell);
-                }));
-            }
-        },
-        maximum: (maximum) => {
-            if (maximum instanceof Array) {
-                items.push(...maximum.map(({cell, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles maximum");
-
-                    return MaxConstraint<T>(cell);
-                }));
-            }
-        },
-        palindrome: (palindrome) => {
-            if (palindrome instanceof Array) {
-                items.push(...palindrome.flatMap(({lines, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles palindrome");
-
-                    return lines.map((cells) => PalindromeConstraint<T>(
-                        parsePositionLiterals(cells).filter(isVisibleGridCell),
-                        false,
-                    ));
-                }));
-            }
-        },
-        renban: (renban) => {
-            if (renban instanceof Array) {
-                items.push(...renban.flatMap(({lines, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles renban line");
-
-                    // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((cells) => RenbanConstraint<T>(
-                        parsePositionLiterals(cells).filter(isVisibleGridCell),
-                        false,
-                        false,
-                    ));
-                }));
-            }
-        },
-        whispers: (whispers) => {
-            if (whispers instanceof Array) {
-                items.push(...whispers.flatMap(({lines, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles German whispers line");
-
-                    // Don't display the line - it's represented by a line constraint with isNewConstraint
-                    return lines.map((cells) => GermanWhispersConstraint<T>(
-                        parsePositionLiterals(cells).filter(isVisibleGridCell),
-                        false,
-                        false
-                    ));
-                }));
-            }
-        },
-        line: (lineData, {size}) => {
-            if (lineData instanceof Array) {
-                for (const {lines, outlineC, width, isNewConstraint, fromConstraint, ...other} of lineData) {
-                    ObjectParser.empty.parse(other, "f-puzzles line");
-
-                    items.push(...lines.map((cells) => {
-                        const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
-
-                        checkForOutsideCells(visibleCells, size);
-
-                        return LineConstraint<T>(
-                            visibleCells,
-                            outlineC,
-                            width === undefined ? undefined : width / 2,
-                            false,
+                        return LittleKillerConstraintByCells<T>(
+                            offsetCoordsArray(getLittleKillerCellsByStartAndDirection(startCell, direction, fieldSize)),
+                            direction,
+                            parseOptionalNumber(value)
                         );
                     }));
                 }
-            }
-        },
-        rectangle: (rectangle, {size}) => {
-            if (rectangle instanceof Array) {
-                items.push(...rectangle.map(({cells, width, height, baseC, outlineC, value, fontC, angle, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles rect");
+            },
+            arrow: (arrow) => {
+                if (arrow instanceof Array) {
+                    this.items.push(...arrow.flatMap(({cells, lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles arrow");
 
-                    checkForOutsideCells(cells, size);
+                        const visibleCells = offsetCoordsArray(cells).filter(isVisibleGridCell);
 
-                    return RectConstraint<T>(
-                        parsePositionLiterals(cells).map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell),
-                        {width, height},
-                        baseC,
-                        outlineC,
-                        value,
-                        fontC,
-                        angle,
-                        cosmeticsLayer
-                    );
-                }));
-            }
-        },
-        circle: (circle, {size}) => {
-            if (circle instanceof Array) {
-                items.push(...circle.map(({cells, width, height, baseC, outlineC, value, fontC, angle, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles circle");
-
-                    checkForOutsideCells(cells, size);
-
-                    return EllipseConstraint<T>(
-                        parsePositionLiterals(cells).map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell),
-                        {width, height},
-                        baseC,
-                        outlineC,
-                        value,
-                        fontC,
-                        angle,
-                        cosmeticsLayer
-                    );
-                }));
-            }
-        },
-        text: (text, {size: fieldSize}) => {
-            if (text instanceof Array) {
-                if (puzzleJson.fogofwar) {
-                    text = text.filter((obj) => !isFowText(obj));
+                        return lines.length
+                            ? lines.map(([lineStart, ...line]) => ArrowConstraint<T>(
+                                visibleCells,
+                                offsetCoordsArray(line).filter(isVisibleGridCell),
+                                false,
+                                offsetCoords(lineStart),
+                                !!productArrow,
+                                false,
+                            ))
+                            : ArrowConstraint<T>(
+                                visibleCells,
+                                [],
+                                false,
+                                undefined,
+                                !!productArrow,
+                                false,
+                            );
+                    }));
                 }
+            },
+            killercage: (cage) => {
+                if (cage instanceof Array) {
+                    this.items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles killer cage");
 
-                items.push(...text.flatMap(({cells, value, fontC, size, angle, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles text");
+                        const visibleCells = offsetCoordsArray(cells).filter(isVisibleGridCell);
 
-                    if (!value) {
-                        return [];
+                        return KillerCageConstraint<T>(
+                            visibleCells,
+                            parseOptionalNumber(value),
+                            false,
+                            undefined,
+                            outlineC,
+                            fontC,
+                        );
+                    }));
+                }
+            },
+            antiknight: (antiKnight) => {
+                if (antiKnight) {
+                    this.items.push(AntiKnightConstraint());
+                }
+            },
+            antiking: (antiKing) => {
+                if (antiKing) {
+                    this.items.push(AntiKingConstraint());
+                }
+            },
+            disjointgroups: (disjointGroups, {size}) => {
+                if (disjointGroups) {
+                    // TODO: support custom regions
+                    const regionWidth = calculateDefaultRegionWidth(size);
+                    const regionHeight = size / regionWidth;
+                    // TODO: support grid offset
+                    this.items.push(DisjointGroupsConstraint(regionWidth, regionHeight));
+                }
+            },
+            nonconsecutive: (nonConsecutive) => {
+                if (nonConsecutive) {
+                    this.items.push(NonConsecutiveNeighborsConstraint());
+                }
+            },
+            ratio: (ratio) => {
+                if (ratio instanceof Array) {
+                    this.items.push(...ratio.map(({cells, value, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles ratio");
+
+                        const [cell1, cell2] = offsetCoordsArray(cells)
+                            .map(cell => this.typeManager.fixCellPosition?.(cell, this.puzzle) ?? cell);
+
+                        return KropkiDotConstraint<T>(cell1, cell2, true, parseOptionalNumber(value));
+                    }));
+                }
+            },
+            difference: (difference) => {
+                if (difference instanceof Array) {
+                    this.items.push(...difference.map(({cells, value, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles difference");
+
+                        const [cell1, cell2] = offsetCoordsArray(cells)
+                            .map(cell => this.typeManager.fixCellPosition?.(cell, this.puzzle) ?? cell);
+
+                        return KropkiDotConstraint<T>(cell1, cell2, false, parseOptionalNumber(value));
+                    }));
+                }
+            },
+            xv: (xv) => {
+                if (xv instanceof Array) {
+                    this.items.push(...xv.flatMap(({cells, value, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles XV");
+
+                        const [cell1, cell2] = offsetCoordsArray(cells)
+                            .map(cell => this.typeManager.fixCellPosition?.(cell, this.puzzle) ?? cell);
+
+                        switch (value) {
+                            case "X": return [XMarkConstraint<T>(cell1, cell2)];
+                            case "V": return [VMarkConstraint<T>(cell1, cell2)];
+                            default: return [];
+                        }
+                    }));
+                }
+            },
+            thermometer: (thermometer) => {
+                if (thermometer instanceof Array) {
+                    this.items.push(...thermometer.flatMap(({lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles thermometer");
+
+                        return lines.map((cells) => ThermometerConstraint<T>(
+                            offsetCoordsArray(cells).filter(isVisibleGridCell),
+                            undefined,
+                            false,
+                        ));
+                    }));
+                }
+            },
+            sandwichsum: (sandwichsum, {size}) => {
+                if (sandwichsum instanceof Array) {
+                    this.puzzle.fieldMargin = this.puzzle.fieldMargin || 1;
+
+                    const fieldSize: FieldSize = {fieldSize: size, rowsCount: size, columnsCount: size};
+
+                    this.items.push(...sandwichsum.flatMap(({cell, value, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
+
+                        // TODO: support grid offset
+                        return value ? [SandwichSumConstraint<T>(offsetCoords(cell), fieldSize, Number(value))] : [];
+                    }));
+                }
+            },
+            even: (even) => {
+                if (even instanceof Array) {
+                    this.items.push(...even.map(({cell, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles even cell");
+
+                        return EvenConstraint<T>(offsetCoords(cell));
+                    }));
+                }
+            },
+            odd: (odd) => {
+                if (odd instanceof Array) {
+                    this.items.push(...odd.map(({cell, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles odd cell");
+
+                        return OddConstraint<T>(offsetCoords(cell));
+                    }));
+                }
+            },
+            extraregion: (extraregion) => {
+                if (extraregion instanceof Array) {
+                    this.items.push(...extraregion.map(({cells, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles extra region");
+
+                        const visibleCells = offsetCoordsArray(cells).filter(isVisibleGridCell);
+
+                        return KillerCageConstraint<T>(visibleCells);
+                    }));
+                }
+            },
+            clone: (clone) => {
+                if (clone instanceof Array) {
+                    this.items.push(...clone.flatMap(({cells, cloneCells, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles clone");
+
+                        const uniqueCells = new PositionSet([
+                            ...offsetCoordsArray(cells),
+                            ...offsetCoordsArray(cloneCells),
+                        ].filter(isVisibleGridCell)).items;
+
+                        return uniqueCells.length > 1 ? [CloneConstraint<T>(uniqueCells)] : [];
+                    }));
+                }
+            },
+            quadruple: (quadruple) => {
+                if (quadruple instanceof Array) {
+                    this.items.push(...quadruple.map(({cells, values, ...other}) => {
+
+                        ObjectParser.empty.parse(other, "f-puzzles quadruple");
+
+                        return QuadConstraint<T>(offsetCoordsArray(cells)[3], values.map(this.typeManager.createCellDataByImportedDigit));
+                    }));
+                }
+            },
+            betweenline: (betweenLine) => {
+                if (betweenLine instanceof Array) {
+                    this.items.push(...betweenLine.flatMap(({lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles between line");
+
+                        return lines.map((cells) => InBetweenLineConstraint<T>(
+                            offsetCoordsArray(cells).filter(isVisibleGridCell),
+                            false
+                        ));
+                    }));
+                }
+            },
+            minimum: (minimum) => {
+                if (minimum instanceof Array) {
+                    this.items.push(...minimum.map(({cell, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles minimum");
+
+                        return MinConstraint<T>(offsetCoords(cell));
+                    }));
+                }
+            },
+            maximum: (maximum) => {
+                if (maximum instanceof Array) {
+                    this.items.push(...maximum.map(({cell, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles maximum");
+
+                        return MaxConstraint<T>(offsetCoords(cell));
+                    }));
+                }
+            },
+            palindrome: (palindrome) => {
+                if (palindrome instanceof Array) {
+                    this.items.push(...palindrome.flatMap(({lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles palindrome");
+
+                        return lines.map((cells) => PalindromeConstraint<T>(
+                            offsetCoordsArray(cells).filter(isVisibleGridCell),
+                            false,
+                        ));
+                    }));
+                }
+            },
+            renban: (renban) => {
+                if (renban instanceof Array) {
+                    this.items.push(...renban.flatMap(({lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles renban line");
+
+                        // Don't display the line - it's represented by a line constraint with isNewConstraint
+                        return lines.map((cells) => RenbanConstraint<T>(
+                            offsetCoordsArray(cells).filter(isVisibleGridCell),
+                            false,
+                            false,
+                        ));
+                    }));
+                }
+            },
+            whispers: (whispers) => {
+                if (whispers instanceof Array) {
+                    this.items.push(...whispers.flatMap(({lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles German whispers line");
+
+                        // Don't display the line - it's represented by a line constraint with isNewConstraint
+                        return lines.map((cells) => GermanWhispersConstraint<T>(
+                            offsetCoordsArray(cells).filter(isVisibleGridCell),
+                            false,
+                            false
+                        ));
+                    }));
+                }
+            },
+            line: (lineData) => {
+                if (lineData instanceof Array) {
+                    for (const {lines, outlineC, width, isNewConstraint, fromConstraint, ...other} of lineData) {
+                        ObjectParser.empty.parse(other, "f-puzzles line");
+
+                        this.items.push(...lines.map((cells) => {
+                            const visibleCells = offsetCoordsArray(cells).filter(isVisibleGridCell);
+
+                            checkForOutsideCells(visibleCells);
+
+                            return LineConstraint<T>(
+                                visibleCells,
+                                outlineC,
+                                width === undefined ? undefined : width / 2,
+                                false,
+                            );
+                        }));
+                    }
+                }
+            },
+            rectangle: (rectangle) => {
+                if (rectangle instanceof Array) {
+                    this.items.push(...rectangle.map(({cells: cellLiterals, width, height, baseC, outlineC, value, fontC, angle, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles rect");
+
+                        const cells = offsetCoordsArray(cellLiterals);
+                        checkForOutsideCells(cells);
+
+                        return RectConstraint<T>(
+                            cells.map(cell => this.typeManager.fixCellPosition?.(cell, this.puzzle) ?? cell),
+                            {width, height},
+                            baseC,
+                            outlineC,
+                            value,
+                            fontC,
+                            angle,
+                            cosmeticsLayer
+                        );
+                    }));
+                }
+            },
+            circle: (circle) => {
+                if (circle instanceof Array) {
+                    this.items.push(...circle.map(({cells: cellLiterals, width, height, baseC, outlineC, value, fontC, angle, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles circle");
+
+                        const cells = offsetCoordsArray(cellLiterals);
+                        checkForOutsideCells(cells);
+
+                        return EllipseConstraint<T>(
+                            cells.map(cell => this.typeManager.fixCellPosition?.(cell, this.puzzle) ?? cell),
+                            {width, height},
+                            baseC,
+                            outlineC,
+                            value,
+                            fontC,
+                            angle,
+                            cosmeticsLayer
+                        );
+                    }));
+                }
+            },
+            text: (text) => {
+                if (text instanceof Array) {
+                    if (puzzleJson.fogofwar) {
+                        text = text.filter((obj) => !isFowText(obj));
                     }
 
-                    checkForOutsideCells(cells, fieldSize);
+                    this.items.push(...text.flatMap(({cells: cellLiterals, value, fontC, size, angle, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles text");
 
-                    return [TextConstraint<T>(
-                        parsePositionLiterals(cells).map(cell => typeManager.fixCellPosition?.(cell, puzzle) ?? cell),
-                        value,
-                        fontC,
-                        size,
-                        angle,
-                        cosmeticsLayer,
-                    )];
-                }));
-            }
-        },
-        cage: (cage) => {
-            if (cage instanceof Array) {
-                items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
-                    ObjectParser.empty.parse(other, "f-puzzles cage");
+                        if (!value) {
+                            return [];
+                        }
 
-                    const visibleCells = parsePositionLiterals(cells).filter(isVisibleGridCell);
+                        const cells = offsetCoordsArray(cellLiterals);
+                        checkForOutsideCells(cells);
 
-                    return DecorativeCageConstraint<T>(visibleCells, value?.toString(), false, undefined, outlineC, fontC);
-                }));
-            }
-        },
-        "diagonal+": (diagonal, {size}) => {
-            if (diagonal) {
-                items.push(PositiveDiagonalConstraint<T>(size));
-            }
-        },
-        "diagonal-": (diagonal, {size}) => {
-            if (diagonal) {
-                items.push(NegativeDiagonalConstraint<T>(size));
-            }
-        },
-        // endregion
-        // endregion
-        // region Extensions
-        solution: (solution, {size}) => {
-            if (solution instanceof Array) {
-                puzzle.solution = createGivenDigitsMapFromArray(splitArrayIntoChunks(
-                    solution.map((value) => {
-                        const num = Number(value);
-                        return Number.isFinite(num) ? num : value;
-                    }),
-                    size
-                ));
-            }
-        },
-        disabledlogic: undefined,
-        truecandidatesoptions: undefined,
-        fogofwar: undefined,
-        foglight: undefined,
-        // endregion
-    }, ["size"]).parse(puzzleJson, "f-puzzles data");
+                        return [TextConstraint<T>(
+                            cells.map(cell => this.typeManager.fixCellPosition?.(cell, this.puzzle) ?? cell),
+                            value,
+                            fontC,
+                            size,
+                            angle,
+                            cosmeticsLayer,
+                        )];
+                    }));
+                }
+            },
+            cage: (cage) => {
+                if (cage instanceof Array) {
+                    this.items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles cage");
 
-    if (Object.keys(puzzle.solution ?? {}).length || Object.keys(puzzle.solutionColors ?? {}).length) {
-        puzzle.resultChecker = isValidFinishedPuzzleByEmbeddedSolution;
+                        const visibleCells = offsetCoordsArray(cells).filter(isVisibleGridCell);
+
+                        return DecorativeCageConstraint<T>(visibleCells, value?.toString(), false, undefined, outlineC, fontC);
+                    }));
+                }
+            },
+            "diagonal+": (diagonal, {size}) => {
+                if (diagonal) {
+                    // TODO: support grid offset
+                    this.items.push(PositiveDiagonalConstraint<T>(size));
+                }
+            },
+            "diagonal-": (diagonal, {size}) => {
+                if (diagonal) {
+                    // TODO: support grid offset
+                    this.items.push(NegativeDiagonalConstraint<T>(size));
+                }
+            },
+            // endregion
+            // endregion
+            // region Extensions
+            solution: (solution, {size}) => {
+                if (solution instanceof Array) {
+                    const puzzleSolution = this.puzzle.solution = this.puzzle.solution ?? {};
+                    const solutionArray = splitArrayIntoChunks(
+                        solution.map((value) => {
+                            const num = Number(value);
+                            return Number.isFinite(num) ? num : value;
+                        }),
+                        size
+                    );
+                    for (const [top, row] of solutionArray.entries()) {
+                        const offsetTop = top + offsetY;
+                        puzzleSolution[offsetTop] = puzzleSolution[offsetTop] ?? {};
+                        for (const [left, value] of row.entries()) {
+                            if (value !== undefined) {
+                                puzzleSolution[offsetTop][left + offsetX] = value;
+                            }
+                        }
+                    }
+                }
+            },
+            disabledlogic: undefined,
+            truecandidatesoptions: undefined,
+            fogofwar: undefined,
+            foglight: undefined,
+            // endregion
+        }).parse(puzzleJson, "f-puzzles data");
+
+        if (puzzleJson.fogofwar || puzzleJson.foglight) {
+            this.items.push(FogConstraint<T>(
+                offsetCoordsArray(puzzleJson.fogofwar ?? []),
+                offsetCoordsArray(puzzleJson.foglight ?? []),
+                puzzleJson.text?.filter(isFowText)?.flatMap(text => offsetCoordsArray(text.cells)),
+            ));
+
+            this.puzzle.prioritizeSelection = true;
+        }
     }
 
-    if (puzzleJson.fogofwar || puzzleJson.foglight) {
-        items.push(FogConstraint<T>(
-            puzzleJson.fogofwar,
-            puzzleJson.foglight,
-            puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),
-        ));
+    public finalize(): PuzzleDefinition<T> {
+        this.puzzle.inactiveCells = this.inactiveCells.items;
 
-        puzzle.prioritizeSelection = true;
+        if (Object.keys(this.puzzle.solution ?? {}).length || Object.keys(this.puzzle.solutionColors ?? {}).length) {
+            this.puzzle.resultChecker = isValidFinishedPuzzleByEmbeddedSolution;
+        }
+
+        return this.puzzle.typeManager.postProcessPuzzle?.(this.puzzle) ?? this.puzzle;
     }
-
-    return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
-};
+}
 
 export const FPuzzles: PuzzleDefinitionLoader<AnyPTM> = {
     noIndex: true,
     slug: "f-puzzles",
-    loadPuzzle: ({load, ...params}) => {
-        if (typeof load !== "string") {
+    loadPuzzle: (params) => {
+        if (typeof params.load !== "string") {
             throw new Error("Missing parameter");
         }
-        const puzzleJson = decodeFPuzzlesString(load);
-        console.debug("Importing from f-puzzles:", puzzleJson);
 
         return {
-            ...loadByFPuzzlesObject(puzzleJson, "f-puzzles", params),
-            saveStateKey: `f-puzzles-${sha1().update(load + JSON.stringify(sanitizeImportOptions(params))).digest("hex").substring(0, 20)}`,
+            ...loadByImportOptions("f-puzzles", params),
+            saveStateKey: `f-puzzles-${sha1().update(JSON.stringify(sanitizeImportOptions(params))).digest("hex").substring(0, 20)}`,
         };
     }
 };

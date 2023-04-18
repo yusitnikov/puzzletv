@@ -1,4 +1,4 @@
-import {getLineVector, getVectorLength, Line, Position, stringifyPosition} from "../layout/Position";
+import {getLineVector, getVectorLength, Line, Position, PositionSet, stringifyPosition} from "../layout/Position";
 import {
     getIsSamePuzzlePosition,
     getPuzzleLineHasher,
@@ -46,6 +46,8 @@ export class SudokuCellsIndex<T extends AnyPTM> {
             disableDiagonalBorderLines,
         } = puzzle;
 
+        const inactiveCellsIndex = new PositionSet(puzzle.inactiveCells ?? []);
+
         // Init all cell infos (neighbors and border segments are empty at this point)
         this.allCells = indexes(rowsCount).map(top => indexes(columnsCount).map(left => {
             const naiveRect: Rect = {
@@ -87,6 +89,7 @@ export class SudokuCellsIndex<T extends AnyPTM> {
                 neighbors: new PuzzlePositionSet(puzzle),
                 diagonalNeighbors: new PuzzlePositionSet(puzzle),
                 borderSegments: {},
+                isActive: !inactiveCellsIndex.contains({top, left}),
             };
         }));
 
@@ -428,7 +431,15 @@ export class SudokuCellsIndex<T extends AnyPTM> {
     getCellTypeProps(cell: Position): CellTypeProps<T> {
         const cache = this.cache.cellTypeProps = this.cache.cellTypeProps ?? {};
         const key = stringifyPosition(cell);
-        return cache[key] = cache[key] ?? this.puzzle.typeManager.getCellTypeProps?.(cell, this.puzzle) ?? {};
+        if (!cache[key]) {
+            let props = this.puzzle.typeManager.getCellTypeProps?.(cell, this.puzzle) ?? {};
+            const cellInfo = this.allCells[cell.top]?.[cell.left];
+            if (cellInfo && !cellInfo.isActive) {
+                props = {...props, isVisible: false};
+            }
+            cache[key] = props;
+        }
+        return cache[key];
     }
 
     // region Custom regions
@@ -586,6 +597,7 @@ export interface CellInfo<T extends AnyPTM> {
     neighbors: SetInterface<Position>;
     diagonalNeighbors: SetInterface<Position>;
     borderSegments: Record<string, SudokuCellBorderSegmentInfo>;
+    isActive: boolean;
 }
 
 export interface CellInfoForState extends Omit<CellInfo<AnyPTM>, "getTransformedBounds"> {

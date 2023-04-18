@@ -12,6 +12,7 @@ import {FieldPreview} from "../sudoku/field/FieldPreview";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {PageTitle} from "../layout/page-layout/PageLayout";
 import {
+    PuzzleGridImportOptions,
     PuzzleImportDigitType,
     PuzzleImportOptions,
     PuzzleImportPuzzleType
@@ -59,6 +60,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
+    const [extraGrids, setExtraGrids] = useState<PuzzleGridImportOptions[]>([]);
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
@@ -83,7 +85,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         type,
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
-        digitsCount: digitsCount === puzzle.size ? undefined : digitsCount,
+        digitsCount: digitsCount === puzzle.size && !extraGrids.length ? undefined : digitsCount,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
@@ -101,6 +103,12 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         shuffle: isJigsaw && shuffle,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
         load,
+        extraGrids: extraGrids
+            .map((grid) => ({
+                ...grid,
+                load: grid.load.split("?load=")[1] ?? "",
+            }))
+            .filter(({load}) => load),
     });
 
     const importedPuzzle = useMemo(() => {
@@ -343,6 +351,82 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         (also, it's recommended to include the embedded solution in this case)
                     </Details>
                 </Paragraph>}
+
+                <Paragraph>
+                    Import extra grids:
+                    <ul>
+                        {extraGrids.map((grid, index) => {
+                            const mergeCurrentItem = (updates: Partial<PuzzleGridImportOptions>) => setExtraGrids([
+                                ...extraGrids.slice(0, index),
+                                {
+                                    ...grid,
+                                    ...updates,
+                                },
+                                ...extraGrids.slice(index + 1),
+                            ]);
+
+                            return <li key={`extra-grid-${index}`}>
+                                <Paragraph>
+                                    <label>
+                                        F-Puzzles link:&nbsp;
+                                        <input type={"text"} value={grid.load} onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
+                                    </label>
+                                </Paragraph>
+
+                                <Paragraph>
+                                    <label>
+                                        Offset X:&nbsp;
+                                        <input type={"number"} step={1} value={grid.offsetX} onChange={ev => mergeCurrentItem({offsetX: ev.target.valueAsNumber})}/>
+                                    </label>
+                                </Paragraph>
+
+                                <Paragraph>
+                                    <label>
+                                        Offset Y:&nbsp;
+                                        <input type={"number"} step={1} value={grid.offsetY} onChange={ev => mergeCurrentItem({offsetY: ev.target.valueAsNumber})}/>
+                                    </label>
+                                </Paragraph>
+
+                                <Paragraph>
+                                    <button
+                                        type={"button"}
+                                        onClick={() => setExtraGrids([
+                                            ...extraGrids.slice(0, index),
+                                            ...extraGrids.slice(index + 1),
+                                        ])}
+                                    >
+                                        Remove
+                                    </button>
+                                </Paragraph>
+                            </li>;
+                        })}
+
+                        <li key={`extra-grid-${extraGrids.length}`}>
+                            <Paragraph>
+                                <label>
+                                    F-Puzzles link:&nbsp;
+                                    <input type={"text"} value={""} onChange={ev => setExtraGrids([
+                                        ...extraGrids,
+                                        {
+                                            load: ev.target.value,
+                                            offsetX: puzzle.size + 1,
+                                            offsetY: 0,
+                                        },
+                                    ])}/>
+                                </label>
+                                <Details>
+                                    Create the additional grid in F-Puzzles, then click "Export" and "Open With Link".
+                                    Copy the link of the page that opened in the tab to here.
+                                </Details>
+                                <Details>
+                                    <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
+                                    Also, If you edited the puzzle, it's a must to use the "open with link" feature
+                                    (because the link of the current f-puzzles tab doesn't include the latest information).
+                                </Details>
+                            </Paragraph>
+                        </li>
+                    </ul>
+                </Paragraph>
 
                 <Paragraph>
                     <button type={"submit"} disabled={!isValidForm}>Load</button>

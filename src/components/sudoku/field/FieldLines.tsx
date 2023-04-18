@@ -89,7 +89,7 @@ export const FieldLines = {
         const regularBorders = usePureMemo<Line[]>(customCellBounds ? [] : [
             ...indexes(rowsCount, true).flatMap(
                 top => concatContinuousLines(indexes(columnsCount).filter(
-                    left => cellHasBorders({top, left})
+                    left => (top < rowsCount && cellHasBorders({top, left}))
                         || (top > 0 && cellHasBorders({top: top - 1, left}))
                 )).map(({start, end}) => ({
                     start: {left: start, top},
@@ -98,7 +98,7 @@ export const FieldLines = {
             ),
             ...indexes(columnsCount, true).flatMap(
                 left => concatContinuousLines(indexes(rowsCount).filter(
-                    top => cellHasBorders({top, left})
+                    top => (left < columnsCount && cellHasBorders({top, left}))
                         || (left > 0 && cellHasBorders({top, left: left - 1}))
                 )).map(({start, end}) => ({
                     start: {left, top: start},

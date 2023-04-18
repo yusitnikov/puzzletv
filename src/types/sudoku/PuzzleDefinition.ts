@@ -83,6 +83,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     solution?: GivenDigitsMap<string | number>;
     solutionColors?: GivenDigitsMap<CellColorValue[]>;
     importOptions?: Omit<PuzzleImportOptions, "load">;
+    inactiveCells?: Position[];
 }
 
 export const allDrawingModes: PuzzleDefinition<AnyPTM>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];

@@ -343,8 +343,20 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
                 extension: {pieces: pieceIndexes, highlightCurrentPiece},
                 processedExtension: {pieces: animatedPieces},
             },
-        }
+        },
+        isImportingPuzzle
     ): GridRegion[] {
+        if (isImportingPuzzle) {
+            return [
+                {
+                    top: 0,
+                    left: 0,
+                    width: columnsCount,
+                    height: rowsCount,
+                },
+            ];
+        }
+
         const {pieces, otherCells} = getJigsawPiecesWithCache(cellsIndex);
         const activePieceIndex = getActiveJigsawPieceIndex(pieceIndexes);
 
