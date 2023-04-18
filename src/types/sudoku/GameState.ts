@@ -76,12 +76,10 @@ export interface GameState<T extends AnyPTM> {
     dragAction: DragAction;
 
     animationSpeed: AnimationSpeed;
+    animating: boolean;
     loopOffset: Position;
-    animatingLoopOffset: boolean;
     angle: number;
-    animatingAngle: boolean;
     scale: number;
-    animatingScale: boolean;
 
     openedLmdOnce?: boolean;
 
@@ -299,12 +297,10 @@ export const getEmptyGameState = <T extends AnyPTM>(
 
         // TODO: save animation speed in the global settings
         animationSpeed: AnimationSpeed.regular,
+        animating: false,
         loopOffset: savedGameState?.[11] ?? emptyPosition,
-        animatingLoopOffset: false,
         angle: savedGameState?.[12] ?? initialAngle,
-        animatingAngle: false,
         scale: savedGameState?.[13] ?? initialScale,
-        animatingScale: false,
 
         lives: savedGameState?.[9] ?? initialLives,
 
@@ -638,7 +634,7 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
         ...result,
         ...newState,
         loopOffset,
-        animatingLoopOffset: true,
+        animating: true,
     };
 };
 
@@ -1205,7 +1201,7 @@ export const gameStateSetScaleLog = <T extends AnyPTM>(
     resetSelectedCells = true,
 ): PartialGameStateEx<T> => ({
     scale: getAbsoluteScaleByLog(scaleLog, scaleStep),
-    animatingScale: true,
+    animating: true,
     ...(resetSelectedCells && {selectedCells: selectedCells.clear()}),
 });
 // endregion
@@ -1244,15 +1240,13 @@ export const gameStateApplyFieldDragGesture = <T extends AnyPTM>(
             currentMetrics
         );
         return {
+            animating: animate,
             loopOffset: {
                 left: loopHorizontally || allowMove ? x : left,
                 top: loopVertically || allowMove ? y : top,
             },
-            animatingLoopOffset: animate,
             angle: rotation,
-            animatingAngle: animate,
             scale: newScale,
-            animatingScale: animate,
             ...(resetSelection && {selectedCells: selectedCells.clear()})
         };
     });

@@ -222,19 +222,19 @@ export const useGame = <T extends AnyPTM>(
 
     const animatedLoopOffsetTop = useAnimatedValue(
         gameState.loopOffset.top,
-        gameState.animatingLoopOffset ? gameState.animationSpeed / 2 : 0
+        gameState.animating ? gameState.animationSpeed / 2 : 0
     );
     const animatedLoopOffsetLeft = useAnimatedValue(
         gameState.loopOffset.left,
-        gameState.animatingLoopOffset ? gameState.animationSpeed / 2 : 0
+        gameState.animating ? gameState.animationSpeed / 2 : 0
     );
     const animatedAngle = useAnimatedValue(
         gameState.angle,
-        gameState.animatingAngle ? gameState.animationSpeed : 0
+        gameState.animating ? gameState.animationSpeed : 0
     );
     const animatedScale = useAnimatedValue(
         gameState.scale,
-        gameState.animatingScale ? gameState.animationSpeed / 2 : 0
+        gameState.animating ? gameState.animationSpeed / 2 : 0
     );
     const animated = useMemo<ProcessedGameStateAnimatedValues>(() => ({
         loopOffset: {

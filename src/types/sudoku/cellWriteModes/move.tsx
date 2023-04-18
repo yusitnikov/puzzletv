@@ -59,19 +59,17 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
             onStateChange,
         }
     ) => onStateChange(({angle, scale}) => {
-        let result: PartialGameStateEx<T> = {};
+        let result: PartialGameStateEx<T> = {animating: true};
         if (allowRotation && !isFreeRotation && angleStep) {
             result = {
                 ...result,
                 angle: roundToStep(angle, angleStep),
-                animatingAngle: true,
             };
         }
         if (allowScale && !isFreeScale) {
             result = {
                 ...result,
                 scale: getAbsoluteScaleByLog(Math.round(getScaleLog(scale, scaleStep)), scaleStep),
-                animatingScale: true,
             };
         }
         return result;

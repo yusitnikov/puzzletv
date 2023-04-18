@@ -25,12 +25,10 @@ export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, title
 
     const handleResetPosition = useCallback(
         () => onStateChange({
+            animating: false,
             loopOffset: emptyPosition,
-            animatingLoopOffset: false,
             angle: initialAngle,
-            animatingAngle: false,
             scale: initialScale,
-            animatingScale: false,
         }),
         [onStateChange, initialAngle, initialScale]
     )
