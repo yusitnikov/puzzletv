@@ -75,6 +75,10 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         PuzzleImportPuzzleType.SafeCracker,
         PuzzleImportPuzzleType.InfiniteRings,
     ].includes(type);
+    const supportsExtraGrids = [
+        PuzzleImportPuzzleType.Regular,
+        PuzzleImportPuzzleType.Jigsaw,
+    ].includes(type);
     const supportsJss = isRotatableGrid || (!isSpecialGrid && !loopX && !loopY);
     const hasSolution = !!puzzle.solution;
     const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
@@ -103,7 +107,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         shuffle: isJigsaw && shuffle,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
         load,
-        extraGrids: extraGrids
+        extraGrids: !supportsExtraGrids ? undefined : extraGrids
             .map((grid) => ({
                 ...grid,
                 load: grid.load.split("?load=")[1] ?? "",
@@ -352,7 +356,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     </Details>
                 </Paragraph>}
 
-                <Paragraph>
+                {supportsExtraGrids && <Paragraph>
                     Import extra grids:
                     <ul>
                         {extraGrids.map((grid, index) => {
@@ -369,21 +373,24 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                                 <Paragraph>
                                     <label>
                                         F-Puzzles link:&nbsp;
-                                        <input type={"text"} value={grid.load} onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
+                                        <input type={"text"} value={grid.load}
+                                               onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
                                     </label>
                                 </Paragraph>
 
                                 <Paragraph>
                                     <label>
                                         Offset X:&nbsp;
-                                        <input type={"number"} step={1} value={grid.offsetX} onChange={ev => mergeCurrentItem({offsetX: ev.target.valueAsNumber})}/>
+                                        <input type={"number"} step={1} value={grid.offsetX}
+                                               onChange={ev => mergeCurrentItem({offsetX: ev.target.valueAsNumber})}/>
                                     </label>
                                 </Paragraph>
 
                                 <Paragraph>
                                     <label>
                                         Offset Y:&nbsp;
-                                        <input type={"number"} step={1} value={grid.offsetY} onChange={ev => mergeCurrentItem({offsetY: ev.target.valueAsNumber})}/>
+                                        <input type={"number"} step={1} value={grid.offsetY}
+                                               onChange={ev => mergeCurrentItem({offsetY: ev.target.valueAsNumber})}/>
                                     </label>
                                 </Paragraph>
 
@@ -419,14 +426,16 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                                     Copy the link of the page that opened in the tab to here.
                                 </Details>
                                 <Details>
-                                    <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
+                                    <strong>Important!</strong> Please don't copy the "compressed" link, it will not
+                                    work!
                                     Also, If you edited the puzzle, it's a must to use the "open with link" feature
-                                    (because the link of the current f-puzzles tab doesn't include the latest information).
+                                    (because the link of the current f-puzzles tab doesn't include the latest
+                                    information).
                                 </Details>
                             </Paragraph>
                         </li>
                     </ul>
-                </Paragraph>
+                </Paragraph>}
 
                 <Paragraph>
                     <button type={"submit"} disabled={!isValidForm}>Load</button>
