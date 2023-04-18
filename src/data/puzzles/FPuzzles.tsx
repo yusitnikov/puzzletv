@@ -952,7 +952,9 @@ class FPuzzlesImporter<T extends AnyPTM> {
         const newRegionsMap: Record<number, Position[]> = {};
         for (const row of cellRegions) {
             for (const {id, cells} of row) {
-                newRegionsMap[id] = cells;
+                if (cells.length) {
+                    newRegionsMap[id] = cells;
+                }
             }
         }
 
