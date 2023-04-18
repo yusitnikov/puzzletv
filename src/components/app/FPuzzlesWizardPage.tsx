@@ -118,7 +118,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         noSpecialRules: !hasSolution && noSpecialRules,
         allowOverrideColors: hasInitialColors && allowOverrideColors,
         angleStep: isJigsaw ? angleStep || undefined : undefined,
-        shuffle: isJigsaw && shuffle,
+        shuffle: isJigsaw && filteredExtraGrids.length === 0 && shuffle,
         stickyRegion: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid ? {
             top: globalOffsetY,
             left: globalOffsetX,
@@ -360,12 +360,12 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         </Details>
                     </Paragraph>}
 
-                    <Paragraph>
+                    {filteredExtraGrids.length === 0 && <Paragraph>
                         <label>
                             Shuffle:&nbsp;
                             <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>
                         </label>
-                    </Paragraph>
+                    </Paragraph>}
                 </>}
 
                 <Paragraph>
