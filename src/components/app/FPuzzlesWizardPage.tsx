@@ -60,7 +60,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
-    const [extraGrids, setExtraGrids] = useState<PuzzleGridImportOptions[]>([]);
+    const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
@@ -85,11 +85,23 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
     const hasInitialColors = puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length));
 
+    const filteredExtraGrids = useMemo(
+        () => !supportsExtraGrids ? [] : extraGrids
+            .map((grid) => ({
+                ...grid,
+                load: grid.load.split("?load=")[1] ?? grid.load,
+            }))
+            .filter(({load}) => load),
+        [supportsExtraGrids, extraGrids]
+    );
+    const globalOffsetX = -Math.min(0, ...filteredExtraGrids.map(({offsetX}) => offsetX));
+    const globalOffsetY = -Math.min(0, ...filteredExtraGrids.map(({offsetY}) => offsetY));
+
     const importOptions = usePureMemo<PuzzleImportOptions>({
         type,
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
-        digitsCount: digitsCount === puzzle.size && !extraGrids.length ? undefined : digitsCount,
+        digitsCount: digitsCount === puzzle.size && !filteredExtraGrids.length ? undefined : digitsCount,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
@@ -107,12 +119,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         shuffle: isJigsaw && shuffle,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
         load,
-        extraGrids: !supportsExtraGrids ? undefined : extraGrids
-            .map((grid) => ({
-                ...grid,
-                load: grid.load.split("?load=")[1] ?? grid.load,
-            }))
-            .filter(({load}) => load),
+        offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
+        offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
+        extraGrids: filteredExtraGrids.map(({load, offsetX, offsetY}) => ({
+            load,
+            offsetX: offsetX + globalOffsetX,
+            offsetY: offsetY + globalOffsetY,
+        })),
     });
 
     const importedPuzzle = useMemo(() => {

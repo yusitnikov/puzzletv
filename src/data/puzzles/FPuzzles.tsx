@@ -137,6 +137,8 @@ const loadByImportOptions = (
 ): PuzzleDefinition<AnyPTM> => {
     let {
         load,
+        offsetX: firstOffsetX = 0,
+        offsetY: firstOffsetY = 0,
         extraGrids: extraGridLoad = {},
         type = PuzzleImportPuzzleType.Regular,
         digitType = PuzzleImportDigitType.Regular,
@@ -145,25 +147,23 @@ const loadByImportOptions = (
     const puzzleJson = decodeFPuzzlesString(load);
 
     const extraGrids = (Array.isArray(extraGridLoad) ? extraGridLoad : Object.values(extraGridLoad))
-        .map(({load, offsetX, offsetY}) => ({
+        .map(({load, offsetX = 0, offsetY = 0}) => ({
             json: decodeFPuzzlesString(load),
             offsetX: Number(offsetX),
             offsetY: Number(offsetY),
         }));
-    const minOffsetX = Math.min(0, ...extraGrids.map(({offsetX}) => offsetX));
-    const minOffsetY = Math.min(0, ...extraGrids.map(({offsetY}) => offsetY));
-    let allGrids = [
-        {json: puzzleJson, offsetX: -minOffsetX, offsetY: -minOffsetY},
-        ...extraGrids.map(({json, offsetX, offsetY}) => ({
-            json,
-            offsetX: offsetX - minOffsetX,
-            offsetY: offsetY - minOffsetY,
-        })),
+    const allGrids = [
+        {
+            json: puzzleJson,
+            offsetX: Number(firstOffsetX),
+            offsetY: Number(firstOffsetY),
+        },
+        ...extraGrids,
     ];
     const columnsCount = Math.max(...allGrids.map(({offsetX, json: {size}}) => offsetX + size));
     const rowsCount = Math.max(...allGrids.map(({offsetY, json: {size}}) => offsetY + size));
 
-    console.debug("Importing from f-puzzles:", puzzleJson, ...extraGrids);
+    console.debug("Importing from f-puzzles:", ...allGrids);
 
     switch (type) {
         case PuzzleImportPuzzleType.Calculator:
