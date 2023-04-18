@@ -28,19 +28,21 @@ const getJigsawPieces = (
         (top) => indexes(columnsCount).map((left) => ({top, left}))
     )).bulkRemove(regionCells.flat());
 
-    const otherActiveCells = otherCells.filter(({top, left}) => cellsIndex.allCells[top]?.[left]?.isActive);
-    otherCells = otherCells.bulkRemove(otherActiveCells.items);
-
-    if (otherActiveCells.size) {
-        regionCells.push(otherActiveCells.items);
-    }
-
     if (stickyRegion) {
-        regionCells = regionCells.filter(([{top, left}]) => {
+        const isStickyRegionCell = ({top, left}: Position) => {
             top -= Number(stickyRegion.top);
             left -= Number(stickyRegion.left);
-            return top < 0 || left < 0 || top >= Number(stickyRegion.height) || left >= Number(stickyRegion.width);
-        });
+            return top >= 0 && left >= 0 && top < Number(stickyRegion.height) && left < Number(stickyRegion.width);
+        };
+
+        const otherActiveCells = otherCells.filter((cell) => isStickyRegionCell(cell) && cellsIndex.allCells[cell.top]?.[cell.left]?.isActive);
+        otherCells = otherCells.bulkRemove(otherActiveCells.items);
+
+        if (otherActiveCells.size) {
+            regionCells.push(otherActiveCells.items);
+        }
+
+        regionCells = regionCells.filter(([cell]) => !isStickyRegionCell(cell));
     }
 
     // TODO: other region creation modes

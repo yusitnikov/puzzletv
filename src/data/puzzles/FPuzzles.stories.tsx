@@ -45,6 +45,14 @@ export const JigsawShuffled = Template.bind({});
 JigsawShuffled.args = {
     _hash: "f-puzzles:type=jigsaw:angleStep=90:shuffle:load=N4IgzglgXgpiBcBOANCA5gJwgEwQbT1ADcBDAGwFc54BGVNCImAOwQBcMrUBjBEAYgBiggIIAGcSB4iMGEgE98A4eMkBdAL7JQveMtESxUkNxlzF8PPtVHN2k3yEHJ02QqVObIOzscrDxqZuFlaeAT4OemEuJmbultbhWr5R/jFB5h5ptsmRielxIfk59rrFgYVZziUp5a6ZCdE5asiEuaSU1ABM9Iws7JwwycPaI8BjGi1to/YdVAgAzL1MrPAcVBMz41uTrbX8AEJiwkcVwR5HJzV5h8eCp/XxoZf312W3V2cNz3enEXPUAAsy36a0GPEcLwesXOjShb0hvyMjyKH1e3ly73hXyeAmxESxSJxqPxmMRnxRFyJBPJ6MpcOpu2m2xZ7XI83gAFYQat1kMdjspqyBSyQACEAA2HkDDYipn7AAcYiVgmRMO+AiVKoRUS1xzVGVx/D1qoxpUcJoNlUalrNiuV+uJHltNN1DtN9NCLrJbu1Tpt7uu4vgAHZpWCuDdbZ7NYG7VG4zHjXHXbG/UnvULNsKc2L2dQFeG+cMs3Ky6Lgyh0H1eYNJpogA",
 };
+export const JigsawWithRegionZero = Template.bind({});
+JigsawWithRegionZero.args = {
+    _hash: "f-puzzles:type=jigsaw:angleStep=90:stickyDigits:load=N4IgzglgXgpiBcBOANCA5gJwgEwQbT2AF9ljSSzQMY0IB7AOwQFoBGCka2xl90zmvSbw2HLkN5jBPEewC6yQhWXlVlFVWnDRCpWo0G1A7tvmL1+yxc0nJumxNmHrz4453m3M0VecH7XqZ+vvoB4t58LiHqYVqS/OFBCXFOybapDhHBxHJyREA===",
+};
+export const JigsawWithStickyRegion = Template.bind({});
+JigsawWithStickyRegion.args = {
+    _hash: "f-puzzles:type=jigsaw:digitsCount=9:stickyRegion[top]=0:stickyRegion[left]=0:stickyRegion[width]=9:stickyRegion[height]=9:splitUnconnectedRegions:load=N4IgzglgXgpiBcBOANCA5gJwgEwQbT1ADcBDAGwFc54BGVNCImAOwQBcMqBfZYHv3iAwwGAe1bwADPyEiI4hNMHCxEpaBXy1MzQqk65e6QF1khGaUrUATPUYt2nGPwOrFrre+WHt3t/r9PAI0fd1NzXgtyKgQAZjsmCQ5uQKMPNNTfEP91WRz07XDsoNzdLLySgsVUSxj4ABYEh3hk50yvYozO8rKOirSi/p7Q4KG+3tGJyRro6gBWJqSnKsmR0rWVkzNu8Y321fz99ZyZqwQANkXHFJ2DyqOuQanNl4e32+OS07qAdiuW5bvMb6J57D6vcFA55QtbfagADn+rReoMOkPRwM+XUxEJxRzhCBQ6HsS24xmMXCAA==:extraGrids[0][load]=N4IgzglgXgpiBcBOANCA5gJwgEwQbT2AF9lQMY0IB7AOwQFoBGEsi6u+Jlkcy2h5qR5t+8AAzde7AZJEcuQqaIWs+HCQF1khWWpmld0zoNVGJiuftOjz1+SeF7xRLYUdGV75ScPff9/ysvdUDjUK5XOwRbYKClAIsnT3jo8IcUsMSPdMtnSNjnLL8ikJK43JiM5Iq00M1tKMzG6qdK3Jbs2rLC5pyk5nyMtv6u3rrRgo7ixvq3IYn57qnSse7hzrWXBsm+jZnQ3dFDjmPUpdOwjQ0iIA:extraGrids[0][offsetX]=10:extraGrids[0][offsetY]=0",
+};
 
 export const SimpleJss = Template.bind({});
 SimpleJss.args = {
