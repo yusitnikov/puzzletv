@@ -61,6 +61,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
+    const [splitUnconnectedRegions, setSplitUnconnectedRegions] = useBoolFromLocalStorage("fpwSplitUnconnectedRegions");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
@@ -125,6 +126,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             height: puzzle.size,
         } : undefined,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
+        splitUnconnectedRegions,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
         offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
@@ -365,6 +367,17 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         </label>
                     </Paragraph>
                 </>}
+
+                <Paragraph>
+                    <label>
+                        Split unconnected regions:&nbsp;
+                        <input type={"checkbox"} checked={splitUnconnectedRegions} onChange={ev => setSplitUnconnectedRegions(ev.target.checked)}/>
+                    </label>
+                    <Details>
+                        If multiple cells marked as the same region in f-puzzles, but not connected to each other,
+                        treat them as different regions.
+                    </Details>
+                </Paragraph>
 
                 {hasInitialColors && <Paragraph>
                     <label>

@@ -46,6 +46,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     shuffle?: boolean;
     stickyRegion?: Rect;
     stickyDigits?: boolean;
+    splitUnconnectedRegions?: boolean;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -78,6 +79,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         shuffle,
         stickyRegion,
         stickyDigits,
+        splitUnconnectedRegions,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -110,6 +112,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         shuffle,
         stickyRegion,
         stickyDigits,
+        splitUnconnectedRegions,
     };
 
     return result;
