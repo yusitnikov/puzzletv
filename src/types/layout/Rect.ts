@@ -53,3 +53,26 @@ export const getRectCenter = ({left, top, width, height}: Rect): Position => ({
     left: left + width / 2,
     top: top + height / 2,
 });
+
+export const getPointsBoundingBox = (...points: Position[]): Rect => {
+    if (points.length === 0) {
+        return emptyRect;
+    }
+
+    const tops = points.map(({top}) => top);
+    const lefts = points.map(({left}) => left);
+
+    const top = Math.min(...tops);
+    const left = Math.min(...lefts);
+    const bottom = Math.max(...tops);
+    const right = Math.max(...lefts);
+
+    return {
+        top,
+        left,
+        width: right - left,
+        height: bottom - top,
+    };
+};
+
+export const getRectsBoundingBox = (...rects: Rect[]) => getPointsBoundingBox(...rects.flatMap(getRectPoints));
