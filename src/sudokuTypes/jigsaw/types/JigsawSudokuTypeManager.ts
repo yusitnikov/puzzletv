@@ -18,7 +18,6 @@ import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {
     getActiveJigsawPieceIndex,
     getJigsawPieceIndexByCell,
-    getJigsawPieces,
     getJigsawPiecesWithCache,
     normalizeJigsawDigit,
     sortJigsawPiecesByPosition
@@ -38,6 +37,7 @@ import {getReverseIndexMap} from "../../../utils/array";
 import {createRandomGenerator} from "../../../utils/random";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
+import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit<PuzzleImportOptions, "load">): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -199,7 +199,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
     rotationallySymmetricDigits: true,
 
     initialGameStateExtension: (puzzle) => {
-        const {pieces} = getJigsawPieces(puzzle)
+        const {pieces} = getJigsawPiecesWithCache(new SudokuCellsIndex(puzzle));
         const {extension: {pieces: piecePositions}} = createEmptyFieldState(puzzle);
         const pieceSortIndexesByPosition = getReverseIndexMap(sortJigsawPiecesByPosition(pieces, piecePositions));
 
@@ -223,7 +223,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         const centerLeft = puzzle.fieldSize.columnsCount / 2;
 
         return {
-            pieces: getJigsawPieces(puzzle).pieces.map(({boundingRect}) => {
+            pieces: getJigsawPiecesWithCache(new SudokuCellsIndex(puzzle)).pieces.map(({boundingRect}) => {
                 const {top, left} = getRectCenter(boundingRect);
 
                 return {

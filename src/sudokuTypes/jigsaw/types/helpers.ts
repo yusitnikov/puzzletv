@@ -11,25 +11,20 @@ import {JigsawPieceState} from "./JigsawPieceState";
 import {getRectCenter} from "../../../types/layout/Rect";
 import {indexes} from "../../../utils/indexes";
 
-export const getJigsawPieces = (
-    {regions = [], fieldSize: {rowsCount, columnsCount}}: PuzzleDefinition<JigsawPTM>,
+const getJigsawPieces = (
+    cellsIndex: SudokuCellsIndex<JigsawPTM>
 ): { pieces: JigsawPieceInfo[], otherCells: Position[] } => {
+    const {puzzle: {regions = [], fieldSize: {rowsCount, columnsCount}}} = cellsIndex;
+
+    const regionCells = regions.map((region) => Array.isArray(region) ? region : region.cells);
+
     let otherCells = new PositionSet(indexes(rowsCount).flatMap(
         (top) => indexes(columnsCount).map((left) => ({top, left}))
-    ));
-
-    // Regions may be not initialized yet during puzzle import, so the code below is a fallback
-    if (regions.length === 0) {
-        return {pieces: [], otherCells: otherCells.items};
-    }
+    )).bulkRemove(regionCells.flat());
 
     // TODO: other region creation modes
 
-    const pieces: JigsawPieceInfo[] = regions.map((region) => {
-        const cells = Array.isArray(region) ? region : region.cells;
-
-        otherCells = otherCells.bulkRemove(cells);
-
+    const pieces: JigsawPieceInfo[] = regionCells.map((cells) => {
         return {
             cells,
             boundingRect: getRegionBoundingBox(cells, 1),
@@ -39,10 +34,8 @@ export const getJigsawPieces = (
     return {pieces, otherCells: otherCells.items};
 };
 
-export const getJigsawPiecesWithCache = (
-    {puzzle, cache}: SudokuCellsIndex<JigsawPTM>,
-): ReturnType<typeof getJigsawPieces> => {
-    return cache.jigsawPieces = cache.jigsawPieces ?? getJigsawPieces(puzzle);
+export const getJigsawPiecesWithCache = (cellsIndex: SudokuCellsIndex<JigsawPTM>): ReturnType<typeof getJigsawPieces> => {
+    return cellsIndex.cache.jigsawPieces = cellsIndex.cache.jigsawPieces ?? getJigsawPieces(cellsIndex);
 };
 
 export const getJigsawPieceIndexByCell = (
