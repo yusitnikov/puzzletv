@@ -3,7 +3,7 @@ import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
 import {getJigsawPieceIndexByCell, getJigsawPiecesWithCache} from "./helpers";
 import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "./JigsawPieceState";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
-import {applyMetricsDiff, GestureInfo, GestureMetrics} from "../../../utils/gestures";
+import {applyMetricsDiff, GestureFinishReason, GestureInfo, GestureMetrics} from "../../../utils/gestures";
 import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
 import {getRectCenter} from "../../../types/layout/Rect";
 import {JigsawPTM} from "./JigsawPTM";
@@ -109,7 +109,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         );
     },
     onGestureEnd(props, context) {
-        const {gesture} = props;
+        const {gesture, reason} = props;
         const {puzzle, cellsIndex, onStateChange} = context;
         const {importOptions: {angleStep = 0} = {}} = puzzle;
 
@@ -130,7 +130,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
                 position: {
                     top: roundToStep(top, roundStep),
                     left: roundToStep(left, roundStep),
-                    angle: roundToStep(angle, angleStep) + angleStep * (!isClick ? 0 : isRightButton ? -1 : 1),
+                    angle: roundToStep(angle, angleStep) + angleStep * (!isClick || reason !== GestureFinishReason.pointerUp ? 0 : isRightButton ? -1 : 1),
                 },
                 state: {animating: true},
             })
