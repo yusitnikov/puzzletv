@@ -103,7 +103,7 @@ export class ControlButtonsManager<T extends AnyPTM> {
             });
         }
 
-        if (isTouchDevice) {
+        if (isTouchDevice || process.env.REACT_APP_FORCE_MULTI_SELECTION) {
             right.push({
                 key: "multi-selection",
                 Component: MultiSelectionButton,
