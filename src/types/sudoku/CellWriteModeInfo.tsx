@@ -295,6 +295,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
             if (isCellGestureExtraData(extraData)) {
                 onCornerClick?.(props, context, extraData.cell, extraData.exact, !!button);
             }
+            onStateChange({gestureCellWriteMode: mode});
         },
         onContinue: (props) => {
             const {prevData: {extraData: prevData}, currentData: {extraData: currentData}} = props;
@@ -308,7 +309,10 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
 
             onMove?.(props, context, fieldRect);
         },
-        onEnd: (props) => onGestureEnd?.(props, context),
+        onEnd: (props) => {
+            onGestureEnd?.(props, context);
+            onStateChange({gestureCellWriteMode: undefined});
+        },
         onContextMenu: ({event, extraData}) => {
             if (handlesRightMouseClick && getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode === mode) {
                 event.preventDefault();

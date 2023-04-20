@@ -139,6 +139,7 @@ export const useGame = <T extends AnyPTM>(
                     state,
                     {
                         persistentCellWriteMode: mode,
+                        gestureCellWriteMode: undefined,
                         selectedCells: PositionSet.unserialize(selected),
                         selectedColor: color,
                         currentMultiLine: line,

@@ -61,6 +61,7 @@ import {isSelectableCell} from "./CellTypeProps";
 export interface GameState<T extends AnyPTM> {
     fieldStateHistory: FieldStateHistory<T>;
     persistentCellWriteMode: CellWriteMode;
+    gestureCellWriteMode?: CellWriteMode;
 
     initialDigits: GivenDigitsMap<T["cell"]>;
     excludedDigits: GivenDigitsMap<SetInterface<T["cell"]>>;
@@ -180,8 +181,14 @@ export const calculateProcessedGameState = <T extends AnyPTM>(
 
     const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
     const cellWriteMode = keys
-        ? getFinalCellWriteMode(keys, gameState.persistentCellWriteMode, allowedCellWriteModes, readOnly)
-        : gameState.persistentCellWriteMode;
+        ? getFinalCellWriteMode(
+            keys,
+            gameState.persistentCellWriteMode,
+            gameState.gestureCellWriteMode,
+            allowedCellWriteModes,
+            readOnly
+        )
+        : gameState.gestureCellWriteMode ?? gameState.persistentCellWriteMode;
     const cellWriteModeInfo = allowedCellWriteModes.find(({mode}) => mode === cellWriteMode)!;
     const isReady = !readOnly
         && !isDoubledConnected
@@ -281,6 +288,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
             currentIndex: 0,
         },
         persistentCellWriteMode: savedGameState?.[5] ?? initialCellWriteMode ?? getAllowedCellWriteModeInfos(puzzle)[0].mode,
+        gestureCellWriteMode: undefined,
         selectedCells: new PositionSet(),
         isMultiSelection: loadBoolFromLocalStorage(LocalStorageKeys.enableMultiSelection, false),
         selectedColor: savedGameState?.[10] ?? CellColor.green,
