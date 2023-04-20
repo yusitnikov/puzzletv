@@ -179,7 +179,7 @@ export const calculateProcessedGameState = <T extends AnyPTM>(
 
     const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
 
-    const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
+    const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle, true);
     const cellWriteMode = keys
         ? getFinalCellWriteMode(
             keys,

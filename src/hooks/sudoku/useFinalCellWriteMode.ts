@@ -10,7 +10,7 @@ export const getFinalCellWriteMode = <T extends AnyPTM>(
     allowedModes: CellWriteModeInfo<T>[],
     readOnly?: boolean
 ) => {
-    if (gestureCellWriteMode) {
+    if (gestureCellWriteMode !== undefined) {
         return gestureCellWriteMode;
     }
 
