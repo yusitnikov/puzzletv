@@ -21,6 +21,7 @@ import {PencilmarksCheckerMode} from "../../../../types/sudoku/PencilmarksChecke
 import {LanguageCode} from "../../../../types/translations/LanguageCode";
 import {shortenUrl} from "../../../../services/tinyUrl";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {AnimationSpeed} from "../../../../types/sudoku/AnimationSpeed";
 
 export interface SettingsContentProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -48,6 +49,7 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                 backgroundOpacity,
                 nickname,
                 highlightSeenCells,
+                animationSpeed,
             },
             onStateChange,
             multiPlayer: {isEnabled},
@@ -97,6 +99,11 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
     const handleChangeHighlightSeenCells = (value: boolean) => {
         onStateChange({highlightSeenCells: value});
         saveBoolToLocalStorage(LocalStorageKeys.highlightSeenCells, value);
+    };
+
+    const handleChangeAnimationSpeed = (value: AnimationSpeed) => {
+        onStateChange({animationSpeed: value});
+        saveNumberToLocalStorage(LocalStorageKeys.animationSpeed, value);
     };
 
     return <div>
@@ -263,6 +270,32 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                 onChange={(ev) => handleChangeHighlightSeenCells(ev.target.checked)}
             />
         </SettingsItem>}
+
+        <SettingsItem>
+            <span>{translate({
+                [LanguageCode.en]: "Animation speed",
+                [LanguageCode.ru]: "Скорость анимации",
+            })}:</span>
+
+            <SettingsSelect
+                cellSize={cellSize}
+                value={animationSpeed}
+                onChange={(ev) => handleChangeAnimationSpeed(Number(ev.target.value))}
+            >
+                <option value={AnimationSpeed.regular}>{translate({
+                    [LanguageCode.en]: "Regular",
+                    [LanguageCode.ru]: "Обычная",
+                })}</option>
+                <option value={AnimationSpeed.immediate}>{translate({
+                    [LanguageCode.en]: "No animation",
+                    [LanguageCode.ru]: "Без анимации",
+                })}</option>
+                <option value={AnimationSpeed.slow}>{translate({
+                    [LanguageCode.en]: "Slow",
+                    [LanguageCode.ru]: "Медленная",
+                })}</option>
+            </SettingsSelect>
+        </SettingsItem>
 
         {settingsComponents.map((Component, index) => <Component key={`custom-${index}`} {...props}/>)}
     </div>;

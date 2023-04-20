@@ -52,7 +52,7 @@ export const RotateRightButton = <T extends AnyPTM>({context, top, left}: Contro
             top={top}
             cellSize={cellSize}
             onClick={() => handleRotate(context, 1)}
-            title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: R)\n${translate("Tip")}: ${translate("use the button from the right side to control the rotation speed")}`}
+            title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: R)`}
         >
             <RotateRight/>
         </ControlButton>
@@ -90,7 +90,7 @@ export const RotateLeftButton = <T extends AnyPTM>({context, top, left}: Control
         top={top}
         cellSize={cellSize}
         onClick={() => handleRotate(context, -1)}
-        title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: Shift+R)\n${translate("Tip")}: ${translate("use the button from the right side to control the rotation speed")}`}
+        title={`${translate("Rotate the puzzle")} (${translate("shortcut")}: Shift+R)`}
     >
         <RotateLeft/>
     </ControlButton>;

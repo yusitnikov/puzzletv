@@ -14,7 +14,6 @@ import {InfiniteRingsBorderLinesConstraint} from "../components/InfiniteRingsBor
 import {isShowingAllInfiniteRings} from "./InfiniteRingsLayout";
 import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
 import {InfiniteRingsSettings} from "../components/InfiniteRingsSettings";
-import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
@@ -59,7 +58,6 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         controlButtons: [
             ZoomInButtonItem(),
             ZoomOutButtonItem(),
-            AnimationSpeedControlButtonItem(),
         ],
         getCellTypeProps({top, left}, {fieldSize: {rowsCount: fieldSize}}): CellTypeProps<T> {
             const quadSize = fieldSize / 2;

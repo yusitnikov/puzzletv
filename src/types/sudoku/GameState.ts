@@ -303,8 +303,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
         dragStartPoint: undefined,
         dragAction: DragAction.SetUndefined,
 
-        // TODO: save animation speed in the global settings
-        animationSpeed: AnimationSpeed.regular,
+        animationSpeed: loadNumberFromLocalStorage(LocalStorageKeys.animationSpeed, AnimationSpeed.regular),
         animating: false,
         loopOffset: savedGameState?.[11] ?? emptyPosition,
         angle: savedGameState?.[12] ?? initialAngle,

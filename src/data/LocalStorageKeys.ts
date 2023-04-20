@@ -6,4 +6,5 @@ export enum LocalStorageKeys {
     nickname = "nickname",
     highlightSeenCells = "highlightSeenCells",
     enableMultiSelection = "enableMultiSelection",
+    animationSpeed = "animationSpeed",
 }

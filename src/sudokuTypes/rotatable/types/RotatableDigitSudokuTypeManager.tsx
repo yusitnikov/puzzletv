@@ -10,7 +10,6 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {cageTag, KillerCageProps} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {RotateLeftButton, RotateRightButton} from "../components/RotateButton";
-import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {StickyModeButton} from "../components/StickyModeButton";
 import {loop, roundToStep} from "../../../utils/math";
 import {RotatableDigitPTM, RotatablePTM} from "./RotatablePTM";
@@ -70,7 +69,6 @@ export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
             region: ControlButtonRegion.additional,
             Component: StickyModeButton,
         },
-        AnimationSpeedControlButtonItem(),
     ],
 
     getInternalState(

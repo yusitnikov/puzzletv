@@ -14,7 +14,6 @@ import {JigsawDigitCellDataComponentType} from "../components/JigsawDigitCellDat
 import {mixAnimatedValue, useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {getRectCenter} from "../../../types/layout/Rect";
 import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
-import {AnimationSpeedControlButtonItem} from "../../../components/sudoku/controls/AnimationSpeedControlButton";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {
     getActiveJigsawPieceIndex,
@@ -453,7 +452,6 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
     controlButtons: [
         ZoomInButtonItem(),
         ZoomOutButtonItem(),
-        AnimationSpeedControlButtonItem(),
         JigsawPieceHighlightHandlerControlButtonItem,
     ],
 

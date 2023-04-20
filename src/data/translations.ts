@@ -251,9 +251,6 @@ export const translationsExactType = {
     "Rotate the puzzle": {
         [LanguageCode.ru]: "Повернуть поле",
     },
-    "use the button from the right side to control the rotation speed": {
-        [LanguageCode.ru]: "нажмите на кнопку справа, чтобы изменить скорость вращения поля",
-    },
     "Sticky mode": {
         [LanguageCode.ru]: "Фиксированный режим",
     },
@@ -262,11 +259,6 @@ export const translationsExactType = {
     },
     "Sticky digits are highlighted in green": {
         [LanguageCode.ru]: "Фиксированные цифры помечены зелёным",
-    },
-    // endregion
-    // region RotatableSecondaryControls
-    "Rotation speed": {
-        [LanguageCode.ru]: "Скорость вращения поля",
     },
     // endregion
     // region SettingsContent
