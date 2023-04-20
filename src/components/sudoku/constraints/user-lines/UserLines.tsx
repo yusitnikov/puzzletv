@@ -22,13 +22,14 @@ import {HashSet} from "../../../../types/struct/Set";
 import {emptyPositionWithAngle} from "../../../../types/layout/Position";
 import {loop} from "../../../../utils/math";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {GridRegion} from "../../../../types/sudoku/GridRegion";
 
 const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
 const removingBorderColor = lightGreyColor;
 
 export const UserLines = {
-    [FieldLayer.givenUserLines]: <T extends AnyPTM>({context}: ConstraintProps<T>) => {
+    [FieldLayer.givenUserLines]: <T extends AnyPTM>({context, region}: ConstraintProps<T>) => {
         const {cellSize, puzzle, state} = context;
 
         const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
@@ -58,6 +59,7 @@ export const UserLines = {
                 key={`mark-${index}`}
                 context={context}
                 cellSize={cellSize}
+                region={region}
                 {...mark}
             />)}
         </>;
@@ -77,6 +79,7 @@ export const UserLines = {
 export interface UserMarkByDataProps<T extends AnyPTM> extends CellMark {
     context?: PuzzleContext<T>;
     cellSize: number;
+    region?: GridRegion;
 }
 
 export const UserMarkByData = <T extends AnyPTM>(
@@ -88,6 +91,7 @@ export const UserMarkByData = <T extends AnyPTM>(
         color,
         // Leaving the defaults only for compatibility
         isCenter = position.left % 1 !== 0 && position.top % 1 !== 0,
+        region,
     }: UserMarkByDataProps<T>
 ) => {
     let {top, left} = position;
@@ -124,6 +128,7 @@ export const UserMarkByData = <T extends AnyPTM>(
                     () => undefined,
                     cellPosition,
                     state,
+                    region,
                 )?.angle ?? 0;
             }
         }

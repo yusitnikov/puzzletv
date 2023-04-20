@@ -1,15 +1,13 @@
 import {Rect, transformRect} from "../../../types/layout/Rect";
 import {emptyPosition} from "../../../types/layout/Position";
-import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {Constraint} from "../../../types/sudoku/Constraint";
-import {HashSet} from "../../../types/struct/Set";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {FieldCellUserArea} from "./FieldCellUserArea";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {FieldLoop} from "./FieldLoop";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {doesGridRegionContainCell, GridRegion} from "../../../types/sudoku/GridRegion";
+import {SingleCellFieldItemPositionFix} from "./SingleCellFieldItemPositionFix";
 
 export interface FieldItemsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -28,6 +26,7 @@ export const FieldItems = <T extends AnyPTM>(
 
         if (
             region &&
+            layer !== FieldLayer.noClip &&
             (!context.puzzle.customCellBounds || region.cells) &&
             cells.length &&
             cells.every(({top, left}) => top % 1 === 0 && left % 1 === 0) &&
@@ -40,35 +39,19 @@ export const FieldItems = <T extends AnyPTM>(
             const position = cells[0];
 
             if (position.top % 1 === 0 && position.left % 1 === 0) {
-                const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
-                    context,
-                    {...position, angle: 0},
-                    new HashSet<T["cell"]>(),
-                    0,
-                    () => undefined,
-                    position,
-                    context.state
-                );
-
-                let component = <Component
+                return <SingleCellFieldItemPositionFix
+                    key={index}
                     context={context}
+                    position={position}
                     region={region}
-                    cells={[emptyPosition]}
-                    {...otherData}
-                />;
-                if (processedPosition?.angle) {
-                    component = <AutoSvg top={0.5} left={0.5} angle={processedPosition.angle}>
-                        <AutoSvg top={-0.5} left={-0.5}>
-                            {component}
-                        </AutoSvg>
-                    </AutoSvg>;
-                }
-
-                return <AutoSvg key={index} {...(context.puzzle.customCellBounds ? {} : position)}>
-                    <FieldCellUserArea context={context} cellPosition={position}>
-                        {component}
-                    </FieldCellUserArea>
-                </AutoSvg>;
+                >
+                    <Component
+                        context={context}
+                        region={region}
+                        cells={[emptyPosition]}
+                        {...otherData}
+                    />
+                </SingleCellFieldItemPositionFix>;
             }
         }
 

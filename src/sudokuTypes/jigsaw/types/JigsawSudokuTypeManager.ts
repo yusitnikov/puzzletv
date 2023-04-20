@@ -151,6 +151,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         positionFunction,
         cellPosition,
         state,
+        region,
     ): PositionWithAngle | undefined {
         const {importOptions: {angleStep} = {}} = puzzle;
 
@@ -158,7 +159,8 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
             return basePosition;
         }
 
-        const regionIndex = cellPosition && getJigsawPieceIndexByCell(cellsIndex, cellPosition);
+        const regionCellPosition = region?.cells?.[0] ?? cellPosition;
+        const regionIndex = regionCellPosition && getJigsawPieceIndexByCell(cellsIndex, regionCellPosition);
         if (regionIndex === undefined) {
             return basePosition;
         }

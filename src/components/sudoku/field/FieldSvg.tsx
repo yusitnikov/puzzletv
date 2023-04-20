@@ -12,8 +12,6 @@ export const FieldSvg = <T extends AnyPTM>({context, children}: PropsWithChildre
         fieldMargin = 0,
         fieldFitsWrapper,
         ignoreRowsColumnCountInTheWrapper,
-        loopHorizontally,
-        loopVertically,
         typeManager: {getRegionsWithSameCoordsTransformation},
     } = puzzle;
 
@@ -43,7 +41,7 @@ export const FieldSvg = <T extends AnyPTM>({context, children}: PropsWithChildre
         );
     }
 
-    const extraMargin = loopHorizontally || loopVertically ? fieldSize : 0.5;
+    const extraMargin = fieldSize;
     viewBox = getRectByBounds(
         {
             top: Math.floor(viewBox.top - extraMargin),

@@ -313,7 +313,17 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                     fitParent={fieldFitsWrapper}
                 >
                     <FieldSvg context={readOnlySafeContext}>
-                        <FieldRegionsWithSameCoordsTransformation context={readOnlySafeContext}>
+                        <FieldRegionsWithSameCoordsTransformation
+                            context={readOnlySafeContext}
+                            regionNoClipChildren={(region) => <g data-layer="items-no-clip">
+                                <FieldItems
+                                    layer={FieldLayer.noClip}
+                                    context={readOnlySafeContext}
+                                    items={items}
+                                    region={region}
+                                />
+                            </g>}
+                        >
                             {(region, regionIndex = 0) => {
                                 const shadowFilterId = `field-shadow-${autoIncrementId}-${regionIndex}`;
 

@@ -90,7 +90,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         dataIndex: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         cellPosition?: Position,
-        state?: ProcessedGameStateEx<T>
+        state?: ProcessedGameStateEx<T>,
+        region?: GridRegion,
     ): PositionWithAngle | undefined;
 
     handleDigitGlobally?(

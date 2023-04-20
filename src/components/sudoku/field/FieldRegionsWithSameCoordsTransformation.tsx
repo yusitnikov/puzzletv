@@ -8,12 +8,14 @@ import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     children: ReactNode | ((region?: GridRegion, index?: number) => ReactNode);
+    regionNoClipChildren?: ReactNode | ((region?: GridRegion, index?: number) => ReactNode);
 }
 
 export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
     {
         context,
         children,
+        regionNoClipChildren,
     }: FieldRegionsWithSameCoordsTransformationProps<T>
 ) => {
     const {
@@ -35,7 +37,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                     ) => (zIndex - zIndex2) || (index - index2)
                 )
                 .map(({region, index}) => <Fragment key={`items-region-${index}`}>
-                    {region.highlighted && <FieldRect
+                    <FieldRect
                         context={context}
                         {...region}
                     >
@@ -45,7 +47,9 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                             width={1}
                             height={1}
                         >
-                            {region.cells?.map(({top, left}) => <rect
+                            {typeof regionNoClipChildren === "function" ? regionNoClipChildren(region, index) : regionNoClipChildren}
+
+                            {region.highlighted && region.cells?.map(({top, left}) => <rect
                                 key={`cell-${top}-${left}`}
                                 x={left}
                                 y={top}
@@ -56,7 +60,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                                 strokeWidth={0.2}
                             />)}
                         </AutoSvg>
-                    </FieldRect>}
+                    </FieldRect>
 
                     <FieldRect
                         context={context}
@@ -80,6 +84,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
             top={0}
             left={0}
         >
+            {typeof regionNoClipChildren === "function" ? regionNoClipChildren() : regionNoClipChildren}
             {typeof children === "function" ? children() : children}
         </FieldRect>}
     </>;

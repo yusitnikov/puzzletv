@@ -3,6 +3,11 @@ import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
+import {JssCell} from "./JssCell";
+import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
+import {resolveCellColorValue} from "../../../types/sudoku/CellColor";
+import {JssConstraint} from "../constraints/Jss";
+import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
 
 const getRegionCells = <T extends AnyPTM>(region: Position[] | Constraint<T, any>) =>
     Array.isArray(region) ? region : region.cells;
@@ -31,6 +36,48 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
                         ...getRegionCells(inactiveRegion),
                     ],
                 };
+            }
+
+            puzzle.initialColors = puzzle.initialColors ?? {};
+            if (typeof puzzle.initialColors !== "object") {
+                throw new Error(`puzzle.initialColors is expected to be an object for ${JssSudokuTypeManager.name}`);
+            }
+            // Treat background colors as JSS clues
+            let jssCellsMap: GivenDigitsMap<JssCell> = processGivenDigitsMaps(
+                ([[color]], position): JssCell | undefined =>
+                    color
+                        ? {
+                            ...position,
+                            backgroundColor: resolveCellColorValue(color)
+                        }
+                        : undefined,
+                [puzzle.initialColors]
+            );
+            puzzle.initialColors = undefined;
+
+            puzzle.items = puzzle.items ?? [];
+            if (!Array.isArray(puzzle.items)) {
+                throw new Error(`puzzle.items is expected to be an array for ${JssSudokuTypeManager.name}`);
+            }
+            const isJssTextClue = (constraint: Constraint<T, any>): constraint is Constraint<T, TextProps> => {
+                const {tags = [], cells: {length, 0: cell}} = constraint;
+                return tags.includes(textTag) && length === 1 && cell.top % 1 === 0 && cell.left % 1 === 0;
+            };
+            for (const constraint of puzzle.items) {
+                if (isJssTextClue(constraint)) {
+                    const {cells: [{top, left}], props: {text, size}, color} = constraint;
+                    jssCellsMap[top] = jssCellsMap[top] ?? {};
+                    jssCellsMap[top][left] = jssCellsMap[top][left] ?? {top, left};
+                    jssCellsMap[top][left].text = text;
+                    jssCellsMap[top][left].textColor = color;
+                    jssCellsMap[top][left].textSize = size;
+                }
+            }
+            puzzle.items = puzzle.items.filter((constraint) => !isJssTextClue(constraint));
+
+            const jssCells = Object.values(jssCellsMap).flatMap((rowMap) => Object.values(rowMap));
+            if (jssCells.length) {
+                puzzle.items = [...puzzle.items, JssConstraint(jssCells)];
             }
 
             return baseTypeManager.postProcessPuzzle?.(puzzle) ?? puzzle;

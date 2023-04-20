@@ -6,4 +6,5 @@ export enum FieldLayer {
     givenUserLines,
     newUserLines,
     top,
+    noClip,
 }
