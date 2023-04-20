@@ -3,6 +3,7 @@ import {JigsawGameState, JigsawJssCluesVisibility, JigsawProcessedGameState} fro
 import {JigsawDigit} from "./JigsawDigit";
 import {
     arrayContainsPosition,
+    getLineVector,
     isSamePosition,
     Position,
     PositionWithAngle,
@@ -35,7 +36,6 @@ import {JigsawFieldState} from "./JigsawFieldState";
 import {createEmptyFieldState} from "../../../types/sudoku/FieldState";
 import {getReverseIndexMap} from "../../../utils/array";
 import {createRandomGenerator} from "../../../utils/random";
-import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {Constraint} from "../../../types/sudoku/Constraint";
@@ -296,49 +296,75 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         return {pieces};
     },
 
-    processArrowDirection(currentCell, xDirection, yDirection, context, ...args): { cell?: Position; state?: PartialGameStateEx<JigsawPTM> } {
-        const {cellsIndex, puzzle, state} = context;
+    processArrowDirection(
+        currentCell, xDirection, yDirection, context, ...args
+    ): { cell?: Position; state?: PartialGameStateEx<JigsawPTM> } {
+        const {puzzle: {typeManager: {getRegionsWithSameCoordsTransformation}}} = context;
 
-        const regionIndex = getJigsawPieceIndexByCell(cellsIndex, currentCell);
-        if (regionIndex === undefined) {
+        const regions = getRegionsWithSameCoordsTransformation!(context)
+            .filter(({noInteraction}) => !noInteraction)
+            .sort((a, b) => (a.zIndex ?? -1) - (b.zIndex ?? -1));
+        const currentRegion = regions.find(({cells}) => cells && arrayContainsPosition(cells, currentCell));
+        if (!currentRegion) {
             return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, ...args);
         }
 
-        const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
-        const angle = loop(roundToStep(pieces[regionIndex].angle, 90), 360);
-        const {cells} = getJigsawPiecesWithCache(cellsIndex).pieces[regionIndex];
+        const transformCellCoords = (region: GridRegion, {top, left}: Position) => {
+            const center: Position = {top: top + 0.5, left: left + 0.5};
+            return region.transformCoords?.(center) ?? center;
+        };
+        const currentTransformedCell = transformCellCoords(currentRegion, currentCell);
 
-        if (angle >= 180) {
-            xDirection = -xDirection;
-            yDirection = -yDirection;
-        }
-        if (angle % 180 === 90) {
-            const tmpXDirection = xDirection;
-            xDirection = yDirection;
-            yDirection = -tmpXDirection;
+        const regionCells = regions.flatMap((region) => region.cells?.map((cell) => ({
+            cell,
+            vector: getLineVector({
+                start: currentTransformedCell,
+                end: transformCellCoords(region, cell)
+            }),
+        })) ?? []);
+
+        // Index all cells by how many arrow moves it will take to get to them
+        const regionCellsIndex: Record<number, Position> = {};
+        const round = (value: number) => roundToStep(value, 0.1);
+        for (const {cell, vector: {left: dx, top: dy}} of regionCells) {
+            const x = xDirection === 0 ? 0 : round(dx / xDirection);
+            const y = yDirection === 0 ? 0 : round(dy / yDirection);
+            let position: number;
+            if (xDirection === 0) {
+                if (round(dx) !== 0) {
+                    continue;
+                }
+                position = y;
+            } else if (yDirection === 0) {
+                if (round(dy) !== 0) {
+                    continue;
+                }
+                position = x;
+            } else {
+                if (x !== y) {
+                    continue;
+                }
+                position = x;
+            }
+
+            if (position % 1 === 0) {
+                // It's intentional to overwrite previous cells with the same position - the biggest zIndex will win
+                regionCellsIndex[position] = cell;
+            }
         }
 
-        return defaultProcessArrowDirection(
-            currentCell,
-            xDirection,
-            yDirection,
-            // Substitute the context with a hacked type manager to treat only the cells of the active region as selectable
-            {
-                ...context,
-                puzzle: {
-                    ...puzzle,
-                    typeManager: {
-                        ...puzzle.typeManager,
-                        getCellTypeProps(cell): CellTypeProps<JigsawPTM> {
-                            return {
-                                isSelectable: arrayContainsPosition(cells, cell),
-                            };
-                        },
-                    },
-                },
-            },
-            ...args
-        );
+        // If the next cell according to the arrow direction belongs to any region, then return it
+        if (regionCellsIndex[1]) {
+            return {cell: regionCellsIndex[1]};
+        }
+
+        // Otherwise, go in the opposite direction while it's possible
+        let newPosition = 0;
+        while (regionCellsIndex[newPosition - 1]) {
+            newPosition -= 1;
+        }
+
+        return {cell: regionCellsIndex[newPosition]};
     },
 
     transformCoords: transformCoordsByRegions,
@@ -451,5 +477,6 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
 
         return puzzle;
     },
+
     // TODO: support shared games
 });
