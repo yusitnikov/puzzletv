@@ -1,5 +1,5 @@
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {JigsawGameState, JigsawProcessedGameState} from "./JigsawGameState";
+import {JigsawGameState, JigsawJssCluesVisibility, JigsawProcessedGameState} from "./JigsawGameState";
 import {JigsawDigit} from "./JigsawDigit";
 import {
     arrayContainsPosition,
@@ -38,6 +38,11 @@ import {createRandomGenerator} from "../../../utils/random";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
+import {Constraint} from "../../../types/sudoku/Constraint";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {jssTag} from "../../jss/constraints/Jss";
+import {FieldLayer} from "../../../types/sudoku/FieldLayer";
+import {JigsawJss} from "../constraints/JigsawJss";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit<PuzzleImportOptions, "load">): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -70,12 +75,12 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         return {digit, angle};
     },
 
-    serializeGameState({pieces, highlightCurrentPiece}): any {
-        return {pieces, highlightCurrentPiece};
+    serializeGameState({pieces, highlightCurrentPiece, jssCluesVisibility}): any {
+        return {pieces, highlightCurrentPiece, jssCluesVisibility};
     },
 
-    unserializeGameState({pieces, highlightCurrentPiece = false}): Partial<JigsawGameState> {
-        return {pieces, highlightCurrentPiece};
+    unserializeGameState({pieces, highlightCurrentPiece = false, jssCluesVisibility = JigsawJssCluesVisibility.All}): Partial<JigsawGameState> {
+        return {pieces, highlightCurrentPiece, jssCluesVisibility};
     },
 
     createCellDataByDisplayDigit(digit): JigsawDigit {
@@ -213,6 +218,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
                 };
             }),
             highlightCurrentPiece: false,
+            jssCluesVisibility: JigsawJssCluesVisibility.All,
         };
     },
     initialFieldStateExtension: (puzzle) => {
@@ -431,5 +437,19 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
     gridBackgroundColor: lightGreyColor,
     regionBackgroundColor: "#fff",
 
+    postProcessPuzzle({items, ...puzzle}): PuzzleDefinition<JigsawPTM> {
+        const processJss = (items: Constraint<JigsawPTM, any>[]) => items.map(
+            (constraint) => constraint.tags?.includes(jssTag)
+                ? {...constraint, component: {[FieldLayer.noClip]: JigsawJss}}
+                : constraint
+        );
+
+        switch (typeof items) {
+            case "function": return {...puzzle, items: (...args) => processJss(items(...args))};
+            case "object": return {...puzzle, items: processJss(items)};
+        }
+
+        return puzzle;
+    },
     // TODO: support shared games
 });

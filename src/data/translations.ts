@@ -33,6 +33,9 @@ export const translationsExactType = {
     "Yes": {
         [LanguageCode.ru]: "Да",
     },
+    "No": {
+        [LanguageCode.ru]: "Нет",
+    },
     "Cancel": {
         [LanguageCode.ru]: "Отмена",
     },

@@ -8,7 +8,7 @@ import {SingleCellFieldItemPositionFix} from "../../../components/sudoku/field/S
 import {CenteredText} from "../../../components/svg/centered-text/CenteredText";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 
-const jssTag = "jss";
+export const jssTag = "jss";
 
 export interface JssProps {
     cells: JssCell[];
