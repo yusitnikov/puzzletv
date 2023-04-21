@@ -48,7 +48,7 @@ const JigsawPieceHighlightHandler = (
     const selectedRegionIndexes = usePureMemo(selectedCell && getJigsawPieceIndexesByCell(cellsIndex, piecePositions, selectedCell));
     useEffect(() => {
         if (selectedRegionIndexes?.length) {
-            onStateChangeRef.current(jigsawPieceBringOnTopAction(puzzle, getNextActionId(), selectedRegionIndexes, false));
+            onStateChangeRef.current(jigsawPieceBringOnTopAction(puzzle, selectedRegionIndexes, false));
         }
     }, [puzzle, selectedRegionIndexes, onStateChangeRef]);
 
@@ -72,7 +72,7 @@ const JigsawPieceHighlightHandler = (
                 );
                 // TODO: scroll the active piece into view
                 onStateChange([
-                    jigsawPieceBringOnTopAction(puzzle, getNextActionId(), newActivePieces.indexes),
+                    jigsawPieceBringOnTopAction(puzzle, newActivePieces.indexes),
                     selectedCells.size !== 0
                         ? {
                             // TODO: select the top-left-most cell according to the current angle

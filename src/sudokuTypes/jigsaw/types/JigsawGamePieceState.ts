@@ -87,13 +87,12 @@ export const jigsawPieceStateChangeAction = (
 
 export const jigsawPieceBringOnTopAction = (
     puzzle: PuzzleDefinition<JigsawPTM>,
-    actionId: string,
     pieceIndexes: number[],
     resetSelectedCells = true
 ) => jigsawPieceStateChangeAction(
     puzzle,
     myClientId,
-    actionId,
+    "jigsaw-bring-on-top",
     pieceIndexes,
     ({allPositions}) => ({
         position: {

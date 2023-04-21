@@ -48,7 +48,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         }
 
         // Bring the clicked piece to the top
-        onStateChange(jigsawPieceBringOnTopAction(puzzle, `gesture-${gesture.id}`, piecesGroup.indexes));
+        onStateChange(jigsawPieceBringOnTopAction(puzzle, piecesGroup.indexes));
     },
     onOutsideClick({onStateChange}) {
         onStateChange({extension: {highlightCurrentPiece: false}});
