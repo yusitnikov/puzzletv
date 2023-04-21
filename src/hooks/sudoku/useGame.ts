@@ -219,7 +219,7 @@ export const useGame = <T extends AnyPTM>(
         [readOnly, puzzle, gameState]
     );
 
-    const processedGameStateExtension = useProcessedGameStateExtension(gameState);
+    const processedGameStateExtension = useProcessedGameStateExtension(gameState, cellsIndex);
 
     const animated = useAnimatedValue<ProcessedGameStateAnimatedValues>(
         {

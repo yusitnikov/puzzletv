@@ -16,7 +16,7 @@ export const controlButtonOptions = {
         return propName !== "isActive" && propName !== "opacityOnHover";
     }
 } as const;
-export const controlButtonStyles = ({isActive, opacityOnHover}: {isActive?: boolean, opacityOnHover?: boolean}): any => [
+export const controlButtonStyles = ({isActive, opacityOnHover, disabled}: {isActive?: boolean, opacityOnHover?: boolean, disabled?: boolean}): any => [
     {
         textAlign: "center",
         border: 0,
@@ -24,14 +24,15 @@ export const controlButtonStyles = ({isActive, opacityOnHover}: {isActive?: bool
         margin: 0,
         fontSize: "inherit",
         lineHeight: "inherit",
-        cursor: "pointer",
+        cursor: disabled ? "default" : "pointer",
         color: textColor,
         backgroundColor: isActive ? lightGreyColor : "white",
         [EmotionIconBase.toString()]: {
             verticalAlign: "top",
         },
     },
-    !isTouchDevice && {
+    disabled && {opacity: 0.5},
+    !isTouchDevice && !disabled && {
         "&:hover": {
             backgroundColor: lightGreyColor,
             opacity: opacityOnHover ? 0.8 : 1,

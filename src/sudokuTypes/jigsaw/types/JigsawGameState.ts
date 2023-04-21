@@ -1,5 +1,5 @@
-import {JigsawPieceState} from "./JigsawPieceState";
-import {JigsawFieldState} from "./JigsawFieldState";
+import {JigsawGamePieceState} from "./JigsawGamePieceState";
+import {PositionWithAngle} from "../../../types/layout/Position";
 
 export enum JigsawJssCluesVisibility {
     All,
@@ -8,9 +8,11 @@ export enum JigsawJssCluesVisibility {
 }
 
 export interface JigsawGameState {
-    pieces: JigsawPieceState[];
+    pieces: JigsawGamePieceState[];
     highlightCurrentPiece: boolean;
     jssCluesVisibility: JigsawJssCluesVisibility;
 }
 
-export type JigsawProcessedGameState = JigsawFieldState;
+export interface JigsawProcessedGameState {
+    pieces: PositionWithAngle[];
+}

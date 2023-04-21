@@ -16,9 +16,11 @@ import {getRectCenter} from "../../../types/layout/Rect";
 import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {
-    getActiveJigsawPieceIndex,
+    getActiveJigsawPieceZIndex,
+    getJigsawCellCenterAbsolutePosition,
     getJigsawPieceIndexByCell,
-    getJigsawPiecesWithCache,
+    getJigsawPieceRegion,
+    getJigsawPiecesWithCache, groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture,
     normalizeJigsawDigit,
     sortJigsawPiecesByPosition
 } from "./helpers";
@@ -31,8 +33,7 @@ import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType"
 import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
 import {gameStateGetCurrentFieldState, PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
-import {JigsawFieldState} from "./JigsawFieldState";
-import {createEmptyFieldState} from "../../../types/sudoku/FieldState";
+import {JigsawFieldPieceState, JigsawFieldState} from "./JigsawFieldState";
 import {getReverseIndexMap} from "../../../utils/array";
 import {createRandomGenerator} from "../../../utils/random";
 import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
@@ -42,6 +43,11 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {jssTag} from "../../jss/constraints/Jss";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {JigsawJss} from "../constraints/JigsawJss";
+import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
+import {JigsawGluePiecesButton} from "../components/JigsawGluePiecesButton";
+import {useMemo} from "react";
+import {emptyGestureMetrics} from "../../../utils/gestures";
+import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit<PuzzleImportOptions, "load">): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -206,16 +212,9 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
 
     initialGameStateExtension: (puzzle) => {
         const {pieces} = getJigsawPiecesWithCache(new SudokuCellsIndex(puzzle));
-        const {extension: {pieces: piecePositions}} = createEmptyFieldState(puzzle);
-        const pieceSortIndexesByPosition = getReverseIndexMap(sortJigsawPiecesByPosition(pieces, piecePositions));
 
         return {
-            pieces: pieceSortIndexesByPosition.map((index) => {
-                return {
-                    zIndex: pieces.length - index,
-                    animating: false,
-                };
-            }),
+            pieces: pieces.map(() => ({animating: false})),
             highlightCurrentPiece: false,
             jssCluesVisibility: JigsawJssCluesVisibility.All,
         };
@@ -228,21 +227,30 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         const randomizer = createRandomGenerator(0);
         const centerTop = puzzle.fieldSize.rowsCount / 2;
         const centerLeft = puzzle.fieldSize.columnsCount / 2;
+        const {pieces} = getJigsawPiecesWithCache(new SudokuCellsIndex(puzzle));
+
+        const piecePositions = pieces.map(({boundingRect}): PositionWithAngle => {
+            const {top, left} = getRectCenter(boundingRect);
+
+            return {
+                top: shuffle
+                    ? centerTop - top + (centerTop / initialScale - boundingRect.height / 2) * (randomizer() * 2 - 1)
+                    : 0,
+                left: shuffle
+                    ? centerLeft - left + (centerLeft / initialScale - boundingRect.width / 2) * (randomizer() * 2 - 1)
+                    : 0,
+                angle: shuffle && angleStep
+                    ? roundToStep(randomizer() * 360, angleStep)
+                    : 0,
+            };
+        });
+        const pieceSortIndexesByPosition = getReverseIndexMap(sortJigsawPiecesByPosition(pieces, piecePositions));
 
         return {
-            pieces: getJigsawPiecesWithCache(new SudokuCellsIndex(puzzle)).pieces.map(({boundingRect}) => {
-                const {top, left} = getRectCenter(boundingRect);
-
+            pieces: piecePositions.map((position, index) => {
                 return {
-                    top: shuffle
-                        ? centerTop - top + (centerTop / initialScale - boundingRect.height / 2) * (randomizer() * 2 - 1)
-                        : 0,
-                    left: shuffle
-                        ? centerLeft - left + (centerLeft / initialScale - boundingRect.width / 2) * (randomizer() * 2 - 1)
-                        : 0,
-                    angle: shuffle && angleStep
-                        ? roundToStep(randomizer() * 360, angleStep)
-                        : 0,
+                    ...position,
+                    zIndex: pieces.length - pieceSortIndexesByPosition[index],
                 };
             }),
         };
@@ -251,13 +259,24 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
     areFieldStateExtensionsEqual(a, b): boolean {
         return a.pieces.every((pieceA, index) => {
             const pieceB = b.pieces[index];
-            return isSamePosition(pieceA, pieceB) && pieceA.angle === pieceB.angle;
+            return isSamePosition(pieceA, pieceB) && pieceA.angle === pieceB.angle && pieceA.zIndex === pieceB.zIndex;
         })
     },
 
     cloneFieldStateExtension({pieces}): JigsawFieldState {
         return {
             pieces: pieces.map((position) => ({...position})),
+        };
+    },
+
+    unserializeFieldStateExtension({pieces}: any): Partial<JigsawFieldState> {
+        return {
+            pieces: pieces?.map(({top, left, angle, zIndex}: any, index: number): JigsawFieldPieceState => ({
+                top,
+                left,
+                angle,
+                zIndex: zIndex ?? pieces.length - index,
+            })),
         };
     },
 
@@ -268,22 +287,50 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
     // initial scale to contain the shuffled pieces
     initialScale: shuffle ? 0.7 : 1,
 
-    useProcessedGameStateExtension(state): JigsawProcessedGameState {
+    useProcessedGameStateExtension(state, cellsIndex): JigsawProcessedGameState {
+        const {pieces} = getJigsawPiecesWithCache(cellsIndex);
         const {animationSpeed, extension: {pieces: pieceAnimations}} = state;
         const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
+        const groups = useMemo(
+            () => groupJigsawPiecesByZIndex(pieces, piecePositions),
+            [pieces, piecePositions]
+        );
 
         return {
-            pieces: useAnimatedValue(
+            pieces: useAnimatedValue<PositionWithAngle[]>(
                 piecePositions,
-                animationSpeed,
+                animationSpeed / 2,
                 (as, bs, coeff) => as.map((a, index) => {
                     const b = bs[index];
                     const c = pieceAnimations[index].animating ? coeff : 1;
-                    return {
-                        top: mixAnimatedValue(a.top, b.top, c * 2),
-                        left: mixAnimatedValue(a.left, b.left, c * 2),
-                        angle: mixAnimatedValue(a.angle, b.angle, c),
-                    };
+                    const group = groups.find(({indexes}) => indexes.includes(index))!;
+                    const piece = pieces[index];
+
+                    const angleDiff = b.angle - a.angle;
+                    const {top: topDiff, left: leftDiff} = getLineVector({
+                        start: b,
+                        end: moveJigsawPieceByGroupGesture(
+                            group,
+                            {
+                                ...emptyGestureMetrics,
+                                rotation: angleDiff,
+                            },
+                            piece,
+                            a
+                        ),
+                    });
+
+                    return moveJigsawPieceByGroupGesture(
+                        group,
+                        {
+                            x: mixAnimatedValue(0, -leftDiff, c),
+                            y: mixAnimatedValue(0, -topDiff, c),
+                            rotation: mixAnimatedValue(0, angleDiff, c),
+                            scale: 1,
+                        },
+                        piece,
+                        a
+                    );
                 })
             ),
         };
@@ -307,17 +354,13 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
             return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, ...args);
         }
 
-        const transformCellCoords = (region: GridRegion, {top, left}: Position) => {
-            const center: Position = {top: top + 0.5, left: left + 0.5};
-            return region.transformCoords?.(center) ?? center;
-        };
-        const currentTransformedCell = transformCellCoords(currentRegion, currentCell);
+        const currentCellCenter = getJigsawCellCenterAbsolutePosition(currentRegion, currentCell);
 
         const regionCells = regions.flatMap((region) => region.cells?.map((cell) => ({
             cell,
             vector: getLineVector({
-                start: currentTransformedCell,
-                end: transformCellCoords(region, cell)
+                start: currentCellCenter,
+                end: getJigsawCellCenterAbsolutePosition(region, cell)
             }),
         })) ?? []);
 
@@ -375,7 +418,8 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
                 importOptions: {stickyRegion} = {},
             },
             state: {
-                extension: {pieces: pieceIndexes, highlightCurrentPiece},
+                fieldStateHistory,
+                extension: {highlightCurrentPiece},
                 processedExtension: {pieces: animatedPieces},
             },
         },
@@ -393,25 +437,16 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         }
 
         const {pieces, otherCells} = getJigsawPiecesWithCache(cellsIndex);
-        const activePieceIndex = getActiveJigsawPieceIndex(pieceIndexes);
+        const {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
+        const activePieceZIndex = getActiveJigsawPieceZIndex(piecePositions);
 
-        const regions: GridRegion[] = pieces.map(({cells, boundingRect}, index) => {
-            const {zIndex} = pieceIndexes[index];
-            const {top, left, angle} = animatedPieces[index];
-            const center = getRectCenter(boundingRect);
+        const regions: GridRegion[] = pieces.map((piece, index) => {
+            const {zIndex} = piecePositions[index];
+
             return {
-                ...boundingRect,
+                ...getJigsawPieceRegion(piece, animatedPieces[index]),
                 zIndex,
-                cells: cells.length ? cells : undefined,
-                transformCoords: (position) => {
-                    const rotated = rotateVectorClockwise(position, angle, center);
-
-                    return {
-                        top: rotated.top + top,
-                        left: rotated.left + left,
-                    };
-                },
-                highlighted: highlightCurrentPiece && index === activePieceIndex,
+                highlighted: highlightCurrentPiece && zIndex === activePieceZIndex,
             };
         });
 
@@ -451,6 +486,11 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
     controlButtons: [
         ZoomInButtonItem(),
         ZoomOutButtonItem(),
+        {
+            key: "glue-jigsaw-pieces",
+            region: ControlButtonRegion.custom,
+            Component: JigsawGluePiecesButton,
+        },
         JigsawPieceHighlightHandlerControlButtonItem,
     ],
 

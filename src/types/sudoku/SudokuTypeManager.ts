@@ -22,6 +22,7 @@ import {regionTag} from "../../components/sudoku/constraints/region/Region";
 import {ControlButtonItem} from "../../components/sudoku/controls/ControlButtonsManager";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
+import {SudokuCellsIndex} from "./SudokuCellsIndex";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -150,7 +151,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     isReady?(state: GameStateEx<T>): boolean;
 
-    useProcessedGameStateExtension?(state: GameStateEx<T>): T["processedStateEx"];
+    useProcessedGameStateExtension?(state: GameStateEx<T>, cellsIndex: SudokuCellsIndex<T>): T["processedStateEx"];
 
     // Fallback for useProcessedGameStateExtension() when calling outside a React component
     getProcessedGameStateExtension?(state: GameStateEx<T>): T["processedStateEx"];

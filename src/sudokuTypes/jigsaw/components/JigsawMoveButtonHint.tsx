@@ -19,50 +19,52 @@ export const JigsawMoveButtonHint = ({context}: ControlButtonItemProps<JigsawPTM
 
     const translate = useTranslate();
 
+    if (cellWriteMode !== CellWriteMode.move) {
+        return null;
+    }
+
     const paragraphStyles = {marginBottom: "0.5em"};
 
     const isJss = getAllPuzzleConstraints(context).some(({tags}) => tags?.includes(jssTag));
 
-    return <>
-        {cellWriteMode === CellWriteMode.move && <Absolute
-            left={0}
-            top={0}
-            width={cellSize * (3 + 2 * controlButtonPaddingCoeff)}
-            style={{fontSize: cellSize * 0.25}}
-        >
-            <div style={paragraphStyles}>
-                {translate({
-                    [LanguageCode.en]: "Drag the jigsaw piece to move it" + (angleStep ? ", click it to rotate" : ""),
-                    [LanguageCode.ru]: "Перетащите кусок пазла, чтобы двигать его" + (angleStep ? ". Щелкните по нему, чтобы повернуть" : ""),
-                })}.
-            </div>
-            <div style={paragraphStyles}>
-                {translate({
-                    [LanguageCode.en]: "Drag the grid to move it, use +/- buttons to zoom",
-                    [LanguageCode.ru]: "Перетащите поле, чтобы двигать его. Используйте кнопки +/- для увеличения/отдаления поля",
-                })}.
-            </div>
+    return <Absolute
+        left={0}
+        top={0}
+        width={cellSize * (3 + 2 * controlButtonPaddingCoeff)}
+        style={{fontSize: cellSize * 0.25}}
+    >
+        <div style={paragraphStyles}>
+            {translate({
+                [LanguageCode.en]: "Drag the jigsaw piece to move it" + (angleStep ? ", click it to rotate" : ""),
+                [LanguageCode.ru]: "Перетащите кусок пазла, чтобы двигать его" + (angleStep ? ". Щелкните по нему, чтобы повернуть" : ""),
+            })}.
+        </div>
+        <div style={paragraphStyles}>
+            {translate({
+                [LanguageCode.en]: "Drag the grid to move it, use +/- buttons to zoom",
+                [LanguageCode.ru]: "Перетащите поле, чтобы двигать его. Используйте кнопки +/- для увеличения/отдаления поля",
+            })}.
+        </div>
 
-            {isJss && <div style={paragraphStyles}>
-                <label>
-                    {translate({
-                        [LanguageCode.en]: "Show Japanese sums clues",
-                        [LanguageCode.ru]: "Показывать японские суммы",
-                    })}:<br/>
-                    <select
-                        value={jssCluesVisibility}
-                        onChange={(ev) => onStateChange({extension: {jssCluesVisibility: Number(ev.target.value)}})}
-                        style={{pointerEvents: "all", maxWidth: "100%"}}
-                    >
-                        <option value={JigsawJssCluesVisibility.All}>{translate("Yes")}</option>
-                        <option value={JigsawJssCluesVisibility.ForActiveRegion}>{translate({
-                            [LanguageCode.en]: "For active jigsaw piece",
-                            [LanguageCode.ru]: "Для активного куска пазла",
-                        })}</option>
-                        <option value={JigsawJssCluesVisibility.None}>{translate("No")}</option>
-                    </select>
-                </label>
-            </div>}
-        </Absolute>}
-    </>;
+        {isJss && <div style={paragraphStyles}>
+            <label>
+                {translate({
+                    [LanguageCode.en]: "Show Japanese sums clues",
+                    [LanguageCode.ru]: "Показывать японские суммы",
+                })}:<br/>
+                <select
+                    value={jssCluesVisibility}
+                    onChange={(ev) => onStateChange({extension: {jssCluesVisibility: Number(ev.target.value)}})}
+                    style={{pointerEvents: "all", maxWidth: "100%", fontSize: "inherit"}}
+                >
+                    <option value={JigsawJssCluesVisibility.All}>{translate("Yes")}</option>
+                    <option value={JigsawJssCluesVisibility.ForActiveRegion}>{translate({
+                        [LanguageCode.en]: "For active jigsaw piece",
+                        [LanguageCode.ru]: "Для активного куска пазла",
+                    })}</option>
+                    <option value={JigsawJssCluesVisibility.None}>{translate("No")}</option>
+                </select>
+            </label>
+        </div>}
+    </Absolute>;
 };

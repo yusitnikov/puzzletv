@@ -1,9 +1,10 @@
-import React, {Fragment, ReactNode} from "react";
+import React, {ReactNode} from "react";
 import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {regionHighlightColor} from "../../app/globals";
 
 interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -24,20 +25,27 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
         },
     } = context;
 
-    const regionsWithSameCoordsTransformation = getRegionsWithSameCoordsTransformation?.(context);
+    const regions = getRegionsWithSameCoordsTransformation?.(context);
+    const regionsByZIndex: Record<number, {region: GridRegion, index: number}[]> = {};
+    for (const [index, region] of (regions ?? []).entries()) {
+        const {zIndex = -1} = region;
+        regionsByZIndex[zIndex] = regionsByZIndex[zIndex] ?? [];
+        regionsByZIndex[zIndex].push({region, index});
+    }
 
     return <>
         {
-            (regionsWithSameCoordsTransformation ?? [])
-                .map((region, index) => ({region, index}))
+            Object.entries(regionsByZIndex)
+                .map(([zIndexStr, regions]) => ({regions, zIndex: Number(zIndexStr)}))
                 .sort(
                     (
-                        {region: {zIndex = -1}, index},
-                        {region: {zIndex: zIndex2 = -1}, index: index2}
-                    ) => (zIndex - zIndex2) || (index - index2)
+                        {zIndex},
+                        {zIndex: zIndex2}
+                    ) => zIndex - zIndex2
                 )
-                .map(({region, index}) => <Fragment key={`items-region-${index}`}>
-                    <FieldRect
+                .flatMap(({zIndex, regions}) => [
+                    ...regions.map(({region, index}) => <FieldRect
+                        key={`region-no-clip-${index}`}
                         context={context}
                         {...region}
                     >
@@ -48,21 +56,33 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                             height={1}
                         >
                             {typeof regionNoClipChildren === "function" ? regionNoClipChildren(region, index) : regionNoClipChildren}
-
-                            {region.highlighted && region.cells?.map(({top, left}) => <rect
+                        </AutoSvg>
+                    </FieldRect>),
+                    ...regions.map(({region, index}) => region.highlighted && <FieldRect
+                        key={`region-highlight-${index}`}
+                        context={context}
+                        {...region}
+                    >
+                        <AutoSvg
+                            left={-region.left}
+                            top={-region.top}
+                            width={1}
+                            height={1}
+                        >
+                            {region.cells?.map(({top, left}) => <rect
                                 key={`cell-${top}-${left}`}
                                 x={left}
                                 y={top}
                                 width={1}
                                 height={1}
                                 fill={"none"}
-                                stroke={"#fe4"}
+                                stroke={regionHighlightColor}
                                 strokeWidth={0.2}
                             />)}
                         </AutoSvg>
-                    </FieldRect>
-
-                    <FieldRect
+                    </FieldRect>),
+                    ...regions.map(({region, index}) => <FieldRect
+                        key={`region-clip-${index}`}
                         context={context}
                         clip={!region.noClip}
                         {...region}
@@ -75,11 +95,11 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                         >
                             {typeof children === "function" ? children(region, index) : children}
                         </AutoSvg>
-                    </FieldRect>
-                </Fragment>)
+                    </FieldRect>),
+                ])
         }
 
-        {!regionsWithSameCoordsTransformation && <FieldRect
+        {!regions && <FieldRect
             context={context}
             top={0}
             left={0}

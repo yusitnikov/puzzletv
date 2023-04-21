@@ -30,4 +30,6 @@ export const otherPlayerColor = purpleColor;
 
 export const userDigitColor = "#00f";
 
+export const regionHighlightColor = "#fe4";
+
 export const getRegionBorderWidth = (cellSize: number) => Math.min(5 / cellSize, 0.05);

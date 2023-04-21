@@ -1,9 +1,14 @@
 import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
 import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
-import {getJigsawPieceIndexByCell, getJigsawPiecesWithCache} from "./helpers";
-import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "./JigsawPieceState";
-import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
-import {applyMetricsDiff, GestureFinishReason, GestureInfo, GestureMetrics} from "../../../utils/gestures";
+import {getJigsawPiecesWithCache, groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture} from "./helpers";
+import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "./JigsawGamePieceState";
+import {
+    applyMetricsDiff,
+    emptyGestureMetrics,
+    GestureFinishReason,
+    GestureInfo,
+    GestureMetrics
+} from "../../../utils/gestures";
 import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
 import {getRectCenter} from "../../../types/layout/Rect";
 import {JigsawPTM} from "./JigsawPTM";
@@ -11,6 +16,9 @@ import {roundToStep} from "../../../utils/math";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {JigsawMoveButtonHint} from "../components/JigsawMoveButtonHint";
+import {arrayContainsPosition, Position} from "../../../types/layout/Position";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 
 export const roundStep = 0.5;
 
@@ -29,19 +37,18 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     disableCellHandlers: false,
     handlesRightMouseClick: true,
     onGestureStart(props, context, ...args) {
-        const {gesture: {id}, extraData} = props;
-        const {puzzle, cellsIndex, onStateChange} = context;
+        const {gesture} = props;
+        const {puzzle, onStateChange} = context;
 
-        const cellPosition = isCellGestureExtraData(extraData) ? extraData.cell : undefined;
-        const pieceIndex = cellPosition && getJigsawPieceIndexByCell(cellsIndex, cellPosition);
-        if (pieceIndex === undefined) {
+        const piecesGroup = getJigsawPiecesByGesture(context, gesture);
+        if (!piecesGroup) {
             onStateChange({extension: {highlightCurrentPiece: false}});
             base.onGestureStart?.(props, context, ...args);
             return;
         }
 
         // Bring the clicked piece to the top
-        onStateChange(jigsawPieceBringOnTopAction(puzzle, `gesture-${id}`, pieceIndex));
+        onStateChange(jigsawPieceBringOnTopAction(puzzle, `gesture-${gesture.id}`, piecesGroup.indexes));
     },
     onOutsideClick({onStateChange}) {
         onStateChange({extension: {highlightCurrentPiece: false}});
@@ -49,8 +56,8 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     onMove(props, context, fieldRect) {
         const {gesture, prevMetrics, currentMetrics} = props;
         const {
-            puzzle,
             cellsIndex,
+            puzzle,
             cellSize,
             state: {
                 loopOffset,
@@ -63,46 +70,36 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
             importOptions: {angleStep} = {},
         } = puzzle;
 
-        const pieceIndex = getJigsawPieceIndexByGesture(cellsIndex, gesture);
-        if (pieceIndex === undefined) {
+        const piecesGroup = getJigsawPiecesByGesture(context, gesture);
+        if (!piecesGroup) {
             base.onMove?.(props, context, fieldRect);
             return;
         }
 
-        const {boundingRect} = getJigsawPiecesWithCache(cellsIndex).pieces[pieceIndex];
-        const pieceCenter = getRectCenter(boundingRect);
+        const {center: groupCenter} = piecesGroup;
         const fieldCenter = getRectCenter(fieldRect);
+        const {pieces} = getJigsawPiecesWithCache(cellsIndex);
 
-        const screenToPiece = ({x, y, rotation}: GestureMetrics): GestureMetrics => ({
-            x: ((x - fieldCenter.left) / cellSize - loopOffset.left) / scale + fieldSize / 2 - pieceCenter.left,
-            y: ((y - fieldCenter.top) / cellSize - loopOffset.top) / scale + fieldSize / 2 - pieceCenter.top,
+        const screenToGroup = ({x, y, rotation}: GestureMetrics): GestureMetrics => ({
+            x: ((x - fieldCenter.left) / cellSize - loopOffset.left) / scale + fieldSize / 2 - groupCenter.left,
+            y: ((y - fieldCenter.top) / cellSize - loopOffset.top) / scale + fieldSize / 2 - groupCenter.top,
             rotation: angleStep ? rotation : 0,
             scale: 1,
         });
+        const groupGesture = applyMetricsDiff(
+            emptyGestureMetrics,
+            screenToGroup(prevMetrics),
+            screenToGroup(currentMetrics)
+        );
 
         onStateChange(jigsawPieceStateChangeAction(
             puzzle,
             myClientId,
             `gesture-${gesture.id}`,
-            pieceIndex,
-            ({top, left, angle}) => {
-                const {x, y, rotation} = applyMetricsDiff(
-                    {
-                        x: left,
-                        y: top,
-                        scale: 1,
-                        rotation: angle,
-                    },
-                    screenToPiece(prevMetrics),
-                    screenToPiece(currentMetrics)
-                );
-
+            piecesGroup.indexes,
+            ({position}, pieceIndex) => {
                 return {
-                    position: {
-                        top: y,
-                        left: x,
-                        angle: rotation,
-                    },
+                    position: moveJigsawPieceByGroupGesture(piecesGroup!, groupGesture, pieces[pieceIndex], position),
                     state: {animating: false},
                 };
             })
@@ -110,46 +107,57 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     },
     onGestureEnd(props, context) {
         const {gesture, reason} = props;
-        const {puzzle, cellsIndex, onStateChange} = context;
+        const {cellsIndex, puzzle, onStateChange} = context;
         const {importOptions: {angleStep = 0} = {}} = puzzle;
 
-        const pieceIndex = getJigsawPieceIndexByGesture(cellsIndex, gesture);
-        if (pieceIndex === undefined) {
+        const piecesGroup = getJigsawPiecesByGesture(context, gesture);
+        if (!piecesGroup) {
             base.onGestureEnd?.(props, context);
             return;
         }
 
         const {id, isClick, pointers: [{start: {event: {button: isRightButton}}}]} = gesture;
+        const {pieces} = getJigsawPiecesWithCache(cellsIndex);
+
+        const groupGesture: GestureMetrics = {
+            x: roundToStep(piecesGroup.center.left, roundStep) - piecesGroup.center.left,
+            y: roundToStep(piecesGroup.center.top, roundStep) - piecesGroup.center.top,
+            rotation: roundToStep(piecesGroup.pieces[0].position.angle, angleStep) - piecesGroup.pieces[0].position.angle
+                + angleStep * (!isClick || reason !== GestureFinishReason.pointerUp ? 0 : isRightButton ? -1 : 1),
+            scale: 1,
+        };
 
         onStateChange(jigsawPieceStateChangeAction(
             puzzle,
             myClientId,
             `gesture-${id}`,
-            pieceIndex,
-            ({top, left, angle}) => ({
-                position: {
-                    top: roundToStep(top, roundStep),
-                    left: roundToStep(left, roundStep),
-                    angle: roundToStep(angle, angleStep) + angleStep * (!isClick || reason !== GestureFinishReason.pointerUp ? 0 : isRightButton ? -1 : 1),
-                },
+            piecesGroup.indexes,
+            ({position}, pieceIndex) => ({
+                position: moveJigsawPieceByGroupGesture(piecesGroup, groupGesture, pieces[pieceIndex], position),
                 state: {animating: true},
             })
         ));
     },
 };
 
-export const getJigsawPieceIndexByGesture = (
-    cellsIndex: SudokuCellsIndex<JigsawPTM>,
+const getJigsawPiecesByGesture = (
+    {cellsIndex, state}: PuzzleContext<JigsawPTM>,
     {pointers}: GestureInfo,
-): number | undefined => {
-    const indexes = pointers.map(
-        ({start: {extraData}}) => isCellGestureExtraData(extraData)
-            ? getJigsawPieceIndexByCell(cellsIndex, extraData.cell)
-            : undefined
-    );
+) => {
+    const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
 
-    // return the index if it's the same for all pointers
-    return indexes.every(index => index === indexes[0])
-        ? indexes[0]
+    const cells = pointers
+        .map(({start: {extraData}}) => isCellGestureExtraData(extraData) ? extraData.cell : undefined)
+        .filter(Boolean) as Position[];
+    if (cells.length < pointers.length) {
+        return undefined;
+    }
+
+    const groups = groupJigsawPiecesByZIndex(getJigsawPiecesWithCache(cellsIndex).pieces, piecePositions);
+    const matchingGroups = cells.map((cell) => groups.find(({cells}) => arrayContainsPosition(cells, cell)));
+
+    // return the group if it's the same for all pointers
+    return matchingGroups.every((group) => group === matchingGroups[0])
+        ? matchingGroups[0]
         : undefined;
 };
