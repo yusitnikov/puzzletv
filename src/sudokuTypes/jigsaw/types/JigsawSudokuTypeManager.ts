@@ -273,20 +273,19 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
         const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
 
         return {
-            pieces: piecePositions.map((position, index) => {
-                const {animating} = pieceAnimations[index];
-
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                return useAnimatedValue(
-                    position,
-                    animating ? animationSpeed : 0,
-                    (a, b, coeff) => ({
-                        top: mixAnimatedValue(a.top, b.top, coeff * 2),
-                        left: mixAnimatedValue(a.left, b.left, coeff * 2),
-                        angle: mixAnimatedValue(a.angle, b.angle, coeff),
-                    })
-                );
-            }),
+            pieces: useAnimatedValue(
+                piecePositions,
+                animationSpeed,
+                (as, bs, coeff) => as.map((a, index) => {
+                    const b = bs[index];
+                    const c = pieceAnimations[index].animating ? coeff : 1;
+                    return {
+                        top: mixAnimatedValue(a.top, b.top, c * 2),
+                        left: mixAnimatedValue(a.left, b.left, c * 2),
+                        angle: mixAnimatedValue(a.angle, b.angle, c),
+                    };
+                })
+            ),
         };
     },
 
