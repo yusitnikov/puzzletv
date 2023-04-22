@@ -16,13 +16,12 @@ import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {useMemo} from "react";
-import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {regionHighlightColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
 import {roundToStep} from "../../../utils/math";
+import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteModeInfo";
 
 export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawPTM>) => {
     const {
@@ -32,12 +31,11 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
         state: {
             fieldStateHistory,
             extension: {highlightCurrentPiece},
-            processed: {cellWriteMode},
         },
         onStateChange,
     } = context;
 
-    const {digitsCount = getDefaultDigitsCount(puzzle)} = puzzle;
+    const digitsCount = resolveDigitsCountInCellWriteMode(context);
 
     const translate = useTranslate();
 
@@ -148,7 +146,7 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
         }
     });
 
-    if (digitsCount > 6 && cellWriteMode !== CellWriteMode.move) {
+    if (digitsCount > 6) {
         return null;
     }
 
