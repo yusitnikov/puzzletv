@@ -26,7 +26,15 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
     digitsCount: 0,
     isValidGesture: (isCurrentCellWriteMode, {gesture: {pointers}}) =>
         isCurrentCellWriteMode || pointers.length > 1 || !isCellGestureExtraData(pointers[0].start.extraData),
-    onMove: ({prevMetrics, currentMetrics}, context, fieldRect) => {
+    onMove: (
+        {
+            gesture: {state: startContext},
+            startMetrics,
+            currentMetrics,
+        },
+        context,
+        fieldRect,
+    ) => {
         const {cellSize} = context;
         const fieldCenter = getRectCenter(fieldRect);
         const screenToField = ({x, y, rotation, scale}: GestureMetrics): GestureMetrics => ({
@@ -37,7 +45,8 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
         });
         gameStateApplyFieldDragGesture(
             context,
-            screenToField(prevMetrics),
+            startContext.state,
+            screenToField(startMetrics),
             screenToField(currentMetrics),
             false,
             false,

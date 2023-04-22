@@ -54,16 +54,16 @@ export enum GestureFinishReason {
     staleContext,
 }
 
-export interface GestureIsValidProps extends PointerState {
-    gesture: GestureInfo;
+export interface GestureIsValidProps<StateT> extends PointerState {
+    gesture: GestureInfo<StateT>;
 }
 
-export interface GestureOnStartProps extends PointerState {
-    gesture: GestureInfo;
+export interface GestureOnStartProps<StateT> extends PointerState {
+    gesture: GestureInfo<StateT>;
 }
 
-export interface GestureOnContinueProps {
-    gesture: GestureInfo;
+export interface GestureOnContinueProps<StateT> {
+    gesture: GestureInfo<StateT>;
     startMetrics: GestureMetrics;
     prevMetrics: GestureMetrics;
     currentMetrics: GestureMetrics;
@@ -71,8 +71,8 @@ export interface GestureOnContinueProps {
     currentData: PointerState;
 }
 
-export interface GestureOnEndProps {
-    gesture: GestureInfo;
+export interface GestureOnEndProps<StateT> {
+    gesture: GestureInfo<StateT>;
     reason: GestureFinishReason;
 }
 
@@ -80,12 +80,12 @@ export type GestureOnDoubleClickProps<ElemT> = PointerState<MouseEvent<ElemT>>;
 
 export type GestureOnContextMenuProps<ElemT> = PointerState<MouseEvent<ElemT>>;
 
-export interface GestureHandler {
+export interface GestureHandler<StateT> {
     contextId: string | number;
-    isValidGesture?(props: GestureIsValidProps): boolean;
-    onStart?(props: GestureOnStartProps): void;
-    onContinue?(props: GestureOnContinueProps): void;
-    onEnd?(props: GestureOnEndProps): void;
+    isValidGesture?(props: GestureIsValidProps<StateT>): boolean;
+    onStart?(props: GestureOnStartProps<StateT>): StateT | void;
+    onContinue?(props: GestureOnContinueProps<StateT>): void;
+    onEnd?(props: GestureOnEndProps<StateT>): void;
     onDoubleClick?(props: GestureOnDoubleClickProps<any>): boolean;
     onContextMenu?(props: GestureOnContextMenuProps<any>): boolean;
 }
@@ -147,11 +147,12 @@ const transformPointCoordsAbsoluteToMetricsBase = ({x, y}: GestureMetricsPoint, 
 
 let autoIncrementGestureId = 0;
 
-export class GestureInfo {
+export class GestureInfo<StateT> {
     private pointersMap: Record<number, PointerMovementInfo> = {};
     public get pointers() { return Object.values(this.pointersMap); }
     public isClick = true;
-    public handler?: GestureHandler;
+    public handler?: GestureHandler<StateT>;
+    public state: StateT = undefined as unknown as StateT;
     public id = 0;
 
     constructor() {
@@ -205,7 +206,7 @@ export class GestureInfo {
     }
 }
 
-let currentGesture: GestureInfo | undefined = undefined;
+let currentGesture: GestureInfo<any> | undefined = undefined;
 
 const finalizeGesture = (reason: GestureFinishReason) => {
     if (!currentGesture) {
@@ -243,7 +244,7 @@ const releaseStalePointers = () => {
     }
 };
 
-export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getExtraDataByEvent?: (ev: PointerEvent<ElemT> | MouseEvent<ElemT>) => (BasePointerStateExtraData | undefined))
+export const getGestureHandlerProps = <ElemT, StateT>(handlers?: GestureHandler<StateT>[], getExtraDataByEvent?: (ev: PointerEvent<ElemT> | MouseEvent<ElemT>) => (BasePointerStateExtraData | undefined))
     : Required<EventHandlerProps<ElemT, "onPointerDown" | "onPointerUp" | "onPointerMove" | "onMouseMove" | "onDoubleClick" | "onContextMenu">> => ({
     onPointerDown: (ev) => {
         releasePointerCapture(ev);
@@ -262,7 +263,7 @@ export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getEx
             return;
         }
 
-        currentGesture = currentGesture ?? new GestureInfo();
+        currentGesture = currentGesture ?? new GestureInfo<StateT>();
         const state: PointerState = {
             event: ev,
             time: Date.now(),
@@ -294,7 +295,7 @@ export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getEx
         }
 
         if (currentGesture.handler) {
-            currentGesture.handler.onStart?.({gesture: currentGesture, ...state});
+            currentGesture.state = currentGesture.handler.onStart?.({gesture: currentGesture, ...state});
             ev.stopPropagation();
         }
     },
@@ -382,7 +383,7 @@ export const getGestureHandlerProps = <ElemT>(handlers?: GestureHandler[], getEx
  * Return the memoized the handler with the updated contextId.
  */
 // noinspection JSUnusedGlobalSymbols
-export const useGestureHandler = (handler?: GestureHandler): GestureHandler => {
+export const useGestureHandler = <StateT>(handler?: GestureHandler<StateT>): GestureHandler<StateT> => {
     const autoIncrementId = useAutoIncrementId();
     const finalContextId = `${autoIncrementId}-${handler?.contextId}`;
 
@@ -397,7 +398,7 @@ export const useGestureHandler = (handler?: GestureHandler): GestureHandler => {
         };
     },[finalContextId]);
 
-    return useMemo<GestureHandler>(() => ({
+    return useMemo<GestureHandler<StateT>>(() => ({
         contextId: finalContextId,
         isValidGesture: (props) => handlerRef.current?.isValidGesture?.(props) !== false,
         onStart: (props) => handlerRef.current?.onStart?.(props),
@@ -409,12 +410,12 @@ export const useGestureHandler = (handler?: GestureHandler): GestureHandler => {
 };
 
 // Same as useGestureHandler, but for multiple handlers at once
-export const useGestureHandlers = (handlers: GestureHandler[]): GestureHandler[] => {
+export const useGestureHandlers = <StateT>(handlers: GestureHandler<StateT>[]): GestureHandler<StateT>[] => {
     const autoIncrementId = useAutoIncrementId();
 
     const handlersRef = useLastValueRef(handlers);
     const updatedHandlers = useMemo(
-        () => handlers.map(({contextId}, index): GestureHandler => ({
+        () => handlers.map(({contextId}, index): GestureHandler<StateT> => ({
             contextId: `${autoIncrementId}-${contextId}`,
             isValidGesture: (props) => handlersRef.current[index]?.isValidGesture?.(props) !== false,
             onStart: (props) => handlersRef.current[index]?.onStart?.(props),

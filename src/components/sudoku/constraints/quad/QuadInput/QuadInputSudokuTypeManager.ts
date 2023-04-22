@@ -60,9 +60,12 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
             QuadConstraint(position, digits, [], isRecent, radius),
     } = options;
 
-    const onCornerClick = ({gesture: {id}}: GestureOnStartProps | GestureOnContinueProps, {onStateChange}: PuzzleContext<T>, cellPosition: Position, {corner}: CellExactPosition) => {
-        onStateChange(setQuadPositionAction(corner, options, `gesture-${id}`));
-    };
+    const onCornerClick = (
+        {gesture: {id}}: GestureOnStartProps<PuzzleContext<T>> | GestureOnContinueProps<PuzzleContext<T>>,
+        {onStateChange}: PuzzleContext<T>,
+        cellPosition: Position,
+        {corner}: CellExactPosition,
+    ) => onStateChange(setQuadPositionAction(corner, options, `gesture-${id}`));
 
     return {
         ...parent,

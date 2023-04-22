@@ -19,8 +19,7 @@ import {CellMarkType} from "./CellMark";
 import {CellColorValue} from "./CellColor";
 import {AnyPTM} from "./PuzzleTypeMap";
 
-export type GameStateActionCallback<T extends AnyPTM> =
-    PartialGameStateEx<T> | ((prevState: ProcessedGameStateEx<T>) => PartialGameStateEx<T>);
+export type GameStateActionCallback<T extends AnyPTM> = (prevState: ProcessedGameStateEx<T>) => PartialGameStateEx<T>;
 
 export interface GameStateActionType<ParamsType, T extends AnyPTM> {
     key: string;
@@ -29,7 +28,7 @@ export interface GameStateActionType<ParamsType, T extends AnyPTM> {
         context: PuzzleContext<T>,
         clientId: string,
         actionId: string,
-    ) => GameStateActionCallback<T>;
+    ) => PartialGameStateEx<T> | GameStateActionCallback<T>;
 }
 
 export interface GameStateAction<ParamsType, T extends AnyPTM> {
@@ -39,7 +38,7 @@ export interface GameStateAction<ParamsType, T extends AnyPTM> {
 }
 
 export type GameStateActionOrCallback<ParamsType, T extends AnyPTM> =
-    GameStateAction<ParamsType, T> | GameStateActionCallback<T>;
+    GameStateAction<ParamsType, T> | PartialGameStateEx<T> | GameStateActionCallback<T>;
 
 let autoIncrementActionId = 0;
 export const getNextActionId = (prefix = "single") => `${prefix}-${++autoIncrementActionId}`;

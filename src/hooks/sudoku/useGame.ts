@@ -4,7 +4,7 @@ import {
     GameStateEx,
     getAllShareState,
     getEmptyGameState,
-    mergeGameStateWithUpdates,
+    mergeGameStateWithUpdates, PartialGameStateEx,
     ProcessedGameStateAnimatedValues,
     saveGameState,
     setAllShareState
@@ -281,7 +281,7 @@ export const useGame = <T extends AnyPTM>(
                     if (!isAction || !isEnabled || isHost || (!puzzle.params?.share && !puzzle.typeManager.isGlobalAction?.(asAction, context))) {
                         const callback = isAction
                             ? asAction.type.callback(asAction.params, context, myClientId, asAction.actionId)
-                            : actionOrCallback as GameStateActionCallback<T>;
+                            : actionOrCallback as PartialGameStateEx<T> | GameStateActionCallback<T>;
 
                         const updates = typeof callback === "function" ? callback(processedGameState) : callback;
                         if (updates.selectedCells) {

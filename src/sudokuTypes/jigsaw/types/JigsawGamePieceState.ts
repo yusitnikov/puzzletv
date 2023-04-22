@@ -5,6 +5,7 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getActiveJigsawPieceZIndex} from "./helpers";
 import {JigsawFieldPieceState} from "./JigsawFieldState";
+import {ProcessedGameStateEx} from "../../../types/sudoku/GameState";
 
 export interface JigsawGamePieceState {
     animating: boolean;
@@ -17,6 +18,7 @@ interface JigsawPieceStateUpdate {
 
 export const jigsawPieceStateChangeAction = (
     puzzle: PuzzleDefinition<JigsawPTM>,
+    startState: ProcessedGameStateEx<JigsawPTM> | undefined,
     clientId: string,
     actionId: string,
     pieceIndexes: number[] | number,
@@ -41,7 +43,16 @@ export const jigsawPieceStateChangeAction = (
 
     let updatesPerIndex: JigsawPieceStateUpdate[];
     if (typeof updates === "function") {
-        const {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
+        let {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
+        if (startState) {
+            // Take the position from the start state, but z-index from the current state
+            // (because "bring on top" action could be executed in the middle of the gesture)
+            let {extension: {pieces: startPiecePositions}} = fieldStateHistoryGetCurrent(startState.fieldStateHistory);
+            piecePositions = startPiecePositions.map((startPosition, index) => ({
+                ...startPosition,
+                zIndex: piecePositions[index].zIndex,
+            }));
+        }
 
         updatesPerIndex = pieceIndexes.map((pieceIndex) => updates({
             position: piecePositions[pieceIndex],
@@ -91,6 +102,7 @@ export const jigsawPieceBringOnTopAction = (
     resetSelectedCells = true
 ) => jigsawPieceStateChangeAction(
     puzzle,
+    undefined,
     myClientId,
     "jigsaw-bring-on-top",
     pieceIndexes,

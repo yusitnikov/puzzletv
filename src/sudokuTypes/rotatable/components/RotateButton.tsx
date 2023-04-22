@@ -24,6 +24,7 @@ const handleRotate = <T extends AnyPTM>(context: PuzzleContext<T>, direction: nu
 
     gameStateApplyFieldDragGesture(
         context,
+        undefined,
         emptyGestureMetrics,
         {...emptyGestureMetrics, rotation: newAngle - angle},
         true,

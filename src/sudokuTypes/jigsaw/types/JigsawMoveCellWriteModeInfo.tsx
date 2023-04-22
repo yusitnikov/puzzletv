@@ -38,39 +38,43 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     handlesRightMouseClick: true,
     onGestureStart(props, context, ...args) {
         const {gesture} = props;
-        const {puzzle, onStateChange} = context;
+        const {puzzle, state, onStateChange} = context;
 
         const piecesGroup = getJigsawPiecesByGesture(context, gesture);
         if (!piecesGroup) {
             onStateChange({extension: {highlightCurrentPiece: false}});
-            base.onGestureStart?.(props, context, ...args);
-            return;
+            return base.onGestureStart?.(props, context, ...args);
         }
 
         // Bring the clicked piece to the top
         onStateChange(jigsawPieceBringOnTopAction(puzzle, piecesGroup.indexes));
+
+        return state;
     },
     onOutsideClick({onStateChange}) {
         onStateChange({extension: {highlightCurrentPiece: false}});
     },
     onMove(props, context, fieldRect) {
-        const {gesture, prevMetrics, currentMetrics} = props;
+        const {gesture, startMetrics, currentMetrics} = props;
+        const {id, state: startContext} = gesture;
         const {
             cellsIndex,
             puzzle,
             cellSize,
+            onStateChange,
+        } = context;
+        const {
             state: {
                 loopOffset,
                 scale,
             },
-            onStateChange,
-        } = context;
+        } = startContext;
         const {
             fieldSize: {fieldSize},
             importOptions: {angleStep} = {},
         } = puzzle;
 
-        const piecesGroup = getJigsawPiecesByGesture(context, gesture);
+        const piecesGroup = getJigsawPiecesByGesture(startContext, gesture);
         if (!piecesGroup) {
             base.onMove?.(props, context, fieldRect);
             return;
@@ -88,22 +92,23 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         });
         const groupGesture = applyMetricsDiff(
             emptyGestureMetrics,
-            screenToGroup(prevMetrics),
+            screenToGroup(startMetrics),
             screenToGroup(currentMetrics)
         );
 
         onStateChange(jigsawPieceStateChangeAction(
             puzzle,
+            startContext.state,
             myClientId,
-            `gesture-${gesture.id}`,
+            `gesture-${id}`,
             piecesGroup.indexes,
             ({position}, pieceIndex) => {
                 return {
                     position: moveJigsawPieceByGroupGesture(piecesGroup!, groupGesture, pieces[pieceIndex], position),
                     state: {animating: false},
                 };
-            })
-        );
+            }
+        ));
     },
     onGestureEnd(props, context) {
         const {gesture, reason} = props;
@@ -129,6 +134,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
 
         onStateChange(jigsawPieceStateChangeAction(
             puzzle,
+            undefined,
             myClientId,
             `gesture-${id}`,
             piecesGroup.indexes,
@@ -142,7 +148,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
 
 const getJigsawPiecesByGesture = (
     {cellsIndex, state}: PuzzleContext<JigsawPTM>,
-    {pointers}: GestureInfo,
+    {pointers}: GestureInfo<PuzzleContext<JigsawPTM>>,
 ) => {
     const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
 

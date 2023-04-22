@@ -52,18 +52,18 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     secondaryButtonContent?: (context: PuzzleContext<T>, cellData: T["cell"], cellSize: number, index: number) => ReactNode;
     getCurrentSecondaryButton?: (context: PuzzleContext<T>) => (number | undefined);
     setCurrentSecondaryButton?: (context: PuzzleContext<T>, index: number) => void;
-    isValidGesture?(isCurrentCellWriteMode: boolean, props: GestureIsValidProps, context: PuzzleContext<T>): boolean;
+    isValidGesture?(isCurrentCellWriteMode: boolean, props: GestureIsValidProps<PuzzleContext<T>>, context: PuzzleContext<T>): boolean;
     onCornerClick?: (
-        props: GestureOnStartProps,
+        props: GestureOnStartProps<PuzzleContext<T>>,
         context: PuzzleContext<T>,
         cellPosition: Position,
         exactPosition: CellExactPosition,
         isRightButton: boolean,
     ) => void;
-    onCornerEnter?: (props: GestureOnContinueProps, context: PuzzleContext<T>, cellPosition: Position, exactPosition: CellExactPosition) => void;
-    onGestureStart?(props: GestureOnStartProps, context: PuzzleContext<T>, isRightButton: boolean): void;
-    onMove?(props: GestureOnContinueProps, context: PuzzleContext<T>, fieldRect: Rect): void;
-    onGestureEnd?(props: GestureOnEndProps, context: PuzzleContext<T>): void;
+    onCornerEnter?: (props: GestureOnContinueProps<PuzzleContext<T>>, context: PuzzleContext<T>, cellPosition: Position, exactPosition: CellExactPosition) => void;
+    onGestureStart?(props: GestureOnStartProps<PuzzleContext<T>>, context: PuzzleContext<T>, isRightButton: boolean): void;
+    onMove?(props: GestureOnContinueProps<PuzzleContext<T>>, context: PuzzleContext<T>, fieldRect: Rect): void;
+    onGestureEnd?(props: GestureOnEndProps<PuzzleContext<T>>, context: PuzzleContext<T>): void;
     onOutsideClick?(context: PuzzleContext<T>): void;
 }
 
@@ -213,7 +213,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     {
         mode,
-        isValidGesture = (isCurrentCellWriteMode: boolean, {gesture: {pointers}}: GestureIsValidProps) =>
+        isValidGesture = (isCurrentCellWriteMode: boolean, {gesture: {pointers}}: GestureIsValidProps<PuzzleContext<T>>) =>
             isCurrentCellWriteMode && pointers.length === 1,
         isNoSelectionMode,
         onMove,
@@ -226,10 +226,10 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
     isDeleteSelectedCellsStroke: boolean,
     setIsDeleteSelectedCellsStroke: (value: boolean) => void,
     fieldRect: Rect,
-): GestureHandler => {
+): GestureHandler<PuzzleContext<T>> => {
     const onStateChange = getReadOnlySafeOnStateChange(context);
 
-    const common: Pick<GestureHandler, "isValidGesture"> = {
+    const common: Pick<GestureHandler<PuzzleContext<T>>, "isValidGesture"> = {
         isValidGesture: (props) => isValidGesture(
             getCurrentCellWriteModeInfoByGestureExtraData(context, props.extraData).mode === mode,
             props,
@@ -246,7 +246,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
                 const isMultiSelection = ctrlKey || metaKey || shiftKey || context.state.isMultiSelection;
 
                 if (!isCellGestureExtraData(extraData)) {
-                    return;
+                    return context;
                 }
 
                 const cellPosition = extraData.cell;
@@ -257,6 +257,8 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
                         ? gameStateToggleSelectedCells(gameState, [cellPosition])
                         : gameStateSetSelectedCells(gameState, [cellPosition])
                 );
+
+                return context;
             },
             onContinue: ({prevData, currentData}) => {
                 const [prevCell, currentCell] = [prevData, currentData].map(
@@ -296,6 +298,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
                 onCornerClick?.(props, context, extraData.cell, extraData.exact, !!button);
             }
             onStateChange({gestureCellWriteMode: mode});
+            return context;
         },
         onContinue: (props) => {
             const {prevData: {extraData: prevData}, currentData: {extraData: currentData}} = props;

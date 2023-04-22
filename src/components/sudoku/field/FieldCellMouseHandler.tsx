@@ -16,7 +16,7 @@ const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 export interface FieldCellMouseHandlerProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     cellPosition: Position;
-    handlers: GestureHandler[];
+    handlers: GestureHandler<any>[];
 }
 
 export const FieldCellMouseHandler = <T extends AnyPTM>(
@@ -142,7 +142,7 @@ interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
     cellPosition: Position;
     cellExactPosition: CellExactPosition;
     line?: Position[];
-    handlers: GestureHandler[];
+    handlers: GestureHandler<any>[];
     skipEnter?: boolean;
 }
 

@@ -93,6 +93,7 @@ const JigsawPieceHighlightHandler = (
                         };
                         onStateChange(jigsawPieceStateChangeAction(
                             puzzle,
+                            undefined,
                             myClientId,
                             getNextActionId(),
                             activeGroup.indexes,

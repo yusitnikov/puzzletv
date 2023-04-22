@@ -45,6 +45,7 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
     const canUnglue = highlightCurrentPiece && activePieceIndexes.length > 1;
     const handleUnglue = () => onStateChange(jigsawPieceStateChangeAction(
         puzzle,
+        undefined,
         myClientId,
         getNextActionId(),
         activePieceIndexes,
@@ -125,6 +126,7 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
     const canGlue = highlightCurrentPiece && pieceIndexesToGlue.length > activePieceIndexes.length;
     const handleGlue = () => onStateChange(jigsawPieceStateChangeAction(
         puzzle,
+        undefined,
         myClientId,
         getNextActionId(),
         pieceIndexesToGlue,

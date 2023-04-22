@@ -1222,6 +1222,7 @@ export const gameStateApplyFieldDragGesture = <T extends AnyPTM>(
         },
         onStateChange,
     }: PuzzleContext<T>,
+    startState: ProcessedGameStateEx<T> | undefined,
     prevMetrics: GestureMetrics,
     currentMetrics: GestureMetrics,
     animate: boolean,
@@ -1235,7 +1236,9 @@ export const gameStateApplyFieldDragGesture = <T extends AnyPTM>(
     });
     currentMetrics = filterMetrics(currentMetrics);
     prevMetrics = filterMetrics(prevMetrics);
-    onStateChange(({loopOffset: {top, left}, angle, scale, selectedCells}) => {
+    onStateChange((prevState) => {
+        const {loopOffset: {top, left}, angle, scale} = startState ?? prevState;
+
         const {x, y, rotation, scale: newScale} = applyMetricsDiff(
             {
                 x: left,
@@ -1254,7 +1257,7 @@ export const gameStateApplyFieldDragGesture = <T extends AnyPTM>(
             },
             angle: rotation,
             scale: newScale,
-            ...(resetSelection && {selectedCells: selectedCells.clear()})
+            ...(resetSelection && {selectedCells: prevState.selectedCells.clear()})
         };
     });
 };
@@ -1264,6 +1267,7 @@ export const gameStateHandleZoomClick = <T extends AnyPTM>(context: PuzzleContex
 
     return gameStateApplyFieldDragGesture(
         context,
+        undefined,
         emptyGestureMetrics,
         {...emptyGestureMetrics, scale: increment ? scaleStep : 1 / scaleStep},
         true,
