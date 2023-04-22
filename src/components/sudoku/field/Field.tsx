@@ -81,6 +81,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
         allowRotation,
         allowScale,
         fieldWrapperHandlesScale,
+        transformCoords,
         gridBackgroundColor = "#fff",
         regionBackgroundColor,
     } = typeManager;
@@ -223,7 +224,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                 return null;
             }
 
-            if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation) {
+            if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation && !transformCoords) {
                 const finalTop = topOffset + loopOffset.top + rowIndex;
                 if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
                     return null;
