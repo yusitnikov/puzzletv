@@ -519,6 +519,47 @@ export class SudokuCellsIndex<T extends AnyPTM> {
 
         return newRegion;
     }
+
+    splitUnconnectedRegions(regions: Position[][]): Position[][] {
+        const cellRegions = this.allCells.map((row) => row.map(() => ({
+            index: 0,
+            id: 0,
+            cells: [] as Position[],
+        })));
+        let autoIncrementId = 0;
+        for (const [regionIndex, region] of regions.entries()) {
+            for (const {top, left} of region) {
+                if (cellRegions[top]) {
+                    const info = cellRegions[top][left] = {
+                        index: regionIndex + 1,
+                        id: ++autoIncrementId,
+                        cells: [{top, left}],
+                    };
+
+                    for (const {top: top2, left: left2} of this.allCells[top][left].neighbors.items) {
+                        const info2 = cellRegions[top2]?.[left2];
+                        if (info2 && info2.index === info.index && info2.id !== info.id) {
+                            info.cells.push(...info2.cells);
+                            for (const {top: top3, left: left3} of info2.cells) {
+                                cellRegions[top3][left3] = info;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        const newRegionsMap: Record<number, Position[]> = {};
+        for (const row of cellRegions) {
+            for (const {id, cells} of row) {
+                if (cells.length) {
+                    newRegionsMap[id] = cells;
+                }
+            }
+        }
+
+        return Object.values(newRegionsMap);
+    }
     // endregion
 
     // region Internals
