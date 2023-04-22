@@ -1,4 +1,5 @@
 import {RGB} from "../types/struct/RGB";
+import {average} from "./math";
 
 // convert #xyz to #xxyyzz
 export const normalizeColorStr = (color: string) =>
@@ -34,5 +35,10 @@ export const rgbToColorStr = (color: RGB) => {
 export const mixColorsStr = (color1: string, color2: string, coeff = 0.5) => rgbToColorStr(
     processRgb((value1, value2) => value1 * coeff + value2 * (1 - coeff), colorStrToRgb(color1), colorStrToRgb(color2))
 );
+
+export const getAverageColorsStr = (colors: string[]) => rgbToColorStr(processRgb(
+    (...args) => average(args),
+    ...colors.map(colorStrToRgb)
+));
 
 export const lightenColorStr = (color: string, coeff = 0.5) => mixColorsStr(color, "#fff", coeff);

@@ -54,6 +54,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                             top={-region.top}
                             width={1}
                             height={1}
+                            style={{opacity: region.opacity}}
                         >
                             {typeof regionNoClipChildren === "function" ? regionNoClipChildren(region, index) : regionNoClipChildren}
                         </AutoSvg>
@@ -68,6 +69,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                             top={-region.top}
                             width={1}
                             height={1}
+                            style={{opacity: region.opacity}}
                         >
                             {region.cells?.map(({top, left}) => <rect
                                 key={`cell-${top}-${left}`}
@@ -92,6 +94,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                             top={-region.top}
                             width={1}
                             height={1}
+                            style={{opacity: region.opacity}}
                         >
                             {typeof children === "function" ? children(region, index) : children}
                         </AutoSvg>

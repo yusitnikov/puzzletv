@@ -92,6 +92,7 @@ import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {JssSudokuTypeManager} from "../../sudokuTypes/jss/types/JssSudokuTypeManager";
 import {isVisibleCell} from "../../types/sudoku/CellTypeProps";
 import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
+import {RushHourSudokuTypeManager} from "../../sudokuTypes/rush-hour/types/RushHourSudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -206,6 +207,7 @@ const loadByImportOptions = (
             Number(startOffset),
         ),
         [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager(importOptions),
+        [PuzzleImportPuzzleType.RushHour]: RushHourSudokuTypeManager,
     };
 
     let typeManager = typesMap[type] ?? regularTypeManager;

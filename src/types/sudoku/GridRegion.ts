@@ -9,6 +9,7 @@ export interface GridRegion extends Rect {
     zIndex?: number;
     highlighted?: boolean;
     backgroundColor?: string;
+    opacity?: number;
     noInteraction?: boolean;
     noBorders?: boolean;
     noClip?: boolean;

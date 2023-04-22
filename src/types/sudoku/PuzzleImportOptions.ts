@@ -9,6 +9,7 @@ export enum PuzzleImportPuzzleType {
     SafeCracker = "safe-cracker",
     InfiniteRings = "infinite-rings",
     Jigsaw = "jigsaw",
+    RushHour = "rush-hour",
 }
 
 export enum PuzzleImportDigitType {

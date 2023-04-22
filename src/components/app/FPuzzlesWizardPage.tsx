@@ -76,6 +76,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         PuzzleImportPuzzleType.Cubedoku,
         PuzzleImportPuzzleType.SafeCracker,
         PuzzleImportPuzzleType.InfiniteRings,
+        PuzzleImportPuzzleType.RushHour,
     ].includes(type);
     const supportsExtraGrids = [
         PuzzleImportPuzzleType.Regular,
@@ -185,6 +186,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
                             <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
                             <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
+                            <option value={PuzzleImportPuzzleType.RushHour}>Rush hour</option>
                         </Select>
                     </label>
                 </Paragraph>
