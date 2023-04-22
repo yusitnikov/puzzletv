@@ -12,7 +12,7 @@ export const carMargin = 0.1;
 const frameSize = 0.02;
 const glassSize = 0.1;
 const glassColor = textColor;
-const glassOpacity = 0.5;
+const glassOpacity = 0.3;
 const lightSize = 0.2;
 const lightOpacity = 0.7;
 
@@ -34,6 +34,7 @@ export const Car = memo(({top, left, width, height, color}: CarProps) => {
     width -= carMargin * 2;
     height -= carMargin * 2;
 
+    color = mixColorsStr(color, "#fff", 0.7);
     const mirrorColor = mixColorsStr(color, "#000", 0.9);
     const mirrorX = width - 0.45;
 
