@@ -38,7 +38,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
     handlesRightMouseClick: true,
     onGestureStart(props, context, ...args) {
         const {gesture} = props;
-        const {puzzle, state, onStateChange} = context;
+        const {puzzle, onStateChange} = context;
 
         const piecesGroup = getJigsawPiecesByGesture(context, gesture);
         if (!piecesGroup) {
@@ -48,8 +48,6 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
 
         // Bring the clicked piece to the top
         onStateChange(jigsawPieceBringOnTopAction(puzzle, piecesGroup.indexes));
-
-        return state;
     },
     onOutsideClick({onStateChange}) {
         onStateChange({extension: {highlightCurrentPiece: false}});
