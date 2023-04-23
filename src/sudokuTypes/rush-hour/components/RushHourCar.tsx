@@ -19,14 +19,14 @@ interface CarProps extends Rect {
     color: string;
 }
 
-export const Car = memo(({top, left, width, height, color}: CarProps) => {
+export const RushHourCar = memo(({top, left, width, height, color}: CarProps) => {
     if (height > width) {
         return <TransformedRectGraphics rect={{
             base: {top, left},
             rightVector: {top: 1, left: 0},
             bottomVector: {top: 0, left: 1},
         }}>
-            <Car top={0} left={0} width={height} height={width} color={color}/>;
+            <RushHourCar top={0} left={0} width={height} height={width} color={color}/>;
         </TransformedRectGraphics>;
     }
 
@@ -163,7 +163,7 @@ export const Car = memo(({top, left, width, height, color}: CarProps) => {
     </g>;
 });
 
-export const Cars = (
+export const RushHourCars = (
     {
         region,
         context: {
@@ -180,7 +180,7 @@ export const Cars = (
     }
 
     return <g opacity={hideCars ? 0.3 : undefined}>
-        {extension?.cars.map(({boundingRect: {top, left, width, height}, color}, index) => <Car
+        {extension?.cars.map(({boundingRect: {top, left, width, height}, color}, index) => <RushHourCar
             key={`car-${index}`}
             top={top + carPositions[index].top}
             left={left + carPositions[index].left}
@@ -191,11 +191,11 @@ export const Cars = (
     </g>;
 };
 
-export const CarsConstraint: Constraint<RushHourPTM> = {
+export const RushHourCarsConstraint: Constraint<RushHourPTM> = {
     name: "rush hour cars",
     cells: [],
     component: {
-        [FieldLayer.beforeSelection]: Cars,
+        [FieldLayer.beforeSelection]: RushHourCars,
     },
     props: undefined,
 };

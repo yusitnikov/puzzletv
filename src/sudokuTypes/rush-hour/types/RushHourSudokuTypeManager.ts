@@ -18,7 +18,7 @@ import {getRegionBoundingBox} from "../../../utils/regions";
 import {loop} from "../../../utils/math";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {RushHourHideCarsButton} from "../components/RushHourHideCarsButton";
-import {CarsConstraint} from "../components/Car";
+import {RushHourCarsConstraint} from "../components/RushHourCar";
 import {getDefaultRegionsForRowsAndColumns} from "../../../types/sudoku/FieldSize";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
@@ -271,7 +271,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         },
     ],
 
-    items: [CarsConstraint],
+    items: [RushHourCarsConstraint],
 
     // TODO: support shared games
 };

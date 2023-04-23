@@ -6,7 +6,7 @@ import {useEventListener} from "../../../hooks/useEventListener";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {RushHourPTM} from "../types/RushHourPTM";
 import {errorColor, yellowColor} from "../../../components/app/globals";
-import {Car} from "./Car";
+import {RushHourCar} from "./RushHourCar";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {transformRect} from "../../../types/layout/Rect";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
@@ -59,7 +59,7 @@ export const RushHourHideCarsButton = ({context, top, left}: ControlButtonItemPr
                 width: 0.5,
                 height: 0.5,
             })}>
-                <Car color={yellowColor} left={0} top={0} width={2} height={1}/>
+                <RushHourCar color={yellowColor} left={0} top={0} width={2} height={1}/>
             </TransformedRectGraphics>
 
             {hideCars && <>

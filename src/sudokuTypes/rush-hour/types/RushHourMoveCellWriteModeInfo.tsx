@@ -10,7 +10,7 @@ import {arrayContainsPosition, Position} from "../../../types/layout/Position";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Rect} from "../../../types/layout/Rect";
-import {carMargin} from "../components/Car";
+import {carMargin} from "../components/RushHourCar";
 
 const base = MoveCellWriteModeInfo<RushHourPTM>();
 
