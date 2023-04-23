@@ -45,6 +45,7 @@ import {FieldItems, FieldItemsProps} from "./FieldItems";
 import {FieldLoop} from "./FieldLoop";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {isInteractableCell, isVisibleCell} from "../../../types/sudoku/CellTypeProps";
+import {useUserAgentParser} from "../../../hooks/useUserAgentParser";
 
 export interface FieldProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -292,6 +293,11 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
         )}
     </g>;
 
+    const {device: {vendor}} = useUserAgentParser();
+    const applyShadowFilter = vendor?.toLowerCase() !== "apple";
+    const shadowFilterId = `field-shadow-${autoIncrementId}`;
+    const shadowFilterStr = applyShadowFilter ? `url(#${shadowFilterId})` : undefined;
+
     return <>
         <Absolute
             {...rect}
@@ -314,6 +320,10 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                     fitParent={fieldFitsWrapper}
                 >
                     <FieldSvg context={readOnlySafeContext}>
+                        {applyShadowFilter && <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
+                            <feDropShadow dx={0} dy={0} stdDeviation={0.02} floodColor={"#fff"} floodOpacity={1}/>
+                        </filter>}
+
                         <FieldRegionsWithSameCoordsTransformation
                             context={readOnlySafeContext}
                             regionNoClipChildren={(region) => <g data-layer="items-no-clip">
@@ -325,9 +335,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                 />
                             </g>}
                         >
-                            {(region, regionIndex = 0) => {
-                                const shadowFilterId = `field-shadow-${autoIncrementId}-${regionIndex}`;
-
+                            {(region) => {
                                 const itemsProps: Omit<FieldItemsProps<T>, "layer"> = {
                                     context: readOnlySafeContext,
                                     items,
@@ -337,10 +345,6 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                 const {backgroundColor = regionBackgroundColor} = region ?? {};
 
                                 return <>
-                                    <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
-                                        <feDropShadow dx={0} dy={0} stdDeviation={0.02} floodColor={"#fff"} floodOpacity={1}/>
-                                    </filter>
-
                                     {region && backgroundColor && <rect
                                         x={region.left}
                                         y={region.top}
@@ -351,7 +355,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                         stroke={"none"}
                                     />}
 
-                                    <g data-layer="items-before-background" filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="items-before-background" filter={shadowFilterStr}>
                                         <FieldItems layer={FieldLayer.beforeBackground} {...itemsProps}/>
                                     </g>
 
@@ -371,13 +375,13 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                         }, region)}
                                     </g>
 
-                                    <g data-layer="items-before-selection" filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="items-before-selection" filter={shadowFilterStr}>
                                         <FieldItems layer={FieldLayer.beforeSelection} {...itemsProps}/>
                                     </g>
 
                                     {!prioritizeSelection && selection(region)}
 
-                                    <g data-layer="items-regular" filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="items-regular" filter={shadowFilterStr}>
                                         <FieldItems layer={FieldLayer.regular} {...itemsProps}/>
                                     </g>
 
@@ -399,7 +403,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                         <FieldItems layer={FieldLayer.top} {...itemsProps}/>
                                     </g>
 
-                                    <g data-layer="digits" filter={`url(#${shadowFilterId})`}>
+                                    <g data-layer="digits" filter={shadowFilterStr}>
                                         {renderCellsLayer("digits", (cellState, cell) => {
                                             const initialData = initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left];
                                             const cellExcludedDigits = excludedDigits[cell.top][cell.left];
