@@ -35,6 +35,7 @@ import {Embark, EmbarkWeirdSlug} from "./Embark";
 import {ToroidalRenbanmometers} from "./ToroidalRenbanmometers";
 import {PenroseTiles} from "./PenroseTiles";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {RushHour} from "./RushHour";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -91,6 +92,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    RushHour,
+
     ToroidalRenbanmometers,
     ToroidalYinYang,
 
