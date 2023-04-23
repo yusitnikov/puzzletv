@@ -22,6 +22,7 @@ import {RushHourCarsConstraint} from "../components/RushHourCar";
 import {getDefaultRegionsForRowsAndColumns} from "../../../types/sudoku/FieldSize";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
+import {createRandomGenerator} from "../../../utils/random";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
@@ -215,11 +216,13 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
             }
 
             const cellsIndex = new SudokuCellsIndex(puzzle);
+            const randomizer = createRandomGenerator(0);
             const cars = Object.values(carsMap)
                 .flatMap(
                     ({color, cells}) => cellsIndex.splitUnconnectedRegions([cells]).map(
-                        (cells) => ({
+                        (cells): RushHourCar => ({
                             color,
+                            invert: randomizer() > 0.5,
                             cells,
                             boundingRect: getRegionBoundingBox(cells, 1),
                         })

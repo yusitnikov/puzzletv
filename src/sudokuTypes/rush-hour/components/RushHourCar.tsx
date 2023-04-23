@@ -18,16 +18,27 @@ const lightOpacity = 0.7;
 
 interface CarProps extends Rect {
     color: string;
+    invert?: boolean;
 }
 
-export const RushHourCar = memo(({top, left, width, height, color}: CarProps) => {
+export const RushHourCar = memo(({top, left, width, height, color, invert}: CarProps) => {
     if (height > width) {
         return <TransformedRectGraphics rect={{
             base: {top, left},
             rightVector: {top: 1, left: 0},
             bottomVector: {top: 0, left: 1},
         }}>
-            <RushHourCar top={0} left={0} width={height} height={width} color={color}/>;
+            <RushHourCar top={0} left={0} width={height} height={width} color={color} invert={invert}/>;
+        </TransformedRectGraphics>;
+    }
+
+    if (invert) {
+        return <TransformedRectGraphics rect={{
+            base: {top, left: left + width},
+            rightVector: {top: 0, left: -1},
+            bottomVector: {top: 1, left: 0},
+        }}>
+            <RushHourCar top={0} left={0} width={width} height={height} color={color} invert={false}/>;
         </TransformedRectGraphics>;
     }
 
@@ -182,13 +193,14 @@ export const RushHourCars = (
     }
 
     return <g opacity={hideCars && cellWriteMode !== CellWriteMode.move ? 0.3 : undefined}>
-        {extension?.cars.map(({boundingRect: {top, left, width, height}, color}, index) => <RushHourCar
+        {extension?.cars.map(({boundingRect: {top, left, width, height}, color, invert}, index) => <RushHourCar
             key={`car-${index}`}
             top={top + carPositions[index].top}
             left={left + carPositions[index].left}
             width={width}
             height={height}
             color={color}
+            invert={invert}
         />)}
     </g>;
 };
