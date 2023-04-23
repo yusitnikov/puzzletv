@@ -20,6 +20,8 @@ import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlBu
 import {RushHourHideCarsButton} from "../components/RushHourHideCarsButton";
 import {CarsConstraint} from "../components/Car";
 import {getDefaultRegionsForRowsAndColumns} from "../../../types/sudoku/FieldSize";
+import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
+import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
@@ -140,6 +142,13 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         ];
     },
 
+    getCellTypeProps({left}, {fieldSize: {fieldSize}}): CellTypeProps<RushHourPTM> {
+        if (left >= fieldSize) {
+            return {isSelectable: false};
+        }
+        return {};
+    },
+
     getRegionsForRowsAndColumns({fieldSize: {fieldSize}, ...puzzle}) {
         return getDefaultRegionsForRowsAndColumns({
             ...puzzle,
@@ -157,7 +166,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     extraCellWriteModes: [RushHourMoveCellWriteModeInfo],
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RushHourPTM> {
-        let {initialColors, fieldSize: {fieldSize}} = puzzle;
+        let {initialColors, fieldSize: {fieldSize}, resultChecker} = puzzle;
 
         puzzle = {
             ...puzzle,
@@ -206,18 +215,49 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
             }
 
             const cellsIndex = new SudokuCellsIndex(puzzle);
-            puzzle.extension = {
-                cars: Object.values(carsMap)
-                    .flatMap(
-                        ({color, cells}) => cellsIndex.splitUnconnectedRegions([cells]).map(
-                            (cells) => ({
-                                color,
-                                cells,
-                                boundingRect: getRegionBoundingBox(cells, 1),
-                            })
-                        )
-                    ),
-            };
+            const cars = Object.values(carsMap)
+                .flatMap(
+                    ({color, cells}) => cellsIndex.splitUnconnectedRegions([cells]).map(
+                        (cells) => ({
+                            color,
+                            cells,
+                            boundingRect: getRegionBoundingBox(cells, 1),
+                        })
+                    )
+                );
+            puzzle.extension = {cars};
+
+            if (resultChecker) {
+                puzzle.resultChecker = (context) => {
+                    const {puzzle, state} = context;
+                    const {initialDigits = {}} = puzzle;
+                    const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
+
+                    const carInitialDigits: GivenDigitsMap<number> = {};
+                    for (const [index, {cells}] of cars.entries()) {
+                        let {top, left} = carPositions[index];
+                        top = Math.round(top);
+                        left = Math.round(left);
+                        for (const cell of cells) {
+                            const digit = initialDigits[cell.top]?.[cell.left];
+                            if (digit !== undefined) {
+                                const offsetTop = cell.top + top;
+                                const offsetLeft = cell.left + left;
+                                carInitialDigits[offsetTop] = carInitialDigits[offsetTop] ?? {};
+                                carInitialDigits[offsetTop][offsetLeft] = digit;
+                            }
+                        }
+                    }
+
+                    return resultChecker!({
+                        ...context,
+                        puzzle: {
+                            ...puzzle,
+                            initialDigits: mergeGivenDigitsMaps(carInitialDigits, initialDigits),
+                        },
+                    });
+                };
+            }
         }
 
         return puzzle;
