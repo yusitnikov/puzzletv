@@ -6,6 +6,7 @@ import {RushHourPTM} from "../types/RushHourPTM";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {textColor} from "../../../components/app/globals";
 import {mixColorsStr} from "../../../utils/color";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 
 export const carMargin = 0.1;
 const frameSize = 0.02;
@@ -170,6 +171,7 @@ export const RushHourCars = (
             puzzle: {extension},
             state: {
                 extension: {hideCars},
+                processed: {cellWriteMode},
                 processedExtension: {cars: carPositions},
             },
         },
@@ -179,7 +181,7 @@ export const RushHourCars = (
         return null;
     }
 
-    return <g opacity={hideCars ? 0.3 : undefined}>
+    return <g opacity={hideCars && cellWriteMode !== CellWriteMode.move ? 0.3 : undefined}>
         {extension?.cars.map(({boundingRect: {top, left, width, height}, color}, index) => <RushHourCar
             key={`car-${index}`}
             top={top + carPositions[index].top}
