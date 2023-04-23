@@ -3,7 +3,6 @@ import {Rect} from "../../../types/layout/Rect";
 import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {RushHourPTM} from "../types/RushHourPTM";
-import {isSamePosition} from "../../../types/layout/Position";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {textColor} from "../../../components/app/globals";
 import {mixColorsStr} from "../../../utils/color";
@@ -164,24 +163,39 @@ export const Car = memo(({top, left, width, height, color}: CarProps) => {
     </g>;
 });
 
-export const RegionCar = ({region, context: {puzzle: {extension}}}: ConstraintProps<RushHourPTM>) => {
-    if (!region?.cells?.length) {
+export const Cars = (
+    {
+        region,
+        context: {
+            puzzle: {extension},
+            state: {
+                extension: {hideCars},
+                processedExtension: {cars: carPositions},
+            },
+        },
+    }: ConstraintProps<RushHourPTM>
+) => {
+    if (region?.cells?.length) {
         return null;
     }
 
-    const car = extension?.cars.find(({boundingRect}) => isSamePosition(boundingRect, region));
-    if (!car) {
-        return null;
-    }
-
-    return <Car {...car.boundingRect} color={car.color}/>;
+    return <g opacity={hideCars ? 0.3 : undefined}>
+        {extension?.cars.map(({boundingRect: {top, left, width, height}, color}, index) => <Car
+            key={`car-${index}`}
+            top={top + carPositions[index].top}
+            left={left + carPositions[index].left}
+            width={width}
+            height={height}
+            color={color}
+        />)}
+    </g>;
 };
 
-export const RegionCarConstraint: Constraint<RushHourPTM> = {
+export const CarsConstraint: Constraint<RushHourPTM> = {
     name: "rush hour cars",
     cells: [],
     component: {
-        [FieldLayer.beforeSelection]: RegionCar,
+        [FieldLayer.beforeSelection]: Cars,
     },
     props: undefined,
 };

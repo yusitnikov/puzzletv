@@ -6,7 +6,7 @@ import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {RushHourMoveCellWriteModeInfo} from "./RushHourMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {RushHourPTM} from "./RushHourPTM";
-import {gameStateGetCurrentFieldState, PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {RushHourFieldState} from "./RushHourFieldState";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
@@ -18,7 +18,7 @@ import {getRegionBoundingBox} from "../../../utils/regions";
 import {loop} from "../../../utils/math";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {RushHourHideCarsButton} from "../components/RushHourHideCarsButton";
-import {RegionCarConstraint} from "../components/Car";
+import {CarsConstraint} from "../components/Car";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
@@ -85,42 +85,14 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     },
 
     processArrowDirection(
-        cell, xDirection, yDirection, context
-    ): { cell?: Position; state?: PartialGameStateEx<RushHourPTM> } {
-        const {
-            puzzle: {
-                fieldSize: {fieldSize},
-                extension,
+        {top, left}, xDirection, yDirection, {puzzle: {fieldSize: {fieldSize}}}
+    ): { cell?: Position } {
+        return {
+            cell: {
+                top: loop(top + yDirection, fieldSize),
+                left: loop(left + xDirection, fieldSize),
             },
-            state,
-        } = context;
-        const cars = extension?.cars ?? [];
-        const {extension: {cars: carsPositions}} = gameStateGetCurrentFieldState(state);
-
-        let {top, left} = context.puzzle.typeManager.transformCoords?.(cell, context) ?? cell;
-        top = loop(top + yDirection, fieldSize);
-        left = loop(left + xDirection, fieldSize);
-
-        if (!state.extension.hideCars) {
-            for (const [index, {boundingRect}] of cars.entries()) {
-                const carsPosition = carsPositions[index];
-                const carTop = boundingRect.top + carsPosition.top;
-                const carLeft = boundingRect.left + carsPosition.left;
-                if (
-                    top >= carTop && top + 1 <= carTop + boundingRect.height &&
-                    left >= carLeft && left + 1 <= carLeft + boundingRect.width
-                ) {
-                    return {
-                        cell: {
-                            top: top - carsPosition.top,
-                            left: left - carsPosition.left,
-                        },
-                    };
-                }
-            }
-        }
-
-        return {cell: {top, left}};
+        };
     },
 
     transformCoords: transformCoordsByRegions,
@@ -138,7 +110,8 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
             },
         },
     ): GridRegion[] {
-        const hideCars = hideCarsState && cellWriteMode !== CellWriteMode.move;
+        const isMoveMode = cellWriteMode === CellWriteMode.move;
+        const hideCars = hideCarsState && !isMoveMode;
 
         return [
             {
@@ -160,7 +133,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                         };
                     },
                     noBorders: true,
-                    noInteraction: hideCars,
+                    noInteraction: !isMoveMode,
                     opacity: hideCars ? 0.2 : undefined,
                     zIndex: 1,
                 };
@@ -207,7 +180,6 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                     const resolvedColors = colors.map(resolveCellColorValue);
                     const averageColor = getAverageColorsStr(resolvedColors);
 
-                    // puzzle.initialColors[top][offsetLeft] = [averageColor];
                     const {[left]: initialDigit, ...rowInitialDigits} = puzzle.initialDigits?.[top] ?? {};
                     if (initialDigit !== undefined) {
                         puzzle.initialDigits = {
@@ -254,7 +226,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         },
     ],
 
-    items: [RegionCarConstraint],
+    items: [CarsConstraint],
 
     // TODO: support shared games
 };
