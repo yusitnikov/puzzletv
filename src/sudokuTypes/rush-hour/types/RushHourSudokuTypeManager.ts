@@ -19,11 +19,10 @@ import {loop} from "../../../utils/math";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {RushHourHideCarsButton} from "../components/RushHourHideCarsButton";
 import {CarsConstraint} from "../components/Car";
+import {getDefaultRegionsForRowsAndColumns} from "../../../types/sudoku/FieldSize";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
-
-    disableConflictChecker: true,
 
     serializeGameState({cars, hideCars}): any {
         return {cars, hideCars};
@@ -141,9 +140,15 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         ];
     },
 
-    getRegionsForRowsAndColumns() {
-        // TODO
-        return [];
+    getRegionsForRowsAndColumns({fieldSize: {fieldSize}, ...puzzle}) {
+        return getDefaultRegionsForRowsAndColumns({
+            ...puzzle,
+            fieldSize: {
+                fieldSize,
+                rowsCount: fieldSize,
+                columnsCount: fieldSize,
+            },
+        });
     },
 
     mapImportedColors: true,
