@@ -19,27 +19,22 @@ export const ForSetters = () => {
             })}>
                 <p>
                     {translate({
-                        [LanguageCode.en]: "Since the purpose of Puzzle TV is to support puzzles with unique rules and mechanics, the site doesn't have a \"setter mode\".",
-                        [LanguageCode.ru]: "Поскольку целью Puzzle TV является поддержка головоломок с уникальными правилами и механикой, на сайте нет «режима редактирования».",
-                    })}{" "}
+                        [LanguageCode.en]: <>Several popular puzzle genres (e.g. wraparound, rotational, infinity loop, etc.) could be imported from {fPuzzlesLink}. See the details <a href={importLink}>here</a></>,
+                        [LanguageCode.ru]: <>Некоторые популярные жанры (тороидное поле, перевёртыш, бесконечный цикл и т.д.) можно импортировать из {fPuzzlesLink}. Подробнее <a href={importLink}>здесь</a></>,
+                    })}.
+                </p>
+
+                <p>
                     {translate({
-                        [LanguageCode.en]: "The only way to publish a puzzle here is to contact me (the site creator).",
-                        [LanguageCode.ru]: "Единственный способ опубликовать здесь головоломку — связаться со мной (создателем сайта).",
-                    })}
+                        [LanguageCode.en]: "For creating puzzles of new genres, please contact me (the site creator) with your idea",
+                        [LanguageCode.ru]: "Для создания головоломок в новых жанрах, напишите мне (создателю сайта) о своей идее",
+                    })} ({translate({
+                        [LanguageCode.en]: "since the purpose of Puzzle TV is to support puzzles with unique rules and mechanics, the site doesn't have a \"setter mode\"",
+                        [LanguageCode.ru]: "поскольку целью Puzzle TV является поддержка головоломок с уникальными правилами и механикой, на сайте нет «режима редактирования»",
+                    })}).
                 </p>
 
                 <p><ContactMeShort/></p>
-
-                <p>
-                    <strong style={{color: "#f00"}}>{translate({
-                        [LanguageCode.en]: "NEW!",
-                        [LanguageCode.ru]: "НОВИНКА!",
-                    })}</strong>{" "}
-                    {translate({
-                        [LanguageCode.en]: <>There's a limited support for importing from {fPuzzlesLink}. See details <a href={importLink}>here</a>.</>,
-                        [LanguageCode.ru]: <>Есть ограниченная поддержка импорта из {fPuzzlesLink}. Подробнее <a href={importLink}>здесь</a>.</>,
-                    })}
-                </p>
             </FaqItem>
 
             <FaqItem question={translate({
@@ -86,9 +81,9 @@ export const ForSetters = () => {
                 <ul>
                     <li>{translate({
                         [LanguageCode.en]: "Does the puzzle contain unique rules or mechanics that other popular platforms don't support? " +
-                        "If f-puzzles or penpa+ can handle the puzzle, it will not be published on Puzzle TV.",
+                        "If f-puzzles (imported into SudokuPad) or penpa+ can handle the puzzle, it will not be published on Puzzle TV.",
                         [LanguageCode.ru]: "Содержит ли головоломка уникальные правила или механику, которые не поддерживаются другими популярными платформами? " +
-                        "Если f-puzzles или penpa+ могут справиться с головоломкой, она не будет опубликована на Puzzle TV.",
+                        "Если f-puzzles (импортированный в SudokuPad) или penpa+ могут справиться с головоломкой, она не будет опубликована на Puzzle TV.",
                     })}</li>
 
                     <li>{translate({
