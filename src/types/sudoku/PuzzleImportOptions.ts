@@ -46,6 +46,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     angleStep?: number;
     shuffle?: boolean;
     stickyRegion?: Rect;
+    noStickyRegionValidation?: boolean;
     stickyDigits?: boolean;
     splitUnconnectedRegions?: boolean;
 }
@@ -79,6 +80,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         angleStep,
         shuffle,
         stickyRegion,
+        noStickyRegionValidation,
         stickyDigits,
         splitUnconnectedRegions,
     } = importOptions as Required<PuzzleImportOptions>;
@@ -112,6 +114,7 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         angleStep,
         shuffle,
         stickyRegion,
+        noStickyRegionValidation,
         stickyDigits,
         splitUnconnectedRegions,
     };

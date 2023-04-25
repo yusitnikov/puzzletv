@@ -221,6 +221,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         initialCellMarks = [],
         solution = {},
         solutionColors = {},
+        importOptions: {stickyRegion, noStickyRegionValidation} = {},
     } = puzzle;
 
     const hasSolutionColors = Object.keys(solutionColors).length !== 0;
@@ -239,6 +240,14 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         for (const [left, {usersDigit, colors}] of row.entries()) {
             if (!isInteractableCell(cellsIndex.getCellTypeProps({top, left}))) {
                 continue;
+            }
+
+            if (stickyRegion && noStickyRegionValidation) {
+                const stickyTop = top - Number(stickyRegion.top);
+                const stickyLeft = left - Number(stickyRegion.left);
+                if (stickyTop >= 0 && stickyLeft >= 0 && stickyTop < Number(stickyRegion.height) && stickyLeft < Number(stickyRegion.width)) {
+                    continue;
+                }
             }
 
             let expectedData = solution[top]?.[left] ?? undefined;

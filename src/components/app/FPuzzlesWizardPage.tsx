@@ -60,6 +60,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
+    const [noStickyRegionValidation, setNoStickyRegionValidation] = useBoolFromLocalStorage("fpwNoStickyRegionValidation");
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
     const [splitUnconnectedRegions, setSplitUnconnectedRegions] = useBoolFromLocalStorage("fpwSplitUnconnectedRegions");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
@@ -126,6 +127,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             width: puzzle.size,
             height: puzzle.size,
         } : undefined,
+        noStickyRegionValidation: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid && noStickyRegionValidation,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
         splitUnconnectedRegions,
         load,
@@ -352,15 +354,29 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         </label>
                     </Paragraph>}
 
-                    {filteredExtraGrids.length !== 0 && <Paragraph>
-                        <label>
-                            The first grid is sticky:&nbsp;
-                            <input type={"checkbox"} checked={isFirstStickyGrid} onChange={ev => setIsFirstStickyGrid(ev.target.checked)}/>
-                        </label>
-                        <Details>
-                            When enabled, the first grid will be treated as a regular sudoku grid instead of being split into jigsaw pieces.
-                        </Details>
-                    </Paragraph>}
+                    {filteredExtraGrids.length !== 0 && <>
+                        <Paragraph>
+                            <label>
+                                The first grid is sticky:&nbsp;
+                                <input type={"checkbox"} checked={isFirstStickyGrid} onChange={ev => setIsFirstStickyGrid(ev.target.checked)}/>
+                            </label>
+                            <Details>
+                                When enabled, the first grid will be treated as a regular sudoku grid instead of being split into jigsaw pieces.
+                            </Details>
+                        </Paragraph>
+
+                        {isFirstStickyGrid && <Paragraph>
+                            <label>
+                                Don't validate the sticky grid:&nbsp;
+                                <input type={"checkbox"} checked={noStickyRegionValidation}
+                                       onChange={ev => setNoStickyRegionValidation(ev.target.checked)}/>
+                            </label>
+                            <Details>
+                                When enabled, the digits and colors in the sticky grid will not affect the solution check
+                                (so that the sticky grid is just a canvas to play around).
+                            </Details>
+                        </Paragraph>}
+                    </>}
 
                     {filteredExtraGrids.length === 0 && <Paragraph>
                         <label>
