@@ -84,7 +84,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     decreaseOnlyOneLive?: boolean;
     solution?: GivenDigitsMap<string | number>;
     solutionColors?: GivenDigitsMap<CellColorValue[]>;
-    importOptions?: Omit<PuzzleImportOptions, "load">;
+    importOptions?: Partial<PuzzleImportOptions>;
     inactiveCells?: Position[];
 }
 
@@ -243,9 +243,9 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             }
 
             if (stickyRegion && noStickyRegionValidation) {
-                const stickyTop = top - Number(stickyRegion.top);
-                const stickyLeft = left - Number(stickyRegion.left);
-                if (stickyTop >= 0 && stickyLeft >= 0 && stickyTop < Number(stickyRegion.height) && stickyLeft < Number(stickyRegion.width)) {
+                const stickyTop = top - stickyRegion.top;
+                const stickyLeft = left - stickyRegion.left;
+                if (stickyTop >= 0 && stickyLeft >= 0 && stickyTop < stickyRegion.height && stickyLeft < stickyRegion.width) {
                     continue;
                 }
             }

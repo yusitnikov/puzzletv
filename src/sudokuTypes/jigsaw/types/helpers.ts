@@ -26,9 +26,10 @@ const getJigsawPieces = (
         puzzle: {
             regions = [],
             fieldSize: {rowsCount, columnsCount},
-            importOptions: {stickyRegion} = {},
+            importOptions,
         },
     } = cellsIndex;
+    const stickyRegion = importOptions?.stickyRegion;
 
     let regionCells = regions.map((region) => Array.isArray(region) ? region : region.cells);
 
@@ -38,9 +39,9 @@ const getJigsawPieces = (
 
     if (stickyRegion) {
         const isStickyRegionCell = ({top, left}: Position) => {
-            top -= Number(stickyRegion.top);
-            left -= Number(stickyRegion.left);
-            return top >= 0 && left >= 0 && top < Number(stickyRegion.height) && left < Number(stickyRegion.width);
+            top -= stickyRegion.top;
+            left -= stickyRegion.left;
+            return top >= 0 && left >= 0 && top < stickyRegion.height && left < stickyRegion.width;
         };
 
         const otherActiveCells = otherCells.filter((cell) => isStickyRegionCell(cell) && cellsIndex.allCells[cell.top]?.[cell.left]?.isActive);

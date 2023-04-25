@@ -52,13 +52,16 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
-export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions>): Partial<PuzzleImportOptions> => {
+const sanitizeGridImportOptions = ({load, offsetX = 0, offsetY = 0}: PuzzleGridImportOptions)
+    : Required<PuzzleGridImportOptions> => ({
+    load,
+    offsetX: Number(offsetX),
+    offsetY: Number(offsetY),
+});
+export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): PuzzleImportOptions => {
     // typescript trick: treat all properties as "required", to ensure that no property was accidentally forgotten
 
     const {
-        load,
-        offsetX,
-        offsetY,
         extraGrids = {},
         type,
         digitType,
@@ -74,10 +77,10 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         cosmeticsBehindFog,
         safeCrackerCodeLength,
         visibleRingsCount,
-        startOffset,
+        startOffset = 0,
         allowOverrideColors,
         digitsCount,
-        angleStep,
+        angleStep = 0,
         shuffle,
         stickyRegion,
         noStickyRegionValidation,
@@ -87,12 +90,10 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
 
     // noinspection UnnecessaryLocalVariableJS
     const result: Required<PuzzleImportOptions> = {
-        load,
-        offsetX,
-        offsetY,
+        ...sanitizeGridImportOptions(importOptions),
         extraGrids: Object.fromEntries(
             [...(Array.isArray(extraGrids) ? extraGrids.entries() : Object.entries(extraGrids))]
-                .map(([key, {load, offsetX, offsetY}]) => [key, {load, offsetX, offsetY}]),
+                .map(([key, grid]) => [key, sanitizeGridImportOptions(grid)]),
         ),
         type,
         digitType,
@@ -106,14 +107,25 @@ export const sanitizeImportOptions = (importOptions: Partial<PuzzleImportOptions
         "product-arrow": productArrow,
         yajilinFog,
         cosmeticsBehindFog,
-        safeCrackerCodeLength,
-        visibleRingsCount,
-        startOffset,
+        safeCrackerCodeLength: safeCrackerCodeLength === undefined
+            ? undefined as unknown as number
+            : Number(safeCrackerCodeLength),
+        visibleRingsCount: visibleRingsCount === undefined
+            ? undefined as unknown as number
+            : Number(visibleRingsCount),
+        startOffset: Number(startOffset),
         allowOverrideColors,
-        digitsCount,
-        angleStep,
+        digitsCount: digitsCount === undefined
+            ? undefined as unknown as number
+            : Number(digitsCount),
+        angleStep: Number(angleStep),
         shuffle,
-        stickyRegion,
+        stickyRegion: stickyRegion && {
+            top: Number(stickyRegion.top),
+            left: Number(stickyRegion.left),
+            width: Number(stickyRegion.width),
+            height: Number(stickyRegion.height),
+        },
         noStickyRegionValidation,
         stickyDigits,
         splitUnconnectedRegions,

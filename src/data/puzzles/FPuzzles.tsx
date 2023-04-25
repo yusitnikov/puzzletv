@@ -151,14 +151,14 @@ const loadByImportOptions = (
     const extraGrids = (Array.isArray(extraGridLoad) ? extraGridLoad : Object.values(extraGridLoad))
         .map(({load, offsetX = 0, offsetY = 0}) => ({
             json: decodeFPuzzlesString(load),
-            offsetX: Number(offsetX),
-            offsetY: Number(offsetY),
+            offsetX,
+            offsetY,
         }));
     const allGrids = [
         {
             json: puzzleJson,
-            offsetX: Number(firstOffsetX),
-            offsetY: Number(firstOffsetY),
+            offsetX: firstOffsetX,
+            offsetY: firstOffsetY,
         },
         ...extraGrids,
     ];
@@ -197,14 +197,14 @@ const loadByImportOptions = (
         [PuzzleImportPuzzleType.Cubedoku]: CubedokuTypeManager,
         [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
         [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
-            size: Number(digitsCount),
+            size: digitsCount,
             circleRegionsCount: Math.ceil((puzzleJson.size - 2) / 2),
-            codeCellsCount: Math.min(puzzleJson.size, Number(safeCrackerCodeLength)),
+            codeCellsCount: Math.min(puzzleJson.size, safeCrackerCodeLength),
         }),
         [PuzzleImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(
             regularTypeManager,
-            Number(visibleRingsCount),
-            Number(startOffset),
+            visibleRingsCount,
+            startOffset,
         ),
         [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.RushHour]: RushHourSudokuTypeManager,
@@ -265,7 +265,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
 
     constructor(
         slug: string,
-        private readonly importOptions: Omit<PuzzleImportOptions, "load">,
+        private readonly importOptions: PuzzleImportOptions,
         private readonly typeManager: SudokuTypeManager<T>,
         fieldSize: FieldSize,
     ) {
@@ -284,7 +284,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
             typeManager,
             fieldSize,
             regions: this.regions,
-            digitsCount: digitsCount && Number(digitsCount),
+            digitsCount,
             loopHorizontally: loopX,
             loopVertically: loopY,
             fieldMargin: loopX || loopY ? 0.99 : 0,
@@ -935,9 +935,11 @@ export const FPuzzles: PuzzleDefinitionLoader<AnyPTM> = {
             throw new Error("Missing parameter");
         }
 
+        params = sanitizeImportOptions(params);
+
         return {
             ...loadByImportOptions("f-puzzles", params),
-            saveStateKey: `f-puzzles-${sha1().update(JSON.stringify(sanitizeImportOptions(params))).digest("hex").substring(0, 20)}`,
+            saveStateKey: `f-puzzles-${sha1().update(JSON.stringify(params)).digest("hex").substring(0, 20)}`,
         };
     }
 };

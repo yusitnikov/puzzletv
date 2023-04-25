@@ -49,7 +49,7 @@ import {useMemo} from "react";
 import {emptyGestureMetrics} from "../../../utils/gestures";
 import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 
-export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit<PuzzleImportOptions, "load">): SudokuTypeManager<JigsawPTM> => ({
+export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
         {digit: digit1, angle: angle1},
         {digit: digit2, angle: angle2},
@@ -468,10 +468,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Omit
 
         if (stickyRegion) {
             regions.push({
-                top: Number(stickyRegion.top),
-                left: Number(stickyRegion.left),
-                width: Number(stickyRegion.width),
-                height: Number(stickyRegion.height),
+                ...stickyRegion,
                 zIndex: 0,
             });
         }
