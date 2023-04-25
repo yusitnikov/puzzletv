@@ -145,7 +145,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
 
     getCellTypeProps({left}, {fieldSize: {fieldSize}}): CellTypeProps<RushHourPTM> {
         if (left >= fieldSize) {
-            return {isSelectable: false};
+            return {isSelectable: false, isCheckingSolution: false};
         }
         return {};
     },

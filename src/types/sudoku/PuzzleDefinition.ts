@@ -27,7 +27,7 @@ import {HashSet} from "../struct/Set";
 import {LanguageCode} from "../translations/LanguageCode";
 import type {PuzzleImportOptions} from "./PuzzleImportOptions";
 import {AnyPTM} from "./PuzzleTypeMap";
-import {isInteractableCell} from "./CellTypeProps";
+import {isSolutionCheckCell} from "./CellTypeProps";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
     // The field is required. Marking it as optional here only to avoid adding empty object to each puzzle.
@@ -238,7 +238,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const digitToColorMap: Record<number, string> = {};
     for (const [top, row] of cells.entries()) {
         for (const [left, {usersDigit, colors}] of row.entries()) {
-            if (!isInteractableCell(cellsIndex.getCellTypeProps({top, left}))) {
+            if (!isSolutionCheckCell(cellsIndex.getCellTypeProps({top, left}))) {
                 continue;
             }
 

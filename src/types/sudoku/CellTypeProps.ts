@@ -6,6 +6,7 @@ export interface CellTypeProps<T extends AnyPTM> {
     isVisible?: boolean;
     isVisibleForState?: (context: PuzzleContext<T>) => boolean;
     isSelectable?: boolean;
+    isCheckingSolution?: boolean;
     forceCellWriteMode?: CellWriteModeInfo<T>;
     noInteraction?: boolean;
     noBorders?: boolean;
@@ -18,6 +19,9 @@ export const isInteractableCell = <T extends AnyPTM>(props: CellTypeProps<T> = {
 
 export const isSelectableCell = <T extends AnyPTM>(props: CellTypeProps<T> = {}): boolean =>
     isInteractableCell(props) && props.isSelectable !== false;
+
+export const isSolutionCheckCell = <T extends AnyPTM>(props: CellTypeProps<T> = {}): boolean =>
+    isInteractableCell(props) && props.isCheckingSolution !== false;
 
 export const isCellWithBorders = <T extends AnyPTM>(props: CellTypeProps<T> = {}): boolean =>
     isVisibleCell(props) && !props.noBorders;
