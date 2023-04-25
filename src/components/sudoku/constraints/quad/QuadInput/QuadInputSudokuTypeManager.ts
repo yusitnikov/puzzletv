@@ -16,9 +16,9 @@ import {QuadConstraint} from "../Quad";
 import {CellWriteMode} from "../../../../../types/sudoku/CellWriteMode";
 import {setQuadPositionAction, setQuadPositionActionType, setQuadPositionActionTypeKey} from "./setQuadPositionAction";
 import {QuadInputModeButton} from "./QuadInputModeButton";
-import {CellExactPosition} from "../../../../../types/sudoku/CellExactPosition";
 import {AnyQuadInputPTM} from "./QuadInputPTM";
 import {GestureOnContinueProps, GestureOnStartProps} from "../../../../../utils/gestures";
+import {CellGestureExtraData} from "../../../../../types/sudoku/CellGestureExtraData";
 
 // TODO: support CellType operations!
 
@@ -63,8 +63,7 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
     const onCornerClick = (
         {gesture: {id}}: GestureOnStartProps<PuzzleContext<T>> | GestureOnContinueProps<PuzzleContext<T>>,
         {onStateChange}: PuzzleContext<T>,
-        cellPosition: Position,
-        {corner}: CellExactPosition,
+        {exact: {corner}}: CellGestureExtraData,
     ) => onStateChange(setQuadPositionAction(corner, options, `gesture-${id}`));
 
     return {

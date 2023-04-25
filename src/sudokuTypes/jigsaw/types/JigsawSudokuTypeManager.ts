@@ -476,6 +476,8 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
         return regions;
     },
 
+    regionSpecificUserMarks: true,
+
     getRegionsForRowsAndColumns() {
         return [];
     },

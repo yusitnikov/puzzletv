@@ -20,6 +20,7 @@ export interface CellMark {
     color?: CellColorValue;
     type: CellMarkType;
     isCenter?: boolean;
+    regionIndex?: number;
 }
 
 export const getMarkHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) => {

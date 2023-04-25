@@ -10,6 +10,7 @@ export const cellGestureExtraDataTag = "cell";
 export interface CellGestureExtraData extends BasePointerStateExtraData {
     cell: Position;
     exact: CellExactPosition;
+    regionIndex?: number;
     skipEnter?: boolean;
 }
 

@@ -13,13 +13,13 @@ import {PuzzleDefinition} from "./PuzzleDefinition";
 import {SetInterface} from "../struct/Set";
 import {CellMark, CellMarkSet, CellMarkType} from "./CellMark";
 import {PuzzleLineSet} from "./PuzzleLineSet";
-import {LineWithColor} from "./LineWithColor";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {myClientId} from "../../hooks/useMultiPlayer";
+import {PuzzleLine} from "./PuzzleLine";
 
 export interface FieldState<T extends AnyPTM> {
     cells: CellState<T>[][];
-    lines: SetInterface<LineWithColor>;
+    lines: SetInterface<PuzzleLine>;
     marks: SetInterface<CellMark>;
     extension: T["fieldStateEx"];
     clientId: string;

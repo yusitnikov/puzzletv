@@ -57,6 +57,8 @@ import {getFinalCellWriteMode} from "../../hooks/sudoku/useFinalCellWriteMode";
 import {ControlKeysState} from "../../hooks/useControlKeysState";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {isSelectableCell} from "./CellTypeProps";
+import {PuzzleLine} from "./PuzzleLine";
+import {CellGestureExtraData} from "./CellGestureExtraData";
 
 export interface GameState<T extends AnyPTM> {
     fieldStateHistory: FieldStateHistory<T>;
@@ -70,7 +72,7 @@ export interface GameState<T extends AnyPTM> {
     selectedCells: SetInterface<Position>;
     selectedColor: CellColor;
 
-    currentMultiLine: LineWithColor[];
+    currentMultiLine: PuzzleLine[];
     currentMultiLineEnd?: Position;
     isCurrentMultiLineCenters?: boolean;
     dragStartPoint?: CellExactPosition;
@@ -958,6 +960,7 @@ export const gameStateResetCurrentMultiLine = <T extends AnyPTM>(): PartialGameS
 export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     clientId: string,
+    regionIndex: number | undefined,
     isClick: boolean,
     isRightButton: boolean,
     isGlobal: boolean,
@@ -983,8 +986,20 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
                         const {type, round} = state.dragStartPoint;
 
                         if (allowDrawing.includes(`${type}-mark`)) {
-                            const xMark: CellMark = {position: round, color: selectedColor, type: CellMarkType.X, isCenter: type === "center"};
-                            const circleMark: CellMark = {position: round, color: selectedColor, type: CellMarkType.O, isCenter: type === "center"};
+                            const xMark: CellMark = {
+                                position: round,
+                                color: selectedColor,
+                                type: CellMarkType.X,
+                                isCenter: type === "center",
+                                regionIndex,
+                            };
+                            const circleMark: CellMark = {
+                                position: round,
+                                color: selectedColor,
+                                type: CellMarkType.O,
+                                isCenter: type === "center",
+                                regionIndex,
+                            };
 
                             if (type !== "center") {
                                 marks = marks.toggle(xMark);
@@ -1070,10 +1085,10 @@ export const gameStateContinueMultiLine = <T extends AnyPTM>(
         cellsIndex,
         state,
     }: PuzzleContext<T>,
-    exactPosition: CellExactPosition
+    {exact, regionIndex}: CellGestureExtraData
 ): PartialGameStateEx<T> => {
     const result: PartialGameStateEx<T> = {
-        dragStartPoint: state.dragStartPoint && JSON.stringify(state.dragStartPoint) === JSON.stringify(exactPosition)
+        dragStartPoint: state.dragStartPoint && JSON.stringify(state.dragStartPoint) === JSON.stringify(exact)
             ? state.dragStartPoint
             : undefined,
     };
@@ -1083,11 +1098,11 @@ export const gameStateContinueMultiLine = <T extends AnyPTM>(
         return result;
     }
 
-    if (exactPosition.type === (state.isCurrentMultiLineCenters ? CellPart.corner : CellPart.center)) {
+    if (exact.type === (state.isCurrentMultiLineCenters ? CellPart.corner : CellPart.center)) {
         return result;
     }
 
-    const position = state.isCurrentMultiLineCenters ? exactPosition.center : exactPosition.corner;
+    const position = state.isCurrentMultiLineCenters ? exact.center : exact.corner;
     const newLines = cellsIndex.getPath(
         {start: currentMultiLineEnd, end: position},
         puzzle.disableLineColors ? undefined : state.selectedColor
@@ -1098,7 +1113,10 @@ export const gameStateContinueMultiLine = <T extends AnyPTM>(
     }
 
     return mergeGameStateUpdates(result, {
-        currentMultiLine: [...state.currentMultiLine, ...newLines],
+        currentMultiLine: [
+            ...state.currentMultiLine,
+            ...newLines.map((line) => ({...line, regionIndex})),
+        ],
         currentMultiLineEnd: normalizePuzzlePosition(position, puzzle),
         dragAction: state.currentMultiLine.length === 0
             ? (gameStateGetCurrentFieldState(state).lines.contains(newLines[0]) ? DragAction.SetUndefined : DragAction.SetTrue)

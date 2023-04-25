@@ -94,27 +94,29 @@ export const enterDigitAction = <T extends AnyPTM>(
 ];
 
 interface ApplyCurrentMultiLineActionParams {
+    regionIndex?: number;
     isClick?: boolean;
     isRightButton?: boolean;
 }
 export const applyCurrentMultiLineActionType = <T extends AnyPTM>()
     : GameStateActionType<ApplyCurrentMultiLineActionParams, T> => ({
     key: "apply-current-multiline",
-    callback: ({isClick = false, isRightButton = false} = {}, context, clientId, actionId) =>
-        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, isClick, isRightButton, true, actionId),
+    callback: ({regionIndex, isClick = false, isRightButton = false} = {}, context, clientId, actionId) =>
+        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, regionIndex, isClick, isRightButton, true, actionId),
 });
 export const applyCurrentMultiLineAction = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     actionId: string,
+    regionIndex?: number,
     isClick = false,
     isRightButton = false
 ): GameStateActionOrCallback<ApplyCurrentMultiLineActionParams, T>[] => [
     {
         type: applyCurrentMultiLineActionType(),
-        params: {isClick, isRightButton},
+        params: {regionIndex, isClick, isRightButton},
         actionId,
     },
-    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, isClick, isRightButton, false, actionId),
+    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, regionIndex, isClick, isRightButton, false, actionId),
 ];
 
 export interface SetCellMarkActionParams extends Position {

@@ -326,20 +326,22 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
 
                         <FieldRegionsWithSameCoordsTransformation
                             context={readOnlySafeContext}
-                            regionNoClipChildren={(region) => <g data-layer="items-no-clip">
+                            regionNoClipChildren={(region, regionIndex) => <g data-layer="items-no-clip">
                                 <FieldItems
                                     layer={FieldLayer.noClip}
                                     context={readOnlySafeContext}
                                     items={items}
                                     region={region}
+                                    regionIndex={regionIndex}
                                 />
                             </g>}
                         >
-                            {(region) => {
+                            {(region, regionIndex) => {
                                 const itemsProps: Omit<FieldItemsProps<T>, "layer"> = {
                                     context: readOnlySafeContext,
                                     items,
                                     region,
+                                    regionIndex,
                                 };
 
                                 const {backgroundColor = regionBackgroundColor} = region ?? {};
@@ -443,6 +445,7 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                             (cellState, cellPosition) => <FieldCellMouseHandler
                                                 context={readOnlySafeContext}
                                                 cellPosition={cellPosition}
+                                                regionIndex={regionIndex}
                                                 handlers={cellGestureHandlers}
                                             />,
                                             region,

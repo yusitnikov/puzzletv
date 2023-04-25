@@ -3,7 +3,6 @@ import {PuzzleContext} from "./PuzzleContext";
 import {getDefaultDigitsCount, PuzzleDefinition} from "./PuzzleDefinition";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
-import {CellExactPosition} from "./CellExactPosition";
 import {CellDataSet} from "./CellDataSet";
 import {incrementArrayItem} from "../../utils/array";
 import {useEventListener} from "../../hooks/useEventListener";
@@ -17,14 +16,18 @@ import type {
 import {LinesCellWriteModeInfo} from "./cellWriteModes/lines";
 import {MoveCellWriteModeInfo} from "./cellWriteModes/move";
 import {ShadingCellWriteModeInfo} from "./cellWriteModes/shading";
-import {getCurrentCellWriteModeInfoByGestureExtraData, isCellGestureExtraData} from "./CellGestureExtraData";
+import {
+    CellGestureExtraData,
+    getCurrentCellWriteModeInfoByGestureExtraData,
+    isCellGestureExtraData
+} from "./CellGestureExtraData";
 import {
     gameStateClearSelectedCells,
     gameStateHandleCellDoubleClick,
     gameStateSetSelectedCells,
     gameStateToggleSelectedCells
 } from "./GameState";
-import {isSamePosition, Position} from "../layout/Position";
+import {isSamePosition} from "../layout/Position";
 import {GestureFinishReason} from "../../utils/gestures";
 import {getReadOnlySafeOnStateChange} from "../../hooks/sudoku/useReadOnlySafeContext";
 import {Rect} from "../layout/Rect";
@@ -56,11 +59,10 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     onCornerClick?: (
         props: GestureOnStartProps<PuzzleContext<T>>,
         context: PuzzleContext<T>,
-        cellPosition: Position,
-        exactPosition: CellExactPosition,
+        cellData: CellGestureExtraData,
         isRightButton: boolean,
     ) => void;
-    onCornerEnter?: (props: GestureOnContinueProps<PuzzleContext<T>>, context: PuzzleContext<T>, cellPosition: Position, exactPosition: CellExactPosition) => void;
+    onCornerEnter?: (props: GestureOnContinueProps<PuzzleContext<T>>, context: PuzzleContext<T>, cellData: CellGestureExtraData) => void;
     onGestureStart?(props: GestureOnStartProps<PuzzleContext<T>>, context: PuzzleContext<T>, isRightButton: boolean): void;
     onMove?(props: GestureOnContinueProps<PuzzleContext<T>>, context: PuzzleContext<T>, fieldRect: Rect): void;
     onGestureEnd?(props: GestureOnEndProps<PuzzleContext<T>>, context: PuzzleContext<T>): void;
@@ -295,7 +297,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
             const {extraData, event: {button}} = props;
             onGestureStart?.(props, context, !!button);
             if (isCellGestureExtraData(extraData)) {
-                onCornerClick?.(props, context, extraData.cell, extraData.exact, !!button);
+                onCornerClick?.(props, context, extraData, !!button);
             }
             onStateChange({gestureCellWriteMode: mode});
             return context;
@@ -307,7 +309,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
                 isCellGestureExtraData(currentData) &&
                 (!isCellGestureExtraData(prevData) || JSON.stringify(prevData.exact) !== JSON.stringify(currentData.exact))
             ) {
-                onCornerEnter?.(props, context, currentData.cell, currentData.exact);
+                onCornerEnter?.(props, context, currentData);
             }
 
             onMove?.(props, context, fieldRect);

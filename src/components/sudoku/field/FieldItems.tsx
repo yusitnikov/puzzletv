@@ -14,10 +14,11 @@ export interface FieldItemsProps<T extends AnyPTM> {
     items: Constraint<T, any>[];
     layer: FieldLayer;
     region?: GridRegion;
+    regionIndex?: number;
 }
 
 export const FieldItems = <T extends AnyPTM>(
-    {context, items, layer, region}: FieldItemsProps<T>
+    {context, items, layer, region, regionIndex}: FieldItemsProps<T>
 ) => <FieldLoop context={context}>
     {items.map(({component: {[layer]: Component} = {}, cells, renderSingleCellInUserArea, ...otherData}, index) => {
         if (!Component) {
@@ -48,6 +49,7 @@ export const FieldItems = <T extends AnyPTM>(
                     <Component
                         context={context}
                         region={region}
+                        regionIndex={regionIndex}
                         cells={[emptyPosition]}
                         {...otherData}
                     />
@@ -77,6 +79,7 @@ export const FieldItems = <T extends AnyPTM>(
                 <Component
                     context={context}
                     region={region}
+                    regionIndex={regionIndex}
                     cells={[emptyPosition, emptyPosition]}
                     {...otherData}
                 />
@@ -87,6 +90,7 @@ export const FieldItems = <T extends AnyPTM>(
             key={index}
             context={context}
             region={region}
+            regionIndex={regionIndex}
             cells={cells}
             {...otherData}
         />;

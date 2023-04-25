@@ -177,6 +177,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     // Get rectangles of non-modified coords that get the same transformation matrix by transformCoords
     getRegionsWithSameCoordsTransformation?(context: PuzzleContext<T>, isImportingPuzzle?: boolean): GridRegion[];
 
+    regionSpecificUserMarks?: boolean;
+
     items?: Constraint<T, any>[]
         | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
 
@@ -265,6 +267,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     mapImportedColors?: boolean;
 }
+
+// region Helper functions
 
 export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPTM>(
     {left, top}: Position,
@@ -389,3 +393,5 @@ export const getDefaultCellSelectionType = <T extends AnyPTM>(
         }
         : undefined;
 };
+
+// endregion

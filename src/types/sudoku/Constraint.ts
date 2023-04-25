@@ -58,6 +58,7 @@ export type ConstraintProps<T extends AnyPTM, DataT = undefined> =
     Omit<Constraint<T, DataT>, "component"> & {
     context: PuzzleContext<T>;
     region?: GridRegion;
+    regionIndex?: number;
 }
 
 export type ConstraintPropsGenericFc<DataT = undefined> = <T extends AnyPTM>(

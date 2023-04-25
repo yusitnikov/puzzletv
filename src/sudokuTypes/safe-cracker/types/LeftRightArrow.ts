@@ -41,7 +41,7 @@ export const safeCrackerArrowsCellWriteModeInfo = <T extends AnyPTM>(): CellWrit
     digitsCount: 0,
     handlesRightMouseClick: true,
     isNoSelectionMode: true,
-    onCornerClick: ({gesture: {id}}, context, cellPosition, exactPosition, isRightButton) => {
-        context.onStateChange(safeCrackerArrowsAction(context, exactPosition.center, isRightButton, `gesture-${id}`));
+    onCornerClick: ({gesture: {id}}, context, {exact: {center}}, isRightButton) => {
+        context.onStateChange(safeCrackerArrowsAction(context, center, isRightButton, `gesture-${id}`));
     },
 });

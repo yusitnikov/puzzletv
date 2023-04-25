@@ -29,8 +29,10 @@ const errorBorderColor = "#e00";
 const removingBorderColor = lightGreyColor;
 
 export const UserLines = {
-    [FieldLayer.givenUserLines]: <T extends AnyPTM>({context, region}: ConstraintProps<T>) => {
+    [FieldLayer.givenUserLines]: <T extends AnyPTM>({context, region, regionIndex}: ConstraintProps<T>) => {
         const {cellSize, puzzle, state} = context;
+
+        const {typeManager: {regionSpecificUserMarks}} = puzzle;
 
         const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
 
@@ -43,8 +45,10 @@ export const UserLines = {
             context
         ), [context, lines, cells]);
 
+        const filterByRegion = (item: {regionIndex?: number}) => !regionSpecificUserMarks || item.regionIndex === regionIndex;
+
         return <>
-            {lines.items.map((line, index) => {
+            {lines.items.filter(filterByRegion).map((line, index) => {
                 line = normalizePuzzleLine(line, puzzle);
 
                 return <RoundedPolyLine
@@ -55,7 +59,7 @@ export const UserLines = {
                 />;
             })}
 
-            {marks.items.map((mark, index) => <UserMarkByData
+            {marks.items.filter(filterByRegion).map((mark, index) => <UserMarkByData
                 key={`mark-${index}`}
                 context={context}
                 cellSize={cellSize}
@@ -64,9 +68,20 @@ export const UserLines = {
             />)}
         </>;
     },
-    [FieldLayer.newUserLines]: <T extends AnyPTM>({context: {cellSize, state: {currentMultiLine, dragAction}}}: ConstraintProps<T>) => {
+    [FieldLayer.newUserLines]: <T extends AnyPTM>(
+        {
+            context: {
+                cellSize,
+                puzzle: {typeManager: {regionSpecificUserMarks}},
+                state: {currentMultiLine, dragAction},
+            },
+            regionIndex,
+        }: ConstraintProps<T>
+    ) => {
+        const filterByRegion = (item: {regionIndex?: number}) => !regionSpecificUserMarks || item.regionIndex === regionIndex;
+
         return <>
-            {currentMultiLine.map((line, index) => <UserLinesByData
+            {currentMultiLine.filter(filterByRegion).map((line, index) => <UserLinesByData
                 key={`new-line-${index}`}
                 cellSize={cellSize}
                 {...line}

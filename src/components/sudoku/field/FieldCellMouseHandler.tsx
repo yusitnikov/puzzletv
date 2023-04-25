@@ -16,6 +16,7 @@ const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 export interface FieldCellMouseHandlerProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     cellPosition: Position;
+    regionIndex?: number;
     handlers: GestureHandler<any>[];
 }
 
@@ -23,6 +24,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
     {
         context,
         cellPosition,
+        regionIndex,
         handlers,
     }: FieldCellMouseHandlerProps<T>
 ) => {
@@ -73,6 +75,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
                     context={context}
                     cellPosition={cellPosition}
                     cellExactPosition={exactPosition}
+                    regionIndex={regionIndex}
                     handlers={handlers}
                     left={leftOffset * 0.25}
                     top={topOffset * 0.25}
@@ -87,6 +90,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
                     context={context}
                     cellPosition={cellPosition}
                     cellExactPosition={centerExactPosition}
+                    regionIndex={regionIndex}
                     handlers={handlers}
                 />
 
@@ -103,6 +107,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
                         context={context}
                         cellPosition={cellPosition}
                         cellExactPosition={exactPosition}
+                        regionIndex={regionIndex}
                         line={line}
                         handlers={handlers}
                     />
@@ -116,6 +121,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
                 context={context}
                 cellPosition={cellPosition}
                 cellExactPosition={centerExactPosition}
+                regionIndex={regionIndex}
                 handlers={handlers}
             />
 
@@ -125,6 +131,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
                     context={context}
                     cellPosition={cellPosition}
                     cellExactPosition={centerExactPosition}
+                    regionIndex={regionIndex}
                     left={leftOffset * (1 - borderPaddingCoeff)}
                     top={topOffset * (1 - borderPaddingCoeff)}
                     width={borderPaddingCoeff}
@@ -141,6 +148,7 @@ interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
     context: PuzzleContext<T>;
     cellPosition: Position;
     cellExactPosition: CellExactPosition;
+    regionIndex?: number;
     line?: Position[];
     handlers: GestureHandler<any>[];
     skipEnter?: boolean;
@@ -148,7 +156,7 @@ interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
 
 const MouseHandlerRect = <T extends AnyPTM>(
     {
-        context, cellPosition, cellExactPosition, line, handlers, skipEnter, ...rect
+        context, cellPosition, cellExactPosition, regionIndex, line, handlers, skipEnter, ...rect
     }: MouseHandlerRectProps<T>
 ) => <FieldCellShape
     context={context}
@@ -169,6 +177,7 @@ const MouseHandlerRect = <T extends AnyPTM>(
             tags: [cellGestureExtraDataTag],
             cell: cellPosition,
             exact: cellExactPosition,
+            regionIndex,
             skipEnter,
         })),
     )}
