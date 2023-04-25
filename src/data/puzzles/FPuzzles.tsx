@@ -872,6 +872,9 @@ class FPuzzlesImporter<T extends AnyPTM> {
                     const puzzleSolution = this.puzzle.solution = this.puzzle.solution ?? {};
                     const solutionArray = splitArrayIntoChunks(
                         solution.map((value) => {
+                            if (value?.toString() === ".") {
+                                return undefined;
+                            }
                             const num = Number(value);
                             return Number.isFinite(num) ? num : value;
                         }),

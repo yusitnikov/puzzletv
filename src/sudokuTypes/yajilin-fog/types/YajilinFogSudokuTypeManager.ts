@@ -2,7 +2,7 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {CellColor} from "../../../types/sudoku/CellColor";
 import {lineTag} from "../../../components/sudoku/constraints/line/Line";
 import {PuzzleLineSet} from "../../../types/sudoku/PuzzleLineSet";
-import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {indexes} from "../../../utils/indexes";
 import {FogConstraint, FogProps, fogTag} from "../../../components/sudoku/constraints/fog/Fog";
 import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
@@ -28,6 +28,13 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                     disableDiagonalBorderLines: true,
                     disableDiagonalCenterLines: true,
                 };
+            }
+
+            if (puzzle.solution) {
+                puzzle.solution = processGivenDigitsMaps(
+                    ([value]) => value === 0 ? undefined : value,
+                    [puzzle.solution]
+                );
             }
 
             let yajilinFogLineSolution = new PuzzleLineSet(puzzle);
