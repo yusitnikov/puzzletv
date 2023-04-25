@@ -45,12 +45,15 @@ const JigsawPieceHighlightHandler = (
 
     // TODO: make sure that the last selected cell with Ctrl+A is the bottom-right-most cell according to the pieces' state
     const selectedCell = selectedCells.last();
+    const hasSelectedCell = !!selectedCell;
     const selectedRegionIndexes = usePureMemo(selectedCell && getJigsawPieceIndexesByCell(cellsIndex, piecePositions, selectedCell));
     useEffect(() => {
         if (selectedRegionIndexes?.length) {
             onStateChangeRef.current(jigsawPieceBringOnTopAction(puzzle, selectedRegionIndexes, false));
+        } else if (hasSelectedCell) {
+            onStateChangeRef.current({extension: {highlightCurrentPiece: false}});
         }
-    }, [puzzle, selectedRegionIndexes, onStateChangeRef]);
+    }, [puzzle, selectedRegionIndexes, hasSelectedCell, onStateChangeRef]);
 
     useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey, metaKey, altKey, shiftKey} = ev;
