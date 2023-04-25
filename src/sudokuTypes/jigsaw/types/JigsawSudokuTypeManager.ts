@@ -2,7 +2,6 @@ import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/su
 import {JigsawGameState, JigsawJssCluesVisibility, JigsawProcessedGameState} from "./JigsawGameState";
 import {JigsawDigit} from "./JigsawDigit";
 import {
-    arrayContainsPosition,
     getLineVector,
     isSamePosition,
     Position,
@@ -25,7 +24,7 @@ import {
     sortJigsawPiecesByPosition
 } from "./helpers";
 import {JigsawMoveCellWriteModeInfo} from "./JigsawMoveCellWriteModeInfo";
-import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
+import {doesGridRegionContainCell, GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {lightGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
@@ -48,6 +47,7 @@ import {JigsawGluePiecesButton} from "../components/JigsawGluePiecesButton";
 import {useMemo} from "react";
 import {emptyGestureMetrics} from "../../../utils/gestures";
 import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
+import {indexesFromTo} from "../../../utils/indexes";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -349,20 +349,29 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
         const regions = getRegionsWithSameCoordsTransformation!(context)
             .filter(({noInteraction}) => !noInteraction)
             .sort((a, b) => (a.zIndex ?? -1) - (b.zIndex ?? -1));
-        const currentRegion = regions.find(({cells}) => cells && arrayContainsPosition(cells, currentCell));
+        // Find the last matching region - it's the one that is visible by z-index
+        const currentRegion = [...regions].reverse()
+            .find((region) => doesGridRegionContainCell(region, currentCell));
         if (!currentRegion) {
             return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, ...args);
         }
 
         const currentCellCenter = getJigsawCellCenterAbsolutePosition(currentRegion, currentCell);
 
-        const regionCells = regions.flatMap((region) => region.cells?.map((cell) => ({
-            cell,
-            vector: getLineVector({
-                start: currentCellCenter,
-                end: getJigsawCellCenterAbsolutePosition(region, cell)
-            }),
-        })) ?? []);
+        const regionCells = regions.flatMap((region) => {
+            const cells = region.cells ?? indexesFromTo(region.top, region.top + region.width).flatMap(
+                (top) => indexesFromTo(region.left, region.left + region.height).map(
+                    (left): Position => ({top, left})
+                )
+            );
+            return cells.map((cell) => ({
+                cell,
+                vector: getLineVector({
+                    start: currentCellCenter,
+                    end: getJigsawCellCenterAbsolutePosition(region, cell)
+                }),
+            }));
+        });
 
         // Index all cells by how many arrow moves it will take to get to them
         const regionCellsIndex: Record<number, Position> = {};
