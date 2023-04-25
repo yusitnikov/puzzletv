@@ -222,7 +222,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                     ({color, cells}) => cellsIndex.splitUnconnectedRegions([cells]).map(
                         (cells): RushHourCar => ({
                             color,
-                            invert: randomizer() > 0.5,
+                            invert: randomizer() < 0.5,
                             cells,
                             boundingRect: getRegionBoundingBox(cells, 1),
                         })
