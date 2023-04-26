@@ -244,7 +244,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                 regions: [],
                 customCellBounds,
                 ignoreRowsColumnCountInTheWrapper: true,
-                fieldWrapperComponent: InfiniteRingsFieldWrapper(visibleRingsCountArg, startRingOffset),
+                fieldWrapperComponent: InfiniteRingsFieldWrapper(visibleRingsCountArg),
                 allowDrawing: puzzle.allowDrawing?.filter(type => ["center-mark"].includes(type)),
             };
         },
