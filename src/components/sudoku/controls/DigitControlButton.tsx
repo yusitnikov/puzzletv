@@ -11,10 +11,12 @@ import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export interface DigitControlButtonProps<T extends AnyPTM> {
     index: number;
+    // how many digits do we have in the current mode
+    count: number;
     context: PuzzleContext<T>;
 }
 
-export const DigitControlButton = <T extends AnyPTM>({index, context}: DigitControlButtonProps<T>) => {
+export const DigitControlButton = <T extends AnyPTM>({index, count, context}: DigitControlButtonProps<T>) => {
     const translate = useTranslate();
 
     const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;
@@ -32,6 +34,7 @@ export const DigitControlButton = <T extends AnyPTM>({index, context}: DigitCont
 
     const {
         isShowingSettings,
+        flipKeypad,
         processed: {
             cellWriteMode,
             cellWriteModeInfo: {
@@ -96,9 +99,12 @@ export const DigitControlButton = <T extends AnyPTM>({index, context}: DigitCont
         }
     });
 
+    const top = (index - index % 3) / 3;
+    const rowsCount = Math.min(3, Math.ceil(count / 3));
+
     return <ControlButton
         left={index === 9 ? 1 : index % 3}
-        top={(index - index % 3) / 3}
+        top={flipKeypad && top < rowsCount ? (rowsCount - 1 - top) : top}
         cellSize={cellSize}
         fullHeight={!selectableButtonContent}
         innerBorderWidth={selectableButtonContent ? 1 : 0}

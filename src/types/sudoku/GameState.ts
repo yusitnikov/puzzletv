@@ -97,6 +97,7 @@ export interface GameState<T extends AnyPTM> {
     enableConflictChecker: boolean;
     pencilmarksCheckerMode: PencilmarksCheckerMode;
     autoCheckOnFinish: boolean;
+    flipKeypad: boolean;
     backgroundOpacity: number;
     nickname: string;
     highlightSeenCells: boolean;
@@ -322,6 +323,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
         enableConflictChecker: loadBoolFromLocalStorage(LocalStorageKeys.enableConflictChecker, true),
         pencilmarksCheckerMode: loadNumberFromLocalStorage(LocalStorageKeys.pencilmarksCheckerMode, PencilmarksCheckerMode.CheckObvious),
         autoCheckOnFinish: loadBoolFromLocalStorage(LocalStorageKeys.autoCheckOnFinish, true),
+        flipKeypad: loadBoolFromLocalStorage(LocalStorageKeys.flipKeypad),
         backgroundOpacity: loadNumberFromLocalStorage(LocalStorageKeys.backgroundOpacity, 0.5),
         nickname: loadStringFromLocalStorage(LocalStorageKeys.nickname, ""),
         highlightSeenCells: loadBoolFromLocalStorage(LocalStorageKeys.highlightSeenCells, false),

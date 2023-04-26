@@ -274,6 +274,9 @@ export const translationsExactType = {
     "Auto-check on finish": {
         [LanguageCode.ru]: "Авто-проверка при завершении",
     },
+    "Flip keypad": {
+        [LanguageCode.ru]: "Перевернуть клавиатуру",
+    },
     "Background color's opacity": {
         [LanguageCode.ru]: "Прорачность цвета фона",
     },

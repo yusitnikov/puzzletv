@@ -33,6 +33,7 @@ export const Controls = <T extends AnyPTM>({rect, isHorizontal, context}: Contro
             {indexes(digitsCountInCurrentMode).map(index => <DigitControlButton
                 key={`digit-${index}`}
                 index={index}
+                count={digitsCountInCurrentMode}
                 context={context}
             />)}
         </>}

@@ -46,6 +46,7 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                 enableConflictChecker,
                 pencilmarksCheckerMode,
                 autoCheckOnFinish,
+                flipKeypad,
                 backgroundOpacity,
                 nickname,
                 highlightSeenCells,
@@ -84,6 +85,11 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
     const handleChangeAutoCheckOnFinish = (value: boolean) => {
         onStateChange({autoCheckOnFinish: value});
         saveBoolToLocalStorage(LocalStorageKeys.autoCheckOnFinish, value);
+    };
+
+    const handleChangeFlipKeypad = (value: boolean) => {
+        onStateChange({flipKeypad: value});
+        saveBoolToLocalStorage(LocalStorageKeys.flipKeypad, value);
     };
 
     const handleChangeBackgroundOpacity = (value: number) => {
@@ -246,6 +252,17 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                 onChange={(ev) => handleChangeAutoCheckOnFinish(ev.target.checked)}
             />
         </SettingsItem>}
+
+        <SettingsItem>
+            {translate("Flip keypad")}:
+
+            <SettingsCheckbox
+                type={"checkbox"}
+                cellSize={cellSize}
+                checked={flipKeypad}
+                onChange={(ev) => handleChangeFlipKeypad(ev.target.checked)}
+            />
+        </SettingsItem>
 
         {!disableBackgroundColorOpacity && <SettingsItem>
             {translate("Background color's opacity")}:<br/>
