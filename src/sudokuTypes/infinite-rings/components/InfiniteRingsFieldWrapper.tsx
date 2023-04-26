@@ -93,6 +93,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
                 position: "absolute",
                 inset: 0,
                 opacity: 0.15,
+                pointerEvents: "none",
             }}>
                 <div style={{
                     position: "absolute",
