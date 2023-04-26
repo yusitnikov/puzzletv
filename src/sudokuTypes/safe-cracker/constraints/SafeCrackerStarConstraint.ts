@@ -6,7 +6,7 @@ import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const SafeCrackerStarConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
-    layer = FieldLayer.lines,
+    layer = FieldLayer.afterLines,
 ) => TextConstraint<T>(
     cellLiterals,
     "☆",

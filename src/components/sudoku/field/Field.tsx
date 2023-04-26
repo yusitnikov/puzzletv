@@ -393,6 +393,10 @@ export const Field = <T extends AnyPTM>({context, rect}: FieldProps<T>) => {
                                         <FieldItems layer={FieldLayer.lines} {...itemsProps}/>
                                     </g>
 
+                                    <g data-layer="items-after-lines">
+                                        <FieldItems layer={FieldLayer.afterLines} {...itemsProps}/>
+                                    </g>
+
                                     <g data-layer="items-given-user-lines">
                                         <FieldItems layer={FieldLayer.givenUserLines} {...itemsProps}/>
                                     </g>

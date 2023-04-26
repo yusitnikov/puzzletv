@@ -13,7 +13,7 @@ export interface QuadProps<CellType> {
 }
 
 export const Quad = {
-    [FieldLayer.top]: <T extends AnyPTM>(
+    [FieldLayer.afterLines]: <T extends AnyPTM>(
         {
             context,
             cells,

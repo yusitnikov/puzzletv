@@ -27,7 +27,7 @@ export interface QuadleProps<CellType> {
 }
 
 export const Quadle = {
-    [FieldLayer.top]: <T extends AnyPTM>(
+    [FieldLayer.afterLines]: <T extends AnyPTM>(
         {
             context,
             cells,

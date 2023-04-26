@@ -62,7 +62,7 @@ const XVConstraint = <T extends AnyPTM>(
     return {
         name,
         cells: [cell1, cell2],
-        component: {[FieldLayer.top]: component},
+        component: {[FieldLayer.afterLines]: component},
         props: undefined,
         isObvious: true,
         isValidCell(cell, digits, [cell1, cell2], context) {

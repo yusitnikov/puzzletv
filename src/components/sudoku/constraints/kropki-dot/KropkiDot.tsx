@@ -15,7 +15,7 @@ export interface KropkiDotProps {
 }
 
 export const KropkiDot = {
-    [FieldLayer.top]: <T extends AnyPTM>(
+    [FieldLayer.afterLines]: <T extends AnyPTM>(
         {
             cells: [cell1, cell2],
             color = blackColor,

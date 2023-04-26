@@ -3,6 +3,7 @@ export enum FieldLayer {
     beforeSelection,
     regular,
     lines,
+    afterLines,
     givenUserLines,
     newUserLines,
     top,

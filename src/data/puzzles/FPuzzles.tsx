@@ -348,7 +348,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
             && cells.length === 1
             && puzzleJson.fogofwar?.includes(cells[0]);
 
-        const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.lines;
+        const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.afterLines;
 
         const isVisibleGridCell = (cell: Position) => isVisibleCell(this.typeManager.getCellTypeProps?.(cell, this.puzzle));
 

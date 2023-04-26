@@ -8,7 +8,7 @@ const radius = 0.15;
 const lineWidth = 0.03;
 
 export const Greater = {
-    [FieldLayer.top]: <T extends AnyPTM>({cells: [greaterCell, lessCell]}: ConstraintProps<T>) => {
+    [FieldLayer.afterLines]: <T extends AnyPTM>({cells: [greaterCell, lessCell]}: ConstraintProps<T>) => {
         const {left: dx, top: dy} = getLineVector({start: greaterCell, end: lessCell});
 
         return <g

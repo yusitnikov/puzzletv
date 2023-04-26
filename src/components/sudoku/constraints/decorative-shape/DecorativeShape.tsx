@@ -108,7 +108,7 @@ export const RectConstraint = <T extends AnyPTM>(
     text?: string,
     textColor?: string,
     angle?: number,
-    layer = FieldLayer.lines,
+    layer = FieldLayer.afterLines,
 ) => DecorativeShapeConstraint<T>("rect", layer, RectComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
 
 export const EllipseConstraint = <T extends AnyPTM>(
@@ -119,5 +119,5 @@ export const EllipseConstraint = <T extends AnyPTM>(
     text?: string,
     textColor?: string,
     angle?: number,
-    layer = FieldLayer.lines,
+    layer = FieldLayer.afterLines,
 ) => DecorativeShapeConstraint<T>("ellipse", layer, EllipseComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);

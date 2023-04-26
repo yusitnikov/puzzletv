@@ -38,7 +38,7 @@ export const TextConstraint = <T extends AnyPTM>(
     color?: string,
     size?: number,
     angle?: number,
-    layer = FieldLayer.lines,
+    layer = FieldLayer.afterLines,
 ): Constraint<T, TextProps> => {
     return {
         name: `text: ${text}`,

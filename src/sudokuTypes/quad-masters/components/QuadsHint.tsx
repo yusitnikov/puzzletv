@@ -5,7 +5,7 @@ import {lightGreyColor} from "../../../components/app/globals";
 import {QuadMastersPTM} from "../types/QuadMastersPTM";
 
 export const QuadsHint = {
-    [FieldLayer.top]: (
+    [FieldLayer.afterLines]: (
         {
             context: {
                 puzzle: {
