@@ -36,6 +36,7 @@ import {ToroidalRenbanmometers} from "./ToroidalRenbanmometers";
 import {PenroseTiles} from "./PenroseTiles";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {RushHour} from "./RushHour";
+import {InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdge} from "./InfinityLoop";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -92,6 +93,11 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    InfinityLoopIntro1,
+    InfinityLoopIntro2,
+    MisterFantastic,
+    WalkingOnTheEdge,
+
     RushHour,
 
     ToroidalRenbanmometers,
