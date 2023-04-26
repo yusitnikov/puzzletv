@@ -46,7 +46,6 @@ import {getAllPuzzleConstraints, isValidUserDigit, prepareGivenDigitsMapForConst
 import {DragAction} from "./DragAction";
 import {incrementArrayItem} from "../../utils/array";
 import {CellColor, CellColorValue} from "./CellColor";
-import {LineWithColor} from "./LineWithColor";
 import {CellPart} from "./CellPart";
 import {PencilmarksCheckerMode} from "./PencilmarksCheckerMode";
 import {loop} from "../../utils/math";
