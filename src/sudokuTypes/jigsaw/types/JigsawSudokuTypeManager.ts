@@ -44,7 +44,7 @@ import {getReverseIndexMap} from "../../../utils/array";
 import {createRandomGenerator} from "../../../utils/random";
 import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
-import {Constraint} from "../../../types/sudoku/Constraint";
+import {Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {jssTag} from "../../jss/constraints/Jss";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
@@ -546,16 +546,35 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
     gridBackgroundColor: lightGreyColor,
     regionBackgroundColor: "#fff",
 
-    postProcessPuzzle({items, ...puzzle}): PuzzleDefinition<JigsawPTM> {
+    postProcessPuzzle(puzzle): PuzzleDefinition<JigsawPTM> {
         const processJss = (items: Constraint<JigsawPTM, any>[]) => items.map(
             (constraint) => constraint.tags?.includes(jssTag)
                 ? {...constraint, component: {[FieldLayer.noClip]: JigsawJss}}
                 : constraint
         );
 
+        const {items, resultChecker} = puzzle;
+
         switch (typeof items) {
-            case "function": return {...puzzle, items: (...args) => processJss(items(...args))};
-            case "object": return {...puzzle, items: processJss(items)};
+            case "function":
+                puzzle = {...puzzle, items: (...args) => processJss(items(...args))};
+                break;
+            case "object":
+                puzzle = {...puzzle, items: processJss(items)};
+                break;
+        }
+
+        if (resultChecker) {
+            puzzle = {
+                ...puzzle,
+                resultChecker: (context) => {
+                    if (resultChecker !== isValidFinishedPuzzleByConstraints && !isValidFinishedPuzzleByConstraints(context)) {
+                        return false;
+                    }
+
+                    return resultChecker(context);
+                },
+            };
         }
 
         return puzzle;
