@@ -94,6 +94,7 @@ import {isVisibleCell} from "../../types/sudoku/CellTypeProps";
 import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
 import {RushHourSudokuTypeManager} from "../../sudokuTypes/rush-hour/types/RushHourSudokuTypeManager";
 import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
+import {SokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/types/SokobanSudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -189,6 +190,7 @@ const loadByImportOptions = (
         startOffset = 0,
         jss,
         rotatableClues,
+        sokoban,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager();
@@ -213,6 +215,9 @@ const loadByImportOptions = (
     };
 
     let typeManager = typesMap[type] ?? regularTypeManager;
+    if (sokoban) {
+        typeManager = SokobanSudokuTypeManager;
+    }
     if (tesseract) {
         typeManager = TesseractSudokuTypeManager(typeManager);
     }

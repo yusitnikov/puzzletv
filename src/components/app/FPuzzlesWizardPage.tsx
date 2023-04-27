@@ -62,6 +62,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [isJss, setIsJss] = useBoolFromLocalStorage("fpwIsJss");
     const [rotatableClues, setRotatableClues] = useBoolFromLocalStorage("fpwRotatableClues");
+    const [sokoban, setSokoban] = useBoolFromLocalStorage("fpwSokoban");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
@@ -128,6 +129,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         loopY: !isSpecialGrid && loopY,
         jss: supportsJss && isJss,
         rotatableClues: !isSpecialGrid && rotatableClues,
+        sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
         "product-arrow": !!puzzle.arrow && productArrow,
         yajilinFog: hasFog && yajilinFog,
@@ -261,15 +263,22 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     {!isSpecialGrid && <>
                         <Paragraph>
                             <label>
-                                Tesseract:&nbsp;
-                                <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
+                                Rotatable clues:&nbsp;
+                                <input type={"checkbox"} checked={rotatableClues} onChange={ev => setRotatableClues(ev.target.checked)}/>
                             </label>
                         </Paragraph>
 
                         <Paragraph>
                             <label>
-                                Rotatable clues:&nbsp;
-                                <input type={"checkbox"} checked={rotatableClues} onChange={ev => setRotatableClues(ev.target.checked)}/>
+                                Sokoban:&nbsp;
+                                <input type={"checkbox"} checked={sokoban} onChange={ev => setSokoban(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Tesseract:&nbsp;
+                                <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
                             </label>
                         </Paragraph>
                     </>}

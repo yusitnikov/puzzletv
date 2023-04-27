@@ -37,7 +37,7 @@ import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
 import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
-import {gameStateGetCurrentFieldState, PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 import {JigsawFieldPieceState, JigsawFieldState} from "./JigsawFieldState";
 import {getReverseIndexMap} from "../../../utils/array";
@@ -354,7 +354,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
 
     processArrowDirection(
         currentCell, xDirection, yDirection, context, ...args
-    ): { cell?: Position; state?: PartialGameStateEx<JigsawPTM> } {
+    ): {cell?: Position} {
         const {puzzle: {typeManager: {getRegionsWithSameCoordsTransformation}}} = context;
 
         const regions = getRegionsWithSameCoordsTransformation!(context)

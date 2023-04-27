@@ -166,6 +166,9 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         isMainKeyboard: boolean
     ): {cell?: Position, state?: PartialGameStateEx<T>};
 
+    // Apply processArrowDirection() changes even if there are no selected cells
+    applyArrowProcessorToNoCell?: boolean;
+
     transformCoords?(
         coords: Position,
         context: PuzzleContext<T>,

@@ -578,24 +578,26 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
 ): PartialGameStateEx<T> => {
     const {puzzle, state} = context;
 
-    if (state.processed.cellWriteModeInfo.isNoSelectionMode) {
-        return {};
-    }
-
     const currentCell = state.selectedCells.last();
-    // Nothing to do when there's no selection
-    if (!currentCell) {
-        return {};
-    }
 
     const {
-        typeManager: {processArrowDirection = defaultProcessArrowDirection},
+        typeManager: {processArrowDirection = defaultProcessArrowDirection, applyArrowProcessorToNoCell},
         fieldSize,
         loopHorizontally,
         loopVertically,
     } = puzzle;
 
-    const {cell: newCell, state: newState = {}} = processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard);
+    let {cell: newCell, state: newState = {}} = processArrowDirection(currentCell ?? emptyPosition, xDirection, yDirection, context, isMainKeyboard);
+
+    // Nothing to do when there's no selection
+    if (state.processed.cellWriteModeInfo.isNoSelectionMode || !currentCell) {
+        if (!applyArrowProcessorToNoCell) {
+            return {};
+        }
+
+        newCell = undefined;
+    }
+
     if (!newCell) {
         return newState;
     }

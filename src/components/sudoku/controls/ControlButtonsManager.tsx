@@ -3,7 +3,7 @@ import {Position} from "../../../types/layout/Position";
 import {ComponentType, useMemo} from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteModeInfo";
+import {CellWriteModeInfo, getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteModeInfo";
 import {ResetButton} from "./ResetButton";
 import {SettingsButton} from "./SettingsButton";
 import {ResultCheckButton} from "./ResultCheckButton";
@@ -13,7 +13,6 @@ import {DeleteButton} from "./DeleteButton";
 import {MultiSelectionButton} from "./MultiSelectionButton";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 
 export enum ControlButtonRegion {
     // main digit, corner marks, center marks, colors, pen tool, etc.
@@ -30,14 +29,14 @@ export enum ControlButtonRegion {
 
 export interface ControlButtonItemProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
-    title?: PartiallyTranslatable;
+    info?: CellWriteModeInfo<T>;
 }
 
 export interface ControlButtonItem<T extends AnyPTM> {
     key: string;
     region: ControlButtonRegion;
     Component: ComponentType<ControlButtonItemProps<T>>;
-    title?: PartiallyTranslatable;
+    info?: CellWriteModeInfo<T>;
 }
 
 export class ControlButtonsManager<T extends AnyPTM> {
@@ -77,10 +76,10 @@ export class ControlButtonsManager<T extends AnyPTM> {
             modes.push(
                 ...allowedCellWriteModes
                     .filter(({mode, mainButtonContent}) => mainButtonContent)
-                    .map<Omit<ControlButtonItem<T>, "region">>(({mode, mainButtonContent, title}) => ({
-                        key: `mode-${mode}`,
-                        Component: mainButtonContent!,
-                        title,
+                    .map<Omit<ControlButtonItem<T>, "region">>((info) => ({
+                        key: `mode-${info.mode}`,
+                        Component: info.mainButtonContent!,
+                        info,
                     }))
             );
         }
@@ -168,44 +167,44 @@ export class ControlButtonsManager<T extends AnyPTM> {
         const rightColumn = this.isCompact ? 1 : 4;
 
         return <>
-            {modes.slice(0, realHeight).map(({key, Component, title}, index) => <Component
+            {modes.slice(0, realHeight).map(({key, Component, info}, index) => <Component
                 key={key}
                 context={context}
                 top={index}
                 left={3}
-                title={title}
+                info={info}
             />)}
 
-            {[...right, ...modes.slice(realHeight)].map(({key, Component, title}, index) => <Component
+            {[...right, ...modes.slice(realHeight)].map(({key, Component, info}, index) => <Component
                 key={key}
                 context={context}
                 top={isRevertedRight ? rightColumn : index}
                 left={isRevertedRight ? index : rightColumn}
-                title={title}
+                info={info}
             />)}
 
-            {bottom.map(({key, Component, title}, index) => (!isColorMode || index !== 1) && <Component
+            {bottom.map(({key, Component, info}, index) => (!isColorMode || index !== 1) && <Component
                 key={key}
                 context={context}
                 top={isRevertedBottom ? index : bottomRow}
                 left={isRevertedBottom ? bottomRow : index}
-                title={title}
+                info={info}
             />)}
 
-            {additional.map(({key, Component, title}, index) => <Component
+            {additional.map(({key, Component, info}, index) => <Component
                 key={key}
                 context={context}
                 top={realHeight - 1}
                 left={index}
-                title={title}
+                info={info}
             />)}
 
-            {custom.map(({key, Component, title}) => <Component
+            {custom.map(({key, Component, info}) => <Component
                 key={key}
                 context={context}
                 top={0}
                 left={0}
-                title={title}
+                info={info}
             />)}
         </>;
     }

@@ -9,7 +9,7 @@ import {useCallback} from "react";
 import {emptyPosition} from "../../../types/layout/Position";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, title}: ControlButtonItemProps<T>) => {
+export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, info}: ControlButtonItemProps<T>) => {
     const {
         puzzle: {
             typeManager: {initialAngle = 0, initialScale = 1},
@@ -56,7 +56,7 @@ export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, title
                 <polyline points={"0.3,0.7 0,1 -0.3,0.7"} stroke={textColor} strokeWidth={0.15}/>
             </AutoSvg>}
             noBorders={true}
-            title={`${translate(title ?? "Move the grid")} (${translate("shortcut")}: Alt+Shift)`}
+            title={`${translate(info?.title ?? "Move the grid")} ${info?.hotKeyStr ? `(${translate("shortcut")}: ${info?.hotKeyStr})` : ""}`}
             context={context}
         />
 
