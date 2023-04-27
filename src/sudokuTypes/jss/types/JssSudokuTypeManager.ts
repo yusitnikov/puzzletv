@@ -1,10 +1,10 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {Position} from "../../../types/layout/Position";
+import {Position, PositionSet} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {JssCell} from "./JssCell";
-import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
+import {GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {resolveCellColorValue} from "../../../types/sudoku/CellColor";
 import {JssConstraint} from "../constraints/Jss";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
@@ -38,14 +38,27 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
                 };
             }
 
+            const allRegionCells = new PositionSet(puzzle.regions?.flatMap(getRegionCells));
+
             puzzle.initialColors = puzzle.initialColors ?? {};
-            if (typeof puzzle.initialColors !== "object") {
-                throw new Error(`puzzle.initialColors is expected to be an object for ${JssSudokuTypeManager.name}`);
+            puzzle.solutionColors = puzzle.solutionColors ?? {};
+            if (typeof puzzle.initialColors !== "object" || typeof puzzle.solutionColors !== "object") {
+                throw new Error(`puzzle.initialColors and puzzle.solutionColors are expected to be objects for ${JssSudokuTypeManager.name}`);
             }
-            // Treat background colors as JSS clues
+
+            // Treat given colors inside active regions as solution colors
+            puzzle.solutionColors = mergeGivenDigitsMaps(
+                puzzle.solutionColors,
+                processGivenDigitsMaps(
+                    ([colors], position) =>
+                        allRegionCells.contains(position) ? colors : undefined,
+                    [puzzle.initialColors]
+                )
+            );
+            // Treat given colors outside active regions as JSS clues
             let jssCellsMap: GivenDigitsMap<JssCell> = processGivenDigitsMaps(
                 ([[color]], position): JssCell | undefined =>
-                    color
+                    color && !allRegionCells.contains(position)
                         ? {
                             ...position,
                             backgroundColor: resolveCellColorValue(color)
