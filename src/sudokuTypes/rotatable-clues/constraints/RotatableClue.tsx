@@ -12,7 +12,7 @@ const pivotRadius = 0.15;
 const pivotLineWidth = pivotRadius * 0.1;
 
 export const RotatableClueConstraint = <T extends AnyPTM>(
-    {clue, pivot}: RotatableClue,
+    {clues, pivot}: RotatableClue,
     angle: number,
     animatedAngle: number,
 ): Constraint<RotatableCluesPTM<T>, any>[] => {
@@ -27,36 +27,37 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
             left: pivot.left + Math.round(left),
         };
     };
-    const processedCells = clue.cells.map(processCellCoords);
+    const processedCells = clues.flatMap(({cells}) => cells).map(processCellCoords);
 
     return [
-        {
-            ...clue,
-            ...cloneConstraint(clue, {processCellCoords}),
-            name: `${clue.name} - validation`,
-            component: undefined,
-        },
-        {
-            ...clue,
-            name: `${clue.name} - animation`,
-            component: Object.fromEntries(Object.entries(clue.component ?? {}).map(([layer, Component]) => [
-                layer,
-                (props: ConstraintProps<RotatableCluesPTM<T>, any>) => {
-                    const cellFixOffset = getLineVector({start: props.cells[0], end: clue.cells[0]});
-                    const offsetTop = pivot.top + 0.5 + cellFixOffset.top;
-                    const offsetLeft = pivot.left + 0.5 + cellFixOffset.left;
+        ...clues.flatMap((clue) => [
+            {
+                ...cloneConstraint(clue, {processCellCoords}),
+                name: `${clue.name} - validation`,
+                component: undefined,
+            },
+            {
+                ...clue,
+                name: `${clue.name} - animation`,
+                component: clue.component && Object.fromEntries(Object.entries(clue.component).map(([layer, Component]) => [
+                    layer,
+                    (props: ConstraintProps<RotatableCluesPTM<T>, any>) => {
+                        const offsetTop = pivot.top + 0.5;
+                        const offsetLeft = pivot.left + 0.5;
 
-                    return <AutoSvg top={offsetTop} left={offsetLeft} angle={animatedAngle}>
-                        <AutoSvg top={-offsetTop} left={-offsetLeft}>
-                            <Component {...props}/>
-                        </AutoSvg>
-                    </AutoSvg>;
-                },
-            ])),
-            isValidCell: undefined,
-            isValidPuzzle: undefined,
-            getInvalidUserLines: undefined,
-        },
+                        return <AutoSvg top={offsetTop} left={offsetLeft} angle={animatedAngle}>
+                            <AutoSvg top={-offsetTop} left={-offsetLeft}>
+                                <Component {...props}/>
+                            </AutoSvg>
+                        </AutoSvg>;
+                    },
+                ])),
+                renderSingleCellInUserArea: false,
+                isValidCell: undefined,
+                isValidPuzzle: undefined,
+                getInvalidUserLines: undefined,
+            },
+        ]),
         {
             name: "rotatable clue pivot",
             cells: [pivot],

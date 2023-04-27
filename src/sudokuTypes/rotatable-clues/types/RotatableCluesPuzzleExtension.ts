@@ -4,7 +4,7 @@ import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export interface RotatableClue {
     pivot: Position;
-    clue: Constraint<AnyPTM, any>,
+    clues: Constraint<AnyPTM, any>[],
 }
 
 export interface RotatableCluesPuzzleExtension {

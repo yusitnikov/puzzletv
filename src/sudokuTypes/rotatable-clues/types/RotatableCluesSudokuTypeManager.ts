@@ -1,6 +1,6 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {RotatableCluesGameState, RotatableCluesProcessedGameState} from "./RotatableCluesGameState";
-import {PositionSet} from "../../../types/layout/Position";
+import {PositionSet, stringifyPosition} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {RotatableCluesPTM} from "./RotatableCluesPTM";
 import {GameStateEx, gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
@@ -127,14 +127,22 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             const pivots = new PositionSet(puzzle.items.filter(isPivot).map(({cells: [cell]}) => cell));
             const items = puzzle.items.filter((item) => !isPivot(item));
 
-            const getCluePivot = ({cells, component}: Constraint<RotatableCluesPTM<T>>) =>
-                component ? cells.find((cell) => pivots.contains(cell)) : undefined;
-            const clues = items
-                .map((clue): RotatableClue => ({
-                    pivot: getCluePivot(clue)!,
-                    clue,
-                }))
-                .filter(({pivot}) => pivot);
+            const getCluePivot = ({cells}: Constraint<RotatableCluesPTM<T>>) =>
+                cells.find((cell) => pivots.contains(cell));
+            const cluesMap: Record<string, RotatableClue> = {};
+            for (const clue of items) {
+                const pivot = getCluePivot(clue);
+                if (!pivot) {
+                    continue;
+                }
+                const key = stringifyPosition(pivot);
+                cluesMap[key] = cluesMap[key] ?? {
+                    pivot,
+                    clues: [],
+                };
+                cluesMap[key].clues.push(clue);
+            }
+            const clues = Object.values(cluesMap);
             const noPivotItems = items.filter((clue) => !getCluePivot(clue));
 
             puzzle = {
