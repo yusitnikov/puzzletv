@@ -76,5 +76,14 @@ export const SandwichSumConstraint = <T extends AnyPTM>(
 
             return actualSum === sum;
         },
+        clone(constraint, {processCellCoords}): Constraint<T, SandwichSumProps> {
+            return {
+                ...constraint,
+                props: {
+                    ...constraint.props,
+                    clueCell: processCellCoords(constraint.props.clueCell),
+                }
+            };
+        },
     });
 };

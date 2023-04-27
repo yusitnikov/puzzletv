@@ -7,6 +7,7 @@ import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {Size} from "../../../../types/layout/Size";
 import {ComponentType, SVGAttributes} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {resolveCellColorValue} from "../../../../types/sudoku/CellColor";
 
 export interface DecorativeShapeProps extends Size {
     borderColor?: string;
@@ -98,6 +99,19 @@ const DecorativeShapeConstraint = <T extends AnyPTM>(
         angle,
         component: {[layer]: component},
         renderSingleCellInUserArea: true,
+        clone(
+            {props: {borderColor, textColor, ...props}, ...constraint},
+            {processColor},
+        ): Constraint<T, DecorativeShapeProps> {
+            return {
+                ...constraint,
+                props: {
+                    ...props,
+                    borderColor: borderColor && resolveCellColorValue(processColor(borderColor)),
+                    textColor: textColor && resolveCellColorValue(processColor(textColor)),
+                },
+            };
+        },
     };
 };
 
