@@ -175,5 +175,18 @@ export const ArrowConstraint = <T extends AnyPTM>(
 
             return arrowNumber === circleNumber;
         },
+        clone(
+            {props: {circleCells, arrowCells, transparentCircle}},
+            {processCellCoords},
+        ): Constraint<T, ArrowProps> {
+            return ArrowConstraint(
+                circleCells.map(processCellCoords),
+                arrowCells.map(processCellCoords),
+                transparentCircle,
+                undefined,
+                product,
+                false,
+            );
+        },
     };
 };

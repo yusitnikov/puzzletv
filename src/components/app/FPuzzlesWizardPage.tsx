@@ -61,6 +61,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [isJss, setIsJss] = useBoolFromLocalStorage("fpwIsJss");
+    const [rotatableClues, setRotatableClues] = useBoolFromLocalStorage("fpwRotatableClues");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
@@ -124,6 +125,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
         jss: supportsJss && isJss,
+        rotatableClues: !isSpecialGrid && rotatableClues,
         tesseract: !isSpecialGrid && tesseract,
         "product-arrow": !!puzzle.arrow && productArrow,
         yajilinFog: hasFog && yajilinFog,
@@ -244,6 +246,15 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         </label>
                     </Paragraph>}
 
+                    {supportsJss && <>
+                        <Paragraph>
+                            <label>
+                                JSS:&nbsp;
+                                <input type={"checkbox"} checked={isJss} onChange={ev => setIsJss(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+                    </>}
+
                     {!isSpecialGrid && <>
                         <Paragraph>
                             <label>
@@ -251,13 +262,11 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                                 <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
                             </label>
                         </Paragraph>
-                    </>}
 
-                    {supportsJss && <>
                         <Paragraph>
                             <label>
-                                JSS:&nbsp;
-                                <input type={"checkbox"} checked={isJss} onChange={ev => setIsJss(ev.target.checked)}/>
+                                Rotatable clues:&nbsp;
+                                <input type={"checkbox"} checked={rotatableClues} onChange={ev => setRotatableClues(ev.target.checked)}/>
                             </label>
                         </Paragraph>
                     </>}

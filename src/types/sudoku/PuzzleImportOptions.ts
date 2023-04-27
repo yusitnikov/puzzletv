@@ -36,6 +36,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     loopX?: boolean;
     loopY?: boolean;
     jss?: boolean;
+    rotatableClues?: boolean;
     "product-arrow"?: boolean;
     yajilinFog?: boolean;
     cosmeticsBehindFog?: boolean;
@@ -72,6 +73,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         loopX,
         loopY,
         jss,
+        rotatableClues,
         "product-arrow": productArrow,
         yajilinFog,
         cosmeticsBehindFog,
@@ -104,6 +106,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         loopX,
         loopY,
         jss,
+        rotatableClues,
         "product-arrow": productArrow,
         yajilinFog,
         cosmeticsBehindFog,

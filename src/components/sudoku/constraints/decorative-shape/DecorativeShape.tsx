@@ -85,6 +85,7 @@ const DecorativeShapeConstraint = <T extends AnyPTM>(
 ): Constraint<T, DecorativeShapeProps> => {
     return {
         name,
+        tags: [name],
         cells: parsePositionLiterals(cellLiterals),
         props: {
             width: typeof size === "number" ? size : size.width,
@@ -100,6 +101,7 @@ const DecorativeShapeConstraint = <T extends AnyPTM>(
     };
 };
 
+export const rectTag = "rect";
 export const RectConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     size: Size | number,
@@ -109,8 +111,9 @@ export const RectConstraint = <T extends AnyPTM>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.afterLines,
-) => DecorativeShapeConstraint<T>("rect", layer, RectComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>(rectTag, layer, RectComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
 
+export const ellipseTag = "ellipse";
 export const EllipseConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     size: Size | number,
@@ -120,4 +123,4 @@ export const EllipseConstraint = <T extends AnyPTM>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.afterLines,
-) => DecorativeShapeConstraint<T>("ellipse", layer, EllipseComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>(ellipseTag, layer, EllipseComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);

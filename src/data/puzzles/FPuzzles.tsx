@@ -93,6 +93,7 @@ import {JssSudokuTypeManager} from "../../sudokuTypes/jss/types/JssSudokuTypeMan
 import {isVisibleCell} from "../../types/sudoku/CellTypeProps";
 import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
 import {RushHourSudokuTypeManager} from "../../sudokuTypes/rush-hour/types/RushHourSudokuTypeManager";
+import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -187,6 +188,7 @@ const loadByImportOptions = (
         visibleRingsCount = 2,
         startOffset = 0,
         jss,
+        rotatableClues,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager();
@@ -219,6 +221,9 @@ const loadByImportOptions = (
     }
     if (jss) {
         typeManager = JssSudokuTypeManager(typeManager);
+    }
+    if (rotatableClues) {
+        typeManager = RotatableCluesSudokuTypeManager(typeManager);
     }
 
     switch (digitType) {

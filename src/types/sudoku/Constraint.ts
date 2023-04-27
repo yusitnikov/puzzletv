@@ -16,6 +16,7 @@ import {FieldLayer} from "./FieldLayer";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {isSelectableCell} from "./CellTypeProps";
 import {GridRegion} from "./GridRegion";
+import {CellColorValue, resolveCellColorValue} from "./CellColor";
 
 export type Constraint<T extends AnyPTM, DataT = undefined> = {
     name: string;
@@ -51,6 +52,7 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
         context: PuzzleContext<T>,
         isFinalCheck?: boolean
     ): Line[];
+    clone?(constraint: Constraint<T, DataT>, options: CloneConstraintOptions): Constraint<T, DataT>;
     props: DataT;
 };
 
@@ -204,5 +206,24 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
                 || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
         }))
     ) && getInvalidUserLines(lines, userDigits, constraints, context, true).size === 0;
+};
+
+export interface CloneConstraintOptions {
+    processCellCoords: (coords: Position) => Position;
+    processColor: (color: CellColorValue) => CellColorValue;
+}
+export const cloneConstraint = <T extends AnyPTM, DataT>(
+    constraint: Constraint<T, DataT>,
+    {
+        processCellCoords = (coords: Position) => coords,
+        processColor = (color: CellColorValue) => color,
+    }: Partial<CloneConstraintOptions> = {},
+): Constraint<T, DataT> => {
+    constraint = {
+        ...constraint,
+        cells: constraint.cells.map(processCellCoords),
+        color: constraint.color && resolveCellColorValue(processColor(constraint.color)),
+    };
+    return constraint.clone?.(constraint, {processCellCoords, processColor}) ?? constraint;
 };
 // endregion
