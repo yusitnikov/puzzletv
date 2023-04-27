@@ -56,6 +56,7 @@ import {emptyGestureMetrics} from "../../../utils/gestures";
 import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
+import {JigsawGluedPiecesConstraint} from "../constraints/JigsawGluedPieces";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -547,11 +548,14 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
     regionBackgroundColor: "#fff",
 
     postProcessPuzzle(puzzle): PuzzleDefinition<JigsawPTM> {
-        const processJss = (items: Constraint<JigsawPTM, any>[]) => items.map(
-            (constraint) => constraint.tags?.includes(jssTag)
-                ? {...constraint, component: {[FieldLayer.noClip]: JigsawJss}}
-                : constraint
-        );
+        const processJss = (items: Constraint<JigsawPTM, any>[]) => [
+            ...items.map(
+                (constraint) => constraint.tags?.includes(jssTag)
+                    ? {...constraint, component: {[FieldLayer.noClip]: JigsawJss}}
+                    : constraint
+            ),
+            JigsawGluedPiecesConstraint,
+        ];
 
         const {items, resultChecker} = puzzle;
 
