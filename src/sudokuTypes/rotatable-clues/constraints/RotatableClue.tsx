@@ -104,12 +104,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                 const {puzzle: {typeManager: {getDigitByCellData}}} = context;
                 const digit = getDigitByCellData(digits[cell.top][cell.left], context, cell);
 
-                const normalizeAngle = (angle: number) => {
-                    const normalizedAngle = loop(angle, 360);
-                    return normalizedAngle === 270 ? 90 : normalizedAngle;
-                };
-
-                return normalizeAngle(angle) === normalizeAngle(digit * 90);
+                return loop(digit * 90 - angle, 360) === 0;
             },
         },
     ];
