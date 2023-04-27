@@ -7,7 +7,7 @@ import {
     rotateVectorClockwise
 } from "../../../types/layout/Position";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
-import {loop} from "../../../utils/math";
+import {loop, roundToStep} from "../../../utils/math";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {getRegionBoundingBox} from "../../../utils/regions";
 import {JigsawPieceInfo} from "./JigsawPieceInfo";
@@ -18,6 +18,7 @@ import {indexes} from "../../../utils/indexes";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
 import {applyMetricsDiff, emptyGestureMetrics, GestureMetrics} from "../../../utils/gestures";
 import {JigsawFieldPieceState} from "./JigsawFieldState";
+import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 
 const getJigsawPieces = (
     cellsIndex: SudokuCellsIndex<JigsawPTM>
@@ -220,6 +221,41 @@ export const getJigsawCellCenterAbsolutePosition = (region: GridRegion, {top, le
     const center: Position = {top: top + 0.5, left: left + 0.5};
     return region.transformCoords?.(center) ?? center;
 };
+
+export const getJigsawCellCenterAbsolutePositionsIndex = (groups: JigsawPiecesGroup[]) => groups.map(
+    ({pieces, indexes, zIndex}) => {
+        const cells = pieces.flatMap(
+            ({info: {cells}, region, index}) => cells.map(
+                (cell) => {
+                    const {top, left} = getJigsawCellCenterAbsolutePosition(region, cell);
+
+                    return {
+                        pieceIndex: index,
+                        cell,
+                        position: {
+                            top: roundToStep(top, 0.1),
+                            left: roundToStep(left, 0.1),
+                        },
+                    };
+                }
+            )
+        );
+
+        const cellsMap: GivenDigitsMap<typeof cells[0]> = {};
+        for (const cell of cells) {
+            const {position: {top, left}} = cell;
+            cellsMap[top] = cellsMap[top] ?? {};
+            cellsMap[top][left] = cell;
+        }
+
+        return {
+            zIndex,
+            pieceIndexes: indexes,
+            cells,
+            cellsMap,
+        };
+    }
+);
 
 export const getJigsawPieceRegion = (
     {cells, boundingRect}: JigsawPieceInfo,

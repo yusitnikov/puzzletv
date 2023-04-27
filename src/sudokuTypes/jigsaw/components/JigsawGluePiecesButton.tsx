@@ -7,7 +7,7 @@ import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHisto
 import {
     getActiveJigsawPieceIndexes,
     getActiveJigsawPieceZIndex,
-    getJigsawCellCenterAbsolutePosition,
+    getJigsawCellCenterAbsolutePositionsIndex,
     getJigsawPiecesWithCache,
     groupJigsawPiecesByZIndex
 } from "../types/helpers";
@@ -20,8 +20,8 @@ import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {regionHighlightColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {useTransformScale} from "../../../contexts/TransformScaleContext";
-import {roundToStep} from "../../../utils/math";
 import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteModeInfo";
+import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 
 export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawPTM>) => {
     const {
@@ -62,36 +62,11 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
         [pieces, piecePositions]
     );
     const pieceIndexesToGlue = useMemo(() => {
-        const getCellKey = ({top, left}: Position) => `${roundToStep(top, 0.1)}-${roundToStep(left, 0.1)}`;
-        const groupCells = groups.map(({pieces, indexes, zIndex}) => {
-            const cells = pieces.flatMap(
-                ({info: {cells}, region, index}) => cells.map(
-                    (cell) => ({
-                        pieceIndex: index,
-                        cell,
-                        position: getJigsawCellCenterAbsolutePosition(region, cell),
-                    })
-                )
-            );
-
-            const cellsMap: Record<string, typeof cells[0]> = {};
-            for (const cell of cells) {
-                cellsMap[getCellKey(cell.position)] = cell;
-            }
-
-            return {
-                zIndex,
-                pieceIndexes: indexes,
-                cells,
-                cellsMap,
-            };
-        });
+        const groupCells = getJigsawCellCenterAbsolutePositionsIndex(groups);
 
         const groupsToGlue = groupCells.filter(({zIndex}) => zIndex === activePieceZIndex);
-        let cellsMapToGlue = groupsToGlue
-            .map(({cellsMap}) => cellsMap)
-            .reduce((a, b) => ({...a, ...b}));
-        const isGroupCell = (cell: Position) => !!cellsMapToGlue[getCellKey(cell)];
+        let cellsMapToGlue = mergeGivenDigitsMaps(...groupsToGlue.map(({cellsMap}) => cellsMap));
+        const isGroupCell = ({top, left}: Position) => !!cellsMapToGlue[top]?.[left];
         let remainingGroups = groupCells.filter(({zIndex}) => zIndex !== activePieceZIndex);
 
         while (remainingGroups.length) {
@@ -118,7 +93,7 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
             const nextGroup = remainingGroups[nextGroupIndex];
             remainingGroups.splice(nextGroupIndex, 1);
             groupsToGlue.push(nextGroup);
-            cellsMapToGlue = {...cellsMapToGlue, ...nextGroup.cellsMap};
+            cellsMapToGlue = mergeGivenDigitsMaps(cellsMapToGlue, nextGroup.cellsMap);
         }
 
         return groupsToGlue.flatMap(({pieceIndexes}) => pieceIndexes);
