@@ -73,6 +73,8 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
+    const [hasStickyJigsawPiece, setHasStickyJigsawPiece] = useBoolFromLocalStorage("fpwHasStickyJigsawPiece", false);
+    const [stickyJigsawPiece, setStickyJigsawPiece] = useNumberFromLocalStorage("fpwStickyJigsawPiece", 1);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
     const [noStickyRegionValidation, setNoStickyRegionValidation] = useBoolFromLocalStorage("fpwNoStickyRegionValidation");
@@ -145,6 +147,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         } : undefined,
         noStickyRegionValidation: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid && noStickyRegionValidation,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
+        stickyJigsawPiece: isJigsaw && angleStep !== 0 && hasStickyJigsawPiece ? stickyJigsawPiece: undefined,
         splitUnconnectedRegions,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
@@ -343,12 +346,42 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         </Select>
                     </Paragraph>
 
-                    {angleStep !== 0 && <Paragraph>
-                        <label>
-                            Digits should stay vertical:&nbsp;
-                            <input type={"checkbox"} checked={stickyDigits} onChange={ev => setStickyDigits(ev.target.checked)}/>
-                        </label>
-                    </Paragraph>}
+                    {angleStep !== 0 && <>
+                        <Paragraph>
+                            <label>
+                                Digits should stay vertical:&nbsp;
+                                <input type={"checkbox"} checked={stickyDigits} onChange={ev => setStickyDigits(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Fixed jigsaw piece:&nbsp;
+                                <input
+                                    type={"checkbox"}
+                                    checked={hasStickyJigsawPiece}
+                                    onChange={ev => setHasStickyJigsawPiece(ev.target.checked)}
+                                />&nbsp;
+                                <input
+                                    type={"number"}
+                                    min={1}
+                                    step={1}
+                                    max={99}
+                                    value={stickyJigsawPiece}
+                                    onChange={ev => setStickyJigsawPiece(ev.target.valueAsNumber)}
+                                    disabled={!hasStickyJigsawPiece}
+                                />
+                            </label>
+                            <Details>
+                                When enabled, the selected jigsaw piece will be considered as "fixed".<br/>
+                                The initial rotation of this piece will be treated as the correct rotation of the jigsaw.
+                            </Details>
+                            <Details>
+                                Note: the puzzle must have an embedded solution (at least for the digits)
+                                for this feature to work properly.
+                            </Details>
+                        </Paragraph>
+                    </>}
 
                     {filteredExtraGrids.length !== 0 && <>
                         <Paragraph>

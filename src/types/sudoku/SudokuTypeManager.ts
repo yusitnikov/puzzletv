@@ -263,6 +263,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     rotationallySymmetricDigits?: boolean;
 
     mapImportedColors?: boolean;
+
+    onCloseCorrectResultPopup?(context: PuzzleContext<T>): void;
 }
 
 // region Helper functions

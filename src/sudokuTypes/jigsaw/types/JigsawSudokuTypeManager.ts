@@ -52,11 +52,13 @@ import {JigsawJss} from "../constraints/JigsawJss";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {JigsawGluePiecesButton} from "../components/JigsawGluePiecesButton";
 import {useMemo} from "react";
-import {emptyGestureMetrics} from "../../../utils/gestures";
+import {emptyGestureMetrics, GestureMetrics} from "../../../utils/gestures";
 import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
 import {JigsawGluedPiecesConstraint} from "../constraints/JigsawGluedPieces";
+import {jigsawPieceStateChangeAction} from "./JigsawGamePieceState";
+import {myClientId} from "../../../hooks/useMultiPlayer";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -582,6 +584,52 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
         }
 
         return puzzle;
+    },
+
+    onCloseCorrectResultPopup({cellsIndex, puzzle, onStateChange}) {
+        const stickyPiece = puzzle.importOptions?.stickyJigsawPiece;
+        if (!stickyPiece) {
+            return;
+        }
+
+        onStateChange([
+            jigsawPieceStateChangeAction(
+                puzzle,
+                undefined,
+                myClientId,
+                "finalize-jigsaw",
+                undefined,
+                {position: {zIndex: 1}},
+                false
+            ),
+            (state) => {
+                const {pieces} = getJigsawPiecesWithCache(cellsIndex);
+                const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
+                const [group] = groupJigsawPiecesByZIndex(pieces, piecePositions);
+                const groupGesture: GestureMetrics = {
+                    ...emptyGestureMetrics,
+                    rotation: -piecePositions[stickyPiece - 1].angle,
+                };
+
+                return jigsawPieceStateChangeAction(
+                    puzzle,
+                    undefined,
+                    myClientId,
+                    "finalize-jigsaw",
+                    group.indexes,
+                    ({position}, pieceIndex) => ({
+                        position: moveJigsawPieceByGroupGesture(
+                            group,
+                            groupGesture,
+                            pieces[pieceIndex],
+                            position
+                        ),
+                        state: {animating: true},
+                    }),
+                    false
+                )(state);
+            },
+        ]);
     },
 
     // TODO: support shared games

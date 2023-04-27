@@ -5,7 +5,7 @@ import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff, textColor} from "../../app/globals";
 import {useTranslate} from "../../../hooks/useTranslate";
-import {useCallback, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
 import {useEffectExceptInit} from "../../../hooks/useEffectExceptInit";
 import {myClientId} from "../../../hooks/useMultiPlayer";
@@ -29,6 +29,7 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
 
     const {
         getPlayerScore,
+        onCloseCorrectResultPopup,
     } = typeManager;
 
     const {
@@ -42,8 +43,6 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
     const translate = useTranslate();
 
     const [isShowingResult, setIsShowingResult] = useState(false);
-    const handleCheckResult = useCallback(() => setIsShowingResult(true), [setIsShowingResult]);
-    const handleCloseCheckResult = useCallback(() => setIsShowingResult(false), [setIsShowingResult]);
 
     const {isCorrectResult, resultPhrase} = useMemo(
         (): PuzzleResultCheck<string> => {
@@ -69,6 +68,15 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
         },
         [resultChecker, context, translate, lives]
     );
+
+    const handleCheckResult = () => setIsShowingResult(true);
+    const handleCloseCheckResult = () => {
+        setIsShowingResult(false);
+        if (isCorrectResult) {
+            onCloseCorrectResultPopup?.(context);
+        }
+    };
+
     const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
 
     const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;

@@ -6,6 +6,7 @@ import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getActiveJigsawPieceZIndex} from "./helpers";
 import {JigsawFieldPieceState} from "./JigsawFieldState";
 import {ProcessedGameStateEx} from "../../../types/sudoku/GameState";
+import {indexes} from "../../../utils/indexes";
 
 export interface JigsawGamePieceState {
     animating: boolean;
@@ -21,7 +22,7 @@ export const jigsawPieceStateChangeAction = (
     startState: ProcessedGameStateEx<JigsawPTM> | undefined,
     clientId: string,
     actionId: string,
-    pieceIndexes: number[] | number,
+    pieceIndexes: number[] | number | undefined,
     updates: JigsawPieceStateUpdate | ((
         prevPieceData: {
             position: JigsawFieldPieceState,
@@ -33,6 +34,9 @@ export const jigsawPieceStateChangeAction = (
     ) => JigsawPieceStateUpdate),
     resetSelectedCells = true,
 ): GameStateActionCallback<JigsawPTM> => ({selectedCells, fieldStateHistory, extension: {pieces: pieceStates}}) => {
+    if (pieceIndexes === undefined) {
+        pieceIndexes = indexes(pieceStates.length);
+    }
     if (!Array.isArray(pieceIndexes)) {
         pieceIndexes = [pieceIndexes];
     }
