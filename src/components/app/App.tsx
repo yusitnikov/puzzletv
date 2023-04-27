@@ -100,8 +100,8 @@ export const App = ({onPageLoaded}: AppProps) => {
     }
 
     if (puzzle) {
-        return <PageLayout scrollable={false} addPadding={false}>
-            <Puzzle key={hash} puzzle={puzzle}/>
+        return <PageLayout key={hash} scrollable={false} addPadding={false}>
+            <Puzzle puzzle={puzzle}/>
         </PageLayout>;
     }
 
