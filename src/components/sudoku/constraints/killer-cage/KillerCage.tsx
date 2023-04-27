@@ -25,6 +25,7 @@ export interface KillerCageProps {
     sumPointIndex?: number;
     lineColor?: string;
     fontColor?: string;
+    largeSum?: boolean;
 }
 
 export const KillerCage = {
@@ -38,6 +39,7 @@ export const KillerCage = {
                 sumPointIndex = 0,
                 lineColor = blackColor,
                 fontColor = blackColor,
+                largeSum,
             },
         }: ConstraintProps<T, KillerCageProps>
     ) => {
@@ -58,8 +60,8 @@ export const KillerCage = {
         );
 
         const borderPadding = prioritizeSelection ? 0.15 : 0.1;
-        const sumPadding = prioritizeSelection ? 0.17 : borderPadding;
-        const sumDigitSize = prioritizeSelection ? 0.25 : 0.15;
+        const sumPadding = prioritizeSelection ? 0.17 : largeSum ? 0.12 : borderPadding;
+        const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.15;
 
         return <>
             <polygon

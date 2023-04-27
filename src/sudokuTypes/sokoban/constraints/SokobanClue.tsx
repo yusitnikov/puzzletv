@@ -21,7 +21,7 @@ export const SokobanClueConstraint = (
         (props: ConstraintProps<SokobanPTM, KillerCageProps>) => <AutoSvg
             {...getLineVector({start: position, end: animatedPosition})}
         >
-            <Component {...props}/>
+            <Component {...props} props={{...props.props, largeSum: true}}/>
         </AutoSvg>,
     ])),
     renderSingleCellInUserArea: false,
