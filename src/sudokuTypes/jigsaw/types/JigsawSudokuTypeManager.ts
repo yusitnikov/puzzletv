@@ -608,7 +608,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
                 const [group] = groupJigsawPiecesByZIndex(pieces, piecePositions);
                 const groupGesture: GestureMetrics = {
                     ...emptyGestureMetrics,
-                    rotation: -piecePositions[stickyPiece - 1].angle,
+                    rotation: loop(-piecePositions[stickyPiece - 1].angle + 180, 360) - 180,
                 };
 
                 return jigsawPieceStateChangeAction(
