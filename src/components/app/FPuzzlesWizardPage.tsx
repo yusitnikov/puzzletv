@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import styled from "@emotion/styled";
+import styled from "@emotion/styled/macro";
 import {buildLink} from "../../utils/link";
-import {FormEvent, useMemo, useState} from "react";
+import {Children, FC, FormEvent, useMemo, useRef, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
 import {decodeFPuzzlesString, FPuzzles} from "../../data/puzzles/FPuzzles";
 import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
-import {headerPadding, veryDarkGreyColor} from "./globals";
+import {darkGreyColor, headerPadding, veryDarkGreyColor} from "./globals";
 import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
 import {usePureMemo} from "../../hooks/usePureMemo";
 import {FieldPreview} from "../sudoku/field/FieldPreview";
@@ -23,7 +23,21 @@ export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
 
 let autoIncrement = 0;
 
-const Paragraph = styled("div")({margin: "1em 0"});
+const paragraphStyles = {margin: "1em 0"};
+const Paragraph = styled("div")(paragraphStyles);
+const FieldSet = styled("fieldset")({
+    ...paragraphStyles,
+    border: `1px solid ${darkGreyColor}`,
+    borderRadius: 5,
+    [`& > ${Paragraph}, & > &`]: {
+        "&:first-of-type": {
+            marginTop: 0,
+        },
+        "&:last-of-type": {
+            marginBottom: 0,
+        },
+    }
+});
 const Details = styled("div")({marginTop: "0.25em", color: veryDarkGreyColor});
 const Select = styled("select")({font: "inherit"});
 
@@ -178,143 +192,116 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             <PageTitle>{translate(fPuzzlesWizardPageTitle)}</PageTitle>
 
             <form onSubmit={handleSubmit}>
-                <Paragraph>
-                    <label>
-                        Grid type:&nbsp;
-                        <Select value={type} onChange={ev => setType(ev.target.value as PuzzleImportPuzzleType)}>
-                            <option value={PuzzleImportPuzzleType.Regular}>Regular</option>
-                            <option value={PuzzleImportPuzzleType.Cubedoku}>Cubedoku</option>
-                            <option value={PuzzleImportPuzzleType.InfiniteRings}>Infinite rings</option>
-                            <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
-                            <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
-                            <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
-                            <option value={PuzzleImportPuzzleType.RushHour}>Rush hour</option>
-                        </Select>
-                    </label>
-                </Paragraph>
-
-                <Paragraph>
-                    <label>
-                        Digit type:&nbsp;
-                        <Select value={digitType} onChange={ev => setDigitType(ev.target.value as PuzzleImportDigitType)}>
-                            <option value={PuzzleImportDigitType.Regular}>Regular</option>
-                            <option value={PuzzleImportDigitType.Calculator}>Calculator</option>
-                            <option value={PuzzleImportDigitType.Latin}>Latin</option>
-                        </Select>
-                    </label>
-                </Paragraph>
-
-                <Paragraph>
-                    Digits count:&nbsp;
-                    <input
-                        type={"number"}
-                        value={digitsCount}
-                        min={1}
-                        max={Math.max(puzzle.size, 9)}
-                        step={1}
-                        onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
-                    />
-                </Paragraph>
-
-                <Paragraph>
-                    <label>
-                        Rules are HTML:&nbsp;
-                        <input type={"checkbox"} checked={areHtmlRules} onChange={ev => setAreHtmlRules(ev.target.checked)}/>
-                    </label>
-                    {areHtmlRules && <Details>
-                        Notes:
-                        <ul style={{margin: 0}}>
-                            <li>
-                                Line breaks in the text will <strong>not</strong> be applied automatically in the HTML mode.
-                                Please use the <code>&lt;p&gt;</code> tag for paragraphs.
-                            </li>
-                            <li>
-                                The following HTML tags are allowed: <code>{allowedRulesHtmlTags.join(", ")}</code>.<br/>
-                                Tag attributes are not supported and will be stripped,
-                                except for the common attributes of <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.<br/>
-                                Please <a href={buildLink("contacts", languageCode)} target={"_blank"}>contact the site creator</a>{" "}
-                                to add support for other tags or attributes.
-                            </li>
-                        </ul>
-                    </Details>}
-                </Paragraph>
-
-                {isCalculator && <Paragraph>
-                    <label>
-                        Fillable digital display:&nbsp;
-                        <input type={"checkbox"} checked={fillableDigitalDisplay} onChange={ev => setFillableDigitalDisplay(ev.target.checked)}/>
-                    </label>
-                </Paragraph>}
-
-                {!isSpecialGrid && <>
+                <CollapsableFieldSet legend={"Puzzle type"}>
                     <Paragraph>
                         <label>
-                            Loop horizontally:&nbsp;
-                            <input type={"checkbox"} checked={loopX} onChange={ev => setLoopX(ev.target.checked)}/>
+                            Grid type:&nbsp;
+                            <Select value={type} onChange={ev => setType(ev.target.value as PuzzleImportPuzzleType)}>
+                                <option value={PuzzleImportPuzzleType.Regular}>Regular</option>
+                                <option value={PuzzleImportPuzzleType.Cubedoku}>Cubedoku</option>
+                                <option value={PuzzleImportPuzzleType.InfiniteRings}>Infinite loop</option>
+                                <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
+                                <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
+                                <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
+                                <option value={PuzzleImportPuzzleType.RushHour}>Rush hour</option>
+                            </Select>
                         </label>
                     </Paragraph>
 
-                    <Paragraph>
-                        <label>
-                            Loop vertically:&nbsp;
-                            <input type={"checkbox"} checked={loopY} onChange={ev => setLoopY(ev.target.checked)}/>
-                        </label>
-                    </Paragraph>
+                    {!isSpecialGrid && <>
+                        <Paragraph>
+                            <label>
+                                Loop horizontally:&nbsp;
+                                <input type={"checkbox"} checked={loopX} onChange={ev => setLoopX(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Loop vertically:&nbsp;
+                                <input type={"checkbox"} checked={loopY} onChange={ev => setLoopY(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+                    </>}
 
                     <Paragraph>
                         <label>
-                            Tesseract constraint:&nbsp;
-                            <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
+                            Digit type:&nbsp;
+                            <Select value={digitType} onChange={ev => setDigitType(ev.target.value as PuzzleImportDigitType)}>
+                                <option value={PuzzleImportDigitType.Regular}>Regular</option>
+                                <option value={PuzzleImportDigitType.Calculator}>Calculator</option>
+                                <option value={PuzzleImportDigitType.Latin}>Latin</option>
+                            </Select>
                         </label>
                     </Paragraph>
-                </>}
+                </CollapsableFieldSet>
 
-                {supportsJss && <>
-                    <Paragraph>
+                <CollapsableFieldSet legend={"Additional constraints"}>
+                    {isCalculator && <Paragraph>
                         <label>
-                            JSS:&nbsp;
-                            <input type={"checkbox"} checked={isJss} onChange={ev => setIsJss(ev.target.checked)}/>
-                        </label>
-                    </Paragraph>
-                </>}
-
-                {!!puzzle.arrow && <Paragraph>
-                    <label>
-                        Arrow circle is a product instead of a sum:&nbsp;
-                        <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
-                    </label>
-                </Paragraph>}
-
-                {hasFog && <>
-                    <Paragraph>
-                        <label>
-                            Yajilin fog:&nbsp;
-                            <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
-                        </label>
-                    </Paragraph>
-
-                    {hasCosmeticElements && <Paragraph>
-                        <label>
-                            Hide cosmetic elements behind the fog:&nbsp;
-                            <input type={"checkbox"} checked={cosmeticsBehindFog}
-                                   onChange={ev => setCosmeticsBehindFog(ev.target.checked)}/>
+                            Fillable digital display:&nbsp;
+                            <input type={"checkbox"} checked={fillableDigitalDisplay} onChange={ev => setFillableDigitalDisplay(ev.target.checked)}/>
                         </label>
                     </Paragraph>}
-                </>}
 
-                {isSafeCracker && <Paragraph>
-                    Safe cracker code length:&nbsp;
-                    <input
-                        type={"number"}
-                        value={safeCrackerCodeLength}
-                        min={1}
-                        max={puzzle.size}
-                        step={1}
-                        onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
-                    />
-                </Paragraph>}
+                    {!isSpecialGrid && <>
+                        <Paragraph>
+                            <label>
+                                Tesseract:&nbsp;
+                                <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+                    </>}
 
-                {isInfiniteRings && <>
+                    {supportsJss && <>
+                        <Paragraph>
+                            <label>
+                                JSS:&nbsp;
+                                <input type={"checkbox"} checked={isJss} onChange={ev => setIsJss(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+                    </>}
+
+                    {!!puzzle.arrow && <Paragraph>
+                        <label>
+                            Arrow circle is a product instead of a sum:&nbsp;
+                            <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
+                        </label>
+                    </Paragraph>}
+
+                    {hasFog && <>
+                        <Paragraph>
+                            <label>
+                                Yajilin fog:&nbsp;
+                                <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+
+                        {hasCosmeticElements && <Paragraph>
+                            <label>
+                                Hide cosmetic elements behind the fog:&nbsp;
+                                <input type={"checkbox"} checked={cosmeticsBehindFog}
+                                       onChange={ev => setCosmeticsBehindFog(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>}
+                    </>}
+                </CollapsableFieldSet>
+
+                {isSafeCracker && <CollapsableFieldSet legend={"Safe cracker"}>
+                    <Paragraph>
+                        Code length:&nbsp;
+                        <input
+                            type={"number"}
+                            value={safeCrackerCodeLength}
+                            min={1}
+                            max={puzzle.size}
+                            step={1}
+                            onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
+                        />
+                    </Paragraph>
+                </CollapsableFieldSet>}
+
+                {isInfiniteRings && <CollapsableFieldSet legend={"Infinite loop"}>
                     <Paragraph>
                         Visible rings count:&nbsp;
                         <Select value={visibleRingsCount} onChange={ev => setVisibleRingsCount(Number(ev.target.value))}>
@@ -335,9 +322,9 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             onChange={ev => setStartOffset(ev.target.valueAsNumber)}
                         />
                     </Paragraph>
-                </>}
+                </CollapsableFieldSet>}
 
-                {isJigsaw && <>
+                {isJigsaw && <CollapsableFieldSet legend={"Jigsaw"}>
                     <Paragraph>
                         Jigsaw piece rotation:&nbsp;
                         <Select value={angleStep} onChange={ev => setAngleStep(Number(ev.target.value))}>
@@ -384,124 +371,162 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>
                         </label>
                     </Paragraph>}
-                </>}
+                </CollapsableFieldSet>}
 
-                <Paragraph>
-                    <label>
-                        Split unconnected regions:&nbsp;
-                        <input type={"checkbox"} checked={splitUnconnectedRegions} onChange={ev => setSplitUnconnectedRegions(ev.target.checked)}/>
-                    </label>
-                    <Details>
-                        If multiple cells marked as the same region in f-puzzles, but not connected to each other,
-                        treat them as different regions.
-                    </Details>
-                </Paragraph>
+                <CollapsableFieldSet legend={"Miscellaneous"}>
+                    <Paragraph>
+                        Digits count:&nbsp;
+                        <input
+                            type={"number"}
+                            value={digitsCount}
+                            min={1}
+                            max={Math.max(puzzle.size, 9)}
+                            step={1}
+                            onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
+                        />
+                    </Paragraph>
 
-                {hasInitialColors && <Paragraph>
-                    <label>
-                        Allow overriding initial colors:&nbsp;
-                        <input type={"checkbox"} checked={allowOverrideColors} onChange={ev => setAllowOverrideColors(ev.target.checked)}/>
-                    </label>
-                </Paragraph>}
+                    <Paragraph>
+                        <label>
+                            Rules are HTML:&nbsp;
+                            <input type={"checkbox"} checked={areHtmlRules} onChange={ev => setAreHtmlRules(ev.target.checked)}/>
+                        </label>
+                        {areHtmlRules && <Details>
+                            Notes:
+                            <ul style={{margin: 0}}>
+                                <li>
+                                    Line breaks in the text will <strong>not</strong> be applied automatically in the HTML mode.
+                                    Please use the <code>&lt;p&gt;</code> tag for paragraphs.
+                                </li>
+                                <li>
+                                    The following HTML tags are allowed: <code>{allowedRulesHtmlTags.join(", ")}</code>.<br/>
+                                    Tag attributes are not supported and will be stripped,
+                                    except for the common attributes of <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.<br/>
+                                    Please <a href={buildLink("contacts", languageCode)} target={"_blank"}>contact the site creator</a>{" "}
+                                    to add support for other tags or attributes.
+                                </li>
+                            </ul>
+                        </Details>}
+                    </Paragraph>
 
-                {!hasSolution && <Paragraph>
-                    <label>
-                        Verify the solution based on the conflict checker:&nbsp;
-                        <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
-                    </label>
-                    <Details>
-                        When enabled, the software will say that the puzzle was solved correctly as soon as all digits are fulfilled
-                        and there are no conflicts for the standard constraints included in the puzzle.
-                    </Details>
-                    <Details>
-                        Please don't enable it when the puzzle contains non-standard constraints or rules
-                        that cannot be verified by the conflict checker!
-                        (also, it's recommended to include the embedded solution in this case)
-                    </Details>
-                </Paragraph>}
+                    <Paragraph>
+                        <label>
+                            Split unconnected regions:&nbsp;
+                            <input type={"checkbox"} checked={splitUnconnectedRegions} onChange={ev => setSplitUnconnectedRegions(ev.target.checked)}/>
+                        </label>
+                        <Details>
+                            If multiple cells marked as the same region in f-puzzles, but not connected to each other,
+                            treat them as different regions.
+                        </Details>
+                    </Paragraph>
 
-                {supportsExtraGrids && <Paragraph>
-                    Import extra grids:
-                    <ul>
-                        {extraGrids.map((grid, index) => {
-                            const mergeCurrentItem = (updates: Partial<PuzzleGridImportOptions>) => setExtraGrids([
-                                ...extraGrids.slice(0, index),
-                                {
-                                    ...grid,
-                                    ...updates,
-                                },
-                                ...extraGrids.slice(index + 1),
-                            ]);
+                    {hasInitialColors && <Paragraph>
+                        <label>
+                            Allow overriding initial colors:&nbsp;
+                            <input type={"checkbox"} checked={allowOverrideColors} onChange={ev => setAllowOverrideColors(ev.target.checked)}/>
+                        </label>
+                    </Paragraph>}
 
-                            return <li key={`extra-grid-${index}`}>
+                    {!hasSolution && <Paragraph>
+                        <label>
+                            Verify the solution based on the conflict checker:&nbsp;
+                            <input type={"checkbox"} checked={noSpecialRules} onChange={ev => setNoSpecialRules(ev.target.checked)}/>
+                        </label>
+                        <Details>
+                            When enabled, the software will say that the puzzle was solved correctly as soon as all digits are fulfilled
+                            and there are no conflicts for the standard constraints included in the puzzle.
+                        </Details>
+                        <Details>
+                            Please don't enable it when the puzzle contains non-standard constraints or rules
+                            that cannot be verified by the conflict checker!
+                            (also, it's recommended to include the embedded solution in this case)
+                        </Details>
+                    </Paragraph>}
+                </CollapsableFieldSet>
+
+                {supportsExtraGrids && <CollapsableFieldSet legend={"Import extra grids"}>
+                    <Paragraph>
+                        <ul>
+                            {extraGrids.map((grid, index) => {
+                                const mergeCurrentItem = (updates: Partial<PuzzleGridImportOptions>) => setExtraGrids([
+                                    ...extraGrids.slice(0, index),
+                                    {
+                                        ...grid,
+                                        ...updates,
+                                    },
+                                    ...extraGrids.slice(index + 1),
+                                ]);
+
+                                return <li key={`extra-grid-${index}`}>
+                                    <Paragraph>
+                                        <label>
+                                            F-Puzzles link or ID:&nbsp;
+                                            <input type={"text"} value={grid.load}
+                                                   onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
+                                        </label>
+                                    </Paragraph>
+
+                                    <Paragraph>
+                                        <label>
+                                            Offset X:&nbsp;
+                                            <input type={"number"} step={1} value={grid.offsetX}
+                                                   onChange={ev => mergeCurrentItem({offsetX: ev.target.valueAsNumber})}/>
+                                        </label>
+                                    </Paragraph>
+
+                                    <Paragraph>
+                                        <label>
+                                            Offset Y:&nbsp;
+                                            <input type={"number"} step={1} value={grid.offsetY}
+                                                   onChange={ev => mergeCurrentItem({offsetY: ev.target.valueAsNumber})}/>
+                                        </label>
+                                    </Paragraph>
+
+                                    <Paragraph>
+                                        <button
+                                            type={"button"}
+                                            onClick={() => setExtraGrids([
+                                                ...extraGrids.slice(0, index),
+                                                ...extraGrids.slice(index + 1),
+                                            ])}
+                                        >
+                                            Remove
+                                        </button>
+                                    </Paragraph>
+                                </li>;
+                            })}
+
+                            <li key={`extra-grid-${extraGrids.length}`}>
                                 <Paragraph>
                                     <label>
                                         F-Puzzles link or ID:&nbsp;
-                                        <input type={"text"} value={grid.load}
-                                               onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
+                                        <input type={"text"} value={""} onChange={ev => setExtraGrids([
+                                            ...extraGrids,
+                                            {
+                                                load: ev.target.value,
+                                                offsetX: puzzle.size + 1,
+                                                offsetY: 0,
+                                            },
+                                        ])}/>
                                     </label>
+                                    <Details>
+                                        Create the additional grid in F-Puzzles, then click "Export" and "Open With Link".
+                                        Copy the link of the page that opened in the tab to here.
+                                    </Details>
+                                    <Details>
+                                        Alternative: copy the f-puzzles ID to the clipboard by installing and using this bookmarklet: <a href={copyIdBookmarkletCode}>Copy f-puzzles ID</a>.
+                                    </Details>
+                                    <Details>
+                                        <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
+                                        Also, If you edited the puzzle, it's a must to use the "open with link" feature
+                                        (because the link of the current f-puzzles tab doesn't include the latest
+                                        information).
+                                    </Details>
                                 </Paragraph>
-
-                                <Paragraph>
-                                    <label>
-                                        Offset X:&nbsp;
-                                        <input type={"number"} step={1} value={grid.offsetX}
-                                               onChange={ev => mergeCurrentItem({offsetX: ev.target.valueAsNumber})}/>
-                                    </label>
-                                </Paragraph>
-
-                                <Paragraph>
-                                    <label>
-                                        Offset Y:&nbsp;
-                                        <input type={"number"} step={1} value={grid.offsetY}
-                                               onChange={ev => mergeCurrentItem({offsetY: ev.target.valueAsNumber})}/>
-                                    </label>
-                                </Paragraph>
-
-                                <Paragraph>
-                                    <button
-                                        type={"button"}
-                                        onClick={() => setExtraGrids([
-                                            ...extraGrids.slice(0, index),
-                                            ...extraGrids.slice(index + 1),
-                                        ])}
-                                    >
-                                        Remove
-                                    </button>
-                                </Paragraph>
-                            </li>;
-                        })}
-
-                        <li key={`extra-grid-${extraGrids.length}`}>
-                            <Paragraph>
-                                <label>
-                                    F-Puzzles link or ID:&nbsp;
-                                    <input type={"text"} value={""} onChange={ev => setExtraGrids([
-                                        ...extraGrids,
-                                        {
-                                            load: ev.target.value,
-                                            offsetX: puzzle.size + 1,
-                                            offsetY: 0,
-                                        },
-                                    ])}/>
-                                </label>
-                                <Details>
-                                    Create the additional grid in F-Puzzles, then click "Export" and "Open With Link".
-                                    Copy the link of the page that opened in the tab to here.
-                                </Details>
-                                <Details>
-                                    Alternative: copy the f-puzzles ID to the clipboard by installing and using this bookmarklet: <a href={copyIdBookmarkletCode}>Copy f-puzzles ID</a>.
-                                </Details>
-                                <Details>
-                                    <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
-                                    Also, If you edited the puzzle, it's a must to use the "open with link" feature
-                                    (because the link of the current f-puzzles tab doesn't include the latest
-                                    information).
-                                </Details>
-                            </Paragraph>
-                        </li>
-                    </ul>
-                </Paragraph>}
+                            </li>
+                        </ul>
+                    </Paragraph>
+                </CollapsableFieldSet>}
 
                 <Paragraph>
                     <button type={"submit"} disabled={!isValidForm}>Load</button>
@@ -515,4 +540,36 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             width={previewSize}
         />
     </div>;
+};
+
+interface CollapsableFieldSetProps {
+    legend: string;
+}
+const CollapsableFieldSet: FC<CollapsableFieldSetProps> = ({legend, children}) => {
+    const [open, setOpen] = useState(true);
+    const detailsRef = useRef<HTMLDetailsElement>(null);
+    const doOpen = () => {
+        if (detailsRef.current) {
+            detailsRef.current.open = true;
+            setOpen(true);
+        }
+    };
+
+    if (!Children.toArray(children).some(Boolean)) {
+        return null;
+    }
+
+    return <FieldSet>
+        <legend>
+            <details
+                ref={detailsRef}
+                open={open}
+                onToggle={(ev) => setOpen((ev.target as HTMLDetailsElement).open)}
+            >
+                <summary>{legend}</summary>
+            </details>
+        </legend>
+
+        {open ? children : <button type={"button"} onClick={doOpen}>Show collapsed options</button>}
+    </FieldSet>;
 };
