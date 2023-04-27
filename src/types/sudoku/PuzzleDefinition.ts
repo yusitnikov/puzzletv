@@ -28,6 +28,7 @@ import {LanguageCode} from "../translations/LanguageCode";
 import type {PuzzleImportOptions} from "./PuzzleImportOptions";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {isSolutionCheckCell} from "./CellTypeProps";
+import {profiler} from "../../utils/profiler";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
     // The field is required. Marking it as optional here only to avoid adding empty object to each puzzle.
@@ -214,6 +215,8 @@ export const resolvePuzzleInitialColors = <T extends AnyPTM>(context: PuzzleCont
 export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     context: PuzzleContext<T>
 ): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
+    const timer = profiler.track("isValidFinishedPuzzleByEmbeddedSolution");
+
     const {puzzle, state, cellsIndex} = context;
     const {
         typeManager: {getDigitByCellData},
@@ -288,27 +291,32 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                 }
 
                 if (actualColor !== expectedColor) {
+                    timer.stop();
                     return false;
                 }
 
                 if (unshadedCellColor !== undefined && usedSolutionColors[unshadedCellColor]) {
+                    timer.stop();
                     return false;
                 }
             }
 
             if (!areCorrectDigits && !areCorrectColorsByDigits) {
+                timer.stop();
                 return false;
             }
         }
     }
 
     if (areCorrectDigits) {
+        timer.stop();
         return true;
     }
 
     if (areCorrectColorsByDigits) {
         const allColors = Object.values(digitToColorMap);
         if (new HashSet(allColors).size === allColors.length) {
+            timer.stop();
             return {
                 isCorrectResult: true,
                 resultPhrase: {
@@ -327,5 +335,6 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         }
     }
 
+    timer.stop();
     return false;
 };

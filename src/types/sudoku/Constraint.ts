@@ -17,6 +17,7 @@ import {AnyPTM} from "./PuzzleTypeMap";
 import {isSelectableCell} from "./CellTypeProps";
 import {GridRegion} from "./GridRegion";
 import {CellColorValue, resolveCellColorValue} from "./CellColor";
+import {profiler} from "../../utils/profiler";
 
 export type Constraint<T extends AnyPTM, DataT = undefined> = {
     name: string;
@@ -182,6 +183,8 @@ export const getInvalidUserLines = <T extends AnyPTM>(
 };
 
 export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: PuzzleContext<T>) => {
+    const timer = profiler.track("isValidFinishedPuzzleByConstraints");
+
     const {cellsIndex, puzzle, state} = context;
     const {digitsCount, importOptions: {stickyRegion, noStickyRegionValidation} = {}} = puzzle;
     const constraints = getAllPuzzleConstraints(context);
@@ -192,11 +195,12 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
         const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
 
         if (constraint.isValidPuzzle && !constraint.isValidPuzzle(lines, userDigits, normalizedConstraintCells, context)) {
+            timer.stop();
             return false;
         }
     }
 
-    return (
+    const result = (
         digitsCount === 0 ||
         cells.every((row, top) => row.every((cell, left) => {
             const position: Position = {left, top};
@@ -214,6 +218,8 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
                 || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
         }))
     ) && getInvalidUserLines(lines, userDigits, constraints, context, true).size === 0;
+    timer.stop();
+    return result;
 };
 
 export interface CloneConstraintOptions {
