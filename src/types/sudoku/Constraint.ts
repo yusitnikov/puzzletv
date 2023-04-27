@@ -183,7 +183,7 @@ export const getInvalidUserLines = <T extends AnyPTM>(
 
 export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: PuzzleContext<T>) => {
     const {cellsIndex, puzzle, state} = context;
-    const {digitsCount} = puzzle;
+    const {digitsCount, importOptions: {stickyRegion, noStickyRegionValidation} = {}} = puzzle;
     const constraints = getAllPuzzleConstraints(context);
     const {cells, lines} = gameStateGetCurrentFieldState(state);
     const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
@@ -201,6 +201,14 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
         cells.every((row, top) => row.every((cell, left) => {
             const position: Position = {left, top};
             const digit = userDigits[top]?.[left];
+
+            if (stickyRegion && noStickyRegionValidation) {
+                const stickyTop = top - stickyRegion.top;
+                const stickyLeft = left - stickyRegion.left;
+                if (stickyTop >= 0 && stickyLeft >= 0 && stickyTop < stickyRegion.height && stickyLeft < stickyRegion.width) {
+                    return true;
+                }
+            }
 
             return !isSelectableCell(cellsIndex.getCellTypeProps(position))
                 || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
