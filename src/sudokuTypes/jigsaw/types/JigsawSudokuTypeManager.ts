@@ -19,12 +19,19 @@ import {
     getJigsawCellCenterAbsolutePosition,
     getJigsawPieceIndexByCell,
     getJigsawPieceRegion,
-    getJigsawPiecesWithCache, groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture,
+    getJigsawPiecesWithCache,
+    groupJigsawPiecesByZIndex,
+    moveJigsawPieceByGroupGesture,
     normalizeJigsawDigit,
     sortJigsawPiecesByPosition
 } from "./helpers";
 import {JigsawMoveCellWriteModeInfo} from "./JigsawMoveCellWriteModeInfo";
-import {doesGridRegionContainCell, GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
+import {
+    doesGridRegionContainCell,
+    getGridRegionCells,
+    GridRegion,
+    transformCoordsByRegions
+} from "../../../types/sudoku/GridRegion";
 import {lightGreyColor} from "../../../components/app/globals";
 import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
@@ -47,7 +54,8 @@ import {JigsawGluePiecesButton} from "../components/JigsawGluePiecesButton";
 import {useMemo} from "react";
 import {emptyGestureMetrics} from "../../../utils/gestures";
 import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
-import {indexesFromTo} from "../../../utils/indexes";
+import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -356,37 +364,29 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
             return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, ...args);
         }
 
-        const currentCellCenter = getJigsawCellCenterAbsolutePosition(currentRegion, currentCell);
+        const currentCellCenter = getJigsawCellCenterAbsolutePosition(currentRegion, currentCell, true);
 
-        const regionCells = regions.flatMap((region) => {
-            const cells = region.cells ?? indexesFromTo(region.top, region.top + region.width).flatMap(
-                (top) => indexesFromTo(region.left, region.left + region.height).map(
-                    (left): Position => ({top, left})
-                )
-            );
-            return cells.map((cell) => ({
-                cell,
-                vector: getLineVector({
-                    start: currentCellCenter,
-                    end: getJigsawCellCenterAbsolutePosition(region, cell)
-                }),
-            }));
-        });
+        const regionCells = regions.flatMap((region) => getGridRegionCells(region).map((cell) => ({
+            cell,
+            vector: getLineVector({
+                start: currentCellCenter,
+                end: getJigsawCellCenterAbsolutePosition(region, cell, true)
+            }),
+        })));
 
         // Index all cells by how many arrow moves it will take to get to them
         const regionCellsIndex: Record<number, Position> = {};
-        const round = (value: number) => roundToStep(value, 0.1);
         for (const {cell, vector: {left: dx, top: dy}} of regionCells) {
-            const x = xDirection === 0 ? 0 : round(dx / xDirection);
-            const y = yDirection === 0 ? 0 : round(dy / yDirection);
+            const x = xDirection === 0 ? 0 : dx / xDirection;
+            const y = yDirection === 0 ? 0 : dy / yDirection;
             let position: number;
             if (xDirection === 0) {
-                if (round(dx) !== 0) {
+                if (dx !== 0) {
                     continue;
                 }
                 position = y;
             } else if (yDirection === 0) {
-                if (round(dy) !== 0) {
+                if (dy !== 0) {
                     continue;
                 }
                 position = x;
@@ -487,8 +487,46 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
 
     regionSpecificUserMarks: true,
 
-    getRegionsForRowsAndColumns() {
-        return [];
+    getRegionsForRowsAndColumns(context): Constraint<JigsawPTM, any>[] {
+        const regions = context.puzzle.typeManager.getRegionsWithSameCoordsTransformation!(context)
+            .filter(({noInteraction}) => !noInteraction)
+            .sort((a, b) => (a.zIndex ?? -1) - (b.zIndex ?? -1));
+
+        const cellsMap: GivenDigitsMap<Position> = {};
+        const flippedCellsMap: GivenDigitsMap<Position> = {};
+        for (const region of regions) {
+            for (const cell of getGridRegionCells(region)) {
+                const {top, left} = getJigsawCellCenterAbsolutePosition(region, cell, true);
+
+                cellsMap[top] = cellsMap[top] ?? {};
+                cellsMap[top][left] = cell;
+
+                flippedCellsMap[left] = flippedCellsMap[left] ?? {};
+                flippedCellsMap[left][top] = cell;
+            }
+        }
+
+        return [cellsMap, flippedCellsMap].flatMap(
+            (cellsMap) => Object.values(cellsMap).flatMap((rowMap) => {
+                const results: Constraint<JigsawPTM, any>[] = [];
+
+                while (true) {
+                    const keys = Object.keys(rowMap);
+                    if (keys.length === 0) {
+                        break;
+                    }
+
+                    const cells: Position[] = [];
+                    for (let index = Math.min(...keys.map(Number)); rowMap[index]; index += 1) {
+                        cells.push(rowMap[index]);
+                        delete rowMap[index];
+                    }
+                    results.push(RegionConstraint(cells, false, "row/column"));
+                }
+
+                return results;
+            })
+        );
     },
 
     controlButtons: [

@@ -2,6 +2,7 @@ import {Rect} from "../layout/Rect";
 import {arrayContainsPosition, Position} from "../layout/Position";
 import {PuzzleContext} from "./PuzzleContext";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {indexesFromTo} from "../../utils/indexes";
 
 export interface GridRegion extends Rect {
     transformCoords?: (position: Position) => Position;
@@ -14,6 +15,13 @@ export interface GridRegion extends Rect {
     noBorders?: boolean;
     noClip?: boolean;
 }
+
+export const getGridRegionCells = (region: GridRegion): Position[] =>
+    region.cells ?? indexesFromTo(region.top, region.top + region.width).flatMap(
+        (top) => indexesFromTo(region.left, region.left + region.height).map(
+            (left) => ({top, left})
+        )
+    );
 
 export const doesGridRegionContainCell = ({cells, top, left, width, height}: GridRegion, cell: Position) =>
     cells

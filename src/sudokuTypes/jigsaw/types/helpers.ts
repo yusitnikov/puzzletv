@@ -217,27 +217,27 @@ export const sortJigsawPiecesByPosition = (pieces: JigsawPieceInfo[], piecePosit
         .sort((a, b) => Math.sign(a.top - b.top) || Math.sign(a.left - b.left) || (a.index - b.index))
         .map(({index}) => index);
 
-export const getJigsawCellCenterAbsolutePosition = (region: GridRegion, {top, left}: Position) => {
-    const center: Position = {top: top + 0.5, left: left + 0.5};
-    return region.transformCoords?.(center) ?? center;
+export const getJigsawCellCenterAbsolutePosition = (region: GridRegion, {top, left}: Position, round: boolean) => {
+    let center: Position = {top: top + 0.5, left: left + 0.5};
+    center = region.transformCoords?.(center) ?? center;
+    if (round) {
+        center = {
+            top: roundToStep(center.top, 0.1),
+            left: roundToStep(center.left, 0.1),
+        };
+    }
+    return center;
 };
 
 export const getJigsawCellCenterAbsolutePositionsIndex = (groups: JigsawPiecesGroup[]) => groups.map(
     ({pieces, indexes, zIndex}) => {
         const cells = pieces.flatMap(
             ({info: {cells}, region, index}) => cells.map(
-                (cell) => {
-                    const {top, left} = getJigsawCellCenterAbsolutePosition(region, cell);
-
-                    return {
-                        pieceIndex: index,
-                        cell,
-                        position: {
-                            top: roundToStep(top, 0.1),
-                            left: roundToStep(left, 0.1),
-                        },
-                    };
-                }
+                (cell) => ({
+                    pieceIndex: index,
+                    cell,
+                    position: getJigsawCellCenterAbsolutePosition(region, cell, true),
+                })
             )
         );
 
