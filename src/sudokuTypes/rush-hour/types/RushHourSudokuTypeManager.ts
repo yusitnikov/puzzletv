@@ -150,13 +150,16 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         return {};
     },
 
-    getRegionsForRowsAndColumns({fieldSize: {fieldSize}, ...puzzle}) {
+    getRegionsForRowsAndColumns({puzzle: {fieldSize: {fieldSize}, ...puzzle}, ...context}) {
         return getDefaultRegionsForRowsAndColumns({
-            ...puzzle,
-            fieldSize: {
-                fieldSize,
-                rowsCount: fieldSize,
-                columnsCount: fieldSize,
+            ...context,
+            puzzle: {
+                ...puzzle,
+                fieldSize: {
+                    fieldSize,
+                    rowsCount: fieldSize,
+                    columnsCount: fieldSize,
+                },
             },
         });
     },

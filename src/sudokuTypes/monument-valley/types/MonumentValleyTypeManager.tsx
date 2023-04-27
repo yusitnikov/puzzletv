@@ -258,7 +258,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         ];
     },
 
-    getRegionsForRowsAndColumns({fieldSize}): Constraint<MonumentValleyPTM, any>[] {
+    getRegionsForRowsAndColumns({puzzle: {fieldSize}}): Constraint<MonumentValleyPTM, any>[] {
         const processedFieldSize = parseMonumentValleyFieldSize(fieldSize);
         const {gridSize, intersectionSize, columnsCount} = processedFieldSize;
 

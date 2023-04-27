@@ -182,10 +182,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     items?: Constraint<T, any>[]
         | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
 
-    getRegionsForRowsAndColumns?(
-        puzzle: PuzzleDefinition<T>,
-        state: ProcessedGameStateEx<T>
-    ): Constraint<T, any>[];
+    getRegionsForRowsAndColumns?(context: PuzzleContext<T>): Constraint<T, any>[];
 
     getAdditionalNeighbors?(
         position: Position,

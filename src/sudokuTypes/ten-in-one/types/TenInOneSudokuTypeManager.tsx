@@ -77,10 +77,8 @@ export const TenInOneSudokuTypeManager = (
             : undefined,
     }),
 
-    getRegionsForRowsAndColumns(
-        puzzle,
-        {extension: {stage}}
-    ): Constraint<MultiStagePTM, any>[] {
+    getRegionsForRowsAndColumns(context): Constraint<MultiStagePTM, any>[] {
+        const {puzzle, state: {extension: {stage}}} = context;
         const individualBoxes = stage === 1;
         const {fieldSize: {rowsCount, columnsCount, regionWidth, regionHeight}} = puzzle;
 
@@ -99,7 +97,7 @@ export const TenInOneSudokuTypeManager = (
         if (!individualBoxes) {
             return [
                 ...boxes,
-                ...getDefaultRegionsForRowsAndColumns(puzzle),
+                ...getDefaultRegionsForRowsAndColumns(context),
             ];
         }
 

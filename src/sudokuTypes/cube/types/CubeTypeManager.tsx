@@ -79,7 +79,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         ];
     },
 
-    getRegionsForRowsAndColumns({fieldSize: {fieldSize}}): Constraint<NumberPTM, any>[] {
+    getRegionsForRowsAndColumns({puzzle: {fieldSize: {fieldSize}}}): Constraint<NumberPTM, any>[] {
         const realFieldSize = fieldSize / 2;
 
         if (continuousRowColumnRegions) {

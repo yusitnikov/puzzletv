@@ -255,7 +255,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                 left: coordsRingToPlain(fieldSize, ring, left),
             };
         },
-        getRegionsForRowsAndColumns({fieldSize: {rowsCount: fieldSize}}): Constraint<T, any>[] {
+        getRegionsForRowsAndColumns({puzzle: {fieldSize: {rowsCount: fieldSize}}}): Constraint<T, any>[] {
             const quadsCount = fieldSize / 2 - 1;
             return indexes(quadsCount).flatMap(outerRing => {
                 const createRegion = (cells: (Position & { ring: number })[]) => RegionConstraint<T>(

@@ -1,9 +1,9 @@
 import {indexes} from "../../utils/indexes";
 import {Position} from "../layout/Position";
-import {PuzzleDefinition} from "./PuzzleDefinition";
 import {Constraint} from "./Constraint";
 import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {PuzzleContext} from "./PuzzleContext";
 
 export interface FieldSize {
     fieldSize: number;
@@ -81,7 +81,7 @@ export function createRegularFieldSize(
 }
 
 export const getDefaultRegionsForRowsAndColumns = <T extends AnyPTM>(
-    {customCellBounds, fieldSize}: PuzzleDefinition<T>
+    {puzzle: {customCellBounds, fieldSize}}: PuzzleContext<T>
 ): Constraint<T>[] => customCellBounds ? [] : [
     ...indexes(fieldSize.rowsCount).map(top => RegionConstraint<T>(
         indexes(fieldSize.columnsCount).map(left => ({left, top})),

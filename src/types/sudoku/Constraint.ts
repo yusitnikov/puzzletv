@@ -84,7 +84,7 @@ export const getAllPuzzleConstraints = <T extends AnyPTM>(
 
     return [
         FieldLinesConstraint<T>(),
-        ...getRegionsForRowsAndColumns(puzzle, state),
+        ...getRegionsForRowsAndColumns(context),
         ...regions.map(
             (region): Constraint<T, any> => Array.isArray(region)
                 ? RegionConstraint(region)
