@@ -5,7 +5,7 @@ import {Children, FC, FormEvent, useMemo, useRef, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
 import {decodeFPuzzlesString, FPuzzles} from "../../data/puzzles/FPuzzles";
 import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
-import {darkGreyColor, headerPadding, veryDarkGreyColor} from "./globals";
+import {darkGreyColor, headerPadding} from "./globals";
 import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
 import {usePureMemo} from "../../hooks/usePureMemo";
 import {FieldPreview} from "../sudoku/field/FieldPreview";
@@ -38,7 +38,7 @@ const FieldSet = styled("fieldset")({
         },
     }
 });
-const Details = styled("div")({marginTop: "0.25em", color: veryDarkGreyColor});
+const Details = styled("div")({marginTop: "0.25em", color: "#888"});
 const Select = styled("select")({font: "inherit"});
 
 interface FPuzzlesWizardPageProps {
