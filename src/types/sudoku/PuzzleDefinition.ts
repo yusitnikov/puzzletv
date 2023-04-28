@@ -17,6 +17,7 @@ import {
     isSamePosition,
     Line,
     Position,
+    stringifyCellCoords,
     stringifyLine,
     stringifyPosition
 } from "../layout/Position";
@@ -219,6 +220,7 @@ export const resolvePuzzleInitialColors = <T extends AnyPTM>(context: PuzzleCont
         : initialColors;
 };
 
+const debugSolutionChecker = false;
 export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     context: PuzzleContext<T>
 ): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
@@ -272,6 +274,9 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             const actualDigit = puzzleInitialDigits?.[top]?.[left] ?? stateInitialDigits?.[top]?.[left] ?? usersDigit;
             const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, context, {top, left}) : actualMark;
             if (actualData !== expectedData) {
+                if (debugSolutionChecker) {
+                    console.warn("Wrong digit at", stringifyCellCoords({top, left}), "expected", expectedData, "got", actualData);
+                }
                 areCorrectDigits = false;
             }
 
@@ -299,11 +304,17 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                 }
 
                 if (actualColor !== expectedColor) {
+                    if (debugSolutionChecker) {
+                        console.warn("Wrong color at", stringifyCellCoords({top, left}), "expected", expectedColor, "got", actualColor);
+                    }
                     timer.stop();
                     return false;
                 }
 
                 if (unshadedCellColor !== undefined && usedSolutionColors[unshadedCellColor]) {
+                    if (debugSolutionChecker) {
+                        console.warn("Wrong unshaded color at", stringifyCellCoords({top, left}), "color:", unshadedCellColor);
+                    }
                     timer.stop();
                     return false;
                 }
