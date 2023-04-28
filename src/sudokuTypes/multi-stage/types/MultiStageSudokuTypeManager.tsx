@@ -19,31 +19,30 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 import {processTranslations} from "../../../utils/translate";
-import {MultiStagePTM} from "./MultiStagePTM";
+import {AnyMultiStagePTM} from "./MultiStagePTM";
 
-interface MultiStageSudokuOptions {
-    getStage: (context: PuzzleContext<MultiStagePTM>) => number;
-    onStageChange?: (context: PuzzleContext<MultiStagePTM>, stage: number)
-        => PartialGameStateEx<MultiStagePTM>;
-    getStageCompletionText?: (context: PuzzleContext<MultiStagePTM>)
-        => PartiallyTranslatable<ReactNode> | undefined;
-    getStageButtonText?: (context: PuzzleContext<MultiStagePTM>)
-        => PartiallyTranslatable<ReactNode> | undefined;
+interface MultiStageSudokuOptions<T extends AnyMultiStagePTM> {
+    baseTypeManager?: SudokuTypeManager<any>;
+    getStage: (context: PuzzleContext<T>) => number;
+    onStageChange?: (context: PuzzleContext<T>, stage: number) => PartialGameStateEx<T>;
+    getStageCompletionText?: (context: PuzzleContext<T>) => PartiallyTranslatable<ReactNode> | undefined;
+    getStageButtonText?: (context: PuzzleContext<T>) => PartiallyTranslatable<ReactNode> | undefined;
 }
 
-export const MultiStageSudokuTypeManager = (
-    {getStage, onStageChange, getStageCompletionText, getStageButtonText}: MultiStageSudokuOptions
-): SudokuTypeManager<MultiStagePTM> => ({
-    ...DigitSudokuTypeManager(),
+export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
+    {baseTypeManager = DigitSudokuTypeManager(), getStage, onStageChange, getStageCompletionText, getStageButtonText}: MultiStageSudokuOptions<T>
+): SudokuTypeManager<T> => ({
+    ...baseTypeManager,
 
     initialGameStateExtension: {
+        ...baseTypeManager.initialGameStateExtension,
         stage: 1,
     },
-    serializeGameState({stage}): any {
-        return {stage};
+    serializeGameState({stage, ...other}): any {
+        return {stage, ...baseTypeManager.serializeGameState(other)};
     },
-    unserializeGameState({stage = 1}: any): Partial<MultiStageGameState> {
-        return {stage};
+    unserializeGameState({stage = 1, ...other}: any): Partial<MultiStageGameState> {
+        return {stage, ...baseTypeManager.unserializeGameState(other)};
     },
 
     getAboveRules: (
@@ -55,7 +54,10 @@ export const MultiStageSudokuTypeManager = (
         const isNext = stage > state.extension.stage;
         const coeff = isNext ? 1 : 0;
 
-        return <div style={{
+        return <>
+            {baseTypeManager.getAboveRules?.(translate, context)}
+
+            <div style={{
             background: yellowColor,
             marginTop: cellSize * rulesMarginCoeff * coeff,
             marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
@@ -69,41 +71,42 @@ export const MultiStageSudokuTypeManager = (
             transition: "0.3s all linear",
             textAlign: "center",
         }}>
-            {translate(getStageCompletionText?.(context) ?? processTranslations<ReactNode>(
-                (congratulations, youCompletedTheStage) => <>{congratulations}, {youCompletedTheStage}!</>,
-                "Congratulations",
-                {
-                    [LanguageCode.en]: <>you completed the&nbsp;stage</>,
-                    [LanguageCode.ru]: <>Вы завершили этап</>,
-                }
-            ))} &nbsp;
+                {translate(getStageCompletionText?.(context) ?? processTranslations<ReactNode>(
+                    (congratulations, youCompletedTheStage) => <>{congratulations}, {youCompletedTheStage}!</>,
+                    "Congratulations",
+                    {
+                        [LanguageCode.en]: <>you completed the&nbsp;stage</>,
+                        [LanguageCode.ru]: <>Вы завершили этап</>,
+                    }
+                ))} &nbsp;
 
-            <Button
-                type={"button"}
-                cellSize={cellSize}
-                style={{
-                    fontFamily: "inherit",
-                    fontSize: "inherit",
-                    lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5 - 2}px`,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                }}
-                onClick={() => onStateChange(mergeGameStateUpdates(
-                    {extension: {stage}},
-                    onStageChange?.(context, stage) ?? {}
-                ))}
-            >
-                {translate(getStageButtonText?.(context) ?? {
-                    [LanguageCode.en]: "Go to the next stage",
-                    [LanguageCode.ru]: "Перейти на следующий этап",
-                })}
-            </Button>
-        </div>;
+                <Button
+                    type={"button"}
+                    cellSize={cellSize}
+                    style={{
+                        fontFamily: "inherit",
+                        fontSize: "inherit",
+                        lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5 - 2}px`,
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                    }}
+                    onClick={() => onStateChange(mergeGameStateUpdates(
+                        {extension: {stage}},
+                        onStageChange?.(context, stage) ?? {}
+                    ))}
+                >
+                    {translate(getStageButtonText?.(context) ?? {
+                        [LanguageCode.en]: "Go to the next stage",
+                        [LanguageCode.ru]: "Перейти на следующий этап",
+                    })}
+                </Button>
+            </div>
+        </>;
     },
 });
 
-export const isValidFinishedPuzzleByStageConstraints = <CellType,>(stage: number) =>
-    (context: PuzzleContext<MultiStagePTM<CellType>>) => isValidFinishedPuzzleByConstraints({
+export const isValidFinishedPuzzleByStageConstraints = <T extends AnyMultiStagePTM>(stage: number) =>
+    (context: PuzzleContext<T>) => isValidFinishedPuzzleByConstraints({
         ...context,
         state: mergeProcessedGameStateWithUpdates(context.state, {extension: {stage}}),
     });
