@@ -56,32 +56,29 @@ export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
         return {stage, ...unserializeGameState(other)};
     },
 
-    getAboveRules: (
-        translate,
-        context
-    ) => {
+    getAboveRules: (translate, context, isPortrait) => {
         const {state, onStateChange, cellSizeForSidePanel: cellSize} = context;
         const stage = getStage(context);
         const isNext = stage > state.extension.stage;
         const coeff = isNext ? 1 : 0;
 
         return <>
-            {baseTypeManager.getAboveRules?.(translate, context)}
+            {baseTypeManager.getAboveRules?.(translate, context, isPortrait)}
 
             <div style={{
-            background: yellowColor,
-            marginTop: cellSize * rulesMarginCoeff * coeff,
-            marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
-            padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
-            fontSize: cellSize * aboveRulesTextHeightCoeff,
-            lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
-            height: (cellSize * aboveRulesTextHeightCoeff * 3) * coeff,
-            border: "2px solid #f00",
-            opacity: coeff,
-            overflow: "hidden",
-            transition: "0.3s all linear",
-            textAlign: "center",
-        }}>
+                background: yellowColor,
+                marginTop: cellSize * rulesMarginCoeff * coeff,
+                marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
+                padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
+                fontSize: cellSize * aboveRulesTextHeightCoeff,
+                lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
+                height: (cellSize * aboveRulesTextHeightCoeff * 1.5 * (isPortrait ? 3 : 2)) * coeff,
+                border: "2px solid #f00",
+                opacity: coeff,
+                overflow: "hidden",
+                transition: "0.3s all linear",
+                textAlign: "center",
+            }}>
                 {translate(getStageCompletionText?.(context) ?? processTranslations<ReactNode>(
                     (congratulations, youCompletedTheStage) => <>{congratulations}, {youCompletedTheStage}!</>,
                     "Congratulations",

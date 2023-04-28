@@ -30,6 +30,7 @@ import {getFogPropsByContext} from "../constraints/fog/Fog";
 import {Button} from "../../layout/button/Button";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {useWindowSize} from "../../../hooks/useWindowSize";
 
 const liveHeartCoeff = 0.3;
 const liveHeartMarginCoeff = 0.1;
@@ -48,6 +49,8 @@ export const Rules = <T extends AnyPTM>({rect, context}: RulesProps<T>) => {
     const translate = useTranslate();
 
     const isFullScreen = useIsFullScreen();
+    const windowSize = useWindowSize();
+    const isPortrait = windowSize.width < windowSize.height;
 
     const {
         puzzle: {
@@ -267,8 +270,8 @@ export const Rules = <T extends AnyPTM>({rect, context}: RulesProps<T>) => {
             </Button>
         </div>}
 
-        {puzzleAboveRules?.(translate, context)}
-        {typeAboveRules?.(translate, context)}
+        {puzzleAboveRules?.(translate, context, isPortrait)}
+        {typeAboveRules?.(translate, context, isPortrait)}
 
         <div
             style={{
