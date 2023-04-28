@@ -128,8 +128,15 @@ export const loadPuzzle = <T extends AnyPTM>(
     };
 };
 
-export const getDefaultDigitsCount = <T extends AnyPTM>({typeManager: {maxDigitsCount}, fieldSize: {fieldSize}}: PuzzleDefinition<T>) =>
-    Math.min(maxDigitsCount || fieldSize, fieldSize);
+export const getDefaultDigitsCount = <T extends AnyPTM>(
+    {typeManager: {maxDigitsCount}, fieldSize: {fieldSize}, importOptions: {stickyRegion} = {}}: PuzzleDefinition<T>
+) => {
+    if (stickyRegion) {
+        fieldSize = Math.min(fieldSize, Math.max(stickyRegion.width, stickyRegion.height));
+    }
+
+    return Math.min(maxDigitsCount || fieldSize, fieldSize);
+};
 
 export const normalizePuzzlePosition = <T extends AnyPTM>(
     {top, left}: Position,
