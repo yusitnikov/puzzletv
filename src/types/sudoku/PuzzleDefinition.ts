@@ -227,12 +227,13 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const {puzzle, state, cellsIndex} = context;
     const {
         typeManager: {getDigitByCellData},
-        initialDigits,
+        initialDigits: puzzleInitialDigits,
         initialCellMarks = [],
         solution = {},
         solutionColors = {},
         importOptions: {stickyRegion, noStickyRegionValidation} = {},
     } = puzzle;
+    const {initialDigits: stateInitialDigits} = state;
 
     const hasSolutionColors = Object.keys(solutionColors).length !== 0;
 
@@ -268,7 +269,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                 }
             }
             const actualMark = (initialCenterMarks?.[top]?.[left] ?? userCenterMarks?.[top]?.[left])?.type;
-            const actualDigit = initialDigits?.[top]?.[left] ?? usersDigit;
+            const actualDigit = puzzleInitialDigits?.[top]?.[left] ?? stateInitialDigits?.[top]?.[left] ?? usersDigit;
             const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, context, {top, left}) : actualMark;
             if (actualData !== expectedData) {
                 areCorrectDigits = false;
