@@ -116,3 +116,6 @@ RealChessPuzzle.args = {_hash: "real-chess-sudoku"};
 
 export const Africa = Template.bind({});
 Africa.args = {_hash: "africa"};
+
+export const ReservedParking = Template.bind({});
+ReservedParking.args = {_hash: "reserved-parking"};

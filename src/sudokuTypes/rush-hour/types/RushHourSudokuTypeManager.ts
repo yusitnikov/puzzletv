@@ -167,7 +167,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     mapImportedColors: true,
 
     disabledCellWriteModes: [CellWriteMode.move],
-    extraCellWriteModes: [RushHourMoveCellWriteModeInfo],
+    extraCellWriteModes: [RushHourMoveCellWriteModeInfo()],
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RushHourPTM> {
         let {initialColors, fieldSize: {fieldSize}, resultChecker} = puzzle;

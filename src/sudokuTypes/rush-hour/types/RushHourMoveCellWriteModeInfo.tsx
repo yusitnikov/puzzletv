@@ -14,7 +14,9 @@ import {carMargin} from "../components/RushHourCar";
 
 const base = MoveCellWriteModeInfo<RushHourPTM>();
 
-export const RushHourMoveCellWriteModeInfo: CellWriteModeInfo<RushHourPTM> = {
+export const RushHourMoveCellWriteModeInfo = (
+    restrictCarCoords?: (car: Rect, isVertical: boolean, context: PuzzleContext<RushHourPTM>) => number,
+): CellWriteModeInfo<RushHourPTM> => ({
     title: {
         [LanguageCode.en]: "Move the cars",
         [LanguageCode.ru]: "Двигать машины",
@@ -68,6 +70,18 @@ export const RushHourMoveCellWriteModeInfo: CellWriteModeInfo<RushHourPTM> = {
                     newTop = Math.max(-carMargin, newTop);
                     newTop = Math.min(fieldSize + carMargin - carRect.height, newTop);
 
+                    if (restrictCarCoords) {
+                        newTop = restrictCarCoords(
+                            {
+                                ...carRect,
+                                top: newTop,
+                                left: offsetLeft,
+                            },
+                            isVertical,
+                            context
+                        );
+                    }
+
                     for (const offsetRect of offsetRects) {
                         if (
                             offsetRect.left + offsetRect.width > offsetLeft &&
@@ -89,6 +103,18 @@ export const RushHourMoveCellWriteModeInfo: CellWriteModeInfo<RushHourPTM> = {
                     let newLeft = offsetLeft + (currentMetrics.x - startMetrics.x) / cellSize;
                     newLeft = Math.max(-carMargin, newLeft);
                     newLeft = Math.min(fieldSize + carMargin - carRect.width, newLeft);
+
+                    if (restrictCarCoords) {
+                        newLeft = restrictCarCoords(
+                            {
+                                ...carRect,
+                                top: offsetTop,
+                                left: newLeft,
+                            },
+                            isVertical,
+                            context
+                        );
+                    }
 
                     for (const offsetRect of offsetRects) {
                         if (
@@ -134,7 +160,7 @@ export const RushHourMoveCellWriteModeInfo: CellWriteModeInfo<RushHourPTM> = {
             true,
         ));
     },
-};
+});
 
 const getRushHourCarIndexByGesture = (
     {puzzle, cellsIndex, state}: PuzzleContext<RushHourPTM>,

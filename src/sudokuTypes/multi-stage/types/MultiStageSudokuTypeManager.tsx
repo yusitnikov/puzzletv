@@ -20,6 +20,7 @@ import {isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constrai
 import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 import {processTranslations} from "../../../utils/translate";
 import {AnyMultiStagePTM} from "./MultiStagePTM";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
 interface MultiStageSudokuOptions<T extends AnyMultiStagePTM> {
     baseTypeManager?: SudokuTypeManager<any>;
@@ -30,19 +31,29 @@ interface MultiStageSudokuOptions<T extends AnyMultiStagePTM> {
 }
 
 export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
-    {baseTypeManager = DigitSudokuTypeManager(), getStage, onStageChange, getStageCompletionText, getStageButtonText}: MultiStageSudokuOptions<T>
+    {
+        baseTypeManager: {initialGameStateExtension, serializeGameState, unserializeGameState, ...baseTypeManager} = DigitSudokuTypeManager(),
+        getStage,
+        onStageChange,
+        getStageCompletionText,
+        getStageButtonText,
+    }: MultiStageSudokuOptions<T>
 ): SudokuTypeManager<T> => ({
     ...baseTypeManager,
 
-    initialGameStateExtension: {
-        ...baseTypeManager.initialGameStateExtension,
+    initialGameStateExtension: (puzzle) => ({
+        ...(
+            typeof initialGameStateExtension === "function"
+                ? (initialGameStateExtension as ((puzzle: PuzzleDefinition<T>) => T["stateEx"]))(puzzle)
+                : initialGameStateExtension
+        ),
         stage: 1,
-    },
+    }),
     serializeGameState({stage, ...other}): any {
-        return {stage, ...baseTypeManager.serializeGameState(other)};
+        return {stage, ...serializeGameState(other)};
     },
     unserializeGameState({stage = 1, ...other}: any): Partial<MultiStageGameState> {
-        return {stage, ...baseTypeManager.unserializeGameState(other)};
+        return {stage, ...unserializeGameState(other)};
     },
 
     getAboveRules: (

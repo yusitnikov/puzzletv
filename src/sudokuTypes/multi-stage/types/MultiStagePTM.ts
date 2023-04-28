@@ -16,3 +16,5 @@ export type AnyMultiStagePTM<
     FieldStateEx = any,
     PuzzleExType = any
 > = AnyPTM<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx, PuzzleExType>;
+
+export type ToMultiStagePTM<T extends AnyPTM> = Omit<T, "stateEx"> & {stateEx: T["stateEx"] & MultiStageGameState};

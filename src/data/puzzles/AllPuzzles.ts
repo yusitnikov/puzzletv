@@ -37,6 +37,7 @@ import {PenroseTiles} from "./PenroseTiles";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {RushHour} from "./RushHour";
 import {InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdge} from "./InfinityLoop";
+import {ReservedParking} from "./ReservedParking";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -63,6 +64,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    ReservedParking,
+
     PenroseTiles,
 
     Embark,
