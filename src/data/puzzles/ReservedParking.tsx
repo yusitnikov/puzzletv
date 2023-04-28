@@ -19,6 +19,7 @@ import {carMargin} from "../../sudokuTypes/rush-hour/components/RushHourCar";
 import {TextProps, textTag} from "../../components/sudoku/constraints/text/Text";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {Position} from "../../types/layout/Position";
+import {LanguageCode} from "../../types/translations/LanguageCode";
 
 type ReservedParkingPTM = ToMultiStagePTM<RushHourPTM>;
 
@@ -49,6 +50,12 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                 ...MultiStageSudokuTypeManager<ReservedParkingPTM>({
                     baseTypeManager: typeManager,
                     getStage: (context) => hasParkedCar(context, {top: 2, left: 7, width: 2, height: 1}) ? 2 : 1,
+                    getStageCompletionText: () => ({
+                        [LanguageCode.en]: "Great job freeing the car!",
+                    }),
+                    getStageButtonText: () => ({
+                        [LanguageCode.en]: "Release all other cars from the cage",
+                    }),
                 }),
                 extraCellWriteModes: [RushHourMoveCellWriteModeInfo(
                     ({top, left, width, height}, isVertical, {state: {extension}}) => {
