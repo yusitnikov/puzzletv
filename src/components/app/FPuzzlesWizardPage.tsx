@@ -386,17 +386,17 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                                     type={"checkbox"}
                                     checked={hasStickyJigsawPiece}
                                     onChange={ev => setHasStickyJigsawPiece(ev.target.checked)}
-                                />&nbsp;
-                                <input
-                                    type={"number"}
-                                    min={1}
-                                    step={1}
-                                    max={99}
-                                    value={stickyJigsawPiece}
-                                    onChange={ev => setStickyJigsawPiece(ev.target.valueAsNumber)}
-                                    disabled={!hasStickyJigsawPiece}
                                 />
-                            </label>
+                            </label>&nbsp;
+                            <input
+                                type={"number"}
+                                min={1}
+                                step={1}
+                                max={99}
+                                value={stickyJigsawPiece}
+                                onChange={ev => setStickyJigsawPiece(ev.target.valueAsNumber)}
+                                disabled={!hasStickyJigsawPiece}
+                            />
                             <Details>
                                 When enabled, the selected jigsaw piece will be considered as "fixed".<br/>
                                 The initial rotation of this piece will be treated as the correct rotation of the jigsaw.
