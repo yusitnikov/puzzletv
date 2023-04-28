@@ -16,7 +16,9 @@ import {CellWriteModeInfo} from "../../types/sudoku/CellWriteModeInfo";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {MultiStageGameState} from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
 import {carMargin} from "../../sudokuTypes/rush-hour/components/RushHourCar";
-import {textTag} from "../../components/sudoku/constraints/text/Text";
+import {TextProps, textTag} from "../../components/sudoku/constraints/text/Text";
+import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
+import {Position} from "../../types/layout/Position";
 
 type ReservedParkingPTM = ToMultiStagePTM<RushHourPTM>;
 
@@ -63,6 +65,46 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                         return Math.min(value, 6 + carMargin - size);
                     }
                 ) as unknown as CellWriteModeInfo<ReservedParkingPTM>],
+                applyStateDiffEffect(state, prevState, context) {
+                    const {puzzle: {items: itemsFn, extension}, onStateChange} = context;
+                    const items = typeof itemsFn === "function" ? itemsFn(state) : itemsFn ?? [];
+
+                    const {initialDigits = {}} = state;
+                    const newInitialDigitsCandidates: (Position & {digit: number})[] = [];
+                    for (const {tags, cells: [cell], props} of items) {
+                        if (tags?.includes(textTag) && !initialDigits[cell.top]?.[cell.left]) {
+                            newInitialDigitsCandidates.push({
+                                ...cell,
+                                digit: Number((props as TextProps).text),
+                            });
+                        }
+                    }
+
+                    const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
+                    const newInitialDigits: GivenDigitsMap<number> = {};
+                    for (const [index, {boundingRect: {top, left, width, height}}] of (extension?.cars ?? []).entries()) {
+                        const offset = carPositions[index];
+                        const offsetTop = top + offset.top;
+                        const offsetLeft = left + offset.left;
+                        const offsetBottom = offsetTop + height;
+                        const offsetRight = offsetLeft + width;
+
+                        for (const {top, left, digit} of newInitialDigitsCandidates) {
+                            const centerTop = top + 0.5;
+                            const centerLeft = left + 0.5;
+                            if (centerTop >= offsetTop && centerTop <= offsetBottom && centerLeft >= offsetLeft && centerLeft <= offsetRight) {
+                                newInitialDigits[top] = newInitialDigits[top] || {};
+                                newInitialDigits[top][left] = digit;
+                            }
+                        }
+                    }
+
+                    if (Object.keys(newInitialDigits).length !== 0) {
+                        onStateChange({
+                            initialDigits: mergeGivenDigitsMaps(initialDigits, newInitialDigits),
+                        });
+                    }
+                },
             },
             items: (state) => {
                 const parkedRedCar = state.extension.stage === 2;
@@ -107,11 +149,8 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                     }
 
                     if (item.tags?.includes(textTag)) {
-                        // Enable the extra givens after parking the red car
-                        return {
-                            ...item,
-                            component: parkedRedCar ? item.component : undefined,
-                        };
+                        // Hide all "white digits"
+                        return {...item, component: undefined};
                     }
 
                     return item;
