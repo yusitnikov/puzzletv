@@ -52,11 +52,8 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const {width, height} = useWindowSize();
     const previewSize = Math.min(width, height) - 2 * headerPadding;
 
-    const puzzle = useMemo(() => decodeFPuzzlesString(load), [load]);
-
     const [type, setType] = useStringFromLocalStorage<PuzzleImportPuzzleType>("fpwType", PuzzleImportPuzzleType.Regular);
     const [digitType, setDigitType] = useStringFromLocalStorage<PuzzleImportDigitType>("fpwDigitType", PuzzleImportDigitType.Regular);
-    const [digitsCount, setDigitsCount] = useState(Math.min(puzzle.size, 9));
     const [areHtmlRules, setAreHtmlRules] = useBoolFromLocalStorage("fpwHtmlRules");
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
@@ -102,10 +99,6 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         PuzzleImportPuzzleType.Jigsaw,
     ].includes(type);
     const supportsJss = isRotatableGrid || (!isSpecialGrid && !loopX && !loopY);
-    const hasSolution = !!puzzle.solution;
-    const hasFog = !!(puzzle.fogofwar || puzzle.foglight);
-    const hasCosmeticElements = !!(puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
-    const hasInitialColors = puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length));
 
     const filteredExtraGrids = useMemo(
         () => !supportsExtraGrids ? [] : extraGrids
@@ -119,11 +112,34 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const globalOffsetX = -Math.min(0, ...filteredExtraGrids.map(({offsetX}) => offsetX));
     const globalOffsetY = -Math.min(0, ...filteredExtraGrids.map(({offsetY}) => offsetY));
 
+    const puzzles = useMemo(() => {
+        const result = [decodeFPuzzlesString(load)];
+
+        for (const extraGrid of extraGrids) {
+            try {
+                result.push(decodeFPuzzlesString(extraGrid.load));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        return result;
+    }, [load, extraGrids]);
+
+    const fieldSize = puzzles[0].size;
+    const hasSolution = puzzles.some((puzzle) => puzzle.solution);
+    const hasFog = puzzles.some((puzzle) => puzzle.fogofwar || puzzle.foglight);
+    const hasCosmeticElements = puzzles.some((puzzle) => puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
+    const hasInitialColors = puzzles.some((puzzle) => puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length)));
+    const hasArrows = puzzles.some((puzzle) => puzzle.arrow);
+
+    const [digitsCount, setDigitsCount] = useState(Math.min(fieldSize, 9));
+
     const importOptions = usePureMemo<PuzzleImportOptions>({
         type,
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
-        digitsCount: digitsCount === puzzle.size && !filteredExtraGrids.length ? undefined : digitsCount,
+        digitsCount: digitsCount === fieldSize && !filteredExtraGrids.length ? undefined : digitsCount,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
@@ -131,11 +147,11 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         rotatableClues: !isSpecialGrid && rotatableClues,
         sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
-        "product-arrow": !!puzzle.arrow && productArrow,
+        "product-arrow": hasArrows && productArrow,
         yajilinFog: hasFog && yajilinFog,
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
-        visibleRingsCount: isInfiniteRings ? (visibleRingsCount || (puzzle.size / 2 - 1)) : undefined,
+        visibleRingsCount: isInfiniteRings ? (visibleRingsCount || (fieldSize / 2 - 1)) : undefined,
         startOffset: isInfiniteRings ? startOffset : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
         allowOverrideColors: hasInitialColors && allowOverrideColors,
@@ -144,8 +160,8 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         stickyRegion: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid ? {
             top: globalOffsetY,
             left: globalOffsetX,
-            width: puzzle.size,
-            height: puzzle.size,
+            width: fieldSize,
+            height: fieldSize,
         } : undefined,
         noStickyRegionValidation: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid && noStickyRegionValidation,
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
@@ -283,7 +299,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         </Paragraph>
                     </>}
 
-                    {!!puzzle.arrow && <Paragraph>
+                    {hasArrows && <Paragraph>
                         <label>
                             Arrow circle is a product instead of a sum:&nbsp;
                             <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
@@ -315,7 +331,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             type={"number"}
                             value={safeCrackerCodeLength}
                             min={1}
-                            max={puzzle.size}
+                            max={fieldSize}
                             step={1}
                             onChange={ev => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
                         />
@@ -338,7 +354,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             type={"number"}
                             value={startOffset}
                             min={0}
-                            max={puzzle.size / 2 - 2}
+                            max={fieldSize / 2 - 2}
                             step={1}
                             onChange={ev => setStartOffset(ev.target.valueAsNumber)}
                         />
@@ -431,7 +447,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             type={"number"}
                             value={digitsCount}
                             min={1}
-                            max={Math.max(puzzle.size, 9)}
+                            max={Math.min(fieldSize, 9)}
                             step={1}
                             onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
                         />
@@ -555,7 +571,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                                             ...extraGrids,
                                             {
                                                 load: ev.target.value,
-                                                offsetX: puzzle.size + 1,
+                                                offsetX: fieldSize + 1,
                                                 offsetY: 0,
                                             },
                                         ])}/>
