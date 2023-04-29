@@ -6,7 +6,7 @@ import {blackColor} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
 import {gameStateHandleZoomClick, gameStateSetScaleLog} from "../../../types/sudoku/GameState";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
-import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
+import {useIsFocusingInfiniteRings, useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {indexes} from "../../../utils/indexes";
 import {loop} from "../../../utils/math";
@@ -69,6 +69,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
 
     const ringOffset = Math.round(scaleLog);
     const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
+    const [isFocusingInfiniteRings] = useIsFocusingInfiniteRings();
     const ringsCount = fieldSize / 2 - 1;
     const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
     const loopedRingOffset = loop(ringOffset, ringsCount);
@@ -89,7 +90,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
         }}>
             {children}
 
-            {isShowingAllInfiniteRings && !isReadonlyContext && <div style={{
+            {isShowingAllInfiniteRings && isFocusingInfiniteRings && !isReadonlyContext && <div style={{
                 position: "absolute",
                 inset: 0,
                 opacity: 0.15,

@@ -2,7 +2,8 @@ import {loadBoolFromLocalStorage, useBoolFromLocalStorage} from "../../../utils/
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
-const localStorageKey = "infiniteRingsShowAllRings";
+const showAllLocalStorageKey = "infiniteRingsShowAllRings";
+const focusLocalStorageKey = "infiniteRingsFocusRings";
 
 export const isShowingAllInfiniteRingsAllowed = (visibleRingsCount: number) => visibleRingsCount <= 2;
 
@@ -16,12 +17,14 @@ const calcIsShowingAllInfiniteRings = <T extends AnyPTM>(
 export const isShowingAllInfiniteRings = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     visibleRingsCount: number,
-) => calcIsShowingAllInfiniteRings(context, loadBoolFromLocalStorage(localStorageKey, false), visibleRingsCount);
+) => calcIsShowingAllInfiniteRings(context, loadBoolFromLocalStorage(showAllLocalStorageKey, false), visibleRingsCount);
 
 export const useIsShowingAllInfiniteRings = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     visibleRingsCount: number,
 ): [boolean, (isShowing: boolean) => void] => {
-    const [isShowingBySettings, setIsShowingBySettings] = useBoolFromLocalStorage(localStorageKey, false);
+    const [isShowingBySettings, setIsShowingBySettings] = useBoolFromLocalStorage(showAllLocalStorageKey, false);
     return [calcIsShowingAllInfiniteRings(context, isShowingBySettings, visibleRingsCount), setIsShowingBySettings];
 };
+
+export const useIsFocusingInfiniteRings = () => useBoolFromLocalStorage(focusLocalStorageKey, true);
