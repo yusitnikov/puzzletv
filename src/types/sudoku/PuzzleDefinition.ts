@@ -96,7 +96,7 @@ export interface PuzzleDefinitionLoader<T extends AnyPTM> {
     slug: string;
     noIndex?: boolean;
     fulfillParams?: (params: any) => any;
-    loadPuzzle: (params: any) => Omit<PuzzleDefinition<T>, "noIndex" | "slug"> & {slug?: string};
+    loadPuzzle: (params: any, isPreview?: boolean) => Omit<PuzzleDefinition<T>, "noIndex" | "slug"> & {slug?: string};
 }
 
 export type PuzzleDefinitionOrLoader<T extends AnyPTM> = PuzzleDefinition<T> | PuzzleDefinitionLoader<T>;
@@ -104,6 +104,7 @@ export type PuzzleDefinitionOrLoader<T extends AnyPTM> = PuzzleDefinition<T> | P
 export const loadPuzzle = <T extends AnyPTM>(
     puzzleOrLoader: PuzzleDefinitionOrLoader<T>,
     params: any = {},
+    isPreview = false,
 ): PuzzleDefinition<T> => {
     const {
         loadPuzzle,
@@ -115,7 +116,7 @@ export const loadPuzzle = <T extends AnyPTM>(
         : params;
 
     const puzzle = typeof loadPuzzle === "function"
-        ? loadPuzzle(fulfilledParams)
+        ? loadPuzzle(fulfilledParams, isPreview)
         : puzzleOrLoader as PuzzleDefinition<T>;
 
     return {

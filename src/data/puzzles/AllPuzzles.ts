@@ -38,6 +38,7 @@ import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {RushHour} from "./RushHour";
 import {InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdge} from "./InfinityLoop";
 import {ReservedParking} from "./ReservedParking";
+import {JssChicken, MakeAPicture} from "./JigsawJss";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -64,6 +65,9 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    MakeAPicture,
+    JssChicken,
+
     ReservedParking,
 
     PenroseTiles,
@@ -126,4 +130,4 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 ];
 
-export const getAllPuzzlesWithDefaultParams = () => AllPuzzles.filter(({noIndex}) => !noIndex).map(loadPuzzle);
+export const getAllPuzzlesForPreview = () => AllPuzzles.filter(({noIndex}) => !noIndex).map((puzzle) => loadPuzzle(puzzle, undefined, true));

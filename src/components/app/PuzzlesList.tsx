@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useState} from "react";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {headerPadding} from "./globals";
-import {getAllPuzzlesWithDefaultParams} from "../../data/puzzles/AllPuzzles";
+import {getAllPuzzlesForPreview} from "../../data/puzzles/AllPuzzles";
 import {PuzzlesListItem} from "./PuzzlesListItem";
 import {useRaf} from "../../hooks/useRaf";
 import {useLastValueRef} from "../../hooks/useLastValueRef";
@@ -18,7 +18,7 @@ export const PuzzlesList = ({onLoaded}: PuzzlesListProps) => {
     const columnsCount = Math.max(Math.round(innerWidth / 400), 1);
     const itemWidth = (innerWidth - (columnsCount - 1) * gridGap) / columnsCount;
 
-    const puzzles = useMemo(getAllPuzzlesWithDefaultParams, []);
+    const puzzles = useMemo(getAllPuzzlesForPreview, []);
 
     const [visiblePuzzlesCount, setVisiblePuzzlesCount] = useState(0);
     useRaf(() => setVisiblePuzzlesCount(Math.min(visiblePuzzlesCount + 1, puzzles.length)));
