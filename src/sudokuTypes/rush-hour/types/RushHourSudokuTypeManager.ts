@@ -23,6 +23,7 @@ import {getDefaultRegionsForRowsAndColumns} from "../../../types/sudoku/FieldSiz
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {createRandomGenerator} from "../../../utils/random";
+import {cloneConstraint} from "../../../types/sudoku/Constraint";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
@@ -170,7 +171,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     extraCellWriteModes: [RushHourMoveCellWriteModeInfo()],
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RushHourPTM> {
-        let {initialColors, fieldSize: {fieldSize}, resultChecker} = puzzle;
+        let {initialColors, fieldSize: {fieldSize}, resultChecker, items} = puzzle;
 
         puzzle = {
             ...puzzle,
@@ -232,6 +233,36 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                     )
                 );
             puzzle.extension = {cars};
+
+            if (Array.isArray(items)) {
+                puzzle = {
+                    ...puzzle,
+                    items: items.map((item) => {
+                        if (item.cells.length === 0) {
+                            return item;
+                        }
+                        const {
+                            top: itemTop,
+                            left: itemLeft,
+                            width: itemWidth,
+                            height: itemHeight,
+                        } = getRegionBoundingBox(item.cells, 1);
+                        const itemBottom = itemTop + itemHeight;
+                        const itemRight = itemLeft + itemWidth;
+
+                        for (const {boundingRect: {top, left: offsetLeft, width, height}} of cars) {
+                            const left = offsetLeft - fieldSize;
+                            if (itemTop >= top && itemLeft >= left && itemBottom <= top + height && itemRight <= left + width) {
+                                return cloneConstraint(item, {
+                                    processCellCoords: ({top, left}) => ({top, left: left + fieldSize}),
+                                });
+                            }
+                        }
+
+                        return item;
+                    }),
+                };
+            }
 
             if (resultChecker) {
                 puzzle.resultChecker = (context) => {
