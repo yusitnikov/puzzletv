@@ -78,12 +78,14 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [noStickyRegionValidation, setNoStickyRegionValidation] = useBoolFromLocalStorage("fpwNoStickyRegionValidation");
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
     const [splitUnconnectedRegions, setSplitUnconnectedRegions] = useBoolFromLocalStorage("fpwSplitUnconnectedRegions");
+    const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
     const isInfiniteRings = type === PuzzleImportPuzzleType.InfiniteRings;
     const isJigsaw = type === PuzzleImportPuzzleType.Jigsaw;
+    const isRushHour = type === PuzzleImportPuzzleType.RushHour;
     const isRotatableGrid = [
         PuzzleImportPuzzleType.Rotatable,
         PuzzleImportPuzzleType.Jigsaw,
@@ -167,6 +169,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
         stickyJigsawPiece: isJigsaw && angleStep !== 0 && hasStickyJigsawPiece ? stickyJigsawPiece: undefined,
         splitUnconnectedRegions,
+        givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
         offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
@@ -438,6 +441,19 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                             <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>
                         </label>
                     </Paragraph>}
+                </CollapsableFieldSet>}
+
+                {isRushHour && <CollapsableFieldSet legend={"Rush Hour"}>
+                    <Paragraph>
+                        <label>
+                            Given digits block cars:&nbsp;
+                            <input
+                                type={"checkbox"}
+                                checked={givenDigitsBlockCars}
+                                onChange={ev => setGivenDigitsBlockCars(ev.target.checked)}
+                            />
+                        </label>
+                    </Paragraph>
                 </CollapsableFieldSet>}
 
                 <CollapsableFieldSet legend={"Miscellaneous"}>

@@ -52,6 +52,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     noStickyRegionValidation?: boolean;
     stickyDigits?: boolean;
     splitUnconnectedRegions?: boolean;
+    givenDigitsBlockCars?: boolean;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -92,6 +93,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         noStickyRegionValidation,
         stickyDigits,
         splitUnconnectedRegions,
+        givenDigitsBlockCars,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -138,6 +140,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         noStickyRegionValidation,
         stickyDigits,
         splitUnconnectedRegions,
+        givenDigitsBlockCars,
     };
 
     return result;

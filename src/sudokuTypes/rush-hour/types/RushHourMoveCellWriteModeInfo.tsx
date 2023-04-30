@@ -11,6 +11,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {Rect} from "../../../types/layout/Rect";
 import {carMargin} from "../components/RushHourCar";
+import {processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 
 const base = MoveCellWriteModeInfo<RushHourPTM>();
 
@@ -31,7 +32,7 @@ export const RushHourMoveCellWriteModeInfo = (
         const {gesture, startMetrics, currentMetrics} = props;
         const {id, state: startContext} = gesture;
         const {puzzle, onStateChange, cellSize} = context;
-        const {fieldSize: {fieldSize}} = puzzle;
+        const {fieldSize: {fieldSize}, importOptions: {givenDigitsBlockCars} = {}} = puzzle;
 
         if (!puzzle.extension) {
             return;
@@ -61,6 +62,16 @@ export const RushHourMoveCellWriteModeInfo = (
                     })
                 );
                 offsetRects.splice(carIndex, 1);
+
+                if (givenDigitsBlockCars) {
+                    processGivenDigitsMaps(([digit], position) => {
+                        offsetRects.push({
+                            ...position,
+                            width: 1,
+                            height: 1,
+                        });
+                    }, [puzzle.initialDigits ?? {}]);
+                }
 
                 const offsetTop = top + carRect.top;
                 const offsetLeft = left + carRect.left;
