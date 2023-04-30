@@ -73,7 +73,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
     const [hasStickyJigsawPiece, setHasStickyJigsawPiece] = useBoolFromLocalStorage("fpwHasStickyJigsawPiece", false);
     const [stickyJigsawPiece, setStickyJigsawPiece] = useNumberFromLocalStorage("fpwStickyJigsawPiece", 1);
-    const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", true);
+    const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", false);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
     const [noStickyRegionValidation, setNoStickyRegionValidation] = useBoolFromLocalStorage("fpwNoStickyRegionValidation");
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
