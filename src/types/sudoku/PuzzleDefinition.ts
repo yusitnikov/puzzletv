@@ -115,19 +115,21 @@ export const loadPuzzle = <T extends AnyPTM>(
         ? fulfillParams(params)
         : params;
 
-    const puzzle = typeof loadPuzzle === "function"
+    const basePuzzle = typeof loadPuzzle === "function"
         ? loadPuzzle(fulfilledParams, isPreview)
         : puzzleOrLoader as PuzzleDefinition<T>;
 
-    return {
-        ...puzzle,
+    const puzzle: PuzzleDefinition<T> = {
+        ...basePuzzle,
         noIndex: puzzleOrLoader.noIndex,
         slug: puzzleOrLoader.slug,
         params: {
-            ...puzzle.params,
+            ...basePuzzle.params,
             ...fulfilledParams,
         },
     };
+
+    return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 };
 
 export const getDefaultDigitsCount = <T extends AnyPTM>(

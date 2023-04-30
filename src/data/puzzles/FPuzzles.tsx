@@ -930,7 +930,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
             this.splitUnconnectedRegions();
         }
 
-        return this.puzzle.typeManager.postProcessPuzzle?.(this.puzzle) ?? this.puzzle;
+        return this.puzzle;
     }
 
     private splitUnconnectedRegions() {
