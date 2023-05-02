@@ -25,14 +25,14 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
     const isClockwise = direction > 0;
     const isShift = !isClockwise;
 
-    const selectedClueIndexes = (puzzle.extension?.clues as RotatableClue[] | undefined)
-            ?.map(({pivot}, index) => ({
+    const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
+    const selectedClueIndexes = clues
+            .map(({pivot}, index) => ({
                 pivot,
                 index,
             }))
             .filter(({pivot}) => selectedCells.contains(pivot))
-            .map(({index}) => index)
-        ?? [];
+            .map(({index}) => index);
 
     const handleRotate = () => onStateChange(({fieldStateHistory, extension}) => ({
         fieldStateHistory: fieldStateHistoryAddState(
@@ -44,9 +44,18 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
                 ...fieldState,
                 extension: {
                     ...fieldState.extension,
-                    clueAngles: fieldState.extension.clueAngles?.map(
-                        (angle: number, index: number) => angle + (selectedClueIndexes.includes(index) ? direction : 0)
-                    )
+                    clueAngles: fieldState.extension.clueAngles?.map((angle: number, index: number) => {
+                        if (!selectedClueIndexes.includes(index)) {
+                            return angle;
+                        }
+
+                        const {pivot: {top, left}} = clues[index];
+                        if (fieldState.cells[top]?.[left]?.usersDigit !== undefined) {
+                            return angle;
+                        }
+
+                        return angle + direction;
+                    })
                 },
             })
         ),
