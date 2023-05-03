@@ -135,6 +135,8 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const hasCosmeticElements = puzzles.some((puzzle) => puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
     const hasInitialColors = puzzles.some((puzzle) => puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length)));
     const hasArrows = puzzles.some((puzzle) => puzzle.arrow);
+    // Transparent arrow circles are always on for the rotatable clues puzzles, so don't allow to change the flag
+    const transparentCirclesForced = rotatableClues;
 
     const [digitsCount, setDigitsCount] = useState(Math.min(fieldSize, 9));
 
@@ -151,7 +153,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
         "product-arrow": hasArrows && productArrow,
-        transparentArrowCircle: hasArrows && transparentArrowCircle,
+        transparentArrowCircle: hasArrows && !transparentCirclesForced && transparentArrowCircle,
         yajilinFog: hasFog && yajilinFog,
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
@@ -305,12 +307,13 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                     </>}
 
                     {hasArrows && <>
-                        <Paragraph>
+                        {!transparentCirclesForced && <Paragraph>
                             <label>
                                 Transparent arrow circles:&nbsp;
-                                <input type={"checkbox"} checked={transparentArrowCircle} onChange={ev => setTransparentArrowCircle(ev.target.checked)}/>
+                                <input type={"checkbox"} checked={transparentArrowCircle}
+                                       onChange={ev => setTransparentArrowCircle(ev.target.checked)}/>
                             </label>
-                        </Paragraph>
+                        </Paragraph>}
 
                         <Paragraph>
                             <label>
