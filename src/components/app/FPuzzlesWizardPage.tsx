@@ -65,6 +65,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
+    const [transparentArrowCircle, setTransparentArrowCircle] = useBoolFromLocalStorage("fpwTransparentArrowCircle");
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
     const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
@@ -150,6 +151,7 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
         sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
         "product-arrow": hasArrows && productArrow,
+        transparentArrowCircle: hasArrows && transparentArrowCircle,
         yajilinFog: hasFog && yajilinFog,
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
@@ -302,12 +304,21 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
                         </Paragraph>
                     </>}
 
-                    {hasArrows && <Paragraph>
-                        <label>
-                            Arrow circle is a product instead of a sum:&nbsp;
-                            <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
-                        </label>
-                    </Paragraph>}
+                    {hasArrows && <>
+                        <Paragraph>
+                            <label>
+                                Transparent arrow circles:&nbsp;
+                                <input type={"checkbox"} checked={transparentArrowCircle} onChange={ev => setTransparentArrowCircle(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Arrow circle is a product instead of a sum:&nbsp;
+                                <input type={"checkbox"} checked={productArrow} onChange={ev => setProductArrow(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+                    </>}
 
                     {hasFog && <>
                         <Paragraph>

@@ -14,6 +14,8 @@ import {defaultGetDefaultNumberByDigits} from "../../../../types/sudoku/SudokuTy
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
+export const arrowTag = "arrow";
+
 const lineWidth = 0.1;
 const arrowSize = 0.25;
 const arrowEndMargin = 0.07;
@@ -124,6 +126,7 @@ export const ArrowConstraint = <T extends AnyPTM>(
 
     return {
         name: "arrow",
+        tags: [arrowTag],
         props: {
             circleCells,
             arrowCells: [arrowStartCell, ...arrowCells],
@@ -190,3 +193,6 @@ export const ArrowConstraint = <T extends AnyPTM>(
         },
     };
 };
+
+export const isArrowConstraint = <T extends AnyPTM>(constraint: Constraint<T, any>)
+    : constraint is Constraint<T, ArrowProps> => (constraint.tags ?? []).includes(arrowTag);

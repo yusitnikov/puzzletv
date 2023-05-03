@@ -318,6 +318,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
         const {
             htmlRules,
             fillableDigitalDisplay,
+            transparentArrowCircle = false,
             "product-arrow": productArrow,
             cosmeticsBehindFog,
         } = this.importOptions;
@@ -514,7 +515,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
                             ? lines.map(([lineStart, ...line]) => ArrowConstraint<T>(
                                 visibleCells,
                                 offsetCoordsArray(line).filter(isVisibleGridCell),
-                                false,
+                                transparentArrowCircle,
                                 offsetCoords(lineStart),
                                 !!productArrow,
                                 false,
@@ -522,7 +523,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
                             : ArrowConstraint<T>(
                                 visibleCells,
                                 [],
-                                false,
+                                transparentArrowCircle,
                                 undefined,
                                 !!productArrow,
                                 false,

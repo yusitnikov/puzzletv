@@ -39,6 +39,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     rotatableClues?: boolean;
     sokoban?: boolean;
     "product-arrow"?: boolean;
+    transparentArrowCircle?: boolean;
     yajilinFog?: boolean;
     cosmeticsBehindFog?: boolean;
     safeCrackerCodeLength?: number;
@@ -79,6 +80,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         rotatableClues,
         sokoban,
         "product-arrow": productArrow,
+        transparentArrowCircle,
         yajilinFog,
         cosmeticsBehindFog,
         safeCrackerCodeLength,
@@ -115,6 +117,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         rotatableClues,
         sokoban,
         "product-arrow": productArrow,
+        transparentArrowCircle,
         yajilinFog,
         cosmeticsBehindFog,
         safeCrackerCodeLength: safeCrackerCodeLength === undefined

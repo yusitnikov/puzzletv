@@ -21,6 +21,7 @@ import {RotatableClueConstraint} from "../constraints/RotatableClue";
 import {RotateClueButton} from "../components/RotateClueButton";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {loop} from "../../../utils/math";
+import {ArrowProps, isArrowConstraint} from "../../../components/sudoku/constraints/arrow/Arrow";
 
 export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     {
@@ -173,6 +174,18 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
         }
 
         if (Array.isArray(puzzle.items)) {
+            puzzle.items = puzzle.items.map(
+                (item) => isArrowConstraint(item)
+                    ? {
+                        ...item,
+                        props: {
+                            ...item.props,
+                            transparentCircle: true,
+                        },
+                    } as Constraint<RotatableCluesPTM<T>, ArrowProps>
+                    : item
+            );
+
             const isPivot = ({tags, cells: {length}}: Constraint<RotatableCluesPTM<T>>) =>
                 tags?.includes(ellipseTag) && length === 1;
 
