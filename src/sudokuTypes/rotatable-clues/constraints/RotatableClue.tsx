@@ -63,7 +63,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
             cells: [pivot],
             props: undefined,
             component: {
-                [FieldLayer.regular]: ({cells: [{top, left}]}) => <AutoSvg top={top + 0.5} left={left + 0.5}>
+                [FieldLayer.top]: ({cells: [{top, left}]}) => <AutoSvg top={top + 0.5} left={left + 0.5}>
                     <circle
                         r={pivotRadius}
                         fill={"#BD8ABB"}
