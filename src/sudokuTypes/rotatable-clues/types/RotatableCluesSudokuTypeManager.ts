@@ -140,8 +140,8 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             }
             const digit = puzzle.typeManager.getDigitByCellData(data, context, {top, left});
             const forcedAngle = digit * 90;
-            // Find the closest angle to the manual angle, so that we don't have weird animation
-            return manualAngle + loop(forcedAngle - manualAngle + 180, 360) - 180;
+            // Find the closest angle to the manual angle, so that we don't have weird animation (but rotate only clockwise)
+            return manualAngle + loop(forcedAngle - manualAngle, 360);
         });
         if (processedClueAngles.some((value, index) => value !== clueAngles[index])) {
             onStateChange({
