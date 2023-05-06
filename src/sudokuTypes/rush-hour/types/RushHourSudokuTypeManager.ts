@@ -23,7 +23,7 @@ import {getDefaultRegionsForRowsAndColumns} from "../../../types/sudoku/FieldSiz
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {createRandomGenerator} from "../../../utils/random";
-import {cloneConstraint} from "../../../types/sudoku/Constraint";
+import {cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
@@ -171,7 +171,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     extraCellWriteModes: [RushHourMoveCellWriteModeInfo()],
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RushHourPTM> {
-        let {initialColors, fieldSize: {fieldSize}, resultChecker, items} = puzzle;
+        let {initialColors, fieldSize: {fieldSize}, resultChecker, items = []} = puzzle;
 
         puzzle = {
             ...puzzle,
@@ -234,35 +234,41 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                 );
             puzzle.extension = {cars};
 
-            if (Array.isArray(items)) {
-                puzzle = {
-                    ...puzzle,
-                    items: items.map((item) => {
-                        if (item.cells.length === 0) {
-                            return item;
-                        }
-                        const {
-                            top: itemTop,
-                            left: itemLeft,
-                            width: itemWidth,
-                            height: itemHeight,
-                        } = getRegionBoundingBox(item.cells, 1);
-                        const itemBottom = itemTop + itemHeight;
-                        const itemRight = itemLeft + itemWidth;
-
-                        for (const {boundingRect: {top, left: offsetLeft, width, height}} of cars) {
-                            const left = offsetLeft - fieldSize;
-                            if (itemTop >= top && itemLeft >= left && itemBottom <= top + height && itemRight <= left + width) {
-                                return cloneConstraint(item, {
-                                    processCellCoords: ({top, left}) => ({top, left: left + fieldSize}),
-                                });
-                            }
-                        }
-
-                        return item;
-                    }),
-                };
+            if (!Array.isArray(items)) {
+                throw new Error("puzzle.items must be an array for rush hour puzzles");
             }
+
+            const processedItems = items.map((item: Constraint<RushHourPTM, any>): typeof item & {carIndex?: number} => {
+                if (item.cells.length === 0) {
+                    return item;
+                }
+                const {
+                    top: itemTop,
+                    left: itemLeft,
+                    width: itemWidth,
+                    height: itemHeight,
+                } = getRegionBoundingBox(item.cells, 1);
+                const itemBottom = itemTop + itemHeight;
+                const itemRight = itemLeft + itemWidth;
+
+                for (const [carIndex, {boundingRect: {top, left: offsetLeft, width, height}}] of cars.entries()) {
+                    const left = offsetLeft - fieldSize;
+                    if (itemTop >= top && itemLeft >= left && itemBottom <= top + height && itemRight <= left + width) {
+                        return {
+                            ...cloneConstraint(item, {
+                                processCellCoords: ({top, left}) => ({top, left: left + fieldSize}),
+                            }),
+                            carIndex,
+                        };
+                    }
+                }
+
+                return item;
+            });
+            puzzle = {
+                ...puzzle,
+                items: processedItems,
+            };
 
             if (resultChecker) {
                 puzzle.resultChecker = (context) => {
@@ -286,13 +292,31 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                         }
                     }
 
-                    return resultChecker!({
+                    const fixedContext: typeof context = {
                         ...context,
                         puzzle: {
                             ...puzzle,
                             initialDigits: mergeGivenDigitsMaps(carInitialDigits, initialDigits),
+                            items: processedItems.map(({carIndex, ...item}) => {
+                                if (carIndex !== undefined) {
+                                    const position = carPositions[carIndex];
+                                    return cloneConstraint(item, {
+                                        processCellCoords: ({top, left}) => ({
+                                            top: Math.round(top + position.top),
+                                            left: Math.round(left + position.left),
+                                        }),
+                                    });
+                                }
+                                return item;
+                            }),
                         },
-                    });
+                    };
+
+                    if (resultChecker !== isValidFinishedPuzzleByConstraints && !isValidFinishedPuzzleByConstraints(fixedContext)) {
+                        return false;
+                    }
+
+                    return resultChecker!(fixedContext);
                 };
             }
         }
