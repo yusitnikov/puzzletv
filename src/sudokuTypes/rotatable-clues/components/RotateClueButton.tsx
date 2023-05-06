@@ -6,7 +6,7 @@ import {ControlButton} from "../../../components/sudoku/controls/ControlButton";
 import {RotateLeft, RotateRight} from "@emotion-icons/material";
 import {RotatableCluesPTM} from "../types/RotatableCluesPTM";
 import {RotatableClue} from "../types/RotatableCluesPuzzleExtension";
-import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
+import {fieldStateHistoryAddState, fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {RotatableCluesGameState} from "../types/RotatableCluesGameState";
@@ -16,7 +16,7 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
     const {
         puzzle,
         cellSizeForSidePanel: cellSize,
-        state: {selectedCells, isShowingSettings},
+        state: {fieldStateHistory, selectedCells, isShowingSettings},
         onStateChange,
     } = context;
 
@@ -25,13 +25,15 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
     const isClockwise = direction > 0;
     const isShift = !isClockwise;
 
+    const {cells} = fieldStateHistoryGetCurrent(fieldStateHistory);
+
     const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
     const selectedClueIndexes = clues
             .map(({pivot}, index) => ({
                 pivot,
                 index,
             }))
-            .filter(({pivot}) => selectedCells.contains(pivot))
+            .filter(({pivot}) => selectedCells.contains(pivot) && cells[pivot.top]?.[pivot.left]?.usersDigit === undefined)
             .map(({index}) => index);
 
     const handleRotate = () => onStateChange(({fieldStateHistory, extension}) => ({
@@ -46,11 +48,6 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
                     ...fieldState.extension,
                     clueAngles: fieldState.extension.clueAngles?.map((angle: number, index: number) => {
                         if (!selectedClueIndexes.includes(index)) {
-                            return angle;
-                        }
-
-                        const {pivot: {top, left}} = clues[index];
-                        if (fieldState.cells[top]?.[left]?.usersDigit !== undefined) {
                             return angle;
                         }
 
