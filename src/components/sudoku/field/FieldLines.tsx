@@ -5,7 +5,7 @@ import {darkGreyColor, textColor} from "../../app/globals";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {formatSvgPointsArray, Line, Position} from "../../../types/layout/Position";
 import {concatContinuousLines} from "../../../utils/lines";
-import {useTransformScale} from "../../../contexts/TransformScaleContext";
+import {useTransformScale} from "../../../contexts/TransformContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {isCellWithBorders} from "../../../types/sudoku/CellTypeProps";
 import {doesGridRegionContainCell} from "../../../types/sudoku/GridRegion";

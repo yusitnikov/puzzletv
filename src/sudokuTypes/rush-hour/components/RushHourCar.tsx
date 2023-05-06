@@ -1,6 +1,6 @@
 import {memo} from "react";
 import {Rect} from "../../../types/layout/Rect";
-import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {TransformedRectGraphics} from "../../../contexts/TransformContext";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {RushHourPTM} from "../types/RushHourPTM";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";

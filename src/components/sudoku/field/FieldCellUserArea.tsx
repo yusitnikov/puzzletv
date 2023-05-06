@@ -1,7 +1,7 @@
 import {Position} from "../../../types/layout/Position";
 import {ReactNode, useMemo} from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {TransformedRectGraphics} from "../../../contexts/TransformContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 interface FieldCellUserAreaProps<T extends AnyPTM> {

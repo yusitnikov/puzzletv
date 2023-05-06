@@ -16,6 +16,8 @@ import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {incrementArrayItemByIndex} from "../../../../utils/array";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
+import {useTransformAngle} from "../../../../contexts/TransformContext";
+import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 
 export const cageTag = "cage";
 
@@ -45,9 +47,7 @@ export const KillerCage = {
     ) => {
         const {
             prioritizeSelection,
-            typeManager: {
-                digitComponentType: {widthCoeff},
-            },
+            typeManager: {compensateKillerCageSumAngle},
         } = puzzle;
 
         const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
@@ -62,6 +62,11 @@ export const KillerCage = {
         const borderPadding = prioritizeSelection ? 0.15 : 0.1;
         const sumPadding = prioritizeSelection ? 0.17 : largeSum ? 0.12 : borderPadding;
         const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.15;
+
+        let angle = useTransformAngle();
+        if (!compensateKillerCageSumAngle) {
+            angle = 0;
+        }
 
         return <>
             <polygon
@@ -92,18 +97,21 @@ export const KillerCage = {
                     puzzle={puzzle}
                     sum={sum}
                     size={sumDigitSize}
-                    left={points[sumPointIndex].left + sumPadding - sumDigitSize * widthCoeff / 2}
+                    left={points[sumPointIndex].left + sumPadding}
                     top={points[sumPointIndex].top + sumPadding}
                     color={fontColor}
+                    angle={angle}
                 />
 
                 {showBottomSum && <KillerCageSum
                     puzzle={puzzle}
                     sum={sum}
                     size={sumDigitSize}
-                    left={right - sumPadding - sumDigitSize * widthCoeff * (sum.toString().length - 0.5)}
+                    left={right - sumPadding}
                     top={bottom - sumPadding}
                     color={fontColor}
+                    angle={angle}
+                    reverse={true}
                 />}
             </>}
         </>;
@@ -115,9 +123,11 @@ interface KillerCageSumProps<T extends AnyPTM> extends Position {
     sum: string | number;
     size: number;
     color?: string;
+    angle?: number;
+    reverse?: boolean;
 }
 
-const KillerCageSum = <T extends AnyPTM>({puzzle, sum, size, color = blackColor, left, top}: KillerCageSumProps<T>) => {
+const KillerCageSum = <T extends AnyPTM>({puzzle, sum, size, color = blackColor, left, top, reverse, angle = 0}: KillerCageSumProps<T>) => {
     const {
         typeManager: {
             digitComponentType: {
@@ -127,35 +137,43 @@ const KillerCageSum = <T extends AnyPTM>({puzzle, sum, size, color = blackColor,
         },
     } = puzzle;
 
-    return <>
-        <rect
-            x={left}
-            y={top - size / 2}
-            width={size * widthCoeff * sum.toString().length}
-            height={size}
-            fill={"white"}
-        />
+    const width = size * widthCoeff * sum.toString().length;
 
-        {typeof sum === "number" && sum.toString().split("").map((digit, index) => <DigitSvgContent
-            key={`digit-${index}`}
-            puzzle={puzzle}
-            digit={Number(digit)}
-            size={size}
-            left={left + size * widthCoeff * (index + 0.5)}
-            top={top}
-            color={color}
-        />)}
+    return <AutoSvg
+        top={top}
+        left={left}
+        angle={-angle}
+    >
+        <AutoSvg left={(width - size * widthCoeff) / 2 * Math.cos((angle + (reverse ? 180 : 0) + 45) * Math.PI / 180) / Math.cos(Math.PI / 4) - width / 2}>
+            <rect
+                x={0}
+                y={-size / 2}
+                width={width}
+                height={size}
+                fill={"white"}
+            />
 
-        {typeof sum === "string" && sum.split("").map((character, index) => <CenteredText
-            key={`character-${index}`}
-            size={size}
-            left={left + size * widthCoeff * (index + 0.5)}
-            top={top}
-            fill={color}
-        >
-            {character}
-        </CenteredText>)}
-    </>;
+            {typeof sum === "number" && sum.toString().split("").map((digit, index) => <DigitSvgContent
+                key={`digit-${index}`}
+                puzzle={puzzle}
+                digit={Number(digit)}
+                size={size}
+                left={size * widthCoeff * (index + 0.5)}
+                top={0}
+                color={color}
+            />)}
+
+            {typeof sum === "string" && sum.split("").map((character, index) => <CenteredText
+                key={`character-${index}`}
+                size={size}
+                left={size * widthCoeff * (index + 0.5)}
+                top={0}
+                fill={color}
+            >
+                {character}
+            </CenteredText>)}
+        </AutoSvg>
+    </AutoSvg>;
 };
 
 export const DecorativeCageConstraint = <T extends AnyPTM>(

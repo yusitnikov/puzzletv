@@ -1,7 +1,7 @@
 import {ReactNode} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {Line} from "../line/Line";
-import {TransformScaleContextProvider} from "../../../contexts/TransformScaleContext";
+import {TransformAngleContextProvider, TransformScaleContextProvider} from "../../../contexts/TransformContext";
 
 export type AbsoluteProps<TagNameT extends keyof JSX.IntrinsicElements = "div"> = Partial<Rect> & JSX.IntrinsicElements[TagNameT] & {
     tagName?: TagNameT;
@@ -36,7 +36,7 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
 ) => {
     const TagName = tagName as any;
 
-    const result = <TagName
+    let result = <TagName
         style={{
             position: "absolute",
             left: fitParent ? 0 : `${left}px`,
@@ -61,5 +61,12 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
         {childrenOnTopOfBorders && children}
     </TagName>;
 
-    return scale === 1 ? result : <TransformScaleContextProvider scale={scale}>{result}</TransformScaleContextProvider>;
+    if (scale !== 1) {
+        result = <TransformScaleContextProvider scale={scale}>{result}</TransformScaleContextProvider>;
+    }
+    if (angle !== 0) {
+        result = <TransformAngleContextProvider angle={angle}>{result}</TransformAngleContextProvider>;
+    }
+
+    return result;
 };

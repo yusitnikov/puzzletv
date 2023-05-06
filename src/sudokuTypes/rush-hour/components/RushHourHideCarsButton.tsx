@@ -7,7 +7,7 @@ import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {RushHourPTM} from "../types/RushHourPTM";
 import {errorColor, yellowColor} from "../../../components/app/globals";
 import {RushHourCar} from "./RushHourCar";
-import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {TransformedRectGraphics} from "../../../contexts/TransformContext";
 import {transformRect} from "../../../types/layout/Rect";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 

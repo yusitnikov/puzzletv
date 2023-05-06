@@ -2,7 +2,7 @@ import {Rect, transformRect} from "../../../types/layout/Rect";
 import {emptyPosition} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {TransformedRectGraphics} from "../../../contexts/TransformContext";
 import {FieldLoop} from "./FieldLoop";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";

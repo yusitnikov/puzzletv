@@ -5,7 +5,7 @@ import {Size} from "../../../types/layout/Size";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {TransformedRect, transformRect} from "../../../types/layout/Rect";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
-import {TransformedRectGraphics} from "../../../contexts/TransformScaleContext";
+import {TransformedRectGraphics} from "../../../contexts/TransformContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 interface FieldRectProps<T extends AnyPTM> extends Omit<GridRegion, keyof Size>, Partial<Size> {

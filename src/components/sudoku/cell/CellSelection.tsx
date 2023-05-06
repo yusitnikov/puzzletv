@@ -4,7 +4,7 @@ import {Position} from "../../../types/layout/Position";
 import {getTransformedRectAverageSize} from "../../../types/layout/Rect";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {useTransformScale} from "../../../contexts/TransformScaleContext";
+import {useTransformScale} from "../../../contexts/TransformContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const CellSelectionColor = {

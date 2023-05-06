@@ -3,7 +3,7 @@ import {Absolute, AbsoluteProps} from "../../layout/absolute/Absolute";
 import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 import {profiler} from "../../../utils/profiler";
 import {Rect} from "../../../types/layout/Rect";
-import {TransformScaleContextProvider} from "../../../contexts/TransformScaleContext";
+import {TransformAngleContextProvider, TransformScaleContextProvider} from "../../../contexts/TransformContext";
 
 const SvgParentExistsContext = createContext<boolean>(false);
 
@@ -74,6 +74,10 @@ export const AutoSvg = ({children, viewBox, clip, style, ...props}: AutoSvgProps
     }
 
     if (left || top || angle || style) {
+        if (angle !== 0) {
+            children = <TransformAngleContextProvider angle={angle}>{children}</TransformAngleContextProvider>;
+        }
+
         return <g
             transform={`translate(${left} ${top}) rotate(${angle})`}
             style={style}

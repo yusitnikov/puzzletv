@@ -49,6 +49,9 @@ export const getTransformedRectMatrix = ({base, rightVector, bottomVector}: Tran
 export const getTransformedRectAverageSize = ({rightVector, bottomVector}: TransformedRect) =>
     (getVectorLength(rightVector) + getVectorLength(bottomVector)) / 2;
 
+export const getTransformedRectAverageAngle = ({rightVector, bottomVector}: TransformedRect) =>
+    Math.atan2(rightVector.top + bottomVector.top, rightVector.left + bottomVector.left) * 180 / Math.PI - 45;
+
 export const getRectPoints = ({left, top, width, height}: Rect): Position[] => [
     {left, top},
     {left: left + width, top},

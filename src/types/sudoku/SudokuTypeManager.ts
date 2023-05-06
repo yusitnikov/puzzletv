@@ -137,6 +137,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     angleStep?: number;
     allowRotation?: boolean;
     isFreeRotation?: boolean;
+    compensateKillerCageSumAngle?: boolean;
 
     initialScale?: number;
     scaleStep?: number;

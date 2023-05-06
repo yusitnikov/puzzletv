@@ -2,7 +2,7 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
-import {useTransformScale} from "../../../contexts/TransformScaleContext";
+import {useTransformScale} from "../../../contexts/TransformContext";
 import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 

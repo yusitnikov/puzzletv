@@ -19,7 +19,7 @@ import {useMemo} from "react";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {regionHighlightColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
-import {useTransformScale} from "../../../contexts/TransformScaleContext";
+import {useTransformScale} from "../../../contexts/TransformContext";
 import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteModeInfo";
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 
