@@ -234,90 +234,88 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                 );
             puzzle.extension = {cars};
 
-            if (!Array.isArray(items)) {
-                throw new Error("puzzle.items must be an array for rush hour puzzles");
-            }
-
-            const processedItems = items.map((item: Constraint<RushHourPTM, any>): typeof item & {carIndex?: number} => {
-                if (item.cells.length === 0) {
-                    return item;
-                }
-                const {
-                    top: itemTop,
-                    left: itemLeft,
-                    width: itemWidth,
-                    height: itemHeight,
-                } = getRegionBoundingBox(item.cells, 1);
-                const itemBottom = itemTop + itemHeight;
-                const itemRight = itemLeft + itemWidth;
-
-                for (const [carIndex, {boundingRect: {top, left: offsetLeft, width, height}}] of cars.entries()) {
-                    const left = offsetLeft - fieldSize;
-                    if (itemTop >= top && itemLeft >= left && itemBottom <= top + height && itemRight <= left + width) {
-                        return {
-                            ...cloneConstraint(item, {
-                                processCellCoords: ({top, left}) => ({top, left: left + fieldSize}),
-                            }),
-                            carIndex,
-                        };
+            if (Array.isArray(items)) {
+                const processedItems = items.map((item: Constraint<RushHourPTM, any>): typeof item & {carIndex?: number} => {
+                    if (item.cells.length === 0) {
+                        return item;
                     }
-                }
+                    const {
+                        top: itemTop,
+                        left: itemLeft,
+                        width: itemWidth,
+                        height: itemHeight,
+                    } = getRegionBoundingBox(item.cells, 1);
+                    const itemBottom = itemTop + itemHeight;
+                    const itemRight = itemLeft + itemWidth;
 
-                return item;
-            });
-            puzzle = {
-                ...puzzle,
-                items: processedItems,
-            };
-
-            if (resultChecker) {
-                puzzle.resultChecker = (context) => {
-                    const {puzzle, state} = context;
-                    const {initialDigits = {}} = puzzle;
-                    const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
-
-                    const carInitialDigits: GivenDigitsMap<number> = {};
-                    for (const [index, {cells}] of cars.entries()) {
-                        let {top, left} = carPositions[index];
-                        top = Math.round(top);
-                        left = Math.round(left);
-                        for (const cell of cells) {
-                            const digit = initialDigits[cell.top]?.[cell.left];
-                            if (digit !== undefined) {
-                                const offsetTop = cell.top + top;
-                                const offsetLeft = cell.left + left;
-                                carInitialDigits[offsetTop] = carInitialDigits[offsetTop] ?? {};
-                                carInitialDigits[offsetTop][offsetLeft] = digit;
-                            }
+                    for (const [carIndex, {boundingRect: {top, left: offsetLeft, width, height}}] of cars.entries()) {
+                        const left = offsetLeft - fieldSize;
+                        if (itemTop >= top && itemLeft >= left && itemBottom <= top + height && itemRight <= left + width) {
+                            return {
+                                ...cloneConstraint(item, {
+                                    processCellCoords: ({top, left}) => ({top, left: left + fieldSize}),
+                                }),
+                                carIndex,
+                            };
                         }
                     }
 
-                    const fixedContext: typeof context = {
-                        ...context,
-                        puzzle: {
-                            ...puzzle,
-                            initialDigits: mergeGivenDigitsMaps(carInitialDigits, initialDigits),
-                            items: processedItems.map(({carIndex, ...item}) => {
-                                if (carIndex !== undefined) {
-                                    const position = carPositions[carIndex];
-                                    return cloneConstraint(item, {
-                                        processCellCoords: ({top, left}) => ({
-                                            top: Math.round(top + position.top),
-                                            left: Math.round(left + position.left),
-                                        }),
-                                    });
-                                }
-                                return item;
-                            }),
-                        },
-                    };
-
-                    if (resultChecker !== isValidFinishedPuzzleByConstraints && !isValidFinishedPuzzleByConstraints(fixedContext)) {
-                        return false;
-                    }
-
-                    return resultChecker!(fixedContext);
+                    return item;
+                });
+                puzzle = {
+                    ...puzzle,
+                    items: processedItems,
                 };
+
+                if (resultChecker) {
+                    puzzle.resultChecker = (context) => {
+                        const {puzzle, state} = context;
+                        const {initialDigits = {}} = puzzle;
+                        const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
+
+                        const carInitialDigits: GivenDigitsMap<number> = {};
+                        for (const [index, {cells}] of cars.entries()) {
+                            let {top, left} = carPositions[index];
+                            top = Math.round(top);
+                            left = Math.round(left);
+                            for (const cell of cells) {
+                                const digit = initialDigits[cell.top]?.[cell.left];
+                                if (digit !== undefined) {
+                                    const offsetTop = cell.top + top;
+                                    const offsetLeft = cell.left + left;
+                                    carInitialDigits[offsetTop] = carInitialDigits[offsetTop] ?? {};
+                                    carInitialDigits[offsetTop][offsetLeft] = digit;
+                                }
+                            }
+                        }
+
+                        const fixedContext: typeof context = {
+                            ...context,
+                            puzzle: {
+                                ...puzzle,
+                                initialDigits: mergeGivenDigitsMaps(carInitialDigits, initialDigits),
+                                items: processedItems.map(({carIndex, ...item}) => {
+                                    if (carIndex !== undefined) {
+                                        const position = carPositions[carIndex];
+                                        return cloneConstraint(item, {
+                                            processCellCoords: ({top, left}) => ({
+                                                top: Math.round(top + position.top),
+                                                left: Math.round(left + position.left),
+                                            }),
+                                        });
+                                    }
+                                    return item;
+                                }),
+                            },
+                        };
+
+                        if (resultChecker !== isValidFinishedPuzzleByConstraints && !isValidFinishedPuzzleByConstraints(fixedContext)) {
+                            return false;
+                        }
+
+                        return resultChecker!(fixedContext);
+                    };
+                }
             }
         }
 
