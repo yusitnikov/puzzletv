@@ -11,11 +11,11 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {Title} from "../../layout/title/Title";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {PuzzleContainerContext} from "../../../contexts/PuzzleContainerContext";
-import {Modal} from "../../layout/modal/Modal";
 import {Rect} from "../../../types/layout/Rect";
 import {profiler} from "../../../utils/profiler";
 import {useControlButtonsManager} from "../controls/ControlButtonsManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {PuzzleMultiPlayerWarnings} from "./PuzzleMultiPlayerWarnings";
 
 export interface PuzzleProps<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
@@ -78,10 +78,6 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
 
     const context = useGame(puzzle, cellSize, cellSizeForSidePanel);
 
-    const {multiPlayer} = context;
-
-    const {isEnabled, isLoaded, isDoubledConnected, hostData} = multiPlayer;
-
     return <>
         <Title>
             {translate(title).replace("\n", " ")}
@@ -112,23 +108,7 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
                 />
             </Absolute>
 
-            {isEnabled && <>
-                {!isLoaded && <Modal cellSize={cellSizeForSidePanel}>
-                    <div>{translate("Loading")}...</div>
-                </Modal>}
-
-                {isLoaded && <>
-                    {isDoubledConnected && <Modal cellSize={cellSizeForSidePanel}>
-                        <div>{translate("You opened this puzzle in more than one tab")}!</div>
-                        <div>{translate("Please leave only one active tab")}.</div>
-                    </Modal>}
-
-                    {!hostData && <Modal cellSize={cellSizeForSidePanel}>
-                        <div>{translate("The host of the game is not connected")}!</div>
-                        <div>{translate("Please wait for them to join")}.</div>
-                    </Modal>}
-                </>}
-            </>}
+            <PuzzleMultiPlayerWarnings context={context}/>
         </PuzzleContainerContext.Provider>
     </>;
 }
