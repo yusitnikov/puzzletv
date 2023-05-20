@@ -60,8 +60,6 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     },
     author: Chameleon,
     slug: "the-only-thing-that-matters",
-    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AX6",
-    getLmdSolutionCode: () => "colors",
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
