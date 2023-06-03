@@ -1,4 +1,4 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {ControlButton} from "./ControlButton";
 import {Redo} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
@@ -7,28 +7,30 @@ import {ctrlKeyText} from "../../../utils/os";
 import {getNextActionId, redoAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
-export const RedoButton = <T extends AnyPTM>(
-    {
-        context: {
-            cellSizeForSidePanel: cellSize,
-            state: {isShowingSettings, processed: {isReady}},
-            onStateChange,
-            multiPlayer: {isEnabled},
-        },
-        top,
-        left,
-    }: ControlButtonItemProps<T>
-) => {
+export const RedoButton: ControlButtonItemPropsGenericFc = observer(function RedoButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
+    const {
+        cellSizeForSidePanel: cellSize,
+        isReady,
+        multiPlayer: {isEnabled},
+    } = context;
+
     const translate = useTranslate();
 
-    const handleRedo = useCallback(() => onStateChange(redoAction(getNextActionId())), [onStateChange]);
+    const handleRedo = useCallback(() => context.onStateChange(redoAction(getNextActionId())), [context]);
 
     useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 
-        if (!isShowingSettings && !isEnabled && ctrlKey && code === "KeyY") {
+        if (!settings.isOpened && !isEnabled && ctrlKey && code === "KeyY") {
             handleRedo();
             ev.preventDefault();
         }
@@ -61,4 +63,4 @@ export const RedoButton = <T extends AnyPTM>(
             {translate("Redo")}
         </div>
     </ControlButton>;
-};
+});

@@ -26,7 +26,9 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
         {top, left},
         {
             puzzle: {solution = {}, params = {}},
-            state: {currentPlayer, selectedCells, initialDigits},
+            currentPlayer,
+            selectedCells,
+            stateInitialDigits,
             multiPlayer: {isEnabled},
         },
         defaultResult,
@@ -51,7 +53,7 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
         }
 
         const areAllCorrect: boolean = (cache.areAllPositive = cache.areAllPositive ?? selectedCells.items.every(
-            ({top, left}) => solution[top][left] === cellData || initialDigits[top]?.[left] !== undefined)
+            ({top, left}) => solution[top][left] === cellData || stateInitialDigits[top]?.[left] !== undefined)
         );
 
         if (solution[top][left] !== cellData) {
@@ -80,11 +82,10 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
     },
 
     setSharedState(
-        puzzle,
-        state,
+        {puzzle, myGameState},
         {initialDigits, excludedDigits}
     ): GameStateEx<T> {
-        return mergeGameStateWithUpdates(state, {
+        return mergeGameStateWithUpdates(myGameState, {
             initialDigits: unserializeGivenDigitsMap(initialDigits, puzzle.typeManager.unserializeCellData),
             excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(puzzle, item)),
         });
@@ -93,8 +94,8 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
     getPlayerScore(context, clientId) {
         const {
             puzzle,
-            state,
             multiPlayer: {isEnabled},
+            playerObjects,
         } = context;
 
         const {
@@ -103,8 +104,6 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
             fieldSize: {rowsCount, columnsCount},
             digitsCount = getDefaultDigitsCount(puzzle),
         } = puzzle;
-
-        const {playerObjects} = state;
 
         const isCompetitive = isEnabled && !params.share;
 
@@ -122,7 +121,7 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
                     }
                 } else {
                     for (const digit of indexesFromTo(1, digitsCount, true)) {
-                        const cellData = createCellDataByDisplayDigit(digit, state);
+                        const cellData = createCellDataByDisplayDigit(digit, context);
                         const playerObject = playerObjects[getExcludedDigitDataHash(position, cellData, context)];
 
                         if (playerObject?.isValid && playerObject?.clientId === clientId) {

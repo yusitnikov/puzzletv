@@ -3,13 +3,12 @@ import {
     gameStateApplyShading,
     gameStateClearSelectedCellsContent,
     gameStateGetCellShading,
-    gameStateGetCurrentFieldState,
     gameStateHandleDigit,
     gameStateIncrementShading,
-    gameStateRedo, gameStateSetCellMark,
+    gameStateRedo,
+    gameStateSetCellMark,
     gameStateUndo,
     PartialGameStateEx,
-    ProcessedGameStateEx
 } from "./GameState";
 import {PuzzleContext} from "./PuzzleContext";
 import {myClientId} from "../../hooks/useMultiPlayer";
@@ -19,13 +18,12 @@ import {CellMarkType} from "./CellMark";
 import {CellColorValue} from "./CellColor";
 import {AnyPTM} from "./PuzzleTypeMap";
 
-export type GameStateActionCallback<T extends AnyPTM> = (prevState: ProcessedGameStateEx<T>) => PartialGameStateEx<T>;
+export type GameStateActionCallback<T extends AnyPTM> = (context: PuzzleContext<T>) => PartialGameStateEx<T>;
 
 export interface GameStateActionType<ParamsType, T extends AnyPTM> {
     key: string;
     callback: (
         params: ParamsType,
-        context: PuzzleContext<T>,
         clientId: string,
         actionId: string,
     ) => PartialGameStateEx<T> | GameStateActionCallback<T>;
@@ -66,8 +64,8 @@ export const redoAction = <T extends AnyPTM>(actionId: string): GameStateAction<
 
 export const clearSelectionActionType = <T extends AnyPTM>(): GameStateActionType<undefined, T> => ({
     key: "clear-selection",
-    callback: (_, context, clientId, actionId) =>
-        state => gameStateClearSelectedCellsContent({...context, state}, clientId, actionId),
+    callback: (_, clientId, actionId) =>
+        (context) => gameStateClearSelectedCellsContent(context, clientId, actionId),
 });
 export const clearSelectionAction = <T extends AnyPTM>(actionId: string): GameStateAction<undefined, T> => ({
     type: clearSelectionActionType(),
@@ -77,15 +75,14 @@ export const clearSelectionAction = <T extends AnyPTM>(actionId: string): GameSt
 
 export const enterDigitActionType = <T extends AnyPTM>(): GameStateActionType<number, T> => ({
     key: "enter-digit",
-    callback: (digit, context, clientId, actionId) =>
-        state => gameStateHandleDigit({...context, state}, digit, clientId, actionId, true),
+    callback: (digit, clientId, actionId) =>
+        (context) => gameStateHandleDigit(context, digit, clientId, actionId, true),
 });
 export const enterDigitAction = <T extends AnyPTM>(
     digit: number,
-    context: PuzzleContext<T>,
     actionId: string,
 ): GameStateActionOrCallback<number, T>[] => [
-    state => gameStateHandleDigit({...context, state}, digit, myClientId, actionId, false),
+    (context) => gameStateHandleDigit(context, digit, myClientId, actionId, false),
     {
         type: enterDigitActionType(),
         params: digit,
@@ -101,11 +98,10 @@ interface ApplyCurrentMultiLineActionParams {
 export const applyCurrentMultiLineActionType = <T extends AnyPTM>()
     : GameStateActionType<ApplyCurrentMultiLineActionParams, T> => ({
     key: "apply-current-multiline",
-    callback: ({regionIndex, isClick = false, isRightButton = false} = {}, context, clientId, actionId) =>
-        state => gameStateApplyCurrentMultiLine({...context, state}, clientId, regionIndex, isClick, isRightButton, true, actionId),
+    callback: ({regionIndex, isClick = false, isRightButton = false} = {}, clientId, actionId) =>
+        (context) => gameStateApplyCurrentMultiLine(context, clientId, regionIndex, isClick, isRightButton, true, actionId),
 });
 export const applyCurrentMultiLineAction = <T extends AnyPTM>(
-    context: PuzzleContext<T>,
     actionId: string,
     regionIndex?: number,
     isClick = false,
@@ -116,7 +112,7 @@ export const applyCurrentMultiLineAction = <T extends AnyPTM>(
         params: {regionIndex, isClick, isRightButton},
         actionId,
     },
-    state => gameStateApplyCurrentMultiLine({...context, state}, myClientId, regionIndex, isClick, isRightButton, false, actionId),
+    (context) => gameStateApplyCurrentMultiLine(context, myClientId, regionIndex, isClick, isRightButton, false, actionId),
 ];
 
 export interface SetCellMarkActionParams extends Position {
@@ -126,8 +122,8 @@ export interface SetCellMarkActionParams extends Position {
 }
 export const setCellMarkActionType = <T extends AnyPTM>(): GameStateActionType<SetCellMarkActionParams, T> => ({
     key: "set-cell-mark",
-    callback: ({isCenter, cellMarkType, color, ...position}, context, clientId, actionId) =>
-        state => gameStateSetCellMark({...context, state}, position, isCenter, clientId, actionId, cellMarkType, color),
+    callback: ({isCenter, cellMarkType, color, ...position}, clientId, actionId) =>
+        (context) => gameStateSetCellMark(context, position, isCenter, clientId, actionId, cellMarkType, color),
 });
 
 interface ShadingActionParams extends Position {
@@ -135,15 +131,14 @@ interface ShadingActionParams extends Position {
 }
 export const shadingActionType = <T extends AnyPTM>(): GameStateActionType<ShadingActionParams, T> => ({
     key: "apply-shading",
-    callback: ({action, ...position}, context, clientId, actionId) =>
-        state => gameStateApplyShading({...context, state}, position, action, clientId, actionId),
+    callback: ({action, ...position}, clientId, actionId) =>
+        (context) => gameStateApplyShading(context, position, action, clientId, actionId),
 });
 export const shadingAction = <T extends AnyPTM>(
-    context: PuzzleContext<T>,
     position: Position,
     action: DragAction,
     actionId: string,
-): GameStateActionOrCallback<ShadingActionParams, T> => ({
+): GameStateAction<ShadingActionParams, T> => ({
     type: shadingActionType(),
     params: {...position, action},
     actionId,
@@ -154,14 +149,13 @@ export const shadingStartAction = <T extends AnyPTM>(
     isRightButton: boolean,
     actionId: string,
 ): GameStateActionOrCallback<ShadingActionParams, T>[] => {
-    const field = gameStateGetCurrentFieldState(context.state);
     const action = gameStateIncrementShading(
-        gameStateGetCellShading(field.cells[position.top][position.left]),
+        gameStateGetCellShading(context.getCell(position.top, position.left)),
         isRightButton ? -1 : 1
     );
     return [
         () => ({dragAction: action}),
-        shadingAction(context, position, action, actionId),
+        shadingAction(position, action, actionId),
     ];
 }
 // endregion

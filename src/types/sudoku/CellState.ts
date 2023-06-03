@@ -4,6 +4,7 @@ import {CellColor} from "./CellColor";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellDataSet} from "./CellDataSet";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {PuzzleContext} from "./PuzzleContext";
 
 export interface CellState<T extends AnyPTM> {
     usersDigit?: T["cell"];
@@ -58,9 +59,9 @@ export const cloneCellState = <T extends AnyPTM>(
 });
 
 export const areCellStatesEqual = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>,
+    context: PuzzleContext<T>,
     {usersDigit, centerDigits, cornerDigits, colors}: CellState<T>,
     {usersDigit: usersDigit2, centerDigits: centerDigits2, cornerDigits: cornerDigits2, colors: colors2}: CellState<T>
 ) =>
-    typeof usersDigit === typeof usersDigit2 && (!usersDigit || puzzle.typeManager.areSameCellData(usersDigit, usersDigit2!, puzzle, undefined, false)) &&
+    typeof usersDigit === typeof usersDigit2 && (!usersDigit || context.puzzle.typeManager.areSameCellData(usersDigit, usersDigit2!, context, false, false)) &&
     centerDigits.equals(centerDigits2) && cornerDigits.equals(cornerDigits2) && colors.equals(colors2);

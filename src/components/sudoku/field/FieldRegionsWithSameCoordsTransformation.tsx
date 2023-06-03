@@ -1,10 +1,12 @@
-import React, {ReactNode} from "react";
+import React, {ReactElement, ReactNode} from "react";
 import {FieldRect} from "./FieldRect";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {regionHighlightColor} from "../../app/globals";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -12,20 +14,17 @@ interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
     regionNoClipChildren?: ReactNode | ((region?: GridRegion, index?: number) => ReactNode);
 }
 
-export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
+export const FieldRegionsWithSameCoordsTransformation = observer(function FieldRegionsWithSameCoordsTransformation<T extends AnyPTM>(
     {
         context,
         children,
         regionNoClipChildren,
     }: FieldRegionsWithSameCoordsTransformationProps<T>
-) => {
-    const {
-        puzzle: {
-            typeManager: {getRegionsWithSameCoordsTransformation},
-        },
-    } = context;
+) {
+    profiler.trace();
 
-    const regions = getRegionsWithSameCoordsTransformation?.(context);
+    const {regions} = context;
+
     const regionsByZIndex: Record<number, {region: GridRegion, index: number}[]> = {};
     for (const [index, region] of (regions ?? []).entries()) {
         const {zIndex = -1} = region;
@@ -43,7 +42,7 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
                         {zIndex: zIndex2}
                     ) => zIndex - zIndex2
                 )
-                .flatMap(({zIndex, regions}) => [
+                .flatMap(({regions}) => [
                     ...regions.map(({region, index}) => <FieldRect
                         key={`region-no-clip-${index}`}
                         context={context}
@@ -111,4 +110,4 @@ export const FieldRegionsWithSameCoordsTransformation = <T extends AnyPTM>(
             {typeof children === "function" ? children() : children}
         </FieldRect>}
     </>;
-};
+}) as <T extends AnyPTM>(props: FieldRegionsWithSameCoordsTransformationProps<T>) => ReactElement;

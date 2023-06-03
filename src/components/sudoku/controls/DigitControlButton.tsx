@@ -1,6 +1,6 @@
 import {useTranslate} from "../../../hooks/useTranslate";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {useCallback} from "react";
+import {ReactElement, useCallback} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
@@ -8,6 +8,9 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {enterDigitAction, getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {joinListSemantically} from "../../../utils/array";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
 export interface DigitControlButtonProps<T extends AnyPTM> {
     index: number;
@@ -16,42 +19,38 @@ export interface DigitControlButtonProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
 }
 
-export const DigitControlButton = <T extends AnyPTM>({index, count, context}: DigitControlButtonProps<T>) => {
+export const DigitControlButton = observer(function DigitControlButton<T extends AnyPTM>(
+    {index, count, context}: DigitControlButtonProps<T>
+) {
+    profiler.trace();
+
     const translate = useTranslate();
 
-    const {puzzle, state, onStateChange, cellSizeForSidePanel: cellSize} = context;
-
     const {
-        typeManager,
-    } = puzzle;
+        puzzle,
+        cellWriteMode,
+        cellWriteModeInfo: {
+            isDigitMode,
+            secondaryButtonContent: ButtonContent,
+            getCurrentSecondaryButton,
+            setCurrentSecondaryButton,
+        },
+        cellSizeForSidePanel: cellSize,
+    } = context;
 
     const {
         createCellDataByDisplayDigit,
         disableDigitShortcuts,
         digitShortcuts = [],
         digitShortcutTips = [],
-    } = typeManager;
-
-    const {
-        isShowingSettings,
-        flipKeypad,
-        processed: {
-            cellWriteMode,
-            cellWriteModeInfo: {
-                isDigitMode,
-                secondaryButtonContent: ButtonContent,
-                getCurrentSecondaryButton,
-                setCurrentSecondaryButton,
-            },
-        },
-    } = state;
+    } = puzzle.typeManager;
 
     const currentButton = getCurrentSecondaryButton?.(context);
     const selectableButtonContent = currentButton !== undefined;
 
     const digit = index + 1;
     const digitKey = digit === 10 ? 0 : digit;
-    const cellData = createCellDataByDisplayDigit(digit, state);
+    const cellData = createCellDataByDisplayDigit(digit, context);
     let shortcuts = (isDigitMode && digitShortcuts[index]) || [];
     const shortcutTip = isDigitMode && digitShortcutTips[index];
 
@@ -75,14 +74,14 @@ export const DigitControlButton = <T extends AnyPTM>({index, count, context}: Di
             if (setCurrentSecondaryButton) {
                 setCurrentSecondaryButton(context, index);
             } else {
-                onStateChange(enterDigitAction(digit, context, getNextActionId()));
+                context.onStateChange(enterDigitAction(digit, getNextActionId()));
             }
         },
-        [setCurrentSecondaryButton, onStateChange, digit, index, context]
+        [context, setCurrentSecondaryButton, digit, index]
     );
 
     useEventListener(window, "keydown", (ev) => {
-        if (isShowingSettings) {
+        if (settings.isOpened) {
             return;
         }
 
@@ -104,7 +103,7 @@ export const DigitControlButton = <T extends AnyPTM>({index, count, context}: Di
 
     return <ControlButton
         left={index === 9 ? 1 : index % 3}
-        top={flipKeypad && top < rowsCount ? (rowsCount - 1 - top) : top}
+        top={settings.flipKeypad.get() && top < rowsCount ? (rowsCount - 1 - top) : top}
         cellSize={cellSize}
         fullHeight={!selectableButtonContent}
         innerBorderWidth={selectableButtonContent ? 1 : 0}
@@ -119,4 +118,4 @@ export const DigitControlButton = <T extends AnyPTM>({index, count, context}: Di
             size={contentSize}
         />}
     </ControlButton>;
-};
+}) as <T extends AnyPTM>(props: DigitControlButtonProps<T>) => ReactElement;

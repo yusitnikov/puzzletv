@@ -1,16 +1,17 @@
-import {memo} from "react";
 import {indexes} from "../../../utils/indexes";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {darkGreyColor, textColor} from "../../app/globals";
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../types/sudoku/Constraint";
 import {formatSvgPointsArray, Line, Position} from "../../../types/layout/Position";
 import {concatContinuousLines} from "../../../utils/lines";
 import {useTransformScale} from "../../../contexts/TransformContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {isCellWithBorders} from "../../../types/sudoku/CellTypeProps";
 import {doesGridRegionContainCell} from "../../../types/sudoku/GridRegion";
-import {usePureMemo} from "../../../hooks/usePureMemo";
 import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
+import {comparer} from "mobx";
+import {useComputed} from "../../../hooks/useComputed";
 
 interface FieldLinesByDataProps {
     borderColor: string;
@@ -19,9 +20,11 @@ interface FieldLinesByDataProps {
     regularBorders: Line[];
 }
 
-const FieldLinesByData = memo((
+const FieldLinesByData = observer((
     {borderColor, borderWidth, customCellBorders, regularBorders}: FieldLinesByDataProps
 ) => {
+    profiler.trace();
+
     return <>
         {customCellBorders.map((border, index) => <polygon
             key={`custom-${index}`}
@@ -43,18 +46,18 @@ const FieldLinesByData = memo((
     </>;
 });
 
-export const FieldLines = {
-    [FieldLayer.lines]: <T extends AnyPTM>(
-        {
-            context: {
-                puzzle,
-                cellsIndex,
-                cellsIndexForState,
-                state: {processed: {isMyTurn}},
-            },
-            region,
-        }: ConstraintProps<T>
-    ) => {
+export const FieldLines: ConstraintPropsGenericFcMap = {
+    [FieldLayer.lines]: observer(function FieldLines<T extends AnyPTM>(
+        {context, region}: ConstraintProps<T>
+    ) {
+        profiler.trace();
+
+        const {
+            puzzle,
+            puzzleIndex,
+            isMyTurn,
+        } = context;
+
         const {
             typeManager: {borderColor: typeBorderColor},
             fieldSize: {columnsCount, rowsCount},
@@ -64,48 +67,61 @@ export const FieldLines = {
 
         const scale = useTransformScale();
 
-        if (region?.noBorders) {
-            return null;
-        }
-
         const timer = profiler.track("FieldLines");
 
         const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
         const borderWidth = 1 / scale;
 
-        const cellHasBorders = (position: Position) => isCellWithBorders(cellsIndex.getCellTypeProps(position))
+        const cellHasBorders = (position: Position) => isCellWithBorders(puzzleIndex.getCellTypeProps(position))
             && (!region || (customCellBounds && !region.cells) || doesGridRegionContainCell(region, position));
 
-        const customCellBorders = usePureMemo<Position[][]>(
-            customCellBounds
-                ? cellsIndexForState.getAllCells().flatMap(
-                    (row, top) => row.flatMap(
-                        ({transformedBounds: {borders}}, left) => cellHasBorders({top, left}) ? borders : []
+        const getCustomCellBorders = useComputed(
+            function getCustomCellBorders(): Position[][] {
+                return customCellBounds
+                    ? context.puzzleIndex.allCells.flatMap(
+                        (row, top) => row.flatMap(
+                            (_, left) => cellHasBorders({top, left})
+                                ? context.getCellTransformedBounds(top, left).borders
+                                : []
+                        )
                     )
-                )
-                : []
+                    : [];
+            },
+            {equals: comparer.structural}
         );
 
-        const regularBorders = usePureMemo<Line[]>(customCellBounds ? [] : [
-            ...indexes(rowsCount, true).flatMap(
-                top => concatContinuousLines(indexes(columnsCount).filter(
-                    left => (top < rowsCount && cellHasBorders({top, left}))
-                        || (top > 0 && cellHasBorders({top: top - 1, left}))
-                )).map(({start, end}) => ({
-                    start: {left: start, top},
-                    end: {left: end, top},
-                }))
-            ),
-            ...indexes(columnsCount, true).flatMap(
-                left => concatContinuousLines(indexes(rowsCount).filter(
-                    top => (left < columnsCount && cellHasBorders({top, left}))
-                        || (left > 0 && cellHasBorders({top, left: left - 1}))
-                )).map(({start, end}) => ({
-                    start: {left, top: start},
-                    end: {left, top: end},
-                }))
-            ),
-        ]);
+        const getRegularBorders = useComputed(
+            function getRegularBorders(): Line[] {
+                return customCellBounds ? [] : [
+                    ...indexes(rowsCount, true).flatMap(
+                        top => concatContinuousLines(indexes(columnsCount).filter(
+                            left => (top < rowsCount && cellHasBorders({top, left}))
+                                || (top > 0 && cellHasBorders({top: top - 1, left}))
+                        )).map(({start, end}) => ({
+                            start: {left: start, top},
+                            end: {left: end, top},
+                        }))
+                    ),
+                    ...indexes(columnsCount, true).flatMap(
+                        left => concatContinuousLines(indexes(rowsCount).filter(
+                            top => (left < columnsCount && cellHasBorders({top, left}))
+                                || (left > 0 && cellHasBorders({top, left: left - 1}))
+                        )).map(({start, end}) => ({
+                            start: {left, top: start},
+                            end: {left, top: end},
+                        }))
+                    ),
+                ];
+            },
+            {equals: comparer.structural}
+        );
+
+        if (region?.noBorders) {
+            return null;
+        }
+
+        const regularBorders = getRegularBorders();
+        const customCellBorders = getCustomCellBorders();
 
         timer.stop();
 
@@ -115,7 +131,7 @@ export const FieldLines = {
             customCellBorders={customCellBorders}
             regularBorders={regularBorders}
         />;
-    },
+    }),
 };
 
 export const FieldLinesConstraint = <T extends AnyPTM>(): Constraint<T, any> => ({

@@ -1,6 +1,8 @@
-import {FC, Fragment, memo} from "react";
+import {FC, Fragment} from "react";
 import parseHtml, {domToReact, Element, HTMLReactParserOptions} from "html-react-parser";
 import {RulesParagraph} from "./RulesParagraph";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export const allowedRulesHtmlTags = [
     "div", "p", "br",
@@ -19,7 +21,9 @@ interface ParsedRulesHtmlProps {
     children?: string;
 }
 
-export const ParsedRulesHtml = memo(({children: ruleset}: ParsedRulesHtmlProps) => {
+export const ParsedRulesHtml = observer(function ParsedRulesHtml({children: ruleset}: ParsedRulesHtmlProps) {
+    profiler.trace();
+
     if (!ruleset) {
         return null;
     }

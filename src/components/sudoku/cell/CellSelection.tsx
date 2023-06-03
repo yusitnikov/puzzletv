@@ -6,6 +6,11 @@ import {FieldCellShape} from "../field/FieldCellShape";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {useTransformScale} from "../../../contexts/TransformContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {ReactElement, useMemo} from "react";
+import {settings} from "../../../types/layout/Settings";
+import {getDefaultCellSelectionType} from "../../../types/sudoku/SudokuTypeManager";
+import {profiler} from "../../../utils/profiler";
 
 export const CellSelectionColor = {
     mainCurrent: blueColor,
@@ -13,23 +18,69 @@ export const CellSelectionColor = {
     secondary: yellowColor,
 };
 
-export interface CellSelectionProps<T extends AnyPTM> {
+export interface CellSelectionByCoordsProps<T extends AnyPTM> extends Position {
+    context: PuzzleContext<T>;
+}
+
+export const CellSelectionByCoords = observer(function CellSelectionByCoords<T extends AnyPTM>(
+    {context, top, left}: CellSelectionByCoordsProps<T>
+) {
+    profiler.trace();
+
+    const cellPosition = useMemo((): Position => ({top, left}), [top, left]);
+
+    let color = "";
+    let width = 1;
+
+    if (context.isSelectedCell(top, left)) {
+        color = context.isLastSelectedCell(top, left)
+            ? CellSelectionColor.mainCurrent
+            : CellSelectionColor.mainPrevious;
+    } else {
+        const {
+            getCellSelectionType = settings.highlightSeenCells.get()
+                ? getDefaultCellSelectionType
+                : undefined
+        } = context.puzzle.typeManager;
+
+        const customSelection = getCellSelectionType?.(cellPosition, context);
+        if (customSelection) {
+            color = customSelection.color;
+            width = customSelection.strokeWidth;
+        }
+    }
+
+    if (!color) {
+        return null;
+    }
+
+    return <CellSelectionByData
+        context={context}
+        cellPosition={cellPosition}
+        color={color}
+        strokeWidth={width}
+    />
+}) as <T extends AnyPTM>(props: CellSelectionByCoordsProps<T>) => ReactElement | null;
+
+export interface CellSelectionByDataProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     cellPosition: Position;
     color?: string;
     strokeWidth?: number;
 }
 
-export const CellSelection = <T extends AnyPTM>({context, cellPosition, color = CellSelectionColor.mainCurrent, strokeWidth = 1}: CellSelectionProps<T>) => {
+export const CellSelectionByData = observer(function CellSelectionByData<T extends AnyPTM>(
+    {context, cellPosition, color = CellSelectionColor.mainCurrent, strokeWidth = 1}: CellSelectionByDataProps<T>
+) {
+    profiler.trace();
+
     const scale = useTransformScale();
 
     let selectionBorderWidth = 0.1 * strokeWidth;
     const selectionBorderWidth2 = 2 / scale;
 
-    const {
-        areCustomBounds,
-        transformedBounds: {userArea},
-    } = context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
+    const {areCustomBounds} = context.puzzleIndex.allCells[cellPosition.top][cellPosition.left];
+    const {userArea} = context.getCellTransformedBounds(cellPosition.top, cellPosition.left);
 
     if (areCustomBounds) {
         const cellTransformedSize = getTransformedRectAverageSize(userArea);
@@ -78,4 +129,4 @@ export const CellSelection = <T extends AnyPTM>({context, cellPosition, color = 
             stroke={"#fff"}
         />
     </>;
-};
+}) as <T extends AnyPTM>(props: CellSelectionByDataProps<T>) => ReactElement;

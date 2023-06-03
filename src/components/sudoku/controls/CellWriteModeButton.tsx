@@ -1,10 +1,12 @@
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellState} from "../../../types/sudoku/CellState";
-import {ReactNode, useCallback} from "react";
+import {ReactElement, ReactNode, useCallback} from "react";
 import {ControlButton} from "./ControlButton";
 import {CellContent} from "../cell/CellContent";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export interface CellWriteModeButtonProps<T extends AnyPTM> {
     cellWriteMode: CellWriteMode;
@@ -20,7 +22,7 @@ export interface CellWriteModeButtonProps<T extends AnyPTM> {
     fullHeight?: boolean;
 }
 
-export const CellWriteModeButton = <T extends AnyPTM>(
+export const CellWriteModeButton = observer(function CellWriteModeButtonFc<T extends AnyPTM>(
     {
         cellWriteMode,
         top,
@@ -32,16 +34,14 @@ export const CellWriteModeButton = <T extends AnyPTM>(
         childrenOnTopOfBorders,
         fullHeight,
     }: CellWriteModeButtonProps<T>
-) => {
-    const {
-        state,
-        onStateChange,
-        cellSizeForSidePanel: cellSize,
-    } = context;
+) {
+    profiler.trace();
+
+    const {cellSizeForSidePanel: cellSize} = context;
 
     const handleSetCellWriteMode = useCallback(
-        () => onStateChange({persistentCellWriteMode: cellWriteMode}),
-        [onStateChange, cellWriteMode]
+        () => context.onStateChange({persistentCellWriteMode: cellWriteMode}),
+        [context, cellWriteMode]
     );
 
     return <ControlButton
@@ -49,7 +49,7 @@ export const CellWriteModeButton = <T extends AnyPTM>(
         top={top}
         cellSize={cellSize}
         innerBorderWidth={noBorders ? 0 : 1}
-        checked={state.processed.cellWriteMode === cellWriteMode}
+        checked={context.cellWriteMode === cellWriteMode}
         onClick={handleSetCellWriteMode}
         title={title}
         childrenOnTopOfBorders={childrenOnTopOfBorders}
@@ -66,4 +66,4 @@ export const CellWriteModeButton = <T extends AnyPTM>(
                 />
         }
     </ControlButton>;
-};
+}) as <T extends AnyPTM>(props: CellWriteModeButtonProps<T>) => ReactElement;

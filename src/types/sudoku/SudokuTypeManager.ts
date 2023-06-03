@@ -2,14 +2,14 @@ import {DigitComponentType} from "../../components/sudoku/digit/DigitComponentTy
 import {CellDataComponentType} from "../../components/sudoku/cell/CellDataComponentType";
 import {getLineVector, Position, PositionWithAngle} from "../layout/Position";
 import {SetInterface} from "../struct/Set";
-import {GameStateEx, PartialGameStateEx, ProcessedGameStateEx} from "./GameState";
+import {GameStateEx, PartialGameStateEx} from "./GameState";
 import {ComponentType, ReactNode} from "react";
 import {ControlsProps} from "../../components/sudoku/controls/Controls";
 import {Translatable} from "../translations/Translatable";
 import {getIsSamePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
-import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
+import {CellSelectionColor, CellSelectionByDataProps} from "../../components/sudoku/cell/CellSelection";
 import {GridRegion} from "./GridRegion";
-import {Constraint, getAllPuzzleConstraints} from "./Constraint";
+import {Constraint} from "./Constraint";
 import {PuzzleContext} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
 import {CellWriteMode} from "./CellWriteMode";
@@ -22,7 +22,7 @@ import {regionTag} from "../../components/sudoku/constraints/region/Region";
 import {ControlButtonItem} from "../../components/sudoku/controls/ControlButtonsManager";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
-import {SudokuCellsIndex} from "./SudokuCellsIndex";
+import {IReactionDisposer} from "mobx";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -32,17 +32,21 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     areSameCellData(
         data1: T["cell"],
         data2: T["cell"],
-        puzzle: PuzzleDefinition<T>,
-        state: ProcessedGameStateEx<T> | undefined,
-        forConstraints: boolean
+        context: PuzzleContext<T>,
+        // default: true
+        useState?: boolean,
+        // default: true
+        forConstraints?: boolean
     ): boolean;
 
     compareCellData(
         data1: T["cell"],
         data2: T["cell"],
-        puzzle: PuzzleDefinition<T>,
-        state: ProcessedGameStateEx<T> | undefined,
-        forConstraints: boolean
+        context: PuzzleContext<T>,
+        // default: true
+        useState?: boolean,
+        // default: true
+        forConstraints?: boolean
     ): number;
 
     getCellDataHash(data: T["cell"], puzzle: PuzzleDefinition<T>): string;
@@ -67,7 +71,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     createCellDataByDisplayDigit(
         digit: number,
-        gameState: ProcessedGameStateEx<T>
+        context: PuzzleContext<T>,
     ): T["cell"];
 
     createCellDataByTypedDigit(
@@ -91,7 +95,6 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         dataIndex: number,
         positionFunction: (index: number) => PositionWithAngle | undefined,
         cellPosition?: Position,
-        state?: ProcessedGameStateEx<T>,
         region?: GridRegion,
     ): PositionWithAngle | undefined;
 
@@ -148,14 +151,14 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     gridBackgroundColor?: string;
     regionBackgroundColor?: string;
 
-    keepStateOnRestart?(state: ProcessedGameStateEx<T>): PartialGameStateEx<T>;
+    keepStateOnRestart?(context: PuzzleContext<T>): PartialGameStateEx<T>;
 
-    isReady?(state: GameStateEx<T>): boolean;
+    isReady?(context: PuzzleContext<T>): boolean;
 
-    useProcessedGameStateExtension?(state: GameStateEx<T>, cellsIndex: SudokuCellsIndex<T>): T["processedStateEx"];
+    useProcessedGameStateExtension?(context: PuzzleContext<T>): T["processedStateEx"];
 
     // Fallback for useProcessedGameStateExtension() when calling outside a React component
-    getProcessedGameStateExtension?(state: GameStateEx<T>): T["processedStateEx"];
+    getProcessedGameStateExtension?(context: PuzzleContext<T>): T["processedStateEx"];
 
     getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<T>): CellTypeProps<T>;
 
@@ -198,7 +201,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     getCellSelectionType?(
         cell: Position,
         context: PuzzleContext<T>
-    ): Required<Pick<CellSelectionProps<T>, "color" | "strokeWidth">> | undefined;
+    ): Required<Pick<CellSelectionByDataProps<T>, "color" | "strokeWidth">> | undefined;
 
     mainControlsComponent?: ComponentType<ControlsProps<T>>;
     controlButtons?: (ControlButtonItem<T> | undefined | false)[];
@@ -222,11 +225,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         state: GameStateEx<T>
     ): any;
 
-    setSharedState?(
-        puzzle: PuzzleDefinition<T>,
-        state: GameStateEx<T>,
-        newState: any
-    ): GameStateEx<T>;
+    setSharedState?(context: PuzzleContext<T>, newState: any): GameStateEx<T>;
 
     getInternalState?(
         puzzle: PuzzleDefinition<T>,
@@ -250,11 +249,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         context: PuzzleContext<T>
     ): boolean;
 
-    applyStateDiffEffect?(
-        state: ProcessedGameStateEx<T>,
-        prevState: ProcessedGameStateEx<T> | undefined,
-        context: PuzzleContext<T>
-    ): void;
+    getReactions?(context: PuzzleContext<T>): IReactionDisposer[];
 
     getPlayerScore?(context: PuzzleContext<T>, clientId: string): string | number;
 
@@ -277,14 +272,14 @@ export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPT
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {cellsIndex, puzzle: {fieldSize: {rowsCount, columnsCount}}}: PuzzleContext<T>
+    {puzzleIndex, puzzle: {fieldSize: {rowsCount, columnsCount}}}: PuzzleContext<T>
 ): {cell?: Position, state?: undefined} => {
     const isTotallyValidCell = (position: Position) => {
         const {top, left} = position;
         if (top < 0 || top >= rowsCount || left < 0 || left >= columnsCount) {
             return false;
         }
-        return isSelectableCell(cellsIndex.getCellTypeProps(position));
+        return isSelectableCell(puzzleIndex.getCellTypeProps(position));
     };
 
     // Try moving in the requested direction naively
@@ -313,21 +308,21 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
     {left, top}: Position,
     xDirection: number,
     yDirection: number,
-    {cellsIndex}: PuzzleContext<T>,
+    {puzzleIndex}: PuzzleContext<T>,
     isMainKeyboard?: boolean,
     enableBackwardSteps = true,
 ): {cell?: Position, state?: undefined} => {
-    const {center, neighbors} = cellsIndex.allCells[top][left];
+    const {center, neighbors} = puzzleIndex.allCells[top][left];
 
     let bestDist: number | undefined = undefined;
     let bestCell: Position | undefined = undefined;
 
     for (const neighbor of neighbors.items) {
-        if (!isSelectableCell(cellsIndex.getCellTypeProps(neighbor))) {
+        if (!isSelectableCell(puzzleIndex.getCellTypeProps(neighbor))) {
             continue;
         }
 
-        const center2 = cellsIndex.allCells[neighbor.top][neighbor.left].center;
+        const center2 = puzzleIndex.allCells[neighbor.top][neighbor.left].center;
         const vector = getLineVector({start: center, end: center2});
 
         const straightDist = vector.left * xDirection + vector.top * yDirection;
@@ -373,16 +368,16 @@ export const getDefaultCellSelectionType = <T extends AnyPTM>(
     cell: Position,
     context: PuzzleContext<T>,
 ): ReturnType<Required<SudokuTypeManager<T>>["getCellSelectionType"]> => {
-    const {puzzle, state: {selectedCells}} = context;
+    const {puzzle, selectedCells} = context;
 
-    if (selectedCells.size === 0) {
+    if (context.selectedCellsCount === 0) {
         return undefined;
     }
 
     const isSamePosition = getIsSamePuzzlePosition(puzzle);
     const doesRegionContainCell = (cells: Position[], cell: Position) =>
         cells.some((cell2) => isSamePosition(cell2, cell));
-    const seenRegions = getAllPuzzleConstraints(context)
+    const seenRegions = context.allItems
         .filter(({tags}) => tags?.includes(regionTag))
         .map(({cells}) => cells)
         .filter((region) => doesRegionContainCell(region, cell));

@@ -1,10 +1,12 @@
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
-import {SVGAttributes, useMemo} from "react";
+import {ReactElement, SVGAttributes} from "react";
 import {getTransformedRectAverageSize, Rect} from "../../../types/layout/Rect";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {usePureMemo} from "../../../hooks/usePureMemo";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 interface FieldCellShapeProps<T extends AnyPTM> extends Partial<Rect>, Omit<SVGAttributes<SVGRectElement | SVGPolygonElement | SVGPolylineElement>, keyof Rect> {
     context?: PuzzleContext<T>;
@@ -12,18 +14,16 @@ interface FieldCellShapeProps<T extends AnyPTM> extends Partial<Rect>, Omit<SVGA
     line?: Position[];
 }
 
-export const FieldCellShape = <T extends AnyPTM>({context, cellPosition, line, left = 0, top = 0, width = 1, height = 1, ...props}: FieldCellShapeProps<T>) => {
+export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPTM>(
+    {context, cellPosition, line, left = 0, top = 0, width = 1, height = 1, ...props}: FieldCellShapeProps<T>
+) {
+    profiler.trace();
+
     cellPosition = usePureMemo(cellPosition);
 
-    const customCellBounds = useMemo(() => {
-        if (!context || !cellPosition) {
-            return undefined;
-        }
-
-        const {areCustomBounds, transformedBounds} = context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
-
-        return areCustomBounds ? transformedBounds : undefined;
-    }, [context, cellPosition]);
+    const customCellBounds = context && cellPosition && context.puzzleIndex.allCells[cellPosition.top][cellPosition.left].areCustomBounds
+        ? context.getCellTransformedBounds(cellPosition.top, cellPosition.left)
+        : undefined;
 
     if (!context || !cellPosition || !customCellBounds) {
         return <rect
@@ -72,4 +72,4 @@ export const FieldCellShape = <T extends AnyPTM>({context, cellPosition, line, l
             {...props}
         />)}
     </>;
-};
+}) as <T extends AnyPTM>(props: FieldCellShapeProps<T>) => ReactElement;

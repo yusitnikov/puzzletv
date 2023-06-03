@@ -15,9 +15,9 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     areSameCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
-        puzzle,
-        state,
-        forConstraints
+        context,
+        useState = true,
+        forConstraints = true
     ): boolean {
         return type1 === type2 && (forConstraints || color1 === color2);
     },
@@ -25,9 +25,9 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     compareCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
-        puzzle,
-        state,
-        forConstraints
+        context,
+        useState = true,
+        forConstraints = true
     ): number {
         return (forConstraints ? 0 : color1 - color2) || type1 - type2;
     },
@@ -56,14 +56,14 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         return {selectedColor};
     },
 
-    createCellDataByDisplayDigit(digit, {extension: {selectedColor}}): ChessPiece {
+    createCellDataByDisplayDigit(digit, {stateExtension: {selectedColor}}): ChessPiece {
         return {
             type: digit,
             color: selectedColor,
         };
     },
 
-    createCellDataByTypedDigit(digit, {state: {extension: {selectedColor}}}): ChessPiece {
+    createCellDataByTypedDigit(digit, {stateExtension: {selectedColor}}): ChessPiece {
         return {
             type: digit,
             color: selectedColor,

@@ -5,7 +5,7 @@ import {
 } from "../../../components/sudoku/controls/ControlButtonsManager";
 import {JigsawPTM} from "../types/JigsawPTM";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {useEffect, useMemo} from "react";
+import {useEffect} from "react";
 import {
     getActiveJigsawPieceZIndex,
     getJigsawPieceIndexesByCell,
@@ -15,45 +15,43 @@ import {
 } from "../types/helpers";
 import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "../types/JigsawGamePieceState";
 import {incrementArrayItem} from "../../../utils/array";
-import {useLastValueRef} from "../../../hooks/useLastValueRef";
-import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
-import {usePureMemo} from "../../../hooks/usePureMemo";
 import {emptyGestureMetrics, GestureMetrics} from "../../../utils/gestures";
+import {comparer} from "mobx";
+import {observer} from "mobx-react-lite";
+import {useComputedValue} from "../../../hooks/useComputed";
+import {profiler} from "../../../utils/profiler";
 
-const JigsawPieceHighlightHandler = (
-    {
-        context: {
-            cellsIndex,
-            puzzle,
-            state: {fieldStateHistory, selectedCells, extension: {highlightCurrentPiece}},
-            onStateChange,
-        },
-    }: ControlButtonItemProps<JigsawPTM>
-) => {
-    const onStateChangeRef = useLastValueRef(onStateChange);
-
-    const {importOptions: {angleStep} = {}} = puzzle;
-    const {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
-    const {pieces} = getJigsawPiecesWithCache(cellsIndex);
-    const activeZIndex = getActiveJigsawPieceZIndex(piecePositions);
-    const groups = useMemo(
-        () => groupJigsawPiecesByZIndex(pieces, piecePositions),
-        [pieces, piecePositions]
-    );
+const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandler(
+    {context}: ControlButtonItemProps<JigsawPTM>
+) {
+    profiler.trace();
 
     // TODO: make sure that the last selected cell with Ctrl+A is the bottom-right-most cell according to the pieces' state
-    const selectedCell = selectedCells.last();
-    const hasSelectedCell = !!selectedCell;
-    const selectedRegionIndexes = usePureMemo(selectedCell && getJigsawPieceIndexesByCell(cellsIndex, piecePositions, selectedCell));
+    const hasSelectedCell = useComputedValue(
+        function getHasSelectedCell() {
+            return !!context.lastSelectedCell;
+        },
+        {equals: comparer.structural}
+    );
+    const selectedRegionIndexes = useComputedValue(
+        function getSelectedRegionIndexes() {
+            return context.lastSelectedCell && getJigsawPieceIndexesByCell(
+                context.puzzleIndex,
+                context.fieldExtension.pieces,
+                context.lastSelectedCell
+            );
+        },
+        {equals: comparer.structural}
+    );
     useEffect(() => {
         if (selectedRegionIndexes?.length) {
-            onStateChangeRef.current(jigsawPieceBringOnTopAction(puzzle, selectedRegionIndexes, false));
+            context.onStateChange(jigsawPieceBringOnTopAction(selectedRegionIndexes, false));
         } else if (hasSelectedCell) {
-            onStateChangeRef.current({extension: {highlightCurrentPiece: false}});
+            context.onStateChange({extension: {highlightCurrentPiece: false}});
         }
-    }, [puzzle, selectedRegionIndexes, hasSelectedCell, onStateChangeRef]);
+    }, [context, selectedRegionIndexes, hasSelectedCell]);
 
     useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey, metaKey, altKey, shiftKey} = ev;
@@ -61,6 +59,18 @@ const JigsawPieceHighlightHandler = (
         if (ctrlKey || metaKey || altKey) {
             return;
         }
+
+        const {
+            puzzleIndex,
+            puzzle,
+            stateExtension: {highlightCurrentPiece},
+            fieldExtension: {pieces: piecePositions},
+        } = context;
+
+        const {importOptions: {angleStep} = {}} = puzzle;
+        const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
+        const activeZIndex = getActiveJigsawPieceZIndex(piecePositions);
+        const groups = groupJigsawPiecesByZIndex(context);
 
         switch (code) {
             case "Tab":
@@ -74,12 +84,12 @@ const JigsawPieceHighlightHandler = (
                     shiftKey ? -1 : 1
                 );
                 // TODO: scroll the active piece into view
-                onStateChange([
-                    jigsawPieceBringOnTopAction(puzzle, newActivePieces.indexes),
-                    selectedCells.size !== 0
+                context.onStateChange([
+                    jigsawPieceBringOnTopAction(newActivePieces.indexes),
+                    context.selectedCellsCount !== 0
                         ? {
                             // TODO: select the top-left-most cell according to the current angle
-                            selectedCells: selectedCells.set(newActivePieces.cells.slice(0, 1)),
+                            selectedCells: context.selectedCells.set(newActivePieces.cells.slice(0, 1)),
                         }
                         : {},
                 ]);
@@ -94,8 +104,7 @@ const JigsawPieceHighlightHandler = (
                             ...emptyGestureMetrics,
                             rotation: angleStep * (shiftKey ? -1 : 1)
                         };
-                        onStateChange(jigsawPieceStateChangeAction(
-                            puzzle,
+                        context.onStateChange(jigsawPieceStateChangeAction(
                             undefined,
                             myClientId,
                             getNextActionId(),
@@ -119,7 +128,7 @@ const JigsawPieceHighlightHandler = (
     });
 
     return null;
-};
+});
 
 export const JigsawPieceHighlightHandlerControlButtonItem: ControlButtonItem<JigsawPTM> = {
     key: "jigsaw-piece-highlight",

@@ -7,6 +7,9 @@ import {DigitControlButton} from "./DigitControlButton";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {useControlButtonsManager} from "./ControlButtonsManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {ReactElement} from "react";
+import {profiler} from "../../../utils/profiler";
 
 export const getControlsSizeCoeff = (size: number) => size + controlButtonPaddingCoeff * (size - 1);
 
@@ -16,11 +19,10 @@ export interface ControlsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
 }
 
-export const Controls = <T extends AnyPTM>({rect, isHorizontal, context}: ControlsProps<T>) => {
-    const {
-        puzzle,
-        state: {processed: {isReady}},
-    } = context;
+export const Controls = observer(function Controls<T extends AnyPTM>({rect, isHorizontal, context}: ControlsProps<T>) {
+    profiler.trace();
+
+    const {puzzle, isReady} = context;
 
     const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);
 
@@ -40,4 +42,4 @@ export const Controls = <T extends AnyPTM>({rect, isHorizontal, context}: Contro
 
         {controlButtonsManager.render(context)}
     </Absolute>;
-};
+}) as <T extends AnyPTM>(props: ControlsProps<T>) => ReactElement;

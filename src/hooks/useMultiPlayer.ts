@@ -1,9 +1,14 @@
 import {Types} from "ably/promises";
 import {useAblyChannelPresence, useSetMyAblyChannelPresence} from "./useAbly";
-import {useCallback, useEffect, useMemo, useState} from "react";
-import {usePureMemo} from "./usePureMemo";
-import {useTranslate} from "./useTranslate";
-import {useLastValueRef} from "./useLastValueRef";
+import {useEffect} from "react";
+import {autorun, comparer, makeAutoObservable, runInAction} from "mobx";
+import {PuzzleContext} from "../types/sudoku/PuzzleContext";
+import {AnyPTM} from "../types/sudoku/PuzzleTypeMap";
+import {getAllShareState} from "../types/sudoku/GameState";
+import {settings} from "../types/layout/Settings";
+import {profiler} from "../utils/profiler";
+
+const emptyObject = {};
 
 export const myClientId: string = (window.localStorage.clientId = window.localStorage.clientId || Math.random().toString().substring(2));
 
@@ -28,53 +33,47 @@ export interface MessageWithClientId {
     clientId: string;
 }
 
-export interface UseMultiPlayerResult {
-    isLoaded: boolean;
-    isEnabled: boolean;
-    hostId: string;
-    isHost: boolean;
-    isDoubledConnected: boolean;
-    allPlayerIds: string[];
-    playerNicknames: Record<string, string>;
-    playersDataMap: Record<string, PlayerPresenceData>;
-    hostData?: any;
-    myPendingMessages: Message[];
-    sendMessage: (message: any) => void;
-}
+export class UseMultiPlayerResult<T extends AnyPTM> {
+    readonly context: PuzzleContext<T>;
 
-export const emptyUseMultiPlayerResult: UseMultiPlayerResult = {
-    isEnabled: false,
-    isLoaded: false,
-    hostId: myClientId,
-    isHost: true,
-    isDoubledConnected: false,
-    allPlayerIds: [],
-    playerNicknames: {},
-    playersDataMap: {},
-    myPendingMessages: [],
-    sendMessage: () => {},
-};
+    presenceData: Types.PresenceMessage[] = [];
+    isLoaded = false;
 
-export const useMultiPlayer = (
-    gameId: string,
-    hostId: string,
-    roomId: string,
-    myNickname: string,
-    myHostData: any,
-    onMessages: (messages: MessageWithClientId[]) => void
-): UseMultiPlayerResult => {
-    const translate = useTranslate();
+    private myMessages: Message[] = [];
+    private processedMessageIds: Record<string, number> = {};
 
-    const channelName = `game:${gameId}:${hostId}:${roomId}`;
-    const isEnabled = !!hostId;
-    const isHost = hostId === myClientId;
+    get hostId() {
+        profiler.trace();
 
-    const [presenceData, isLoaded] = useAblyChannelPresence(ablyOptions, channelName, isEnabled);
+        return this.context.puzzle.params?.host ?? "";
+    }
+    get roomId() {
+        profiler.trace();
 
-    const playersDataMap = usePureMemo<Record<string, PlayerPresenceData>>(() => {
+        return this.context.puzzle.params?.room ?? "";
+    }
+    get gameId() {
+        profiler.trace();
+
+        return `puzzle:${this.context.puzzle.saveStateKey ?? this.context.puzzle.slug}`;
+    }
+    get isEnabled() {
+        profiler.trace();
+
+        return !!this.hostId;
+    }
+    get isHost() {
+        profiler.trace();
+
+        return this.hostId === myClientId;
+    }
+
+    get playersDataMap() {
+        profiler.trace();
+
         const map: Record<string, PlayerPresenceData> = {};
 
-        for (const {clientId, data} of presenceData) {
+        for (const {clientId, data} of this.presenceData) {
             map[clientId] = map[clientId] || {clientId, data, connectionsCount: 0};
             ++map[clientId].connectionsCount;
         }
@@ -82,119 +81,173 @@ export const useMultiPlayer = (
         map[myClientId] = map[myClientId] || {clientId: myClientId, data: undefined, connectionsCount: 1};
 
         return map;
-    }, [presenceData]);
+    }
+    get allPlayerIds() {
+        profiler.trace();
 
-    const allPlayerIds = useMemo(() => {
-        const allIds = Object.keys(playersDataMap);
+        const allIds = Object.keys(this.playersDataMap);
 
         return [
-            ...allIds.filter(id => comparePlayerIds(id, hostId) >= 0).sort(comparePlayerIds),
-            ...allIds.filter(id => comparePlayerIds(id, hostId) < 0).sort(comparePlayerIds),
+            ...allIds.filter(id => comparePlayerIds(id, this.hostId) >= 0).sort(comparePlayerIds),
+            ...allIds.filter(id => comparePlayerIds(id, this.hostId) < 0).sort(comparePlayerIds),
         ];
-    }, [playersDataMap, hostId]);
+    }
 
-    const hostStr = translate("host");
-    const guestStr = translate("guest");
-    const playerNicknames = useMemo(
-        () => Object.fromEntries(Object.values(playersDataMap).map(({clientId, data}) => [
+    get playerNicknames(): Record<string, string> {
+        profiler.trace();
+
+        const hostStr = this.context.translate("host");
+        const guestStr = this.context.translate("guest");
+
+        return Object.fromEntries(Object.values(this.playersDataMap).map(({clientId, data}) => [
             clientId,
-            (clientId === myClientId ? myNickname : data?.nickname || "") || (clientId === hostId ? hostStr : `${guestStr}#${clientId.substring(0, 4)}`),
-        ])),
-        [playersDataMap, myNickname, hostId, hostStr, guestStr]
-    );
+            (clientId === myClientId ? settings.nickname.get() : data?.nickname || "") || (clientId === this.hostId ? hostStr : `${guestStr}#${clientId.substring(0, 4)}`),
+        ]));
+    }
 
-    const {data: hostData, processed: hostProcessedMessageIds} = playersDataMap[hostId]?.data || {};
-    const myProcessedMessageId = hostProcessedMessageIds?.[myClientId] || 0;
+    private get hostPlayerData() {
+        profiler.trace();
 
-    const [myMessages, setMyMessages] = useState<Message[]>([]);
-    const sendMessage = useCallback(
-        (data: any) => setTimeout(() => setMyMessages(messages => [...messages, {id: Date.now(), data}])),
-        [setMyMessages]
-    );
+        return this.playersDataMap[this.hostId]?.data || emptyObject;
+    }
+    get hostData() {
+        profiler.trace();
 
-    const [processedMessageIds, setProcessedMessageIds] = useState<Record<string, number>>({});
+        return this.hostPlayerData.data;
+    }
 
-    const onMessagesRef = useLastValueRef(onMessages);
-    useEffect(() => {
-        if (!isHost) {
-            return;
-        }
+    get isDoubledConnected() {
+        profiler.trace();
 
-        setProcessedMessageIds(processedMessageIds => {
-            const newProcessedMessageIds = {...processedMessageIds};
-            const messagesToProcess: MessageWithClientId[] = [];
+        return this.playersDataMap[myClientId]?.connectionsCount > 1;
+    }
 
-            for (const {clientId, data: presenceData} of Object.values(playersDataMap)) {
-                if (clientId === myClientId) {
-                    continue;
-                }
+    get myProcessedMessageId() {
+        profiler.trace();
 
-                const processedMessageId = processedMessageIds[clientId] || 0;
+        return this.hostPlayerData.processed?.[myClientId] || 0;
+    }
+    get myPendingMessages() {
+        profiler.trace();
 
-                for (const {id, data} of presenceData?.messages || [] as Message[]) {
-                    if (id <= processedMessageId) {
-                        continue;
-                    }
+        return this.myMessages.filter(({id}) => id > this.myProcessedMessageId);
+    }
 
-                    messagesToProcess.push({data, clientId});
-                    newProcessedMessageIds[clientId] = id;
-                }
-            }
+    /**
+     * Current player's data to share with other players (as the host)
+     */
+    get myHostData() {
+        profiler.trace();
 
-            if (messagesToProcess.length) {
-                try {
-                    onMessagesRef.current(messagesToProcess);
-                } catch (err) {
-                    console.error(err);
-                }
+        const {
+            isHost,
+            context: {puzzle, myGameState},
+        } = this;
+        const {currentPlayer, playerObjects} = myGameState;
 
-                return newProcessedMessageIds;
-            } else {
-                return processedMessageIds;
-            }
-        });
-    }, [isHost, setProcessedMessageIds, playersDataMap, onMessagesRef]);
+        return {
+            ...(isHost && (
+                puzzle.params?.share
+                    ? getAllShareState(this.context)
+                    : puzzle.typeManager.getSharedState?.(puzzle, myGameState)
+            )),
+            currentPlayer,
+            playerObjects,
+        };
+    }
 
-    const myPendingMessages = useMemo(
-        () => myMessages.filter(({id}) => id > myProcessedMessageId),
-        [myMessages, myProcessedMessageId]
-    );
-    const myPendingMessagesSliced = useMemo(
-        () => myPendingMessages.slice(0, 50),
-        [myPendingMessages]
-    );
+    get dataToSend() {
+        profiler.trace();
 
-    const dataToSend = useMemo(() => {
         const sharedData = {
-            nickname: myNickname,
+            nickname: settings.nickname.get(),
         };
 
-        return isHost
+        return this.isHost
             ? {
                 ...sharedData,
-                data: myHostData,
-                processed: processedMessageIds,
+                data: this.myHostData,
+                processed: this.processedMessageIds,
             }
             : {
                 ...sharedData,
-                messages: myPendingMessagesSliced
+                messages: this.myPendingMessages.slice(0, 50),
             };
-    }, [isHost, myNickname, myHostData, myPendingMessagesSliced, processedMessageIds]);
-    useSetMyAblyChannelPresence(ablyOptions, channelName, dataToSend, isEnabled);
+    }
 
-    return usePureMemo({
-        isLoaded,
-        isEnabled,
-        hostId,
-        isHost,
-        isDoubledConnected: playersDataMap[myClientId]?.connectionsCount > 1,
-        allPlayerIds,
-        playerNicknames,
-        playersDataMap,
-        hostData,
-        myPendingMessages,
-        sendMessage,
+    constructor(context: PuzzleContext<T>) {
+        makeAutoObservable(this, {}, {equals: comparer.structural});
+
+        this.context = context;
+    }
+
+    sendMessage(data: any) {
+        setTimeout(() => runInAction(() => {
+            this.myMessages.push({id: Date.now(), data});
+        }));
+    };
+
+    processPendingMessages(onMessages: (messages: MessageWithClientId[]) => void) {
+        if (this.isHost) {
+            return;
+        }
+
+        const newProcessedMessageIds = {...this.processedMessageIds};
+        const messagesToProcess: MessageWithClientId[] = [];
+
+        for (const {clientId, data: presenceData} of Object.values(this.playersDataMap)) {
+            if (clientId === myClientId) {
+                continue;
+            }
+
+            const processedMessageId = this.processedMessageIds[clientId] || 0;
+
+            for (const {id, data} of presenceData?.messages || [] as Message[]) {
+                if (id <= processedMessageId) {
+                    continue;
+                }
+
+                messagesToProcess.push({data, clientId});
+                newProcessedMessageIds[clientId] = id;
+            }
+        }
+
+        if (!messagesToProcess.length) {
+            return;
+        }
+
+        try {
+            onMessages(messagesToProcess);
+        } catch (err) {
+            console.error(err);
+        }
+        this.processedMessageIds = newProcessedMessageIds;
+    }
+}
+
+export const useMultiPlayer = <T extends AnyPTM>(multiPlayer: UseMultiPlayerResult<T>) => {
+    const channelName = `game:${multiPlayer.gameId}:${multiPlayer.hostId}:${multiPlayer.roomId}`;
+
+    const [presenceData, isLoaded] = useAblyChannelPresence(ablyOptions, channelName, multiPlayer.isEnabled);
+    runInAction(() => {
+        multiPlayer.isLoaded = isLoaded;
     });
+    useEffect(() => runInAction(function updatePresenceData() {
+        multiPlayer.presenceData = presenceData;
+    }), [multiPlayer, presenceData]);
+
+    useEffect(() => autorun(() => multiPlayer.context.mergeHostDataToState()), [multiPlayer]);
+
+    useEffect(
+        () => autorun(() => multiPlayer.processPendingMessages(
+            (messages) => multiPlayer.context.update({
+                myGameState: multiPlayer.context.processMessages(messages),
+            })
+        )),
+        [multiPlayer]
+    );
+
+    useSetMyAblyChannelPresence(ablyOptions, channelName, multiPlayer.dataToSend, multiPlayer.isEnabled);
 };
 
 export const comparePlayerIds = (a: string, b: string) => a.localeCompare(b);

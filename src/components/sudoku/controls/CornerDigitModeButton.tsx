@@ -1,19 +1,18 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
-export const CornerDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
-    const {
-        puzzle,
-        state,
-    } = context;
+export const CornerDigitModeButton: ControlButtonItemPropsGenericFc = observer(function CornerDigitModeButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
 
-    const {
-        typeManager: {createCellDataByDisplayDigit},
-    } = puzzle;
+    const {puzzle} = context;
 
     const translate = useTranslate();
 
@@ -21,8 +20,8 @@ export const CornerDigitModeButton = <T extends AnyPTM>({context, top, left}: Co
         top={top}
         left={left}
         cellWriteMode={CellWriteMode.corner}
-        data={{cornerDigits: new CellDataSet(puzzle, [1, 2, 3].map(digit => createCellDataByDisplayDigit(digit, state)))}}
+        data={{cornerDigits: new CellDataSet(puzzle, [1, 2, 3].map(digit => puzzle.typeManager.createCellDataByDisplayDigit(digit, context)))}}
         title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}
         context={context}
     />;
-};
+});

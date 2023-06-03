@@ -3,8 +3,12 @@ import {LanguageCode} from "../../types/translations/LanguageCode";
 import {ContactMeShort} from "./ContactMe";
 import {ReactNode} from "react";
 import {buildLink} from "../../utils/link";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../utils/profiler";
 
-export const ForSetters = () => {
+export const ForSetters = observer(function ForSetters() {
+    profiler.trace();
+
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -107,7 +111,7 @@ export const ForSetters = () => {
             </FaqItem>
         </dl>
     </>;
-};
+});
 
 interface FaqItemProps {
     question: ReactNode;
@@ -115,7 +119,11 @@ interface FaqItemProps {
     children: ReactNode;
 }
 
-const FaqItem = ({question, children: answer}: FaqItemProps) => <>
-    <dt><strong>{question}</strong></dt>
-    <dd>{answer}</dd>
-</>;
+const FaqItem = observer(function FaqItem({question, children: answer}: FaqItemProps) {
+    profiler.trace();
+
+    return <>
+        <dt><strong>{question}</strong></dt>
+        <dd>{answer}</dd>
+    </>;
+});

@@ -31,9 +31,9 @@ export const RenbanConstraint = <T extends AnyPTM>(
             isFinalCheck,
             onlyObvious
         ) {
-            const {puzzle, state} = context;
+            const {puzzle} = context;
 
-            if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
+            if (!isValidCellForRegion(cells, cell, digits, context)) {
                 return false;
             }
 

@@ -7,11 +7,11 @@ import {
     PositionLiteral
 } from "../../../../types/layout/Position";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps, getAllPuzzleConstraints} from "../../../../types/sudoku/Constraint";
-import {Fragment} from "react";
-import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "../../../../types/sudoku/GameState";
+import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Fragment, ReactElement} from "react";
+import {gameStateGetCurrentGivenDigitsByCells} from "../../../../types/sudoku/GameState";
 import {darkGreyColor} from "../../../app/globals";
-import {CellBackground} from "../../cell/CellBackground";
+import {FieldCellBackground} from "../../cell/CellBackground";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
 import {CellColor} from "../../../../types/sudoku/CellColor";
@@ -19,9 +19,10 @@ import {PuzzlePositionSet} from "../../../../types/sudoku/PuzzlePositionSet";
 import {indexes} from "../../../../utils/indexes";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
-import {resolvePuzzleInitialColors} from "../../../../types/sudoku/PuzzleDefinition";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 export const fogTag = "fog";
 const shadowSize = 0.07;
@@ -49,8 +50,8 @@ export const getFogVisibleCells = <T extends AnyPTM>(
 ) => {
     const {
         puzzle,
-        state,
-        cellsIndex,
+        puzzleIndex,
+        currentFieldStateWithFogDemo: {cells, lines},
     } = context;
 
     const {
@@ -59,9 +60,8 @@ export const getFogVisibleCells = <T extends AnyPTM>(
         typeManager: {getDigitByCellData},
     } = puzzle;
 
-    const {cells, lines} = gameStateGetCurrentFieldState(state, true);
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
-    const initialColors = resolvePuzzleInitialColors(context);
+    const initialColors = context.puzzleInitialColors;
 
     const visible3x3Centers = indexes(rowsCount).map(
         (top) => indexes(columnsCount).map(
@@ -86,7 +86,7 @@ export const getFogVisibleCells = <T extends AnyPTM>(
 
     const linePoints = new PuzzlePositionSet(
         puzzle,
-        cellsIndex.getCenterLines(lines.items, true)
+        puzzleIndex.getCenterLines(lines.items, true)
             .filter(line => typeof revealByCenterLines !== "object" || revealByCenterLines.contains(line))
             .flatMap(({start, end}) => [start, end])
     );
@@ -114,15 +114,14 @@ export const getFogVisibleCells = <T extends AnyPTM>(
 };
 
 export const Fog = {
-    [FieldLayer.regular]: <T extends AnyPTM>({context, props}: ConstraintProps<T, FogProps<T>>) => {
+    [FieldLayer.regular]: observer(function Fog<T extends AnyPTM>({context, props}: ConstraintProps<T, FogProps<T>>) {
+        profiler.trace();
+
         const {bulbCells} = props;
 
         const {
             puzzle: {fieldSize: {rowsCount, columnsCount}},
-            state,
         } = context;
-
-        const {cells} = gameStateGetCurrentFieldState(state);
 
         const visible = getFogVisibleCells(context, props);
 
@@ -212,21 +211,7 @@ export const Fog = {
                     strokeWidth={0}
                 />
 
-                {indexes(rowsCount).map((top) => indexes(columnsCount).map((left) => {
-                    const {colors} = cells[top][left];
-
-                    return colors.size !== 0 && <AutoSvg
-                        key={`${top}-${left}`}
-                        top={top}
-                        left={left}
-                    >
-                        <CellBackground
-                            context={context}
-                            cellPosition={{top, left}}
-                            colors={colors}
-                        />
-                    </AutoSvg>;
-                }))}
+                <FogCellsBackground context={context}/>
             </g>
 
             {bulbCells?.map(({top, left}) => <use
@@ -235,8 +220,36 @@ export const Fog = {
                 transform={`translate(${left} ${top})`}
             />)}
         </>;
-    },
+    }) as <T extends AnyPTM>(props: ConstraintProps<T, FogProps<T>>) => ReactElement,
 };
+
+interface FogCellsBackgroundProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
+}
+const FogCellsBackground = observer(function FogCellsBackground<T extends AnyPTM>({context}: FogCellsBackgroundProps<T>) {
+    profiler.trace();
+
+    const {
+        puzzle: {fieldSize: {rowsCount, columnsCount}},
+    } = context;
+
+    return <>
+        {indexes(rowsCount).map((top) => indexes(columnsCount).map((left) => {
+            return <AutoSvg
+                key={`${top}-${left}`}
+                top={top}
+                left={left}
+            >
+                <FieldCellBackground
+                    context={context}
+                    noGivenColors={true}
+                    top={top}
+                    left={left}
+                />
+            </AutoSvg>;
+        }))}
+    </>;
+}) as <T extends AnyPTM>(props: FogCellsBackgroundProps<T>) => ReactElement;
 
 export const FogConstraint = <T extends AnyPTM>(
     startCell3x3Literals: PositionLiteral[] = [],
@@ -259,20 +272,15 @@ export const FogConstraint = <T extends AnyPTM>(
     noPencilmarkCheck: true,
     isCheckingFog: true,
     isValidCell: ({top, left}, digits, _, context) => {
-        const {puzzle: {solution, typeManager: {getDigitByCellData}}, state} = context;
+        const {puzzle: {solution, typeManager: {getDigitByCellData}}, fogDemoFieldStateHistory} = context;
 
-        return !!state.fogDemoFieldStateHistory || typeof solution?.[top][left] !== "number" ||
+        return !!fogDemoFieldStateHistory || typeof solution?.[top][left] !== "number" ||
             getDigitByCellData(digits[top][left], context, {top, left}) === solution[top][left];
     },
 });
 
-export const getFogPropsByConstraintsList = <T extends AnyPTM>(
-    constraints: Constraint<T, any>[]
-): FogProps<T> | undefined =>
-    constraints
-        .find(({tags}) => tags?.includes(fogTag))
-        ?.props;
-
 export const getFogPropsByContext = <T extends AnyPTM>(
     context: PuzzleContext<T>
-) => getFogPropsByConstraintsList(getAllPuzzleConstraints(context));
+): FogProps<T> | undefined => context.allItems
+    .find(({tags}) => tags?.includes(fogTag))
+    ?.props;

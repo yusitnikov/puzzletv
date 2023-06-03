@@ -1,4 +1,3 @@
-import {memo} from "react";
 import {textColor} from "../../app/globals";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {DigitProps, DigitPropsGenericFc} from "./DigitProps";
@@ -6,6 +5,8 @@ import {DigitComponentType} from "./DigitComponentType";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {DigitRotationInfo} from "./DigitRotationInfo";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 const T = true;
 const F = false;
@@ -101,41 +102,55 @@ const lineSpacingCoeff = lineWidthCoeff * 0.3;
 const squareSizeCoeff = (1 - lineWidthCoeff) / 2;
 const digitWidthCoeff = squareSizeCoeff + lineWidthCoeff;
 
-export const CenteredCalculatorDigit = memo(<T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) => <AutoSvg
-    width={size}
-    height={size}
-    {...containerProps}
->
-    <CenteredCalculatorDigitSvgContent
-        puzzle={puzzle}
-        digit={digit}
-        size={size}
-        color={color}
-    />
-</AutoSvg>) as DigitPropsGenericFc;
-export const RegularCalculatorDigit = memo(<T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) => <AutoSvg
-    width={size}
-    height={size}
-    {...containerProps}
->
-    <RegularCalculatorDigitSvgContent
-        puzzle={puzzle}
-        digit={digit}
-        size={size}
-        color={color}
-    />
-</AutoSvg>) as DigitPropsGenericFc;
+export const CenteredCalculatorDigit = observer(function CenteredCalculatorDigit<T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) {
+    profiler.trace();
 
-export const getCalculatorDigitSvgContent = (centerOne: boolean) => (memo(<T extends AnyPTM>({digit, size, color, left = 0, top = 0}: DigitProps<T>) => <>
-    {(centerOne ? matricesCentered : matricesRegular)[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled && <DigitLine
-        key={`${rowIndex}-${columnIndex}`}
-        left={left + size * (columnIndex - 1) * squareSizeCoeff / 2}
-        top={top + size * (rowIndex - 2) * squareSizeCoeff / 2}
-        size={size}
-        vertical={!!(rowIndex % 2)}
-        color={color}
-    />))}
-</>) as DigitPropsGenericFc);
+    return <AutoSvg
+        width={size}
+        height={size}
+        {...containerProps}
+    >
+        <CenteredCalculatorDigitSvgContent
+            puzzle={puzzle}
+            digit={digit}
+            size={size}
+            color={color}
+        />
+    </AutoSvg>;
+}) as DigitPropsGenericFc;
+export const RegularCalculatorDigit = observer(function RegularCalculatorDigit<T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) {
+    profiler.trace();
+
+    return <AutoSvg
+        width={size}
+        height={size}
+        {...containerProps}
+    >
+        <RegularCalculatorDigitSvgContent
+            puzzle={puzzle}
+            digit={digit}
+            size={size}
+            color={color}
+        />
+    </AutoSvg>;
+}) as DigitPropsGenericFc;
+
+export const getCalculatorDigitSvgContent = (centerOne: boolean): DigitPropsGenericFc =>
+    observer(function CalculatorDigitSvgContent<T extends AnyPTM>({digit, size, color, left = 0, top = 0}: DigitProps<T>) {
+        profiler.trace();
+
+        return <>
+            {(centerOne ? matricesCentered : matricesRegular)[digit].flatMap((matrixRow, rowIndex) => matrixRow.map((enabled, columnIndex) => enabled &&
+                <DigitLine
+                    key={`${rowIndex}-${columnIndex}`}
+                    left={left + size * (columnIndex - 1) * squareSizeCoeff / 2}
+                    top={top + size * (rowIndex - 2) * squareSizeCoeff / 2}
+                    size={size}
+                    vertical={!!(rowIndex % 2)}
+                    color={color}
+                />))}
+        </>;
+    });
 const CenteredCalculatorDigitSvgContent = getCalculatorDigitSvgContent(true);
 const RegularCalculatorDigitSvgContent = getCalculatorDigitSvgContent(false);
 
@@ -145,42 +160,47 @@ interface DigitLineProps extends Position {
     color?: string;
 }
 
-const DigitLine = memo(({left, top, size, vertical, color = "currentColor"}: DigitLineProps) => <polygon
-    points={formatSvgPointsArray(
-        [
-            {
-                left: lineWidthCoeff + lineSpacingCoeff,
-                top: 0
-            },
-            {
-                left: digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
-                top: 0
-            },
-            {
-                left: digitWidthCoeff - lineWidthCoeff / 2 - lineSpacingCoeff,
-                top: lineWidthCoeff / 2
-            },
-            {
-                left: digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
-                top: lineWidthCoeff
-            },
-            {
-                left: lineWidthCoeff + lineSpacingCoeff,
-                top: lineWidthCoeff
-            },
-            {
-                left: lineWidthCoeff / 2 + lineSpacingCoeff,
-                top: lineWidthCoeff / 2
-            },
-        ]
-            .map(coords => (vertical ? {left: coords.top, top: coords.left} : coords))
-            .map(({left: x, top: y}) => ({
-                left: left + size * (x - (vertical ? lineWidthCoeff : digitWidthCoeff) / 2),
-                top: top + size * (y - (vertical ? digitWidthCoeff : lineWidthCoeff) / 2)
-            }))
-    )}
-    fill={color}
-/>);
+const DigitLine = observer(function DigitLine({left, top, size, vertical, color = "currentColor"}: DigitLineProps) {
+    profiler.trace();
+
+    // noinspection JSSuspiciousNameCombination
+    return <polygon
+        points={formatSvgPointsArray(
+            [
+                {
+                    left: lineWidthCoeff + lineSpacingCoeff,
+                    top: 0
+                },
+                {
+                    left: digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
+                    top: 0
+                },
+                {
+                    left: digitWidthCoeff - lineWidthCoeff / 2 - lineSpacingCoeff,
+                    top: lineWidthCoeff / 2
+                },
+                {
+                    left: digitWidthCoeff - lineWidthCoeff - lineSpacingCoeff,
+                    top: lineWidthCoeff
+                },
+                {
+                    left: lineWidthCoeff + lineSpacingCoeff,
+                    top: lineWidthCoeff
+                },
+                {
+                    left: lineWidthCoeff / 2 + lineSpacingCoeff,
+                    top: lineWidthCoeff / 2
+                },
+            ]
+                .map(coords => (vertical ? {left: coords.top, top: coords.left} : coords))
+                .map(({left: x, top: y}) => ({
+                    left: left + size * (x - (vertical ? lineWidthCoeff : digitWidthCoeff) / 2),
+                    top: top + size * (y - (vertical ? digitWidthCoeff : lineWidthCoeff) / 2)
+                }))
+        )}
+        fill={color}
+    />;
+});
 
 export const CenteredCalculatorDigitComponentType = <T extends AnyPTM>(): DigitComponentType<T> => ({
     component: CenteredCalculatorDigit,

@@ -6,8 +6,10 @@ import {
     parsePositionLiteral,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 const arrowWidth = 0.1;
 const arrowHeight = 0.05;
@@ -16,8 +18,10 @@ export interface MinMaxProps {
     coeff: number;
 }
 
-export const MinMax = {
-    [FieldLayer.beforeSelection]: <T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T, MinMaxProps>) => {
+export const MinMax: ConstraintPropsGenericFcMap<MinMaxProps> = {
+    [FieldLayer.beforeSelection]: observer(function MinMaxRect<T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T, MinMaxProps>) {
+        profiler.trace();
+
         return <rect
             x={left}
             y={top}
@@ -26,8 +30,10 @@ export const MinMax = {
             fill={lightGreyColor}
             fillOpacity={0.5}
         />;
-    },
-    [FieldLayer.regular]: <T extends AnyPTM>({cells: [{left, top}], props: {coeff}}: ConstraintProps<T, MinMaxProps>) => {
+    }),
+    [FieldLayer.regular]: observer(function MinMaxArrows<T extends AnyPTM>({cells: [{left, top}], props: {coeff}}: ConstraintProps<T, MinMaxProps>) {
+        profiler.trace();
+
         left += 0.5;
         top += 0.5;
 
@@ -37,7 +43,7 @@ export const MinMax = {
             <Arrow cx={left} cy={top} dx={0} dy={1} coeff={coeff}/>
             <Arrow cx={left} cy={top} dx={0} dy={-1} coeff={coeff}/>
         </>;
-    },
+    }),
 }
 
 interface ArrowProps {
@@ -48,7 +54,9 @@ interface ArrowProps {
     coeff: number;
 }
 
-const Arrow = ({cx, cy, dx, dy, coeff}: ArrowProps) => {
+const Arrow = observer(function ArrowFc({cx, cy, dx, dy, coeff}: ArrowProps) {
+    profiler.trace();
+
     const start = 0.5 - arrowHeight * (1.5 - 0.5 * coeff);
     cx += start * dx;
     cy += start * dy;
@@ -74,7 +82,7 @@ const Arrow = ({cx, cy, dx, dy, coeff}: ArrowProps) => {
         strokeWidth={arrowHeight / 2}
         fill={"none"}
     />;
-};
+});
 
 const MinMaxConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
@@ -96,8 +104,8 @@ const MinMaxConstraint = <T extends AnyPTM>(
         renderSingleCellInUserArea: true,
         props: {coeff},
         isObvious: true,
-        isValidCell(cell, digits, [mainCell, ...neighborCells], {puzzle, state}) {
-            const {typeManager: {compareCellData}} = puzzle;
+        isValidCell(cell, digits, [mainCell, ...neighborCells], context) {
+            const {typeManager: {compareCellData}} = context.puzzle;
             const digit = digits[cell.top][cell.left]!;
 
             const mainDigit = digits[mainCell.top]?.[mainCell.left];
@@ -108,9 +116,9 @@ const MinMaxConstraint = <T extends AnyPTM>(
             return isSamePosition(cell, mainCell)
                 ? neighborCells.every(({left, top}) => {
                     const neighborDigit = digits[top]?.[left];
-                    return neighborDigit === undefined || compareCellData(mainDigit, neighborDigit, puzzle, state, true) * coeff > 0;
+                    return neighborDigit === undefined || compareCellData(mainDigit, neighborDigit, context) * coeff > 0;
                 })
-                : compareCellData(mainDigit, digit, puzzle, state, true) * coeff > 0;
+                : compareCellData(mainDigit, digit, context) * coeff > 0;
         },
     });
 };

@@ -5,8 +5,13 @@ import {SettingsSelect} from "../../../components/sudoku/controls/settings/Setti
 import {TesseractSelectionType, useTesseractSelectionType} from "../types/TesseractSelection";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {ReactElement} from "react";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
-export const TesseractSettings = <T extends AnyPTM>({cellSize}: SettingsContentProps<T>) => {
+export const TesseractSettings = observer(function TesseractSettings<T extends AnyPTM>({cellSize}: SettingsContentProps<T>) {
+    profiler.trace();
+
     const translate = useTranslate();
 
     const [selectionType, setSelectionType] = useTesseractSelectionType();
@@ -36,4 +41,4 @@ export const TesseractSettings = <T extends AnyPTM>({cellSize}: SettingsContentP
             })}</option>
         </SettingsSelect>
     </SettingsItem>;
-};
+}) as <T extends AnyPTM>(props: SettingsContentProps<T>) => ReactElement;

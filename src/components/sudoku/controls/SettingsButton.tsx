@@ -1,4 +1,4 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {ControlButton} from "./ControlButton";
 import {Settings} from "@emotion-icons/material";
 import {Modal} from "../../layout/modal/Modal";
@@ -8,24 +8,21 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
 import {SettingsContent} from "./settings/SettingsContent";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
-export const SettingsButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
-    const {
-        cellSizeForSidePanel: cellSize,
-        state: {isShowingSettings},
-        onStateChange,
-    } = context;
+export const SettingsButton: ControlButtonItemPropsGenericFc = observer(function SettingsButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
+    const {cellSizeForSidePanel: cellSize} = context;
 
     const translate = useTranslate();
 
-    const handleOpenSettings = useCallback(
-        () => onStateChange({isShowingSettings: true}),
-        [onStateChange]
-    );
-    const handleCloseSettings = useCallback(
-        () => onStateChange({isShowingSettings: false}),
-        [onStateChange]
-    );
+    const handleOpenSettings = useCallback(() => settings.toggle(true), []);
+    const handleCloseSettings = useCallback(() => settings.toggle(false), []);
 
     return <>
         <ControlButton
@@ -37,7 +34,7 @@ export const SettingsButton = <T extends AnyPTM>({context, top, left}: ControlBu
         >
             <Settings/>
         </ControlButton>
-        {isShowingSettings && <Modal cellSize={cellSize} onClose={handleCloseSettings}>
+        {settings.isOpened && <Modal cellSize={cellSize} onClose={handleCloseSettings}>
             <form
                 onSubmit={(ev) => {
                     handleCloseSettings();
@@ -64,4 +61,4 @@ export const SettingsButton = <T extends AnyPTM>({context, top, left}: ControlBu
             </form>
         </Modal>}
     </>;
-};
+});

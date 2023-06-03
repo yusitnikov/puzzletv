@@ -7,7 +7,6 @@ import {CellColor} from "../../types/sudoku/CellColor";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {moveButtonTip, normalYinYangRulesApply, normalYinYangRulesExplained, toroidalRulesApply} from "../ruleSnippets";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 const S = CellColor.shaded;
@@ -60,10 +59,9 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
     allowOverridingInitialColors: false,
     enableShading: true,
     allowDrawing: ["center-line", "border-line", "border-mark"],
-    resultChecker: ({state}) => {
-        const {cells} = gameStateGetCurrentFieldState(state);
-        return cells.every((row, top) => row.every(
-            ({colors}, left) => (givenColors[top]?.[left] ?? colors.first()) === correctAnswer[top][left]
+    resultChecker: (context) => {
+        return correctAnswer.every((row, top) => row.every(
+            (answer, left) => (givenColors[top]?.[left] ?? context.getCellColors(top, left).first()) === answer
         ));
     },
 };

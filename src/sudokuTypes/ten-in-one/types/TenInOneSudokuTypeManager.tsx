@@ -7,7 +7,6 @@ import {indexes} from "../../../utils/indexes";
 import {TenInOneRegionConstraint} from "../constraints/TenInOneRegion";
 import {Position} from "../../../types/layout/Position";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
-import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {MultiStagePTM} from "../../multi-stage/types/MultiStagePTM";
@@ -18,35 +17,32 @@ export const TenInOneSudokuTypeManager = (
 ): SudokuTypeManager<MultiStagePTM> => ({
     ...MultiStageSudokuTypeManager({
         getStage: (context) =>
-            context.state.extension.stage === 1
+            context.stateExtension.stage === 1
                 ? (isValidFinishedPuzzleByConstraints(context) ? 2 : 1)
                 : 3,
         onStageChange: (context, stage) => {
-            const {puzzle, state} = context;
+            const {puzzle, stateInitialDigits} = context;
             const {fieldSize: {rowsCount, columnsCount}} = puzzle;
 
             if (stage === 2) {
-                const {cells} = gameStateGetCurrentFieldState(state);
-
                 const allCells: Position[] = indexes(rowsCount).flatMap(top => indexes(columnsCount).map(left => ({top, left})));
                 const remainingCells = allCells.filter(isRemainingCell);
 
                 const initialDigits: GivenDigitsMap<number> = {};
                 for (const {top, left} of remainingCells) {
                     initialDigits[top] = initialDigits[top] || {};
-                    initialDigits[top][left] = cells[top][left].usersDigit!;
+                    initialDigits[top][left] = context.getCellDigit(top, left)!;
                 }
 
                 return {
-                    initialDigits: mergeGivenDigitsMaps(state.initialDigits, initialDigits),
+                    initialDigits: mergeGivenDigitsMaps(stateInitialDigits, initialDigits),
                 };
             }
 
             return {
                 // TODO support shared games
                 fieldStateHistory: fieldStateHistoryAddState(
-                    puzzle,
-                    state.fieldStateHistory,
+                    context,
                     myClientId,
                     "ten-in-one-reset-field",
                     (state) => ({
@@ -63,13 +59,13 @@ export const TenInOneSudokuTypeManager = (
                 ),
             };
         },
-        getStageCompletionText: ({state: {extension: {stage}}}) => stage === 2
+        getStageCompletionText: ({stateExtension: {stage}}) => stage === 2
             ? {
                 [LanguageCode.en]: <>Now other digits from stage 1 can be&nbsp;removed.</>,
                 [LanguageCode.ru]: <>Теперь можно удалить остальные цифры с этапа 1.</>,
             }
             : undefined,
-        getStageButtonText: ({state: {extension: {stage}}}) => stage === 2
+        getStageButtonText: ({stateExtension: {stage}}) => stage === 2
             ? {
                 [LanguageCode.en]: "Clean up the grid",
                 [LanguageCode.ru]: "Очистить поле",
@@ -78,7 +74,7 @@ export const TenInOneSudokuTypeManager = (
     }),
 
     getRegionsForRowsAndColumns(context): Constraint<MultiStagePTM, any>[] {
-        const {puzzle, state: {extension: {stage}}} = context;
+        const {puzzle, stateExtension: {stage}} = context;
         const individualBoxes = stage === 1;
         const {fieldSize: {rowsCount, columnsCount, regionWidth, regionHeight}} = puzzle;
 

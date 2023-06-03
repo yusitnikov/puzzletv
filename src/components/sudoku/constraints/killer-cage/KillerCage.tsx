@@ -1,4 +1,4 @@
-import {useMemo} from "react";
+import {ReactElement, useMemo} from "react";
 import {blackColor} from "../../../app/globals";
 import {
     formatSvgPointsArray,
@@ -8,7 +8,7 @@ import {
     PositionLiteral
 } from "../../../../types/layout/Position";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions";
 import {isValidCellForRegion} from "../region/Region";
 import {indexes} from "../../../../utils/indexes";
@@ -18,6 +18,8 @@ import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
 import {useTransformAngle} from "../../../../contexts/TransformContext";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 export const cageTag = "cage";
 
@@ -30,8 +32,8 @@ export interface KillerCageProps {
     largeSum?: boolean;
 }
 
-export const KillerCage = {
-    [FieldLayer.regular]: <T extends AnyPTM>(
+export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
+    [FieldLayer.regular]: observer(function KillerCage<T extends AnyPTM>(
         {
             context: {puzzle},
             cells,
@@ -44,7 +46,9 @@ export const KillerCage = {
                 largeSum,
             },
         }: ConstraintProps<T, KillerCageProps>
-    ) => {
+    ) {
+        profiler.trace();
+
         const {
             prioritizeSelection,
             typeManager: {compensateKillerCageSumAngle},
@@ -115,7 +119,7 @@ export const KillerCage = {
                 />}
             </>}
         </>;
-    },
+    }),
 };
 
 interface KillerCageSumProps<T extends AnyPTM> extends Position {
@@ -127,7 +131,11 @@ interface KillerCageSumProps<T extends AnyPTM> extends Position {
     reverse?: boolean;
 }
 
-const KillerCageSum = <T extends AnyPTM>({puzzle, sum, size, color = blackColor, left, top, reverse, angle = 0}: KillerCageSumProps<T>) => {
+const KillerCageSum = observer(function KillerCageSum<T extends AnyPTM>(
+    {puzzle, sum, size, color = blackColor, left, top, reverse, angle = 0}: KillerCageSumProps<T>
+) {
+    profiler.trace();
+
     const {
         typeManager: {
             digitComponentType: {
@@ -174,7 +182,7 @@ const KillerCageSum = <T extends AnyPTM>({puzzle, sum, size, color = blackColor,
             </CenteredText>)}
         </AutoSvg>
     </AutoSvg>;
-};
+}) as <T extends AnyPTM>(props: KillerCageSumProps<T>) => ReactElement;
 
 export const DecorativeCageConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
@@ -217,9 +225,9 @@ export const KillerCageConstraint = <T extends AnyPTM>(
         isFinalCheck,
         onlyObvious
     ) {
-        const {puzzle, state} = context;
+        const {puzzle} = context;
 
-        if (!isValidCellForRegion(cells, cell, digits, puzzle, state)) {
+        if (!isValidCellForRegion(cells, cell, digits, context)) {
             return false;
         }
 

@@ -5,16 +5,14 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {ctrlKeyText} from "../../../utils/os";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
+import {ReactElement} from "react";
 
-export const CenterDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
-    const {
-        puzzle,
-        state,
-    } = context;
+export const CenterDigitModeButton = observer(function CenterDigitModeButton<T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) {
+    profiler.trace();
 
-    const {
-        typeManager: {createCellDataByDisplayDigit},
-    } = puzzle;
+    const {puzzle} = context;
 
     const translate = useTranslate();
 
@@ -22,8 +20,8 @@ export const CenterDigitModeButton = <T extends AnyPTM>({context, top, left}: Co
         top={top}
         left={left}
         cellWriteMode={CellWriteMode.center}
-        data={{centerDigits: new CellDataSet(puzzle, [1, 2].map(digit => createCellDataByDisplayDigit(digit, state)))}}
+        data={{centerDigits: new CellDataSet(puzzle, [1, 2].map(digit => puzzle.typeManager.createCellDataByDisplayDigit(digit, context)))}}
         title={`${translate("Center")} (${translate("shortcut")}: ${ctrlKeyText})`}
         context={context}
     />;
-};
+}) as <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => ReactElement;

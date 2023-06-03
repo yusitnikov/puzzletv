@@ -4,6 +4,9 @@ import {parsePositionLiteral, Position, PositionLiteral} from "../../../../types
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {ReactElement} from "react";
+import {profiler} from "../../../../utils/profiler";
 
 export interface QuadProps<CellType> {
     expectedDigits?: CellType[];
@@ -13,20 +16,25 @@ export interface QuadProps<CellType> {
 }
 
 export const Quad = {
-    [FieldLayer.afterLines]: <T extends AnyPTM>(
+    [FieldLayer.afterLines]: observer(function Quad<T extends AnyPTM>(
         {
             context,
             cells,
             props,
         }: ConstraintProps<T, QuadProps<T["cell"]>>
-    ) => <QuadByData
-        context={context}
-        cells={cells}
-        props={props}
-    />,
+    ) {
+        profiler.trace();
+
+        return <QuadByData
+            context={context}
+            cells={cells}
+            props={props}
+        />;
+    }) as <T extends AnyPTM>(props: ConstraintProps<T, QuadProps<T["cell"]>>) => ReactElement,
 };
 
-export const QuadByData = <T extends AnyPTM>(
+type QuadByDataProps<T extends AnyPTM> = Pick<ConstraintProps<T, QuadProps<T["cell"]>>, "context" | "cells" | "props">;
+export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
     {
         context: {puzzle},
         cells: [{top, left}],
@@ -36,8 +44,10 @@ export const QuadByData = <T extends AnyPTM>(
             isRecent,
             radius = 0.3,
         },
-    }: Pick<ConstraintProps<T, QuadProps<T["cell"]>>, "context" | "cells" | "props">
-) => {
+    }: QuadByDataProps<T>
+) {
+    profiler.trace();
+
     const {typeManager: {cellDataComponentType: {component: CellData}}} = puzzle;
 
     const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: T["cell"], valid?: boolean}[] = [
@@ -79,7 +89,7 @@ export const QuadByData = <T extends AnyPTM>(
             />;
         })}
     </>;
-};
+}) as <T extends AnyPTM>(props: QuadByDataProps<T>) => ReactElement;
 
 const getQuadCells = ({top, left}: Position): Position[] => [
     {top, left},
@@ -106,12 +116,13 @@ export const QuadConstraint = <T extends AnyPTM>(
         },
         component: Quad,
         isObvious: true,
-        isValidCell({top, left}, digitsMap, cells, {puzzle, state}) {
+        isValidCell({top, left}, digitsMap, cells, context) {
+            const {puzzle} = context;
             const {typeManager: {areSameCellData}} = puzzle;
 
             const data = digitsMap[top][left];
 
-            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, puzzle, state, true))) {
+            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, context))) {
                 return false;
             }
 
@@ -124,7 +135,7 @@ export const QuadConstraint = <T extends AnyPTM>(
                         continue;
                     }
 
-                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, puzzle, state, true));
+                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, context));
                     if (matchingIndex < 0) {
                         return false;
                     }
@@ -135,25 +146,25 @@ export const QuadConstraint = <T extends AnyPTM>(
 
             return cells.some(({top, left}) => digitsMap[top]?.[left] === undefined)
                 || expectedDigits.every(expectedData => cells.some(
-                ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, puzzle, state, true)
+                ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, context)
             ));
         },
     });
 };
 
 export const QuadConstraintBySolution = <T extends AnyPTM>(
-    {puzzle, state}: PuzzleContext<T>,
+    context: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
     digits: T["cell"][],
     isRecent = false,
     radius = 0.3
 ): Constraint<T, QuadProps<T["cell"]>> => {
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
-        .map(({top, left}) => puzzle.solution?.[top]?.[left])
+        .map(({top, left}) => context.puzzle.solution?.[top]?.[left])
         .filter(value => value !== undefined)
         .map(value => value!);
 
-    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => puzzle.typeManager.areSameCellData(digit, actualDigit, puzzle, state, true))
+    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => context.puzzle.typeManager.areSameCellData(digit, actualDigit, context))
 
     return QuadConstraint(
         cellLiteral,

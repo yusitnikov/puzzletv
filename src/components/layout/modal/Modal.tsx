@@ -3,6 +3,9 @@ import {CSSProperties, ReactNode} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {globalPaddingCoeff, headerHeight, textColor, textHeightCoeff} from "../../app/globals";
 import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
+import { runInAction } from "mobx";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
 export interface ModalProps {
     cellSize: number;
@@ -12,7 +15,9 @@ export interface ModalProps {
     children: ReactNode;
 }
 
-export const Modal = ({cellSize, onClose, textAlign = "center", borderless, children}: ModalProps) => {
+export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "center", borderless, children}: ModalProps) {
+    profiler.trace();
+
     const padding = cellSize * globalPaddingCoeff;
 
     const puzzleContainer = usePuzzleContainer();
@@ -40,7 +45,7 @@ export const Modal = ({cellSize, onClose, textAlign = "center", borderless, chil
                     position: "absolute",
                     inset: 0,
                 }}
-                onClick={onClose}
+                onClick={onClose && (() => runInAction(onClose))}
             />
 
             <div
@@ -69,4 +74,4 @@ export const Modal = ({cellSize, onClose, textAlign = "center", borderless, chil
         </div>,
         document.body
     );
-};
+});

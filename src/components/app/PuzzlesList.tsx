@@ -5,6 +5,8 @@ import {getAllPuzzlesForPreview} from "../../data/puzzles/AllPuzzles";
 import {PuzzlesListItem} from "./PuzzlesListItem";
 import {useRaf} from "../../hooks/useRaf";
 import {useLastValueRef} from "../../hooks/useLastValueRef";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../utils/profiler";
 
 const gridGap = headerPadding;
 
@@ -12,7 +14,9 @@ interface PuzzlesListProps {
     onLoaded?: () => void;
 }
 
-export const PuzzlesList = ({onLoaded}: PuzzlesListProps) => {
+export const PuzzlesList = observer(({onLoaded}: PuzzlesListProps) => {
+    profiler.trace();
+
     const {width: windowWidth} = useWindowSize();
     const innerWidth = windowWidth - headerPadding * 2;
     const columnsCount = Math.max(Math.round(innerWidth / 400), 1);
@@ -42,4 +46,4 @@ export const PuzzlesList = ({onLoaded}: PuzzlesListProps) => {
             hide={puzzleIndex >= visiblePuzzlesCount}
         />)}
     </div>;
-};
+});

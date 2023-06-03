@@ -29,7 +29,6 @@ import {
 } from "./GameState";
 import {isSamePosition} from "../layout/Position";
 import {GestureFinishReason} from "../../utils/gestures";
-import {getReadOnlySafeOnStateChange} from "../../hooks/sudoku/useReadOnlySafeContext";
 import {Rect} from "../layout/Rect";
 import {CellWriteMode} from "./CellWriteMode";
 import {AnyPTM} from "./PuzzleTypeMap";
@@ -39,6 +38,7 @@ import {CornerDigitModeButton} from "../../components/sudoku/controls/CornerDigi
 import {CenterDigitModeButton} from "../../components/sudoku/controls/CenterDigitModeButton";
 import {ColorDigitModeButton} from "../../components/sudoku/controls/ColorDigitModeButton";
 import {PartiallyTranslatable} from "../translations/Translatable";
+import {settings} from "../layout/Settings";
 
 export interface CellWriteModeInfo<T extends AnyPTM> {
     mode: CellWriteMode | number;
@@ -105,7 +105,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         isActiveForPuzzle: ({disableColoring, enableShading}) => !disableColoring && !enableShading,
         secondaryButtonContent: (context, _, cellSize, index) => <CellBackground
             context={context}
-            colors={new CellDataSet(context.puzzle, [index])}
+            colors={[index]}
             size={cellSize}
         />,
     },
@@ -144,7 +144,7 @@ export const incrementCellWriteMode = <T extends AnyPTM>(allowedModes: CellWrite
 export const resolveDigitsCountInCellWriteMode = <T extends AnyPTM>(context: PuzzleContext<T>) => {
     const {
         puzzle,
-        state,
+        cellWriteModeInfo,
     } = context;
 
     const {
@@ -152,10 +152,8 @@ export const resolveDigitsCountInCellWriteMode = <T extends AnyPTM>(context: Puz
     } = puzzle;
 
     const {
-        processed: {
-            cellWriteModeInfo: {digitsCount: digitsCountFunc = digitsCount},
-        },
-    } = state;
+        digitsCount: digitsCountFunc = digitsCount,
+    } = cellWriteModeInfo;
 
     return typeof digitsCountFunc === "function"
         ? digitsCountFunc(context)
@@ -165,25 +163,18 @@ export const resolveDigitsCountInCellWriteMode = <T extends AnyPTM>(context: Puz
 export const useCellWriteModeHotkeys = <T extends AnyPTM>(context: PuzzleContext<T>) => {
     const {
         puzzle,
-        state,
-        onStateChange,
+        visibleCellWriteModeInfos,
+        persistentCellWriteMode,
     } = context;
 
     const {
         typeManager: {disableCellModeLetterShortcuts},
     } = puzzle;
 
-    const {
-        persistentCellWriteMode,
-        isShowingSettings,
-    } = state;
-
-    const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
-
-    const setCellWriteMode = (persistentCellWriteMode: CellWriteMode) => onStateChange({persistentCellWriteMode});
+    const setCellWriteMode = (persistentCellWriteMode: CellWriteMode) => context.onStateChange({persistentCellWriteMode});
 
     useEventListener(window, "keydown", (ev) => {
-        if (isShowingSettings) {
+        if (settings.isOpened) {
             return;
         }
 
@@ -191,7 +182,7 @@ export const useCellWriteModeHotkeys = <T extends AnyPTM>(context: PuzzleContext
         const ctrlKey = winCtrlKey || macCtrlKey;
         const anyKey = ctrlKey || shiftKey;
 
-        for (const [index, {mode}] of allowedCellWriteModes.entries()) {
+        for (const [index, {mode}] of visibleCellWriteModeInfos.entries()) {
             if (!disableCellModeLetterShortcuts && code === ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"][index] && !anyKey) {
                 setCellWriteMode(mode);
                 ev.preventDefault();
@@ -200,11 +191,11 @@ export const useCellWriteModeHotkeys = <T extends AnyPTM>(context: PuzzleContext
 
         switch (code) {
             case "PageUp":
-                setCellWriteMode(incrementCellWriteMode(allowedCellWriteModes, persistentCellWriteMode, -1));
+                setCellWriteMode(incrementCellWriteMode(visibleCellWriteModeInfos, persistentCellWriteMode, -1));
                 ev.preventDefault();
                 break;
             case "PageDown":
-                setCellWriteMode(incrementCellWriteMode(allowedCellWriteModes, persistentCellWriteMode, +1));
+                setCellWriteMode(incrementCellWriteMode(visibleCellWriteModeInfos, persistentCellWriteMode, +1));
                 ev.preventDefault();
                 break;
         }
@@ -229,7 +220,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
     setIsDeleteSelectedCellsStroke: (value: boolean) => void,
     fieldRect: Rect,
 ): GestureHandler<PuzzleContext<T>> => {
-    const onStateChange = getReadOnlySafeOnStateChange(context);
+    const {readOnlySafeContext} = context;
 
     const common: Pick<GestureHandler<PuzzleContext<T>>, "isValidGesture"> = {
         isValidGesture: (props) => isValidGesture(
@@ -245,34 +236,34 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
             ...common,
             onStart: ({extraData, event}) => {
                 const {ctrlKey, metaKey, shiftKey} = event;
-                const isMultiSelection = ctrlKey || metaKey || shiftKey || context.state.isMultiSelection;
+                const isMultiSelection = ctrlKey || metaKey || shiftKey || context.isMultiSelection;
 
                 if (!isCellGestureExtraData(extraData)) {
-                    return context;
+                    return context.clone();
                 }
 
                 const cellPosition = extraData.cell;
 
-                setIsDeleteSelectedCellsStroke(isMultiSelection && context.state.selectedCells.contains(cellPosition));
-                onStateChange(
-                    gameState => isMultiSelection
-                        ? gameStateToggleSelectedCells(gameState, [cellPosition])
-                        : gameStateSetSelectedCells(gameState, [cellPosition])
+                setIsDeleteSelectedCellsStroke(isMultiSelection && context.isSelectedCell(cellPosition.top, cellPosition.left));
+                readOnlySafeContext.onStateChange(
+                    (context) => isMultiSelection
+                        ? gameStateToggleSelectedCells(context, [cellPosition])
+                        : gameStateSetSelectedCells(context, [cellPosition])
                 );
 
-                return context;
+                return context.clone();
             },
             onContinue: ({prevData, currentData}) => {
                 const [prevCell, currentCell] = [prevData, currentData].map(
                     ({extraData}) => isCellGestureExtraData(extraData) && !extraData.skipEnter ? extraData.cell : undefined
                 );
                 if (currentCell && (!prevCell || !isSamePosition(prevCell, currentCell))) {
-                    onStateChange(gameState => gameStateToggleSelectedCells(gameState, [currentCell], !isDeleteSelectedCellsStroke));
+                    readOnlySafeContext.onStateChange((context) => gameStateToggleSelectedCells(context, [currentCell], !isDeleteSelectedCellsStroke));
                 }
             },
             onEnd: ({reason}) => {
                 if (reason === GestureFinishReason.startNewGesture) {
-                    onStateChange(gameStateClearSelectedCells);
+                    readOnlySafeContext.onStateChange(gameStateClearSelectedCells);
                 }
             },
             onDoubleClick: ({extraData, event: {ctrlKey, metaKey, shiftKey}}) => {
@@ -280,7 +271,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
                     return false;
                 }
 
-                onStateChange(gameStateHandleCellDoubleClick(
+                readOnlySafeContext.onStateChange(gameStateHandleCellDoubleClick(
                     context,
                     extraData.cell,
                     ctrlKey || metaKey || shiftKey
@@ -299,8 +290,8 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
             if (isCellGestureExtraData(extraData)) {
                 onCornerClick?.(props, context, extraData, !!button);
             }
-            onStateChange({gestureCellWriteMode: mode});
-            return context;
+            readOnlySafeContext.onStateChange({gestureCellWriteMode: mode});
+            return context.clone();
         },
         onContinue: (props) => {
             const {prevData: {extraData: prevData}, currentData: {extraData: currentData}} = props;
@@ -316,7 +307,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
         },
         onEnd: (props) => {
             onGestureEnd?.(props, context);
-            onStateChange({gestureCellWriteMode: undefined});
+            readOnlySafeContext.onStateChange({gestureCellWriteMode: undefined});
         },
         onContextMenu: ({event, extraData}) => {
             if (handlesRightMouseClick && getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode === mode) {

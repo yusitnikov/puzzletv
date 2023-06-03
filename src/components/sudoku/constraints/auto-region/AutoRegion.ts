@@ -8,8 +8,13 @@ export const AutoRegionConstraint = <T extends AnyPTM>(): Constraint<T> => {
         name: "auto-region",
         cells: [],
         props: undefined,
-        isValidCell(cell, digits, cells, {puzzle, cellsIndex, state}, constraints, isFinalCheck) {
-            const region = cellsIndex.getCustomRegionByBorderLinesAt(state, cell);
+        isValidCell(cell, digits, cells, context, constraints, isFinalCheck) {
+            const {
+                puzzle,
+                puzzleIndex,
+            } = context;
+
+            const region = puzzleIndex.getCustomRegionByBorderLinesAt(context, cell);
 
             const expectedSize = puzzle.digitsCount ?? getDefaultDigitsCount(puzzle);
 
@@ -21,7 +26,7 @@ export const AutoRegionConstraint = <T extends AnyPTM>(): Constraint<T> => {
                 return !isFinalCheck;
             }
 
-            return isValidCellForRegion(region, cell, digits, puzzle, state);
+            return isValidCellForRegion(region, cell, digits, context);
         },
     };
 };

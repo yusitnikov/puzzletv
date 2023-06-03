@@ -37,7 +37,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     digitComponentType: MonumentValleyDigitComponentType,
     cellDataComponentType: DigitCellDataComponentType(),
 
-    createCellDataByTypedDigit(digit, {puzzle, state: {angle}}, position) {
+    createCellDataByTypedDigit(digit, {puzzle, angle}, position) {
         if (!position) {
             return digit;
         }
@@ -76,8 +76,8 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         return {};
     },
 
-    processCellDataPosition(context, {left, top, angle}, dataSet, dataIndex, positionFunction, cellPosition, state): PositionWithAngle | undefined {
-        const angleDelta = roundToStep(state?.processed.animated.angle ?? 0, 90) * Math.PI / 180;
+    processCellDataPosition(context, {left, top, angle}, dataSet, dataIndex, positionFunction, cellPosition): PositionWithAngle | undefined {
+        const angleDelta = roundToStep(cellPosition ? context.animatedAngle : 0, 90) * Math.PI / 180;
         const sin = Math.sin(angleDelta);
         const cos = Math.cos(angleDelta);
 
@@ -141,9 +141,9 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
             return defaultPosition;
         };
 
-        cell = rotateCellCoords(cell, processedFieldSize, context.state.angle);
+        cell = rotateCellCoords(cell, processedFieldSize, context.angle);
         cell = process(xDirection, yDirection);
-        cell = rotateCellCoords(cell, processedFieldSize, -context.state.angle);
+        cell = rotateCellCoords(cell, processedFieldSize, -context.angle);
 
         return {cell};
     },
@@ -400,21 +400,6 @@ export const rotateCellCoords = (
 
     return position;
 };
-
-/*export const rotateCellCoords_ = (position, gridSize, intersectionSize, angle) => {
-        const {top, left} = position;
-
-        position = top < gridSize && left < gridSize && (top < gridSize - intersectionSize || left < gridSize - intersectionSize)
-            ? {
-                left: columnsCount - 1 - left,
-                top: gridSize - 1 - top,
-            }
-            : {
-                left: columnsCount - gridSize + intersectionSize - 1 - top,
-                top: intersectionSize - gridSize + left,
-            }
-    return position;
-};*/
 
 export const createMonumentValleyFieldSize = (
     gridSize: number,

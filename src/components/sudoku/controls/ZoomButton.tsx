@@ -5,17 +5,22 @@ import {ControlButton} from "./ControlButton";
 import {gameStateHandleZoomClick} from "../../../types/sudoku/GameState";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {useEventListener} from "../../../hooks/useEventListener";
+import {settings} from "../../../types/layout/Settings";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 const ZoomButton = <T extends AnyPTM>(increment: boolean, title: PartiallyTranslatable, hotkeys: string[], sign: string) =>
-    function ZoomButtonComponent({context, top, left}: ControlButtonItemProps<T>) {
-        const {state: {isShowingSettings}, cellSizeForSidePanel: cellSize} = context;
+    observer(function ZoomButtonComponent({context, top, left}: ControlButtonItemProps<T>) {
+        profiler.trace();
+
+        const {cellSizeForSidePanel: cellSize} = context;
 
         const translate = useTranslate();
 
         const handleAction = () => gameStateHandleZoomClick(context, increment);
 
         useEventListener(window, "keydown", (ev) => {
-            if (!isShowingSettings && hotkeys.includes((ev.shiftKey ? "Shift+" : "") + ev.code)) {
+            if (!settings.isOpened && hotkeys.includes((ev.shiftKey ? "Shift+" : "") + ev.code)) {
                 handleAction();
                 ev.preventDefault();
             }
@@ -30,7 +35,7 @@ const ZoomButton = <T extends AnyPTM>(increment: boolean, title: PartiallyTransl
         >
             {sign}
         </ControlButton>;
-    };
+    });
 
 export const ZoomInButton = <T extends AnyPTM>() => ZoomButton<T>(true, "zoom in", ["NumpadAdd", "Shift+Equal"], "+");
 

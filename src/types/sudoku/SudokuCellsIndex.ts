@@ -12,11 +12,8 @@ import {getRectPoints, Rect, transformRect} from "../layout/Rect";
 import {CustomCellBounds, TransformedCustomCellBounds} from "./CustomCellBounds";
 import {CellPart} from "./CellPart";
 import {PlainValueSet, SetInterface} from "../struct/Set";
-import {gameStateGetCurrentFieldState, ProcessedGameStateEx} from "./GameState";
 import {PuzzlePositionSet} from "./PuzzlePositionSet";
 import {PuzzleLineSet} from "./PuzzleLineSet";
-import {lazy} from "../../utils/lazy";
-import {FieldState} from "./FieldState";
 import {incrementArrayItemByIndex} from "../../utils/array";
 import {CellColorValue} from "./CellColor";
 import {LineWithColor} from "./LineWithColor";
@@ -58,15 +55,18 @@ export class SudokuCellsIndex<T extends AnyPTM> {
             };
 
             const customBounds = customCellBounds?.[top]?.[left];
-            const bounds: CustomCellBounds = customBounds || {
+            let bounds: CustomCellBounds = customBounds || {
                 borders: [getRectPoints(naiveRect)],
                 userArea: naiveRect,
             };
-            bounds.borders = bounds.borders.map(
-                border => this.isSamePosition(border[0], border[border.length - 1])
-                    ? border.slice(0, border.length - 1)
-                    : border
-            );
+            bounds = {
+                ...bounds,
+                borders: bounds.borders.map(
+                    border => this.isSamePosition(border[0], border[border.length - 1])
+                        ? border.slice(0, border.length - 1)
+                        : border
+                )
+            };
 
             return {
                 position: {top, left},
@@ -448,13 +448,11 @@ export class SudokuCellsIndex<T extends AnyPTM> {
 
     // region Custom regions
     // noinspection JSUnusedGlobalSymbols
-    getCustomRegionsByBorderLines(state: ProcessedGameStateEx<T>) {
+    getCustomRegionsByBorderLines(lines: SetInterface<Line>) {
         const map: SudokuCustomRegionsMap = {
             regions: [],
             map: {},
         };
-
-        const {lines} = gameStateGetCurrentFieldState(state);
 
         for (const [top, row] of this.allCells.entries()) {
             for (const left of row.keys()) {
@@ -475,13 +473,11 @@ export class SudokuCellsIndex<T extends AnyPTM> {
         };
     }
 
-    getCustomRegionByBorderLinesAt(state: ProcessedGameStateEx<T>, cell: Position) {
+    getCustomRegionByBorderLinesAt({lines}: PuzzleContext<T>, cell: Position) {
         const map: SudokuCustomRegionsMap = {
             regions: [],
             map: {},
         };
-
-        const {lines} = gameStateGetCurrentFieldState(state);
 
         return this.getCustomRegionByBorderLinesAtInternal(lines, cell, map);
     }
@@ -585,35 +581,6 @@ export class SudokuCellsIndex<T extends AnyPTM> {
     //endregion
 }
 
-export class SudokuCellsIndexForState<T extends AnyPTM> {
-    public readonly cache: Record<string, any> = {};
-
-    private readonly context: PuzzleContext<T>;
-    private readonly currentFieldState: FieldState<T>;
-
-    public readonly getCenterLineSegments = lazy(
-        () => this.puzzleIndex.getCenterLineSegments(this.currentFieldState.lines.items)
-    );
-
-    public readonly getAllCells = lazy(() => {
-        return this.puzzleIndex.allCells.map((row, top) => row.map(
-            ({getTransformedBounds, ...cell}, left): CellInfoForState => ({
-                ...cell,
-                transformedBounds: getTransformedBounds(this.context),
-                isVisible: this.puzzleIndex.getCellTypeProps({top, left}).isVisibleForState?.(this.context) !== false,
-            })
-        ));
-    });
-
-    constructor(
-        private puzzleIndex: SudokuCellsIndex<T>,
-        contextNoIndex: Omit<PuzzleContext<T>, "cellsIndexForState">,
-    ) {
-        this.context = {...contextNoIndex, cellsIndexForState: this};
-        this.currentFieldState = gameStateGetCurrentFieldState(contextNoIndex.state);
-    }
-}
-
 export interface SudokuCellPointInfo {
     position: Position;
     cells: SetInterface<Position>;
@@ -643,11 +610,6 @@ export interface CellInfo<T extends AnyPTM> {
     diagonalNeighbors: SetInterface<Position>;
     borderSegments: Record<string, SudokuCellBorderSegmentInfo>;
     isActive: boolean;
-}
-
-export interface CellInfoForState extends Omit<CellInfo<AnyPTM>, "getTransformedBounds"> {
-    transformedBounds: TransformedCustomCellBounds;
-    isVisible: boolean;
 }
 
 interface SudokuCustomRegionsMap {

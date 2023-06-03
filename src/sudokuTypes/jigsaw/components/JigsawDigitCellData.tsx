@@ -1,8 +1,12 @@
 import {CellDataProps, getDefaultCellDataColor} from "../../../components/sudoku/cell/CellDataProps";
 import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataComponentType";
 import {JigsawPTM} from "../types/JigsawPTM";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
-export const JigsawDigitCellData = (props: CellDataProps<JigsawPTM>) => {
+export const JigsawDigitCellData = observer(function JigsawDigitCellDataFc(props: CellDataProps<JigsawPTM>) {
+    profiler.trace();
+
     const {
         puzzle,
         data,
@@ -29,7 +33,7 @@ export const JigsawDigitCellData = (props: CellDataProps<JigsawPTM>) => {
         size={size}
         color={getDefaultCellDataColor(props)}
     />;
-};
+});
 
 export const JigsawDigitCellDataComponentType = (supportRotation90: boolean): CellDataComponentType<JigsawPTM> => ({
     component: JigsawDigitCellData,

@@ -7,6 +7,8 @@ import {getLineVector, Position, rotateVectorClockwise} from "../../../types/lay
 import {loop} from "../../../utils/math";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {lightGreyColor, veryDarkGreyColor} from "../../../components/app/globals";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 const pivotRadius = 0.15;
 const pivotLineWidth = pivotRadius * 0.1;
@@ -63,27 +65,31 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
             cells: [pivot],
             props: undefined,
             component: {
-                [FieldLayer.top]: ({cells: [{top, left}]}) => <AutoSvg top={top + 0.5} left={left + 0.5}>
-                    <circle
-                        r={pivotRadius}
-                        fill={"#BD8ABB"}
-                        stroke={veryDarkGreyColor}
-                        strokeWidth={pivotLineWidth}
-                    />
-                    <path
-                        d={[
-                            "M", 0, -pivotRadius,
-                            "A", pivotRadius, pivotRadius,
-                            roundedAnimatedAngle, roundedAnimatedAngle < 180 ? 0 : 1, 1,
-                            pivotDirection.left, pivotDirection.top,
-                            "L", 0, 0,
-                            "z"
-                        ].join(" ")}
-                        fill={lightGreyColor}
-                        stroke={veryDarkGreyColor}
-                        strokeWidth={pivotLineWidth}
-                    />
-                </AutoSvg>,
+                [FieldLayer.top]: observer(function RotatableCluePivot({cells: [{top, left}]}) {
+                    profiler.trace();
+
+                    return <AutoSvg top={top + 0.5} left={left + 0.5}>
+                        <circle
+                            r={pivotRadius}
+                            fill={"#BD8ABB"}
+                            stroke={veryDarkGreyColor}
+                            strokeWidth={pivotLineWidth}
+                        />
+                        <path
+                            d={[
+                                "M", 0, -pivotRadius,
+                                "A", pivotRadius, pivotRadius,
+                                roundedAnimatedAngle, roundedAnimatedAngle < 180 ? 0 : 1, 1,
+                                pivotDirection.left, pivotDirection.top,
+                                "L", 0, 0,
+                                "z"
+                            ].join(" ")}
+                            fill={lightGreyColor}
+                            stroke={veryDarkGreyColor}
+                            strokeWidth={pivotLineWidth}
+                        />
+                    </AutoSvg>;
+                }),
             },
             renderSingleCellInUserArea: true,
             isObvious: true,
@@ -91,7 +97,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                 lines,
                 digits,
                 regionCells,
-                {cellsIndex: {allCells}},
+                {puzzleIndex: {allCells}},
             ): boolean {
                 // Verify that the rotated cells are still within the grid
                 return processedCells.every(({top, left}) => allCells[top]?.[left]);

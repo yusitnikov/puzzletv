@@ -8,6 +8,7 @@ import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponen
 import {MonumentValleyPTM} from "../types/MonumentValleyPTM";
 import {DigitRotationInfo} from "../../../components/sudoku/digit/DigitRotationInfo";
 import {loop} from "../../../utils/math";
+import {observer} from "mobx-react-lite";
 
 const width = 0.12;
 
@@ -171,24 +172,36 @@ const svgMap: Record<number, ReactElement> = {
     </>,
 };
 
-export const MonumentValleyDigit = profiler.memo<DigitProps<MonumentValleyPTM>>("MonumentValleyDigit", (
-    {puzzle, digit, size, color = textColor, ...containerProps}
-) => <AutoSvg
-    width={size}
-    height={size}
-    {...containerProps}
->
-    <MonumentValleyDigitSvgContent
-        puzzle={puzzle}
-        digit={digit}
-        size={size}
-        color={color}
-    />
-</AutoSvg>);
+export const MonumentValleyDigit = observer(function MonumentValleyDigit(
+    {
+        puzzle,
+        digit,
+        size,
+        color = textColor,
+        ...containerProps
+    }: DigitProps<MonumentValleyPTM>
+) {
+    profiler.trace();
 
-export const MonumentValleyDigitSvgContent = profiler.memo<DigitProps<MonumentValleyPTM>>("MonumentValleyDigitSvgContent", (
-    {digit, size, color, left = 0, top = 0}
-) => {
+    return <AutoSvg
+        width={size}
+        height={size}
+        {...containerProps}
+    >
+        <MonumentValleyDigitSvgContent
+            puzzle={puzzle}
+            digit={digit}
+            size={size}
+            color={color}
+        />
+    </AutoSvg>;
+});
+
+export const MonumentValleyDigitSvgContent = observer(function MonumentValleyDigitSvgContent(
+    {digit, size, color, left = 0, top = 0}: DigitProps<MonumentValleyPTM>
+) {
+    profiler.trace();
+
     return <g
         transform={`translate(${left} ${top}) scale(${size * 0.7})`}
         color={color}

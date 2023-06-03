@@ -1,5 +1,6 @@
 import {useEffect} from "react";
 import {useLastValueRef} from "./useLastValueRef";
+import {runInAction} from "mobx";
 
 export function useEventListener<K extends keyof WindowEventMap>(
     target: Window,
@@ -25,7 +26,7 @@ export function useEventListener<E extends Event>(
     const handlerRef = useLastValueRef(handler);
 
     useEffect(() => {
-        const handlerInstance = (ev: Event) => handlerRef.current(ev as E);
+        const handlerInstance = (ev: Event) => runInAction(() => handlerRef.current(ev as E));
         target.addEventListener(eventName, handlerInstance);
         return () => target.removeEventListener(eventName, handlerInstance);
     }, [target, eventName, handlerRef]);

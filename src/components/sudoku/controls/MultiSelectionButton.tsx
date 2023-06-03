@@ -1,17 +1,20 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButton} from "./ControlButton";
-import {saveBoolToLocalStorage} from "../../../utils/localStorage";
-import {LocalStorageKeys} from "../../../data/LocalStorageKeys";
 import {Grid} from "@emotion-icons/fluentui-system-filled";
 import {CellSelectionColor} from "../cell/CellSelection";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
-export const MultiSelectionButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
+export const MultiSelectionButton: ControlButtonItemPropsGenericFc = observer(function MultiSelectionButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
     const {
         cellSizeForSidePanel: cellSize,
-        state: {isMultiSelection},
-        onStateChange,
+        isMultiSelection,
     } = context;
 
     const translate = useTranslate();
@@ -22,13 +25,9 @@ export const MultiSelectionButton = <T extends AnyPTM>({context, top, left}: Con
         cellSize={cellSize}
         innerBorderWidth={1}
         checked={isMultiSelection}
-        onClick={() => {
-            const newValue = !isMultiSelection;
-            onStateChange({isMultiSelection: newValue});
-            saveBoolToLocalStorage(LocalStorageKeys.enableMultiSelection, newValue);
-        }}
+        onClick={() => context.onStateChange({isMultiSelection: !isMultiSelection})}
         title={translate("Multi-selection")}
     >
         <Grid color={CellSelectionColor.mainCurrent}/>
     </ControlButton>;
-};
+});

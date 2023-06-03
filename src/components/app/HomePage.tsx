@@ -1,8 +1,12 @@
 import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {buildLink} from "../../utils/link";
+import {profiler} from "../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
-export const HomePage = () => {
+export const HomePage = observer(function HomePage() {
+    profiler.trace();
+
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -42,4 +46,4 @@ export const HomePage = () => {
             })}
         </p>
     </>;
-};
+});

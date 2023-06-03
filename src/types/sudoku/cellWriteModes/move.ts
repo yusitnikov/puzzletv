@@ -45,7 +45,7 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
         });
         gameStateApplyFieldDragGesture(
             context,
-            startContext.state,
+            startContext,
             screenToField(startMetrics),
             screenToField(currentMetrics),
             false,
@@ -54,7 +54,9 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
     },
     onGestureEnd: (
         props,
-        {
+        context
+    ) => {
+        const {
             puzzle: {
                 typeManager: {
                     angleStep,
@@ -65,22 +67,23 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
                     isFreeScale,
                 },
             },
-            onStateChange,
-        }
-    ) => onStateChange(({angle, scale}) => {
-        let result: PartialGameStateEx<T> = {animating: true};
-        if (allowRotation && !isFreeRotation && angleStep) {
-            result = {
-                ...result,
-                angle: roundToStep(angle, angleStep),
-            };
-        }
-        if (allowScale && !isFreeScale) {
-            result = {
-                ...result,
-                scale: getAbsoluteScaleByLog(Math.round(getScaleLog(scale, scaleStep)), scaleStep),
-            };
-        }
-        return result;
-    }),
+        } = context;
+
+        context.onStateChange(({angle, scale}) => {
+            let result: PartialGameStateEx<T> = {animating: true};
+            if (allowRotation && !isFreeRotation && angleStep) {
+                result = {
+                    ...result,
+                    angle: roundToStep(angle, angleStep),
+                };
+            }
+            if (allowScale && !isFreeScale) {
+                result = {
+                    ...result,
+                    scale: getAbsoluteScaleByLog(Math.round(getScaleLog(scale, scaleStep)), scaleStep),
+                };
+            }
+            return result;
+        });
+    },
 });

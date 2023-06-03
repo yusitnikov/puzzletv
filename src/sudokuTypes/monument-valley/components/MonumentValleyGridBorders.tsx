@@ -4,16 +4,20 @@ import {darkGreyColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray} from "../../../types/layout/Position";
 import {parseMonumentValleyFieldSize} from "../types/MonumentValleyTypeManager";
 import {MonumentValleyPTM} from "../types/MonumentValleyPTM";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export const MonumentValleyGridBorders = {
-    [FieldLayer.lines]: (
+    [FieldLayer.lines]: observer(function MonumentValleyGridBorders(
         {
             context: {
                 puzzle: {fieldSize},
-                state: {processed: {isMyTurn}},
+                isMyTurn,
             }
         }: ConstraintProps<MonumentValleyPTM>
-    ) => {
+    ) {
+        profiler.trace();
+
         const {gridSize, intersectionSize, columnsCount, rowsCount} = parseMonumentValleyFieldSize(fieldSize);
 
         return <polygon
@@ -34,7 +38,7 @@ export const MonumentValleyGridBorders = {
             fill={isMyTurn ? textColor : darkGreyColor}
             strokeWidth={0}
         />;
-    },
+    }),
 };
 
 export const MonumentValleyGridBordersConstraint = (): Constraint<MonumentValleyPTM> => {

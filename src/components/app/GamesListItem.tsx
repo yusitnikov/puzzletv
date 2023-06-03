@@ -1,5 +1,7 @@
 import {ReactNode} from "react";
 import {useTranslate} from "../../hooks/useTranslate";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../utils/profiler";
 
 export interface GamesListItemProps {
     name: string;
@@ -10,7 +12,9 @@ export interface GamesListItemProps {
     children: ReactNode;
 }
 
-export const GamesListItem = ({name, imageUrl, imageSize = 300, author, playLink, children}: GamesListItemProps) => {
+export const GamesListItem = observer(function GamesListItem({name, imageUrl, imageSize = 300, author, playLink, children}: GamesListItemProps) {
+    profiler.trace();
+
     const translate = useTranslate();
 
     return <>
@@ -40,4 +44,4 @@ export const GamesListItem = ({name, imageUrl, imageSize = 300, author, playLink
             {author && <p>{translate("Game idea")}: {author}</p>}
         </div>
     </>;
-};
+});

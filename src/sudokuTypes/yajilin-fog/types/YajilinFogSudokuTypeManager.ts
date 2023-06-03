@@ -5,7 +5,6 @@ import {PuzzleLineSet} from "../../../types/sudoku/PuzzleLineSet";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {indexes} from "../../../utils/indexes";
 import {FogConstraint, FogProps, fogTag} from "../../../components/sudoku/constraints/fog/Fog";
-import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 
@@ -105,9 +104,7 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
             const originalResultChecker = puzzle.resultChecker;
             if (originalResultChecker && typeof initialColors === "object") {
                 puzzle.resultChecker = (context) => {
-                    const {state, cellsIndex} = context;
-
-                    const {cells, lines} = gameStateGetCurrentFieldState(state, true);
+                    const {puzzleIndex, currentFieldStateWithFogDemo: {cells, lines}} = context;
 
                     if (
                         Object.keys(yajilinFogShadeSolution).length &&
@@ -128,7 +125,7 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                         yajilinFogLineSolution.size &&
                         !new PuzzleLineSet(
                             puzzle,
-                            cellsIndex.getCenterLines(lines.items, true)
+                            puzzleIndex.getCenterLines(lines.items, true)
                         ).equals(yajilinFogLineSolution)
                     ) {
                         return false;

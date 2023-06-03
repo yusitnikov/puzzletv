@@ -7,10 +7,12 @@ import {
     Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 const lineWidth = 0.03;
 
@@ -19,10 +21,12 @@ export interface LittleKillerProps {
     sum?: number;
 }
 
-export const LittleKiller = {
-    [FieldLayer.regular]: <T extends AnyPTM>(
+export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
+    [FieldLayer.regular]: observer(function LittleKiller<T extends AnyPTM>(
         {context: {puzzle}, cells: [{top, left}], props: {direction, sum}}: ConstraintProps<T, LittleKillerProps>
-    ) => {
+    ) {
+        profiler.trace();
+
         const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent}}} = puzzle;
 
         top += 0.5;
@@ -67,7 +71,7 @@ export const LittleKiller = {
                 top={top - 0.5 * direction.top}
             />}
         </>;
-    },
+    }),
 };
 
 export const getLittleKillerCellsByStartAndDirection = (

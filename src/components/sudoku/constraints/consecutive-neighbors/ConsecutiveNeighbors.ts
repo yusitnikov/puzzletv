@@ -30,7 +30,7 @@ const BaseNeighborsConstraint = <T extends AnyPTM>(
             constraints
         ) {
             const {top, left} = cell;
-            const {puzzle, cellsIndex} = context;
+            const {puzzle, puzzleIndex} = context;
             const {typeManager: {getDigitByCellData}} = puzzle;
 
             const digit = getDigitByCellData(digits[top][left]!, context, cell);
@@ -47,7 +47,7 @@ const BaseNeighborsConstraint = <T extends AnyPTM>(
                 }
             }
 
-            return cellsIndex.allCells[top][left].neighbors.items.every((cell2) => {
+            return puzzleIndex.allCells[top][left].neighbors.items.every((cell2) => {
                 if (excludedCellsMap.contains({start: cell, end: cell2})) {
                     return true;
                 }

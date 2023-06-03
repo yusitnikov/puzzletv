@@ -1,10 +1,12 @@
 import {headerPadding, lighterGreyColor} from "./globals";
-import React from "react";
+import React, {ReactElement} from "react";
 import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {buildLink} from "../../utils/link";
 import {FieldPreview} from "../sudoku/field/FieldPreview";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../utils/profiler";
 
 const padding = headerPadding;
 
@@ -14,7 +16,9 @@ export interface PuzzlesListItemProps<T extends AnyPTM> {
     hide?: boolean;
 }
 
-export const PuzzlesListItem = <T extends AnyPTM>({puzzle, width, hide}: PuzzlesListItemProps<T>) => {
+export const PuzzlesListItem = observer(function PuzzlesListItem<T extends AnyPTM>({puzzle, width, hide}: PuzzlesListItemProps<T>) {
+    profiler.trace();
+
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -44,4 +48,4 @@ export const PuzzlesListItem = <T extends AnyPTM>({puzzle, width, hide}: Puzzles
         <div><strong>{translate(puzzle.title)}</strong></div>
         {puzzle.author && <div style={{marginTop: padding}}>{translate("by")} {translate(puzzle.author)}</div>}
     </a>;
-};
+}) as <T extends AnyPTM>(props: PuzzlesListItemProps<T>) => ReactElement;

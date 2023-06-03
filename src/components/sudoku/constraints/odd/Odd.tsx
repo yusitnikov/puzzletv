@@ -1,16 +1,22 @@
 import {lightGreyColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
-export const Odd = {
-    [FieldLayer.beforeSelection]: <T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T>) => <circle
-        cx={left + 0.5}
-        cy={top + 0.5}
-        r={0.4}
-        fill={lightGreyColor}
-    />,
+export const Odd: ConstraintPropsGenericFcMap = {
+    [FieldLayer.beforeSelection]: observer(function Odd<T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T>) {
+        profiler.trace();
+
+        return <circle
+            cx={left + 0.5}
+            cy={top + 0.5}
+            r={0.4}
+            fill={lightGreyColor}
+        />;
+    }),
 };
 
 export const OddConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral, visible = true): Constraint<T> => {

@@ -1,14 +1,22 @@
 import {getLineVector, parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
 import {blackColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFcMap
+} from "../../../../types/sudoku/Constraint";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 const radius = 0.15;
 const lineWidth = 0.03;
 
-export const Greater = {
-    [FieldLayer.afterLines]: <T extends AnyPTM>({cells: [greaterCell, lessCell]}: ConstraintProps<T>) => {
+export const Greater: ConstraintPropsGenericFcMap = {
+    [FieldLayer.afterLines]: observer(function Greater<T extends AnyPTM>({cells: [greaterCell, lessCell]}: ConstraintProps<T>) {
+        profiler.trace();
+
         const {left: dx, top: dy} = getLineVector({start: greaterCell, end: lessCell});
 
         return <g
@@ -32,7 +40,7 @@ export const Greater = {
                 stroke={blackColor}
             />
         </g>;
-    },
+    }),
 };
 
 export const GreaterConstraint = <T extends AnyPTM>(greaterCellLiteral: PositionLiteral, lessCellLiteral: PositionLiteral): Constraint<T> => {
@@ -42,12 +50,12 @@ export const GreaterConstraint = <T extends AnyPTM>(greaterCellLiteral: Position
         component: Greater,
         props: undefined,
         isObvious: true,
-        isValidCell(cell, digits, [greaterCell, lessCell], {puzzle, state}) {
+        isValidCell(cell, digits, [greaterCell, lessCell], context) {
             const greaterDigit = digits[greaterCell.top]?.[greaterCell.left];
             const lessDigit = digits[lessCell.top]?.[lessCell.left];
 
             return greaterDigit === undefined || lessDigit === undefined
-                || puzzle.typeManager.compareCellData(greaterDigit, lessDigit, puzzle, state, true) > 0;
+                || context.puzzle.typeManager.compareCellData(greaterDigit, lessDigit, context) > 0;
         },
     });
 };

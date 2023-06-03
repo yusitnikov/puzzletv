@@ -1,4 +1,4 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {ControlButton} from "./ControlButton";
 import {Check} from "@emotion-icons/material";
 import {Modal} from "../../layout/modal/Modal";
@@ -6,17 +6,26 @@ import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff, textColor} from "../../app/globals";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useMemo, useState} from "react";
-import {PuzzleResultCheck} from "../../../types/sudoku/PuzzleResultCheck";
 import {useEffectExceptInit} from "../../../hooks/useEffectExceptInit";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
-export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
+export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(function ResultCheckButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
     const {
         cellSizeForSidePanel: cellSize,
         puzzle,
-        state,
         multiPlayer: {isEnabled, allPlayerIds, myPendingMessages},
+        lmdSolutionCode,
+        openedLmdOnce,
+        lives,
+        fogDemoFieldStateHistory,
     } = context;
 
     const {
@@ -24,7 +33,6 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
         typeManager,
         resultChecker,
         forceAutoCheckOnFinish = false,
-        getLmdSolutionCode,
     } = puzzle;
 
     const {
@@ -32,42 +40,13 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
         onCloseCorrectResultPopup,
     } = typeManager;
 
-    const {
-        openedLmdOnce,
-        lives,
-        fogDemoFieldStateHistory,
-    } = state;
-
     const isLmdAllowed = !!params?.lmd;
 
     const translate = useTranslate();
 
     const [isShowingResult, setIsShowingResult] = useState(false);
 
-    const {isCorrectResult, resultPhrase} = useMemo(
-        (): PuzzleResultCheck<string> => {
-            if (lives === 0) {
-                return {
-                    isCorrectResult: false,
-                    resultPhrase: translate("You lost") + "!",
-                };
-            }
-
-            const result = resultChecker?.(context) ?? false;
-            return typeof result === "boolean"
-                ? {
-                    isCorrectResult: result,
-                    resultPhrase: result
-                        ? `${translate("Absolutely right")}!`
-                        : `${translate("Something's wrong here")}...`
-                }
-                : {
-                    isCorrectResult: result.isCorrectResult,
-                    resultPhrase: translate(result.resultPhrase),
-                };
-        },
-        [resultChecker, context, translate, lives]
-    );
+    const {isCorrectResult, resultPhrase} = context.resultCheck;
 
     const handleCheckResult = () => setIsShowingResult(true);
     const handleCloseCheckResult = () => {
@@ -77,9 +56,7 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
         }
     };
 
-    const lmdSolutionCode = useMemo(() => getLmdSolutionCode?.(puzzle, state), [getLmdSolutionCode, puzzle, state]);
-
-    const autoCheckOnFinish = state.autoCheckOnFinish || forceAutoCheckOnFinish;
+    const autoCheckOnFinish = settings.autoCheckOnFinish.get() || forceAutoCheckOnFinish;
     useEffectExceptInit(() => {
         if (autoCheckOnFinish && resultChecker && isCorrectResult) {
             setIsShowingResult(true);
@@ -92,6 +69,7 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
         }
     }, [lives]);
 
+    // TODO: probably wrong useMemo usage
     const playerScores = useMemo(
         () => allPlayerIds
             .map(clientId => ({
@@ -175,4 +153,4 @@ export const ResultCheckButton = <T extends AnyPTM>({context, top, left}: Contro
             </div>
         </Modal>}
     </>;
-};
+});

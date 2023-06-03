@@ -1,5 +1,4 @@
-import {ReactElement} from "react";
-import {SetInterface} from "../../../types/struct/Set";
+import React, {ReactElement, useMemo} from "react";
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {CellColorValue, resolveCellColorValue} from "../../../types/sudoku/CellColor";
@@ -7,50 +6,104 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FieldCellShape} from "../field/FieldCellShape";
 import {getRegionBoundingBox} from "../../../utils/regions";
 import {getTransformedRectCenter, Rect} from "../../../types/layout/Rect";
-import {profiler} from "../../../utils/profiler";
-import {usePureMemo} from "../../../hooks/usePureMemo";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {comparer} from "mobx";
+import {settings} from "../../../types/layout/Settings";
+import {useComputed, useComputedValue} from "../../../hooks/useComputed";
+import {profiler} from "../../../utils/profiler";
+
+export interface FieldCellBackgroundProps<T extends AnyPTM> extends Position {
+    context: PuzzleContext<T>;
+    noGivenColors?: boolean;
+}
+
+export const FieldCellBackground = observer(function FieldCellBackground<T extends AnyPTM>({context, noGivenColors, top, left}: FieldCellBackgroundProps<T>) {
+    profiler.trace();
+
+    const cellPosition = useMemo((): Position => ({top, left}), [top, left]);
+
+    const colors = context.getCellColors(top, left).items;
+    const initialCellColors = useComputedValue(
+        () => noGivenColors ? undefined : context.puzzleInitialColors[top]?.[left],
+        {
+            name: `FieldCellBackground:initialCellColors[${top}][${left}]`,
+            equals: comparer.structural,
+        },
+        [noGivenColors, top, left]
+    );
+    const finalColors = context.puzzle.allowOverridingInitialColors
+        ? (colors.length ? colors : (initialCellColors ?? []))
+        : (initialCellColors ?? colors);
+
+    if (!finalColors.length) {
+        return null;
+    }
+
+    return <CellBackground
+        context={context}
+        cellPosition={cellPosition}
+        colors={finalColors}
+        noOpacity={!!initialCellColors?.length}
+    />;
+}) as <T extends AnyPTM>(props: FieldCellBackgroundProps<T>) => ReactElement | null;
 
 export interface CellBackgroundProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     cellPosition?: Position;
-    colors: SetInterface<CellColorValue>;
+    colors: CellColorValue[];
     size?: number;
     noOpacity?: boolean;
 }
 
-export const CellBackground = <T extends AnyPTM>({context, cellPosition, colors, noOpacity, size = 1}: CellBackgroundProps<T>) => {
+export const CellBackground = observer(function CellBackground<T extends AnyPTM>({context, cellPosition, colors, noOpacity, size = 1}: CellBackgroundProps<T>) {
+    profiler.trace();
+
     if (context.puzzle.disableBackgroundColorOpacity) {
         noOpacity = true;
     }
 
-    colors = colors.sorted();
-    cellPosition = usePureMemo(cellPosition);
+    const getCustomBounds = useComputed(
+        () => cellPosition && context.getCellTransformedBounds(cellPosition.top, cellPosition.left),
+        {name: `CellBackground:customBounds[${cellPosition?.top}][${cellPosition?.left}]`},
+        [cellPosition]
+    );
+    const getAreCustomBounds = useComputed(
+        () => cellPosition && !!getCustomBounds && context.puzzleIndex.allCells[cellPosition.top][cellPosition.left].areCustomBounds,
+        {name: `CellBackground:areCustomBounds[${cellPosition?.top}][${cellPosition?.left}]`},
+        [cellPosition, getCustomBounds]
+    );
 
-    const cellInfo = cellPosition && context.cellsIndexForState.getAllCells()[cellPosition.top][cellPosition.left];
-    const customBounds = usePureMemo(() => cellInfo?.transformedBounds, [cellInfo]);
-    const areCustomBounds = cellInfo?.areCustomBounds && !!customBounds;
-
-    const customCellRect: Rect = usePureMemo(
-        () => areCustomBounds
-            ? getRegionBoundingBox(customBounds.borders.flat(), 0)
+    const getCustomCellRect = useComputed(
+        (): Rect => getAreCustomBounds()
+            ? getRegionBoundingBox(getCustomBounds()!.borders.flat(), 0)
             : {
                 left: 0,
                 top: 0,
                 width: size,
                 height: size,
             },
-        [areCustomBounds, customBounds, size]
+        {name: `CellBackground:customCellRect[${cellPosition?.top}][${cellPosition?.left}]`},
+        [getAreCustomBounds, getCustomBounds, size]
     );
-    const customCellCenter: Position = usePureMemo(
-        () => areCustomBounds
-            ? getTransformedRectCenter(customBounds.userArea)
+    const getCustomCellCenter = useComputed(
+        (): Position => getAreCustomBounds()
+            ? getTransformedRectCenter(getCustomBounds()!.userArea)
             : {
                 left: size / 2,
                 top: size / 2,
             },
-        [areCustomBounds, customBounds, size]
+        {name: `CellBackground:customCellCenter[${cellPosition?.top}][${cellPosition?.left}]`},
+        [getAreCustomBounds, getCustomBounds, size]
     );
+
+    if (!colors.length) {
+        return null;
+    }
+
+    const customCellRect = getCustomCellRect();
+    const customCellCenter = getCustomCellCenter();
+
     const customCellRadius = Math.max(
         customCellCenter.left - customCellRect.left,
         customCellRect.left + customCellRect.width - customCellCenter.left,
@@ -58,40 +111,9 @@ export const CellBackground = <T extends AnyPTM>({context, cellPosition, colors,
         customCellRect.top + customCellRect.height - customCellCenter.top,
     );
 
-    if (!colors.size) {
-        return null;
-    }
+    const clip = colors.length > 1 || !!getAreCustomBounds();
+    const opacity = noOpacity ? 1 : settings.backgroundOpacity.get();
 
-    // TODO: don't pass context
-    return <CellBackgroundByData
-        context={context}
-        cellPosition={cellPosition}
-        colors={colors}
-        size={size}
-        clip={colors.size > 1 || !!cellInfo?.areCustomBounds}
-        opacity={noOpacity ? 1 : context.state.backgroundOpacity}
-        customCellRect={customCellRect}
-        customCellCenter={customCellCenter}
-        customCellRadius={customCellRadius}
-    />;
-};
-
-export interface CellBackgroundByDataProps<T extends AnyPTM> {
-    context: PuzzleContext<T>;
-
-    cellPosition?: Position;
-    colors: SetInterface<CellColorValue>;
-    size: number;
-    clip: boolean;
-    opacity: number;
-    customCellRect: Rect;
-    customCellCenter: Position;
-    customCellRadius: number;
-}
-
-export const CellBackgroundByData = profiler.memo("CellBackgroundByData", <T extends AnyPTM>(
-    {context, cellPosition, colors, size, clip, opacity, customCellRect, customCellCenter, customCellRadius}: CellBackgroundByDataProps<T>
-) => {
     return <AutoSvg
         width={size}
         height={size}
@@ -103,13 +125,13 @@ export const CellBackgroundByData = profiler.memo("CellBackgroundByData", <T ext
             y={customCellRect.top}
             width={customCellRect.width}
             height={customCellRect.height}
-            fill={resolveCellColorValue(colors.first()!)}
+            fill={resolveCellColorValue(colors[0])}
             stroke={"none"}
             strokeWidth={0}
         />
 
-        {colors.size > 1 && <>
-            {colors.items.map((color, index) => !!index && <polygon
+        {colors.length > 1 && <>
+            {colors.map((color, index) => !!index && <polygon
                 key={index}
                 points={formatSvgPointsArray(
                     [
@@ -118,7 +140,7 @@ export const CellBackgroundByData = profiler.memo("CellBackgroundByData", <T ext
                         [1, index],
                         [1, index + 0.5]
                     ]
-                        .map(([y, i]) => [y * customCellRadius * 4, Math.PI * (2 * i / colors.size - 0.25)])
+                        .map(([y, i]) => [y * customCellRadius * 4, Math.PI * (2 * i / colors.length - 0.25)])
                         .map(([y, a]) => ({
                             left: customCellCenter.left + y * Math.cos(a),
                             top: customCellCenter.top + y * Math.sin(a),
@@ -128,4 +150,4 @@ export const CellBackgroundByData = profiler.memo("CellBackgroundByData", <T ext
             />)}
         </>}
     </AutoSvg>;
-}) as <T extends AnyPTM>(props: CellBackgroundByDataProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: CellBackgroundProps<T>) => ReactElement;

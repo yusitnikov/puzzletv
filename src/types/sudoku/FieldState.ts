@@ -16,6 +16,7 @@ import {PuzzleLineSet} from "./PuzzleLineSet";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {myClientId} from "../../hooks/useMultiPlayer";
 import {PuzzleLine} from "./PuzzleLine";
+import {PuzzleContext} from "./PuzzleContext";
 
 export interface FieldState<T extends AnyPTM> {
     cells: CellState<T>[][];
@@ -115,7 +116,7 @@ export const isAnyFieldStateCell = <T extends AnyPTM>(
     affectedCells.some((position) => predicate(fieldState.cells[position.top][position.left], position));
 
 export const areFieldStatesEqual = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>,
+    context: PuzzleContext<T>,
     {cells, lines, marks, extension}: FieldState<T>,
     {cells: cells2, lines: lines2, marks: marks2, extension: extension2}: FieldState<T>
 ) => {
@@ -123,11 +124,11 @@ export const areFieldStatesEqual = <T extends AnyPTM>(
         typeManager: {
             areFieldStateExtensionsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b),
         },
-    } = puzzle;
+    } = context.puzzle;
 
     return cells.every(
             (row, rowIndex) => row.every(
-                (cell, columnIndex) => areCellStatesEqual(puzzle, cell, cells2[rowIndex][columnIndex])
+                (cell, columnIndex) => areCellStatesEqual(context, cell, cells2[rowIndex][columnIndex])
             )
         ) &&
         lines.equals(lines2) &&

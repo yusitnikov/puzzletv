@@ -8,27 +8,27 @@ import {GoogleMapsOverlay} from "./GoogleMapsOverlay";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {AnyGoogleMapsPTM} from "../types/GoogleMapsPTM";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
 export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLiteral) =>
-    function GoogleMapsFieldWrapperComponent<T extends AnyGoogleMapsPTM>(
-        {
-            context: {
-                puzzle: {fieldSize: {fieldSize}},
-                state: {
-                    isShowingSettings,
-                    processed: {cellWriteMode, isReady},
-                    extension: {map},
-                },
-                onStateChange,
-                cellSize,
-            },
-            children
-        }: PropsWithChildren<PuzzleContextProps<T>>
+    observer(function GoogleMapsFieldWrapperComponent<T extends AnyGoogleMapsPTM>(
+        {context, children}: PropsWithChildren<PuzzleContextProps<T>>
     ) {
+        profiler.trace();
+
+        const {
+            puzzle: {fieldSize: {fieldSize}},
+            cellWriteMode,
+            stateExtension: {map},
+            cellSize,
+        } = context;
+
         const isDragMode = cellWriteMode === CellWriteMode.move;
 
         useEventListener(window, "keydown", ({key}) => {
-            if (isShowingSettings || !isReady) {
+            if (settings.isOpened || !context.isReady) {
                 return;
             }
 
@@ -61,20 +61,20 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                     gestureHandling={isDragMode ? "auto" : "none"}
                     onReady={(map) => {
                         map.fitBounds(initialBounds, 0);
-                        onStateChange(() => ({
+                        context.onStateChange({
                             extension: {map} as Partial<T["stateEx"]>
-                        }));
+                        });
                     }}
-                    onOverlayReady={(overlay) => onStateChange({
+                    onOverlayReady={(overlay) => context.onStateChange({
                         extension: {overlay} as Partial<T["stateEx"]>
                     })}
-                    onRender={(renderVersion) => onStateChange({
+                    onRender={(renderVersion) => context.onStateChange({
                         extension: {renderVersion} as Partial<T["stateEx"]>
                     })}
-                    onCenterChanged={(ev) => onStateChange({
+                    onCenterChanged={(ev) => context.onStateChange({
                         extension: {center: latLngLiteralToPosition(ev.center)} as Partial<T["stateEx"]>
                     })}
-                    onZoomChanged={(ev) => onStateChange({
+                    onZoomChanged={(ev) => context.onStateChange({
                         extension: {zoom: ev.zoom} as Partial<T["stateEx"]>
                     })}
                     onClick={(ev) => console.debug("google maps click", ev.latLng.toJSON())}
@@ -89,4 +89,4 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                 </GoogleMap>
             </div>
         </GoogleMapsContainer>;
-    };
+    });

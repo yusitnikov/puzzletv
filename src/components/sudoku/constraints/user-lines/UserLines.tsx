@@ -1,15 +1,12 @@
-import {useMemo} from "react";
 import {getRegionBorderWidth, lightGreyColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     Constraint,
     ConstraintProps,
-    getAllPuzzleConstraints,
+    ConstraintPropsGenericFcMap,
     getInvalidUserLines,
-    prepareGivenDigitsMapForConstraints
 } from "../../../../types/sudoku/Constraint";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {gameStateGetCurrentFieldState} from "../../../../types/sudoku/GameState";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {CellMark, CellMarkType} from "../../../../types/sudoku/CellMark";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
@@ -18,37 +15,43 @@ import {DragAction} from "../../../../types/sudoku/DragAction";
 import {resolveCellColorValue} from "../../../../types/sudoku/CellColor";
 import {LineWithColor} from "../../../../types/sudoku/LineWithColor";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
-import {HashSet} from "../../../../types/struct/Set";
+import {HashSet, setComparer} from "../../../../types/struct/Set";
 import {emptyPositionWithAngle} from "../../../../types/layout/Position";
 import {loop} from "../../../../utils/math";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {GridRegion} from "../../../../types/sudoku/GridRegion";
+import {observer} from "mobx-react-lite";
+import {useComputedValue} from "../../../../hooks/useComputed";
+import {profiler} from "../../../../utils/profiler";
 
 const regularBorderColor = "#080";
 const errorBorderColor = "#e00";
 const removingBorderColor = lightGreyColor;
 
-export const UserLines = {
-    [FieldLayer.givenUserLines]: <T extends AnyPTM>({context, region, regionIndex}: ConstraintProps<T>) => {
-        const {cellSize, puzzle, state} = context;
+export const UserLines: ConstraintPropsGenericFcMap = {
+    [FieldLayer.givenUserLines]: observer(function GivenUserLines<T extends AnyPTM>({context, region, regionIndex}: ConstraintProps<T>) {
+        profiler.trace();
+
+        const {
+            cellSize,
+            puzzle,
+        } = context;
 
         const {typeManager: {regionSpecificUserMarks}} = puzzle;
 
-        const {lines, cells, marks} = gameStateGetCurrentFieldState(state);
-
         const borderWidth = getRegionBorderWidth(cellSize) * 1.5;
 
-        const invalidLines = useMemo(() => getInvalidUserLines(
-            lines,
-            prepareGivenDigitsMapForConstraints(context, cells),
-            getAllPuzzleConstraints(context),
-            context
-        ), [context, lines, cells]);
+        const invalidLines = useComputedValue(
+            function getInvalidLines() {
+                return getInvalidUserLines(context);
+            },
+            {equals: setComparer}
+        );
 
         const filterByRegion = (item: {regionIndex?: number}) => !regionSpecificUserMarks || item.regionIndex === regionIndex;
 
         return <>
-            {lines.items.filter(filterByRegion).map((line, index) => {
+            {context.lines.items.filter(filterByRegion).map((line, index) => {
                 line = normalizePuzzleLine(line, puzzle);
 
                 return <RoundedPolyLine
@@ -59,7 +62,7 @@ export const UserLines = {
                 />;
             })}
 
-            {marks.items.filter(filterByRegion).map((mark, index) => <UserMarkByData
+            {context.marks.items.filter(filterByRegion).map((mark, index) => <UserMarkByData
                 key={`mark-${index}`}
                 context={context}
                 cellSize={cellSize}
@@ -67,17 +70,20 @@ export const UserLines = {
                 {...mark}
             />)}
         </>;
-    },
-    [FieldLayer.newUserLines]: <T extends AnyPTM>(
+    }),
+    [FieldLayer.newUserLines]: observer(function NewUserLines<T extends AnyPTM>(
         {
             context: {
                 cellSize,
                 puzzle: {typeManager: {regionSpecificUserMarks}},
-                state: {currentMultiLine, dragAction},
+                currentMultiLine,
+                dragAction,
             },
             regionIndex,
         }: ConstraintProps<T>
-    ) => {
+    ) {
+        profiler.trace();
+
         const filterByRegion = (item: {regionIndex?: number}) => !regionSpecificUserMarks || item.regionIndex === regionIndex;
 
         return <>
@@ -88,7 +94,7 @@ export const UserLines = {
                 isAdding={dragAction === DragAction.SetTrue}
             />)}
         </>;
-    },
+    }),
 };
 
 export interface UserMarkByDataProps<T extends AnyPTM> extends CellMark {
@@ -97,7 +103,7 @@ export interface UserMarkByDataProps<T extends AnyPTM> extends CellMark {
     region?: GridRegion;
 }
 
-export const UserMarkByData = <T extends AnyPTM>(
+export const UserMarkByData = observer(function UserMarkByData<T extends AnyPTM>(
     {
         context,
         cellSize,
@@ -108,7 +114,9 @@ export const UserMarkByData = <T extends AnyPTM>(
         isCenter = position.left % 1 !== 0 && position.top % 1 !== 0,
         region,
     }: UserMarkByDataProps<T>
-) => {
+) {
+    profiler.trace();
+
     let {top, left} = position;
     let angle = 0;
 
@@ -119,7 +127,7 @@ export const UserMarkByData = <T extends AnyPTM>(
     const resolvedColor = color ? resolveCellColorValue(color) : regularBorderColor;
 
     if (context) {
-        const {puzzle, state, cellsIndex} = context;
+        const {puzzle, puzzleIndex} = context;
         const {
             fieldSize: {
                 rowsCount,
@@ -131,9 +139,9 @@ export const UserMarkByData = <T extends AnyPTM>(
         } = puzzle;
 
         if (isCenter) {
-            const cellPosition = cellsIndex.getPointInfo(position)?.cells.first();
+            const cellPosition = puzzleIndex.getPointInfo(position)?.cells.first();
             if (cellPosition) {
-                const {bounds: {userArea}} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
+                const {bounds: {userArea}} = puzzleIndex.allCells[cellPosition.top][cellPosition.left];
                 userAreaSize = (userArea.width + userArea.height) / 2;
                 angle = processCellDataPosition?.(
                     context,
@@ -142,7 +150,6 @@ export const UserMarkByData = <T extends AnyPTM>(
                     0,
                     () => undefined,
                     cellPosition,
-                    state,
                     region,
                 )?.angle ?? 0;
             }
@@ -200,7 +207,7 @@ export const UserMarkByData = <T extends AnyPTM>(
 
         {![CellMarkType.X, CellMarkType.O].includes(type) && <CenteredText color={resolvedColor} size={0.7}>{type}</CenteredText>}
     </AutoSvg>;
-};
+});
 
 export interface UserLinesByDataProps extends LineWithColor {
     cellSize: number;

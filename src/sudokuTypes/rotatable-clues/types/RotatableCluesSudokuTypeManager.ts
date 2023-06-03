@@ -3,25 +3,21 @@ import {RotatableCluesGameState, RotatableCluesProcessedGameState} from "./Rotat
 import {PositionSet, stringifyPosition} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {RotatableCluesPTM} from "./RotatableCluesPTM";
-import {
-    GameStateEx,
-    gameStateGetCurrentFieldState,
-    ProcessedGameStateEx
-} from "../../../types/sudoku/GameState";
 import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {ControlButtonItem, ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {RotatableClue} from "./RotatableCluesPuzzleExtension";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {fieldStateHistoryAddState, fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
+import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {RotatableClueConstraint} from "../constraints/RotatableClue";
 import {RotateClueButton} from "../components/RotateClueButton";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {loop} from "../../../utils/math";
 import {ArrowProps, isArrowConstraint} from "../../../components/sudoku/constraints/arrow/Arrow";
+import {comparer, IReactionDisposer, reaction} from "mobx";
+import {settings} from "../../../types/layout/Settings";
 
 export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     {
@@ -98,74 +94,86 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
         };
     },
 
-    useProcessedGameStateExtension(state, cellsIndex): RotatableCluesProcessedGameState {
-        const {animationSpeed, extension: {clues: clueAnimations}} = state;
-        const {extension: {clueAngles}} = gameStateGetCurrentFieldState(state);
+    useProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
+        const {
+            fieldExtension: {clueAngles},
+            stateExtension: {clues: clueAnimations},
+        } = context;
 
         return {
             // eslint-disable-next-line react-hooks/rules-of-hooks
-            ...useProcessedGameStateExtension?.(state as GameStateEx<T>, cellsIndex as unknown as SudokuCellsIndex<T>),
+            ...useProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>),
             // eslint-disable-next-line react-hooks/rules-of-hooks
             clueAngles: (clueAngles as number[]).map((angle, index) => useAnimatedValue(
                 angle,
-                clueAnimations[index].animating ? animationSpeed / 2 : 0
+                clueAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0
             )),
         };
     },
 
-    getProcessedGameStateExtension(state): RotatableCluesProcessedGameState {
-        const {extension: {clueAngles}} = gameStateGetCurrentFieldState(state);
-
+    getProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
         return {
-            ...getProcessedGameStateExtension?.(state as GameStateEx<T>),
-            clueAngles,
+            ...getProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>),
+            clueAngles: context.fieldExtension.clueAngles,
         };
     },
 
-    applyStateDiffEffect(state, prevState, context) {
-        baseTypeManager.applyStateDiffEffect?.(
-            state as unknown as ProcessedGameStateEx<T>,
-            prevState as unknown as ProcessedGameStateEx<T>,
-            context as unknown as PuzzleContext<T>,
-        );
+    getReactions(context: PuzzleContext<RotatableCluesPTM<T>>): IReactionDisposer[] {
+        return [
+            ...(baseTypeManager.getReactions?.(context as unknown as PuzzleContext<T>) ?? []),
+            reaction(
+                () => {
+                    const {
+                        puzzle,
+                        fieldExtension: {clueAngles},
+                    } = context;
+                    const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
 
-        const {puzzle, onStateChange} = context;
-        const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
-        const {cells, extension: {clueAngles}, clientId, actionId} = gameStateGetCurrentFieldState(state);
-
-        const processedClueAngles = (clueAngles as number[]).map((manualAngle, index) => {
-            const {pivot: {top, left}} = clues[index];
-            const data = cells[top]?.[left]?.usersDigit;
-            if (data === undefined) {
-                return manualAngle;
-            }
-            const digit = puzzle.typeManager.getDigitByCellData(data, context, {top, left});
-            const forcedAngle = digit * 90;
-            // Find the closest angle to the manual angle, so that we don't have weird animation (but rotate only clockwise)
-            return manualAngle + loop(forcedAngle - manualAngle, 360);
-        });
-        if (processedClueAngles.some((value, index) => value !== clueAngles[index])) {
-            onStateChange({
-                fieldStateHistory: fieldStateHistoryAddState(
-                    puzzle,
-                    state.fieldStateHistory,
-                    // repeat clientId and actionId of the action that caused this change
-                    clientId,
-                    actionId,
-                    (fieldState) => ({
-                        ...fieldState,
-                        extension: {
-                            ...fieldState.extension,
-                            clueAngles: processedClueAngles,
-                        },
-                    })
-                ),
-                extension: {
-                    ...state.extension,
-                    clues: state.extension.clues.map(() => ({animating: true})),
+                    return (clueAngles as number[]).map((manualAngle, index) => {
+                        const {pivot: {top, left}} = clues[index];
+                        const data = context.getCellDigit(top, left);
+                        if (data === undefined) {
+                            return manualAngle;
+                        }
+                        const digit = puzzle.typeManager.getDigitByCellData(data, context, {top, left});
+                        const forcedAngle = digit * 90;
+                        // Find the closest angle to the manual angle, so that we don't have weird animation (but rotate only clockwise)
+                        return manualAngle + loop(forcedAngle - manualAngle, 360);
+                    });
                 },
-            });
-        }
+                (processedClueAngles) => {
+                    const {fieldExtension: {clueAngles}} = context;
+
+                    if (processedClueAngles.some((value, index) => value !== clueAngles[index])) {
+                        const {clientId, actionId} = context.currentFieldState;
+
+                        context.onStateChange({
+                            fieldStateHistory: fieldStateHistoryAddState(
+                                context,
+                                // repeat clientId and actionId of the action that caused this change
+                                clientId,
+                                actionId,
+                                (fieldState) => ({
+                                    ...fieldState,
+                                    extension: {
+                                        ...fieldState.extension,
+                                        clueAngles: processedClueAngles,
+                                    },
+                                })
+                            ),
+                            extension: {
+                                ...context.stateExtension,
+                                clues: context.stateExtension.clues.map(() => ({animating: true})),
+                            },
+                        });
+                    }
+                },
+                {
+                    name: "update clue angles according to digits",
+                    equals: comparer.structural,
+                }
+            ),
+        ];
     },
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RotatableCluesPTM<T>> {
@@ -216,9 +224,12 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                     ...puzzle.extension,
                     clues,
                 },
-                items: ({fieldStateHistory, processedExtension: {clueAngles: animatedClueAngles}}) => {
-                    const {extension: {clueAngles}} = fieldStateHistoryGetCurrent(fieldStateHistory);
-
+                items: (
+                    {
+                        fieldExtension: {clueAngles},
+                        processedGameStateExtension: {clueAngles: animatedClueAngles},
+                    }
+                ) => {
                     return [
                         ...noPivotItems,
                         ...clues.flatMap((clue, index) => RotatableClueConstraint(

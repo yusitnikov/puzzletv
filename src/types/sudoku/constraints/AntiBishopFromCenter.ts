@@ -12,14 +12,14 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
         {left, top},
         digits,
         _,
-        {puzzle, state}
+        context
     ) {
         const {
             typeManager: {areSameCellData},
             loopHorizontally,
             loopVertically,
             fieldSize: {rowsCount, columnsCount, fieldSize},
-        } = puzzle;
+        } = context.puzzle;
 
         const digit = digits[top][left]!;
 
@@ -51,7 +51,7 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
                 }
 
                 const digit2 = digits[y]?.[x];
-                if (digit2 !== undefined && areSameCellData(digit2, digit, puzzle, state, true)) {
+                if (digit2 !== undefined && areSameCellData(digit2, digit, context)) {
                     return false;
                 }
             }

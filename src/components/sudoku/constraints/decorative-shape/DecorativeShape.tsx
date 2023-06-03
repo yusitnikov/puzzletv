@@ -8,6 +8,8 @@ import {Size} from "../../../../types/layout/Size";
 import {ComponentType, SVGAttributes} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {resolveCellColorValue} from "../../../../types/sudoku/CellColor";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 export interface DecorativeShapeProps extends Size {
     borderColor?: string;
@@ -17,60 +19,68 @@ export interface DecorativeShapeProps extends Size {
 
 const DecorativeShapeComponent = <T extends AnyPTM>(
     Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>
-) => {
-    return function DecorativeShapeComponent(
-        {
-            context: {puzzle: {typeManager: {digitComponentType: {widthCoeff}}}},
-            cells,
-            props: {
-                width,
-                height,
-                borderColor,
-                text,
-                textColor: textC = textColor,
-            },
-            color: backgroundColor = "none",
-            angle = 0,
-        }: ConstraintProps<T, DecorativeShapeProps>
-    ) {
-        const {top, left} = getAveragePosition(cells);
+) => observer(function DecorativeShapeComponent(
+    {
+        context: {puzzle: {typeManager: {digitComponentType: {widthCoeff}}}},
+        cells,
+        props: {
+            width,
+            height,
+            borderColor,
+            text,
+            textColor: textC = textColor,
+        },
+        color: backgroundColor = "none",
+        angle = 0,
+    }: ConstraintProps<T, DecorativeShapeProps>
+) {
+    profiler.trace();
 
-        return <AutoSvg
-            top={top + 0.5}
-            left={left + 0.5}
-            angle={angle}
+    const {top, left} = getAveragePosition(cells);
+
+    return <AutoSvg
+        top={top + 0.5}
+        left={left + 0.5}
+        angle={angle}
+    >
+        <Component
+            width={width}
+            height={height}
+            fill={backgroundColor}
+            stroke={borderColor || "none"}
+            strokeWidth={borderColor ? 0.03 : 0}
+        />
+
+        {!!text && <CenteredText
+            size={Math.min(0.5, width / (text.length + 1) / widthCoeff, height)}
+            fill={textC}
         >
-            <Component
-                width={width}
-                height={height}
-                fill={backgroundColor}
-                stroke={borderColor || "none"}
-                strokeWidth={borderColor ? 0.03 : 0}
-            />
+            {text}
+        </CenteredText>}
+    </AutoSvg>;
+} as ConstraintPropsGenericFc<DecorativeShapeProps>);
 
-            {!!text && <CenteredText
-                size={Math.min(0.5, width / (text.length + 1) / widthCoeff, height)}
-                fill={textC}
-            >
-                {text}
-            </CenteredText>}
-        </AutoSvg>;
-    } as ConstraintPropsGenericFc<DecorativeShapeProps>;
-};
+const RectComponent = DecorativeShapeComponent(observer(function RectFc(props) {
+    profiler.trace();
 
-const RectComponent = DecorativeShapeComponent((props) => <rect
-    x={-props.width / 2}
-    y={-props.height / 2}
-    {...props}
-/>);
+    return <rect
+        x={-props.width / 2}
+        y={-props.height / 2}
+        {...props}
+    />;
+}));
 
-const EllipseComponent = DecorativeShapeComponent(({width, height, ...props}) => <ellipse
-    cx={0}
-    cy={0}
-    rx={width / 2}
-    ry={height / 2}
-    {...props}
-/>);
+const EllipseComponent = DecorativeShapeComponent(observer(function EllipseFc({width, height, ...props}) {
+    profiler.trace();
+
+    return <ellipse
+        cx={0}
+        cy={0}
+        rx={width / 2}
+        ry={height / 2}
+        {...props}
+    />;
+}));
 
 const DecorativeShapeConstraint = <T extends AnyPTM>(
     name: string,

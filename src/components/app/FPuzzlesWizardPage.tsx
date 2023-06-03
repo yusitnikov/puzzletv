@@ -18,6 +18,8 @@ import {
     PuzzleImportPuzzleType
 } from "../../types/sudoku/PuzzleImportOptions";
 import {loadPuzzle} from "../../types/sudoku/PuzzleDefinition";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../utils/profiler";
 
 export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
 
@@ -45,7 +47,7 @@ interface FPuzzlesWizardPageProps {
     load: string;
 }
 
-export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
+export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => {
     const languageCode = useLanguageCode();
     const translate = useTranslate();
 
@@ -637,12 +639,14 @@ export const FPuzzlesWizardPage = ({load}: FPuzzlesWizardPageProps) => {
             width={previewSize}
         />
     </div>;
-};
+});
 
 interface CollapsableFieldSetProps {
     legend: string;
 }
-const CollapsableFieldSet: FC<CollapsableFieldSetProps> = ({legend, children}) => {
+const CollapsableFieldSet: FC<CollapsableFieldSetProps> = observer(function CollapsableFieldSet({legend, children}) {
+    profiler.trace();
+
     const [open, setOpen] = useState(true);
     const detailsRef = useRef<HTMLDetailsElement>(null);
     const doOpen = () => {
@@ -669,4 +673,4 @@ const CollapsableFieldSet: FC<CollapsableFieldSetProps> = ({legend, children}) =
 
         {open ? children : <button type={"button"} onClick={doOpen}>Show collapsed options</button>}
     </FieldSet>;
-};
+});

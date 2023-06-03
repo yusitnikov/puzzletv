@@ -10,22 +10,25 @@ import {RushHourCar} from "./RushHourCar";
 import {TransformedRectGraphics} from "../../../contexts/TransformContext";
 import {transformRect} from "../../../types/layout/Rect";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 const crossLineWidth = 0.1;
 
-export const RushHourHideCarsButton = ({context, top, left}: ControlButtonItemProps<RushHourPTM>) => {
+export const RushHourHideCarsButton = observer(function RushHourHideCarsButtonFc(
+    {context, top, left}: ControlButtonItemProps<RushHourPTM>
+) {
+    profiler.trace();
+
     const {
         cellSizeForSidePanel: cellSize,
-        state: {
-            processed: {cellWriteMode},
-            extension: {hideCars},
-        },
-        onStateChange,
+        cellWriteMode,
+        stateExtension: {hideCars},
     } = context;
 
     const translate = useTranslate();
 
-    const handleToggle = () => onStateChange({extension: {hideCars: !hideCars}});
+    const handleToggle = () => context.onStateChange({extension: {hideCars: !hideCars}});
 
     useEventListener(window, "keydown", (ev) => {
         if (ev.code === "KeyH") {
@@ -82,4 +85,4 @@ export const RushHourHideCarsButton = ({context, top, left}: ControlButtonItemPr
             </>}
         </AutoSvg>}
     </ControlButton>;
-};
+});

@@ -4,7 +4,6 @@ import {gameStateContinueMultiLine, gameStateResetCurrentMultiLine, gameStateSta
 import {GestureFinishReason} from "../../../utils/gestures";
 import {applyCurrentMultiLineAction} from "../GameStateAction";
 import {CellBackground} from "../../../components/sudoku/cell/CellBackground";
-import {CellDataSet} from "../CellDataSet";
 import {AnyPTM} from "../PuzzleTypeMap";
 import {LinesDigitModeButton} from "../../../components/sudoku/controls/LinesDigitModeButton";
 import {isCellGestureExtraData} from "../CellGestureExtraData";
@@ -16,7 +15,7 @@ export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T>
     hotKeyStr: ["Alt"],
     isNoSelectionMode: true,
     onCornerClick: ({gesture: {id}}, context, {exact}) =>
-        context.onStateChange(state => gameStateStartMultiLine({...context, state}, exact)),
+        context.onStateChange((context) => gameStateStartMultiLine(context, exact)),
     onCornerEnter: (
         {gesture: {id, pointers: [{start: {extraData}}]}},
         context,
@@ -26,10 +25,7 @@ export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T>
         if (context.puzzle.typeManager.regionSpecificUserMarks && startRegionIndex !== cellData.regionIndex) {
             return;
         }
-        context.onStateChange(state => gameStateContinueMultiLine(
-            {...context, state},
-            cellData
-        ));
+        context.onStateChange((context) => gameStateContinueMultiLine(context, cellData));
     },
     onGestureEnd: (
         {
@@ -44,7 +40,6 @@ export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T>
     ) => context.onStateChange(
         reason === GestureFinishReason.pointerUp
             ? applyCurrentMultiLineAction(
-                context,
                 `gesture-${id}`,
                 isCellGestureExtraData(extraData) ? extraData.regionIndex : undefined,
                 isClick,
@@ -55,12 +50,13 @@ export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T>
     digitsCount: ({puzzle: {disableLineColors}}) => disableLineColors ? 0 : 9,
     secondaryButtonContent: (context, _, cellSize, index) => <CellBackground
         context={context}
-        colors={new CellDataSet(context.puzzle, [index])}
+        colors={[index]}
         size={cellSize}
         noOpacity={true}
     />,
-    getCurrentSecondaryButton: ({puzzle: {disableLineColors}, state: {selectedColor}}) =>
+    getCurrentSecondaryButton: ({puzzle: {disableLineColors}, selectedColor}) =>
         disableLineColors ? undefined : selectedColor,
-    setCurrentSecondaryButton: ({onStateChange}, index) => onStateChange({selectedColor: index}),
+    setCurrentSecondaryButton: (context, index) =>
+        context.onStateChange({selectedColor: index}),
     handlesRightMouseClick: true,
 });

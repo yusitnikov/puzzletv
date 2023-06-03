@@ -1,9 +1,11 @@
 import {blackColor, textColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 export const KropkiDotTag = "kropki-dot";
 
@@ -14,8 +16,8 @@ export interface KropkiDotProps {
     showValue?: boolean;
 }
 
-export const KropkiDot = {
-    [FieldLayer.afterLines]: <T extends AnyPTM>(
+export const KropkiDot: ConstraintPropsGenericFcMap<KropkiDotProps> = {
+    [FieldLayer.afterLines]: observer(function KropkiDot<T extends AnyPTM>(
         {
             cells: [cell1, cell2],
             color = blackColor,
@@ -24,7 +26,9 @@ export const KropkiDot = {
                 showValue = true
             },
         }: ConstraintProps<T, KropkiDotProps>
-    ) => {
+    ) {
+        profiler.trace();
+
         const top = (cell1.top + cell2.top) / 2 + 0.5;
         const left = (cell1.left + cell2.left) / 2 + 0.5;
 
@@ -47,7 +51,7 @@ export const KropkiDot = {
                 {typeof value === "number" ? value : value.join(":")}
             </CenteredText>}
         </>;
-    },
+    }),
 };
 
 export const KropkiDotConstraint = <T extends AnyPTM>(

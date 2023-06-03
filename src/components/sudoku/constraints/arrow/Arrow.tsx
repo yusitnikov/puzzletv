@@ -7,12 +7,19 @@ import {
     parsePositionLiterals, Position,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFcMap
+} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {defaultGetDefaultNumberByDigits} from "../../../../types/sudoku/SudokuTypeManager";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {ReactElement} from "react";
+import {profiler} from "../../../../utils/profiler";
 
 export const arrowTag = "arrow";
 
@@ -28,19 +35,21 @@ export interface ArrowProps {
 }
 
 const getPointInfo = <T extends AnyPTM>(context: PuzzleContext<T>, {top, left}: Position, radius: number) => {
-    const cellInfo = context.cellsIndex.allCells[top]?.[left];
+    const cellInfo = context.puzzleIndex.allCells[top]?.[left];
     return cellInfo
         ? {...cellInfo.center, radius: radius * cellInfo.bounds.userArea.width}
         : {left: left + 0.5, top: top + 0.5, radius};
 };
 
-export const Arrow = {
-    [FieldLayer.regular]: <T extends AnyPTM>(
+export const Arrow: ConstraintPropsGenericFcMap<ArrowProps> = {
+    [FieldLayer.regular]: observer(function Arrow<T extends AnyPTM>(
         {
             props: {circleCells, arrowCells, transparentCircle},
             context,
         }: ConstraintProps<T, ArrowProps>
-    ) => {
+    ) {
+        profiler.trace();
+
         const {left, top, radius: scaledCircleRadius} = getPointInfo(context, circleCells[0], circleRadius);
         const {
             left: left2,
@@ -63,12 +72,16 @@ export const Arrow = {
                 fill={transparentCircle ? "none" : "#fff"}
             />
         </>;
-    },
+    }),
 };
 
-export const ArrowLine = <T extends AnyPTM>(
-    {cells, context}: {cells: Position[], context: PuzzleContext<T>}
-) => {
+interface ArrowLineProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
+    cells: Position[];
+}
+export const ArrowLine = observer(function ArrowLine<T extends AnyPTM>({cells, context}: ArrowLineProps<T>) {
+    profiler.trace();
+
     if (cells.length < 2) {
         return null;
     }
@@ -103,7 +116,7 @@ export const ArrowLine = <T extends AnyPTM>(
             color={darkGreyColor}
         />
     </>;
-};
+}) as <T extends AnyPTM>(props: ArrowLineProps<T>) => ReactElement;
 
 export const ArrowConstraint = <T extends AnyPTM>(
     circleCellLiterals: PositionLiteral | PositionLiteral[],

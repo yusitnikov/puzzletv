@@ -71,7 +71,14 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
 
             return defaultProcessArrowDirectionForRegularCellBounds(currentCell, xDirection, yDirection, context);
         },
-        processCellDataPosition(context, basePosition, dataSet, dataIndex, positionFunction, cellPosition): PositionWithAngle | undefined {
+        processCellDataPosition(
+            context,
+            basePosition,
+            dataSet,
+            dataIndex,
+            positionFunction,
+            cellPosition,
+        ): PositionWithAngle | undefined {
             if (cellPosition && cellPosition.top < circleRegionsCount * 2 && cellPosition.top % 2 === 0) {
                 return {
                     ...basePosition,

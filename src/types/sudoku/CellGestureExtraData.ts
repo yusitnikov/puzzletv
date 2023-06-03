@@ -23,11 +23,11 @@ export const getCurrentCellWriteModeInfoByGestureExtraData = <T extends AnyPTM>(
     extraData: BasePointerStateExtraData | undefined,
 ): CellWriteModeInfo<T> => {
     if (isCellGestureExtraData(extraData)) {
-        const forceCellWriteMode = context.cellsIndex.getCellTypeProps(extraData.cell).forceCellWriteMode;
+        const forceCellWriteMode = context.puzzleIndex.getCellTypeProps(extraData.cell).forceCellWriteMode;
         if (forceCellWriteMode) {
             return forceCellWriteMode;
         }
     }
 
-    return context.state.processed.cellWriteModeInfo;
+    return context.cellWriteModeInfo;
 };

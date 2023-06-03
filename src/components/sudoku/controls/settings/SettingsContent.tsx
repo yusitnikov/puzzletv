@@ -1,12 +1,6 @@
-import {useEffect, useState} from "react";
+import {ReactElement, useEffect, useState} from "react";
 import {useLanguageCode, useTranslate} from "../../../../hooks/useTranslate";
 import {textHeightCoeff} from "../../../app/globals";
-import {
-    saveBoolToLocalStorage,
-    saveNumberToLocalStorage,
-    saveStringToLocalStorage
-} from "../../../../utils/localStorage";
-import {LocalStorageKeys} from "../../../../data/LocalStorageKeys";
 import InputSlider from "react-input-slider";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {myClientId} from "../../../../hooks/useMultiPlayer";
@@ -22,40 +16,38 @@ import {LanguageCode} from "../../../../types/translations/LanguageCode";
 import {shortenUrl} from "../../../../services/tinyUrl";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {AnimationSpeed} from "../../../../types/sudoku/AnimationSpeed";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../../types/layout/Settings";
+import {profiler} from "../../../../utils/profiler";
 
 export interface SettingsContentProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     cellSize: number;
 }
 
-export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>) => {
+export const SettingsContent = observer(function SettingsContent<T extends AnyPTM>(props: SettingsContentProps<T>) {
+    profiler.trace();
+
     const {
         cellSize,
-        context: {
-            puzzle: {
-                slug,
-                params,
-                getNewHostedGameParams,
-                resultChecker,
-                forceAutoCheckOnFinish,
-                forceEnableConflictChecker,
-                disableBackgroundColorOpacity,
-                typeManager: {disableConflictChecker, settingsComponents = [], getCellSelectionType},
-            },
-            state: {
-                enableConflictChecker,
-                pencilmarksCheckerMode,
-                autoCheckOnFinish,
-                flipKeypad,
-                backgroundOpacity,
-                nickname,
-                highlightSeenCells,
-                animationSpeed,
-            },
-            onStateChange,
-            multiPlayer: {isEnabled},
-        },
+        context,
     } = props;
+
+    const {
+        puzzle: {
+            slug,
+            params,
+            getNewHostedGameParams,
+            resultChecker,
+            forceAutoCheckOnFinish,
+            forceEnableConflictChecker,
+            disableBackgroundColorOpacity,
+            typeManager: {disableConflictChecker, settingsComponents = [], getCellSelectionType},
+        },
+        multiPlayer: {isEnabled},
+    } = context;
+
+    const enableConflictChecker = settings.enableConflictChecker.get();
 
     const language = useLanguageCode();
     const translate = useTranslate();
@@ -71,46 +63,6 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
             shortenUrl(fullUrl).then(setShortenedUrl);
         }
     }, [isEnabled, fullUrl]);
-
-    const handleChangeEnableConflictChecker = (value: boolean) => {
-        onStateChange({enableConflictChecker: value});
-        saveBoolToLocalStorage(LocalStorageKeys.enableConflictChecker, value);
-    };
-
-    const handleChangePencilmarksCheckerMode = (value: PencilmarksCheckerMode) => {
-        onStateChange({pencilmarksCheckerMode: value});
-        saveNumberToLocalStorage(LocalStorageKeys.pencilmarksCheckerMode, value);
-    };
-
-    const handleChangeAutoCheckOnFinish = (value: boolean) => {
-        onStateChange({autoCheckOnFinish: value});
-        saveBoolToLocalStorage(LocalStorageKeys.autoCheckOnFinish, value);
-    };
-
-    const handleChangeFlipKeypad = (value: boolean) => {
-        onStateChange({flipKeypad: value});
-        saveBoolToLocalStorage(LocalStorageKeys.flipKeypad, value);
-    };
-
-    const handleChangeBackgroundOpacity = (value: number) => {
-        onStateChange({backgroundOpacity: value});
-        saveNumberToLocalStorage(LocalStorageKeys.backgroundOpacity, value);
-    };
-
-    const handleChangeNickname = (value: string) => {
-        onStateChange({nickname: value});
-        saveStringToLocalStorage(LocalStorageKeys.nickname, value);
-    };
-
-    const handleChangeHighlightSeenCells = (value: boolean) => {
-        onStateChange({highlightSeenCells: value});
-        saveBoolToLocalStorage(LocalStorageKeys.highlightSeenCells, value);
-    };
-
-    const handleChangeAnimationSpeed = (value: AnimationSpeed) => {
-        onStateChange({animationSpeed: value});
-        saveNumberToLocalStorage(LocalStorageKeys.animationSpeed, value);
-    };
 
     return <div>
         <div style={{fontSize: textSize * 1.5, marginBottom: textSize}}>
@@ -203,8 +155,8 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
             <SettingsTextBox
                 type={"text"}
                 cellSize={cellSize}
-                value={nickname}
-                onChange={(ev) => handleChangeNickname(ev.target.value)}
+                value={settings.nickname.get()}
+                onChange={(ev) => settings.nickname.set(ev.target.value)}
             />
         </SettingsItem>}
 
@@ -216,7 +168,7 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                     type={"checkbox"}
                     cellSize={cellSize}
                     checked={enableConflictChecker}
-                    onChange={(ev) => handleChangeEnableConflictChecker(ev.target.checked)}
+                    onChange={(ev) => settings.enableConflictChecker.set(ev.target.checked)}
                 />
             </SettingsItem>
 
@@ -226,8 +178,8 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
                 <SettingsSelect
                     cellSize={cellSize}
                     disabled={!enableConflictChecker}
-                    value={enableConflictChecker ? pencilmarksCheckerMode : PencilmarksCheckerMode.Off}
-                    onChange={(ev) => handleChangePencilmarksCheckerMode(Number(ev.target.value))}
+                    value={enableConflictChecker ? settings.pencilmarksCheckerMode.get() : PencilmarksCheckerMode.Off}
+                    onChange={(ev) => settings.pencilmarksCheckerMode.set(Number(ev.target.value))}
                 >
                     <option value={PencilmarksCheckerMode.Off}>{translate("OFF")}</option>
                     <option value={PencilmarksCheckerMode.CheckObvious}>{translate({
@@ -248,8 +200,8 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
             <SettingsCheckbox
                 type={"checkbox"}
                 cellSize={cellSize}
-                checked={autoCheckOnFinish}
-                onChange={(ev) => handleChangeAutoCheckOnFinish(ev.target.checked)}
+                checked={settings.autoCheckOnFinish.get()}
+                onChange={(ev) => settings.autoCheckOnFinish.set(ev.target.checked)}
             />
         </SettingsItem>}
 
@@ -259,8 +211,8 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
             <SettingsCheckbox
                 type={"checkbox"}
                 cellSize={cellSize}
-                checked={flipKeypad}
-                onChange={(ev) => handleChangeFlipKeypad(ev.target.checked)}
+                checked={settings.flipKeypad.get()}
+                onChange={(ev) => settings.flipKeypad.set(ev.target.checked)}
             />
         </SettingsItem>
 
@@ -269,11 +221,11 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
 
             <InputSlider
                 axis={"x"}
-                x={backgroundOpacity}
+                x={settings.backgroundOpacity.get()}
                 xmin={0.1}
                 xmax={1}
                 xstep={0.1}
-                onChange={({x}) => handleChangeBackgroundOpacity(x)}
+                onChange={({x}) => settings.backgroundOpacity.set(x)}
             />
         </SettingsItem>}
 
@@ -283,8 +235,8 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
             <SettingsCheckbox
                 type={"checkbox"}
                 cellSize={cellSize}
-                checked={highlightSeenCells}
-                onChange={(ev) => handleChangeHighlightSeenCells(ev.target.checked)}
+                checked={settings.highlightSeenCells.get()}
+                onChange={(ev) => settings.highlightSeenCells.set(ev.target.checked)}
             />
         </SettingsItem>}
 
@@ -296,8 +248,8 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
 
             <SettingsSelect
                 cellSize={cellSize}
-                value={animationSpeed}
-                onChange={(ev) => handleChangeAnimationSpeed(Number(ev.target.value))}
+                value={settings.animationSpeed.get()}
+                onChange={(ev) => settings.animationSpeed.set(Number(ev.target.value))}
             >
                 <option value={AnimationSpeed.regular}>{translate({
                     [LanguageCode.en]: "Regular",
@@ -316,4 +268,4 @@ export const SettingsContent = <T extends AnyPTM>(props: SettingsContentProps<T>
 
         {settingsComponents.map((Component, index) => <Component key={`custom-${index}`} {...props}/>)}
     </div>;
-};
+}) as <T extends AnyPTM>(props: SettingsContentProps<T>) => ReactElement;

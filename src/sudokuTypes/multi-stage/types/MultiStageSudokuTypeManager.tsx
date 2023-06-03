@@ -3,7 +3,6 @@ import {MultiStageGameState} from "./MultiStageGameState";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {
     mergeGameStateUpdates,
-    mergeProcessedGameStateWithUpdates,
     PartialGameStateEx
 } from "../../../types/sudoku/GameState";
 import {
@@ -57,9 +56,9 @@ export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
     },
 
     getAboveRules: (translate, context, isPortrait) => {
-        const {state, onStateChange, cellSizeForSidePanel: cellSize} = context;
+        const {cellSizeForSidePanel: cellSize} = context;
         const stage = getStage(context);
-        const isNext = stage > state.extension.stage;
+        const isNext = stage > context.stateExtension.stage;
         const coeff = isNext ? 1 : 0;
 
         return <>
@@ -98,7 +97,7 @@ export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
                         paddingTop: 0,
                         paddingBottom: 0,
                     }}
-                    onClick={() => onStateChange(mergeGameStateUpdates(
+                    onClick={() => context.onStateChange(mergeGameStateUpdates(
                         {extension: {stage}},
                         onStageChange?.(context, stage) ?? {}
                     ))}
@@ -114,7 +113,13 @@ export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
 });
 
 export const isValidFinishedPuzzleByStageConstraints = <T extends AnyMultiStagePTM>(stage: number) =>
-    (context: PuzzleContext<T>) => isValidFinishedPuzzleByConstraints({
-        ...context,
-        state: mergeProcessedGameStateWithUpdates(context.state, {extension: {stage}}),
-    });
+    (context: PuzzleContext<T>) => isValidFinishedPuzzleByConstraints(context.cloneWith({
+        myGameState: {
+            ...context.myGameState,
+            extension: {
+                ...context.myGameState.extension,
+                stage,
+            },
+        },
+        processedGameStateExtension: undefined,
+    }));

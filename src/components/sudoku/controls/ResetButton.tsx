@@ -1,4 +1,4 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {ControlButton} from "./ControlButton";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Replay} from "@emotion-icons/material";
@@ -9,20 +9,18 @@ import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback, useState} from "react";
 import {getEmptyGameState, mergeGameStateWithUpdates} from "../../../types/sudoku/GameState";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
-export const ResetButton = <T extends AnyPTM>(
-    {
-        context: {
-            cellSizeForSidePanel: cellSize,
-            puzzle,
-            onStateChange,
-            multiPlayer: {isEnabled, isHost},
-        },
-        top,
-        left,
-    }: ControlButtonItemProps<T>
-) => {
-    const {typeManager: {keepStateOnRestart}} = puzzle;
+export const ResetButton: ControlButtonItemPropsGenericFc = observer(function ResetButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
+    const {
+        cellSizeForSidePanel: cellSize,
+        multiPlayer: {isEnabled, isHost},
+    } = context;
     const canRestart = !isEnabled || isHost;
 
     const translate = useTranslate();
@@ -33,11 +31,11 @@ export const ResetButton = <T extends AnyPTM>(
     const handleCloseRestart = useCallback(() => setIsShowingRestartConfirmation(false), [setIsShowingRestartConfirmation]);
     const handleSureRestart = useCallback(() => {
         handleCloseRestart();
-        onStateChange((state) => mergeGameStateWithUpdates(
-            getEmptyGameState(puzzle, false),
-            keepStateOnRestart?.(state) ?? {},
+        context.onStateChange((context) => mergeGameStateWithUpdates(
+            getEmptyGameState(context.puzzle, false),
+            context.puzzle.typeManager.keepStateOnRestart?.(context) ?? {},
         ));
-    }, [handleCloseRestart, onStateChange, puzzle, keepStateOnRestart]);
+    }, [context, handleCloseRestart]);
 
     return <>
         <ControlButton
@@ -116,4 +114,4 @@ export const ResetButton = <T extends AnyPTM>(
             </>}
         </Modal>}
     </>;
-};
+});

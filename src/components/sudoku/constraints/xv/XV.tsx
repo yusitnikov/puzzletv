@@ -1,14 +1,18 @@
 import {formatSvgPointsArray, parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
 import {blackColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../../types/sudoku/Constraint";
 import {ComponentType} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 const radius = 0.2;
 const lineWidth = 0.03;
 
-export const XMark = <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
+export const XMark: ConstraintPropsGenericFc = observer(function XMark<T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) {
+    profiler.trace();
+
     const left = (cell1.left + cell2.left) / 2 + 0.5;
     const top = (cell1.top + cell2.top) / 2 + 0.5;
 
@@ -31,9 +35,9 @@ export const XMark = <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps
             stroke={blackColor}
         />
     </>;
-};
+});
 
-export const VMark = <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) => {
+export const VMark: ConstraintPropsGenericFc = observer(function VMark<T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) {
     const left = (cell1.left + cell2.left) / 2 + 0.5;
     const top = (cell1.top + cell2.top) / 2 + 0.5;
 
@@ -47,7 +51,7 @@ export const VMark = <T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps
         stroke={blackColor}
         fill={"none"}
     />;
-};
+});
 
 const XVConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,

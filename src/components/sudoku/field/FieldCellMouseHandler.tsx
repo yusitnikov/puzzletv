@@ -10,49 +10,101 @@ import {mergeEventHandlerProps} from "../../../utils/mergeEventHandlerProps";
 import {cancelOutsideClickProps, GestureHandler, getGestureHandlerProps} from "../../../utils/gestures";
 import {CellGestureExtraData, cellGestureExtraDataTag} from "../../../types/sudoku/CellGestureExtraData";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {ReactElement, useMemo} from "react";
+import {observer} from "mobx-react-lite";
+import {useComputed, useComputedValue} from "../../../hooks/useComputed";
+import {profiler} from "../../../utils/profiler";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
-export interface FieldCellMouseHandlerProps<T extends AnyPTM> {
+export interface FieldCellMouseHandlerProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
-    cellPosition: Position;
     regionIndex?: number;
     handlers: GestureHandler<any>[];
 }
 
-export const FieldCellMouseHandler = <T extends AnyPTM>(
-    {
-        context,
-        cellPosition,
-        regionIndex,
-        handlers,
-    }: FieldCellMouseHandlerProps<T>
-) => {
-    const {cellsIndex, state} = context;
-
-    const {processed: {cellWriteModeInfo}} = state;
+export const FieldCellMouseHandler = observer(function FieldCellMouseHandler<T extends AnyPTM>(
+    props: FieldCellMouseHandlerProps<T>
+) {
+    profiler.trace();
 
     const {
-        onCornerClick,
-        onCornerEnter,
-        disableCellHandlers,
-    } = cellsIndex.getCellTypeProps(cellPosition).forceCellWriteMode ?? cellWriteModeInfo;
+        context,
+        top,
+        left,
+    } = props;
+
+    const getCellWriteModeInfo = useComputed(
+        function getCellWriteModeInfo() {
+            return context.puzzleIndex.getCellTypeProps({top, left}).forceCellWriteMode
+                ?? context.cellWriteModeInfo;
+        },
+        undefined,
+        [top, left]
+    );
+    const disableCellHandlers = useComputedValue(
+        function getDisableCellHandlers() {
+            return getCellWriteModeInfo().disableCellHandlers;
+        },
+        undefined,
+        [getCellWriteModeInfo]
+    );
+    const hasCellHandlers = useComputedValue(
+        function getHasCellHandlers() {
+            const {
+                onCornerClick,
+                onCornerEnter,
+            } = getCellWriteModeInfo();
+            return !!(onCornerClick || onCornerEnter);
+        },
+        undefined,
+        [getCellWriteModeInfo]
+    );
 
     if (disableCellHandlers) {
         return null;
     }
 
-    const {areCustomBounds, center, borderSegments} = cellsIndex.allCells[cellPosition.top][cellPosition.left];
+    return <FieldCellMouseHandlerInner
+        {...props}
+        hasCellHandlers={hasCellHandlers}
+    />;
+}) as <T extends AnyPTM>(props: FieldCellMouseHandlerProps<T>) => ReactElement | null;
 
-    const centerExactPosition: CellExactPosition = {
+interface FieldCellMouseHandlerInnerProps<T extends AnyPTM> extends FieldCellMouseHandlerProps<T> {
+    hasCellHandlers: boolean;
+}
+const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<T extends AnyPTM>(
+    {
+        context,
+        top,
+        left,
+        regionIndex,
+        handlers,
+        hasCellHandlers,
+    }: FieldCellMouseHandlerInnerProps<T>
+) {
+    profiler.trace();
+
+    const {puzzleIndex} = context;
+
+    const {
+        areCustomBounds,
+        center,
+        borderSegments,
+    } = puzzleIndex.allCells[top][left];
+
+    const cellPosition = useMemo((): Position => ({top, left}), [top, left]);
+
+    const centerExactPosition = useMemo((): CellExactPosition => ({
         center,
         corner: cellPosition,
         round: center,
         type: CellPart.center,
-    };
+    }), [center, cellPosition]);
 
     return <>
-        {(onCornerClick || onCornerEnter) && <>
+        {hasCellHandlers && <>
             {!areCustomBounds && indexes(4).flatMap(topOffset => indexes(4).map(leftOffset => {
                 const isTopCenter = [1, 2].includes(topOffset);
                 const isLeftCenter = [1, 2].includes(leftOffset);
@@ -60,12 +112,12 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
                 const exactPosition: CellExactPosition = {
                     center,
                     corner: {
-                        left: cellPosition.left + (leftOffset >> 1),
-                        top: cellPosition.top + (topOffset >> 1),
+                        left: left + (leftOffset >> 1),
+                        top: top + (topOffset >> 1),
                     },
                     round: {
-                        left: cellPosition.left + (isLeftCenter ? 0.5 : (leftOffset ? 1 : 0)),
-                        top: cellPosition.top + (isTopCenter ? 0.5 : (topOffset ? 1 : 0)),
+                        left: left + (isLeftCenter ? 0.5 : (leftOffset ? 1 : 0)),
+                        top: top + (isTopCenter ? 0.5 : (topOffset ? 1 : 0)),
                     },
                     type: isTopCenter && isLeftCenter ? CellPart.center : (!isTopCenter && !isLeftCenter ? CellPart.corner : CellPart.border),
                 };
@@ -115,7 +167,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
             </>}
         </>}
 
-        {!(onCornerClick || onCornerEnter) && <>
+        {!hasCellHandlers && <>
             <MouseHandlerRect
                 key={"cell-selection"}
                 context={context}
@@ -142,7 +194,7 @@ export const FieldCellMouseHandler = <T extends AnyPTM>(
             }))}
         </>}
     </>;
-};
+}) as <T extends AnyPTM>(props: FieldCellMouseHandlerInnerProps<T>) => ReactElement;
 
 interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
     context: PuzzleContext<T>;
@@ -154,32 +206,36 @@ interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
     skipEnter?: boolean;
 }
 
-const MouseHandlerRect = <T extends AnyPTM>(
+const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>(
     {
         context, cellPosition, cellExactPosition, regionIndex, line, handlers, skipEnter, ...rect
     }: MouseHandlerRectProps<T>
-) => <FieldCellShape
-    context={context}
-    cellPosition={cellPosition}
-    line={line}
-    style={{
-        cursor: "pointer",
-        pointerEvents: "all",
-    }}
-    {...mergeEventHandlerProps(
-        // Make sure that clicking on the grid won't be recognized as an outside click
-        cancelOutsideClickProps,
-        // Make sure that clicking on the grid won't try to drag
-        {
-            onMouseDown: (ev) => ev.preventDefault(),
-        },
-        getGestureHandlerProps(handlers, (): CellGestureExtraData => ({
-            tags: [cellGestureExtraDataTag],
-            cell: cellPosition,
-            exact: cellExactPosition,
-            regionIndex,
-            skipEnter,
-        })),
-    )}
-    {...rect}
-/>;
+) {
+    profiler.trace();
+
+    return <FieldCellShape
+        context={context}
+        cellPosition={cellPosition}
+        line={line}
+        style={{
+            cursor: "pointer",
+            pointerEvents: "all",
+        }}
+        {...mergeEventHandlerProps(
+            // Make sure that clicking on the grid won't be recognized as an outside click
+            cancelOutsideClickProps,
+            // Make sure that clicking on the grid won't try to drag
+            {
+                onMouseDown: (ev) => ev.preventDefault(),
+            },
+            getGestureHandlerProps(handlers, (): CellGestureExtraData => ({
+                tags: [cellGestureExtraDataTag],
+                cell: cellPosition,
+                exact: cellExactPosition,
+                regionIndex,
+                skipEnter,
+            })),
+        )}
+        {...rect}
+    />;
+}) as <T extends AnyPTM>(props: MouseHandlerRectProps<T>) => ReactElement;

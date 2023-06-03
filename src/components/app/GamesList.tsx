@@ -5,8 +5,12 @@ import {buildLink} from "../../utils/link";
 import {Chameleon} from "../../data/authors";
 import {GamesListItem} from "./GamesListItem";
 import {OpenInNew} from "@emotion-icons/material";
+import {profiler} from "../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
-export const GamesList = () => {
+export const GamesList = observer(function GamesList() {
+    profiler.trace();
+
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -65,4 +69,4 @@ export const GamesList = () => {
             })}</p>
         </GamesListItem>
     </>;
-};
+});

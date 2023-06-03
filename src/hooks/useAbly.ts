@@ -45,6 +45,7 @@ export const useAblyChannelMessages = (options: Types.ClientOptions, channelName
     }, [channel, callbackRef, enabled, chain]);
 };
 
+const noMessages: Types.PresenceMessage[] = [];
 export const useAblyChannelPresence = (
     options: Types.ClientOptions,
     channelName: string,
@@ -83,7 +84,7 @@ export const useAblyChannelPresence = (
         };
     }, [channel, enabled, setPresenceMessages, chain]);
 
-    return [presenceMessages || [], presenceMessages !== undefined];
+    return [presenceMessages || noMessages, presenceMessages !== undefined];
 };
 
 export const useSetMyAblyChannelPresence = (

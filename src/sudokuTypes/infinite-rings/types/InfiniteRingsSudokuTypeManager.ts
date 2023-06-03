@@ -69,7 +69,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
             return {
                 isVisible: (top === left || top + left === fieldSize - 1 || isCenterTop || isCenterLeft) && !(isCenterTop && isCenterLeft),
                 isVisibleForState: (context) => {
-                    const {state: {processed: {animated: {scaleLog: ringOffset}}}} = context;
+                    const {animatedScaleLog: ringOffset} = context;
                     return isShowingAllInfiniteRings(context, visibleRingsCountArg) || loop(ring + 0.5 - ringOffset, ringsCount) < visibleRingsCountArg;
                 },
             };
@@ -77,7 +77,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         processArrowDirection({top, left}, xDirection, yDirection, context) {
             const {
                 puzzle: {fieldSize: {rowsCount: fieldSize}},
-                state: {processed: {scaleLog}},
+                scaleLog,
             } = context;
 
             const ringOffset = Math.round(scaleLog);
@@ -114,7 +114,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                         top: coordsRingToPlain(fieldSize, ring, top),
                         left: coordsRingToPlain(fieldSize, ring, left),
                     },
-                    state: gameStateSetScaleLog(context, newRingOffset, false),
+                    state: gameStateSetScaleLog<T>(newRingOffset, false)(context),
                 };
             }
 
@@ -129,7 +129,9 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                 }
             } else {
                 const processDownArrow = ({top, left}: Position) => {
+                    // noinspection JSSuspiciousNameCombination
                     const {cell: {top: newTop, left: newLeft}, state} = processRightArrow({top: left, left: top});
+                    // noinspection JSSuspiciousNameCombination
                     return {cell: {top: newLeft, left: newTop}, state};
                 };
 
@@ -146,7 +148,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         transformCoords({top, left}, context): Position {
             const {
                 puzzle: {fieldSize: {rowsCount: fieldSize}},
-                state: {processed: {animated: {scaleLog: ringOffset}}},
+                animatedScaleLog: ringOffset,
             } = context;
             const ringsCount = fieldSize / 2 - 1;
             const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg) ? ringsCount : visibleRingsCountArg;
@@ -174,7 +176,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         getRegionsWithSameCoordsTransformation(
             {
                 puzzle: {fieldSize: {rowsCount: fieldSize}},
-                state: {processed: {animated: {scaleLog: ringOffset}}},
+                animatedScaleLog: ringOffset,
             }
         ): GridRegion[] {
             const ringsCount = fieldSize / 2 - 1;
@@ -268,6 +270,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                     }),
                     false,
                 );
+                // noinspection JSSuspiciousNameCombination
                 const createRowColumnRegions = (cells: (Position & { ring: number })[]) => [
                     createRegion(cells),
                     createRegion(cells.map(({top, left, ring}) => ({

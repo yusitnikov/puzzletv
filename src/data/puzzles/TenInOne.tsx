@@ -242,7 +242,7 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         </RulesIndentedBlock>
     </>,
-    items: ({extension: {stage}}) => {
+    items: ({stateExtension: {stage}}) => {
         let lines: Constraint<MultiStagePTM, any>[] = [
             RenbanConstraint(["R3C3", "R2C3", "R1C4", "R2C5"]),
             RenbanConstraint(["R5C6", "R6C6", "R6C7", "R5C8"]),
@@ -338,7 +338,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         </RulesIndentedBlock>
     </>,
-    items: ({extension: {stage}}) => {
+    items: ({stateExtension: {stage}}) => {
         let lines = [
             MoodyLineConstraint(["R5C2", "R3C2", "R1C4", "R1C5", "R2C5"]),
             MoodyLineConstraint(["R4C6", "R7C3", "R8C3", "R8C4", "R9C5"]),

@@ -8,32 +8,37 @@ import {useCallback, useState} from "react";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButtonItemProps} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {ChessPTM} from "../types/ChessPTM";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
-export const ChessMainControls = (
-    {
-        context: {
-            cellSizeForSidePanel: cellSize,
-            state: {isShowingSettings, processed: {cellWriteMode}, extension: {selectedColor}},
-            onStateChange,
-        },
-    }: ControlButtonItemProps<ChessPTM>
-) => {
+export const ChessMainControls = observer(function ChessMainControls(
+    {context}: ControlButtonItemProps<ChessPTM>
+) {
+    profiler.trace();
+
+    const {
+        cellSizeForSidePanel: cellSize,
+        stateExtension: {selectedColor},
+        cellWriteMode,
+    } = context;
+
     const translate = useTranslate();
 
     const [usedColorSelectionOnce, setUsedColorSelectionOnce] = useState(false);
 
     const handleToggleColor = useCallback(() => {
-        onStateChange(({extension: {selectedColor}}) => ({
+        context.onStateChange(({stateExtension: {selectedColor}}) => ({
             extension: {
                 selectedColor: selectedColor === ChessColor.white ? ChessColor.black : ChessColor.white,
             },
         }));
 
         setUsedColorSelectionOnce(true);
-    }, [onStateChange, setUsedColorSelectionOnce]);
+    }, [context, setUsedColorSelectionOnce]);
 
     useEventListener(window, "keydown", (ev) => {
-        if (isShowingSettings) {
+        if (settings.isOpened) {
             return;
         }
 
@@ -101,4 +106,4 @@ export const ChessMainControls = (
             />}
         </ControlButton>
     </>;
-};
+});

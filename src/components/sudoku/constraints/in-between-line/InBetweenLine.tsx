@@ -6,17 +6,21 @@ import {
     parsePositionLiterals,
     PositionLiteral
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {darkGreyColor, lighterGreyColor} from "../../../app/globals";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 const lineWidth = 0.1;
 const circleRadius = 0.4;
 const backgroundColor = lighterGreyColor;
 
-export const InBetweenLine = {
-    [FieldLayer.regular]: <T extends AnyPTM>({cells}: ConstraintProps<T>) => {
+export const InBetweenLine: ConstraintPropsGenericFcMap = {
+    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({cells}: ConstraintProps<T>) {
+        profiler.trace();
+
         cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
         const edge1 = cells[0];
@@ -50,7 +54,7 @@ export const InBetweenLine = {
                 fill={backgroundColor}
             />
         </>;
-    },
+    }),
 };
 
 export const InBetweenLineConstraint = <T extends AnyPTM>(
@@ -67,7 +71,8 @@ export const InBetweenLineConstraint = <T extends AnyPTM>(
         cells,
         component: InBetweenLine,
         props: undefined,
-        isValidCell(cell, digits, cells, {puzzle, state}) {
+        isValidCell(cell, digits, cells, context) {
+            const {puzzle} = context;
             const {typeManager: {areSameCellData, compareCellData}} = puzzle;
 
             const digit = digits[cell.top][cell.left]!;
@@ -76,19 +81,19 @@ export const InBetweenLineConstraint = <T extends AnyPTM>(
             const [edgeDigit1, edgeDigit2] = edgeCells
                 .map(({top, left}) => digits[top]?.[left])
                 .filter(digit => digit !== undefined)
-                .sort((a, b) => compareCellData(a, b, puzzle, state, true));
+                .sort((a, b) => compareCellData(a, b, context));
 
             // The current cell is an edge cell
             if (arrayContainsPosition(edgeCells, cell)) {
                 // Other edge cells shouldn't be the same
-                return edgeDigit2 === undefined || !areSameCellData(edgeDigit1, edgeDigit2, puzzle, state, true);
+                return edgeDigit2 === undefined || !areSameCellData(edgeDigit1, edgeDigit2, context);
             } else {
                 // The current cell is on the between line
                 if (edgeDigit1 !== undefined && edgeDigit2 !== undefined) {
-                    return compareCellData(digit, edgeDigit1, puzzle, state, true) > 0
-                        && compareCellData(edgeDigit2, digit, puzzle, state, true) > 0;
+                    return compareCellData(digit, edgeDigit1, context) > 0
+                        && compareCellData(edgeDigit2, digit, context) > 0;
                 } else if (edgeDigit1 !== undefined) {
-                    return !areSameCellData(digit, edgeDigit1, puzzle, state, true);
+                    return !areSameCellData(digit, edgeDigit1, context);
                 }
             }
 

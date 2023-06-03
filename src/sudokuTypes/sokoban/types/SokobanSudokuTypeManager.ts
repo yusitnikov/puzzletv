@@ -2,7 +2,7 @@ import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/su
 import {defaultSokobanDirection, SokobanGameState, SokobanProcessedGameState} from "./SokobanGameState";
 import {mixAnimatedValue, useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {SokobanPTM} from "./SokobanPTM";
-import {gameStateGetCurrentFieldState, PartialGameStateEx} from "../../../types/sudoku/GameState";
+import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {SokobanFieldState} from "./SokobanFieldState";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
@@ -10,11 +10,11 @@ import {emptyPosition, isSamePosition, Position} from "../../../types/layout/Pos
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {cageTag} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 import {SokobanClueConstraint} from "../constraints/SokobanClue";
 import {SokobanPlayerConstraint} from "../constraints/SokobanPlayer";
 import {moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo} from "./SokobanMovePlayerCellWriteModeInfo";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {settings} from "../../../types/layout/Settings";
 
 export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
     ...DigitSudokuTypeManager(),
@@ -50,13 +50,15 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
         };
     },
 
-    useProcessedGameStateExtension(state): SokobanProcessedGameState {
-        const {animationSpeed, extension: {animating}} = state;
-        const {extension} = gameStateGetCurrentFieldState(state);
-
+    useProcessedGameStateExtension(
+        {
+            fieldExtension,
+            stateExtension: {animating},
+        }
+    ): SokobanProcessedGameState {
         return useAnimatedValue(
-            extension,
-            animating ? animationSpeed / 2 : 0,
+            fieldExtension,
+            animating ? settings.animationSpeed.get() / 2 : 0,
             (a, b, coeff) => ({
                 cluePositions: a.cluePositions.map((positionA, index) => {
                     const positionB = b.cluePositions[index];
@@ -73,16 +75,16 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
         );
     },
 
-    getProcessedGameStateExtension(state): SokobanProcessedGameState {
-        return gameStateGetCurrentFieldState(state).extension;
+    getProcessedGameStateExtension({fieldExtension}): SokobanProcessedGameState {
+        return fieldExtension;
     },
 
     processArrowDirection(
         currentCell, xDirection, yDirection, context, isMainKeyboard
     ): { cell?: Position; state?: PartialGameStateEx<SokobanPTM> } {
-        return context.state.processed.cellWriteMode === CellWriteMode.move || !isMainKeyboard
+        return context.cellWriteMode === CellWriteMode.move || !isMainKeyboard
             ? {
-                state: moveSokobanPlayer(context, xDirection, yDirection)(context.state),
+                state: moveSokobanPlayer(xDirection, yDirection)(context),
             }
             : defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard);
     },
@@ -105,19 +107,20 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
         const otherItems = items.filter((item) => !isSokobanClue(item) && !isSokobanPlayer(item));
         return {
             ...puzzle,
-            items: ({fieldStateHistory, processedExtension}): Constraint<SokobanPTM, any>[] => {
-                const {extension: {cluePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
-
-                return [
-                    ...otherItems,
-                    ...clues.map((clue, index) => SokobanClueConstraint(
-                        clue,
-                        cluePositions[index],
-                        processedExtension.cluePositions[index],
-                    )),
-                    SokobanPlayerConstraint(processedExtension.sokobanPosition),
-                ];
-            },
+            items: (
+                {
+                    fieldExtension: {cluePositions},
+                    processedGameStateExtension,
+                }
+            ): Constraint<SokobanPTM, any>[] => [
+                ...otherItems,
+                ...clues.map((clue, index) => SokobanClueConstraint(
+                    clue,
+                    cluePositions[index],
+                    processedGameStateExtension.cluePositions[index],
+                )),
+                SokobanPlayerConstraint(processedGameStateExtension.sokobanPosition),
+            ],
             extension: {
                 clues,
                 sokobanStartPosition: sokobanPlayer.cells[0],

@@ -1,4 +1,4 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {useTranslate} from "../../../hooks/useTranslate";
@@ -8,8 +8,14 @@ import {ControlButton} from "./ControlButton";
 import {useCallback} from "react";
 import {emptyPosition} from "../../../types/layout/Position";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
-export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, info}: ControlButtonItemProps<T>) => {
+export const MoveDigitModeButton: ControlButtonItemPropsGenericFc = observer(function MoveDigitModeButton<T extends AnyPTM>(
+    {context, top, left, info}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
     const {
         puzzle: {
             typeManager: {initialAngle = 0, initialScale = 1},
@@ -17,20 +23,19 @@ export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, info}
             loopVertically,
         },
         cellSizeForSidePanel: cellSize,
-        state: {processed: {cellWriteMode}},
-        onStateChange,
+        cellWriteMode,
     } = context;
 
     const translate = useTranslate();
 
     const handleResetPosition = useCallback(
-        () => onStateChange({
+        () => context.onStateChange({
             animating: false,
             loopOffset: emptyPosition,
             angle: initialAngle,
             scale: initialScale,
         }),
-        [onStateChange, initialAngle, initialScale]
+        [context, initialAngle, initialScale]
     )
 
     return <>
@@ -73,4 +78,4 @@ export const MoveDigitModeButton = <T extends AnyPTM>({context, top, left, info}
             </div>}
         </ControlButton>}
     </>;
-};
+});

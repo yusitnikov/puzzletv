@@ -6,12 +6,15 @@ import {blackColor} from "../../../components/app/globals";
 import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
 import {gameStateHandleZoomClick, gameStateSetScaleLog} from "../../../types/sudoku/GameState";
 import {getInfiniteLoopRegionBorderWidth} from "./InfiniteRingsBorderLines";
-import {useIsFocusingInfiniteRings, useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
+import {focusRingsSetting, isShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {indexes} from "../../../utils/indexes";
 import {loop} from "../../../utils/math";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {runInAction} from "mobx";
+import {profiler} from "../../../utils/profiler";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
@@ -54,13 +57,14 @@ const StyledCircle = styled("div")({
 
 export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
     visibleRingsCountArg = 2,
-) => function InfiniteRingsFieldWrapperComponent(
+) => observer(function InfiniteRingsFieldWrapperFc(
     {context, children}: PropsWithChildren<PuzzleContextProps<T>>
 ) {
+    profiler.trace();
+
     const {
         puzzle: {fieldSize: {rowsCount: fieldSize}},
-        state: {processed: {scaleLog}},
-        onStateChange,
+        scaleLog,
         cellSize,
         isReadonlyContext,
     } = context;
@@ -68,10 +72,9 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
     const translate = useTranslate();
 
     const ringOffset = Math.round(scaleLog);
-    const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
-    const [isFocusingInfiniteRings] = useIsFocusingInfiniteRings();
+    const showingAllInfiniteRings = isShowingAllInfiniteRings(context, visibleRingsCountArg);
     const ringsCount = fieldSize / 2 - 1;
-    const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
+    const visibleRingsCount = showingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
     const loopedRingOffset = loop(ringOffset, ringsCount);
 
     const buttonFontSize = cellSize * 1.2 * Math.pow(0.5, visibleRingsCount);
@@ -90,7 +93,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
         }}>
             {children}
 
-            {isShowingAllInfiniteRings && isFocusingInfiniteRings && !isReadonlyContext && <div style={{
+            {showingAllInfiniteRings && focusRingsSetting.get() && !isReadonlyContext && <div style={{
                 position: "absolute",
                 inset: 0,
                 opacity: 0.15,
@@ -152,7 +155,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => gameStateHandleZoomClick(context, true)}
+                        onClick={() => runInAction(() => gameStateHandleZoomClick(context, true))}
                         title={translate("zoom in")}
                     >
                         +
@@ -166,7 +169,7 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
                             width: "40%",
                             height: "40%",
                         }}
-                        onClick={() => gameStateHandleZoomClick(context, false)}
+                        onClick={() => runInAction(() => gameStateHandleZoomClick(context, false))}
                         title={translate("zoom out")}
                     >
                         -
@@ -177,10 +180,9 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
                         count={ringsCount}
                         index={index}
                         selected={index === loopedRingOffset}
-                        onClick={() => onStateChange(gameStateSetScaleLog(
-                            context,
+                        onClick={() => runInAction(() => context.onStateChange(gameStateSetScaleLog(
                             loop(index - ringOffset + ringsCount / 2, ringsCount) + ringOffset - ringsCount / 2
-                        ))}
+                        )))}
                     >
                         <StyledCircle/>
                     </StyledCircleButton>)}
@@ -188,4 +190,4 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(
             </div>
         </div>
     </div>;
-};
+});

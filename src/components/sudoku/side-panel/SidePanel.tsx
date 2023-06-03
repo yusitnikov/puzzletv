@@ -9,11 +9,13 @@ import {Size} from "../../../types/layout/Size";
 import {globalPaddingCoeff} from "../../app/globals";
 import {useControlButtonsManager} from "../controls/ControlButtonsManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {ReactElement} from "react";
+import {profiler} from "../../../utils/profiler";
 
-export interface SidePanelProps<T extends AnyPTM> extends ControlsProps<T> {
-}
+export const SidePanel = observer(function SidePanel<T extends AnyPTM>({context, rect, isHorizontal}: ControlsProps<T>) {
+    profiler.trace();
 
-export const SidePanel = <T extends AnyPTM>({context, rect, isHorizontal}: SidePanelProps<T>) => {
     const {puzzle, cellSizeForSidePanel: cellSize} = context;
 
     const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);
@@ -53,4 +55,4 @@ export const SidePanel = <T extends AnyPTM>({context, rect, isHorizontal}: SideP
             isHorizontal={isHorizontal}
         />
     </Absolute>;
-};
+}) as <T extends AnyPTM>(props: ControlsProps<T>) => ReactElement;

@@ -1,12 +1,11 @@
 import {GameStateActionCallback} from "../../../types/sudoku/GameStateAction";
 import {JigsawPTM} from "./JigsawPTM";
-import {fieldStateHistoryAddState, fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getActiveJigsawPieceZIndex} from "./helpers";
 import {JigsawFieldPieceState} from "./JigsawFieldState";
-import {ProcessedGameStateEx} from "../../../types/sudoku/GameState";
 import {indexes} from "../../../utils/indexes";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export interface JigsawGamePieceState {
     animating: boolean;
@@ -18,8 +17,7 @@ interface JigsawPieceStateUpdate {
 }
 
 export const jigsawPieceStateChangeAction = (
-    puzzle: PuzzleDefinition<JigsawPTM>,
-    startState: ProcessedGameStateEx<JigsawPTM> | undefined,
+    startContext: PuzzleContext<JigsawPTM> | undefined,
     clientId: string,
     actionId: string,
     pieceIndexes: number[] | number | undefined,
@@ -33,7 +31,11 @@ export const jigsawPieceStateChangeAction = (
         index: number,
     ) => JigsawPieceStateUpdate),
     resetSelectedCells = true,
-): GameStateActionCallback<JigsawPTM> => ({selectedCells, fieldStateHistory, extension: {pieces: pieceStates}}) => {
+): GameStateActionCallback<JigsawPTM> => (context) => {
+    const {
+        stateExtension: {pieces: pieceStates},
+    } = context;
+
     if (pieceIndexes === undefined) {
         pieceIndexes = indexes(pieceStates.length);
     }
@@ -47,11 +49,11 @@ export const jigsawPieceStateChangeAction = (
 
     let updatesPerIndex: JigsawPieceStateUpdate[];
     if (typeof updates === "function") {
-        let {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
-        if (startState) {
+        let {fieldExtension: {pieces: piecePositions}} = context;
+        if (startContext) {
             // Take the position from the start state, but z-index from the current state
             // (because "bring on top" action could be executed in the middle of the gesture)
-            let {extension: {pieces: startPiecePositions}} = fieldStateHistoryGetCurrent(startState.fieldStateHistory);
+            const {fieldExtension: {pieces: startPiecePositions}} = startContext;
             piecePositions = startPiecePositions.map((startPosition, index) => ({
                 ...startPosition,
                 zIndex: piecePositions[index].zIndex,
@@ -71,8 +73,7 @@ export const jigsawPieceStateChangeAction = (
     return {
         ...(updatesPerIndex.some(({position}) => position) && {
             fieldStateHistory: fieldStateHistoryAddState(
-                puzzle,
-                fieldStateHistory,
+                context,
                 clientId,
                 actionId,
                 ({extension: {pieces: piecePositions}, ...fieldState}) => ({
@@ -96,16 +97,14 @@ export const jigsawPieceStateChangeAction = (
             ),
             highlightCurrentPiece: true,
         },
-        ...(resetSelectedCells && {selectedCells: selectedCells.clear()}),
+        ...(resetSelectedCells && {selectedCells: context.selectedCells.clear()}),
     };
 };
 
 export const jigsawPieceBringOnTopAction = (
-    puzzle: PuzzleDefinition<JigsawPTM>,
     pieceIndexes: number[],
     resetSelectedCells = true
 ) => jigsawPieceStateChangeAction(
-    puzzle,
     undefined,
     myClientId,
     "jigsaw-bring-on-top",

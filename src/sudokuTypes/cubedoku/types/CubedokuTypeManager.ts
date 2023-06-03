@@ -1,5 +1,5 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {CellSelectionColor, CellSelectionProps} from "../../../components/sudoku/cell/CellSelection";
+import {CellSelectionColor, CellSelectionByDataProps} from "../../../components/sudoku/cell/CellSelection";
 import {CubeTypeManager} from "../../cube/types/CubeTypeManager";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {CubedokuIndexingConstraint} from "../constraints/CubedokuIndexing";
@@ -9,14 +9,14 @@ import {NumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
     ...CubeTypeManager(false),
 
-    getCellSelectionType: function ({top, left}, {puzzle: {fieldSize: {fieldSize}}, state: {selectedCells}}) {
+    getCellSelectionType({top, left}, {puzzle: {fieldSize: {fieldSize}}, selectedCells}) {
         const realFieldSize = fieldSize / 2;
 
-        const tooltipResult: Required<Pick<CellSelectionProps<NumberPTM>, "color" | "strokeWidth">> = {
+        const tooltipResult: Required<Pick<CellSelectionByDataProps<NumberPTM>, "color" | "strokeWidth">> = {
             color: CellSelectionColor.secondary,
             strokeWidth: 1,
         };
-        const trackResult: Required<Pick<CellSelectionProps<NumberPTM>, "color" | "strokeWidth">> = {
+        const trackResult: Required<Pick<CellSelectionByDataProps<NumberPTM>, "color" | "strokeWidth">> = {
             color: CellSelectionColor.secondary,
             strokeWidth: 0.5,
         };
@@ -86,7 +86,7 @@ export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
         return {
             ...puzzle,
             items: typeof items === "function"
-                ? (state) => addConstraint(items(state))
+                ? (context) => addConstraint(items(context))
                 : addConstraint(items ?? []),
         };
     },

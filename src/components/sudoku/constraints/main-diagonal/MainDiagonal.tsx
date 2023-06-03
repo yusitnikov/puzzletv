@@ -1,17 +1,21 @@
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {getLineVector, PositionLiteral} from "../../../../types/layout/Position";
 import {RenbanConstraint} from "../renban/Renban";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {LineProps} from "../line/Line";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 const diagonalColor = "#34bbe6";
 const diagonalWidth = 0.03;
 
-export const DiagonalComponent = {
-    [FieldLayer.regular]: <T extends AnyPTM>(
+export const DiagonalComponent: ConstraintPropsGenericFcMap<LineProps> = {
+    [FieldLayer.regular]: observer(function Diagonal<T extends AnyPTM>(
         {cells, color = diagonalColor, context: {cellSize}}: ConstraintProps<T, LineProps>
-    ) => {
+    ) {
+        profiler.trace();
+
         cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
 
         const [first, second] = cells;
@@ -26,7 +30,7 @@ export const DiagonalComponent = {
             strokeWidth={3 / cellSize}
             stroke={color}
         />;
-    },
+    }),
 };
 
 const BaseDiagonalConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[]): Constraint<T, LineProps> => ({

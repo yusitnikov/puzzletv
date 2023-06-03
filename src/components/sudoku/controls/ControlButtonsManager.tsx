@@ -1,6 +1,6 @@
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {Position} from "../../../types/layout/Position";
-import {ComponentType, useMemo} from "react";
+import {ComponentType, ReactElement, useMemo} from "react";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellWriteModeInfo, getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteModeInfo";
@@ -31,6 +31,8 @@ export interface ControlButtonItemProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
     info?: CellWriteModeInfo<T>;
 }
+
+export type ControlButtonItemPropsGenericFc = <T extends AnyPTM>(props: ControlButtonItemProps<T>) => (ReactElement | null);
 
 export interface ControlButtonItem<T extends AnyPTM> {
     key: string;
@@ -161,7 +163,7 @@ export class ControlButtonsManager<T extends AnyPTM> {
 
         const isRevertedBottom = this.isCompact && !this.isHorizontal;
         const bottomRow = this.isCompact ? 0 : 3;
-        const isColorMode = context.state.processed.cellWriteMode === CellWriteMode.color;
+        const isColorMode = context.cellWriteMode === CellWriteMode.color;
 
         const isRevertedRight = this.isCompact === this.isHorizontal;
         const rightColumn = this.isCompact ? 1 : 4;

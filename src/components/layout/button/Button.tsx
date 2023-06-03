@@ -3,6 +3,9 @@ import styled from "@emotion/styled";
 import {lightGreyColor, textColor, textHeightCoeff} from "../../app/globals";
 import {ButtonHTMLAttributes, useLayoutEffect, useRef} from "react";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
+import {runInAction} from "mobx";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
 const StyledButton = styled("button", {
     shouldForwardProp(propName) {
@@ -31,7 +34,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     autoFocus?: boolean;
 }
 
-export const Button = ({autoFocus, children, ...buttonProps}: ButtonProps) => {
+export const Button = observer(function ButtonFc({autoFocus, children, onClick, ...buttonProps}: ButtonProps) {
+    profiler.trace();
+
     const ref = useRef<HTMLButtonElement>(null);
 
     useLayoutEffect(() => {
@@ -42,8 +47,9 @@ export const Button = ({autoFocus, children, ...buttonProps}: ButtonProps) => {
 
     return <StyledButton
         ref={ref}
+        onClick={(ev) => runInAction(() => onClick?.(ev))}
         {...buttonProps}
     >
         {children}
     </StyledButton>;
-};
+});

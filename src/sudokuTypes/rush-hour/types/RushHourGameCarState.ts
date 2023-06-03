@@ -1,29 +1,30 @@
 import {GameStateActionCallback} from "../../../types/sudoku/GameStateAction";
 import {RushHourPTM} from "./RushHourPTM";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {gameStateGetCurrentFieldState, ProcessedGameStateEx} from "../../../types/sudoku/GameState";
 import {Position} from "../../../types/layout/Position";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export interface RushHourGameCarState {
     animating: boolean;
 }
 
 export const rushHourCarStateChangeAction = (
-    puzzle: PuzzleDefinition<RushHourPTM>,
-    startState: ProcessedGameStateEx<RushHourPTM> | undefined,
+    startContext: PuzzleContext<RushHourPTM> | undefined,
     clientId: string,
     actionId: string,
     carIndex: number,
     calculatePosition: (prevPosition: Position, allPositions: Position[]) => Position,
     animate: boolean,
-): GameStateActionCallback<RushHourPTM> => ({fieldStateHistory, extension: {cars: carStates}}) => {
-    const startCarPositions = startState && gameStateGetCurrentFieldState(startState).extension.cars;
+): GameStateActionCallback<RushHourPTM> => (context) => {
+    const {
+        stateExtension: {cars: carStates},
+    } = context;
+
+    const startCarPositions = startContext?.fieldExtension.cars;
 
     return {
         fieldStateHistory: fieldStateHistoryAddState(
-            puzzle,
-            fieldStateHistory,
+            context,
             clientId,
             actionId,
             ({extension: {cars}, ...fieldState}) => ({

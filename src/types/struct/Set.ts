@@ -298,3 +298,5 @@ export class PlainValueSet<ItemT extends string | number> extends HashSet<ItemT>
         return new PlainValueSet<ItemT>(items as ItemT[]);
     }
 }
+
+export const setComparer = <T>(a: SetInterface<T>, b: SetInterface<T>) => a.equals(b);

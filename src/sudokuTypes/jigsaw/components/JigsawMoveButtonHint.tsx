@@ -5,27 +5,32 @@ import {controlButtonPaddingCoeff} from "../../../components/sudoku/controls/Con
 import {useTranslate} from "../../../hooks/useTranslate";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ControlButtonItemProps} from "../../../components/sudoku/controls/ControlButtonsManager";
-import {getAllPuzzleConstraints} from "../../../types/sudoku/Constraint";
 import {jssTag} from "../../jss/constraints/Jss";
 import {JigsawJssCluesVisibility} from "../types/JigsawGameState";
+import {observer} from "mobx-react-lite";
+import {useComputed} from "../../../hooks/useComputed";
+import {profiler} from "../../../utils/profiler";
 
-export const JigsawMoveButtonHint = ({context}: ControlButtonItemProps<JigsawPTM>) => {
-    const {
-        puzzle: {importOptions: {angleStep} = {}},
-        cellSizeForSidePanel: cellSize,
-        state: {extension: {jssCluesVisibility}, processed: {cellWriteMode}},
-        onStateChange,
-    } = context;
+export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({context}: ControlButtonItemProps<JigsawPTM>) {
+    profiler.trace();
 
     const translate = useTranslate();
 
-    if (cellWriteMode !== CellWriteMode.move) {
+    const isJss = useComputed(function isJss() {
+        return context.allItems.some(({tags}) => tags?.includes(jssTag));
+    });
+
+    if (context.cellWriteMode !== CellWriteMode.move) {
         return null;
     }
 
-    const paragraphStyles = {marginBottom: "0.5em"};
+    const {
+        puzzle: {importOptions: {angleStep} = {}},
+        cellSizeForSidePanel: cellSize,
+        stateExtension: {jssCluesVisibility},
+    } = context;
 
-    const isJss = getAllPuzzleConstraints(context).some(({tags}) => tags?.includes(jssTag));
+    const paragraphStyles = {marginBottom: "0.5em"};
 
     return <Absolute
         left={0}
@@ -46,7 +51,7 @@ export const JigsawMoveButtonHint = ({context}: ControlButtonItemProps<JigsawPTM
             })}.
         </div>
 
-        {isJss && <div style={paragraphStyles}>
+        {isJss() && <div style={paragraphStyles}>
             <label>
                 {translate({
                     [LanguageCode.en]: "Show Japanese sums clues",
@@ -54,7 +59,7 @@ export const JigsawMoveButtonHint = ({context}: ControlButtonItemProps<JigsawPTM
                 })}:<br/>
                 <select
                     value={jssCluesVisibility}
-                    onChange={(ev) => onStateChange({extension: {jssCluesVisibility: Number(ev.target.value)}})}
+                    onChange={(ev) => context.onStateChange({extension: {jssCluesVisibility: Number(ev.target.value)}})}
                     style={{pointerEvents: "all", maxWidth: "100%", fontSize: "inherit"}}
                 >
                     <option value={JigsawJssCluesVisibility.All}>{translate("Yes")}</option>
@@ -67,4 +72,4 @@ export const JigsawMoveButtonHint = ({context}: ControlButtonItemProps<JigsawPTM
             </label>
         </div>}
     </Absolute>;
-};
+});

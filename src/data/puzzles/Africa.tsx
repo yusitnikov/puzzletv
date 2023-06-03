@@ -14,10 +14,10 @@ import {latLngLiteralToPosition} from "../../sudokuTypes/google-maps/utils/googl
 import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
 import {GoogleMapsTypeManager} from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
 import {GoogleMapsPTM} from "../../sudokuTypes/google-maps/types/GoogleMapsPTM";
+import {indexes} from "../../utils/indexes";
 
 export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
     slug: "africa",
@@ -65,15 +65,17 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             name: "neighbors",
             cells: [],
             props: undefined,
-            isValidCell({top, left}, digits, regionCells, {puzzle, cellsIndex, state}): boolean {
+            isValidCell({top, left}, digits, regionCells, context): boolean {
                 const digit = digits[top][left]!;
 
-                const {neighbors} = cellsIndex.allCells[top][left];
+                const {puzzle, puzzleIndex} = context;
+
+                const {neighbors} = puzzleIndex.allCells[top][left];
 
                 for (const neighbor of neighbors.items) {
                     const digit2 = digits[neighbor.top]?.[neighbor.left];
 
-                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, puzzle, state, true)) {
+                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, context)) {
                         return false;
                     }
                 }
@@ -97,8 +99,8 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             return false;
         }
 
-        const digits = gameStateGetCurrentFieldState(context.state).cells[0].map(({usersDigit}) => usersDigit!);
-        const cellInfos = context.cellsIndex.allCells[0];
+        const digits = indexes(context.puzzle.fieldSize.columnsCount).map((left) => context.getCellDigit(0, left)!);
+        const cellInfos = context.puzzleIndex.allCells[0];
 
         let product = 1;
         let dots = 0;

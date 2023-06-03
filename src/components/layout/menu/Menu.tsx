@@ -9,6 +9,9 @@ import {createPortal} from "react-dom";
 import {useEventListener} from "../../../hooks/useEventListener";
 import FocusTrap from "focus-trap-react";
 import {useRoute} from "../../../hooks/useRoute";
+import {runInAction} from "mobx";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
 const fontSize = headerHeight * 0.5;
 
@@ -32,7 +35,9 @@ interface StyledMenuItemProps {
     active: boolean;
 }
 
-export const VerticalMenu = ({className, style, items}: MenuProps) => {
+export const VerticalMenu = observer(function VerticalMenuFc({className, style, items}: MenuProps) {
+    profiler.trace();
+
     const language = useLanguageCode();
     const {slug} = useRoute();
 
@@ -45,7 +50,7 @@ export const VerticalMenu = ({className, style, items}: MenuProps) => {
 
         <div
             className={className}
-            onClick={toggleOpen}
+            onClick={() => runInAction(toggleOpen)}
             style={{
                 ...style,
                 cursor: "pointer",
@@ -76,7 +81,7 @@ export const VerticalMenu = ({className, style, items}: MenuProps) => {
             </FocusTrap>}
         </div>
     </>;
-};
+});
 
 const StyledVerticalMenuItem = styled("a", {
     shouldForwardProp(propName) {
@@ -95,7 +100,9 @@ const StyledVerticalMenuItem = styled("a", {
     },
 }));
 
-export const HorizontalMenu = ({className, style, items}: MenuProps) => {
+export const HorizontalMenu = observer(function HorizontalMenuFc({className, style, items}: MenuProps) {
+    profiler.trace();
+
     const language = useLanguageCode();
     const {slug} = useRoute();
 
@@ -115,7 +122,7 @@ export const HorizontalMenu = ({className, style, items}: MenuProps) => {
             {item.name}
         </StyledHorizontalMenuItem>)}
     </div>;
-};
+});
 
 const StyledHorizontalMenuItem = styled("a", {
     shouldForwardProp(propName) {
@@ -138,7 +145,9 @@ interface BackDropProps {
     onClose: () => void;
 }
 
-const BackDrop = ({onClose}: BackDropProps) => {
+const BackDrop = observer(function BackDropFc({onClose}: BackDropProps) {
+    profiler.trace();
+
     useEventListener(window, "keydown", ({code}) => {
         if (code === "Escape") {
             onClose();
@@ -152,8 +161,8 @@ const BackDrop = ({onClose}: BackDropProps) => {
                 inset: 0,
                 zIndex: 1,
             }}
-            onClick={onClose}
+            onClick={() => runInAction(onClose)}
         />,
         window.document.body
     );
-};
+});

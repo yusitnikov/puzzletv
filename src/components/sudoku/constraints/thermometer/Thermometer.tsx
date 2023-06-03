@@ -1,21 +1,25 @@
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import {darkGreyColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {isSamePosition, parsePositionLiterals, Position, PositionLiteral} from "../../../../types/layout/Position";
 import {splitMultiLine} from "../../../../utils/lines";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
-export const Thermometer = {
-    [FieldLayer.regular]: <T extends AnyPTM>(
+export const Thermometer: ConstraintPropsGenericFcMap = {
+    [FieldLayer.regular]: observer(function Thermometer<T extends AnyPTM>(
         {
             cells: points,
             color = darkGreyColor,
-            context: {cellsIndex},
+            context: {puzzleIndex},
         }: ConstraintProps<T>
-    ) => {
+    ) {
+        profiler.trace();
+
         const getPointInfo = ({top, left}: Position, radius: number) => {
-            const cellInfo = cellsIndex.allCells[top]?.[left];
+            const cellInfo = puzzleIndex.allCells[top]?.[left];
             return cellInfo
                 ? {...cellInfo.center, radius: radius * cellInfo.bounds.userArea.width}
                 : {left: left + 0.5, top: top + 0.5, radius};
@@ -37,7 +41,7 @@ export const Thermometer = {
                 stroke={color}
             />
         </g>;
-    },
+    }),
 };
 
 export const ThermometerConstraint = <T extends AnyPTM>(
@@ -57,7 +61,7 @@ export const ThermometerConstraint = <T extends AnyPTM>(
         props: undefined,
         color,
         isObvious: true,
-        isValidCell(cell, digits, cells, {puzzle, state}) {
+        isValidCell(cell, digits, cells, context) {
             const digit = digits[cell.top][cell.left]!;
 
             let isBeforeCurrentCell = true;
@@ -73,7 +77,7 @@ export const ThermometerConstraint = <T extends AnyPTM>(
                     continue;
                 }
 
-                const comparison = puzzle.typeManager.compareCellData(constraintDigit, digit, puzzle, state, true);
+                const comparison = context.puzzle.typeManager.compareCellData(constraintDigit, digit, context);
                 if (comparison === 0) {
                     return false;
                 }

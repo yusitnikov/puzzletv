@@ -6,18 +6,23 @@ import {ControlButton} from "../../../components/sudoku/controls/ControlButton";
 import {RotateLeft, RotateRight} from "@emotion-icons/material";
 import {RotatableCluesPTM} from "../types/RotatableCluesPTM";
 import {RotatableClue} from "../types/RotatableCluesPuzzleExtension";
-import {fieldStateHistoryAddState, fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
+import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {RotatableCluesGameState} from "../types/RotatableCluesGameState";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
-export const RotateClueButton = <T extends AnyPTM>(direction: number) => function RotateClueButton({context, top, left}: ControlButtonItemProps<RotatableCluesPTM<T>>) {
+export const RotateClueButton = <T extends AnyPTM>(direction: number) => observer(function RotateClueButton(
+    {context, top, left}: ControlButtonItemProps<RotatableCluesPTM<T>>
+) {
+    profiler.trace();
+
     const {
         puzzle,
         cellSizeForSidePanel: cellSize,
-        state: {fieldStateHistory, selectedCells, isShowingSettings},
-        onStateChange,
     } = context;
 
     const translate = useTranslate();
@@ -25,21 +30,18 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
     const isClockwise = direction > 0;
     const isShift = !isClockwise;
 
-    const {cells} = fieldStateHistoryGetCurrent(fieldStateHistory);
-
     const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
     const selectedClueIndexes = clues
-            .map(({pivot}, index) => ({
-                pivot,
-                index,
-            }))
-            .filter(({pivot}) => selectedCells.contains(pivot) && cells[pivot.top]?.[pivot.left]?.usersDigit === undefined)
-            .map(({index}) => index);
+        .map(({pivot}, index) => ({
+            pivot,
+            index,
+        }))
+        .filter(({pivot}) => context.isSelectedCell(pivot.top, pivot.left) && context.getCellDigit(pivot.top, pivot.left) === undefined)
+        .map(({index}) => index);
 
-    const handleRotate = () => onStateChange(({fieldStateHistory, extension}) => ({
+    const handleRotate = () => context.onStateChange((context) => ({
         fieldStateHistory: fieldStateHistoryAddState(
-            puzzle,
-            fieldStateHistory,
+            context,
             myClientId,
             getNextActionId(),
             (fieldState) => ({
@@ -57,14 +59,14 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
             })
         ),
         extension: {
-            clues: (extension as RotatableCluesGameState).clues.map(({animating}, index) => ({
+            clues: (context.stateExtension as RotatableCluesGameState).clues.map(({animating}, index) => ({
                 animating: animating || selectedClueIndexes.includes(index),
             })),
         },
     }));
 
     useEventListener(window, "keydown", (ev) => {
-        if (!isShowingSettings && ev.shiftKey === isShift && ev.code === "KeyR") {
+        if (!settings.isOpened && ev.shiftKey === isShift && ev.code === "KeyR") {
             handleRotate();
             ev.preventDefault();
         }
@@ -83,4 +85,4 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => functio
     >
         {isClockwise ? <RotateRight/> : <RotateLeft/>}
     </ControlButton>;
-};
+});

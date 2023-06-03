@@ -1,6 +1,6 @@
 import {Position} from "../layout/Position";
 import {AnyPTM} from "./PuzzleTypeMap";
-import {PuzzleDefinition} from "./PuzzleDefinition";
+import {PuzzleContext} from "./PuzzleContext";
 
 export type GivenDigitsMap<CellType> = Record<number, Record<number, CellType>>;
 
@@ -55,7 +55,7 @@ export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>
     processGivenDigitsMaps(([first]) => first, maps);
 
 export const areSameGivenDigitsMaps = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>, map1: GivenDigitsMap<T["cell"]>, map2: GivenDigitsMap<T["cell"]>
+    context: PuzzleContext<T>, map1: GivenDigitsMap<T["cell"]>, map2: GivenDigitsMap<T["cell"]>
 ) => {
     const mergedMap = mergeGivenDigitsMaps(map1, map2);
 
@@ -74,7 +74,7 @@ export const areSameGivenDigitsMaps = <T extends AnyPTM>(
                 continue;
             }
 
-            if (!puzzle.typeManager.areSameCellData(cell1, cell2, puzzle, undefined, false)) {
+            if (!context.puzzle.typeManager.areSameCellData(cell1, cell2, context, false, false)) {
                 return false;
             }
         }

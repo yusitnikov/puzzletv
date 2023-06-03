@@ -65,10 +65,15 @@ const SameColorRegionConstraint: Constraint<NumberPTM> = {
         )
     ),
     props: undefined,
-    isValidCell(cell, digits, cells, {cellsIndex, state}) {
+    isValidCell(
+        cell,
+        digits,
+        cells,
+        context
+    ) {
         const color = initialColors[cell.top][cell.left];
 
-        const region = cellsIndex.getCustomRegionByBorderLinesAt(state, cell);
+        const region = context.puzzleIndex.getCustomRegionByBorderLinesAt(context, cell);
 
         return region.filter(({top, left}) => initialColors[top]?.[left] === color).length === 2;
     },

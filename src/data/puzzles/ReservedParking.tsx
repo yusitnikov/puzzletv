@@ -1,5 +1,4 @@
 import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import React from "react";
 import {MultiStageSudokuTypeManager} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
@@ -20,15 +19,20 @@ import {TextProps, textTag} from "../../components/sudoku/constraints/text/Text"
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {Position} from "../../types/layout/Position";
 import {LanguageCode} from "../../types/translations/LanguageCode";
+import {comparer, IReactionDisposer, reaction} from "mobx";
+
+// TODO: accessibility for color-blind
 
 type ReservedParkingPTM = ToMultiStagePTM<RushHourPTM>;
 
 const hasParkedCar = (
-    {puzzle: {extension}, state}: PuzzleContext<ReservedParkingPTM>,
+    {
+        puzzle: {extension},
+        fieldExtension: {cars: carPositions},
+    }: PuzzleContext<ReservedParkingPTM>,
     expected: Rect,
 ) => {
     const cars = extension?.cars ?? [];
-    const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
 
     return cars.some(({boundingRect: {top, left, width, height}}, index) => {
         const offset = carPositions[index];
@@ -58,64 +62,82 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                     }),
                 }),
                 extraCellWriteModes: [RushHourMoveCellWriteModeInfo(
-                    ({top, left, width, height}, isVertical, {state: {extension}}) => {
+                    ({top, left, width, height}, isVertical, {stateExtension}) => {
                         const value = isVertical ? top : left;
                         const size = isVertical ? height : width;
                         if (!isVertical && top === 2) {
                             // It's the red car
                             return value;
                         }
-                        if ((extension as unknown as MultiStageGameState).stage === 2) {
+                        if ((stateExtension as unknown as MultiStageGameState).stage === 2) {
                             // There's no cage anymore
                             return value;
                         }
                         return Math.min(value, 6 + carMargin - size);
                     }
                 ) as unknown as CellWriteModeInfo<ReservedParkingPTM>],
-                applyStateDiffEffect(state, prevState, context) {
-                    const {puzzle: {items: itemsFn, extension}, onStateChange} = context;
-                    const items = typeof itemsFn === "function" ? itemsFn(state) : itemsFn ?? [];
+                getReactions(context): IReactionDisposer[] {
+                    return [
+                        reaction(
+                            () => {
+                                const {
+                                    puzzle: {
+                                        items: itemsFn,
+                                        extension,
+                                    },
+                                    stateInitialDigits = {},
+                                } = context;
+                                const items = typeof itemsFn === "function" ? itemsFn(context) : itemsFn ?? [];
 
-                    const {initialDigits = {}} = state;
-                    const newInitialDigitsCandidates: (Position & {digit: number})[] = [];
-                    for (const {tags, cells: [cell], props} of items) {
-                        if (tags?.includes(textTag) && !initialDigits[cell.top]?.[cell.left]) {
-                            newInitialDigitsCandidates.push({
-                                ...cell,
-                                digit: Number((props as TextProps).text),
-                            });
-                        }
-                    }
+                                const newInitialDigitsCandidates: (Position & {digit: number})[] = [];
+                                for (const {tags, cells: [cell], props} of items) {
+                                    if (tags?.includes(textTag) && !stateInitialDigits[cell.top]?.[cell.left]) {
+                                        newInitialDigitsCandidates.push({
+                                            ...cell,
+                                            digit: Number((props as TextProps).text),
+                                        });
+                                    }
+                                }
 
-                    const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
-                    const newInitialDigits: GivenDigitsMap<number> = {};
-                    for (const [index, {boundingRect: {top, left, width, height}}] of (extension?.cars ?? []).entries()) {
-                        const offset = carPositions[index];
-                        const offsetTop = top + offset.top;
-                        const offsetLeft = left + offset.left;
-                        const offsetBottom = offsetTop + height;
-                        const offsetRight = offsetLeft + width;
+                                const {fieldExtension: {cars: carPositions}} = context;
+                                const newInitialDigits: GivenDigitsMap<number> = {};
+                                for (const [index, {boundingRect: {top, left, width, height}}] of (extension?.cars ?? []).entries()) {
+                                    const offset = carPositions[index];
+                                    const offsetTop = top + offset.top;
+                                    const offsetLeft = left + offset.left;
+                                    const offsetBottom = offsetTop + height;
+                                    const offsetRight = offsetLeft + width;
 
-                        for (const {top, left, digit} of newInitialDigitsCandidates) {
-                            const centerTop = top + 0.5;
-                            const centerLeft = left + 0.5;
-                            if (centerTop >= offsetTop && centerTop <= offsetBottom && centerLeft >= offsetLeft && centerLeft <= offsetRight) {
-                                newInitialDigits[top] = newInitialDigits[top] || {};
-                                newInitialDigits[top][left] = digit;
+                                    for (const {top, left, digit} of newInitialDigitsCandidates) {
+                                        const centerTop = top + 0.5;
+                                        const centerLeft = left + 0.5;
+                                        if (centerTop >= offsetTop && centerTop <= offsetBottom && centerLeft >= offsetLeft && centerLeft <= offsetRight) {
+                                            newInitialDigits[top] = newInitialDigits[top] || {};
+                                            newInitialDigits[top][left] = digit;
+                                        }
+                                    }
+                                }
+
+                                return newInitialDigits;
+                            },
+                            (newInitialDigits) => {
+                                if (Object.keys(newInitialDigits).length !== 0) {
+                                    context.onStateChange({
+                                        initialDigits: mergeGivenDigitsMaps(context.stateInitialDigits, newInitialDigits),
+                                    });
+                                }
+                            },
+                            {
+                                name: "digits discovered by cars",
+                                equals: comparer.structural,
                             }
-                        }
-                    }
-
-                    if (Object.keys(newInitialDigits).length !== 0) {
-                        onStateChange({
-                            initialDigits: mergeGivenDigitsMaps(initialDigits, newInitialDigits),
-                        });
-                    }
+                        )
+                    ];
                 },
             },
-            items: (state) => {
-                const parkedRedCar = state.extension.stage === 2;
-                const baseItems = typeof items === "function" ? items(state) : items ?? [];
+            items: (context) => {
+                const parkedRedCar = context.stateExtension.stage === 2;
+                const baseItems = typeof items === "function" ? items(context) : items ?? [];
 
                 return baseItems.map((item) => {
                     if (item.tags?.includes(cageTag)) {
@@ -165,7 +187,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
             },
             resultChecker: (context) => {
                 // Hack the digits count in the context to check only the global constraints, not the digits
-                if (!isValidFinishedPuzzleByConstraints({...context, puzzle: {...context.puzzle, digitsCount: 0}})) {
+                if (!isValidFinishedPuzzleByConstraints(context.cloneWith({puzzle: {...context.puzzle, digitsCount: 0}}))) {
                     return false;
                 }
 

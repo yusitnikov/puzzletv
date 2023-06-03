@@ -15,11 +15,9 @@ import {getRectCenter} from "../../../types/layout/Rect";
 import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {
-    getActiveJigsawPieceZIndex,
     getJigsawCellCenterAbsolutePosition,
     getJigsawPieceIndexByCell,
-    getJigsawPieceRegion,
-    getJigsawPiecesWithCache,
+    getJigsawPiecesWithCache, getJigsawRegionWithCache,
     groupJigsawPiecesByZIndex,
     moveJigsawPieceByGroupGesture,
     normalizeJigsawDigit,
@@ -37,7 +35,6 @@ import {JigsawPTM} from "./JigsawPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
 import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
 import {JigsawPieceHighlightHandlerControlButtonItem} from "../components/JigsawPieceHighlightHandler";
-import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {getCellDataSortIndexes} from "../../../components/sudoku/cell/CellDigits";
 import {JigsawFieldPieceState, JigsawFieldState} from "./JigsawFieldState";
 import {getReverseIndexMap} from "../../../utils/array";
@@ -51,14 +48,14 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {JigsawJss} from "../constraints/JigsawJss";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {JigsawGluePiecesButton} from "../components/JigsawGluePiecesButton";
-import {useMemo} from "react";
 import {emptyGestureMetrics, GestureMetrics} from "../../../utils/gestures";
-import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
 import {JigsawGluedPiecesConstraint} from "../constraints/JigsawGluedPieces";
 import {jigsawPieceStateChangeAction} from "./JigsawGamePieceState";
 import {myClientId} from "../../../hooks/useMultiPlayer";
+import {settings} from "../../../types/layout/Settings";
+import {indexes} from "../../../utils/indexes";
 
 export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -105,14 +102,16 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
 
     createCellDataByTypedDigit(
         digit,
-        {cellsIndex, puzzle, state},
+        {
+            puzzleIndex,
+            puzzle,
+            fieldExtension: {pieces},
+        },
         position,
     ): JigsawDigit {
         if (position) {
-            const regionIndex = getJigsawPieceIndexByCell(cellsIndex, position);
+            const regionIndex = getJigsawPieceIndexByCell(puzzleIndex, position);
             if (regionIndex !== undefined) {
-                const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
-
                 return normalizeJigsawDigit(puzzle, {
                     digit,
                     angle: stickyDigits ? 0 : -pieces[regionIndex].angle,
@@ -129,13 +128,15 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
 
     getDigitByCellData(
         data,
-        {cellsIndex, puzzle, state},
+        {
+            puzzleIndex,
+            puzzle,
+            fieldExtension: {pieces},
+        },
         cellPosition,
     ): number {
-        const regionIndex = getJigsawPieceIndexByCell(cellsIndex, cellPosition);
+        const regionIndex = getJigsawPieceIndexByCell(puzzleIndex, cellPosition);
         if (regionIndex) {
-            const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
-
             // TODO: return NaN if it's not a valid digit
             data = normalizeJigsawDigit(puzzle, {
                 digit: data.digit,
@@ -148,12 +149,15 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
 
     transformNumber(
         num,
-        {cellsIndex, puzzle, state},
+        {
+            puzzleIndex,
+            puzzle,
+            fieldExtension: {pieces},
+        },
         cellPosition
     ): number {
-        const regionIndex = getJigsawPieceIndexByCell(cellsIndex, cellPosition);
+        const regionIndex = getJigsawPieceIndexByCell(puzzleIndex, cellPosition);
         if (regionIndex) {
-            const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
             const {importOptions: {angleStep = 0} = {}} = puzzle;
             const angle = loop(roundToStep(stickyDigits ? 0 : pieces[regionIndex].angle, angleStep), 360);
             // TODO: return NaN if it's not a valid angle
@@ -165,28 +169,28 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
     },
 
     processCellDataPosition(
-        {cellsIndex, puzzle},
+        context,
         basePosition,
         dataSet,
         dataIndex,
         positionFunction,
         cellPosition,
-        state,
         region,
     ): PositionWithAngle | undefined {
+        const {puzzleIndex, puzzle} = context;
         const {importOptions: {angleStep} = {}} = puzzle;
 
-        if (!state || !angleStep) {
+        if (!cellPosition || !angleStep) {
             return basePosition;
         }
 
         const regionCellPosition = region?.cells?.[0] ?? cellPosition;
-        const regionIndex = regionCellPosition && getJigsawPieceIndexByCell(cellsIndex, regionCellPosition);
+        const regionIndex = regionCellPosition && getJigsawPieceIndexByCell(puzzleIndex, regionCellPosition);
         if (regionIndex === undefined) {
             return basePosition;
         }
 
-        const {angle: pieceAngle} = state.processedExtension.pieces[regionIndex];
+        const {angle: pieceAngle} = context.processedGameStateExtension.pieces[regionIndex];
         const roundedAngle = loop(roundToStep(pieceAngle, angleStep), 360);
         const processDigit = ({digit, angle}: JigsawDigit): JigsawDigit => normalizeJigsawDigit(
             puzzle,
@@ -197,8 +201,8 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
             (a, b) => puzzle.typeManager.compareCellData(
                 processDigit(a),
                 processDigit(b),
-                puzzle,
-                undefined,
+                context,
+                false,
                 false
             ),
             `sortRotatedIndexes-${roundedAngle}`
@@ -298,22 +302,21 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
     // initial scale to contain the shuffled pieces
     initialScale: shuffle ? 0.7 : 1,
 
-    useProcessedGameStateExtension(state, cellsIndex): JigsawProcessedGameState {
-        const {pieces} = getJigsawPiecesWithCache(cellsIndex);
-        const {animationSpeed, extension: {pieces: pieceAnimations}} = state;
-        const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
-        const groups = useMemo(
-            () => groupJigsawPiecesByZIndex(pieces, piecePositions),
-            [pieces, piecePositions]
-        );
+    useProcessedGameStateExtension(context): JigsawProcessedGameState {
+        const {
+            puzzleIndex,
+            fieldExtension: {pieces: piecePositions},
+            stateExtension: {pieces: pieceAnimations},
+        } = context;
+        const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
+        const groups = groupJigsawPiecesByZIndex(context);
 
         return {
-            pieces: useAnimatedValue<PositionWithAngle[]>(
-                piecePositions,
-                animationSpeed / 2,
-                (as, bs, coeff) => as.map((a, index) => {
-                    const b = bs[index];
-                    const c = pieceAnimations[index].animating ? coeff : 1;
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            pieces: piecePositions.map((position, index) => useAnimatedValue<PositionWithAngle>(
+                position,
+                pieceAnimations[index].animating ? settings.animationSpeed.get() / 2 : 1,
+                (a, b, coeff) => {
                     const group = groups.find(({indexes}) => indexes.includes(index))!;
                     const piece = pieces[index];
 
@@ -334,30 +337,64 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
                     return moveJigsawPieceByGroupGesture(
                         group,
                         {
-                            x: mixAnimatedValue(0, -leftDiff, c),
-                            y: mixAnimatedValue(0, -topDiff, c),
-                            rotation: mixAnimatedValue(0, angleDiff, c),
+                            x: mixAnimatedValue(0, -leftDiff, coeff),
+                            y: mixAnimatedValue(0, -topDiff, coeff),
+                            rotation: mixAnimatedValue(0, angleDiff, coeff),
                             scale: 1,
                         },
                         piece,
                         a
                     );
-                })
-            ),
+                },
+            )),
+            // pieces_: useAnimatedValue<PositionWithAngle[]>(
+            //     piecePositions,
+            //     settings.animationSpeed.get() / 2,
+            //     (as, bs, coeff) => as.map((a, index) => {
+            //         const b = bs[index];
+            //         // return b;
+            //         const c = pieceAnimations[index].animating ? coeff : 1;
+            //         const group = groups.find(({indexes}) => indexes.includes(index))!;
+            //         const piece = pieces[index];
+            //
+            //         const angleDiff = b.angle - a.angle;
+            //         const {top: topDiff, left: leftDiff} = getLineVector({
+            //             start: b,
+            //             end: moveJigsawPieceByGroupGesture(
+            //                 group,
+            //                 {
+            //                     ...emptyGestureMetrics,
+            //                     rotation: angleDiff,
+            //                 },
+            //                 piece,
+            //                 a
+            //             ),
+            //         });
+            //
+            //         return moveJigsawPieceByGroupGesture(
+            //             group,
+            //             {
+            //                 x: mixAnimatedValue(0, -leftDiff, c),
+            //                 y: mixAnimatedValue(0, -topDiff, c),
+            //                 rotation: mixAnimatedValue(0, angleDiff, c),
+            //                 scale: 1,
+            //             },
+            //             piece,
+            //             a
+            //         );
+            //     })
+            // ),
         };
     },
 
-    getProcessedGameStateExtension(state): JigsawProcessedGameState {
-        const {extension: {pieces}} = gameStateGetCurrentFieldState(state);
+    getProcessedGameStateExtension({fieldExtension: {pieces}}): JigsawProcessedGameState {
         return {pieces};
     },
 
     processArrowDirection(
         currentCell, xDirection, yDirection, context, ...args
     ): {cell?: Position} {
-        const {puzzle: {typeManager: {getRegionsWithSameCoordsTransformation}}} = context;
-
-        const regions = getRegionsWithSameCoordsTransformation!(context)
+        const regions = context.regions!
             .filter(({noInteraction}) => !noInteraction)
             .sort((a, b) => (a.zIndex ?? -1) - (b.zIndex ?? -1));
         // Find the last matching region - it's the one that is visible by z-index
@@ -422,21 +459,9 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
 
     transformCoords: transformCoordsByRegions,
 
-    getRegionsWithSameCoordsTransformation(
-        {
-            cellsIndex,
-            puzzle: {
-                fieldSize: {rowsCount, columnsCount},
-                importOptions: {stickyRegion} = {},
-            },
-            state: {
-                fieldStateHistory,
-                extension: {highlightCurrentPiece},
-                processedExtension: {pieces: animatedPieces},
-            },
-        },
-        isImportingPuzzle
-    ): GridRegion[] {
+    getRegionsWithSameCoordsTransformation(context, isImportingPuzzle): GridRegion[] {
+        const {rowsCount, columnsCount} = context.puzzle.fieldSize;
+
         if (isImportingPuzzle) {
             return [
                 {
@@ -448,18 +473,17 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
             ];
         }
 
-        const {pieces, otherCells} = getJigsawPiecesWithCache(cellsIndex);
-        const {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
-        const activePieceZIndex = getActiveJigsawPieceZIndex(piecePositions);
+        const {
+            puzzleIndex,
+            puzzle: {
+                importOptions: {stickyRegion} = {},
+            },
+        } = context;
 
-        const regions: GridRegion[] = pieces.map((piece, index) => {
-            const {zIndex} = piecePositions[index];
+        const {pieces, otherCells} = getJigsawPiecesWithCache(puzzleIndex);
 
-            return {
-                ...getJigsawPieceRegion(piece, animatedPieces[index]),
-                zIndex,
-                highlighted: highlightCurrentPiece && zIndex === activePieceZIndex,
-            };
+        const regions: GridRegion[] = indexes(pieces.length).map((index) => {
+            return getJigsawRegionWithCache(context, index);
         });
 
         if (otherCells.length) {
@@ -491,7 +515,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
     regionSpecificUserMarks: true,
 
     getRegionsForRowsAndColumns(context): Constraint<JigsawPTM, any>[] {
-        const regions = context.puzzle.typeManager.getRegionsWithSameCoordsTransformation!(context)
+        const regions = context.regions!
             .filter(({noInteraction}) => !noInteraction)
             .sort((a, b) => (a.zIndex ?? -1) - (b.zIndex ?? -1));
 
@@ -586,15 +610,15 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
         return puzzle;
     },
 
-    onCloseCorrectResultPopup({cellsIndex, puzzle, onStateChange}) {
+    onCloseCorrectResultPopup(context) {
+        const {puzzle} = context;
         const stickyPiece = puzzle.importOptions?.stickyJigsawPiece;
         if (!stickyPiece) {
             return;
         }
 
-        onStateChange([
+        context.onStateChange([
             jigsawPieceStateChangeAction(
-                puzzle,
                 undefined,
                 myClientId,
                 "finalize-jigsaw",
@@ -602,17 +626,19 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
                 {position: {zIndex: 1}},
                 false
             ),
-            (state) => {
-                const {pieces} = getJigsawPiecesWithCache(cellsIndex);
-                const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
-                const [group] = groupJigsawPiecesByZIndex(pieces, piecePositions);
+            (context) => {
+                const {
+                    puzzleIndex,
+                    fieldExtension: {pieces: piecePositions},
+                } = context;
+                const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
+                const [group] = groupJigsawPiecesByZIndex(context);
                 const groupGesture: GestureMetrics = {
                     ...emptyGestureMetrics,
                     rotation: loop(-piecePositions[stickyPiece - 1].angle + 180, 360) - 180,
                 };
 
                 return jigsawPieceStateChangeAction(
-                    puzzle,
                     undefined,
                     myClientId,
                     "finalize-jigsaw",
@@ -627,7 +653,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
                         state: {animating: true},
                     }),
                     false
-                )(state);
+                )(context);
             },
         ]);
     },

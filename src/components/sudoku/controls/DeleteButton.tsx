@@ -1,4 +1,4 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {ControlButton} from "./ControlButton";
 import {Clear} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
@@ -6,26 +6,28 @@ import {useCallback} from "react";
 import {clearSelectionAction, getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
 export const deleteHotkeys = ["Delete", "Backspace"];
 
-export const DeleteButton = <T extends AnyPTM>(
-    {
-        context: {
-            cellSizeForSidePanel: cellSize,
-            state: {isShowingSettings, processed: {isReady}},
-            onStateChange,
-        },
-        top,
-        left,
-    }: ControlButtonItemProps<T>
-) => {
+export const DeleteButton: ControlButtonItemPropsGenericFc = observer(function DeleteButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
+    const {
+        cellSizeForSidePanel: cellSize,
+        isReady,
+    } = context;
+
     const translate = useTranslate();
 
-    const handleClear = useCallback(() => onStateChange(clearSelectionAction(getNextActionId())), [onStateChange]);
+    const handleClear = useCallback(() => context.onStateChange(clearSelectionAction(getNextActionId())), [context]);
 
     useEventListener(window, "keydown", (ev) => {
-        if (!isShowingSettings && deleteHotkeys.includes(ev.code)) {
+        if (!settings.isOpened && deleteHotkeys.includes(ev.code)) {
             handleClear();
             ev.preventDefault();
         }
@@ -44,4 +46,4 @@ export const DeleteButton = <T extends AnyPTM>(
     >
         <Clear/>
     </ControlButton>;
-};
+});

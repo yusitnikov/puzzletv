@@ -14,18 +14,21 @@ import {ForSetters} from "./ForSetters";
 import {FPuzzlesWizardPage, fPuzzlesWizardPageTitle} from "./FPuzzlesWizardPage";
 import {HowToImport} from "./HowToImport";
 import {useGesturesGlobalEvents} from "../../utils/gestures";
+import {observer} from "mobx-react-lite";
+import {useUpdateControlKeysState} from "../../hooks/useControlKeysState";
 
 interface AppProps {
     onPageLoaded?: () => void;
 }
 
-export const App = ({onPageLoaded}: AppProps) => {
+export const App = observer(({onPageLoaded}: AppProps) => {
     const {hash = "", slug, params} = useRoute();
 
     const language = useLanguageCode();
     const translate = useTranslate();
 
     useGesturesGlobalEvents();
+    useUpdateControlKeysState();
 
     const puzzle = useMemo(() => {
         for (const puzzleOrLoader of AllPuzzles) {
@@ -111,4 +114,4 @@ export const App = ({onPageLoaded}: AppProps) => {
     >
         <a href={buildLink("", language)}>{translate("Go to the home page")}</a>
     </PageLayout>;
-};
+});

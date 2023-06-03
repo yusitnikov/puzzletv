@@ -1,6 +1,6 @@
 import {CellWriteMode} from "../../types/sudoku/CellWriteMode";
 import {CellWriteModeInfo} from "../../types/sudoku/CellWriteModeInfo";
-import {ControlKeysState, useControlKeysState} from "../useControlKeysState";
+import {ControlKeysState} from "../useControlKeysState";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 export const getFinalCellWriteMode = <T extends AnyPTM>(
@@ -25,16 +25,4 @@ export const getFinalCellWriteMode = <T extends AnyPTM>(
     }
 
     return persistentCellWriteMode;
-};
-
-// noinspection JSUnusedGlobalSymbols
-export const useFinalCellWriteMode = <T extends AnyPTM>(
-    persistentCellWriteMode: CellWriteMode,
-    gestureCellWriteMode: CellWriteMode | undefined,
-    allowedModes: CellWriteModeInfo<T>[],
-    readOnly?: boolean
-) => {
-    const keys = useControlKeysState();
-
-    return getFinalCellWriteMode(keys, persistentCellWriteMode, gestureCellWriteMode, allowedModes, readOnly);
 };

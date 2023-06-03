@@ -2,8 +2,12 @@ import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {buildLink} from "../../utils/link";
 import {DiscordAlt, Whatsapp} from "@emotion-icons/boxicons-logos";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../utils/profiler";
 
-export const ContactMe = () => {
+export const ContactMe = observer(function ContactMe() {
+    profiler.trace();
+
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -27,9 +31,11 @@ export const ContactMe = () => {
             [LanguageCode.ru]: <>Примечание: если Вы создатель головоломок и хотите опубликовать Вашу работу на Puzzle TV, Вы также найдете ответы на распространенные вопросы <a href={settersLink}>здесь</a>.</>,
         })}</p>
     </>;
-};
+});
 
-export const ContactMeShort = () => {
+export const ContactMeShort = observer(function ContactMeShort() {
+    profiler.trace();
+
     const translate = useTranslate();
 
     return <>
@@ -46,4 +52,4 @@ export const ContactMeShort = () => {
             <Whatsapp size={"1.2em"} color={"#0dc143"}/>&nbsp;WhatsApp:&nbsp;+972527367825
         </span>
     </>;
-};
+});

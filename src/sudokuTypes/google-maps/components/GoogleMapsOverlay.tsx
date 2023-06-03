@@ -1,11 +1,15 @@
 import {FC} from "react";
 import {useGoogleMapProjection} from "../contexts/GoogleMapContext";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
 export interface GoogleMapsOverlayProps {
     fieldSize: number;
 }
 
-export const GoogleMapsOverlay: FC<GoogleMapsOverlayProps> = ({fieldSize, children}) => {
+export const GoogleMapsOverlay: FC<GoogleMapsOverlayProps> = observer(function GoogleMapsOverlay({fieldSize, children}) {
+    profiler.trace();
+
     const projection = useGoogleMapProjection();
     if (!projection) {
         return null;
@@ -29,4 +33,4 @@ export const GoogleMapsOverlay: FC<GoogleMapsOverlayProps> = ({fieldSize, childr
     >
         {children}
     </div>;
-};
+});

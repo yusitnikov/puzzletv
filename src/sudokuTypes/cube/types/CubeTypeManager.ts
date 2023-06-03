@@ -23,7 +23,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         dataSet,
         dataIndex,
         positionFunction,
-        cellPosition?
+        cellPosition,
     ): PositionWithAngle | undefined {
         const position = basePosition;
         if (!position || !cellPosition || cellPosition.top * 2 >= fieldSize) {

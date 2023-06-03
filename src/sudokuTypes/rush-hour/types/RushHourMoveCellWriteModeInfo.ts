@@ -31,7 +31,7 @@ export const RushHourMoveCellWriteModeInfo = (
     onMove(props, context) {
         const {gesture, startMetrics, currentMetrics} = props;
         const {id, state: startContext} = gesture;
-        const {puzzle, onStateChange, cellSize} = context;
+        const {puzzle, cellSize} = context;
         const {fieldSize: {fieldSize}, importOptions: {givenDigitsBlockCars} = {}} = puzzle;
 
         if (!puzzle.extension) {
@@ -46,9 +46,8 @@ export const RushHourMoveCellWriteModeInfo = (
         const carRect = carRects[carIndex];
         const isVertical = carRect.height > carRect.width;
 
-        onStateChange(rushHourCarStateChangeAction(
-            puzzle,
-            startContext.state,
+        context.onStateChange(rushHourCarStateChangeAction(
+            startContext,
             myClientId,
             `gesture-${id}`,
             carIndex,
@@ -151,15 +150,13 @@ export const RushHourMoveCellWriteModeInfo = (
     },
     onGestureEnd(props, context) {
         const {gesture} = props;
-        const {puzzle, onStateChange} = context;
 
         const carIndex = getRushHourCarIndexByGesture(context, gesture);
         if (carIndex === undefined) {
             return;
         }
 
-        onStateChange(rushHourCarStateChangeAction(
-            puzzle,
+        context.onStateChange(rushHourCarStateChangeAction(
             undefined,
             myClientId,
             `gesture-${gesture.id}`,
@@ -174,7 +171,7 @@ export const RushHourMoveCellWriteModeInfo = (
 });
 
 const getRushHourCarIndexByGesture = (
-    {puzzle, cellsIndex, state}: PuzzleContext<RushHourPTM>,
+    {puzzle, puzzleIndex}: PuzzleContext<RushHourPTM>,
     {pointers}: GestureInfo<PuzzleContext<RushHourPTM>>,
 ) => {
     const cars = puzzle.extension?.cars ?? [];

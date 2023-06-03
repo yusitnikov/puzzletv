@@ -5,6 +5,8 @@ import {ChessPieceType} from "../types/ChessPieceType";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {ReactNode} from "react";
 import {ChessPTM} from "../types/ChessPTM";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
 const map: Record<ChessColor, Record<ChessPieceType, ReactNode>> = {
     [ChessColor.white]: {
@@ -293,7 +295,9 @@ const map: Record<ChessColor, Record<ChessPieceType, ReactNode>> = {
     },
 };
 
-export const ChessPieceCellData = (props: CellDataProps<ChessPTM>) => {
+export const ChessPieceCellData = observer(function ChessPieceCellData(props: CellDataProps<ChessPTM>) {
+    profiler.trace();
+
     const {data: {type, color}, size: miniSize, left = 0, top = 0} = props;
 
     const size = miniSize * 1.2;
@@ -311,7 +315,7 @@ export const ChessPieceCellData = (props: CellDataProps<ChessPTM>) => {
             </g>
         </g>
     </AutoSvg>;
-};
+});
 
 export const ChessPieceCellDataComponentType: CellDataComponentType<ChessPTM> = {
     component: ChessPieceCellData,

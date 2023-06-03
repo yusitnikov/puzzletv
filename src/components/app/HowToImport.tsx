@@ -1,7 +1,11 @@
 import {useTranslate} from "../../hooks/useTranslate";
 import {LanguageCode} from "../../types/translations/LanguageCode";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../utils/profiler";
 
-export const HowToImport = () => {
+export const HowToImport = observer(function HowToImport() {
+    profiler.trace();
+
     const translate = useTranslate();
 
     const fPuzzlesLink = <a href="https://f-puzzles.com" target="_blank">f-puzzles</a>;
@@ -33,4 +37,4 @@ export const HowToImport = () => {
             [LanguageCode.ru]: "Готово! Теперь Вы можете поделиться ссылкой на головоломку",
         })}.</li>
     </ol>;
-};
+});

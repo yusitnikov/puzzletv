@@ -1,19 +1,23 @@
 import {textColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {getAveragePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {profiler} from "../../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
 export interface TextProps {
     text: string;
     size?: number;
 }
 
-export const TextComponent = <T extends AnyPTM>(
+export const TextComponent: ConstraintPropsGenericFc<TextProps> = observer(function TextFc<T extends AnyPTM>(
     {cells, angle = 0, color = textColor, props: {text, size = 0.5}}: ConstraintProps<T, TextProps>
-) => {
+) {
+    profiler.trace();
+
     const {top, left} = getAveragePosition(cells);
 
     return <AutoSvg
@@ -28,7 +32,7 @@ export const TextComponent = <T extends AnyPTM>(
             {text}
         </CenteredText>
     </AutoSvg>;
-};
+});
 
 export const textTag = "text";
 

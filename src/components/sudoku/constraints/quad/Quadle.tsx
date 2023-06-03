@@ -4,8 +4,10 @@ import {isSamePosition, parsePositionLiteral, Position, PositionLiteral} from ".
 import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {useAutoIncrementId} from "../../../../hooks/useAutoIncrementId";
-import {Fragment} from "react";
+import {Fragment, ReactElement} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 const radius = 0.3;
 
@@ -27,26 +29,33 @@ export interface QuadleProps<CellType> {
 }
 
 export const Quadle = {
-    [FieldLayer.afterLines]: <T extends AnyPTM>(
+    [FieldLayer.afterLines]: observer(function Quadle<T extends AnyPTM>(
         {
             context,
             cells,
             props,
         }: ConstraintProps<T, QuadleProps<T["cell"]>>
-    ) => <QuadleByData
-        context={context}
-        cells={cells}
-        props={props}
-    />,
+    ) {
+        profiler.trace();
+
+        return <QuadleByData
+            context={context}
+            cells={cells}
+            props={props}
+        />;
+    }) as <T extends AnyPTM>(props: ConstraintProps<T, QuadleProps<T["cell"]>>) => ReactElement,
 };
 
-export const QuadleByData = <T extends AnyPTM>(
+type QuadleByDataProps<T extends AnyPTM> = Pick<ConstraintProps<T, QuadleProps<T["cell"]>>, "context" | "cells" | "props">;
+export const QuadleByData = observer(function QuadleByData<T extends AnyPTM>(
     {
         context: {puzzle},
         cells,
         props: {digits, isRecent},
-    }: Pick<ConstraintProps<T, QuadleProps<T["cell"]>>, "context" | "cells" | "props">
-) => {
+    }: QuadleByDataProps<T>
+) {
+    profiler.trace();
+
     const {typeManager: {cellDataComponentType: {component: CellData}}} = puzzle;
 
     const id = "clipPath" + useAutoIncrementId();
@@ -135,7 +144,7 @@ export const QuadleByData = <T extends AnyPTM>(
             fill={"none"}
         />
     </>;
-};
+}) as <T extends AnyPTM>(props: QuadleByDataProps<T>) => ReactElement;
 
 const getQuadCells = ({top, left}: Position): Position[] => [
     {top: top - 1, left: left - 1},
@@ -158,7 +167,8 @@ export const QuadleConstraint = <T extends AnyPTM>(
         },
         component: Quadle,
         isObvious: true,
-        isValidCell(cell, digitsMap, cells, {puzzle, state}) {
+        isValidCell(cell, digitsMap, cells, context) {
+            const {puzzle} = context;
             const {typeManager: {areSameCellData}} = puzzle;
 
             const data = digitsMap[cell.top][cell.left];
@@ -169,11 +179,11 @@ export const QuadleConstraint = <T extends AnyPTM>(
                 return true;
             }
 
-            const isHere = areSameCellData(data, digit.digit, puzzle, state, true);
+            const isHere = areSameCellData(data, digit.digit, context);
             const hasEmpty = cells.some(({top, left}) => digitsMap[top]?.[left] === undefined);
             const isSomewhere = cells.some(({top, left}) => {
                 const data = digitsMap[top]?.[left];
-                return data !== undefined && areSameCellData(data, digit.digit, puzzle, state, true);
+                return data !== undefined && areSameCellData(data, digit.digit, context);
             });
 
             switch (digit.type) {
@@ -187,12 +197,12 @@ export const QuadleConstraint = <T extends AnyPTM>(
 };
 
 export const QuadleConstraintBySolution = <T extends AnyPTM>(
-    {puzzle, state}: PuzzleContext<T>,
+    context: PuzzleContext<T>,
     cellLiteral: PositionLiteral,
     digits: T["cell"][],
     isRecent = false
 ): Constraint<T, QuadleProps<T["cell"]>> => {
-    const {solution = {}, typeManager: {areSameCellData}} = puzzle;
+    const {solution = {}, typeManager: {areSameCellData}} = context.puzzle;
 
     const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
         .map(({top, left}) => solution[top]?.[left]);
@@ -205,11 +215,11 @@ export const QuadleConstraintBySolution = <T extends AnyPTM>(
         }
 
         const actualDigit = actualDigits[index];
-        if (actualDigit !== undefined && areSameCellData(actualDigit, digit, puzzle, state, true)) {
+        if (actualDigit !== undefined && areSameCellData(actualDigit, digit, context)) {
             return QuadleDigitType.here;
         }
 
-        if (actualDigits.some(actualDigit => actualDigit !== undefined && areSameCellData(actualDigit, digit, puzzle, state, true))) {
+        if (actualDigits.some(actualDigit => actualDigit !== undefined && areSameCellData(actualDigit, digit, context))) {
             return QuadleDigitType.elsewhere;
         }
 

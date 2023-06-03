@@ -3,36 +3,36 @@ import {CellDataComponentType} from "../../../components/sudoku/cell/CellDataCom
 import {ReactElement} from "react";
 import {profiler} from "../../../utils/profiler";
 import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
 
-export const DigitCellData = profiler.memo(
-    "DigitCellData",
-    <T extends AnyNumberPTM>(props: CellDataProps<T>) => {
-        const {
-            puzzle,
-            data: digit,
-            size,
-            isInitial,
-            isValid,
-            ...absoluteProps
-        } = props;
-        const {
-            typeManager: {
-                digitComponentType,
-                cellDataDigitComponentType: {
-                    component: DigitComponent
-                } = digitComponentType,
-            }
-        } = puzzle;
+export const DigitCellData = observer(function DigitCellData<T extends AnyNumberPTM>(props: CellDataProps<T>) {
+    profiler.trace();
 
-        return <DigitComponent
-            {...absoluteProps}
-            puzzle={puzzle}
-            digit={digit}
-            size={size}
-            color={getDefaultCellDataColor(props)}
-        />;
-    }
-) as <T extends AnyNumberPTM>(props: CellDataProps<T>) => ReactElement;
+    const {
+        puzzle,
+        data: digit,
+        size,
+        isInitial,
+        isValid,
+        ...absoluteProps
+    } = props;
+    const {
+        typeManager: {
+            digitComponentType,
+            cellDataDigitComponentType: {
+                component: DigitComponent
+            } = digitComponentType,
+        }
+    } = puzzle;
+
+    return <DigitComponent
+        {...absoluteProps}
+        puzzle={puzzle}
+        digit={digit}
+        size={size}
+        color={getDefaultCellDataColor(props)}
+    />;
+}) as <T extends AnyNumberPTM>(props: CellDataProps<T>) => ReactElement;
 
 export const DigitCellDataComponentType = <T extends AnyNumberPTM>(): CellDataComponentType<T> => ({
     component: DigitCellData,

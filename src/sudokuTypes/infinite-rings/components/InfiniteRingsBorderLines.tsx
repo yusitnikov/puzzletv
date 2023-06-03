@@ -1,10 +1,12 @@
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../types/sudoku/Constraint";
 import {blackColor, getRegionBorderWidth} from "../../../components/app/globals";
 import {RoundedPolyLine} from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
 import {useTransformScale} from "../../../contexts/TransformContext";
-import {useIsShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
+import {isShowingAllInfiniteRings} from "../types/InfiniteRingsLayout";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export const getInfiniteLoopRegionBorderWidth = (cellSize: number, visibleRingsCount: number) =>
     Math.ceil(getRegionBorderWidth(cellSize) * cellSize / Math.pow(2, visibleRingsCount / 4) / 2) * 2;
@@ -13,21 +15,24 @@ interface InfiniteRingsBorderLinesProps {
     visibleRingsCount: number;
 }
 
-export const InfiniteRingsBorderLines = {
-    [FieldLayer.lines]: <T extends AnyPTM>(
+export const InfiniteRingsBorderLines: ConstraintPropsGenericFcMap<InfiniteRingsBorderLinesProps> = {
+    [FieldLayer.lines]: observer(function InfiniteRingsBorderLines<T extends AnyPTM>(
         {
             context,
             props: {visibleRingsCount: visibleRingsCountArg},
         }: ConstraintProps<T, InfiniteRingsBorderLinesProps>
-    ) => {
+    ) {
+        profiler.trace();
+
         const {
             puzzle: {fieldSize: {rowsCount: fieldSize}},
             cellSize,
         } = context;
-        const [isShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
         const scale = useTransformScale();
         const ringsCount = fieldSize / 2 - 1;
-        const visibleRingsCount = isShowingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
+        const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg)
+            ? ringsCount
+            : visibleRingsCountArg;
         const borderWidth = getInfiniteLoopRegionBorderWidth(cellSize, visibleRingsCount) / scale;
 
         return <>
@@ -51,7 +56,7 @@ export const InfiniteRingsBorderLines = {
                 rounded={false}
             />
         </>;
-    },
+    }),
 };
 
 export const InfiniteRingsBorderLinesConstraint = <T extends AnyPTM>(visibleRingsCount: number)

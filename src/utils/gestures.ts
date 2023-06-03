@@ -6,6 +6,7 @@ import {useLastValueRef} from "../hooks/useLastValueRef";
 import {average} from "./math";
 import {usePureMemo} from "../hooks/usePureMemo";
 import {useDiffEffect} from "../hooks/useDiffEffect";
+import { runInAction } from "mobx";
 
 const releasePointerCapture = ({target, pointerId}: PointerEvent<any>) => {
     const element = target as Element;
@@ -246,7 +247,7 @@ const releaseStalePointers = () => {
 
 export const getGestureHandlerProps = <ElemT, StateT>(handlers?: GestureHandler<StateT>[], getExtraDataByEvent?: (ev: PointerEvent<ElemT> | MouseEvent<ElemT>) => (BasePointerStateExtraData | undefined))
     : Required<EventHandlerProps<ElemT, "onPointerDown" | "onPointerUp" | "onPointerMove" | "onMouseMove" | "onDoubleClick" | "onContextMenu">> => ({
-    onPointerDown: (ev) => {
+    onPointerDown: (ev) => runInAction(() => {
         releasePointerCapture(ev);
 
         // pointerId is always the same on desktop, so make sure to release the previous gesture if new gesture started
@@ -298,11 +299,11 @@ export const getGestureHandlerProps = <ElemT, StateT>(handlers?: GestureHandler<
             currentGesture.state = currentGesture.handler.onStart?.({gesture: currentGesture, ...state});
             ev.stopPropagation();
         }
-    },
-    onPointerUp: (ev) => {
+    }),
+    onPointerUp: (ev) => runInAction(() => {
         releasePointer(ev.pointerId, GestureFinishReason.pointerUp);
-    },
-    onPointerMove: (ev) => {
+    }),
+    onPointerMove: (ev) => runInAction(() => {
         // Ignore the event on desktop if the mouse moves without holding any mouse button
         if (!currentGesture || !ev.buttons) {
             return;
@@ -339,15 +340,15 @@ export const getGestureHandlerProps = <ElemT, StateT>(handlers?: GestureHandler<
             prevData,
             currentData: pointer.current,
         });
-    },
-    onMouseMove: (ev) => {
+    }),
+    onMouseMove: (ev) => runInAction(() => {
         // Finish the last gesture on desktop if a mouse moves without holding any mouse button
         if (!ev.buttons) {
             finalizeGesture(GestureFinishReason.stalePointer);
             currentGesture = undefined;
         }
-    },
-    onDoubleClick: (ev) => {
+    }),
+    onDoubleClick: (ev) => runInAction(() => {
         const props: GestureOnDoubleClickProps<ElemT> = {
             event: ev,
             time: Date.now(),
@@ -360,8 +361,8 @@ export const getGestureHandlerProps = <ElemT, StateT>(handlers?: GestureHandler<
                 break;
             }
         }
-    },
-    onContextMenu: (ev) => {
+    }),
+    onContextMenu: (ev) => runInAction(() => {
         const props: GestureOnContextMenuProps<ElemT> = {
             event: ev,
             time: Date.now(),
@@ -374,7 +375,7 @@ export const getGestureHandlerProps = <ElemT, StateT>(handlers?: GestureHandler<
                 break;
             }
         }
-    },
+    }),
 });
 
 /*

@@ -17,22 +17,24 @@ export const setQuadPositionActionType = <T extends AnyQuadInputPTM>(
     key: setQuadPositionActionTypeKey,
     callback: (
         position,
-        {
+        clientId
+    ) => (context): PartialGameStateEx<T> => {
+        let {
             puzzle: {
                 params = {},
                 fieldSize: {rowsCount, columnsCount},
             },
-            state: {currentPlayer, extension: {currentQuad, allQuads}},
+            currentPlayer,
+            stateExtension: {currentQuad, allQuads},
             multiPlayer: {isEnabled}
-        },
-        clientId
-    ) => (state): PartialGameStateEx<T> => {
+        } = context;
+
         if (position && !(position.top > 0 && position.top < rowsCount && position.left > 0 && position.left < columnsCount)) {
             return {};
         }
 
         const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
-        if (!isMyTurn || !isQuadAllowedFn(state) || state.processed.cellWriteMode !== CellWriteMode.quads) {
+        if (!isMyTurn || !isQuadAllowedFn(context) || context.cellWriteMode !== CellWriteMode.quads) {
             return {};
         }
 

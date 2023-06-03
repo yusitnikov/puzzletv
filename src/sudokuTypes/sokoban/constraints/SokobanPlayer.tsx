@@ -10,9 +10,10 @@ import {
 } from "../../../types/layout/Position";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {defaultSokobanDirection} from "../types/SokobanGameState";
-import {memo} from "react";
 import {textColor} from "../../../components/app/globals";
 import {loop} from "../../../utils/math";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 const playerSize = 0.8;
 const headSize = 0.3;
@@ -40,16 +41,22 @@ const formatHeadPath = (path: (string | number)[]) => path
     .map((value) => typeof value === "number" ? value * headSize / 2 : value)
     .join(" ");
 
-const SokobanPlayer = (
-    {context: {state: {extension: {sokobanDirection}}}, cells: [position]}: ConstraintProps<SokobanPTM>
-) => <SokobanPlayerByData position={position} direction={sokobanDirection}/>;
+const SokobanPlayer = observer(function SokobanPlayer(
+    {context: {stateExtension: {sokobanDirection}}, cells: [position]}: ConstraintProps<SokobanPTM>
+) {
+    profiler.trace();
+
+    return <SokobanPlayerByData position={position} direction={sokobanDirection}/>;
+});
 
 export interface SokobanPlayerByDataProps {
     position?: Position;
     direction?: Position;
 }
-export const SokobanPlayerByData = memo(
-    ({position: {top, left} = emptyPosition, direction: {top: topDir, left: leftDir} = defaultSokobanDirection}: SokobanPlayerByDataProps) => {
+export const SokobanPlayerByData = observer(
+    function SokobanPlayerByData({position: {top, left} = emptyPosition, direction: {top: topDir, left: leftDir} = defaultSokobanDirection}: SokobanPlayerByDataProps) {
+        profiler.trace();
+
         return <AutoSvg
             top={top + 0.5}
             left={left + 0.5}

@@ -17,8 +17,8 @@ import {AntiBishopFromCenterConstraint} from "../../types/sudoku/constraints/Ant
 import {GreaterConstraint} from "../../components/sudoku/constraints/greater/Greater";
 import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {indexes} from "../../utils/indexes";
 
 export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     slug: "multi-color-madness",
@@ -60,8 +60,8 @@ export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     fieldMargin: 0.99,
     resultChecker: isValidFinishedPuzzleByConstraints,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=0008A2",
-    getLmdSolutionCode: (puzzle, state) => {
-        const {cells} = gameStateGetCurrentFieldState(state);
-        return cells[0].map(cell => cell.usersDigit).join("") + cells[8].map(cell => cell.usersDigit).join("");
-    },
+    getLmdSolutionCode: (context) =>
+        [0, 8]
+            .flatMap((top) => indexes(9).map((left) => context.getCellDigit(top, left)))
+            .join(""),
 };

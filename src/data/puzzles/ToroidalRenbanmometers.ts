@@ -3,6 +3,8 @@ import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
 import {PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
+// TODO: accessibility for color-blind
+
 export const ToroidalRenbanmometers: PuzzleDefinitionLoader<NumberPTM> = {
     loadPuzzle: () => FPuzzles.loadPuzzle({
         loopX: true,

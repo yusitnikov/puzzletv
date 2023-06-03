@@ -4,7 +4,6 @@ import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
 import {PartiallyTranslatable} from "../translations/Translatable";
 import {useTranslate} from "../../hooks/useTranslate";
-import {gameStateGetCurrentFieldState, ProcessedGameStateEx} from "./GameState";
 import {Constraint} from "./Constraint";
 import {CellColorValue} from "./CellColor";
 import {PuzzleContext, PuzzleContextProps} from "./PuzzleContext";
@@ -64,7 +63,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     resultChecker?: (context: PuzzleContext<T>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
     forceAutoCheckOnFinish?: boolean;
     items?: Constraint<T, any>[]
-        | ((state: ProcessedGameStateEx<T>) => Constraint<T, any>[]);
+        | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
     borderColor?: string;
     allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
     disableDiagonalCenterLines?: boolean;
@@ -76,7 +75,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     disableColoring?: boolean;
     enableShading?: boolean;
     lmdLink?: string;
-    getLmdSolutionCode?: (puzzle: PuzzleDefinition<T>, state: ProcessedGameStateEx<T>) => string;
+    getLmdSolutionCode?: (context: PuzzleContext<T>) => string;
     noIndex?: boolean;
     saveState?: boolean;
     saveStateKey?: string;
@@ -215,21 +214,18 @@ export const getIsSamePuzzleLine = <T extends AnyPTM>(puzzle: PuzzleDefinition<T
 export const getPuzzleLineHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
     (line: Line) => stringifyLine(normalizePuzzleLine(line, puzzle));
 
-export const resolvePuzzleInitialColors = <T extends AnyPTM>(context: PuzzleContext<T>): GivenDigitsMap<CellColorValue[]> => {
-    const {puzzle: {initialColors = {}}} = context;
-
-    return typeof initialColors === "function"
-        ? initialColors(context)
-        : initialColors;
-};
-
 const debugSolutionChecker = false;
 export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     context: PuzzleContext<T>
 ): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
     const timer = profiler.track("isValidFinishedPuzzleByEmbeddedSolution");
 
-    const {puzzle, state, cellsIndex} = context;
+    const {
+        puzzle,
+        puzzleIndex,
+        stateInitialDigits,
+        currentFieldStateWithFogDemo: {cells, marks},
+    } = context;
     const {
         typeManager: {getDigitByCellData},
         initialDigits: puzzleInitialDigits,
@@ -238,14 +234,11 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         solutionColors = {},
         importOptions: {stickyRegion, noStickyRegionValidation} = {},
     } = puzzle;
-    const {initialDigits: stateInitialDigits} = state;
 
     const hasSolutionColors = Object.keys(solutionColors).length !== 0;
 
-    const {cells, marks} = gameStateGetCurrentFieldState(state, true);
-
-    const initialCenterMarks = getCenterMarksMap(initialCellMarks, cellsIndex);
-    const userCenterMarks = getCenterMarksMap(marks.items, cellsIndex);
+    const initialCenterMarks = getCenterMarksMap(initialCellMarks, puzzleIndex);
+    const userCenterMarks = getCenterMarksMap(marks.items, puzzleIndex);
 
     let areCorrectDigits = true;
     let areCorrectColorsByDigits = true;
@@ -254,7 +247,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const digitToColorMap: Record<number, string> = {};
     for (const [top, row] of cells.entries()) {
         for (const [left, {usersDigit, colors}] of row.entries()) {
-            if (!isSolutionCheckCell(cellsIndex.getCellTypeProps({top, left}))) {
+            if (!isSolutionCheckCell(puzzleIndex.getCellTypeProps({top, left}))) {
                 continue;
             }
 

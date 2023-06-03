@@ -3,7 +3,6 @@ import {loadStringFromLocalStorage, saveStringToLocalStorage} from "../../../uti
 import {isSamePosition, Position} from "../../../types/layout/Position";
 import {CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {getAllPuzzleConstraints} from "../../../types/sudoku/Constraint";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
@@ -32,19 +31,16 @@ export const getTesseractCellSelectionType = <T extends AnyPTM>(
     cell: Position,
     context: PuzzleContext<T>,
 ): ReturnType<Required<SudokuTypeManager<T>>["getCellSelectionType"]> => {
-    const {state: {selectedCells}} = context;
-
-    if (selectedCells.size !== 1) {
+    if (context.selectedCellsCount !== 1) {
         return undefined;
     }
-    const selectedCell = selectedCells.first()!;
+    const selectedCell = context.firstSelectedCell!;
 
     switch (getTesseractSelectionType()) {
         case TesseractSelectionType.Never:
             return undefined;
         case TesseractSelectionType.Clues:
-            const constraints = getAllPuzzleConstraints(context);
-            if (!constraints.some(({name, cells}) => name === "ellipse" && isSamePosition(cells[0], selectedCell))) {
+            if (!context.allItems.some(({name, cells}) => name === "ellipse" && isSamePosition(cells[0], selectedCell))) {
                 return undefined;
             }
             break;

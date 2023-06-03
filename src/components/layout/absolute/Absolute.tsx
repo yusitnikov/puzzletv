@@ -1,7 +1,9 @@
-import {ReactNode} from "react";
+import {ReactElement, ReactNode} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {Line} from "../line/Line";
 import {TransformAngleContextProvider, TransformScaleContextProvider} from "../../../contexts/TransformContext";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export type AbsoluteProps<TagNameT extends keyof JSX.IntrinsicElements = "div"> = Partial<Rect> & JSX.IntrinsicElements[TagNameT] & {
     tagName?: TagNameT;
@@ -15,7 +17,7 @@ export type AbsoluteProps<TagNameT extends keyof JSX.IntrinsicElements = "div"> 
     childrenOnTopOfBorders?: boolean;
 };
 
-export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
+export const Absolute = observer(function Absolute<TagNameT extends keyof JSX.IntrinsicElements = "div">(
     {
         children,
         childrenOnTopOfBorders,
@@ -33,7 +35,9 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
         pointerEvents,
         ...otherProps
     }: AbsoluteProps<TagNameT>
-) => {
+) {
+    profiler.trace();
+
     const TagName = tagName as any;
 
     let result = <TagName
@@ -69,4 +73,4 @@ export const Absolute = <TagNameT extends keyof JSX.IntrinsicElements = "div">(
     }
 
     return result;
-};
+}) as <TagNameT extends keyof JSX.IntrinsicElements = "div">(props: AbsoluteProps<TagNameT>) => ReactElement;

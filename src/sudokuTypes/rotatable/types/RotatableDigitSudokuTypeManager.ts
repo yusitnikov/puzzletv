@@ -21,7 +21,7 @@ const isRotatableCellData = (puzzle: PuzzleDefinition<RotatableDigitPTM>, {digit
 const rotateCellData = (puzzle: PuzzleDefinition<RotatableDigitPTM>, data: RotatableDigit, angle = 180) =>
     data.sticky ? data.digit : rotateDigit(puzzle, data.digit, roundToStep(angle, 180));
 
-export const RotatableDigitSudokuTypeManagerBase = <CellType,>(
+export const RotatableDigitSudokuTypeManagerBase = <CellType>(
     startAngle: number,
     angleDelta: number,
     showBackButton: boolean,
@@ -94,12 +94,14 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
     areSameCellData(
         data1,
         data2,
-        puzzle,
-        state,
-        forConstraint
+        context,
+        useState = true,
+        forConstraint = true,
     ) {
+        const {puzzle} = context;
+
         if (forConstraint) {
-            const angle = state?.angle ?? 0;
+            const angle = useState ? context.angle : 0;
             return rotateCellData(puzzle, data1, angle) === rotateCellData(puzzle, data2, angle);
         }
 
@@ -108,10 +110,10 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
         return digit === digit2 && (sticky === sticky2 || rotateDigit(puzzle, digit, 180) === digit);
     },
 
-    compareCellData(data1, data2, puzzle, state, forConstraints): number {
-        const angle = state?.angle ?? 0;
+    compareCellData(data1, data2, context, useState = true, forConstraints = true): number {
+        const angle = useState ? context.angle : 0;
 
-        return rotateCellData(puzzle, data1, angle) - rotateCellData(puzzle, data2, angle)
+        return rotateCellData(context.puzzle, data1, angle) - rotateCellData(context.puzzle, data2, angle)
             || (forConstraints ? 0 : (data1.sticky ? 1 : 0) - (data2.sticky ? 1 : 0));
     },
 
@@ -131,14 +133,14 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
         return data as RotatableDigit;
     },
 
-    createCellDataByDisplayDigit(digit, {extension: {isStickyMode}}): RotatableDigit {
+    createCellDataByDisplayDigit(digit, {stateExtension: {isStickyMode}}): RotatableDigit {
         return {
             digit,
             sticky: isStickyMode,
         };
     },
 
-    createCellDataByTypedDigit(digit, {puzzle, state: {angle, extension: {isStickyMode}}}): RotatableDigit {
+    createCellDataByTypedDigit(digit, {puzzle, angle, stateExtension: {isStickyMode}}): RotatableDigit {
         const naiveResult: RotatableDigit = {
             digit,
             sticky: isStickyMode,
@@ -154,23 +156,24 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
         return {digit};
     },
 
-    getDigitByCellData(data, {puzzle, state: {angle}}) {
+    getDigitByCellData(data, {puzzle, angle}) {
         return rotateCellData(puzzle, data, angle);
     },
 
-    transformNumber(num, {puzzle, state: {angle}}) {
+    transformNumber(num, {puzzle, angle}) {
         return isUpsideDownAngle(angle) ? rotateNumber(puzzle, num) : num;
     },
 
     processCellDataPosition(
-        {puzzle},
+        context,
         basePosition,
         dataSet,
         dataIndex,
         positionFunction,
-        cellPosition?,
-        state?
+        cellPosition,
     ): PositionWithAngle | undefined {
+        const {puzzle} = context;
+
         const upsideDownIndexes = getCellDataSortIndexes<RotatableDigit>(
             dataSet,
             (a, b) => rotateCellData(puzzle, a) - rotateCellData(puzzle, b) || (a.sticky ? 1 : 0) - (b.sticky ? 1 : 0),
@@ -182,7 +185,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
             return undefined;
         }
 
-        const animatedAngle = state?.processed.animated.angle ?? 0;
+        const animatedAngle = cellPosition ? context.animatedAngle : 0;
         const angleCoeff = Math.abs(loop(animatedAngle, 360) / 180 - 1);
         const getAnimatedValue = (straight: number, upsideDown: number) => straight * angleCoeff + upsideDown * (1 - angleCoeff);
 
@@ -211,7 +214,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
             return {};
         }
 
-        const coeff = isUpsideDownAngle(context.state.angle) ? -1 : 1;
+        const coeff = isUpsideDownAngle(context.angle) ? -1 : 1;
 
         return defaultProcessArrowDirection(
             currentCell,
@@ -224,7 +227,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
     postProcessPuzzle({items = [], ...puzzle}): PuzzleDefinition<RotatableDigitPTM> {
         return {
             ...puzzle,
-            items: (state) => (typeof items === "function" ? items(state) : items).map(
+            items: (context) => (typeof items === "function" ? items(context) : items).map(
                 (item) => item.tags?.includes(cageTag)
                     ? {
                         ...item,

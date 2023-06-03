@@ -1,4 +1,7 @@
-import {ControlButtonItemProps} from "../../../components/sudoku/controls/ControlButtonsManager";
+import {
+    ControlButtonItemProps,
+    ControlButtonItemPropsGenericFc
+} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {RotateLeft, RotateRight} from "@emotion-icons/material";
 import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
@@ -10,9 +13,12 @@ import {loop} from "../../../utils/math";
 import {gameStateApplyFieldDragGesture} from "../../../types/sudoku/GameState";
 import {emptyGestureMetrics} from "../../../utils/gestures";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
 const handleRotate = <T extends AnyPTM>(context: PuzzleContext<T>, direction: number) => {
-    const {puzzle: {typeManager: {angleStep = 0, isFreeRotation}}, state: {angle}} = context;
+    const {puzzle: {typeManager: {angleStep = 0, isFreeRotation}}, angle} = context;
 
     let newAngle = angle + direction * angleStep;
     if (!isFreeRotation && angleStep !== 0) {
@@ -32,16 +38,18 @@ const handleRotate = <T extends AnyPTM>(context: PuzzleContext<T>, direction: nu
     );
 };
 
-export const RotateRightButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
+export const RotateRightButton: ControlButtonItemPropsGenericFc = observer(function RotateRightButton<T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) {
+    profiler.trace();
+
     const {
         cellSizeForSidePanel: cellSize,
-        state: {isShowingSettings, processed: {isReady}},
+        isReady,
     } = context;
 
     const translate = useTranslate();
 
     useEventListener(window, "keydown", (ev) => {
-        if (!isShowingSettings && ev.code === "KeyR") {
+        if (!settings.isOpened && ev.code === "KeyR") {
             handleRotate(context, ev.shiftKey ? -1 : 1);
             ev.preventDefault();
         }
@@ -79,9 +87,13 @@ export const RotateRightButton = <T extends AnyPTM>({context, top, left}: Contro
             </Absolute>
         </Absolute>}
     </>;
-};
+});
 
-export const RotateLeftButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
+export const RotateLeftButton: ControlButtonItemPropsGenericFc = observer(function RotateLeftButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
     const {cellSizeForSidePanel: cellSize} = context;
 
     const translate = useTranslate();
@@ -95,4 +107,4 @@ export const RotateLeftButton = <T extends AnyPTM>({context, top, left}: Control
     >
         <RotateLeft/>
     </ControlButton>;
-};
+});

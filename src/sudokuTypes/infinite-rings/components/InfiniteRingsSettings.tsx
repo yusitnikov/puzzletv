@@ -1,22 +1,27 @@
 import {SettingsContentProps} from "../../../components/sudoku/controls/settings/SettingsContent";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {
+    focusRingsSetting,
+    isShowingAllInfiniteRings,
     isShowingAllInfiniteRingsAllowed,
-    useIsFocusingInfiniteRings,
-    useIsShowingAllInfiniteRings
+    showAllRingsSetting,
 } from "../types/InfiniteRingsLayout";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {SettingsItem} from "../../../components/sudoku/controls/settings/SettingsItem";
 import {SettingsCheckbox} from "../../../components/sudoku/controls/settings/SettingsCheckbox";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
+import {ReactElement} from "react";
 
-export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => function InfiniteRingsSettingsComponent<T extends AnyPTM>(
+export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => (observer(function InfiniteRingsSettingsComponent<T extends AnyPTM>(
     {context, cellSize}: SettingsContentProps<T>
 ) {
+    profiler.trace();
+
     const translate = useTranslate();
 
-    const [isShowingAllInfiniteRings, setIsShowingAllInfiniteRings] = useIsShowingAllInfiniteRings(context, visibleRingsCountArg);
-    const [isFocusingInfiniteRings, setIsFocusingInfiniteRings] = useIsFocusingInfiniteRings();
+    const showingAllInfiniteRings = isShowingAllInfiniteRings(context, visibleRingsCountArg);
 
     if (!isShowingAllInfiniteRingsAllowed(visibleRingsCountArg)) {
         return null;
@@ -32,12 +37,12 @@ export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => function Infi
             <SettingsCheckbox
                 type={"checkbox"}
                 cellSize={cellSize}
-                checked={isShowingAllInfiniteRings}
-                onChange={(ev) => setIsShowingAllInfiniteRings(ev.target.checked)}
+                checked={showingAllInfiniteRings}
+                onChange={(ev) => showAllRingsSetting.set(ev.target.checked)}
             />
         </SettingsItem>
 
-        {isShowingAllInfiniteRings && <SettingsItem>
+        {showingAllInfiniteRings && <SettingsItem>
             {translate({
                 [LanguageCode.en]: "Focus on two rings",
                 [LanguageCode.ru]: "Сосредоточиться на двух кольцах",
@@ -46,9 +51,9 @@ export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => function Infi
             <SettingsCheckbox
                 type={"checkbox"}
                 cellSize={cellSize}
-                checked={isFocusingInfiniteRings}
-                onChange={(ev) => setIsFocusingInfiniteRings(ev.target.checked)}
+                checked={focusRingsSetting.get()}
+                onChange={(ev) => focusRingsSetting.set(ev.target.checked)}
             />
         </SettingsItem>}
     </>;
-};
+}) as <T extends AnyPTM>(props: SettingsContentProps<T>) => ReactElement | null);

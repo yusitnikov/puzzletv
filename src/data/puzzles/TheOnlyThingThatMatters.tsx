@@ -1,4 +1,4 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
@@ -17,7 +17,6 @@ import {
     KillerCageConstraintByRect
 } from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {SetInterface} from "../../types/struct/Set";
 import {CellColor} from "../../types/sudoku/CellColor";
 import {indexes} from "../../utils/indexes";
@@ -73,23 +72,19 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
         ...items,
         KillerCageConstraintByRect("R7C5", 1, 2, 7),
     ],
-    allowDrawing: ["center-mark"],
-    resultChecker: context => {
+    allowDrawing: allDrawingModes,
+    resultChecker: (context) => {
         if (isValidFinishedPuzzleByConstraints(context)) {
             return true;
         }
 
-        // Get current field colors
-        const fieldColors = gameStateGetCurrentFieldState(context.state)
-            .cells
-            .map((row) => row.map(({colors}) => colors));
-
         // Check that cells with the same digit contain the same set of colors
         const groupsColors: (SetInterface<CellColor> | undefined)[] = indexes(9).map(() => undefined);
-        for (const [top, row] of fieldColors.entries()) {
-            for (const [left, cellColors] of row.entries()) {
+        for (const top of indexes(9)) {
+            for (const left of indexes(9)) {
                 const groupIndex = correctAnswer[top][left] - 1;
                 const groupColors = groupsColors[groupIndex];
+                const cellColors = context.getCellColors(top, left);
 
                 if (groupColors === undefined) {
                     groupsColors[groupIndex] = cellColors;

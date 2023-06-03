@@ -7,6 +7,7 @@ import {Record} from "@emotion-icons/fluentui-system-filled";
 import {ReactElement} from "react";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {DigitRotationInfo} from "./DigitRotationInfo";
+import {observer} from "mobx-react-lite";
 
 const width = 0.12;
 const height = 0.1;
@@ -210,20 +211,26 @@ const svgMap: Record<number, ReactElement> = {
     </>,
 };
 
-export const LatinDigit = profiler.memo("LatinDigit", <T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) => <AutoSvg
-    width={size}
-    height={size}
-    {...containerProps}
->
-    <LatinDigitSvgContent
-        puzzle={puzzle}
-        digit={digit}
-        size={size}
-        color={color}
-    />
-</AutoSvg>) as DigitPropsGenericFc;
+export const LatinDigit: DigitPropsGenericFc = observer(function LatinDigitFc<T extends AnyPTM>({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<T>) {
+    profiler.trace();
 
-export const LatinDigitSvgContent = profiler.memo("LatinDigitSvgContent", <T extends AnyPTM>({digit, size, color, left = 0, top = 0}: DigitProps<T>) => {
+    return <AutoSvg
+        width={size}
+        height={size}
+        {...containerProps}
+    >
+        <LatinDigitSvgContent
+            puzzle={puzzle}
+            digit={digit}
+            size={size}
+            color={color}
+        />
+    </AutoSvg>;
+});
+
+export const LatinDigitSvgContent: DigitPropsGenericFc = observer(function LatinDigitSvgContentFc<T extends AnyPTM>({digit, size, color, left = 0, top = 0}: DigitProps<T>) {
+    profiler.trace();
+
     const width = widthMap[digit] ?? 0.7;
 
     return <g
@@ -248,7 +255,7 @@ export const LatinDigitSvgContent = profiler.memo("LatinDigitSvgContent", <T ext
             strokeWidth={0}
         />
     </g>;
-}) as DigitPropsGenericFc;
+});
 
 export const LatinDigitComponentType = <T extends AnyPTM>(): DigitComponentType<T> => ({
     component: LatinDigit,

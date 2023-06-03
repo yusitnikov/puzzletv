@@ -2,10 +2,8 @@ import {Constraint} from "../../../types/sudoku/Constraint";
 import {JigsawPTM} from "../types/JigsawPTM";
 import {
     getJigsawCellCenterAbsolutePositionsIndex,
-    getJigsawPiecesWithCache,
     groupJigsawPiecesByZIndex
 } from "../types/helpers";
-import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {getRegionBoundingBox} from "../../../utils/regions";
 import {PositionSet} from "../../../types/layout/Position";
 import {profiler} from "../../../utils/profiler";
@@ -15,11 +13,12 @@ export const JigsawGluedPiecesConstraint: Constraint<JigsawPTM> = {
     cells: [],
     props: undefined,
     isValidPuzzle: profiler.wrapFunc("JigsawGluedPiecesConstraint.isValidPuzzle", (
-        lines, digits, regionCells, {cellsIndex, state}
+        lines,
+        digits,
+        regionCells,
+        context,
     ): boolean => {
-        const {pieces} = getJigsawPiecesWithCache(cellsIndex);
-        const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
-        const groups = groupJigsawPiecesByZIndex(pieces, piecePositions);
+        const groups = groupJigsawPiecesByZIndex(context);
         const cells = getJigsawCellCenterAbsolutePositionsIndex(groups)
             .flatMap(({cells}) => cells)
             .map(({position}) => position);

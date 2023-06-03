@@ -7,7 +7,7 @@ export const LoopLineConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     cells: [],
     props: undefined,
     isValidPuzzle(lines, digits, cells, context) {
-        const lineSegments = context.cellsIndexForState.getCenterLineSegments();
+        const lineSegments = context.centerLineSegments;
 
         return lineSegments.length === 1 && lineSegments[0].isLoop;
     },
@@ -18,7 +18,7 @@ export const LoopLineConstraint = <T extends AnyPTM>(): Constraint<T> => ({
         context,
         isFinalCheck
     ): Line[] {
-        const lineSegments = context.cellsIndexForState.getCenterLineSegments();
+        const lineSegments = context.centerLineSegments;
 
         const hasLoop = lineSegments.some(({isLoop}) => isLoop);
 

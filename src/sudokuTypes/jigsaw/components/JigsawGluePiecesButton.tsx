@@ -3,52 +3,58 @@ import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {ControlButton} from "../../../components/sudoku/controls/ControlButton";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {ControlButtonItemProps} from "../../../components/sudoku/controls/ControlButtonsManager";
-import {fieldStateHistoryGetCurrent} from "../../../types/sudoku/FieldStateHistory";
 import {
     getActiveJigsawPieceIndexes,
     getActiveJigsawPieceZIndex,
     getJigsawCellCenterAbsolutePositionsIndex,
-    getJigsawPiecesWithCache,
     groupJigsawPiecesByZIndex
 } from "../types/helpers";
 import {jigsawPieceStateChangeAction} from "../types/JigsawGamePieceState";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
-import {useMemo} from "react";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {regionHighlightColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {useTransformScale} from "../../../contexts/TransformContext";
 import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteModeInfo";
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
+import {comparer} from "mobx";
+import {observer} from "mobx-react-lite";
+import {useComputed, useComputedValue} from "../../../hooks/useComputed";
+import {profiler} from "../../../utils/profiler";
 
-export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawPTM>) => {
-    const {
-        cellsIndex,
-        puzzle,
-        cellSizeForSidePanel: cellSize,
-        state: {
-            fieldStateHistory,
-            extension: {highlightCurrentPiece},
-        },
-        onStateChange,
-    } = context;
+export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton(
+    {context}: ControlButtonItemProps<JigsawPTM>
+) {
+    profiler.trace();
+
+    const {cellSizeForSidePanel: cellSize} = context;
 
     const digitsCount = resolveDigitsCountInCellWriteMode(context);
 
     const translate = useTranslate();
 
-    const {extension: {pieces: piecePositions}} = fieldStateHistoryGetCurrent(fieldStateHistory);
-    const activePieceZIndex = getActiveJigsawPieceZIndex(piecePositions);
-    const activePieceIndexes = useMemo(() => getActiveJigsawPieceIndexes(piecePositions), [piecePositions]);
-    const canUnglue = highlightCurrentPiece && activePieceIndexes.length > 1;
-    const handleUnglue = () => onStateChange(jigsawPieceStateChangeAction(
-        puzzle,
+    const getPiecePositions = useComputed(
+        function getPiecePositions() {
+            return context.fieldExtension.pieces;
+        },
+        {equals: comparer.structural}
+    );
+    const getActivePieceIndexes = useComputed(
+        function getActivePieceIndexes() {
+            return getActiveJigsawPieceIndexes(getPiecePositions());
+        },
+        {equals: comparer.structural}
+    );
+    const canUnglue = useComputedValue(function getCanUnglue() {
+        return context.stateExtension.highlightCurrentPiece && getActivePieceIndexes().length > 1;
+    });
+    const handleUnglue = () => context.onStateChange(jigsawPieceStateChangeAction(
         undefined,
         myClientId,
         getNextActionId(),
-        activePieceIndexes,
+        getActivePieceIndexes(),
         ({allPositions}, index) => ({
             position: {
                 zIndex: getActiveJigsawPieceZIndex(allPositions) + 1 + index,
@@ -56,55 +62,56 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
         }),
     ));
 
-    const {pieces} = getJigsawPiecesWithCache(cellsIndex);
-    const groups = useMemo(
-        () => groupJigsawPiecesByZIndex(pieces, piecePositions),
-        [pieces, piecePositions]
+    const getPieceIndexesToGlue = useComputed(
+        function getPieceIndexesToGlue() {
+            const groupCells = getJigsawCellCenterAbsolutePositionsIndex(groupJigsawPiecesByZIndex(context));
+
+            const activePieceZIndex = getActiveJigsawPieceZIndex(getPiecePositions());
+
+            const groupsToGlue = groupCells.filter(({zIndex}) => zIndex === activePieceZIndex);
+            let cellsMapToGlue = mergeGivenDigitsMaps(...groupsToGlue.map(({cellsMap}) => cellsMap));
+            const isGroupCell = ({top, left}: Position) => !!cellsMapToGlue[top]?.[left];
+            let remainingGroups = groupCells.filter(({zIndex}) => zIndex !== activePieceZIndex);
+
+            while (remainingGroups.length) {
+                // Remove groups that have cell collisions
+                remainingGroups = remainingGroups.filter(
+                    ({cells}) => cells.every(({position}) => !isGroupCell(position))
+                );
+                if (remainingGroups.length === 0) {
+                    break;
+                }
+
+                // Find a group that has a neighbor cell
+                const nextGroupIndex = remainingGroups.findIndex(
+                    ({cells}) => cells.some(
+                        ({position: {top, left}}) =>
+                            isGroupCell({top: top - 1, left}) || isGroupCell({top: top + 1, left}) ||
+                            isGroupCell({top, left: left - 1}) || isGroupCell({top, left: left + 1})
+                    )
+                );
+                if (nextGroupIndex < 0) {
+                    break;
+                }
+
+                const nextGroup = remainingGroups[nextGroupIndex];
+                remainingGroups.splice(nextGroupIndex, 1);
+                groupsToGlue.push(nextGroup);
+                cellsMapToGlue = mergeGivenDigitsMaps(cellsMapToGlue, nextGroup.cellsMap);
+            }
+
+            return groupsToGlue.flatMap(({pieceIndexes}) => pieceIndexes);
+        },
+        {equals: comparer.structural}
     );
-    const pieceIndexesToGlue = useMemo(() => {
-        const groupCells = getJigsawCellCenterAbsolutePositionsIndex(groups);
-
-        const groupsToGlue = groupCells.filter(({zIndex}) => zIndex === activePieceZIndex);
-        let cellsMapToGlue = mergeGivenDigitsMaps(...groupsToGlue.map(({cellsMap}) => cellsMap));
-        const isGroupCell = ({top, left}: Position) => !!cellsMapToGlue[top]?.[left];
-        let remainingGroups = groupCells.filter(({zIndex}) => zIndex !== activePieceZIndex);
-
-        while (remainingGroups.length) {
-            // Remove groups that have cell collisions
-            remainingGroups = remainingGroups.filter(
-                ({cells}) => cells.every(({position}) => !isGroupCell(position))
-            );
-            if (remainingGroups.length === 0) {
-                break;
-            }
-
-            // Find a group that has a neighbor cell
-            const nextGroupIndex = remainingGroups.findIndex(
-                ({cells}) => cells.some(
-                    ({position: {top, left}}) =>
-                        isGroupCell({top: top - 1, left}) || isGroupCell({top: top + 1, left}) ||
-                        isGroupCell({top, left: left - 1}) || isGroupCell({top, left: left + 1})
-                )
-            );
-            if (nextGroupIndex < 0) {
-                break;
-            }
-
-            const nextGroup = remainingGroups[nextGroupIndex];
-            remainingGroups.splice(nextGroupIndex, 1);
-            groupsToGlue.push(nextGroup);
-            cellsMapToGlue = mergeGivenDigitsMaps(cellsMapToGlue, nextGroup.cellsMap);
-        }
-
-        return groupsToGlue.flatMap(({pieceIndexes}) => pieceIndexes);
-    }, [groups, activePieceZIndex]);
-    const canGlue = highlightCurrentPiece && pieceIndexesToGlue.length > activePieceIndexes.length;
-    const handleGlue = () => onStateChange(jigsawPieceStateChangeAction(
-        puzzle,
+    const canGlue = useComputedValue(function getCanGlue() {
+        return context.stateExtension.highlightCurrentPiece && getPieceIndexesToGlue().length > getActivePieceIndexes().length;
+    });
+    const handleGlue = () => context.onStateChange(jigsawPieceStateChangeAction(
         undefined,
         myClientId,
         getNextActionId(),
-        pieceIndexesToGlue,
+        getPieceIndexesToGlue(),
         ({allPositions}) => ({
             position: {
                 zIndex: getActiveJigsawPieceZIndex(allPositions) + 1,
@@ -190,7 +197,7 @@ export const JigsawGluePiecesButton = ({context}: ControlButtonItemProps<JigsawP
             </AutoSvg>}
         </ControlButton>
     </>
-};
+});
 
 interface PieceShapeIconProps {
     backgroundColor?: string;

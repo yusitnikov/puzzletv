@@ -96,5 +96,5 @@ export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
     </>,
     prioritizeSelection: true,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000BIU",
-    getLmdSolutionCode: ({solution}) => indexes(9).map(index => solution![8][index]).join(""),
+    getLmdSolutionCode: ({puzzle: {solution}}) => indexes(9).map(index => solution![8][index]).join(""),
 };

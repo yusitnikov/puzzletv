@@ -6,7 +6,6 @@ import {
     GameStateEx,
     mergeGameStateUpdates,
     mergeGameStateWithUpdates,
-    mergeProcessedGameStateWithUpdates,
     PartialGameStateEx,
 } from "../../../types/sudoku/GameState";
 import {QuadConstraintBySolution} from "../../../components/sudoku/constraints/quad/Quad";
@@ -17,6 +16,7 @@ import {getNextPlayerId} from "../../../hooks/useMultiPlayer";
 import {QuadleConstraintBySolution} from "../../../components/sudoku/constraints/quad/Quadle";
 import {QuadInputSudokuTypeManager} from "../../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
 import {QuadMastersPTM} from "./QuadMastersPTM";
+import {IReactionDisposer, reaction} from "mobx";
 
 export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManager<QuadMastersPTM> => {
     const parent = QuadInputSudokuTypeManager<QuadMastersPTM>({
@@ -27,7 +27,7 @@ export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManag
         getReadyQuadConstraint: (context, position, digits, isRecent) => isQuadle
             ? QuadleConstraintBySolution(context, position, digits, isRecent)
             : QuadConstraintBySolution(context, position, digits, isRecent),
-        isQuadAllowedFn: ({processed: {cellWriteMode}, extension: {isQuadTurn}}) => isQuadTurn && cellWriteMode === CellWriteMode.quads,
+        isQuadAllowedFn: ({cellWriteMode, stateExtension: {isQuadTurn}}) => isQuadTurn && cellWriteMode === CellWriteMode.quads,
         onQuadFinish: (defaultResult) => mergeGameStateUpdates(defaultResult, {extension: {isQuadTurn: false}})
     });
 
@@ -75,33 +75,23 @@ export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManag
         ): PartialGameStateEx<QuadMastersPTM> {
             defaultResult = parent.handleDigitGlobally?.(isGlobal, clientId, context, cellData, defaultResult) || defaultResult;
 
-            if (!isGlobal) {
+            if (!isGlobal || !context.isMyTurn) {
                 return defaultResult;
             }
 
             const {
                 puzzle: {
-                    params = {},
                     fieldSize: {rowsCount, columnsCount},
                 },
-                state,
-                multiPlayer: {isEnabled, allPlayerIds},
-            } = context;
-
-            const {
+                cellWriteMode,
                 selectedCells,
                 currentPlayer = "",
-                processed: {cellWriteMode},
-            } = state;
+                multiPlayer: {allPlayerIds},
+            } = context;
 
-            const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
-            if (!isMyTurn) {
-                return defaultResult;
-            }
+            const newState = mergeGameStateWithUpdates(context.state, defaultResult);
 
-            const newState = mergeProcessedGameStateWithUpdates(state, defaultResult);
-
-            if (cellWriteMode === CellWriteMode.main && selectedCells.size) {
+            if (cellWriteMode === CellWriteMode.main && context.selectedCellsCount) {
                 if (selectedCells.items.some(({top, left}) => !newState.initialDigits?.[top]?.[left])) {
                     return mergeGameStateUpdates(
                         defaultResult,
@@ -140,16 +130,12 @@ export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManag
             };
         },
 
-        setSharedState(
-            puzzle,
-            state,
-            newState
-        ): GameStateEx<QuadMastersPTM> {
+        setSharedState(context, newState): GameStateEx<QuadMastersPTM> {
             const {isQuadTurn} = newState;
 
             return mergeGameStateWithUpdates(
-                state,
-                parent.setSharedState?.(puzzle, state, newState) ?? {},
+                context.myGameState,
+                parent.setSharedState?.(context, newState) ?? {},
                 {extension: {isQuadTurn}}
             );
         },
@@ -161,32 +147,50 @@ export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManag
             context
         ): boolean {
             return parent.isGlobalAction?.(action, context)
-                || (action.type.key === enterDigitActionType().key && context.state.processed.cellWriteMode === CellWriteMode.main);
+                || (action.type.key === enterDigitActionType().key && context.cellWriteMode === CellWriteMode.main);
         },
 
-        applyStateDiffEffect(
-            state,
-            prevState,
-            context
-        ) {
-            parent.applyStateDiffEffect?.(state, prevState, context);
+        getReactions(context): IReactionDisposer[] {
+            return [
+                ...parent.getReactions?.(context) ?? [],
+                reaction(
+                    () => context.isMyTurn,
+                    (isMyTurn, prevIsMyTurn = false) => {
+                        if (
+                            isMyTurn && !prevIsMyTurn && context.stateExtension.isQuadTurn &&
+                            context.multiPlayer.isEnabled && !context.puzzle.params?.share
+                        ) {
+                            context.onStateChange({persistentCellWriteMode: CellWriteMode.quads});
+                        }
+                    },
+                    {
+                        name: "quad masters - isMyTurn",
+                        fireImmediately: true,
+                    }
+                ),
+                reaction(
+                    () => context.stateExtension.isQuadTurn,
+                    (isQuadTurn, prevIsQuadTurn = false) => {
+                        if (isQuadTurn === prevIsQuadTurn) {
+                            return;
+                        }
 
-            const {persistentCellWriteMode, processed: {isMyTurn}, extension: {isQuadTurn}} = state;
-            const {puzzle: {params = {}}, onStateChange, multiPlayer: {isEnabled}} = context;
-
-            if (isMyTurn && prevState?.extension?.isQuadTurn && !isQuadTurn && persistentCellWriteMode === CellWriteMode.quads) {
-                onStateChange({persistentCellWriteMode: CellWriteMode.main});
-            }
-
-            if (isEnabled && !params.share) {
-                if (!prevState?.processed?.isMyTurn && isMyTurn && isQuadTurn) {
-                    onStateChange({persistentCellWriteMode: CellWriteMode.quads});
-                }
-            } else {
-                if (!prevState?.extension?.isQuadTurn && isQuadTurn) {
-                    onStateChange({persistentCellWriteMode: CellWriteMode.quads});
-                }
-            }
+                        if (isQuadTurn) {
+                            if (!context.multiPlayer.isEnabled || context.puzzle.params?.share) {
+                                context.onStateChange({persistentCellWriteMode: CellWriteMode.quads});
+                            }
+                        } else {
+                            if (context.isMyTurn && context.persistentCellWriteMode === CellWriteMode.quads) {
+                                context.onStateChange({persistentCellWriteMode: CellWriteMode.main});
+                            }
+                        }
+                    },
+                    {
+                        name: "quad masters - isQuadTurn",
+                        fireImmediately: true,
+                    }
+                ),
+            ];
         },
     });
 };

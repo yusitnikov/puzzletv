@@ -1,4 +1,3 @@
-import {memo} from "react";
 import {Rect} from "../../../types/layout/Rect";
 import {TransformedRectGraphics} from "../../../contexts/TransformContext";
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
@@ -7,6 +6,8 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {textColor} from "../../../components/app/globals";
 import {mixColorsStr} from "../../../utils/color";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export const carMargin = 0.1;
 const frameSize = 0.02;
@@ -21,7 +22,9 @@ interface CarProps extends Rect {
     invert?: boolean;
 }
 
-export const RushHourCar = memo(({top, left, width, height, color, invert}: CarProps) => {
+export const RushHourCar = observer(function RushHourCarFc({top, left, width, height, color, invert}: CarProps) {
+    profiler.trace();
+
     if (height > width) {
         return <TransformedRectGraphics rect={{
             base: {top, left},
@@ -175,19 +178,19 @@ export const RushHourCar = memo(({top, left, width, height, color, invert}: CarP
     </g>;
 });
 
-export const RushHourCars = (
+export const RushHourCars = observer(function RushHourCars(
     {
         region,
         context: {
             puzzle: {extension},
-            state: {
-                extension: {hideCars},
-                processed: {cellWriteMode},
-                processedExtension: {cars: carPositions},
-            },
+            cellWriteMode,
+            stateExtension: {hideCars},
+            processedGameStateExtension: {cars: carPositions},
         },
     }: ConstraintProps<RushHourPTM>
-) => {
+) {
+    profiler.trace();
+
     if (region?.cells?.length) {
         return null;
     }
@@ -203,7 +206,7 @@ export const RushHourCars = (
             invert={invert}
         />)}
     </g>;
-};
+});
 
 export const RushHourCarsConstraint: Constraint<RushHourPTM> = {
     name: "rush hour cars",

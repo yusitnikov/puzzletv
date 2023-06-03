@@ -21,7 +21,6 @@ import {
     normalSudokuRulesForChessPieces
 } from "../../sudokuTypes/chess/data/ruleSnippets";
 import {RulesSpoiler} from "../../components/sudoku/rules/RulesSpoiler";
-import {gameStateGetCurrentGivenDigits} from "../../types/sudoku/GameState";
 import {areSameGivenDigitsMaps, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {ValidChessPositionConstraint} from "../../sudokuTypes/chess/constraints/ValidChessPosition";
 import {ChessPTM} from "../../sudokuTypes/chess/types/ChessPTM";
@@ -90,24 +89,20 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
         "c2": {color: ChessColor.white, type: ChessPieceType.pawn},
         "a3": {color: ChessColor.white, type: ChessPieceType.pawn},
     }),
-    resultChecker: ({puzzle, state}) => {
-        const currentGivenDigits = gameStateGetCurrentGivenDigits(state);
-
+    resultChecker: (context) => {
         const currentFinalDigits = mergeGivenDigitsMaps(
-            puzzle.initialDigits!,
-            state.initialDigits || {},
-            currentGivenDigits,
+            context.userDigits,
             optionalSolutionPieces
         );
 
         const correctFinalDigits = mergeGivenDigitsMaps(
-            puzzle.initialDigits!,
-            state.initialDigits || {},
+            context.puzzle.initialDigits!,
+            context.stateInitialDigits || {},
             mandatorySolutionPieces,
             optionalSolutionPieces
         );
 
-        return areSameGivenDigitsMaps(puzzle, currentFinalDigits, correctFinalDigits);
+        return areSameGivenDigitsMaps(context, currentFinalDigits, correctFinalDigits);
     },
     items: [
         ChessBoardCellsBackgroundConstraint(),

@@ -7,7 +7,6 @@ import {CellWriteModeButton} from "../../../components/sudoku/controls/CellWrite
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {SokobanPlayerByData} from "../constraints/SokobanPlayer";
 import {useTranslate} from "../../../hooks/useTranslate";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudoku/controls/ControlButton";
 import {ArrowLeft, ArrowRight, ArrowDown, ArrowUp} from "@emotion-icons/fluentui-system-filled";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
@@ -15,22 +14,23 @@ import {myClientId} from "../../../hooks/useMultiPlayer";
 import {GameStateActionCallback, getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 const base = MoveCellWriteModeInfo<SokobanPTM>();
 
-export const moveSokobanPlayer = (context: PuzzleContext<SokobanPTM>, xDirection: number, yDirection: number)
-    : GameStateActionCallback<SokobanPTM> => {
-    const {cellsIndex: {allCells}, puzzle} = context;
+export const moveSokobanPlayer = (xDirection: number, yDirection: number)
+    : GameStateActionCallback<SokobanPTM> => (context) => {
+    const {puzzleIndex: {allCells}, puzzle} = context;
     const clues = puzzle.extension?.clues ?? [];
 
-    return (state) => ({
+    return {
         extension: {
             sokobanDirection: {top: yDirection, left: xDirection},
             animating: true,
         },
         fieldStateHistory: fieldStateHistoryAddState(
-            puzzle,
-            state.fieldStateHistory,
+            context,
             myClientId,
             getNextActionId(),
             (fieldState) => {
@@ -88,14 +88,15 @@ export const moveSokobanPlayer = (context: PuzzleContext<SokobanPTM>, xDirection
                 };
             },
         )
-    });
+    };
 };
 
-const ButtonComponent = ({context, top, left}: ControlButtonItemProps<SokobanPTM>) => {
+const ButtonComponent = observer(function ButtonFc({context, top, left}: ControlButtonItemProps<SokobanPTM>) {
+    profiler.trace();
+
     const {
         cellSizeForSidePanel: cellSize,
-        state: {processed: {cellWriteMode}},
-        onStateChange,
+        cellWriteMode,
     } = context;
 
     const translate = useTranslate();
@@ -124,7 +125,7 @@ const ButtonComponent = ({context, top, left}: ControlButtonItemProps<SokobanPTM
                 cellSize={cellSize}
                 top={1}
                 left={0}
-                onClick={() => onStateChange(moveSokobanPlayer(context, -1, 0))}
+                onClick={() => context.onStateChange(moveSokobanPlayer(-1, 0))}
             >
                 <ArrowLeft/>
             </ControlButton>
@@ -132,7 +133,7 @@ const ButtonComponent = ({context, top, left}: ControlButtonItemProps<SokobanPTM
                 cellSize={cellSize}
                 top={0}
                 left={1}
-                onClick={() => onStateChange(moveSokobanPlayer(context, 0, -1))}
+                onClick={() => context.onStateChange(moveSokobanPlayer(0, -1))}
             >
                 <ArrowUp/>
             </ControlButton>
@@ -140,7 +141,7 @@ const ButtonComponent = ({context, top, left}: ControlButtonItemProps<SokobanPTM
                 cellSize={cellSize}
                 top={1}
                 left={1}
-                onClick={() => onStateChange(moveSokobanPlayer(context, 0, 1))}
+                onClick={() => context.onStateChange(moveSokobanPlayer(0, 1))}
             >
                 <ArrowDown/>
             </ControlButton>
@@ -148,7 +149,7 @@ const ButtonComponent = ({context, top, left}: ControlButtonItemProps<SokobanPTM
                 cellSize={cellSize}
                 top={1}
                 left={2}
-                onClick={() => onStateChange(moveSokobanPlayer(context, 1, 0))}
+                onClick={() => context.onStateChange(moveSokobanPlayer(1, 0))}
             >
                 <ArrowRight/>
             </ControlButton>
@@ -169,7 +170,7 @@ const ButtonComponent = ({context, top, left}: ControlButtonItemProps<SokobanPTM
             </Absolute>
         </>}
     </>;
-};
+});
 
 export const SokobanMovePlayerCellWriteModeInfo: CellWriteModeInfo<SokobanPTM> = {
     mode: base.mode,

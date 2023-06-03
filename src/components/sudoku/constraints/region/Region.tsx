@@ -7,20 +7,23 @@ import {
     PositionLiteral
 } from "../../../../types/layout/Position";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {getRegionBorders} from "../../../../utils/regions";
 import {GivenDigitsMap} from "../../../../types/sudoku/GivenDigitsMap";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
-import {ProcessedGameStateEx} from "../../../../types/sudoku/GameState";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import {profiler} from "../../../../utils/profiler";
 
 export const regionTag = "region";
 
-export const Region = {
-    [FieldLayer.lines]: <T extends AnyPTM>(
-        {cells, context: {cellSize, state: {processed: {isMyTurn}}}}: ConstraintProps<T>
-    ) => {
+export const Region: ConstraintPropsGenericFcMap = {
+    [FieldLayer.lines]: observer(function Region<T extends AnyPTM>(
+        {cells, context: {cellSize, isMyTurn}}: ConstraintProps<T>
+    ) {
+        profiler.trace();
+
         const points = useMemo(() => getRegionBorders(cells, 1, true), [cells]);
 
         return <RoundedPolyLine
@@ -29,15 +32,14 @@ export const Region = {
             strokeWidth={getRegionBorderWidth(cellSize)}
             rounded={false}
         />;
-    },
+    }),
 };
 
 export const isValidCellForRegion = <T extends AnyPTM>(
     region: Position[],
     cell: Position,
     digits: GivenDigitsMap<T["cell"]>,
-    puzzle: PuzzleDefinition<T>,
-    state: ProcessedGameStateEx<T>
+    context: PuzzleContext<T>,
 ) => {
     const digit = digits[cell.top][cell.left]!;
 
@@ -48,7 +50,7 @@ export const isValidCellForRegion = <T extends AnyPTM>(
             continue;
         }
 
-        if (puzzle.typeManager.areSameCellData(constraintDigit, digit, puzzle, state, true)) {
+        if (context.puzzle.typeManager.areSameCellData(constraintDigit, digit, context)) {
             return false;
         }
     }
@@ -69,8 +71,8 @@ export const RegionConstraint = <T extends AnyPTM>(
         props: undefined,
         isObvious: true,
         isCheckingFog: true,
-        isValidCell(cell, digits, cells, {puzzle, state}) {
-            return isValidCellForRegion(cells, cell, digits, puzzle, state);
+        isValidCell(cell, digits, cells, context) {
+            return isValidCellForRegion(cells, cell, digits, context);
         },
     };
 };

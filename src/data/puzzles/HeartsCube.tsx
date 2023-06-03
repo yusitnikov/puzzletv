@@ -9,7 +9,6 @@ import {
     NonRatioNeighborsConstraint
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import {blackKropkiDotsExplained, ratioDotsExplained} from "../ruleSnippets";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => ({
@@ -65,15 +64,12 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AJY",
-    getLmdSolutionCode: (puzzle, state) => {
-        const {cells} = gameStateGetCurrentFieldState(state);
-
+    getLmdSolutionCode: (context) => {
         return [
-            cells[3][0], cells[3][1], cells[3][2],
-            cells[4][0], cells[4][1], cells[4][2],
-            cells[5][0], cells[5][1], cells[5][2],
+            context.getCellDigit(3, 0), context.getCellDigit(3, 1), context.getCellDigit(3, 2),
+            context.getCellDigit(4, 0), context.getCellDigit(4, 1), context.getCellDigit(4, 2),
+            context.getCellDigit(5, 0), context.getCellDigit(5, 1), context.getCellDigit(5, 2),
         ]
-            .map(({usersDigit}) => usersDigit)
             .join("");
     },
 });

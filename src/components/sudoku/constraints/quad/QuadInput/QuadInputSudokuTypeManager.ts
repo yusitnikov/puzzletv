@@ -5,7 +5,6 @@ import {
     mergeGameStateUpdates,
     mergeGameStateWithUpdates,
     PartialGameStateEx,
-    ProcessedGameStateEx
 } from "../../../../../types/sudoku/GameState";
 import {clearSelectionActionType, enterDigitActionType} from "../../../../../types/sudoku/GameStateAction";
 import {SudokuTypeManager} from "../../../../../types/sudoku/SudokuTypeManager";
@@ -33,7 +32,7 @@ export interface QuadInputSudokuTypeManagerOptions<T extends AnyQuadInputPTM> {
         digits: T["cell"][],
         isRecent: boolean
     ) => Constraint<T, any>;
-    isQuadAllowedFn?: (state: ProcessedGameStateEx<T>) => boolean;
+    isQuadAllowedFn?: (context: PuzzleContext<T>) => boolean;
     onQuadFinish?: (
         defaultResult: PartialGameStateEx<T>,
         isGlobal: boolean,
@@ -62,9 +61,9 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
 
     const onCornerClick = (
         {gesture: {id}}: GestureOnStartProps<PuzzleContext<T>> | GestureOnContinueProps<PuzzleContext<T>>,
-        {onStateChange}: PuzzleContext<T>,
+        context: PuzzleContext<T>,
         {exact: {corner}}: CellGestureExtraData,
-    ) => onStateChange(setQuadPositionAction(corner, options, `gesture-${id}`));
+    ) => context.onStateChange(setQuadPositionAction(corner, options, `gesture-${id}`));
 
     return {
         ...parent,
@@ -97,10 +96,8 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
 
         items: (context): Constraint<T, any>[] => {
             const {
-                state: {
-                    processed: {cellWriteMode},
-                    extension: {allQuads, currentQuad},
-                },
+                cellWriteMode,
+                stateExtension: {allQuads, currentQuad},
                 multiPlayer: {isEnabled},
             } = context;
 
@@ -151,21 +148,17 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
                 puzzle: {
                     params = {},
                 },
-                state,
+                cellWriteMode,
                 multiPlayer: {isEnabled},
-            } = context;
-
-            const {
                 currentPlayer = "",
-                processed: {cellWriteMode},
-                extension: {
+                stateExtension: {
                     currentQuad,
                     allQuads,
                 },
-            } = state;
+            } = context;
 
             const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
-            if (!isMyTurn || !currentQuad || !isQuadAllowedFn(state) || cellWriteMode !== CellWriteMode.quads) {
+            if (!isMyTurn || !currentQuad || !isQuadAllowedFn(context) || cellWriteMode !== CellWriteMode.quads) {
                 return defaultResult;
             }
 
@@ -235,14 +228,10 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
             };
         },
 
-        setSharedState(
-            puzzle,
-            state,
-            {currentQuad, allQuads, ...newState}
-        ): GameStateEx<T> {
+        setSharedState(context, {currentQuad, allQuads, ...newState}): GameStateEx<T> {
             return mergeGameStateWithUpdates(
-                state,
-                parent.setSharedState?.(puzzle, state, newState) ?? {},
+                context.myGameState,
+                parent.setSharedState?.(context, newState) ?? {},
                 {
                     extension: {
                         currentQuad,
@@ -275,22 +264,21 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
         ): boolean {
             return parent.isGlobalAction?.(action, context)
                 || action.type.key === setQuadPositionActionTypeKey
-                || (context.state.processed.cellWriteMode === CellWriteMode.quads && [enterDigitActionType().key, clearSelectionActionType().key].includes(action.type.key));
+                || (context.cellWriteMode === CellWriteMode.quads && [enterDigitActionType().key, clearSelectionActionType().key].includes(action.type.key));
         },
 
-        handleClearAction(
-            {
+        handleClearAction(context, clientId): PartialGameStateEx<T> {
+            const {
                 puzzle: {params},
-                state,
+                stateExtension: {currentQuad},
+                cellWriteMode,
                 multiPlayer: {isEnabled},
-            },
-            clientId
-        ): PartialGameStateEx<T> {
-            const {currentPlayer, processed: {cellWriteMode}, extension: {currentQuad}} = state;
+                currentPlayer,
+            } = context;
 
             const isMyTurn = !isEnabled || currentPlayer === clientId || params?.share;
 
-            if (!isMyTurn || !isQuadAllowedFn(state) || cellWriteMode !== CellWriteMode.quads || !currentQuad) {
+            if (!isMyTurn || !isQuadAllowedFn(context) || cellWriteMode !== CellWriteMode.quads || !currentQuad) {
                 return {};
             }
 

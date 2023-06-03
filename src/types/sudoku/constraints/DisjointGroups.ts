@@ -2,6 +2,7 @@ import {Constraint} from "../Constraint";
 import {AnyPTM} from "../PuzzleTypeMap";
 
 // TODO: support custom regions
+// noinspection JSSuspiciousNameCombination
 export const DisjointGroupsConstraint = <T extends AnyPTM>(
     intervalX: number, intervalY = intervalX
 ): Constraint<T> => ({
@@ -13,12 +14,12 @@ export const DisjointGroupsConstraint = <T extends AnyPTM>(
         {left, top},
         digits,
         _,
-        {puzzle, state}
+        context
     ) {
         const {
             fieldSize: {rowsCount, columnsCount},
             typeManager: {areSameCellData}
-        } = puzzle;
+        } = context.puzzle;
 
         const digit = digits[top][left]!;
 
@@ -29,7 +30,7 @@ export const DisjointGroupsConstraint = <T extends AnyPTM>(
                 }
 
                 const digit2 = digits[top2]?.[left2];
-                if (digit2 !== undefined && areSameCellData(digit2, digit, puzzle, state, true)) {
+                if (digit2 !== undefined && areSameCellData(digit2, digit, context)) {
                     return false;
                 }
             }

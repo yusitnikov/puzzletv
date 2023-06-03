@@ -1,8 +1,7 @@
 import {Position} from "../../../types/layout/Position";
-import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {
-    GameStateActionOrCallback,
+    GameStateAction,
     SetCellMarkActionParams,
     setCellMarkActionType
 } from "../../../types/sudoku/GameStateAction";
@@ -18,8 +17,7 @@ export const safeCrackerArrowsAction = <T extends AnyPTM>(
     position: Position,
     isRightButton: boolean,
     actionId: string,
-): GameStateActionOrCallback<SetCellMarkActionParams, T> => {
-    const {marks} = gameStateGetCurrentFieldState(context.state);
+): GameStateAction<SetCellMarkActionParams, T> => {
     return {
         type: setCellMarkActionType(),
         params: {
@@ -28,7 +26,7 @@ export const safeCrackerArrowsAction = <T extends AnyPTM>(
             color: userDigitColor,
             cellMarkType: incrementArrayItem<CellMarkType | undefined>(
                 [undefined, CellMarkType.LeftArrow, CellMarkType.RightArrow, CellMarkType.X],
-                marks.find({position, isCenter: true, type: CellMarkType.Any})?.type,
+                context.marks.find({position, isCenter: true, type: CellMarkType.Any})?.type,
                 isRightButton ? -1 : 1,
             ),
         },

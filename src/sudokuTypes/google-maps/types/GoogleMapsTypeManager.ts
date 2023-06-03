@@ -23,18 +23,18 @@ export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
         overlay: undefined as any,
         renderVersion: 0,
     } as T["stateEx"],
-    keepStateOnRestart(state): PartialGameStateEx<T> {
-        const {extension: {zoom, center, map, overlay, renderVersion}} = state;
+    keepStateOnRestart(context): PartialGameStateEx<T> {
+        const {stateExtension: {zoom, center, map, overlay, renderVersion}} = context;
 
         return mergeGameStateUpdates(
-            baseTypeManager.keepStateOnRestart?.(state) ?? {},
+            baseTypeManager.keepStateOnRestart?.(context) ?? {},
             {extension: {zoom, center, map, overlay, renderVersion}},
         );
     },
     transformCoords(coords, context): Position {
         coords = baseTypeManager.transformCoords?.(coords, context) || coords;
 
-        const projection = context.state.extension.overlay?.getProjection();
+        const projection = context.stateExtension.overlay?.getProjection();
         if (!projection) {
             return coords;
         }

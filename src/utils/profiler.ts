@@ -1,4 +1,4 @@
-import {FC, memo} from "react";
+import {trace} from "mobx";
 
 class Profiler {
     enabled: boolean;
@@ -62,8 +62,10 @@ class Profiler {
         };
     }
 
-    memo<T extends object>(key: string, component: FC<T>) {
-        return memo<T>(this.wrapFunc(key, component));
+    trace() {
+        if (this.enabled) {
+            trace();
+        }
     }
 }
 

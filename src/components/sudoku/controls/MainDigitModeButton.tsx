@@ -1,14 +1,17 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellWriteModeButton} from "./CellWriteModeButton";
 import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
-export const MainDigitModeButton = <T extends AnyPTM>({context, top, left}: ControlButtonItemProps<T>) => {
-    const {
-        puzzle,
-        state,
-    } = context;
+export const MainDigitModeButton: ControlButtonItemPropsGenericFc = observer(function MainDigitModeButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
+    const {puzzle} = context;
 
     const {
         typeManager: {createCellDataByDisplayDigit},
@@ -19,7 +22,7 @@ export const MainDigitModeButton = <T extends AnyPTM>({context, top, left}: Cont
         top={top}
         left={left}
         cellWriteMode={CellWriteMode.main}
-        data={{usersDigit: createCellDataByDisplayDigit(digitsCount, state)}}
+        data={{usersDigit: createCellDataByDisplayDigit(digitsCount, context)}}
         context={context}
     />;
-};
+});

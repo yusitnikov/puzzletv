@@ -1,7 +1,10 @@
-import {FC, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
+import {PropsWithChildren, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import {GoogleMapContext} from "../contexts/GoogleMapContext";
 import {useGoogleMapsApiContext} from "../contexts/GoogleMapsApiContext";
 import {useLastValueRef} from "../../../hooks/useLastValueRef";
+import {runInAction} from "mobx";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
 export interface CenterChangedEvent {
     center: google.maps.LatLngLiteral;
@@ -22,7 +25,7 @@ export interface GoogleMapProps extends google.maps.MapOptions {
     // TODO: other events
 }
 
-export const GoogleMap: FC<GoogleMapProps> = (
+export const GoogleMap = observer(function GoogleMapFn(
     {
         children,
         onReady,
@@ -33,8 +36,10 @@ export const GoogleMap: FC<GoogleMapProps> = (
         onCenterChanged,
         onZoomChanged,
         ...mapOptions
-    }
-) => {
+    }: PropsWithChildren<GoogleMapProps>
+) {
+    profiler.trace();
+
     const google = useGoogleMapsApiContext();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -188,19 +193,19 @@ export const GoogleMap: FC<GoogleMapProps> = (
         () => {
             map?.addListener(
                 "click",
-                (ev) => onClickRef.current && onClickRef.current(ev)
+                (ev) => runInAction(() => onClickRef.current?.(ev))
             );
             map?.addListener(
                 "mousemove",
-                (ev) => onMouseMoveRef.current && onMouseMoveRef.current(ev)
+                (ev) => runInAction(() => onMouseMoveRef.current?.(ev))
             );
             map?.addListener(
                 "center_changed",
-                () => onCenterChangedRef.current && onCenterChangedRef.current({center: map!.getCenter().toJSON()})
+                () => runInAction(() => onCenterChangedRef.current?.({center: map!.getCenter().toJSON()}))
             );
             map?.addListener(
                 "zoom_changed",
-                () => onZoomChangedRef.current && onZoomChangedRef.current({zoom: map!.getZoom()})
+                () => runInAction(() => onZoomChangedRef.current?.({zoom: map!.getZoom()}))
             );
         },
         [map, onClickRef, onMouseMoveRef, onCenterChangedRef, onZoomChangedRef]
@@ -217,4 +222,4 @@ export const GoogleMap: FC<GoogleMapProps> = (
             {children}
         </GoogleMapContext.Provider>}
     </div>;
-};
+});

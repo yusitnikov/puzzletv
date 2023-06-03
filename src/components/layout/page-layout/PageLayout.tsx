@@ -5,6 +5,8 @@ import {buildLink} from "../../../utils/link";
 import {HorizontalMenu, MenuItem, VerticalMenu} from "../menu/Menu";
 import {useWindowSize} from "../../../hooks/useWindowSize";
 import {Title} from "../title/Title";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export interface PageLayoutProps {
     addPadding?: boolean;
@@ -15,7 +17,11 @@ export interface PageLayoutProps {
     children: ReactNode;
 }
 
-export const PageLayout = ({addPadding = true, scrollable, title, hideTitleHeader, addTitleSuffix = true, children}: PageLayoutProps) => {
+export const PageLayout = observer(function PageLayout(
+    {addPadding = true, scrollable, title, hideTitleHeader, addTitleSuffix = true, children}: PageLayoutProps
+) {
+    profiler.trace();
+
     const language = useLanguageCode();
     const translate = useTranslate();
 
@@ -112,6 +118,10 @@ export const PageLayout = ({addPadding = true, scrollable, title, hideTitleHeade
             {children}
         </div>
     </div>;
-};
+});
 
-export const PageTitle: FC = ({children}) => <h1 style={{marginTop: 0}}>{children}</h1>;
+export const PageTitle: FC = observer(function PageTitle({children}) {
+    profiler.trace();
+
+    return <h1 style={{marginTop: 0}}>{children}</h1>;
+});

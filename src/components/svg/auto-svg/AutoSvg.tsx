@@ -4,6 +4,7 @@ import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 import {profiler} from "../../../utils/profiler";
 import {Rect} from "../../../types/layout/Rect";
 import {TransformAngleContextProvider, TransformScaleContextProvider} from "../../../contexts/TransformContext";
+import {observer} from "mobx-react-lite";
 
 const SvgParentExistsContext = createContext<boolean>(false);
 
@@ -14,7 +15,9 @@ export interface AutoSvgProps extends Omit<AbsoluteProps<"svg">, "tagName" | "cl
     clip?: boolean | ReactNode;
 }
 
-export const AutoSvg = ({children, viewBox, clip, style, ...props}: AutoSvgProps) => {
+export const AutoSvg = observer(function AutoSvg({children, viewBox, clip, style, ...props}: AutoSvgProps) {
+    profiler.trace();
+
     profiler.track("AutoSvg").stop();
     if (clip) {
         profiler.track("AutoSvg.clip").stop();
@@ -87,4 +90,4 @@ export const AutoSvg = ({children, viewBox, clip, style, ...props}: AutoSvgProps
     } else {
         return <>{children}</>;
     }
-};
+});

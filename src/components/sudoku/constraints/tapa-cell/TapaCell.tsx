@@ -1,4 +1,4 @@
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {
     Line,
     parsePositionLiteral,
@@ -12,13 +12,17 @@ import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {textColor} from "../../../app/globals";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../../utils/profiler";
 
 export interface TapaCellProps {
     clues: (number | undefined)[];
 }
 
-export const TapaCell = {
-    [FieldLayer.regular]: <T extends AnyPTM>({props: {clues}}: ConstraintProps<T, TapaCellProps>) => {
+export const TapaCell: ConstraintPropsGenericFcMap<TapaCellProps> = {
+    [FieldLayer.regular]: observer(function TapaCell<T extends AnyPTM>({props: {clues}}: ConstraintProps<T, TapaCellProps>) {
+        profiler.trace();
+
         const radius = clues.length === 1 ? 0 : 0.3;
         const size = clues.length === 1 ? 0.8 : 0.4;
 
@@ -37,7 +41,7 @@ export const TapaCell = {
                 </CenteredText>;
             })}
         </>;
-    },
+    }),
 };
 
 export const TapaCellConstraint = <T extends AnyPTM>(
@@ -51,14 +55,11 @@ export const TapaCellConstraint = <T extends AnyPTM>(
         cluesMap[key] = (cluesMap[key] || 0) + 1;
     }
 
-    const getCellInfo = ({cellsIndex: {allCells}}: PuzzleContext<T>) => allCells[cell.top][cell.left];
+    const getCellInfo = ({puzzleIndex: {allCells}}: PuzzleContext<T>) => allCells[cell.top][cell.left];
 
     const getNeighborCenters = (context: PuzzleContext<T>) => getCellInfo(context).neighbors.map(
-        ({top, left}) => context.cellsIndex.allCells[top][left].center
+        ({top, left}) => context.puzzleIndex.allCells[top][left].center
     );
-
-    const getLineSegments = ({cellsIndexForState}: PuzzleContext<T>) =>
-        cellsIndexForState.getCenterLineSegments();
 
     return {
         name: "tapa cell",
@@ -69,7 +70,7 @@ export const TapaCellConstraint = <T extends AnyPTM>(
         isValidPuzzle(lines, digits, cells, context) {
             const neighborCenters = getNeighborCenters(context);
 
-            return getLineSegments(context).some(({points}) => neighborCenters.containsOneOf(points));
+            return context.centerLineSegments.some(({points}) => neighborCenters.containsOneOf(points));
         },
         getInvalidUserLines(
             lines,
@@ -80,7 +81,7 @@ export const TapaCellConstraint = <T extends AnyPTM>(
         ): Line[] {
             const {center} = getCellInfo(context);
             const neighborCenters = getNeighborCenters(context);
-            const lineSegments = getLineSegments(context);
+            const lineSegments = context.centerLineSegments;
 
             const isSamePosition = getIsSamePuzzlePosition(context.puzzle);
 

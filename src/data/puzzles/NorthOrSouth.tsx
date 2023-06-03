@@ -36,8 +36,8 @@ import {
 import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
 import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {RotatableDigitPTM} from "../../sudokuTypes/rotatable/types/RotatablePTM";
+import {indexes} from "../../utils/indexes";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
@@ -145,13 +145,10 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
         XMarkConstraint("R7C6", "R7C7"),
     ],
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AJB",
-    getLmdSolutionCode: ({initialDigits}, state) => {
-        const {cells} = gameStateGetCurrentFieldState(state);
-
-        return cells[8]
-            .map((cell, index) => (cell.usersDigit || initialDigits?.[8]?.[index])?.digit)
-            .join("");
-    },
+    getLmdSolutionCode: (context) =>
+        indexes(9)
+            .map((left) => (context.getCellDigit(8, left) ?? context.puzzle.initialDigits?.[8]?.[left])?.digit)
+            .join(""),
 };
 
 export const NorthOrSouth2ShortRules: typeof NorthOrSouth = {

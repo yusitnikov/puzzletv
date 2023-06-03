@@ -1,5 +1,5 @@
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
+import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../types/sudoku/Constraint";
 import {JssCell} from "../types/JssCell";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
@@ -7,6 +7,8 @@ import {emptyPosition} from "../../../types/layout/Position";
 import {SingleCellFieldItemPositionFix} from "../../../components/sudoku/field/SingleCellFieldItemPositionFix";
 import {CenteredText} from "../../../components/svg/centered-text/CenteredText";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export const jssTag = "jss";
 
@@ -14,7 +16,9 @@ export interface JssProps {
     cells: JssCell[];
 }
 
-export const Jss = <T extends AnyPTM>({context, props: {cells}, region}: ConstraintProps<T, JssProps>) => {
+export const Jss: ConstraintPropsGenericFc<JssProps> = observer(function Jss<T extends AnyPTM>({context, props: {cells}, region}: ConstraintProps<T, JssProps>) {
+    profiler.trace();
+
     if (region) {
         if (region.noInteraction) {
             return null;
@@ -77,7 +81,7 @@ export const Jss = <T extends AnyPTM>({context, props: {cells}, region}: Constra
             </AutoSvg>;
         })}
     </>;
-};
+});
 
 export const JssConstraint = <T extends AnyPTM>(cells: JssCell[]): Constraint<T, JssProps> => ({
     name: "JSS",

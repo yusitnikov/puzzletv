@@ -1,23 +1,17 @@
 import {ComponentType, ReactElement} from "react";
 import {arrayContainsPosition, Line, Position} from "../layout/Position";
-import {gameStateGetCurrentFieldState, gameStateGetCurrentGivenDigitsByCells} from "./GameState";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
-import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
-import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
-import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
-import {CellState} from "./CellState";
-import {UserLinesConstraint} from "../../components/sudoku/constraints/user-lines/UserLines";
+import {GivenDigitsMap} from "./GivenDigitsMap";
 import {PuzzleContext} from "./PuzzleContext";
 import {SetInterface} from "../struct/Set";
-import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 import {LineWithColor} from "./LineWithColor";
-import {getFogPropsByConstraintsList} from "../../components/sudoku/constraints/fog/Fog";
 import {FieldLayer} from "./FieldLayer";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {isSelectableCell} from "./CellTypeProps";
 import {GridRegion} from "./GridRegion";
 import {CellColorValue, resolveCellColorValue} from "./CellColor";
 import {profiler} from "../../utils/profiler";
+import {indexes} from "../../utils/indexes";
 
 export type Constraint<T extends AnyPTM, DataT = undefined> = {
     name: string;
@@ -66,57 +60,17 @@ export type ConstraintProps<T extends AnyPTM, DataT = undefined> =
 
 export type ConstraintPropsGenericFc<DataT = undefined> = <T extends AnyPTM>(
     props: ConstraintProps<T, DataT>
-) => ReactElement;
+) => (ReactElement | null);
+
+export type ConstraintPropsGenericFcMap<DataT = undefined> = Partial<Record<FieldLayer, ConstraintPropsGenericFc<DataT>>>;
 
 // region Helper methods
-export const getAllPuzzleConstraints = <T extends AnyPTM>(
-    context: PuzzleContext<T>
-): Constraint<T, any>[] => {
-    const {puzzle, state} = context;
-
-    const {
-        regions = [],
-        items: puzzleItemsOrFn = [],
-        typeManager: {
-            items: stateItemsOrFn = [],
-            getRegionsForRowsAndColumns = getDefaultRegionsForRowsAndColumns,
-        },
-    } = puzzle;
-
-    return [
-        FieldLinesConstraint<T>(),
-        ...getRegionsForRowsAndColumns(context),
-        ...regions.map(
-            (region): Constraint<T, any> => Array.isArray(region)
-                ? RegionConstraint(region)
-                : region
-        ),
-        UserLinesConstraint<T>(),
-        ...(
-            typeof puzzleItemsOrFn === "function"
-                ? puzzleItemsOrFn(state)
-                : puzzleItemsOrFn as Constraint<T, any>[]
-        ),
-        ...(
-            typeof stateItemsOrFn === "function"
-                ? stateItemsOrFn(context)
-                : stateItemsOrFn as Constraint<T, any>[]
-        ),
-    ].filter(Boolean);
-};
-
-export const prepareGivenDigitsMapForConstraints = <T extends AnyPTM>(
-    {puzzle: {initialDigits = {}}, state: {initialDigits: stateInitialDigits = {}}}: PuzzleContext<T>,
-    cells: CellState<T>[][]
-) => mergeGivenDigitsMaps(initialDigits, stateInitialDigits, gameStateGetCurrentGivenDigitsByCells(cells));
-
 export const normalizeConstraintCells = <T extends AnyPTM>(positions: Position[], puzzle: PuzzleDefinition<T>) =>
     positions.map(position => normalizePuzzlePosition(position, puzzle));
 
 export const isValidUserDigit = <T extends AnyPTM>(
     cell: Position,
     userDigits: GivenDigitsMap<T["cell"]>,
-    constraints: Constraint<T, any>[],
     context: PuzzleContext<T>,
     isFinalCheck = false,
     isPencilmark = false,
@@ -127,7 +81,8 @@ export const isValidUserDigit = <T extends AnyPTM>(
         return true;
     }
 
-    const isFogPuzzle = !!getFogPropsByConstraintsList(constraints);
+    const constraints = context.allItems;
+    const isFogPuzzle = !!context.fogProps;
 
     for (const {cells, isValidCell, isObvious, isCheckingFog, noPencilmarkCheck} of constraints) {
         if (onlyObvious && !isObvious) {
@@ -144,7 +99,7 @@ export const isValidUserDigit = <T extends AnyPTM>(
 
         const normalizedConstraintCells = normalizeConstraintCells(cells, context.puzzle);
         if (normalizedConstraintCells.length) {
-            if (!isFinalCheck && normalizedConstraintCells.some(({top, left}) => !context.cellsIndexForState.getAllCells()[top]?.[left]?.isVisible)) {
+            if (!isFinalCheck && normalizedConstraintCells.some(({top, left}) => !context.isVisibleCellForState(top, left))) {
                 continue;
             }
             if (!arrayContainsPosition(normalizedConstraintCells, cell)) {
@@ -161,12 +116,15 @@ export const isValidUserDigit = <T extends AnyPTM>(
 };
 
 export const getInvalidUserLines = <T extends AnyPTM>(
-    lines: SetInterface<LineWithColor>,
-    userDigits: GivenDigitsMap<T["cell"]>,
-    constraints: Constraint<T, any>[],
     context: PuzzleContext<T>,
     isFinalCheck = false
 ): SetInterface<LineWithColor> => {
+    const {
+        lines,
+        userDigits,
+        allItems: constraints,
+    } = context;
+
     let result = lines.clear();
 
     for (const constraint of constraints) {
@@ -185,11 +143,18 @@ export const getInvalidUserLines = <T extends AnyPTM>(
 export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: PuzzleContext<T>) => {
     const timer = profiler.track("isValidFinishedPuzzleByConstraints");
 
-    const {cellsIndex, puzzle, state} = context;
-    const {digitsCount, importOptions: {stickyRegion, noStickyRegionValidation} = {}} = puzzle;
-    const constraints = getAllPuzzleConstraints(context);
-    const {cells, lines} = gameStateGetCurrentFieldState(state);
-    const userDigits = prepareGivenDigitsMapForConstraints(context, cells);
+    const {
+        puzzleIndex,
+        puzzle,
+        lines,
+        userDigits,
+    } = context;
+    const {
+        digitsCount,
+        fieldSize: {rowsCount, columnsCount},
+        importOptions: {stickyRegion, noStickyRegionValidation} = {},
+    } = puzzle;
+    const constraints = context.allItems;
 
     for (const constraint of constraints) {
         const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
@@ -202,7 +167,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
 
     const result = (
         digitsCount === 0 ||
-        cells.every((row, top) => row.every((cell, left) => {
+        indexes(rowsCount).every((top) => indexes(columnsCount).every((left) => {
             const position: Position = {left, top};
             const digit = userDigits[top]?.[left];
 
@@ -214,10 +179,10 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
                 }
             }
 
-            return !isSelectableCell(cellsIndex.getCellTypeProps(position))
-                || (digit !== undefined && isValidUserDigit(position, userDigits, constraints, context, true));
+            return !isSelectableCell(puzzleIndex.getCellTypeProps(position))
+                || (digit !== undefined && isValidUserDigit(position, context.userDigits, context, true));
         }))
-    ) && getInvalidUserLines(lines, userDigits, constraints, context, true).size === 0;
+    ) && getInvalidUserLines(context, true).size === 0;
     timer.stop();
     return result;
 };

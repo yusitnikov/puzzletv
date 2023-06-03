@@ -13,7 +13,7 @@ const map: Record<number, number> = {
     7: 100,
     8: 500,
     9: 1000,
-}
+};
 
 export const LatinDigitSudokuTypeManager = <T extends AnyPTM>(baseTypeManager: SudokuTypeManager<T>): SudokuTypeManager<T> => ({
     ...baseTypeManager,

@@ -4,22 +4,30 @@ import {PushPin} from "@emotion-icons/material";
 import {ControlButton} from "../../../components/sudoku/controls/ControlButton";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {AnyRotatablePTM} from "../types/RotatablePTM";
+import {ReactElement} from "react";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
+import {observer} from "mobx-react-lite";
 
-export const StickyModeButton = <T extends AnyRotatablePTM>({context, top, left}: ControlButtonItemProps<T>) => {
+export const StickyModeButton = observer(function StickyModeButton<T extends AnyRotatablePTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
     const {
         cellSizeForSidePanel: cellSize,
-        state: {isShowingSettings, extension: {isStickyMode}},
-        onStateChange,
+        stateExtension: {isStickyMode},
     } = context;
 
     const translate = useTranslate();
 
-    const handleToggleStickyMode = () => {
-        onStateChange(({extension: {isStickyMode}}) => ({extension: {isStickyMode: !isStickyMode}}));
-    };
+    const handleToggleStickyMode = () => context.onStateChange(
+        ({stateExtension: {isStickyMode}}) =>
+            ({extension: {isStickyMode: !isStickyMode}})
+    );
 
     useEventListener(window, "keydown", (ev) => {
-        if (!isShowingSettings && ev.code === "KeyS") {
+        if (!settings.isOpened && ev.code === "KeyS") {
             handleToggleStickyMode();
             ev.preventDefault();
         }
@@ -35,4 +43,4 @@ export const StickyModeButton = <T extends AnyRotatablePTM>({context, top, left}
     >
         <PushPin/>
     </ControlButton>;
-};
+}) as <T extends AnyRotatablePTM>(props: ControlButtonItemProps<T>) => ReactElement;

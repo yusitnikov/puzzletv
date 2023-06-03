@@ -18,7 +18,8 @@ import {myClientId} from "../../../hooks/useMultiPlayer";
 import {JigsawMoveButtonHint} from "../components/JigsawMoveButtonHint";
 import {arrayContainsPosition, Position} from "../../../types/layout/Position";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export const roundStep = 0.5;
 
@@ -30,42 +31,42 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         [LanguageCode.en]: "Move the grid and the jigsaw pieces",
         [LanguageCode.ru]: "Двигать поле и куски пазла",
     },
-    mainButtonContent: (props) => <>
-        {base.mainButtonContent && <base.mainButtonContent {...props}/>}
-        <JigsawMoveButtonHint {...props}/>
-    </>,
+    mainButtonContent: observer(function JigsawMoveButton(props) {
+        profiler.trace();
+
+        return <>
+            {base.mainButtonContent && <base.mainButtonContent {...props}/>}
+            <JigsawMoveButtonHint {...props}/>
+        </>;
+    }),
     disableCellHandlers: false,
     handlesRightMouseClick: true,
     onGestureStart(props, context, ...args) {
         const {gesture} = props;
-        const {puzzle, onStateChange} = context;
 
         const piecesGroup = getJigsawPiecesByGesture(context, gesture);
         if (!piecesGroup) {
-            onStateChange({extension: {highlightCurrentPiece: false}});
+            context.onStateChange({extension: {highlightCurrentPiece: false}});
             return base.onGestureStart?.(props, context, ...args);
         }
 
         // Bring the clicked piece to the top
-        onStateChange(jigsawPieceBringOnTopAction(puzzle, piecesGroup.indexes));
+        context.onStateChange(jigsawPieceBringOnTopAction(piecesGroup.indexes));
     },
-    onOutsideClick({onStateChange}) {
-        onStateChange({extension: {highlightCurrentPiece: false}});
+    onOutsideClick(context) {
+        context.onStateChange({extension: {highlightCurrentPiece: false}});
     },
     onMove(props, context, fieldRect) {
         const {gesture, startMetrics, currentMetrics} = props;
         const {id, state: startContext} = gesture;
         const {
-            cellsIndex,
+            puzzleIndex,
             puzzle,
             cellSize,
-            onStateChange,
         } = context;
         const {
-            state: {
-                loopOffset,
-                scale,
-            },
+            loopOffset,
+            scale,
         } = startContext;
         const {
             fieldSize: {fieldSize},
@@ -80,7 +81,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
 
         const {center: groupCenter} = piecesGroup;
         const fieldCenter = getRectCenter(fieldRect);
-        const {pieces} = getJigsawPiecesWithCache(cellsIndex);
+        const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
 
         const screenToGroup = ({x, y, rotation}: GestureMetrics): GestureMetrics => ({
             x: ((x - fieldCenter.left) / cellSize - loopOffset.left) / scale + fieldSize / 2 - groupCenter.left,
@@ -94,9 +95,8 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
             screenToGroup(currentMetrics)
         );
 
-        onStateChange(jigsawPieceStateChangeAction(
-            puzzle,
-            startContext.state,
+        context.onStateChange(jigsawPieceStateChangeAction(
+            startContext,
             myClientId,
             `gesture-${id}`,
             piecesGroup.indexes,
@@ -109,18 +109,23 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
         ));
     },
     onGestureEnd(props, context) {
+        const noAnimationContext = context.cloneWith({
+            animated: undefined,
+            processedGameStateExtension: undefined,
+        });
+
         const {gesture, reason} = props;
-        const {cellsIndex, puzzle, onStateChange} = context;
+        const {puzzleIndex, puzzle} = context;
         const {importOptions: {angleStep = 0} = {}} = puzzle;
 
-        const piecesGroup = getJigsawPiecesByGesture(context, gesture);
+        const piecesGroup = getJigsawPiecesByGesture(noAnimationContext, gesture);
         if (!piecesGroup) {
             base.onGestureEnd?.(props, context);
             return;
         }
 
         const {id, isClick, pointers: [{start: {event: {button: isRightButton}}}]} = gesture;
-        const {pieces} = getJigsawPiecesWithCache(cellsIndex);
+        const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
 
         const groupGesture: GestureMetrics = {
             x: roundToStep(piecesGroup.center.left, roundStep) - piecesGroup.center.left,
@@ -130,8 +135,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
             scale: 1,
         };
 
-        onStateChange(jigsawPieceStateChangeAction(
-            puzzle,
+        context.onStateChange(jigsawPieceStateChangeAction(
             undefined,
             myClientId,
             `gesture-${id}`,
@@ -145,11 +149,9 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
 };
 
 const getJigsawPiecesByGesture = (
-    {cellsIndex, state}: PuzzleContext<JigsawPTM>,
+    context: PuzzleContext<JigsawPTM>,
     {pointers}: GestureInfo<PuzzleContext<JigsawPTM>>,
 ) => {
-    const {extension: {pieces: piecePositions}} = gameStateGetCurrentFieldState(state);
-
     const cells = pointers
         .map(({start: {extraData}}) => isCellGestureExtraData(extraData) ? extraData.cell : undefined)
         .filter(Boolean) as Position[];
@@ -157,7 +159,7 @@ const getJigsawPiecesByGesture = (
         return undefined;
     }
 
-    const groups = groupJigsawPiecesByZIndex(getJigsawPiecesWithCache(cellsIndex).pieces, piecePositions);
+    const groups = groupJigsawPiecesByZIndex(context);
     const matchingGroups = cells.map((cell) => groups.find(({cells}) => arrayContainsPosition(cells, cell)));
 
     // return the group if it's the same for all pointers

@@ -1,4 +1,4 @@
-import {ControlButtonItemProps} from "./ControlButtonsManager";
+import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {ControlButton} from "./ControlButton";
 import {Undo} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
@@ -8,29 +8,31 @@ import {getNextActionId, undoAction} from "../../../types/sudoku/GameStateAction
 import {useEventListener} from "../../../hooks/useEventListener";
 import {deleteHotkeys} from "./DeleteButton";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../types/layout/Settings";
+import {profiler} from "../../../utils/profiler";
 
-export const UndoButton = <T extends AnyPTM>(
-    {
-        context: {
-            cellSizeForSidePanel: cellSize,
-            puzzle: {hideDeleteButton},
-            state: {isShowingSettings, processed: {isReady}},
-            onStateChange,
-            multiPlayer: {isEnabled},
-        },
-        top,
-        left,
-    }: ControlButtonItemProps<T>
-) => {
+export const UndoButton: ControlButtonItemPropsGenericFc = observer(function UndoButton<T extends AnyPTM>(
+    {context, top, left}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
+    const {
+        cellSizeForSidePanel: cellSize,
+        puzzle: {hideDeleteButton},
+        isReady,
+        multiPlayer: {isEnabled},
+    } = context;
+
     const translate = useTranslate();
 
-    const handleUndo = useCallback(() => onStateChange(undoAction(getNextActionId())), [onStateChange]);
+    const handleUndo = useCallback(() => context.onStateChange(undoAction(getNextActionId())), [context]);
 
     useEventListener(window, "keydown", (ev) => {
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 
-        if (!isShowingSettings && !isEnabled && ((ctrlKey && code === "KeyZ") || (hideDeleteButton && deleteHotkeys.includes(code)))) {
+        if (!settings.isOpened && !isEnabled && ((ctrlKey && code === "KeyZ") || (hideDeleteButton && deleteHotkeys.includes(code)))) {
             handleUndo();
             ev.preventDefault();
         }
@@ -63,4 +65,4 @@ export const UndoButton = <T extends AnyPTM>(
             {translate("Undo")}
         </div>
     </ControlButton>;
-};
+});

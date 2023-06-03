@@ -18,7 +18,6 @@ import {
     renbanTitle,
     ruleWithTitle
 } from "../ruleSnippets";
-import {gameStateGetCurrentFieldState} from "../../types/sudoku/GameState";
 import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
 import {InBetweenLineConstraint} from "../../components/sudoku/constraints/in-between-line/InBetweenLine";
@@ -27,7 +26,7 @@ import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import React from "react";
-import {CellSelectionColor, CellSelectionProps} from "../../components/sudoku/cell/CellSelection";
+import {CellSelectionColor, CellSelectionByDataProps} from "../../components/sudoku/cell/CellSelection";
 import {Raumplaner} from "../authors";
 import {
     isValidFinishedPuzzleByStageConstraints,
@@ -99,48 +98,46 @@ const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     return {};
 };
 
-const getStage = ({state}: PuzzleContext<MultiStagePTM>) => {
-    const {cells} = gameStateGetCurrentFieldState(state);
-
+const getStage = (context: PuzzleContext<MultiStagePTM>) => {
     if (
-        cells[3][3].usersDigit !== 8 ||
-        cells[3][4].usersDigit !== 1 ||
-        cells[5][4].usersDigit !== 9 ||
-        cells[5][5].usersDigit !== 2
+        context.getCellDigit(3, 3) !== 8 ||
+        context.getCellDigit(3, 4) !== 1 ||
+        context.getCellDigit(5, 4) !== 9 ||
+        context.getCellDigit(5, 5) !== 2
     ) {
         return 1;
     }
 
     if (
-        cells[2][4].usersDigit !== 5 ||
-        cells[4][2].usersDigit !== 1 ||
-        cells[4][4].usersDigit !== 4 ||
-        cells[4][6].usersDigit !== 9 ||
-        cells[6][4].usersDigit !== 7
+        context.getCellDigit(2, 4) !== 5 ||
+        context.getCellDigit(4, 2) !== 1 ||
+        context.getCellDigit(4, 4) !== 4 ||
+        context.getCellDigit(4, 6) !== 9 ||
+        context.getCellDigit(6, 4) !== 7
     ) {
         return 2;
     }
 
     if (
-        cells[0][0].usersDigit !== 6 ||
-        cells[0][4].usersDigit !== 2 ||
-        cells[0][8].usersDigit !== 8 ||
-        cells[8][0].usersDigit !== 4 ||
-        cells[8][4].usersDigit !== 8 ||
-        cells[8][8].usersDigit !== 6
+        context.getCellDigit(0, 0) !== 6 ||
+        context.getCellDigit(0, 4) !== 2 ||
+        context.getCellDigit(0, 8) !== 8 ||
+        context.getCellDigit(8, 0) !== 4 ||
+        context.getCellDigit(8, 4) !== 8 ||
+        context.getCellDigit(8, 8) !== 6
     ) {
         return 3;
     }
 
     if (
-        cells[0][6].usersDigit !== 3 ||
-        cells[0][7].usersDigit !== 7 ||
-        cells[4][0].usersDigit !== 2 ||
-        cells[4][1].usersDigit !== 5 ||
-        cells[4][7].usersDigit !== 8 ||
-        cells[4][8].usersDigit !== 7 ||
-        cells[8][1].usersDigit !== 7 ||
-        cells[8][2].usersDigit !== 9
+        context.getCellDigit(0, 6) !== 3 ||
+        context.getCellDigit(0, 7) !== 7 ||
+        context.getCellDigit(4, 0) !== 2 ||
+        context.getCellDigit(4, 1) !== 5 ||
+        context.getCellDigit(4, 7) !== 8 ||
+        context.getCellDigit(4, 8) !== 7 ||
+        context.getCellDigit(8, 1) !== 7 ||
+        context.getCellDigit(8, 2) !== 9
     ) {
         return 4;
     }
@@ -160,8 +157,8 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
         ...MultiStageSudokuTypeManager({getStage}),
         getCellSelectionType(
             {top, left},
-            {state: {extension: {stage}}}
-        ): Required<Pick<CellSelectionProps<MultiStagePTM>, "color" | "strokeWidth">> | undefined {
+            {stateExtension: {stage}}
+        ): Required<Pick<CellSelectionByDataProps<MultiStagePTM>, "color" | "strokeWidth">> | undefined {
             const colors = getStageCellsMap(stage);
 
             return colors[top]?.[left] === undefined ? undefined : {
@@ -172,7 +169,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
     },
     fieldSize: FieldSize9,
     regions: Regions9,
-    rules: (translate, {state: {extension: {stage}}}) => {
+    rules: (translate, {stateExtension: {stage}}) => {
         return <>
             <RulesParagraph>{translate({
                 [LanguageCode.en]: "This puzzle does reveal its clues in stages",
@@ -197,7 +194,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
             })}.</RulesParagraph>}
         </>;
     },
-    items: ({extension: {stage}}) => {
+    items: ({stateExtension: {stage}}) => {
         const result: Constraint<MultiStagePTM, any>[] = [
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
@@ -216,8 +213,8 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
                 KillerCageConstraintByRect("R5C1", 2, 1, 7),
                 KillerCageConstraintByRect("R5C8", 2, 1, 15),
                 KillerCageConstraintByRect("R8C5", 1, 2, 14),
-                ArrowConstraint("R4C6", ["R3C5"]),
-                ArrowConstraint("R6C4", ["R7C5"]),
+                ArrowConstraint("R4C6", ["R3C5"], true),
+                ArrowConstraint("R6C4", ["R7C5"], true),
             );
         }
 
@@ -243,8 +240,8 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
 
         if (stage >= 5) {
             result.push(
-                ArrowConstraint("R3C4", ["R3C3", "R4C3"]),
-                ArrowConstraint("R7C6", ["R7C7", "R6C7"]),
+                ArrowConstraint("R3C4", ["R3C3", "R4C3"], true),
+                ArrowConstraint("R7C6", ["R7C7", "R6C7"], true),
             );
         }
 

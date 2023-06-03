@@ -1,11 +1,13 @@
-import React from "react";
+import React, {ReactElement, useMemo} from "react";
 import {Field} from "./Field";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {useGame} from "../../../hooks/sudoku/useGame";
 import {ErrorBoundary} from "react-error-boundary";
 import {errorColor} from "../../app/globals";
 import {lightenColorStr} from "../../../utils/color";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import {createEmptyContextForPuzzle} from "../../../types/sudoku/PuzzleContext";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
 export interface FieldPreviewProps<T extends AnyPTM> {
     puzzle?: PuzzleDefinition<T>;
@@ -13,7 +15,9 @@ export interface FieldPreviewProps<T extends AnyPTM> {
     hide?: boolean;
 }
 
-export const FieldPreview = <T extends AnyPTM>({puzzle, width, hide}: FieldPreviewProps<T>) => {
+export const FieldPreview = observer(function FieldPreview<T extends AnyPTM>({puzzle, width, hide}: FieldPreviewProps<T>) {
+    profiler.trace();
+
     const loadError = <div style={{
         position: "absolute",
         inset: 0,
@@ -25,6 +29,7 @@ export const FieldPreview = <T extends AnyPTM>({puzzle, width, hide}: FieldPrevi
         <span>Failed to load the puzzle :(</span>
     </div>;
 
+    // noinspection JSSuspiciousNameCombination
     return <div style={{
         position: "relative",
         width,
@@ -36,7 +41,7 @@ export const FieldPreview = <T extends AnyPTM>({puzzle, width, hide}: FieldPrevi
             <FieldPreviewInner puzzle={puzzle} width={width}/>
         </ErrorBoundary>)}
     </div>;
-};
+}) as <T extends AnyPTM>(props: FieldPreviewProps<T>) => ReactElement;
 
 interface FieldPreviewInnerProps<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
@@ -44,10 +49,16 @@ interface FieldPreviewInnerProps<T extends AnyPTM> {
     hide?: boolean;
 }
 
-const FieldPreviewInner = <T extends AnyPTM>({puzzle, width}: FieldPreviewInnerProps<T>) => {
-    const cellSize = width / (puzzle.fieldSize.fieldSize + (puzzle.fieldMargin || 0) * 2);
-    const context = useGame(puzzle, cellSize, cellSize, true);
+const FieldPreviewInner = observer(function FieldPreviewInner<T extends AnyPTM>({puzzle, width}: FieldPreviewInnerProps<T>) {
+    profiler.trace();
 
+    const cellSize = width / (puzzle.fieldSize.fieldSize + (puzzle.fieldMargin || 0) * 2);
+    const context = useMemo(
+        () => createEmptyContextForPuzzle(puzzle, cellSize),
+        [puzzle, cellSize]
+    );
+
+    // noinspection JSSuspiciousNameCombination
     return <Field
         rect={{
             left: 0,
@@ -57,4 +68,4 @@ const FieldPreviewInner = <T extends AnyPTM>({puzzle, width}: FieldPreviewInnerP
         }}
         context={context}
     />;
-};
+}) as <T extends AnyPTM>(props: FieldPreviewInnerProps<T>) => ReactElement;

@@ -1,4 +1,4 @@
-import {useMemo} from "react";
+import {ReactElement, useMemo} from "react";
 import {Size} from "../../../types/layout/Size";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Field} from "../field/Field";
@@ -16,12 +16,16 @@ import {profiler} from "../../../utils/profiler";
 import {useControlButtonsManager} from "../controls/ControlButtonsManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleMultiPlayerWarnings} from "./PuzzleMultiPlayerWarnings";
+import {usePureMemo} from "../../../hooks/usePureMemo";
+import {observer} from "mobx-react-lite";
 
 export interface PuzzleProps<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
 }
 
-export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
+export const Puzzle = observer(function Puzzle<T extends AnyPTM>({puzzle}: PuzzleProps<T>) {
+    profiler.trace();
+
     profiler.flush();
 
     const {
@@ -74,6 +78,13 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
         ...fieldInnerRect,
         left: containerLeft + fieldInnerRect.left,
     }), [containerLeft, fieldInnerRect]);
+
+    const sidePanelRect = usePureMemo({
+        left: isHorizontal ? controlsOffset : padding,
+        top: isHorizontal ? padding : controlsOffset,
+        width: isHorizontal ? controlsSize : sudokuSize,
+        height: isHorizontal ? sudokuSize : controlsSize,
+    });
     // endregion
 
     const context = useGame(puzzle, cellSize, cellSizeForSidePanel);
@@ -98,12 +109,7 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
 
                 <SidePanel
                     context={context}
-                    rect={{
-                        left: isHorizontal ? controlsOffset : padding,
-                        top: isHorizontal ? padding : controlsOffset,
-                        width: isHorizontal ? controlsSize : sudokuSize,
-                        height: isHorizontal ? sudokuSize : controlsSize,
-                    }}
+                    rect={sidePanelRect}
                     isHorizontal={isHorizontal}
                 />
             </Absolute>
@@ -111,4 +117,4 @@ export const Puzzle = <T extends AnyPTM>({puzzle}: PuzzleProps<T>) => {
             <PuzzleMultiPlayerWarnings context={context}/>
         </PuzzleContainerContext.Provider>
     </>;
-}
+}) as <T extends AnyPTM>(props: PuzzleProps<T>) => ReactElement;

@@ -15,5 +15,5 @@ export const ShadingCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<
     onCornerClick: ({gesture: {id}}, context, {cell}, isRightButton) =>
         context.onStateChange(shadingStartAction(context, cell, isRightButton, `gesture-${id}`)),
     onCornerEnter: ({gesture: {id}}, context, {cell}) =>
-        context.onStateChange(shadingAction(context, cell, context.state.dragAction, `gesture-${id}`)),
+        context.onStateChange(shadingAction(cell, context.dragAction, `gesture-${id}`)),
 });

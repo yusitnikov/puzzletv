@@ -1,5 +1,68 @@
 import {useCallback} from "react";
 import {useStateWithStorage} from "../hooks/useStateWithStorage";
+import {makeAutoObservable} from "mobx";
+import {computedFn} from "mobx-utils";
+
+interface ItemManager<T> {
+    get(): T;
+    set(value: T): void;
+}
+
+// noinspection JSUnusedLocalSymbols
+class LocalStorageManager {
+    private version = 0;
+
+    constructor() {
+        makeAutoObservable(this);
+
+        window.addEventListener("storage", () => this.invalidate());
+    }
+
+    private invalidate() {
+        ++this.version;
+    }
+
+    private getString = computedFn((key: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _accessVersionJustForDependency = this.version;
+
+        return window.localStorage[key];
+    });
+
+    private setString(key: string, value: string) {
+        window.localStorage[key] = value;
+        this.invalidate();
+    }
+
+    getStringManager<T extends string>(key: string, defaultValue = "" as T): ItemManager<T> {
+        return {
+            get: () => this.getString(key) ?? defaultValue,
+            set: (value) => this.setString(key, value),
+        };
+    }
+
+    getBoolManager(key: string, defaultValue = false): ItemManager<boolean> {
+        return {
+            get: () => {
+                const value = this.getString(key);
+                return value !== undefined ? value === "1" : defaultValue;
+            },
+            set: (value) => this.setString(key, value ? "1" : "0"),
+        };
+    }
+
+    getNumberManager<T extends number = number>(key: string, defaultValue = 0 as T): ItemManager<T> {
+        return {
+            get: () => {
+                const value = this.getString(key);
+                return value !== undefined ? Number(value) as T : defaultValue;
+            },
+            set: (value) => this.setString(key, value.toString()),
+        };
+    }
+}
+
+export const localStorageManager = new LocalStorageManager();
 
 export const loadStringFromLocalStorage = <T extends string>(key: string, defaultValue = "" as T): T =>
     typeof window.localStorage[key] === "string" ? window.localStorage[key] : defaultValue;

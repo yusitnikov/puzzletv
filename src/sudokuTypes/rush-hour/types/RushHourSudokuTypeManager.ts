@@ -6,7 +6,6 @@ import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {RushHourMoveCellWriteModeInfo} from "./RushHourMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {RushHourPTM} from "./RushHourPTM";
-import {gameStateGetCurrentFieldState} from "../../../types/sudoku/GameState";
 import {RushHourFieldState} from "./RushHourFieldState";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
@@ -24,6 +23,7 @@ import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../../types/sudoku/GivenD
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {createRandomGenerator} from "../../../utils/random";
 import {cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
+import {settings} from "../../../types/layout/Settings";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
@@ -63,15 +63,17 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         };
     },
 
-    useProcessedGameStateExtension(state): RushHourProcessedGameState {
-        const {animationSpeed, extension: {cars: carAnimations}} = state;
-        const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
-
+    useProcessedGameStateExtension(
+        {
+            fieldExtension: {cars: carPositions},
+            stateExtension: {cars: carAnimations},
+        }
+    ): RushHourProcessedGameState {
         return {
             // eslint-disable-next-line react-hooks/rules-of-hooks
             cars: carPositions.map((position, index) => useAnimatedValue(
                 position,
-                carAnimations[index].animating ? animationSpeed / 2 : 0,
+                carAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
                 (a, b, coeff) => {
                     return {
                         top: mixAnimatedValue(a.top, b.top, coeff),
@@ -82,8 +84,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         };
     },
 
-    getProcessedGameStateExtension(state): RushHourProcessedGameState {
-        const {extension: {cars}} = gameStateGetCurrentFieldState(state);
+    getProcessedGameStateExtension({fieldExtension: {cars}}): RushHourProcessedGameState {
         return {cars};
     },
 
@@ -106,11 +107,9 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                 extension: carsInfo,
                 fieldSize: {fieldSize},
             },
-            state: {
-                processed: {cellWriteMode},
-                extension: {hideCars: hideCarsState},
-                processedExtension: {cars: carPositions},
-            },
+            cellWriteMode,
+            stateExtension: {hideCars: hideCarsState},
+            processedGameStateExtension: {cars: carPositions},
         },
     ): GridRegion[] {
         const isMoveMode = cellWriteMode === CellWriteMode.move;
@@ -151,9 +150,9 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         return {};
     },
 
-    getRegionsForRowsAndColumns({puzzle: {fieldSize: {fieldSize}, ...puzzle}, ...context}) {
-        return getDefaultRegionsForRowsAndColumns({
-            ...context,
+    getRegionsForRowsAndColumns(context) {
+        const {puzzle: {fieldSize: {fieldSize}, ...puzzle}} = context;
+        return getDefaultRegionsForRowsAndColumns(context.cloneWith({
             puzzle: {
                 ...puzzle,
                 fieldSize: {
@@ -162,7 +161,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                     columnsCount: fieldSize,
                 },
             },
-        });
+        }));
     },
 
     mapImportedColors: true,
@@ -269,9 +268,11 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
 
                 if (resultChecker) {
                     puzzle.resultChecker = (context) => {
-                        const {puzzle, state} = context;
+                        const {
+                            puzzle,
+                            fieldExtension: {cars: carPositions},
+                        } = context;
                         const {initialDigits = {}} = puzzle;
-                        const {extension: {cars: carPositions}} = gameStateGetCurrentFieldState(state);
 
                         const carInitialDigits: GivenDigitsMap<number> = {};
                         for (const [index, {cells}] of cars.entries()) {
@@ -289,8 +290,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                             }
                         }
 
-                        const fixedContext: typeof context = {
-                            ...context,
+                        const fixedContext = context.cloneWith({
                             puzzle: {
                                 ...puzzle,
                                 initialDigits: mergeGivenDigitsMaps(carInitialDigits, initialDigits),
@@ -307,7 +307,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                                     return item;
                                 }),
                             },
-                        };
+                        });
 
                         if (resultChecker !== isValidFinishedPuzzleByConstraints && !isValidFinishedPuzzleByConstraints(fixedContext)) {
                             return false;

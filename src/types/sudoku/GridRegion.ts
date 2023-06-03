@@ -34,7 +34,7 @@ export const transformCoordsByRegions = <T extends AnyPTM>(coords: Position, con
         left: Math.floor(coords.left),
     };
 
-    for (const region of context.puzzle.typeManager.getRegionsWithSameCoordsTransformation?.(context) ?? []) {
+    for (const region of context.regions ?? []) {
         if (region.transformCoords && doesGridRegionContainCell(region, roundedCoords)) {
             return region.transformCoords(coords);
         }

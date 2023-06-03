@@ -13,10 +13,15 @@ import {indexesFromTo} from "../../../../../utils/indexes";
 import {ControlButtonItemProps} from "../../../controls/ControlButtonsManager";
 import {AnyQuadInputPTM} from "./QuadInputPTM";
 import {getNextActionId} from "../../../../../types/sudoku/GameStateAction";
+import {observer} from "mobx-react-lite";
+import {settings} from "../../../../../types/layout/Settings";
+import {profiler} from "../../../../../utils/profiler";
 
 export const QuadInputModeButton = <T extends AnyQuadInputPTM>(
     options: QuadInputSudokuTypeManagerOptions<T>
-) => function QuadInputModeButtonComponent({context, top, left}: ControlButtonItemProps<T>) {
+) => observer(function QuadInputModeButtonFc({context, top, left}: ControlButtonItemProps<T>) {
+    profiler.trace();
+
     const translate = useTranslate();
 
     const {
@@ -28,18 +33,13 @@ export const QuadInputModeButton = <T extends AnyQuadInputPTM>(
 
     const {
         puzzle: {typeManager: {createCellDataByDisplayDigit}},
-        state,
-        onStateChange,
+        stateExtension: {currentQuad},
+        cellWriteMode,
+        isMyTurn,
     } = context;
 
-    const {
-        isShowingSettings,
-        processed: {isMyTurn, cellWriteMode},
-        extension: {currentQuad},
-    } = state;
-
     useEventListener(window, "keydown", (ev) => {
-        if (isShowingSettings) {
+        if (settings.isOpened) {
             return;
         }
 
@@ -50,29 +50,29 @@ export const QuadInputModeButton = <T extends AnyQuadInputPTM>(
         switch (ev.code) {
             case "KeyQ":
             case "Tab":
-                onStateChange(({persistentCellWriteMode}) => ({
+                context.onStateChange(({persistentCellWriteMode}) => ({
                     persistentCellWriteMode: persistentCellWriteMode === CellWriteMode.quads ? CellWriteMode.main : CellWriteMode.quads
                 }));
                 ev.preventDefault();
                 break;
             case "Home":
-                onStateChange({persistentCellWriteMode: CellWriteMode.main});
+                context.onStateChange({persistentCellWriteMode: CellWriteMode.main});
                 ev.preventDefault();
                 break;
             case "End":
-                onStateChange({persistentCellWriteMode: CellWriteMode.quads});
+                context.onStateChange({persistentCellWriteMode: CellWriteMode.quads});
                 ev.preventDefault();
                 break;
             case "Escape":
-                if (isMyTurn && isQuadAllowedFn(state) && cellWriteMode === CellWriteMode.quads && currentQuad && (onQuadFinish || !currentQuad.digits.length)) {
-                    onStateChange(setQuadPositionAction(undefined, options, getNextActionId()));
+                if (isMyTurn && isQuadAllowedFn(context) && cellWriteMode === CellWriteMode.quads && currentQuad && (onQuadFinish || !currentQuad.digits.length)) {
+                    context.onStateChange(setQuadPositionAction(undefined, options, getNextActionId()));
                     ev.preventDefault();
                 }
                 break;
         }
     });
 
-    const digitExamples = indexesFromTo(1, 4).map(digit => createCellDataByDisplayDigit(digit, state));
+    const digitExamples = indexesFromTo(1, 4).map(digit => createCellDataByDisplayDigit(digit, context));
 
     return <CellWriteModeButton
         top={top}
@@ -138,4 +138,4 @@ export const QuadInputModeButton = <T extends AnyQuadInputPTM>(
         title={`${translate(quads)} (${translate("shortcut")}: Q / End)`}
         context={context}
     />;
-};
+});

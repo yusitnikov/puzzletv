@@ -1,68 +1,108 @@
-import {areFieldStatesEqual, cloneFieldState, FieldState} from "./FieldState";
+import {
+    areFieldStatesEqual,
+    cloneFieldState,
+    FieldState,
+    serializeFieldState, unserializeFieldState,
+} from "./FieldState";
 import {SetStateAction} from "react";
 import {AnyPTM} from "./PuzzleTypeMap";
+import {PuzzleContext} from "./PuzzleContext";
+import {makeAutoObservable} from "mobx";
 import {PuzzleDefinition} from "./PuzzleDefinition";
+import {profiler} from "../../utils/profiler";
 
-export interface FieldStateHistory<T extends AnyPTM> {
-    states: FieldState<T>[];
-    currentIndex: number;
+// TODO: T is not used...
+export class FieldStateHistory<T extends AnyPTM> {
+    readonly current: FieldState<T>;
+    readonly statesCount: number;
+
+    get canUndo() {
+        profiler.trace();
+        return this.currentIndex > 0;
+    }
+
+    get canRedo() {
+        profiler.trace();
+        return this.currentIndex < this.statesCount - 1;
+    }
+
+    constructor(
+        private puzzle: PuzzleDefinition<T>,
+        public states: string[],
+        public currentIndex: number,
+    ) {
+        makeAutoObservable(this, {states: false});
+
+        this.current = unserializeFieldState(JSON.parse(states[currentIndex]), puzzle);
+        this.statesCount = states.length;
+    }
+
+    undo() {
+        return this.canUndo
+            ? new FieldStateHistory(
+                this.puzzle,
+                this.states,
+                Math.max(0, this.currentIndex - 1),
+            )
+            : this;
+    }
+
+    redo() {
+        return this.canRedo
+            ? new FieldStateHistory(
+                this.puzzle,
+                this.states,
+                Math.min(this.statesCount - 1, this.currentIndex + 1),
+            )
+            : this;
+    }
 }
 
-export const fieldStateHistoryGetCurrent = <T extends AnyPTM>({states, currentIndex}: FieldStateHistory<T>) => states[currentIndex];
-
-export const fieldStateHistoryCanUndo = <T extends AnyPTM>({currentIndex}: FieldStateHistory<T>) => currentIndex > 0;
-
-export const fieldStateHistoryUndo = <T extends AnyPTM>(history: FieldStateHistory<T>): FieldStateHistory<T> => fieldStateHistoryCanUndo(history)
-    ? {
-        ...history,
-        currentIndex: Math.max(0, history.currentIndex - 1),
-    }
-    : history;
-
-export const fieldStateHistoryCanRedo = <T extends AnyPTM>({currentIndex, states}: FieldStateHistory<T>) => currentIndex < states.length - 1;
-
-export const fieldStateHistoryRedo = <T extends AnyPTM>(history: FieldStateHistory<T>): FieldStateHistory<T> => fieldStateHistoryCanRedo(history)
-    ? {
-        ...history,
-        currentIndex: Math.min(history.states.length - 1, history.currentIndex + 1),
-    }
-    : history;
-
 export const fieldStateHistoryAddState = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>,
-    history: FieldStateHistory<T>,
+    context: PuzzleContext<T>,
     clientId: string,
     actionId: string,
     state: SetStateAction<FieldState<T>>
 ): FieldStateHistory<T> => {
-    const currentState = fieldStateHistoryGetCurrent(history);
+    const {puzzle, currentFieldState, fieldStateHistory} = context;
 
     if (typeof state === "function") {
-        state = state(cloneFieldState(puzzle.typeManager, currentState, clientId, actionId));
+        state = state(cloneFieldState(puzzle.typeManager, currentFieldState, clientId, actionId));
     }
 
     state = {...state, clientId, actionId};
 
-    if (currentState.clientId === clientId && currentState.actionId === actionId && history.currentIndex > 0) {
+    if (currentFieldState.clientId === clientId && currentFieldState.actionId === actionId && fieldStateHistory.currentIndex > 0) {
         // Replace the last state of the same action by the current action
         return fieldStateHistoryAddState(
-            puzzle,
-            {
-                states: history.states.slice(0, history.currentIndex),
-                currentIndex: history.currentIndex - 1,
-            },
+            new PuzzleContext({
+                ...context,
+                applyPendingMessages: false,
+                myGameState: {
+                    ...context.state,
+                    fieldStateHistory: new FieldStateHistory(
+                        puzzle,
+                        fieldStateHistory.states.slice(0, fieldStateHistory.currentIndex),
+                        fieldStateHistory.currentIndex - 1,
+                    )
+                },
+            }),
             clientId,
             actionId,
             state,
         );
     }
 
-    if (areFieldStatesEqual(puzzle, state, currentState)) {
-        return history;
+    if (areFieldStatesEqual(context, state, currentFieldState)) {
+        return fieldStateHistory;
     }
 
-    return {
-        states: [...history.states.slice(0, history.currentIndex + 1), state],
-        currentIndex: history.currentIndex + 1,
-    };
+    return new FieldStateHistory(
+        puzzle,
+        [
+            ...fieldStateHistory.states.slice(0, fieldStateHistory.currentIndex + 1),
+            JSON.stringify(serializeFieldState(state, puzzle)),
+        ],
+        fieldStateHistory.currentIndex + 1,
+    );
 };

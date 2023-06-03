@@ -1,18 +1,21 @@
 import {AutoSvg} from "../../svg/auto-svg/AutoSvg";
-import {PropsWithChildren} from "react";
+import {PropsWithChildren, ReactElement} from "react";
 import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {getPointsBoundingBox, getRectByBounds, getRectPoints} from "../../../types/layout/Rect";
 import {getFieldRectTransform} from "./FieldRect";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
 
-export const FieldSvg = <T extends AnyPTM>({context, children}: PropsWithChildren<PuzzleContextProps<T>>) => {
-    const {puzzle, cellSize} = context;
+export const FieldSvg = observer(function FieldSvg<T extends AnyPTM>({context, children}: PropsWithChildren<PuzzleContextProps<T>>) {
+    profiler.trace();
+
+    const {puzzle, cellSize, regions} = context;
     let {
         fieldSize: {fieldSize, rowsCount, columnsCount},
         fieldMargin = 0,
         fieldFitsWrapper,
         ignoreRowsColumnCountInTheWrapper,
-        typeManager: {getRegionsWithSameCoordsTransformation},
     } = puzzle;
 
     if (ignoreRowsColumnCountInTheWrapper) {
@@ -27,10 +30,10 @@ export const FieldSvg = <T extends AnyPTM>({context, children}: PropsWithChildre
         height: rowsCount + 2 * fieldMargin,
     };
 
-    if (getRegionsWithSameCoordsTransformation) {
+    if (regions) {
         viewBox = getPointsBoundingBox(
             ...getRectPoints(viewBox),
-            ...getRegionsWithSameCoordsTransformation(context).flatMap((region) => {
+            ...regions.flatMap((region) => {
                 const {base, rightVector, bottomVector} = getFieldRectTransform(context, region);
 
                 return [0, region.width].flatMap((right) => [0, region.height].map((bottom) => ({
@@ -63,4 +66,4 @@ export const FieldSvg = <T extends AnyPTM>({context, children}: PropsWithChildre
     >
         {children}
     </AutoSvg>;
-};
+}) as <T extends AnyPTM>(props: PropsWithChildren<PuzzleContextProps<T>>) => ReactElement;

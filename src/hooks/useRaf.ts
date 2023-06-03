@@ -1,18 +1,37 @@
 import {useEventListener} from "./useEventListener";
 import {customEventBus} from "../utils/customEventBus";
-import {useState} from "react";
+import {makeAutoObservable} from "mobx";
 
 interface TickEventData {
     now: number;
     delta: number;
 }
 
-let lastTickTime = Date.now();
+class RafTime {
+    time: number;
+
+    constructor() {
+        makeAutoObservable(this);
+
+        this.time = Date.now();
+    }
+
+    update(now = Date.now()) {
+        const prevTime = this.time;
+        this.time = now;
+        return now - prevTime;
+    }
+}
+
+const rafTimeObj = new RafTime();
+export const rafTime = () => rafTimeObj.time;
+
 const startRaf = () => requestAnimationFrame(() => {
-    const now = Date.now();
-    const delta = now - lastTickTime;
-    lastTickTime = now;
-    customEventBus.dispatchEvent(new CustomEvent<TickEventData>("raf", {detail: {now, delta}}));
+    const delta = rafTimeObj.update();
+    customEventBus.dispatchEvent(new CustomEvent<TickEventData>("raf", {detail: {
+        now: rafTime(),
+        delta,
+    }}));
     startRaf();
 });
 startRaf();
@@ -22,11 +41,3 @@ export const useRaf = (tickHandler: (delta: number, now: number) => void) => use
     "raf",
     ({detail: {now, delta}}: CustomEvent<TickEventData>) => tickHandler?.(delta, now)
 );
-
-export const useRafValue = <T>(value: T) => {
-    const [state, setState] = useState(value);
-
-    useRaf(() => setState((prevValue) => JSON.stringify(value) === JSON.stringify(prevValue) ? prevValue : value));
-
-    return state;
-};

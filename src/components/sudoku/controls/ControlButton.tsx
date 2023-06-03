@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import {ButtonHTMLAttributes, memo, ReactNode} from "react";
+import {ButtonHTMLAttributes, MouseEvent, ReactNode} from "react";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Position} from "../../../types/layout/Position";
 import {Size} from "../../../types/layout/Size";
@@ -8,6 +8,9 @@ import {lightGreyColor, textColor} from "../../app/globals";
 import {EmotionIconBase} from "@emotion-icons/emotion-icon";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
 import {cancelOutsideClickProps} from "../../../utils/gestures";
+import {observer} from "mobx-react-lite";
+import {runInAction} from "mobx";
+import {profiler} from "../../../utils/profiler";
 
 export const controlButtonPaddingCoeff = 0.15;
 
@@ -53,7 +56,7 @@ export interface ControlButtonProps extends Position, Partial<Size>, ButtonHTMLA
     childrenOnTopOfBorders?: boolean;
 }
 
-export const ControlButton = memo((
+export const ControlButton = observer(function ControlButtonFc(
     {
         children,
         childrenOnTopOfBorders,
@@ -66,9 +69,12 @@ export const ControlButton = memo((
         fullHeight,
         innerBorderWidth,
         checked,
+        onClick,
         ...otherProps
     }: ControlButtonProps
-) => {
+) {
+    profiler.trace();
+
     const containerWidth = cellSize * (width + controlButtonPaddingCoeff * (width - 1));
     const containerHeight = cellSize * (height + controlButtonPaddingCoeff * (height - 1));
     const contentHeight = fullHeight
@@ -89,6 +95,7 @@ export const ControlButton = memo((
         pointerEvents={true}
         {...cancelOutsideClickProps}
         childrenOnTopOfBorders={childrenOnTopOfBorders}
+        onClick={(ev: MouseEvent<HTMLButtonElement>) => runInAction(() => onClick?.(ev))}
         {...otherProps}
     >
         <Absolute
