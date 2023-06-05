@@ -113,13 +113,13 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
                     processedGameStateExtension,
                 }
             ): Constraint<SokobanPTM, any>[] => [
-                ...otherItems,
                 ...clues.map((clue, index) => SokobanClueConstraint(
                     clue,
                     cluePositions[index],
                     processedGameStateExtension.cluePositions[index],
                 )),
                 SokobanPlayerConstraint(processedGameStateExtension.sokobanPosition),
+                ...otherItems,
             ],
             extension: {
                 clues,
