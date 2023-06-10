@@ -3,8 +3,10 @@ import {
     blueColor,
     greenColor,
     lightGreyColor,
+    orangeColor,
     purpleColor,
-    redColor, veryDarkGreyColor,
+    redColor,
+    veryDarkGreyColor,
     yellowColor
 } from "../../components/app/globals";
 
@@ -29,7 +31,7 @@ export const cellColors: Record<CellColor, string> = {
     [CellColor.black]: blackColor,
     [CellColor.green]: greenColor,
     [CellColor.purple]: purpleColor,
-    [CellColor.orange]: "#eb7532",
+    [CellColor.orange]: orangeColor,
     [CellColor.red]: redColor,
     [CellColor.yellow]: yellowColor,
     [CellColor.blue]: blueColor,

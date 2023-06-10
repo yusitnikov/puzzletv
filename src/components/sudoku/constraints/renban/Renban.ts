@@ -4,6 +4,7 @@ import {splitMultiLine} from "../../../../utils/lines";
 import {isValidCellForRegion} from "../region/Region";
 import {LineComponent, LineProps} from "../line/Line";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import {purpleColor} from "../../../app/globals";
 
 export const RenbanConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
@@ -18,7 +19,7 @@ export const RenbanConstraint = <T extends AnyPTM>(
     return {
         name: "renban line",
         cells,
-        color: "#f0f",
+        color: purpleColor,
         component: display ? LineComponent : undefined,
         props: {},
         isObvious: true,

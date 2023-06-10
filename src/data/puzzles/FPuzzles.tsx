@@ -95,6 +95,7 @@ import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
 import {RushHourSudokuTypeManager} from "../../sudokuTypes/rush-hour/types/RushHourSudokuTypeManager";
 import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import {SokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/types/SokobanSudokuTypeManager";
+import {greenColor, purpleColor} from "../../components/app/globals";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -768,6 +769,16 @@ class FPuzzlesImporter<T extends AnyPTM> {
                     for (const {lines, outlineC, width, isNewConstraint, fromConstraint, ...other} of lineData) {
                         ObjectParser.empty.parse(other, "f-puzzles line");
 
+                        let color = outlineC;
+                        switch (fromConstraint) {
+                            case "Whispers":
+                                color = greenColor;
+                                break;
+                            case "Renban":
+                                color = purpleColor;
+                                break;
+                        }
+
                         this.items.push(...lines.map((cells) => {
                             const visibleCells = offsetCoordsArray(cells).filter(isVisibleGridCell);
 
@@ -775,7 +786,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
 
                             return LineConstraint<T>(
                                 visibleCells,
-                                outlineC,
+                                color,
                                 width === undefined ? undefined : width / 2,
                                 false,
                             );
