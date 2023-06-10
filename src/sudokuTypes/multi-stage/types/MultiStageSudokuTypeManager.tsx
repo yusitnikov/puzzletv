@@ -9,7 +9,7 @@ import {
     aboveRulesTextHeightCoeff,
     rulesHeaderPaddingCoeff,
     rulesMarginCoeff,
-    yellowColor
+    lightOrangeColor
 } from "../../../components/app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
@@ -65,7 +65,7 @@ export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
             {baseTypeManager.getAboveRules?.(translate, context, isPortrait)}
 
             <div style={{
-                background: yellowColor,
+                background: lightOrangeColor,
                 marginTop: cellSize * rulesMarginCoeff * coeff,
                 marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
                 padding: `${cellSize * rulesHeaderPaddingCoeff * coeff / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,

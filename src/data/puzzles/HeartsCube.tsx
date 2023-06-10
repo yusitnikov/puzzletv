@@ -10,6 +10,7 @@ import {
 } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import {blackKropkiDotsExplained, ratioDotsExplained} from "../ruleSnippets";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {greenColor} from "../../components/app/globals";
 
 export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: showRatio,
@@ -57,7 +58,7 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
         HeartConstraint("R1C3", "R2C3", showRatio),
         HeartConstraint("R6C2", "R6C3", showRatio),
         HeartConstraint("R6C3", "R6C4", showRatio),
-        KropkiDotConstraint("R5C6", "R6C6", true, [1, 3], "#0d0", showRatio),
+        KropkiDotConstraint("R5C6", "R6C6", true, [1, 3], greenColor, showRatio),
         KropkiDotConstraint("R3C1", "R4C1", true, [1, 2], undefined, showRatio),
         KropkiDotConstraint("R4C1", "R4C2", true, [1, 2], undefined, showRatio),
         NonRatioNeighborsConstraint([[1, 2], [1, 3], [2, 3]]),

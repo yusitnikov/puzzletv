@@ -24,6 +24,7 @@ export const purpleColor = "#b66dff";
 export const redColor = "#b60000";
 export const yellowColor = "#ffff6d";
 export const orangeColor = "#db6d00";
+export const lightOrangeColor = "#ffb600";
 export const peachColor = "#ffac80";
 
 export const textColor = blackColor;

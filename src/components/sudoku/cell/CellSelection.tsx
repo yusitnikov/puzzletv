@@ -1,4 +1,4 @@
-import {blueColor, lighterBlueColor, yellowColor} from "../../app/globals";
+import {blueColor, lighterBlueColor, lightOrangeColor} from "../../app/globals";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {Position} from "../../../types/layout/Position";
 import {getTransformedRectAverageSize} from "../../../types/layout/Rect";
@@ -15,7 +15,7 @@ import {profiler} from "../../../utils/profiler";
 export const CellSelectionColor = {
     mainCurrent: blueColor,
     mainPrevious: lighterBlueColor,
-    secondary: yellowColor,
+    secondary: lightOrangeColor,
 };
 
 export interface CellSelectionByCoordsProps<T extends AnyPTM> extends Position {
