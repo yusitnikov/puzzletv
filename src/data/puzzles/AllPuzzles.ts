@@ -40,6 +40,7 @@ import {InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdg
 import {ReservedParking} from "./ReservedParking";
 import {JssChicken, MakeAPicture} from "./JigsawJss";
 import {Sudokuban} from "./Sudokuban";
+import {Pacman} from "./Pacman";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -66,6 +67,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    Pacman,
+
     Sudokuban,
 
     MakeAPicture,

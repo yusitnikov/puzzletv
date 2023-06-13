@@ -190,7 +190,8 @@ export const DecorativeCageConstraint = <T extends AnyPTM>(
     showBottomSum?: boolean,
     sumPointIndex?: number,
     lineColor?: string,
-    fontColor?: string
+    fontColor?: string,
+    largeSum = false,
 ): Constraint<T, KillerCageProps> => ({
     name: "cage",
     tags: [cageTag],
@@ -201,6 +202,7 @@ export const DecorativeCageConstraint = <T extends AnyPTM>(
         sumPointIndex,
         lineColor,
         fontColor,
+        largeSum,
     },
     component: KillerCage,
 });
@@ -211,9 +213,10 @@ export const KillerCageConstraint = <T extends AnyPTM>(
     showBottomSum?: boolean,
     sumPointIndex?: number,
     lineColor?: string,
-    fontColor?: string
+    fontColor?: string,
+    largeSum = false,
 ): Constraint<T, KillerCageProps> => ({
-    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor),
+    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor, largeSum),
     name: "killer cage",
     isObvious: true,
     isValidCell(
