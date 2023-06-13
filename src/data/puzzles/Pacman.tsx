@@ -1,4 +1,8 @@
-import {isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {
+    allDrawingModes,
+    isValidFinishedPuzzleByEmbeddedSolution,
+    PuzzleDefinition
+} from "../../types/sudoku/PuzzleDefinition";
 import {createRegularFieldSize, createRegularRegions} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
@@ -137,7 +141,7 @@ export const Pacman: PuzzleDefinition<NumberPTM> = {
         <RulesParagraph>Normal sudoku rules apply. The leftmost and rightmost cells of a row are considered orthogonally adjacent for the purposes of all rules below.</RulesParagraph>
         <RulesParagraph>Cells joined by a white dot contain consecutive digits. Not all white dots are given.</RulesParagraph>
         <RulesParagraph>Shade some cells in the grid and leave the rest unshaded such that all shaded cells are orthogonally connected and no 2x2 region is entirely shaded. A cell containing Pac-Man, Blinky, Pinky, Inky, or Clyde (yellow, red, pink, blue, and orange)—or part of a white dot—must be shaded.</RulesParagraph>
-        <RulesParagraph>A cell containing a killer clue must remain unshaded. Digits may not repeat within an orthogonally connected area of unshaded cells, and they sum to the killer clue. (Note: Unshaded regions may not touch each other orthogonally.)</RulesParagraph>
+        <RulesParagraph>A cell containing a killer clue must remain unshaded. Digits may not repeat within an orthogonally connected area of unshaded cells, and they sum to the killer clue. (Note: Unshaded regions may not touch each other orthogonally, and not all regions necessarily have a killer clue.)</RulesParagraph>
         <RulesParagraph>Starting in R5C2, Pac-Man must travel orthogonally through the grid. His path may not touch itself orthogonally, although it may do so diagonally, and the path cannot intersect or overlap itself. Pac-Man must go directly through each white dot; his path is completed immediately after going through the final dot. Pac-Man's path cannot be orthogonally adjacent to any of the ghosts (red, pink, blue, and orange) nor can the path enter unshaded cells.</RulesParagraph>
     </>,
     typeManager: DigitSudokuTypeManager(),
@@ -179,4 +183,5 @@ export const Pacman: PuzzleDefinition<NumberPTM> = {
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
     loopHorizontally: true,
     fieldMargin: 0.99,
+    allowDrawing: allDrawingModes,
 };
