@@ -807,7 +807,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             return;
         }
 
-        const {isEnabled, isHost, sendMessage} = this.multiPlayer;
+        const {isEnabled, isHost} = this.multiPlayer;
 
         actionsOrCallbacks = actionsOrCallbacks instanceof Array ? actionsOrCallbacks : [actionsOrCallbacks];
 
@@ -834,7 +834,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
                 processedContext.update({myGameState: mergeGameStateWithUpdates(processedContext.myGameState, updates)});
             } else {
-                sendMessage({
+                this.multiPlayer.sendMessage({
                     type: asAction.type.key,
                     actionId: asAction.actionId,
                     params: asAction.params,
