@@ -597,7 +597,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             ? {
                 isCorrectResult: result,
                 resultPhrase: result
-                    ? `${this.translate("Absolutely right")}!`
+                    ? (this.puzzle.successMessage ?? `${this.translate("Absolutely right")}!`)
                     : `${this.translate("Something's wrong here")}...`
             }
             : {

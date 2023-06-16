@@ -865,13 +865,26 @@ class FPuzzlesImporter<T extends AnyPTM> {
             },
             cage: (cage) => {
                 if (cage instanceof Array) {
-                    this.items.push(...cage.map(({cells, value, outlineC, fontC, ...other}) => {
+                    const metadata: Record<string, string> = {};
+
+                    for (const {cells, value, outlineC, fontC, ...other} of cage) {
                         ObjectParser.empty.parse(other, "f-puzzles cage");
 
                         const visibleCells = offsetCoordsArray(cells).filter(isVisibleGridCell);
 
-                        return DecorativeCageConstraint<T>(visibleCells, value?.toString(), false, undefined, outlineC, fontC);
-                    }));
+                        const match = value?.match(/^(.+?):\s*([\s\S]+)/m);
+                        if (match) {
+                            metadata[match[1]] = match[2];
+                        } else {
+                            this.items.push(DecorativeCageConstraint<T>(visibleCells, value?.toString(), false, undefined, outlineC, fontC));
+                        }
+                    }
+
+                    new ObjectParser<Record<string, string>>({
+                        msgcorrect: (message) => {
+                            this.puzzle.successMessage = message;
+                        },
+                    }).parse(metadata, "metadata from f-puzzles cages")
                 }
             },
             "diagonal+": (diagonal, {size}) => {

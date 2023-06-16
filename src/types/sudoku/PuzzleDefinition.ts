@@ -45,6 +45,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     author?: PartiallyTranslatable<ReactNode>;
     rules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>) => ReactNode;
     aboveRules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>, isPortrait: boolean) => ReactNode;
+    successMessage?: string;
     typeManager: SudokuTypeManager<T>;
     fieldSize: FieldSize;
     regions?: (Position[] | Constraint<T, any>)[];
