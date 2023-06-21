@@ -5,17 +5,18 @@ import React, {ReactNode} from "react";
 export const chessSudokuRules: Translatable<ReactNode> = {
     [LanguageCode.en]: <>
         <strong>Standard chess rules apply</strong>:
-        place chess pieces on the board to create a position that could be reached in a standard game of chess.
-        It's not mandatory to use all possible chess pieces
-        (if placing a piece doesn't affect puzzle correctness, don't place it)
+        place chess pieces on the board to create a position that could be reached in a standard game of chess
     </>,
     [LanguageCode.ru]: <>
         <strong>Стандартные правила шахмат</strong>:
         поставьте шахматные фигуры на доску так, чтоб они образовали позицию,
-        которая может получиться в результате игры в шахматы.
-        Не обязательно использовать все возможные фигуры
-        (если размещение фигуры не влияет на корректность решения, не ставьте её на доску)
+        которая может получиться в результате игры в шахматы
     </>,
+};
+
+export const optionalChessPiecesRules: Translatable = {
+    [LanguageCode.en]: "It's not mandatory to use all possible chess pieces (if placing a piece doesn't affect puzzle correctness, don't place it)",
+    [LanguageCode.ru]: "Не обязательно использовать все возможные фигуры (если размещение фигуры не влияет на корректность решения, не ставьте её на доску)",
 };
 
 export const normalSudokuRulesForChessPieces: Translatable = {

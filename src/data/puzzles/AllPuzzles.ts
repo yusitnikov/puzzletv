@@ -1,6 +1,6 @@
 import {loadPuzzle, PuzzleDefinitionOrLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
-import {RealChessPuzzle, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
+import {RealChessPuzzle, RealChessPuzzle2, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {
     EmptyChaosConstruction,
     EmptyChaosConstructionLoop,
@@ -131,6 +131,7 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
 
     RealChessPuzzle,
     RealChessPuzzleCompatibilitySlug,
+    RealChessPuzzle2,
 
     Africa,
     // endregion

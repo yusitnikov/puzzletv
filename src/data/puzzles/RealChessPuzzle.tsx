@@ -1,6 +1,6 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {FieldSize8, Regions8} from "../../types/sudoku/FieldSize";
+import {FieldSize6, FieldSize8, Regions6, Regions8} from "../../types/sudoku/FieldSize";
 import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
 import {chessInitialPiecesByCellNames} from "../../sudokuTypes/chess/utils/chessCoords";
 import {ChessPieceType} from "../../sudokuTypes/chess/types/ChessPieceType";
@@ -18,12 +18,14 @@ import {
     emptyCells,
     mateInOne,
     noPastPromotions,
-    normalSudokuRulesForChessPieces
+    normalSudokuRulesForChessPieces, optionalChessPiecesRules
 } from "../../sudokuTypes/chess/data/ruleSnippets";
 import {RulesSpoiler} from "../../components/sudoku/rules/RulesSpoiler";
-import {areSameGivenDigitsMaps, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
+import {areSameGivenDigitsMaps, GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {ValidChessPositionConstraint} from "../../sudokuTypes/chess/constraints/ValidChessPosition";
 import {ChessPTM} from "../../sudokuTypes/chess/types/ChessPTM";
+import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
+import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
 
 const mandatorySolutionPieces = chessInitialPiecesByCellNames({
     "g8": {color: ChessColor.black, type: ChessPieceType.knight},
@@ -37,6 +39,26 @@ const optionalSolutionPieces = chessInitialPiecesByCellNames({
     "f7": {color: ChessColor.black, type: ChessPieceType.pawn},
 });
 
+const isValidSolution = (
+    context: PuzzleContext<ChessPTM>,
+    mandatorySolutionPieces: GivenDigitsMap<ChessPiece>,
+    optionalSolutionPieces: GivenDigitsMap<ChessPiece> = {},
+) => {
+    const currentFinalDigits = mergeGivenDigitsMaps(
+        context.userDigits,
+        optionalSolutionPieces
+    );
+
+    const correctFinalDigits = mergeGivenDigitsMaps(
+        context.puzzle.initialDigits!,
+        context.stateInitialDigits || {},
+        mandatorySolutionPieces,
+        optionalSolutionPieces
+    );
+
+    return areSameGivenDigitsMaps(context, currentFinalDigits, correctFinalDigits);
+};
+
 export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
     title: {
         [LanguageCode.en]: "Easy-peasy, Mate in One",
@@ -46,7 +68,7 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
     author: Chameleon,
     rules: translate => <>
         <RulesParagraph>
-            {translate(chessSudokuRules)}.
+            {translate(chessSudokuRules)}. {translate(optionalChessPiecesRules)}.
         </RulesParagraph>
         <RulesParagraph>
             <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)}. {translate({
@@ -89,21 +111,7 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
         "c2": {color: ChessColor.white, type: ChessPieceType.pawn},
         "a3": {color: ChessColor.white, type: ChessPieceType.pawn},
     }),
-    resultChecker: (context) => {
-        const currentFinalDigits = mergeGivenDigitsMaps(
-            context.userDigits,
-            optionalSolutionPieces
-        );
-
-        const correctFinalDigits = mergeGivenDigitsMaps(
-            context.puzzle.initialDigits!,
-            context.stateInitialDigits || {},
-            mandatorySolutionPieces,
-            optionalSolutionPieces
-        );
-
-        return areSameGivenDigitsMaps(context, currentFinalDigits, correctFinalDigits);
-    },
+    resultChecker: (context) => isValidSolution(context, mandatorySolutionPieces, optionalSolutionPieces),
     items: [
         ChessBoardCellsBackgroundConstraint(),
         ChessBoardIndexesConstraint(),
@@ -117,4 +125,104 @@ export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {
     ...RealChessPuzzle,
     slug: "real-chess-puzzle",
     noIndex: true,
+};
+
+export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
+    noIndex: true,
+    title: {
+        [LanguageCode.en]: "Easy-peasy, Mate in One v2",
+        [LanguageCode.ru]: "Мат в 1 ход v2",
+    },
+    slug: "real-chess-sudoku-v2",
+    author: Chameleon,
+    rules: translate => <>
+        <RulesParagraph>
+            {translate(chessSudokuRules)}.
+        </RulesParagraph>
+        <RulesParagraph>
+            {translate({
+                [LanguageCode.en]: "Also, there's a 6x6 sudoku grid in the middle of the chess board",
+                [LanguageCode.ru]: "Кроме того, в центре шахматной доски есть поле судоку 6x6",
+            })}.
+        </RulesParagraph>
+        <RulesParagraph>
+            <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)}. {translate({
+            [LanguageCode.en]: <>For instance, there could be no other bishops (regardless of color) in the bottom-left box, in column <strong>d</strong> and in row <strong>3</strong></>,
+            [LanguageCode.ru]: <>Например, в нижне-левом регионе, на линии <strong>d</strong> и на линии <strong>3</strong> не может быть других слонов (любого цвета)</>,
+        })}. {translate(emptyCells)}.
+        </RulesParagraph>
+        <RulesParagraph>
+            {translate(noPastPromotions)}.
+        </RulesParagraph>
+        <RulesParagraph>
+            {translate(mateInOne)}.
+        </RulesParagraph>
+        <RulesParagraph>
+            {translate({
+                [LanguageCode.en]: "There are no chess pieces outside the sudoku grid",
+                [LanguageCode.ru]: "Шахматные фигуры не могут находиться за пределами поля судоку",
+            })}. {translate({
+            [LanguageCode.en]: "The chess piece that moves to do the mate in one can't escape the sudoku grid either (while doing the move)",
+            [LanguageCode.ru]: "Шахматная фигура, которая ходит для того, чтобы поставить мат в один ход, тоже не может выйти за пределы поля судоку для этого",
+        })}.
+        </RulesParagraph>
+    </>,
+    typeManager: ChessSudokuTypeManager,
+    fieldSize: FieldSize6,
+    regions: Regions6,
+    fieldMargin: chessBoardIndexesMargin + 1,
+    initialDigits: {
+        0: {
+            5: {color: ChessColor.black, type: ChessPieceType.king},
+        },
+        1: {
+            1: {color: ChessColor.white, type: ChessPieceType.king},
+            3: {color: ChessColor.black, type: ChessPieceType.queen},
+            4: {color: ChessColor.black, type: ChessPieceType.pawn},
+        },
+        2: {
+            3: {color: ChessColor.black, type: ChessPieceType.bishop},
+        },
+        3: {
+            0: {color: ChessColor.black, type: ChessPieceType.rook},
+            1: {color: ChessColor.white, type: ChessPieceType.pawn},
+        },
+        4: {
+            0: {color: ChessColor.white, type: ChessPieceType.pawn},
+            1: {color: ChessColor.black, type: ChessPieceType.rook},
+            2: {color: ChessColor.black, type: ChessPieceType.bishop},
+        },
+        5: {
+            3: {color: ChessColor.black, type: ChessPieceType.pawn},
+        },
+    },
+    items: [
+        ChessBoardCellsBackgroundConstraint(),
+        ChessBoardIndexesConstraint(),
+        ValidChessPositionConstraint,
+    ],
+    allowDrawing: allDrawingModes,
+    resultChecker: (context) => isValidSolution(
+        context,
+        {
+            0: {
+                1: {color: ChessColor.white, type: ChessPieceType.bishop},
+                2: {color: ChessColor.white, type: ChessPieceType.rook},
+                4: {color: ChessColor.white, type: ChessPieceType.knight},
+            },
+            1: {
+                2: {color: ChessColor.black, type: ChessPieceType.knight},
+            },
+            2: {
+                4: {color: ChessColor.white, type: ChessPieceType.queen},
+                5: {color: ChessColor.white, type: ChessPieceType.knight},
+            },
+            4: {
+                3: {color: ChessColor.black, type: ChessPieceType.knight},
+            },
+            5: {
+                5: {color: ChessColor.white, type: ChessPieceType.rook},
+            },
+        }
+    ),
 };
