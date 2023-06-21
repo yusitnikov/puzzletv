@@ -114,6 +114,9 @@ NorthOrSouth2.args = {_hash: "north-or-south2"};
 export const RealChessPuzzle = Template.bind({});
 RealChessPuzzle.args = {_hash: "real-chess-sudoku"};
 
+export const RealChessPuzzleV2 = Template.bind({});
+RealChessPuzzleV2.args = {_hash: "real-chess-sudoku-v2"};
+
 export const Africa = Template.bind({});
 Africa.args = {_hash: "africa"};
 
