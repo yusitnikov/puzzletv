@@ -8,7 +8,7 @@ export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
     cells: [],
     props: undefined,
     isObvious: true,
-    isValidCell(cell, pieces): boolean {
+    isValidCell(cell, pieces, regionCells, {puzzle: {fieldSize: {fieldSize}}}): boolean {
         const {left, top} = cell;
         const {color, type} = pieces[top][left]!;
 
@@ -37,7 +37,7 @@ export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
         switch (type) {
             case ChessPieceType.pawn:
                 // Pawn can't be on line 1 or 8
-                return samePiecesCount <= 8 && ![0, 7].includes(top);
+                return samePiecesCount <= 8 && (fieldSize !== 8 || ![0, 7].includes(top));
             case ChessPieceType.knight:
                 return samePiecesCount <= 2;
             case ChessPieceType.bishop:

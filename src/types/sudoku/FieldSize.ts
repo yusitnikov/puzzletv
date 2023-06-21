@@ -100,3 +100,6 @@ export const Regions9 = createRegularRegions(FieldSize9);
 
 export const FieldSize8 = createRegularFieldSize(8, 4);
 export const Regions8 = createRegularRegions(FieldSize8);
+
+export const FieldSize6 = createRegularFieldSize(6, 3);
+export const Regions6 = createRegularRegions(FieldSize6);
