@@ -2,7 +2,6 @@ import {ControlButton, controlButtonPaddingCoeff} from "../../../components/sudo
 import {useEventListener} from "../../../hooks/useEventListener";
 import {ChessColor} from "../types/ChessColor";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {ArrowLeft} from "@emotion-icons/fluentui-system-filled";
 import {useCallback, useState} from "react";
 import {useTranslate} from "../../../hooks/useTranslate";
@@ -11,6 +10,7 @@ import {ChessPTM} from "../types/ChessPTM";
 import {observer} from "mobx-react-lite";
 import {settings} from "../../../types/layout/Settings";
 import {profiler} from "../../../utils/profiler";
+import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteModeInfo";
 
 export const ChessMainControls = observer(function ChessMainControls(
     {context}: ControlButtonItemProps<ChessPTM>
@@ -20,7 +20,6 @@ export const ChessMainControls = observer(function ChessMainControls(
     const {
         cellSizeForSidePanel: cellSize,
         stateExtension: {selectedColor},
-        cellWriteMode,
     } = context;
 
     const translate = useTranslate();
@@ -54,7 +53,7 @@ export const ChessMainControls = observer(function ChessMainControls(
         }
     });
 
-    if (cellWriteMode === CellWriteMode.color) {
+    if (resolveDigitsCountInCellWriteMode(context) > 6) {
         return null;
     }
 
