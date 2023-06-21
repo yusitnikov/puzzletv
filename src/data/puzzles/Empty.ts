@@ -21,6 +21,12 @@ import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {RotatableDigitPTM} from "../../sudokuTypes/rotatable/types/RotatablePTM";
 import {ChessPTM} from "../../sudokuTypes/chess/types/ChessPTM";
 import {MonumentValleyPTM} from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
+import {ValidChessPositionConstraint} from "../../sudokuTypes/chess/constraints/ValidChessPosition";
+import {ChessBoardCellsBackgroundConstraint} from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
+import {
+    ChessBoardIndexesConstraint,
+    chessBoardIndexesMargin
+} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
@@ -76,6 +82,12 @@ export const EmptyChess: PuzzleDefinition<ChessPTM> = {
     typeManager: ChessSudokuTypeManager,
     fieldSize: FieldSize8,
     regions: Regions8,
+    fieldMargin: chessBoardIndexesMargin,
+    items: [
+        ChessBoardCellsBackgroundConstraint(),
+        ChessBoardIndexesConstraint(),
+        ValidChessPositionConstraint,
+    ],
     allowDrawing: allDrawingModes,
 };
 
