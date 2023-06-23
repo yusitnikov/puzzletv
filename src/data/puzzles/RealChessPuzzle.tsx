@@ -135,8 +135,11 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
         [LanguageCode.ru]: "Мат в 1 ход v2",
     },
     slug: "real-chess-sudoku-v2",
-    saveStateKey: "real-chess-sudoku-v2-size8",
-    author: Chameleon,
+    saveStateKey: "real-chess-sudoku-v2-3",
+    author: {
+        [LanguageCode.en]: "Chameleon & Raumplaner",
+        [LanguageCode.ru]: "Хамелеона и Raumplaner'а",
+    },
     rules: translate => <>
         <RulesParagraph>
             {translate(chessSudokuRules)}.
@@ -149,8 +152,8 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
         </RulesParagraph>
         <RulesParagraph>
             <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)}. {translate({
-            [LanguageCode.en]: <>For instance, there could be no other bishops (regardless of color) in the bottom-left box, in column <strong>d</strong> and in row <strong>3</strong></>,
-            [LanguageCode.ru]: <>Например, в нижне-левом регионе, на линии <strong>d</strong> и на линии <strong>3</strong> не может быть других слонов (любого цвета)</>,
+            [LanguageCode.en]: <>For instance, there could be no other bishops (<strong>regardless of color</strong>) in the bottom-left box, in column <strong>d</strong> and in row <strong>3</strong></>,
+            [LanguageCode.ru]: <>Например, в нижне-левом регионе, на линии <strong>d</strong> и на линии <strong>3</strong> не может быть других слонов (<strong>любого цвета</strong>)</>,
         })}. {translate(emptyCells)}.
         </RulesParagraph>
         <RulesParagraph>
@@ -181,16 +184,17 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
     fieldMargin: chessBoardIndexesMargin,
     initialDigits: chessInitialPiecesByCellNames({
         "g7": {color: ChessColor.black, type: ChessPieceType.king},
-        "c6": {color: ChessColor.white, type: ChessPieceType.king},
+        "c5": {color: ChessColor.white, type: ChessPieceType.king},
+        "c6": {color: ChessColor.white, type: ChessPieceType.bishop},
+        "e3": {color: ChessColor.white, type: ChessPieceType.pawn},
         "e6": {color: ChessColor.black, type: ChessPieceType.queen},
         "f6": {color: ChessColor.black, type: ChessPieceType.pawn},
+        "d5": {color: ChessColor.white, type: ChessPieceType.pawn},
         "e5": {color: ChessColor.black, type: ChessPieceType.bishop},
-        "b4": {color: ChessColor.black, type: ChessPieceType.rook},
-        "c4": {color: ChessColor.white, type: ChessPieceType.pawn},
-        "b3": {color: ChessColor.white, type: ChessPieceType.pawn},
-        "c3": {color: ChessColor.black, type: ChessPieceType.rook},
-        "d3": {color: ChessColor.black, type: ChessPieceType.bishop},
-        "e2": {color: ChessColor.black, type: ChessPieceType.pawn},
+        "d3": {color: ChessColor.black, type: ChessPieceType.rook},
+        "e4": {color: ChessColor.black, type: ChessPieceType.rook},
+        "f3": {color: ChessColor.black, type: ChessPieceType.bishop},
+        "c2": {color: ChessColor.black, type: ChessPieceType.pawn},
     }),
     items: [
         ChessBoardCellsBackgroundConstraint(),
@@ -213,13 +217,14 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
     resultChecker: (context) => isValidSolution(
         context,
         chessInitialPiecesByCellNames({
-            "c7": {color: ChessColor.white, type: ChessPieceType.bishop},
-            "d7": {color: ChessColor.white, type: ChessPieceType.rook},
-            "f7": {color: ChessColor.white, type: ChessPieceType.knight},
+            "b7": {color: ChessColor.black, type: ChessPieceType.pawn},
+            "c7": {color: ChessColor.white, type: ChessPieceType.rook},
             "d6": {color: ChessColor.black, type: ChessPieceType.knight},
             "f5": {color: ChessColor.white, type: ChessPieceType.queen},
             "g5": {color: ChessColor.white, type: ChessPieceType.knight},
-            "e3": {color: ChessColor.black, type: ChessPieceType.knight},
+            "f7": {color: ChessColor.white, type: ChessPieceType.knight},
+            "b4": {color: ChessColor.white, type: ChessPieceType.bishop},
+            "c4": {color: ChessColor.black, type: ChessPieceType.knight},
             "g2": {color: ChessColor.white, type: ChessPieceType.rook},
         })
     ),
