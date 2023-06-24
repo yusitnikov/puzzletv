@@ -54,8 +54,10 @@ export const givenDigitsMapToArray = <CellType>(map: GivenDigitsMap<CellType>) =
 export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) =>
     processGivenDigitsMaps(([first]) => first, maps);
 
-export const areSameGivenDigitsMaps = <T extends AnyPTM>(
-    context: PuzzleContext<T>, map1: GivenDigitsMap<T["cell"]>, map2: GivenDigitsMap<T["cell"]>
+export const areSameGivenDigitsMaps = <T>(
+    map1: GivenDigitsMap<T>,
+    map2: GivenDigitsMap<T>,
+    isEqual: (a: T, b: T) => boolean
 ) => {
     const mergedMap = mergeGivenDigitsMaps(map1, map2);
 
@@ -74,7 +76,7 @@ export const areSameGivenDigitsMaps = <T extends AnyPTM>(
                 continue;
             }
 
-            if (!context.puzzle.typeManager.areSameCellData(cell1, cell2, context, false, false)) {
+            if (!isEqual(cell1, cell2)) {
                 return false;
             }
         }
@@ -82,6 +84,16 @@ export const areSameGivenDigitsMaps = <T extends AnyPTM>(
 
     return true;
 };
+
+export const areSameGivenDigitsMapsByContext = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
+    map1: GivenDigitsMap<T["cell"]>,
+    map2: GivenDigitsMap<T["cell"]>,
+) => areSameGivenDigitsMaps(
+    map1,
+    map2,
+    (a, b) => context.puzzle.typeManager.areSameCellData(a, b, context, false, false)
+);
 
 export const createGivenDigitsMapFromArray = <CellType>(array: (CellType | undefined)[][]): GivenDigitsMap<CellType> => {
     const map: GivenDigitsMap<CellType> = {};

@@ -21,7 +21,7 @@ import {
     normalSudokuRulesForChessPieces, optionalChessPiecesRules
 } from "../../sudokuTypes/chess/data/ruleSnippets";
 import {RulesSpoiler} from "../../components/sudoku/rules/RulesSpoiler";
-import {areSameGivenDigitsMaps, GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
+import {areSameGivenDigitsMapsByContext, GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {ValidChessPositionConstraint} from "../../sudokuTypes/chess/constraints/ValidChessPosition";
 import {ChessPTM} from "../../sudokuTypes/chess/types/ChessPTM";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
@@ -57,7 +57,7 @@ const isValidSolution = (
         optionalSolutionPieces
     );
 
-    return areSameGivenDigitsMaps(context, currentFinalDigits, correctFinalDigits);
+    return areSameGivenDigitsMapsByContext(context, currentFinalDigits, correctFinalDigits);
 };
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
