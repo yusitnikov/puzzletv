@@ -236,14 +236,22 @@ export const useMultiPlayer = <T extends AnyPTM>(multiPlayer: UseMultiPlayerResu
         multiPlayer.presenceData = presenceData;
     }), [multiPlayer, presenceData]);
 
-    useEffect(() => autorun(() => multiPlayer.context.mergeHostDataToState()), [multiPlayer]);
+    useEffect(() => autorun(function mergeHostDataToStateAutorun() {
+        profiler.trace();
+
+        multiPlayer.context.mergeHostDataToState();
+    }), [multiPlayer]);
 
     useEffect(
-        () => autorun(() => multiPlayer.processPendingMessages(
-            (messages) => multiPlayer.context.update({
-                myGameState: multiPlayer.context.processMessages(messages),
-            })
-        )),
+        () => autorun(function processPendingMessagesAutorun() {
+            profiler.trace();
+
+            multiPlayer.processPendingMessages(
+                (messages) => multiPlayer.context.update({
+                    myGameState: multiPlayer.context.processMessages(messages),
+                })
+            );
+        }),
         [multiPlayer]
     );
 
