@@ -11,10 +11,12 @@ import {
     unserializeFieldState
 } from "./FieldState";
 import {indexes} from "../../utils/indexes";
-import {emptyPosition, Position, PositionSet} from "../layout/Position";
+import {emptyPosition, isSameLine, isSamePosition, Position, PositionSet} from "../layout/Position";
 import {defaultProcessArrowDirection} from "./SudokuTypeManager";
 import {normalizePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {
+    areSameGivenDigitsMaps,
+    areSameGivenDigitsMapsByContext,
     GivenDigitsMap,
     givenDigitsMapToArray,
     processGivenDigitsMaps,
@@ -307,6 +309,117 @@ export const setAllShareState = <T extends AnyPTM>(context: PuzzleContext<T>, ne
     );
 
     return setSharedState?.(context, newState) ?? result;
+};
+
+export const areSameGameStates = <T extends AnyPTM>(
+    context: PuzzleContext<T>,
+    state1: GameStateEx<T>,
+    state2: GameStateEx<T>,
+) => {
+    if (!state1.fieldStateHistory.equals(state2.fieldStateHistory)) {
+        return false;
+    }
+
+    if (state1.fogDemoFieldStateHistory ? !state2.fogDemoFieldStateHistory || !state1.fogDemoFieldStateHistory.equals(state2.fogDemoFieldStateHistory) : state2.fogDemoFieldStateHistory) {
+        return false;
+    }
+
+    if (state1.persistentCellWriteMode !== state2.persistentCellWriteMode) {
+        return false;
+    }
+
+    if (state1.gestureCellWriteMode !== state2.gestureCellWriteMode) {
+        return false;
+    }
+
+    if (!areSameGivenDigitsMapsByContext(context, state1.initialDigits, state2.initialDigits)) {
+        return false;
+    }
+
+    if (!areSameGivenDigitsMaps(state1.excludedDigits ?? {}, state2.excludedDigits ?? {}, (a, b) => a.equals(b))) {
+        return false;
+    }
+
+    if (state1.isMultiSelection !== state2.isMultiSelection) {
+        return false;
+    }
+
+    if (!state1.selectedCells.equals(state2.selectedCells)) {
+        return false;
+    }
+
+    if (state1.selectedColor !== state2.selectedColor) {
+        return false;
+    }
+
+    if (
+        state1.currentMultiLine.length !== state2.currentMultiLine.length ||
+        !state1.currentMultiLine.every((value, index) => isSameLine(value, state2.currentMultiLine[index]))
+    ) {
+        return false;
+    }
+
+    if (
+        state1.currentMultiLineEnd?.top !== state2.currentMultiLineEnd?.top ||
+        state1.currentMultiLineEnd?.left !== state2.currentMultiLineEnd?.left
+    ) {
+        return false;
+    }
+
+    if (state1.isCurrentMultiLineCenters !== state2.isCurrentMultiLineCenters) {
+        return false;
+    }
+
+    if (
+        state1.dragStartPoint?.type !== state2.dragStartPoint?.type ||
+        state1.dragStartPoint?.center.top !== state2.dragStartPoint?.center.top ||
+        state1.dragStartPoint?.center.left !== state2.dragStartPoint?.center.left ||
+        state1.dragStartPoint?.corner.top !== state2.dragStartPoint?.corner.top ||
+        state1.dragStartPoint?.corner.left !== state2.dragStartPoint?.corner.left ||
+        state1.dragStartPoint?.round.top !== state2.dragStartPoint?.round.top ||
+        state1.dragStartPoint?.round.left !== state2.dragStartPoint?.round.left
+    ) {
+        return false;
+    }
+
+    if (state1.dragAction !== state2.dragAction) {
+        return false;
+    }
+
+    if (state1.animating !== state2.animating) {
+        return false;
+    }
+
+    if (!isSamePosition(state1.loopOffset, state2.loopOffset)) {
+        return false;
+    }
+
+    if (state1.angle !== state2.angle) {
+        return false;
+    }
+
+    if (state1.scale !== state2.scale) {
+        return false;
+    }
+
+    if (!!state1.openedLmdOnce !== !!state2.openedLmdOnce) {
+        return false;
+    }
+
+    if (state1.lives !== state2.lives) {
+        return false;
+    }
+
+    if (state1.currentPlayer !== state2.currentPlayer) {
+        return false;
+    }
+
+    // noinspection RedundantIfStatementJS
+    if (JSON.stringify(state1.playerObjects) !== JSON.stringify(state2.playerObjects)) {
+        return false;
+    }
+
+    return true;
 };
 // endregion
 

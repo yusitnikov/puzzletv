@@ -11,7 +11,6 @@ import {makeAutoObservable} from "mobx";
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {profiler} from "../../utils/profiler";
 
-// TODO: T is not used...
 export class FieldStateHistory<T extends AnyPTM> {
     readonly current: FieldState<T>;
     readonly statesCount: number;
@@ -55,6 +54,11 @@ export class FieldStateHistory<T extends AnyPTM> {
                 Math.min(this.statesCount - 1, this.currentIndex + 1),
             )
             : this;
+    }
+
+    equals(other: FieldStateHistory<T>) {
+        return this.statesCount === other.statesCount && this.currentIndex === other.currentIndex
+            && this.states.every((value, index) => value === other.states[index]);
     }
 }
 

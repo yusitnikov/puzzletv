@@ -1,5 +1,6 @@
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {
+    areSameGameStates,
     GameStateEx,
     gameStateGetCurrentGivenDigitsByCells,
     gameStateNormalizeLoopOffset,
@@ -213,7 +214,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         if ("animated" in updates) {
             this._animated = animated;
         }
-        if (myGameState !== undefined/* && JSON.stringify(myGameState) !== JSON.stringify(this.myGameState)*/) {
+        if (myGameState !== undefined && !areSameGameStates(this, myGameState, this.myGameState)) {
             this.myGameState = myGameState;
         }
         if ("onStateChange" in updates) {
