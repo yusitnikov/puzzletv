@@ -292,7 +292,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 ...(this.puzzle.typeManager.supportedActionTypes || []),
             ];
 
-            const processedContext = this.cloneWith({
+            const processedContext = this.clone().cloneWith({
                 processedGameStateExtension: undefined,
                 animated: undefined,
                 applyKeys: false,
