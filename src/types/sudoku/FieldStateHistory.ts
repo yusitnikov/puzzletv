@@ -101,11 +101,22 @@ export const fieldStateHistoryAddState = <T extends AnyPTM>(
         return fieldStateHistory;
     }
 
+    const stateStr = JSON.stringify(serializeFieldState(state, puzzle));
+
+    // No history for multi-player games
+    if (context.multiPlayer.isEnabled) {
+        return new FieldStateHistory(
+            puzzle,
+            [stateStr],
+            0,
+        );
+    }
+
     return new FieldStateHistory(
         puzzle,
         [
             ...fieldStateHistory.states.slice(0, fieldStateHistory.currentIndex + 1),
-            JSON.stringify(serializeFieldState(state, puzzle)),
+            stateStr,
         ],
         fieldStateHistory.currentIndex + 1,
     );
