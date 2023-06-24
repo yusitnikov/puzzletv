@@ -51,7 +51,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
 
         const {
             prioritizeSelection,
-            typeManager: {compensateKillerCageSumAngle},
+            typeManager: {compensateConstraintDigitAngle},
         } = puzzle;
 
         const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
@@ -68,7 +68,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
         const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.15;
 
         let angle = useTransformAngle();
-        if (!compensateKillerCageSumAngle) {
+        if (!compensateConstraintDigitAngle) {
             angle = 0;
         }
 

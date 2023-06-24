@@ -658,7 +658,7 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
         ]);
     },
 
-    compensateKillerCageSumAngle: stickyDigits,
+    compensateConstraintDigitAngle: stickyDigits,
 
     // TODO: support shared games
 });

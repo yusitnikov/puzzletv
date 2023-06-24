@@ -273,7 +273,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
         },
     ],
 
-    compensateKillerCageSumAngle: true,
+    compensateConstraintDigitAngle: true,
 
     // TODO: support shared games
 });
