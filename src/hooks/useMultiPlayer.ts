@@ -188,7 +188,7 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
     };
 
     processPendingMessages(onMessages: (messages: MessageWithClientId[]) => void) {
-        if (this.isHost) {
+        if (!this.isHost) {
             return;
         }
 
