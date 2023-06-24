@@ -21,7 +21,7 @@ import {
 } from "./GameStateAction";
 import {SudokuCellsIndex} from "./SudokuCellsIndex";
 import {AnyPTM} from "./PuzzleTypeMap";
-import {comparer, computed, makeAutoObservable} from "mobx";
+import {comparer, computed, makeAutoObservable, runInAction} from "mobx";
 import {computedFn, createViewModel} from "mobx-utils";
 import {PositionSet} from "../layout/Position";
 import {isSelectableCell} from "./CellTypeProps";
@@ -191,50 +191,52 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     }
 
     update(updates: Partial<PuzzleContextOptions<T>>) {
-        const {
-            puzzle,
-            processedGameStateExtension,
-            animated,
-            myGameState,
-            onStateChange,
-            cellSize,
-            cellSizeForSidePanel,
-            isReadonlyContext,
-            applyKeys,
-            applyPendingMessages,
-        } = updates;
+        runInAction(() => {
+            const {
+                puzzle,
+                processedGameStateExtension,
+                animated,
+                myGameState,
+                onStateChange,
+                cellSize,
+                cellSizeForSidePanel,
+                isReadonlyContext,
+                applyKeys,
+                applyPendingMessages,
+            } = updates;
 
-        if (puzzle !== undefined) {
-            (window as any).puzzle = this.puzzle;
-            this.puzzle = puzzle;
-        }
-        if ("processedGameStateExtension" in updates) {
-            this._processedGameStateExtension = processedGameStateExtension;
-        }
-        if ("animated" in updates) {
-            this._animated = animated;
-        }
-        if (myGameState !== undefined && !areSameGameStates(this, myGameState, this.myGameState)) {
-            this.myGameState = myGameState;
-        }
-        if ("onStateChange" in updates) {
-            this._onStateChange = onStateChange;
-        }
-        if (cellSize !== undefined) {
-            this.cellSize = cellSize;
-        }
-        if (cellSizeForSidePanel !== undefined) {
-            this.cellSizeForSidePanel = cellSizeForSidePanel;
-        }
-        if (isReadonlyContext !== undefined) {
-            this.isReadonlyContext = isReadonlyContext;
-        }
-        if (applyKeys !== undefined) {
-            this.applyKeys = applyKeys;
-        }
-        if (applyPendingMessages !== undefined) {
-            this.applyPendingMessages = applyPendingMessages;
-        }
+            if (puzzle !== undefined) {
+                (window as any).puzzle = this.puzzle;
+                this.puzzle = puzzle;
+            }
+            if ("processedGameStateExtension" in updates) {
+                this._processedGameStateExtension = processedGameStateExtension;
+            }
+            if ("animated" in updates) {
+                this._animated = animated;
+            }
+            if (myGameState !== undefined && !areSameGameStates(this, myGameState, this.myGameState)) {
+                this.myGameState = myGameState;
+            }
+            if ("onStateChange" in updates) {
+                this._onStateChange = onStateChange;
+            }
+            if (cellSize !== undefined) {
+                this.cellSize = cellSize;
+            }
+            if (cellSizeForSidePanel !== undefined) {
+                this.cellSizeForSidePanel = cellSizeForSidePanel;
+            }
+            if (isReadonlyContext !== undefined) {
+                this.isReadonlyContext = isReadonlyContext;
+            }
+            if (applyKeys !== undefined) {
+                this.applyKeys = applyKeys;
+            }
+            if (applyPendingMessages !== undefined) {
+                this.applyPendingMessages = applyPendingMessages;
+            }
+        });
     }
 
     cloneWith(updates: Partial<PuzzleContextOptions<T>>): PuzzleContext<T> {
