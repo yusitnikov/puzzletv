@@ -7,6 +7,8 @@ import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {ReactElement} from "react";
 import {profiler} from "../../../../utils/profiler";
+import {useTransformAngle} from "../../../../contexts/TransformContext";
+import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 
 export interface QuadProps<CellType> {
     expectedDigits?: CellType[];
@@ -48,7 +50,12 @@ export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
 ) {
     profiler.trace();
 
-    const {typeManager: {cellDataComponentType: {component: CellData}}} = puzzle;
+    const {
+        typeManager: {
+            cellDataComponentType: {component: CellData},
+            compensateConstraintDigitAngle,
+        },
+    } = puzzle;
 
     const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: T["cell"], valid?: boolean}[] = [
         ...expectedDigits.map(digit => ({digit, valid: true})),
@@ -57,11 +64,16 @@ export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
 
     const digits = [d3, d1, d2, d4, ...others];
 
-    return <>
+    let compensationAngle = useTransformAngle();
+    if (!compensateConstraintDigitAngle) {
+        compensationAngle = 0;
+    }
+
+    return <AutoSvg top={top} left={left} angle={-compensationAngle}>
         <circle
             key={"circle"}
-            cx={left}
-            cy={top}
+            cx={0}
+            cy={0}
             r={radius}
             strokeWidth={0.02}
             stroke={isRecent ? recentInfoColor : textColor}
@@ -82,13 +94,13 @@ export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
                 puzzle={puzzle}
                 data={digit}
                 size={fontSize}
-                top={top + offset * Math.cos(angle)}
-                left={left - offset * Math.sin(angle)}
+                top={offset * Math.cos(angle)}
+                left={-offset * Math.sin(angle)}
                 isInitial={valid}
                 isValid={valid}
             />;
         })}
-    </>;
+    </AutoSvg>;
 }) as <T extends AnyPTM>(props: QuadByDataProps<T>) => ReactElement;
 
 const getQuadCells = ({top, left}: Position): Position[] => [
