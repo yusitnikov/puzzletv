@@ -203,6 +203,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 isReadonlyContext,
                 applyKeys,
                 applyPendingMessages,
+                languageCode,
             } = updates;
 
             if (puzzle !== undefined) {
@@ -235,6 +236,9 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             }
             if (applyPendingMessages !== undefined) {
                 this.applyPendingMessages = applyPendingMessages;
+            }
+            if (languageCode !== undefined) {
+                this.languageCode = languageCode;
             }
         });
     }
