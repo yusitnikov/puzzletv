@@ -130,7 +130,7 @@ export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {
 
 export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
     title: {
-        [LanguageCode.en]: "Easy-peasy, Mate in One (v2)",
+        [LanguageCode.en]: "Easy-peasy, Mate in One v2",
         [LanguageCode.ru]: "Мат в 1 ход (v2)",
     },
     slug: "real-chess-sudoku-v2",
