@@ -67,6 +67,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    RealChessPuzzle2,
+
     Pacman,
 
     Sudokuban,
@@ -131,7 +133,6 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
 
     RealChessPuzzle,
     RealChessPuzzleCompatibilitySlug,
-    RealChessPuzzle2,
 
     Africa,
     // endregion

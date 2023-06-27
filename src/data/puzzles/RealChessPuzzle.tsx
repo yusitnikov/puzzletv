@@ -61,6 +61,7 @@ const isValidSolution = (
 };
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
+    noIndex: true,
     title: {
         [LanguageCode.en]: "Easy-peasy, Mate in One",
         [LanguageCode.ru]: "Мат в 1 ход",
@@ -125,14 +126,12 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
 export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {
     ...RealChessPuzzle,
     slug: "real-chess-puzzle",
-    noIndex: true,
 };
 
 export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
-    noIndex: true,
     title: {
-        [LanguageCode.en]: "Easy-peasy, Mate in One v2",
-        [LanguageCode.ru]: "Мат в 1 ход v2",
+        [LanguageCode.en]: "Easy-peasy, Mate in One (v2)",
+        [LanguageCode.ru]: "Мат в 1 ход (v2)",
     },
     slug: "real-chess-sudoku-v2",
     saveStateKey: "real-chess-sudoku-v2-3",
