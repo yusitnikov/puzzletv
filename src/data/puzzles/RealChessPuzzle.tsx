@@ -151,8 +151,8 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
         </RulesParagraph>
         <RulesParagraph>
             <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)}. {translate({
-            [LanguageCode.en]: <>For instance, there could be no other bishops (<strong>regardless of color</strong>) in the bottom-left box, in column <strong>d</strong> and in row <strong>3</strong></>,
-            [LanguageCode.ru]: <>Например, в нижне-левом регионе, на линии <strong>d</strong> и на линии <strong>3</strong> не может быть других слонов (<strong>любого цвета</strong>)</>,
+            [LanguageCode.en]: <>For instance, there could be no other bishops (<strong>regardless of color</strong>) in the bottom-left box, in column <strong>f</strong> and in row <strong>3</strong></>,
+            [LanguageCode.ru]: <>Например, в нижне-левом регионе, на линии <strong>f</strong> и на линии <strong>3</strong> не может быть других слонов (<strong>любого цвета</strong>)</>,
         })}. {translate(emptyCells)}.
         </RulesParagraph>
         <RulesParagraph>
