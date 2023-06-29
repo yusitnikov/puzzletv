@@ -153,9 +153,9 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
         </RulesParagraph>
         <RulesParagraph>
             <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)}. {translate({
-            [LanguageCode.en]: <>For instance, there could be no other bishops (<strong>regardless of color</strong>) in the bottom-left box, in column <strong>f</strong> and in row <strong>3</strong></>,
-            [LanguageCode.ru]: <>Например, в нижне-левом регионе, на линии <strong>f</strong> и на линии <strong>3</strong> не может быть других слонов (<strong>любого цвета</strong>)</>,
-            [LanguageCode.de]: <>Beispielsweise dürfte kein weiterer Läufer (<strong>egal welcher Farbe</strong>) in die 2x3 Region unten links, in Spalte <strong>f</strong> oder in Zeile <strong>3</strong> positioniert werden</>,
+            [LanguageCode.en]: <>For instance, there could be no other bishops (<strong>regardless of color</strong>) in the bottom-right box, in column <strong>f</strong> and in row <strong>3</strong></>,
+            [LanguageCode.ru]: <>Например, в нижне-правом регионе, на линии <strong>f</strong> и на линии <strong>3</strong> не может быть других слонов (<strong>любого цвета</strong>)</>,
+            [LanguageCode.de]: <>Beispielsweise dürfte kein weiterer Läufer (<strong>egal welcher Farbe</strong>) in die 2x3 Region oben links, in Spalte <strong>f</strong> oder in Zeile <strong>3</strong> positioniert werden</>,
         })}. {translate(emptyCells)}.
         </RulesParagraph>
         <RulesParagraph>
