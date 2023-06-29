@@ -46,7 +46,7 @@ export const HomePage = observer(function HomePage() {
             {translate({
                 [LanguageCode.en]: <>If you're a puzzle setter and want to publish your work on Puzzle TV, please see the details <a href={settersLink}>here</a>.</>,
                 [LanguageCode.ru]: <>Если Вы создатель головоломок и хотите опубликовать Вашу работу на Puzzle TV, смотрите детали <a href={settersLink}>здесь</a>.</>,
-                [LanguageCode.de]: <>Wenn Sie ein Rätselsetzer sind und Ihre Arbeit auf Puzzle TV veröffentlichen möchten, sehen Sie sich bitte die Details <a href={settersLink}>hier</a> an.</>,
+                [LanguageCode.de]: <>Wenn Sie ein Rätselautor sind und Ihre Arbeit auf Puzzle TV veröffentlichen möchten, sehen Sie sich bitte die Details <a href={settersLink}>hier</a> an.</>,
             })}
         </p>
     </>;

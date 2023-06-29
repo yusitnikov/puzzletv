@@ -31,7 +31,7 @@ export const ContactMe = observer(function ContactMe() {
         <p>{translate({
             [LanguageCode.en]: <>Note: if you're a puzzle setter and want to publish your work on Puzzle TV, you can also find answers for common questions <a href={settersLink}>here</a>.</>,
             [LanguageCode.ru]: <>Примечание: если Вы создатель головоломок и хотите опубликовать Вашу работу на Puzzle TV, Вы также найдете ответы на распространенные вопросы <a href={settersLink}>здесь</a>.</>,
-            [LanguageCode.de]: <>Hinweis: Wenn Sie ein Rätselsetzer sind und Ihre Arbeit auf Puzzle TV veröffentlichen möchten, finden Sie <a href={settersLink}>hier</a> auch Antworten auf häufig gestellte Fragen.</>,
+            [LanguageCode.de]: <>Hinweis: Wenn Sie ein Rätselautor sind und Ihre Arbeit auf Puzzle TV veröffentlichen möchten, finden Sie <a href={settersLink}>hier</a> auch Antworten auf häufig gestellte Fragen.</>,
         })}</p>
     </>;
 });
