@@ -4,6 +4,7 @@ import {PartiallyTranslatable, Translatable} from "../types/translations/Transla
 export const Chameleon: Translatable = {
     [LanguageCode.en]: "Chameleon",
     [LanguageCode.ru]: "Хамелеона",
+    [LanguageCode.de]: "Chameleon",
 };
 
 export const Raumplaner: PartiallyTranslatable = {

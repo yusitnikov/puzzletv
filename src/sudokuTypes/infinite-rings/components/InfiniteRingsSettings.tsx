@@ -32,6 +32,7 @@ export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => (observer(fun
             {translate({
                 [LanguageCode.en]: "Show all rings",
                 [LanguageCode.ru]: "Показывать все кольца",
+                [LanguageCode.de]: "Alle Ringe anzeigen",
             })}:
 
             <SettingsCheckbox
@@ -46,6 +47,7 @@ export const InfiniteRingsSettings = (visibleRingsCountArg = 2) => (observer(fun
             {translate({
                 [LanguageCode.en]: "Focus on two rings",
                 [LanguageCode.ru]: "Сосредоточиться на двух кольцах",
+                [LanguageCode.de]: "Konzentrieren Sie sich auf zwei Ringe",
             })}:
 
             <SettingsCheckbox

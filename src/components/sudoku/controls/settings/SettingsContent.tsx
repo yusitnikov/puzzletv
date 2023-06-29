@@ -185,10 +185,12 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                     <option value={PencilmarksCheckerMode.CheckObvious}>{translate({
                         [LanguageCode.en]: "Check obvious logic",
                         [LanguageCode.ru]: "Проверять очевидную логику",
+                        [LanguageCode.de]: "Die offensichtliche Logik",
                     })}</option>
                     <option value={PencilmarksCheckerMode.CheckAll}>{translate({
                         [LanguageCode.en]: "Check all",
                         [LanguageCode.ru]: "Проверять всё",
+                        [LanguageCode.de]: "Alle überprüfen",
                     })}</option>
                 </SettingsSelect>
             </SettingsItem>
@@ -244,6 +246,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
             <span>{translate({
                 [LanguageCode.en]: "Animation speed",
                 [LanguageCode.ru]: "Скорость анимации",
+                [LanguageCode.de]: "Animationsgeschwindigkeit",
             })}:</span>
 
             <SettingsSelect
@@ -254,14 +257,17 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                 <option value={AnimationSpeed.regular}>{translate({
                     [LanguageCode.en]: "Regular",
                     [LanguageCode.ru]: "Обычная",
+                    [LanguageCode.de]: "Regelmäßig",
                 })}</option>
                 <option value={AnimationSpeed.immediate}>{translate({
                     [LanguageCode.en]: "No animation",
                     [LanguageCode.ru]: "Без анимации",
+                    [LanguageCode.de]: "Keine Animation",
                 })}</option>
                 <option value={AnimationSpeed.slow}>{translate({
                     [LanguageCode.en]: "Slow",
                     [LanguageCode.ru]: "Медленная",
+                    [LanguageCode.de]: "Langsam",
                 })}</option>
             </SettingsSelect>
         </SettingsItem>

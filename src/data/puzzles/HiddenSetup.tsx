@@ -150,6 +150,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
     title: {
         [LanguageCode.en]: "Hidden Setup",
         [LanguageCode.ru]: "Скрытая установка",
+        [LanguageCode.de]: "Verstecktes Setup",
     },
     slug: "hidden-setup",
     saveStateKey: "hidden-setup-v2",
@@ -174,10 +175,12 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
             <RulesParagraph>{translate({
                 [LanguageCode.en]: "This puzzle does reveal its clues in stages",
                 [LanguageCode.ru]: "Этот судоку раскрывает свои подсказки поэтапно",
+                [LanguageCode.de]: "Dieses Rätsel enthüllt seine Hinweise schrittweise",
             })}.</RulesParagraph>
             <RulesParagraph>{translate({
                 [LanguageCode.en]: "Enter the correct digits into the highlighted cells to proceed to the next stage of the puzzle",
                 [LanguageCode.ru]: "Введите правильные цифры в выделенные ячейки, чтобы перейти к следующему этапу",
+                [LanguageCode.de]: "Geben Sie die richtigen Ziffern in die hervorgehobenen Zellen ein, um mit der nächsten Stufe des Rätsels fortzufahren",
             })}.</RulesParagraph>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
@@ -191,6 +194,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
             {stage < 2 && <RulesParagraph>{translate({
                 [LanguageCode.en]: "In later stages there will be additional clues",
                 [LanguageCode.ru]: "На более поздних этапах будут дополнительные подсказки",
+                [LanguageCode.de]: "In späteren Phasen wird es zusätzliche Hinweise geben",
             })}.</RulesParagraph>}
         </>;
     },

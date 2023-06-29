@@ -51,9 +51,11 @@ import {MultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
 const remainingBoxPositionIndexes = [0, 4, 8];
 const keepDigitsAccordingBoxPositionText = {
     [LanguageCode.en]: "Keep the digit from stage 1 in each box that corresponds to their box position " +
-    "(e.g. keep r1r1 in box 1, r5c9 in box 6, and r9c5 in box 8), clean up all other cells",
+    "(e.g. keep r1c1 in box 1, r5c9 in box 6, and r9c5 in box 8), clean up all other cells",
     [LanguageCode.ru]: "Из этапа 1 оставьте в каждом квадрате цифру, которая соответствует положению её квадрата " +
-    "(например, оставьте r1r1 в квадрате 1, r5c9 в квадрате 6, и r9c5 в квадрате 8), очистите все остальные ячейки",
+    "(например, оставьте r1c1 в квадрате 1, r5c9 в квадрате 6, и r9c5 в квадрате 8), очистите все остальные ячейки",
+    [LanguageCode.de]: "Behalten Sie die Ziffer aus Stufe 1 in jedem Kästchen, das ihrer Kästchenposition entspricht " +
+    "(z. B. behalten Sie r1c1 in Kästchen 1, r5c9 in Kästchen 6 und r9c5 in Kästchen 8) und bereinigen Sie alle anderen Zellen",
 };
 const keepDigitsAccordingBoxPositionCallback = ({top, left}: Position) =>
     remainingBoxPositionIndexes.includes(top) && remainingBoxPositionIndexes.includes(left);
@@ -66,6 +68,7 @@ export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
     title: {
         [LanguageCode.en]: "Abstract Killer Dots",
         [LanguageCode.ru]: "Абстрактные точки-клетки",
+        [LanguageCode.de]: "Abstrakte Killerpunkte",
     },
     slug: "abstract-killer-dots",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
@@ -95,6 +98,7 @@ export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
             {
                 [LanguageCode.en]: "Many thanks to %1 for the help to make the 3x3 logic unique",
                 [LanguageCode.ru]: "Большое спасибо %1 за помощь в создании уникальной логики 3x3",
+                [LanguageCode.de]: "Vielen Dank an %1 für die Hilfe, die 3x3-Logik einzigartig zu machen",
             },
             AnalyticalNinja
         ))}.</RulesParagraph>
@@ -146,6 +150,7 @@ export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
     title: {
         [LanguageCode.en]: "Lego House",
         [LanguageCode.ru]: "Лего-дом",
+        [LanguageCode.de]: "Lego Haus",
     },
     slug: "lego-house",
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AO9",
@@ -178,6 +183,8 @@ export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
                 "(e.g. you'll keep the digits in r4c1c2c3 within box 4)",
                 [LanguageCode.ru]: "Сотрите все цифры на поле, номер квадрата которых не соответствует их номеру строки " +
                 "(например, вы сохраните цифры в r4c1c2c3 в квадрате 4)",
+                [LanguageCode.de]: "Löschen Sie alle Ziffern im Raster, deren Boxnummer nicht mit ihrer Zeilennummer übereinstimmt " +
+                "(z. B. behalten Sie die Ziffern in r4c1c2c3 in Box 4)",
             })}.</RulesParagraph>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
         </RulesIndentedBlock>
@@ -217,6 +224,7 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
     title: {
         [LanguageCode.en]: "Doll House",
         [LanguageCode.ru]: "Кукольный дом",
+        [LanguageCode.de]: "Puppenhaus",
     },
     slug: "doll-house",
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AQX",
@@ -305,6 +313,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
     title: {
         [LanguageCode.en]: "Moody Lines",
         [LanguageCode.ru]: "Капризные линии",
+        [LanguageCode.de]: "Stimmungsvolle Linien",
     },
     slug: "moody-lines",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
@@ -317,6 +326,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
         <RulesParagraph>{translate({
             [LanguageCode.en]: "Ambiguous lines, each line must be one of these types (at least)",
             [LanguageCode.ru]: "Неоднозначные линии, каждая линия должна быть одного из этих типов (как минимум)",
+            [LanguageCode.de]: "Mehrdeutige Zeilen, jede Zeile muss (mindestens) einer dieser Typen sein",
         })}:</RulesParagraph>
         <RulesUnorderedList>
             <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained(true)))}.</li>
@@ -330,6 +340,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
             <RulesParagraph>{translate(tenInOneMultiBoxLineRules)} ({translate({
                 [LanguageCode.en]: "in this stage, line segments in different boxes can be different line types",
                 [LanguageCode.ru]: "на этом этапе сегменты линий в разных квадратах могут быть линиями разных типов",
+                [LanguageCode.de]: "in dieser Phase können Liniensegmente in verschiedenen Feldern unterschiedliche Linientypen sein",
             })}).</RulesParagraph>
         </RulesIndentedBlock>
         <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>

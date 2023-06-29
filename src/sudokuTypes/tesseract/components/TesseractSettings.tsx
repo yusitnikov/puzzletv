@@ -20,6 +20,7 @@ export const TesseractSettings = observer(function TesseractSettings<T extends A
         <span>{translate({
             [LanguageCode.en]: "Highlight cells seen by tesseract",
             [LanguageCode.ru]: "Подсвечивать клетки, видимые тессерактом",
+            [LanguageCode.de]: "Markieren Sie die von Tesseract gesehenen Zellen",
         })}:</span>
 
         <SettingsSelect
@@ -30,14 +31,17 @@ export const TesseractSettings = observer(function TesseractSettings<T extends A
             <option value={TesseractSelectionType.Always}>{translate({
                 [LanguageCode.en]: "Always",
                 [LanguageCode.ru]: "Всегда",
+                [LanguageCode.de]: "Immer",
             })}</option>
             <option value={TesseractSelectionType.Clues}>{translate({
                 [LanguageCode.en]: "Only circles",
                 [LanguageCode.ru]: "Только круги",
+                [LanguageCode.de]: "Nur Kreise",
             })}</option>
             <option value={TesseractSelectionType.Never}>{translate({
                 [LanguageCode.en]: "Never",
                 [LanguageCode.ru]: "Никогда",
+                [LanguageCode.de]: "Nie",
             })}</option>
         </SettingsSelect>
     </SettingsItem>;

@@ -42,12 +42,14 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({cont
             {translate({
                 [LanguageCode.en]: "Drag the jigsaw piece to move it" + (angleStep ? ", click it to rotate" : ""),
                 [LanguageCode.ru]: "Перетащите кусок пазла, чтобы двигать его" + (angleStep ? ". Щелкните по нему, чтобы повернуть" : ""),
+                [LanguageCode.de]: "Ziehen Sie das Puzzleteil, um es zu verschieben" + (angleStep ? ", und klicken Sie darauf, um es zu drehen" : ""),
             })}.
         </div>
         <div style={paragraphStyles}>
             {translate({
                 [LanguageCode.en]: "Drag the grid to move it, use +/- buttons to zoom",
                 [LanguageCode.ru]: "Перетащите поле, чтобы двигать его. Используйте кнопки +/- для увеличения/отдаления поля",
+                [LanguageCode.de]: "Ziehen Sie das Raster, um es zu verschieben, und verwenden Sie die Tasten +/- zum Zoomen",
             })}.
         </div>
 
@@ -56,6 +58,7 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({cont
                 {translate({
                     [LanguageCode.en]: "Show Japanese sums clues",
                     [LanguageCode.ru]: "Показывать японские суммы",
+                    [LanguageCode.de]: "Hinweise zu japanischen Summen anzeigen",
                 })}:<br/>
                 <select
                     value={jssCluesVisibility}
@@ -66,6 +69,7 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({cont
                     <option value={JigsawJssCluesVisibility.ForActiveRegion}>{translate({
                         [LanguageCode.en]: "For active jigsaw piece",
                         [LanguageCode.ru]: "Для активного куска пазла",
+                        [LanguageCode.de]: "Für aktives Puzzleteil",
                     })}</option>
                     <option value={JigsawJssCluesVisibility.None}>{translate("No")}</option>
                 </select>

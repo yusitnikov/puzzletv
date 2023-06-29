@@ -130,8 +130,9 @@ export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle= {
 
 export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
     title: {
-        [LanguageCode.en]: "Easy-peasy, Mate in One v2",
-        [LanguageCode.ru]: "Мат в 1 ход (v2)",
+        [LanguageCode.en]: "Cross-blunder",
+        [LanguageCode.ru]: "Двойной зевок",
+        [LanguageCode.de]: "Doppelte Mattdrohnung",
     },
     slug: "real-chess-sudoku-v2",
     saveStateKey: "real-chess-sudoku-v2-3",
@@ -147,12 +148,14 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
             {translate({
                 [LanguageCode.en]: "Also, there's a 6x6 sudoku grid in the middle of the chess board",
                 [LanguageCode.ru]: "Кроме того, в центре шахматной доски есть поле судоку 6x6",
+                [LanguageCode.de]: "Zusätzlich gibt es ein 6x6 Sudoku-Rätselgitter in der Mitte des Schachbretts",
             })}.
         </RulesParagraph>
         <RulesParagraph>
             <strong>{translate(almostNormalSudokuRulesApply)}</strong>: {translate(normalSudokuRulesForChessPieces)}. {translate({
             [LanguageCode.en]: <>For instance, there could be no other bishops (<strong>regardless of color</strong>) in the bottom-left box, in column <strong>f</strong> and in row <strong>3</strong></>,
             [LanguageCode.ru]: <>Например, в нижне-левом регионе, на линии <strong>f</strong> и на линии <strong>3</strong> не может быть других слонов (<strong>любого цвета</strong>)</>,
+            [LanguageCode.de]: <>Beispielsweise dürfte kein weiterer Läufer (<strong>egal welcher Farbe</strong>) in die 2x3 Region unten links, in Spalte <strong>f</strong> oder in Zeile <strong>3</strong> positioniert werden</>,
         })}. {translate(emptyCells)}.
         </RulesParagraph>
         <RulesParagraph>
@@ -165,12 +168,15 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
             {translate({
                 [LanguageCode.en]: "There are no chess pieces outside the sudoku grid",
                 [LanguageCode.ru]: "Шахматные фигуры не могут находиться за пределами поля судоку",
+                [LanguageCode.de]: "Außerhalb des Sudoku-Rätselgitters dürfen keine Schachfiguren positioniert werden",
             })}. {translate({
                 [LanguageCode.en]: "The chess piece that moves to do the mate in one can't escape the sudoku grid either (while doing the move)",
                 [LanguageCode.ru]: "Шахматная фигура, которая ходит для того, чтобы поставить мат в один ход, тоже не может выйти за пределы поля судоку для этого",
+                [LanguageCode.de]: "Die Figur, die den Zug zur jeweiligen Gewinnstellung ausführt, darf den 6x6 Bereich in der Mitte ebenfalls niemals verlassen",
             })}. {translate({
                 [LanguageCode.en]: "The kings can move outside the sudoku grid, though (it's not a mate if the king has a legal move outside the sudoku grid)",
                 [LanguageCode.ru]: "Однако, короли могут выйти за пределы поля судоку (это не мат, если у короля есть ход за пределы поля судоку)",
+                [LanguageCode.de]: "Der König kann als einzige Figur den 6x6 Bereich verlassen (solange der König also noch einen erlaubten Zug auf ein Feld außerhalb des 6x6 Bereichs machen kann, ist es kein Matt)",
             })}.
         </RulesParagraph>
     </>,

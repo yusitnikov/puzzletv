@@ -183,11 +183,14 @@ export const Rules = observer(function Rules<T extends AnyPTM>({rect, context}: 
                 "All actions made in this mode will be reverted after turning it back off.",
                 [LanguageCode.ru]: "Включите, чтобы свободно изменять вещи на поле, не раскрывая при этом туман.\n" +
                 "Все действия, совершенные в этом режиме, будут отменены после его выключения.",
+                [LanguageCode.de]: "Aktivieren Sie diese Option, um das Raster sicher zu ändern, ohne den Nebel sichtbar zu machen.\n" +
+                "Alle in diesem Modus ausgeführten Aktionen werden nach dem Deaktivieren rückgängig gemacht.",
             })}
         >
             {translate({
                 [LanguageCode.en]: "No fog reveal mode",
                 [LanguageCode.ru]: "Режим без раскрытия тумана",
+                [LanguageCode.de]: "Kein-Nebel-Enthüllungsmodus",
             })}{" "}
 
             <span style={{

@@ -49,6 +49,7 @@ export const RushHourHideCarsButton = observer(function RushHourHideCarsButtonFc
         title={`${translate({
             [LanguageCode.en]: "show the cars",
             [LanguageCode.ru]: "показывать машины",
+            [LanguageCode.de]: "die Autos zeigen",
         })} (${translate("shortcut")}: H)`}
     >
         {(contentSize) => <AutoSvg

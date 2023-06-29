@@ -380,6 +380,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
             {translate({
                 [LanguageCode.en]: "No fog reveal mode on!",
                 [LanguageCode.ru]: "Режим без раскрытия тумана включен!",
+                [LanguageCode.de]: "Kein-Nebel-Enthüllungsmodus aktiviert!",
             })}
         </Absolute>}
     </>;

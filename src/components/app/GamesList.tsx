@@ -28,11 +28,13 @@ export const GamesList = observer(function GamesList() {
             <p>{translate({
                 [LanguageCode.en]: <>A multi-turn game for one or more players<br/>based on classic sudoku with a "quadruple" constraint.</>,
                 [LanguageCode.ru]: <>Многоходовая игра для одного и более игрока,<br/>основанная на классическом судоку и "четверках".</>,
+                [LanguageCode.de]: <>Ein Spiel mit mehreren Runden für einen oder<br/>mehrere Spieler, das auf dem klassischen Sudoku<br/>mit einer "Vierfach"-Beschränkung basiert.</>,
             })}</p>
 
             <p>{translate({
                 [LanguageCode.en]: <>Players put quadruples and digits on the sudoku grid to gain<br/>information about the solution of the sudoku as soon as possible.</>,
                 [LanguageCode.ru]: <>Игроки размещают четверки и цифры на поле судоку,<br/>чтобы как можно быстрее получить информацию о решении судоку.</>,
+                [LanguageCode.de]: <>Die Spieler tragen Vierfache und Ziffern auf das<br/>Sudoku-Raster ein, um so schnell wie möglich<br/>Informationen über die Lösung des Sudokus zu erhalten.</>,
             })}</p>
         </GamesListItem>
 
@@ -49,6 +51,7 @@ export const GamesList = observer(function GamesList() {
             <p>{translate({
                 [LanguageCode.en]: <>Similar to Quad Masters, but the quadruples give more information<br/>about positions of digits relative to the circle.</>,
                 [LanguageCode.ru]: <>Похоже на Quad Masters, но четверки дают больше информации<br/>о положении цифр относительно круга.</>,
+                [LanguageCode.de]: <>Ähnlich wie Quad Masters, aber die Quadruples geben mehr<br/>Informationen über die Positionen der Ziffern relativ zum Kreis.</>,
             })}</p>
         </GamesListItem>
 
@@ -56,6 +59,7 @@ export const GamesList = observer(function GamesList() {
             name={translate({
                 [LanguageCode.en]: "Kropki Snake",
                 [LanguageCode.ru]: "Змейка Кропки",
+                [LanguageCode.de]: "Kropki-Schlange",
             })}
             imageUrl={"/images/KropkiSnake.png"}
             author={translate(Chameleon)}
@@ -66,6 +70,7 @@ export const GamesList = observer(function GamesList() {
             <p>{translate({
                 [LanguageCode.en]: <>The good old snake, but it gathers Kropki dots<br/>on a sudoku grid. Why not? :-)</>,
                 [LanguageCode.ru]: <>Старая добрая змейка, но только она собирает точки Кропки на поле судоку.<br/>А почему бы и нет? :-)</>,
+                [LanguageCode.de]: <>Die gute alte Schlange, aber sie sammelt Kropki-Punkte<br/>auf einem Sudoku-Raster. Warum nicht? :-)</>,
             })}</p>
         </GamesListItem>
     </>;

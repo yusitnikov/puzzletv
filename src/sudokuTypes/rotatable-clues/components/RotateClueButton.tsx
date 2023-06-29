@@ -81,6 +81,7 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => observe
         title={`${translate({
             [LanguageCode.en]: "Rotate the clue",
             [LanguageCode.ru]: "Повернуть",
+            [LanguageCode.de]: "Drehen Sie den Hinweis",
         })} (${translate("shortcut")}: ${isShift ? "Shift+" : ""}R)`}
     >
         {isClockwise ? <RotateRight/> : <RotateLeft/>}

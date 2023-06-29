@@ -25,10 +25,12 @@ export const HomePage = observer(function HomePage() {
             {translate({
                 [LanguageCode.en]: <>The mission of the project is to power sudoku and pencil puzzles with unique rules and mechanics that the commonly-used sudoku applications ({commonAppLinks}) don't support.</>,
                 [LanguageCode.ru]: <>Миссия этого проекта — создать платформу для судоку и прочих головоломок с уникальными правилами и механикой, не поддерживаемыми популярными приложениями для судоку ({commonAppLinks}).</>,
+                [LanguageCode.de]: <>Die Mission des Projekts besteht darin, Sudoku- und Bleistifträtsel mit einzigartigen Regeln und Mechanismen zu versehen, die von den häufig verwendeten Sudoku-Anwendungen ({commonAppLinks}) nicht unterstützt werden.</>,
             })}<br/>
             {translate({
                 [LanguageCode.en]: <>Check out the <a href={puzzlesLink}>puzzles</a> and <a href={gamesLink}>games</a> galleries for examples!</>,
                 [LanguageCode.ru]: <>Вы сможете найти примеры в галереях <a href={puzzlesLink}>головоломок</a> и <a href={gamesLink}>игр.</a></>,
+                [LanguageCode.de]: <>Schauen Sie sich die <a href={puzzlesLink}>Rätsel-</a> und <a href={gamesLink}>Spiele</a>galerien für Beispiele an!</>,
             })}
         </p>
 
@@ -36,6 +38,7 @@ export const HomePage = observer(function HomePage() {
             {translate({
                 [LanguageCode.en]: <>Have a suggestion or found a bug? Feel free to write to me - see the <a href={contactMeLink}>contacts page</a>.</>,
                 [LanguageCode.ru]: <>Хотите предложить идею, или нашли баг на сайте? Пишите в любое время! Вы сможете найти мои контактные данные <a href={contactMeLink}>здесь</a>.</>,
+                [LanguageCode.de]: <>Haben Sie einen Vorschlag oder haben Sie einen Fehler gefunden? Schreiben Sie mir gerne – siehe <a href={contactMeLink}>Kontaktseite</a>.</>,
             })}
         </p>
 
@@ -43,6 +46,7 @@ export const HomePage = observer(function HomePage() {
             {translate({
                 [LanguageCode.en]: <>If you're a puzzle setter and want to publish your work on Puzzle TV, please see the details <a href={settersLink}>here</a>.</>,
                 [LanguageCode.ru]: <>Если Вы создатель головоломок и хотите опубликовать Вашу работу на Puzzle TV, смотрите детали <a href={settersLink}>здесь</a>.</>,
+                [LanguageCode.de]: <>Wenn Sie ein Rätselsetzer sind und Ihre Arbeit auf Puzzle TV veröffentlichen möchten, sehen Sie sich bitte die Details <a href={settersLink}>hier</a> an.</>,
             })}
         </p>
     </>;

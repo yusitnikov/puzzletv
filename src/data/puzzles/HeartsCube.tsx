@@ -17,6 +17,7 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
     title: {
         [LanguageCode.en]: "Rational Cube",
         [LanguageCode.ru]: "Рациональный куб",
+        [LanguageCode.de]: "Rationaler Würfel",
     },
     author: Chameleon,
     slug: showRatio ? "rational-cube-show-ratio" : "rational-cube",
@@ -28,29 +29,35 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
         <RulesParagraph>{translate({
             [LanguageCode.en]: "Put digits from 1 to 9 into every cell of all cube faces",
             [LanguageCode.ru]: "Поместите цифры от 1 до 9 в каждую ячейку всех граней куба",
+            [LanguageCode.de]: "Tragen Sie Ziffern von 1 bis 9 in jede Zelle aller Würfelflächen ein",
         })}.</RulesParagraph>
         <RulesParagraph>
             {translate({
                 [LanguageCode.en]: "Digits cannot repeat in a row, column or 3x3 box (face of the cube)",
                 [LanguageCode.ru]: "Цифры не могут повторяться в строках, столбцах и регионах 3х3 (гранях куба)",
+                [LanguageCode.de]: "Ziffern können sich in einer Zeile, Spalte oder einem 3x3-Feld (Seite des Würfels) nicht wiederholen.",
             })}.{" "}
             {translate({
                 [LanguageCode.en]: '"Rows" and "columns" are 6 cells long - they extend across the edge and take 2 faces of the cube',
                 [LanguageCode.ru]: '"Строки" и "столбцы" имеют длину 6 клеток - они проходят через ребро и занимают 2 грани куба',
+                [LanguageCode.de]: '"Zeilen" und "Spalten" sind 6 Zellen lang – sie erstrecken sich über die Kante und nehmen 2 Seiten des Würfels ein',
             })}.
         </RulesParagraph>
         <RulesParagraph>{translate(blackKropkiDotsExplained)}.</RulesParagraph>
         <RulesParagraph>{translate(ratioDotsExplained({
             [LanguageCode.en]: "green",
             [LanguageCode.ru]: "зелёной",
+            [LanguageCode.de]: "grünen",
         }, "1:3"))}.</RulesParagraph>
         <RulesParagraph>{translate(ratioDotsExplained({
             [LanguageCode.en]: "red",
             [LanguageCode.ru]: "красной",
+            [LanguageCode.de]: "roten",
         }, "2:3"))}.</RulesParagraph>
         <RulesParagraph>{translate({
             [LanguageCode.en]: "All black, green and red dots are given",
             [LanguageCode.ru]: "Все чёрные, зелёные и красные точки даны",
+            [LanguageCode.de]: "Alle schwarzen, grünen und roten Punkte sind gegeben",
         })}.</RulesParagraph>
     </>,
     initialDigits: {2: {2: 5}},

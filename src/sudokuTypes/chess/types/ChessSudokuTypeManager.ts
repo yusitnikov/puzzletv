@@ -107,6 +107,7 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         {
             [LanguageCode.en]: `please note that ${ctrlKeyText}+N may not work`,
             [LanguageCode.ru]: `${ctrlKeyText}+N может не работать`,
+            [LanguageCode.de]: `bitte beachten Sie, dass ${ctrlKeyText}+N möglicherweise nicht funktioniert`,
         },
     ],
 

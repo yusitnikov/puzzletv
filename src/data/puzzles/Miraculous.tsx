@@ -89,6 +89,7 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
     author: {
         [LanguageCode.en]: "Smank, Raumplaner and Uklusi",
         [LanguageCode.ru]: "Smank, Raumplaner и Uklusi",
+        [LanguageCode.de]: "Smank, Raumplaner und Uklusi",
     },
     rules: translate => <>
         <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
@@ -96,10 +97,12 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
         <RulesParagraph>{translate({
             [LanguageCode.en]: "Cells highlighted the same color share a region",
             [LanguageCode.ru]: "Ячейки, выделенные одним цветом, принадлежат одной общей области",
+            [LanguageCode.de]: "Die eingefärbten Zellen gleicher Farbe gehören dabei jeweils zur selben Region",
         })}.</RulesParagraph>
         <RulesParagraph>{translate({
             [LanguageCode.en]: "All digits must be consecutive to their adjacent neighbours. For the purpose of this rule 1 and 9 are consecutive",
             [LanguageCode.ru]: "Соседние ячейки содержат последовательные цифры (различающиеся на 1). Для этого правила, 1 и 9 считаются последовательными",
+            [LanguageCode.de]: "Alle im Gitter direkt benachbarten Zahlen müssen jeweils aufeinanderfolgend sein. Zu diesem Zweck gelten die Ziffern 1 und 9 als aufeinanderfolgend",
         })}.</RulesParagraph>
         <RulesParagraph>{translate(toroidalRulesApply)}. {translate(moveButtonTip)}.</RulesParagraph>
         <RulesParagraph>{translate(blackKropkiDotsExplained)}. {translate(notAllDotsGiven)}.</RulesParagraph>

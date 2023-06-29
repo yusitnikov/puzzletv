@@ -75,7 +75,7 @@ export const RotateRightButton: ControlButtonItemPropsGenericFc = observer(funct
                 fontSize: cellSize * 0.4,
             }}
         >
-            <div>{translate("Please rotate the field once to start solving the puzzle!")}</div>
+            <div>{translate("Please rotate the field once to start solving the puzzle")}!</div>
 
             <Absolute
                 width={cellSize * 1.5}

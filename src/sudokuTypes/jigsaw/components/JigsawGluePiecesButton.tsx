@@ -144,6 +144,7 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton(
             title={`${translate({
                 [LanguageCode.en]: "glue jigsaw pieces together",
                 [LanguageCode.ru]: "объединить куски пазла",
+                [LanguageCode.de]: "Puzzleteile zusammenkleben",
             })} (${translate("shortcut")}: G)`}
         >
             {(contentSize) => <AutoSvg
@@ -175,6 +176,7 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton(
             title={`${translate({
                 [LanguageCode.en]: "unglue the jigsaw pieces",
                 [LanguageCode.ru]: "разъединить куски пазла",
+                [LanguageCode.de]: "die Puzzleteile lösen",
             })} (${translate("shortcut")}: U)`}
         >
             {(contentSize) => <AutoSvg
