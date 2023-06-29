@@ -17,7 +17,7 @@ import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 import {getCellWriteModeGestureHandler} from "../../../types/sudoku/CellWriteModeInfo";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {headerHeight, redColor} from "../../app/globals";
+import {headerHeight} from "../../app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCoordsTransformation";
@@ -370,7 +370,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
 
         {fogDemoFieldStateHistory && <Absolute {...rect} style={{
             opacity: 0.2,
-            color: redColor,
+            color: "#f00",
             textAlign: "center",
             verticalAlign: "middle",
             fontSize: rect.width * 0.08,
