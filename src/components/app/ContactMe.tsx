@@ -46,7 +46,7 @@ export const ContactMeShort = observer(function ContactMeShort() {
 
         <span style={{display: "flex", alignItems: "center"}}>
             <DiscordAlt size={"1.2em"} color={"#5865f2"}/>&nbsp;Discord:&nbsp;
-            <a href="https://discordapp.com/users/814965184438337618" target="_blank">Chameleon#5546</a>
+            <a href="https://discordapp.com/users/814965184438337618" target="_blank">yura_chameleon</a>
         </span>
         <span style={{display: "flex", alignItems: "center"}}>
             <Whatsapp size={"1.2em"} color={"#0dc143"}/>&nbsp;WhatsApp:&nbsp;+972527367825
