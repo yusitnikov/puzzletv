@@ -6,6 +6,12 @@ export enum LanguageCode {
 
 export const allLanguageCodes: LanguageCode[] = [
     LanguageCode.en,
-    LanguageCode.ru,
     LanguageCode.de,
+    LanguageCode.ru,
 ];
+
+export const languageNames: Record<LanguageCode, string> = {
+    [LanguageCode.en]: "English",
+    [LanguageCode.ru]: "Русский",
+    [LanguageCode.de]: "Deutsch",
+};
