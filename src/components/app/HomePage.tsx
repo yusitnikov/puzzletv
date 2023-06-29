@@ -15,7 +15,7 @@ export const HomePage = observer(function HomePage() {
     const settersLink = buildLink("for-setters", language);
     const contactMeLink = buildLink("contacts", language);
     const commonAppLinks = <>
-        <a href="https://app.crackingthecryptic.com/" target="_blank">CTC</a>,{" "}
+        <a href="https://sudokupad.app/" target="_blank">SudokuPad</a>,{" "}
         <a href="https://f-puzzles.com/" target="_blank">f-puzzles</a>,{" "}
         <a href="https://swaroopg92.github.io/penpa-edit/" target="_blank">penpa+</a>
     </>;
