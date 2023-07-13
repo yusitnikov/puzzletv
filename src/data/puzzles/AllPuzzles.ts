@@ -41,6 +41,7 @@ import {ReservedParking} from "./ReservedParking";
 import {JssChicken, MakeAPicture} from "./JigsawJss";
 import {Sudokuban} from "./Sudokuban";
 import {Pacman} from "./Pacman";
+import {Astronavigation} from "./Astronavigation";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -67,6 +68,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    Astronavigation,
+
     RealChessPuzzle2,
 
     Pacman,

@@ -17,7 +17,7 @@ export interface DecorativeShapeProps extends Size {
     textColor?: string;
 }
 
-const DecorativeShapeComponent = <T extends AnyPTM>(
+export const DecorativeShapeComponent = <T extends AnyPTM>(
     Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>
 ) => observer(function DecorativeShapeComponent(
     {
@@ -82,7 +82,7 @@ const EllipseComponent = DecorativeShapeComponent(observer(function EllipseFc({w
     />;
 }));
 
-const DecorativeShapeConstraint = <T extends AnyPTM>(
+export const DecorativeShapeConstraint = <T extends AnyPTM>(
     name: string,
     layer: FieldLayer,
     component: ComponentType<ConstraintProps<T, DecorativeShapeProps>>,
