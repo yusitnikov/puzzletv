@@ -1,4 +1,8 @@
-import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {
+    allDrawingModes,
+    isValidFinishedPuzzleByEmbeddedSolution,
+    PuzzleDefinition
+} from "../../types/sudoku/PuzzleDefinition";
 import {RotatableCluesPTM} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {LanguageCode} from "../../types/translations/LanguageCode";
@@ -16,6 +20,7 @@ import {PositionLiteral} from "../../types/layout/Position";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {textColor} from "../../components/app/globals";
 import {Constraint} from "../../types/sudoku/Constraint";
+import {createGivenDigitsMapFromArray} from "../../types/sudoku/GivenDigitsMap";
 
 const ArrowComponent = DecorativeShapeComponent(observer(function ArrowFc(props) {
     profiler.trace();
@@ -82,4 +87,16 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         ...DecorativeArrowConstraint("R9C3", -90),
     ],
     allowDrawing: allDrawingModes,
+    solution: createGivenDigitsMapFromArray([
+        [6, 5, 1, 4, 3, 2, 9, 8, 7],
+        [7, 8, 2, 9, 1, 5, 4, 6, 3],
+        [3, 9, 4, 7, 6, 8, 5, 2, 1],
+        [4, 7, 8, 2, 9, 3, 1, 5, 6],
+        [1, 3, 5, 8, 4, 6, 7, 9, 2],
+        [2, 6, 9, 5, 7, 1, 8, 3, 4],
+        [5, 4, 7, 3, 2, 9, 6, 1, 8],
+        [9, 1, 3, 6, 8, 7, 2, 4, 5],
+        [8, 2, 6, 1, 5, 4, 3, 7, 9],
+    ]),
+    resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
 };
