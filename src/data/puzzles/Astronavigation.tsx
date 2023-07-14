@@ -64,8 +64,13 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     regions: Regions9,
     rules: () => <>
         <RulesParagraph>Normal Sudoku rules apply.</RulesParagraph>
-        <RulesParagraph>Guide Arrow: Shade some empty cells so that no two shaded cells are orthogonally adjacent and the remaining unshaded cells form one orthogonally connected area. No complete loop of cells may be unshaded (including 2x2s). An arrow indicates the only direction in which one could begin a path to the star without going through a shaded cell or backtracking.</RulesParagraph>
-        <RulesParagraph>Each arrow must be rotated clockwise by D*90°, where D is the digit in that arrow's cell.</RulesParagraph>
+        <RulesParagraph>
+            Guide Arrow: Shade some empty cells so that no two shaded cells are orthogonally adjacent
+            and the remaining unshaded cells form one orthogonally connected area.
+            No complete loop of cells may be unshaded (including 2×2s).
+            An arrow indicates the only direction in which one could begin a path to the star without going through a shaded cell or backtracking.
+        </RulesParagraph>
+        <RulesParagraph>Each arrow must be rotated clockwise by D×90°, where D is the digit in that arrow's cell.</RulesParagraph>
         <RulesParagraph>For each arrow, the sum of the next two digits along the path to the star must equal the digit in that arrow's cell.</RulesParagraph>
         <RulesParagraph>The location of the star is to be discovered, but it must not be in a cell that is part of an arrow's sum.</RulesParagraph>
     </>,
@@ -99,4 +104,7 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         [8, 2, 6, 1, 5, 4, 3, 7, 9],
     ]),
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
+    successMessage: "Congratulations!\n" +
+        "You found your way to the star!\n" +
+        "The solution is correct."
 };
