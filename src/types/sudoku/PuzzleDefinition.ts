@@ -87,6 +87,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     solution?: GivenDigitsMap<string | number>;
     solutionColors?: GivenDigitsMap<CellColorValue[]>;
     allowMappingSolutionColors?: boolean;
+    ignoreEmptySolutionColors?: boolean;
     importOptions?: Partial<PuzzleImportOptions>;
     inactiveCells?: Position[];
 }
@@ -235,6 +236,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         solution = {},
         solutionColors = {},
         allowMappingSolutionColors,
+        ignoreEmptySolutionColors,
         importOptions: {stickyRegion, noStickyRegionValidation} = {},
     } = puzzle;
 
@@ -289,7 +291,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                 areCorrectColorsByDigits = areCorrectColorsByDigits && colorsByDigitsChecker.isValidData(actualColor, expectedData);
             }
 
-            if (hasSolutionColors) {
+            if (hasSolutionColors && (expectedColor || !ignoreEmptySolutionColors)) {
                 if (!colorsBySolutionChecker.isValidData(actualColor, expectedColor)) {
                     if (debugSolutionChecker) {
                         console.warn("Wrong color at", stringifyCellCoords({top, left}), "expected", expectedColor, "got", actualColor);

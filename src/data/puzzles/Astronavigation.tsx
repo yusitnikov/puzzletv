@@ -114,11 +114,12 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         [T, F, T, F, T, T, F, T, T],
         [T, T, T, T, F, T, T, F, T],
         [F, T, F, T, T, T, F, T, T],
-        [T, T, T, F, T, F, T, T, F],
+        [T, T, T, F, T, F, [], T, F],
         [F, T, F, T, F, T, F, T, T],
         [T, T, T, T, T, T, T, T, F],
     ]),
     allowMappingSolutionColors: true,
+    ignoreEmptySolutionColors: true,
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
     successMessage: "Congratulations!\n" +
         "You found your way to the star!\n" +
