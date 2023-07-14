@@ -21,6 +21,7 @@ import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {textColor} from "../../components/app/globals";
 import {Constraint} from "../../types/sudoku/Constraint";
 import {createGivenDigitsMapFromArray} from "../../types/sudoku/GivenDigitsMap";
+import {CellColor} from "../../types/sudoku/CellColor";
 
 const ArrowComponent = DecorativeShapeComponent(observer(function ArrowFc(props) {
     profiler.trace();
@@ -49,6 +50,9 @@ const DecorativeArrowConstraint = (
     ),
     EllipseConstraint([cellLiteral], 1),
 ];
+
+const T = [CellColor.black];
+const F = [CellColor.green];
 
 export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     noIndex: true,
@@ -103,6 +107,18 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         [9, 1, 3, 6, 8, 7, 2, 4, 5],
         [8, 2, 6, 1, 5, 4, 3, 7, 9],
     ]),
+    solutionColors: createGivenDigitsMapFromArray([
+        [F, T, T, T, T, F, T, T, F],
+        [T, F, T, F, T, T, F, T, T],
+        [T, T, F, T, T, F, T, T, F],
+        [T, F, T, F, T, T, F, T, T],
+        [T, T, T, T, F, T, T, F, T],
+        [F, T, F, T, T, T, F, T, T],
+        [T, T, T, F, T, F, T, T, F],
+        [F, T, F, T, F, T, F, T, T],
+        [T, T, T, T, T, T, T, T, F],
+    ]),
+    allowMappingSolutionColors: true,
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
     successMessage: "Congratulations!\n" +
         "You found your way to the star!\n" +

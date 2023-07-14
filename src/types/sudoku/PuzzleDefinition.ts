@@ -23,12 +23,12 @@ import {
 import {PuzzleResultCheck} from "./PuzzleResultCheck";
 import {CellMark, getCenterMarksMap, parseCellMark} from "./CellMark";
 import {loop} from "../../utils/math";
-import {HashSet} from "../struct/Set";
 import {LanguageCode} from "../translations/LanguageCode";
 import type {PuzzleImportOptions} from "./PuzzleImportOptions";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {isSolutionCheckCell} from "./CellTypeProps";
 import {profiler} from "../../utils/profiler";
+import {ColorChecker, ColorMapChecker, ExactColorChecker} from "./ColorChecker";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
     // The field is required. Marking it as optional here only to avoid adding empty object to each puzzle.
@@ -86,6 +86,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     decreaseOnlyOneLive?: boolean;
     solution?: GivenDigitsMap<string | number>;
     solutionColors?: GivenDigitsMap<CellColorValue[]>;
+    allowMappingSolutionColors?: boolean;
     importOptions?: Partial<PuzzleImportOptions>;
     inactiveCells?: Position[];
 }
@@ -233,6 +234,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         initialCellMarks = [],
         solution = {},
         solutionColors = {},
+        allowMappingSolutionColors,
         importOptions: {stickyRegion, noStickyRegionValidation} = {},
     } = puzzle;
 
@@ -243,9 +245,10 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
 
     let areCorrectDigits = true;
     let areCorrectColorsByDigits = true;
-    let unshadedCellColor: string | undefined = undefined;
-    let usedSolutionColors: Record<string, true> = {};
-    const digitToColorMap: Record<number, string> = {};
+    const colorsByDigitsChecker: ColorChecker<number> = new ColorMapChecker<number>();
+    const colorsBySolutionChecker: ColorChecker<string> = allowMappingSolutionColors
+        ? new ColorMapChecker()
+        : new ExactColorChecker();
     for (const [top, row] of cells.entries()) {
         for (const [left, {usersDigit, colors}] of row.entries()) {
             if (!isSolutionCheckCell(puzzleIndex.getCellTypeProps({top, left}))) {
@@ -283,34 +286,13 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             if (!expectedData) {
                 areCorrectColorsByDigits = false;
             } else if (typeof expectedData === "number") {
-                const expectedColorByDigit = digitToColorMap[expectedData];
-                if (!expectedColorByDigit) {
-                    digitToColorMap[expectedData] = actualColor;
-                } else if (actualColor !== expectedColorByDigit) {
-                    areCorrectColorsByDigits = false;
-                }
+                areCorrectColorsByDigits = areCorrectColorsByDigits && colorsByDigitsChecker.isValidData(actualColor, expectedData);
             }
 
             if (hasSolutionColors) {
-                if (expectedColor) {
-                    usedSolutionColors[expectedColor] = true;
-                } else if (unshadedCellColor !== undefined) {
-                    expectedColor = unshadedCellColor;
-                } else {
-                    expectedColor = unshadedCellColor = actualColor;
-                }
-
-                if (actualColor !== expectedColor) {
+                if (!colorsBySolutionChecker.isValidData(actualColor, expectedColor)) {
                     if (debugSolutionChecker) {
                         console.warn("Wrong color at", stringifyCellCoords({top, left}), "expected", expectedColor, "got", actualColor);
-                    }
-                    timer.stop();
-                    return false;
-                }
-
-                if (unshadedCellColor !== undefined && usedSolutionColors[unshadedCellColor]) {
-                    if (debugSolutionChecker) {
-                        console.warn("Wrong unshaded color at", stringifyCellCoords({top, left}), "color:", unshadedCellColor);
                     }
                     timer.stop();
                     return false;
@@ -324,14 +306,18 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         }
     }
 
+    if (hasSolutionColors && !colorsBySolutionChecker.isValidPuzzle()) {
+        timer.stop();
+        return false;
+    }
+
     if (areCorrectDigits) {
         timer.stop();
         return true;
     }
 
     if (areCorrectColorsByDigits) {
-        const allColors = Object.values(digitToColorMap);
-        if (new HashSet(allColors).size === allColors.length) {
+        if (colorsByDigitsChecker.isValidPuzzle()) {
             timer.stop();
             return {
                 isCorrectResult: true,
