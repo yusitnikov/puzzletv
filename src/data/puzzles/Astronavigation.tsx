@@ -36,7 +36,7 @@ const DecorativeArrowConstraint = (
         ArrowComponent,
         [cellLiteral],
         1,
-        undefined,
+        "#fff",
         textColor,
         undefined,
         undefined,
