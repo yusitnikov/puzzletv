@@ -77,6 +77,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const [hasStickyJigsawPiece, setHasStickyJigsawPiece] = useBoolFromLocalStorage("fpwHasStickyJigsawPiece", false);
     const [stickyJigsawPiece, setStickyJigsawPiece] = useNumberFromLocalStorage("fpwStickyJigsawPiece", 1);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", false);
+    const [noPieceRegions, setNoPieceRegions] = useBoolFromLocalStorage("fpwNoPieceRegions", false);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
     const [noStickyRegionValidation, setNoStickyRegionValidation] = useBoolFromLocalStorage("fpwNoStickyRegionValidation");
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
@@ -171,6 +172,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         allowOverrideColors: hasInitialColors && allowOverrideColors,
         angleStep: finalAngleStep,
         shuffle: isJigsaw && filteredExtraGrids.length === 0 && shuffle,
+        noPieceRegions: isJigsawLike && noPieceRegions,
         stickyRegion: isJigsawLike && filteredExtraGrids.length !== 0 && isFirstStickyGrid ? {
             top: globalOffsetY,
             left: globalOffsetX,
@@ -465,6 +467,13 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                             <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>
                         </label>
                     </Paragraph>}
+
+                    <Paragraph>
+                        <label>
+                            Treat {isTetris ? "tetris figures" : "jigsaw pieces"} as sudoku regions:&nbsp;
+                            <input type={"checkbox"} checked={!noPieceRegions} onChange={ev => setNoPieceRegions(!ev.target.checked)}/>
+                        </label>
+                    </Paragraph>
                 </CollapsableFieldSet>}
 
                 {isRushHour && <CollapsableFieldSet legend={"Rush Hour"}>

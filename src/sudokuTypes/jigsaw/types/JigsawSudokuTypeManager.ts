@@ -43,7 +43,7 @@ import {createRandomGenerator} from "../../../utils/random";
 import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {getRegionCells, isStickyRegionCell, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {jssTag} from "../../jss/constraints/Jss";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {JigsawJss} from "../constraints/JigsawJss";
@@ -604,6 +604,15 @@ export const JigsawSudokuTypeManager = (
             ...puzzle,
             extension: getJigsawPieces(new SudokuCellsIndex(puzzle)),
         };
+
+        if (puzzle.importOptions?.noPieceRegions) {
+            puzzle = {
+                ...puzzle,
+                regions: puzzle.regions?.filter(
+                    (region) => isStickyRegionCell(puzzle, getRegionCells(region)[0])
+                ),
+            };
+        }
 
         const processJss = (items: Constraint<JigsawPTM, any>[]) => [
             ...items.map(

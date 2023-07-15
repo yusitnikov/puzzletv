@@ -1,16 +1,13 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {Position, PositionSet} from "../../../types/layout/Position";
+import {getRegionCells, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {PositionSet} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {JssCell} from "./JssCell";
 import {GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {resolveCellColorValue} from "../../../types/sudoku/CellColor";
 import {JssConstraint} from "../constraints/Jss";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
-
-const getRegionCells = <T extends AnyPTM>(region: Position[] | Constraint<T, any>) =>
-    Array.isArray(region) ? region : region.cells;
 
 export const JssSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager: SudokuTypeManager<T>

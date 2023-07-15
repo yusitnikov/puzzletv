@@ -342,3 +342,17 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     timer.stop();
     return false;
 };
+
+export const getRegionCells = <T extends AnyPTM>(region: Position[] | Constraint<T, any>) =>
+    Array.isArray(region) ? region : region.cells;
+
+export const isStickyRegionCell = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, {top, left}: Position) => {
+    const stickyRegion = puzzle.importOptions?.stickyRegion;
+    if (!stickyRegion) {
+        return false;
+    }
+
+    top -= stickyRegion.top;
+    left -= stickyRegion.left;
+    return top >= 0 && left >= 0 && top < stickyRegion.height && left < stickyRegion.width;
+};
