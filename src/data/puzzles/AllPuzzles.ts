@@ -42,6 +42,7 @@ import {JssChicken, MakeAPicture} from "./JigsawJss";
 import {Sudokuban} from "./Sudokuban";
 import {Pacman} from "./Pacman";
 import {Astronavigation} from "./Astronavigation";
+import {Revolutionary, SumwhereAroundHere} from "./RotatableClues";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -69,6 +70,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
 
     // region Other authors
     Astronavigation,
+    SumwhereAroundHere,
+    Revolutionary,
 
     RealChessPuzzle2,
 

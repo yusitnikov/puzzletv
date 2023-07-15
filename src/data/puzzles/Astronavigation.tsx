@@ -55,7 +55,6 @@ const T = [CellColor.black];
 const F = [CellColor.green];
 
 export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
-    noIndex: true,
     slug: "astronavigation",
     author: {
         [LanguageCode.en]: "fjam",
