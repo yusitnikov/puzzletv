@@ -49,8 +49,8 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({cont
         <div style={paragraphStyles}>
             {translate({
                 [LanguageCode.en]: "Drag the grid to move it, use +/- buttons to zoom",
-                [LanguageCode.ru]: "Перетащите поле, чтобы двигать его. Используйте кнопки +/- для увеличения/отдаления поля",
-                [LanguageCode.de]: "Ziehen Sie das Raster, um es zu verschieben, und verwenden Sie die Tasten +/- zum Zoomen",
+                [LanguageCode.ru]: "Перетащите поле, чтобы двигать его. Нажмите на +/- для увел./отдаления поля",
+                [LanguageCode.de]: "Ziehen Sie das Raster, um es zu verschieben. Drücken Sie +/- zum Zoomen",
             })}.
         </div>
 
