@@ -4,7 +4,6 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {JigsawPTM} from "./JigsawPTM";
 import {getActiveJigsawPieceZIndex} from "./helpers";
 import {Position, rotateVectorClockwise} from "../../../types/layout/Position";
-import {getRectCenter} from "../../../types/layout/Rect";
 import {profiler} from "../../../utils/profiler";
 
 export class JigsawPieceRegion implements GridRegion {
@@ -37,7 +36,7 @@ export class JigsawPieceRegion implements GridRegion {
     ) {
         makeAutoObservable(this);
 
-        const {cells, boundingRect} = context.puzzle.extension!.pieces[index];
+        const {cells, boundingRect, center} = context.puzzle.extension!.pieces[index];
 
         this.top = boundingRect.top;
         this.left = boundingRect.left;
@@ -48,7 +47,7 @@ export class JigsawPieceRegion implements GridRegion {
             this.cells = cells;
         }
 
-        this.center = getRectCenter(boundingRect);
+        this.center = center;
 
         this.transformCoords = this.transformCoords.bind(this);
     }

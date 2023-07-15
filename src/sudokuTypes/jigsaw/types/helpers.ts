@@ -22,7 +22,8 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {JigsawPieceRegion} from "./JigsawPieceRegion";
 
 export const getJigsawPieces = (
-    cellsIndex: SudokuCellsIndex<JigsawPTM>
+    cellsIndex: SudokuCellsIndex<JigsawPTM>,
+    getCenter: (piece: Omit<JigsawPieceInfo, "center">) => Position,
 ): { pieces: JigsawPieceInfo[], otherCells: Position[] } => {
     const {puzzle} = cellsIndex;
     const {
@@ -51,10 +52,16 @@ export const getJigsawPieces = (
     // TODO: other region creation modes
 
     const pieces: JigsawPieceInfo[] = regionCells.map((cells) => {
-        return {
+        const boundingRect = getRegionBoundingBox(cells, 1);
+
+        const piece: Omit<JigsawPieceInfo, "center"> = {
             cells,
-            boundingRect: getRegionBoundingBox(cells, 1),
+            boundingRect,
         };
+        return {
+            ...piece,
+            center: getCenter(piece),
+        }
     });
 
     return {pieces, otherCells: otherCells.items};
@@ -148,10 +155,18 @@ export const groupJigsawPiecesByZIndex = (context: PuzzleContext<JigsawPTM>): Ji
                     getRectPoints(boundingRect).map((point) => region.transformCoords?.(point) ?? point)
             ));
 
+            let groupCenter: Position;
+            if (pieces.length === 1) {
+                const {region, info: {center}} = pieces[0];
+                groupCenter = region.transformCoords?.(center) ?? center;
+            } else {
+                groupCenter = getRectCenter(boundingRect);
+            }
+
             return {
                 zIndex: Number(zIndexStr),
                 boundingRect,
-                center: getRectCenter(boundingRect),
+                center: groupCenter,
                 pieces,
                 cells: pieces.flatMap(({info: {cells}}) => cells),
                 indexes: pieces.map(({index}) => index),
@@ -165,11 +180,10 @@ export const moveJigsawPieceByGroupGesture = (
     piece: JigsawPieceInfo,
     prevPosition: PositionWithAngle,
 ): PositionWithAngle => {
-    const pieceCenter = getRectCenter(piece.boundingRect);
     const groupToPieceGesture = (gesture: GestureMetrics): GestureMetrics => ({
         ...gesture,
-        x: gesture.x + group.center.left - pieceCenter.left,
-        y: gesture.y + group.center.top - pieceCenter.top,
+        x: gesture.x + group.center.left - piece.center.left,
+        y: gesture.y + group.center.top - piece.center.top,
     });
 
     const {x, y, rotation} = applyMetricsDiff(
@@ -202,7 +216,7 @@ export const getActiveJigsawPieceIndexes = (piecePositions: JigsawFieldPieceStat
 export const sortJigsawPiecesByPosition = (pieces: JigsawPieceInfo[], piecePositions: Position[]) =>
     piecePositions
         .map(({top, left}, index) => {
-            const center = getRectCenter(pieces[index].boundingRect);
+            const center = pieces[index].center;
             return {
                 index,
                 top: top + center.top,

@@ -59,11 +59,13 @@ import {settings} from "../../../types/layout/Settings";
 import {indexes} from "../../../utils/indexes";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {JigsawSudokuPhrases} from "./JigsawSudokuPhrases";
+import {JigsawPieceInfo} from "./JigsawPieceInfo";
 
 
 interface JigsawSudokuTypeManagerOptions {
     supportGluePieces?: boolean;
     phrases?: JigsawSudokuPhrases;
+    getPieceCenter?: (piece: Omit<JigsawPieceInfo, "center">) => Position;
 }
 
 export const JigsawSudokuTypeManager = (
@@ -87,6 +89,7 @@ export const JigsawSudokuTypeManager = (
                 [LanguageCode.de]: "Bewegen Sie das Gitter und die Puzzleteile",
             },
         } as JigsawSudokuPhrases,
+        getPieceCenter = ({boundingRect}) => getRectCenter(boundingRect),
     }: JigsawSudokuTypeManagerOptions = {}
 ): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
@@ -602,7 +605,7 @@ export const JigsawSudokuTypeManager = (
     postProcessPuzzle(puzzle): PuzzleDefinition<JigsawPTM> {
         puzzle = {
             ...puzzle,
-            extension: getJigsawPieces(new SudokuCellsIndex(puzzle)),
+            extension: getJigsawPieces(new SudokuCellsIndex(puzzle), getPieceCenter),
         };
 
         if (puzzle.importOptions?.noPieceRegions) {

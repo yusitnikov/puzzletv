@@ -3,6 +3,8 @@ import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {JigsawPTM} from "../../jigsaw/types/JigsawPTM";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {getRectCenter} from "../../../types/layout/Rect";
+import {getAveragePosition} from "../../../types/layout/Position";
 
 export const TetrisSudokuTypeManager = (options: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     ...JigsawSudokuTypeManager(options, {
@@ -23,6 +25,19 @@ export const TetrisSudokuTypeManager = (options: PuzzleImportOptions): SudokuTyp
                 [LanguageCode.ru]: "Двигать поле и тетрисные фигуры",
                 [LanguageCode.de]: "Bewegen Sie das Gitter und die Tetris-Figuren",
             },
+        },
+        getPieceCenter: ({cells, boundingRect}) => {
+            // 2x2 quad rotates around the natural center
+            if (boundingRect.width === 2 && boundingRect.height === 2) {
+                return getRectCenter(boundingRect);
+            }
+
+            const {top, left} = getAveragePosition(cells);
+            return {
+                // subtracting 0.001 from the value is to ensure that 0.5 will be rounded down
+                top: Math.round(top - 0.001) + 0.5,
+                left: Math.round(left - 0.001) + 0.5,
+            };
         },
     }),
 });
