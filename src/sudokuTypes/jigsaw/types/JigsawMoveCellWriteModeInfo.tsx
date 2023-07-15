@@ -1,6 +1,6 @@
 import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
 import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
-import {groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture} from "./helpers";
+import {getActiveJigsawPieceIndexes, groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture} from "./helpers";
 import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "./JigsawGamePieceState";
 import {
     applyMetricsDiff,
@@ -20,6 +20,7 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
 import {JigsawSudokuPhrases} from "./JigsawSudokuPhrases";
+import {areSameArrays} from "../../../utils/array";
 
 export const roundStep = 0.5;
 
@@ -121,11 +122,20 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
 
         const {id, isClick, pointers: [{start: {event: {button: isRightButton}}}]} = gesture;
 
+        const {
+            stateExtension: {highlightCurrentPiece: prevHighlightCurrentPiece},
+            fieldExtension: {pieces: prevPiecePositions},
+        } = gesture.state;
+
+        const rotate = isClick
+            && reason === GestureFinishReason.pointerUp
+            && prevHighlightCurrentPiece
+            && areSameArrays(getActiveJigsawPieceIndexes(prevPiecePositions), piecesGroup.indexes);
         const groupGesture: GestureMetrics = {
             x: roundToStep(piecesGroup.center.left, roundStep) - piecesGroup.center.left,
             y: roundToStep(piecesGroup.center.top, roundStep) - piecesGroup.center.top,
             rotation: roundToStep(piecesGroup.pieces[0].position.angle, angleStep) - piecesGroup.pieces[0].position.angle
-                + angleStep * (!isClick || reason !== GestureFinishReason.pointerUp ? 0 : isRightButton ? -1 : 1),
+                + angleStep * (!rotate ? 0 : isRightButton ? -1 : 1),
             scale: 1,
         };
 

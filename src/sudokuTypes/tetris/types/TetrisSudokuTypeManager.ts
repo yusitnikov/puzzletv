@@ -16,9 +16,9 @@ export const TetrisSudokuTypeManager = (options: PuzzleImportOptions): SudokuTyp
                 [LanguageCode.de]: "Für aktives Tetris-Figur",
             },
             dragPieceToMove: (rotatable) => ({
-                [LanguageCode.en]: "Drag the tetris figure to move it" + (rotatable ? ", click it to rotate" : ""),
-                [LanguageCode.ru]: "Перетащите тетрисную фигуру, чтобы двигать её" + (rotatable ? ". Щелкните по ней, чтобы повернуть" : ""),
-                [LanguageCode.de]: "Ziehen Sie das Tetris-Figur, um es zu verschieben" + (rotatable ? ", und klicken Sie darauf, um es zu drehen" : ""),
+                [LanguageCode.en]: "Drag the tetris figure to move it, click it to focus" + (rotatable ? ", click again to rotate" : ""),
+                [LanguageCode.ru]: "Перетащите тетрисную фигуру, чтобы двигать её. Щелкните по ней, чтобы выделить" + (rotatable ? ". Щелкните еще раз, чтобы повернуть" : ""),
+                [LanguageCode.de]: "Ziehen Sie das Tetris-Figur, um es zu verschieben, klicken Sie darauf, um es zu fokussieren" + (rotatable ? ", und klicken Sie erneut, um es zu drehen" : ""),
             }),
             dragModeTitle: {
                 [LanguageCode.en]: "Move the grid and the tetris figures",

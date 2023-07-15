@@ -285,13 +285,14 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
         contextId: `cell-write-mode-${mode}`,
         ...common,
         onStart: (props) => {
+            const startContext = context.clone();
             const {extraData, event: {button}} = props;
             onGestureStart?.(props, context, !!button);
             if (isCellGestureExtraData(extraData)) {
                 onCornerClick?.(props, context, extraData, !!button);
             }
             readOnlySafeContext.onStateChange({gestureCellWriteMode: mode});
-            return context.clone();
+            return startContext;
         },
         onContinue: (props) => {
             const {prevData: {extraData: prevData}, currentData: {extraData: currentData}} = props;
