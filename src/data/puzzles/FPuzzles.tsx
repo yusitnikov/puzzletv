@@ -96,6 +96,7 @@ import {RushHourSudokuTypeManager} from "../../sudokuTypes/rush-hour/types/RushH
 import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import {SokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/types/SokobanSudokuTypeManager";
 import {greenColor, purpleColor} from "../../components/app/globals";
+import {TetrisSudokuTypeManager} from "../../sudokuTypes/tetris/types/TetrisSudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -212,6 +213,7 @@ const loadByImportOptions = (
             startOffset,
         ),
         [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager(importOptions),
+        [PuzzleImportPuzzleType.Tetris]: TetrisSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.RushHour]: RushHourSudokuTypeManager,
     };
 

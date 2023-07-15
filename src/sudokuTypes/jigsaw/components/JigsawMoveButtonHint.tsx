@@ -10,8 +10,13 @@ import {JigsawJssCluesVisibility} from "../types/JigsawGameState";
 import {observer} from "mobx-react-lite";
 import {useComputed} from "../../../hooks/useComputed";
 import {profiler} from "../../../utils/profiler";
+import {JigsawSudokuPhrases} from "../types/JigsawSudokuPhrases";
 
-export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({context}: ControlButtonItemProps<JigsawPTM>) {
+interface JigsawMoveButtonHintProps extends ControlButtonItemProps<JigsawPTM> {
+    phrases: JigsawSudokuPhrases;
+}
+
+export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({context, phrases}: JigsawMoveButtonHintProps) {
     profiler.trace();
 
     const translate = useTranslate();
@@ -39,11 +44,7 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({cont
         style={{fontSize: cellSize * 0.25}}
     >
         <div style={paragraphStyles}>
-            {translate({
-                [LanguageCode.en]: "Drag the jigsaw piece to move it" + (angleStep ? ", click it to rotate" : ""),
-                [LanguageCode.ru]: "Перетащите кусок пазла, чтобы двигать его" + (angleStep ? ". Щелкните по нему, чтобы повернуть" : ""),
-                [LanguageCode.de]: "Ziehen Sie das Puzzleteil, um es zu verschieben" + (angleStep ? ", und klicken Sie darauf, um es zu drehen" : ""),
-            })}.
+            {translate(phrases.dragPieceToMove(!!angleStep))}.
         </div>
         <div style={paragraphStyles}>
             {translate({
@@ -66,11 +67,7 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({cont
                     style={{pointerEvents: "all", maxWidth: "100%", fontSize: "inherit"}}
                 >
                     <option value={JigsawJssCluesVisibility.All}>{translate("Yes")}</option>
-                    <option value={JigsawJssCluesVisibility.ForActiveRegion}>{translate({
-                        [LanguageCode.en]: "For active jigsaw piece",
-                        [LanguageCode.ru]: "Для активного куска пазла",
-                        [LanguageCode.de]: "Für aktives Puzzleteil",
-                    })}</option>
+                    <option value={JigsawJssCluesVisibility.ForActiveRegion}>{translate(phrases.forActivePiece)}</option>
                     <option value={JigsawJssCluesVisibility.None}>{translate("No")}</option>
                 </select>
             </label>

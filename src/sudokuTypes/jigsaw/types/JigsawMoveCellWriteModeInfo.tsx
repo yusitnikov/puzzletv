@@ -13,30 +13,27 @@ import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData
 import {getRectCenter} from "../../../types/layout/Rect";
 import {JigsawPTM} from "./JigsawPTM";
 import {roundToStep} from "../../../utils/math";
-import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {JigsawMoveButtonHint} from "../components/JigsawMoveButtonHint";
 import {arrayContainsPosition, Position} from "../../../types/layout/Position";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
+import {JigsawSudokuPhrases} from "./JigsawSudokuPhrases";
 
 export const roundStep = 0.5;
 
 const base = MoveCellWriteModeInfo<JigsawPTM>();
 
-export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
+export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellWriteModeInfo<JigsawPTM> => ({
     ...base,
-    title: {
-        [LanguageCode.en]: "Move the grid and the jigsaw pieces",
-        [LanguageCode.ru]: "Двигать поле и куски пазла",
-    },
+    title: phrases.dragModeTitle,
     mainButtonContent: observer(function JigsawMoveButton(props) {
         profiler.trace();
 
         return <>
             {base.mainButtonContent && <base.mainButtonContent {...props}/>}
-            <JigsawMoveButtonHint {...props}/>
+            <JigsawMoveButtonHint {...props} phrases={phrases}/>
         </>;
     }),
     disableCellHandlers: false,
@@ -146,7 +143,7 @@ export const JigsawMoveCellWriteModeInfo: CellWriteModeInfo<JigsawPTM> = {
             })
         ));
     },
-};
+});
 
 const getJigsawPiecesByGesture = (
     context: PuzzleContext<JigsawPTM>,

@@ -88,10 +88,13 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
     const isInfiniteRings = type === PuzzleImportPuzzleType.InfiniteRings;
     const isJigsaw = type === PuzzleImportPuzzleType.Jigsaw;
+    const isTetris = type === PuzzleImportPuzzleType.Tetris;
+    const isJigsawLike = isJigsaw || isTetris;
     const isRushHour = type === PuzzleImportPuzzleType.RushHour;
     const isRotatableGrid = [
         PuzzleImportPuzzleType.Rotatable,
         PuzzleImportPuzzleType.Jigsaw,
+        PuzzleImportPuzzleType.Tetris,
     ].includes(type);
     const isSpecialGrid = isRotatableGrid || [
         PuzzleImportPuzzleType.Cubedoku,
@@ -102,8 +105,11 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const supportsExtraGrids = [
         PuzzleImportPuzzleType.Regular,
         PuzzleImportPuzzleType.Jigsaw,
+        PuzzleImportPuzzleType.Tetris,
     ].includes(type);
     const supportsJss = isRotatableGrid || (!isSpecialGrid && !loopX && !loopY);
+
+    const finalAngleStep = isTetris ? 90 : isJigsaw ? angleStep || undefined : undefined;
 
     const filteredExtraGrids = useMemo(
         () => !supportsExtraGrids ? [] : extraGrids
@@ -163,17 +169,17 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         startOffset: isInfiniteRings ? startOffset : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
         allowOverrideColors: hasInitialColors && allowOverrideColors,
-        angleStep: isJigsaw ? angleStep || undefined : undefined,
+        angleStep: finalAngleStep,
         shuffle: isJigsaw && filteredExtraGrids.length === 0 && shuffle,
-        stickyRegion: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid ? {
+        stickyRegion: isJigsawLike && filteredExtraGrids.length !== 0 && isFirstStickyGrid ? {
             top: globalOffsetY,
             left: globalOffsetX,
             width: fieldSize,
             height: fieldSize,
         } : undefined,
-        noStickyRegionValidation: isJigsaw && filteredExtraGrids.length !== 0 && isFirstStickyGrid && noStickyRegionValidation,
-        stickyDigits: isJigsaw && angleStep !== 0 && stickyDigits,
-        stickyJigsawPiece: isJigsaw && angleStep !== 0 && hasStickyJigsawPiece ? stickyJigsawPiece: undefined,
+        noStickyRegionValidation: isJigsawLike && filteredExtraGrids.length !== 0 && isFirstStickyGrid && noStickyRegionValidation,
+        stickyDigits: !!finalAngleStep && stickyDigits,
+        stickyJigsawPiece: isJigsaw && finalAngleStep && hasStickyJigsawPiece ? stickyJigsawPiece : undefined,
         splitUnconnectedRegions,
         givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
         load,
@@ -235,6 +241,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                                 <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
                                 <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>
                                 <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
+                                <option value={PuzzleImportPuzzleType.Tetris}>Tetris</option>
                                 <option value={PuzzleImportPuzzleType.RushHour}>Rush hour</option>
                             </Select>
                         </label>
@@ -380,17 +387,17 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                     </Paragraph>
                 </CollapsableFieldSet>}
 
-                {isJigsaw && <CollapsableFieldSet legend={"Jigsaw"}>
-                    <Paragraph>
+                {isJigsawLike && <CollapsableFieldSet legend={type[0].toUpperCase() + type.substring(1)}>
+                    {isJigsaw && <Paragraph>
                         Jigsaw piece rotation:&nbsp;
                         <Select value={angleStep} onChange={ev => setAngleStep(Number(ev.target.value))}>
                             <option value={0}>no rotation</option>
                             <option value={90}>90 degrees</option>
                             <option value={180}>180 degrees</option>
                         </Select>
-                    </Paragraph>
+                    </Paragraph>}
 
-                    {angleStep !== 0 && <>
+                    {!!finalAngleStep && <>
                         <Paragraph>
                             <label>
                                 Digits should stay vertical:&nbsp;
@@ -398,7 +405,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                             </label>
                         </Paragraph>
 
-                        <Paragraph>
+                        {isJigsaw && <Paragraph>
                             <label>
                                 Fixed jigsaw piece:&nbsp;
                                 <input
@@ -418,13 +425,14 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                             />
                             <Details>
                                 When enabled, the selected jigsaw piece will be considered as "fixed".<br/>
-                                The initial rotation of this piece will be treated as the correct rotation of the jigsaw.
+                                The initial rotation of this piece will be treated as the correct rotation of the
+                                jigsaw.
                             </Details>
                             <Details>
                                 Note: the puzzle must have an embedded solution (at least for the digits)
                                 for this feature to work properly.
                             </Details>
-                        </Paragraph>
+                        </Paragraph>}
                     </>}
 
                     {filteredExtraGrids.length !== 0 && <>
@@ -451,7 +459,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                         </Paragraph>}
                     </>}
 
-                    {filteredExtraGrids.length === 0 && <Paragraph>
+                    {isJigsaw && filteredExtraGrids.length === 0 && <Paragraph>
                         <label>
                             Shuffle:&nbsp;
                             <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>

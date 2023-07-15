@@ -56,8 +56,38 @@ import {jigsawPieceStateChangeAction} from "./JigsawGamePieceState";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {settings} from "../../../types/layout/Settings";
 import {indexes} from "../../../utils/indexes";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {JigsawSudokuPhrases} from "./JigsawSudokuPhrases";
 
-export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
+
+interface JigsawSudokuTypeManagerOptions {
+    supportGluePieces?: boolean;
+    phrases?: JigsawSudokuPhrases;
+}
+
+export const JigsawSudokuTypeManager = (
+    {angleStep, stickyDigits, shuffle}: PuzzleImportOptions,
+    {
+        supportGluePieces = true,
+        phrases = {
+            forActivePiece: {
+                [LanguageCode.en]: "For active jigsaw piece",
+                [LanguageCode.ru]: "Для активного куска пазла",
+                [LanguageCode.de]: "Für aktives Puzzleteil",
+            },
+            dragPieceToMove: (rotatable) => ({
+                [LanguageCode.en]: "Drag the jigsaw piece to move it" + (rotatable ? ", click it to rotate" : ""),
+                [LanguageCode.ru]: "Перетащите кусок пазла, чтобы двигать его" + (rotatable ? ". Щелкните по нему, чтобы повернуть" : ""),
+                [LanguageCode.de]: "Ziehen Sie das Puzzleteil, um es zu verschieben" + (rotatable ? ", und klicken Sie darauf, um es zu drehen" : ""),
+            }),
+            dragModeTitle: {
+                [LanguageCode.en]: "Move the grid and the jigsaw pieces",
+                [LanguageCode.ru]: "Двигать поле и куски пазла",
+                [LanguageCode.de]: "Bewegen Sie das Gitter und die Puzzleteile",
+            },
+        } as JigsawSudokuPhrases,
+    }: JigsawSudokuTypeManagerOptions = {}
+): SudokuTypeManager<JigsawPTM> => ({
     areSameCellData(
         {digit: digit1, angle: angle1},
         {digit: digit2, angle: angle2},
@@ -559,16 +589,16 @@ export const JigsawSudokuTypeManager = ({angleStep, stickyDigits, shuffle}: Puzz
     controlButtons: [
         ZoomInButtonItem(),
         ZoomOutButtonItem(),
-        {
+        ...(supportGluePieces ? [{
             key: "glue-jigsaw-pieces",
             region: ControlButtonRegion.custom,
             Component: JigsawGluePiecesButton,
-        },
+        }] : []),
         JigsawPieceHighlightHandlerControlButtonItem,
     ],
 
     disabledCellWriteModes: [CellWriteMode.move],
-    extraCellWriteModes: [JigsawMoveCellWriteModeInfo],
+    extraCellWriteModes: [JigsawMoveCellWriteModeInfo(phrases)],
 
     gridBackgroundColor: lightGreyColor,
     regionBackgroundColor: "#fff",
