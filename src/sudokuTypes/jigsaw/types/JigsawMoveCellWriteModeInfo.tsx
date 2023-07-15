@@ -1,6 +1,6 @@
 import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
 import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
-import {getJigsawPiecesWithCache, groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture} from "./helpers";
+import {groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture} from "./helpers";
 import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "./JigsawGamePieceState";
 import {
     applyMetricsDiff,
@@ -57,7 +57,6 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
         const {gesture, startMetrics, currentMetrics} = props;
         const {id, state: startContext} = gesture;
         const {
-            puzzleIndex,
             puzzle,
             cellSize,
         } = context;
@@ -78,7 +77,6 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
 
         const {center: groupCenter} = piecesGroup;
         const fieldCenter = getRectCenter(fieldRect);
-        const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
 
         const screenToGroup = ({x, y, rotation}: GestureMetrics): GestureMetrics => ({
             x: ((x - fieldCenter.left) / cellSize - loopOffset.left) / scale + fieldSize / 2 - groupCenter.left,
@@ -99,7 +97,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
             piecesGroup.indexes,
             ({position}, pieceIndex) => {
                 return {
-                    position: moveJigsawPieceByGroupGesture(piecesGroup!, groupGesture, pieces[pieceIndex], position),
+                    position: moveJigsawPieceByGroupGesture(piecesGroup!, groupGesture, puzzle.extension!.pieces[pieceIndex], position),
                     state: {animating: false},
                 };
             }
@@ -112,7 +110,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
         });
 
         const {gesture, reason} = props;
-        const {puzzleIndex, puzzle} = context;
+        const {puzzle} = context;
         const {importOptions: {angleStep = 0} = {}} = puzzle;
 
         const piecesGroup = getJigsawPiecesByGesture(noAnimationContext, gesture);
@@ -122,7 +120,6 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
         }
 
         const {id, isClick, pointers: [{start: {event: {button: isRightButton}}}]} = gesture;
-        const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
 
         const groupGesture: GestureMetrics = {
             x: roundToStep(piecesGroup.center.left, roundStep) - piecesGroup.center.left,
@@ -138,7 +135,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
             `gesture-${id}`,
             piecesGroup.indexes,
             ({position}, pieceIndex) => ({
-                position: moveJigsawPieceByGroupGesture(piecesGroup, groupGesture, pieces[pieceIndex], position),
+                position: moveJigsawPieceByGroupGesture(piecesGroup, groupGesture, puzzle.extension!.pieces[pieceIndex], position),
                 state: {animating: true},
             })
         ));

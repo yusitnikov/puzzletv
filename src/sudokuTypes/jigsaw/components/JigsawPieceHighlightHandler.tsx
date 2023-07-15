@@ -9,7 +9,6 @@ import {useEffect} from "react";
 import {
     getActiveJigsawPieceZIndex,
     getJigsawPieceIndexesByCell,
-    getJigsawPiecesWithCache,
     groupJigsawPiecesByZIndex,
     moveJigsawPieceByGroupGesture,
 } from "../types/helpers";
@@ -38,7 +37,7 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
     const selectedRegionIndexes = useComputedValue(
         function getSelectedRegionIndexes() {
             return context.lastSelectedCell && getJigsawPieceIndexesByCell(
-                context.puzzleIndex,
+                context.puzzle,
                 context.fieldExtension.pieces,
                 context.lastSelectedCell
             );
@@ -61,14 +60,12 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
         }
 
         const {
-            puzzleIndex,
             puzzle,
             stateExtension: {highlightCurrentPiece},
             fieldExtension: {pieces: piecePositions},
         } = context;
 
         const {importOptions: {angleStep} = {}} = puzzle;
-        const {pieces} = getJigsawPiecesWithCache(puzzleIndex);
         const activeZIndex = getActiveJigsawPieceZIndex(piecePositions);
         const groups = groupJigsawPiecesByZIndex(context);
 
@@ -113,7 +110,7 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
                                 position: moveJigsawPieceByGroupGesture(
                                     activeGroup,
                                     groupGesture,
-                                    pieces[pieceIndex],
+                                    puzzle.extension!.pieces[pieceIndex],
                                     position
                                 ),
                                 state: {animating: true},

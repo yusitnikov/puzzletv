@@ -21,7 +21,7 @@ import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {JigsawPieceRegion} from "./JigsawPieceRegion";
 
-const getJigsawPieces = (
+export const getJigsawPieces = (
     cellsIndex: SudokuCellsIndex<JigsawPTM>
 ): { pieces: JigsawPieceInfo[], otherCells: Position[] } => {
     const {
@@ -68,10 +68,6 @@ const getJigsawPieces = (
     return {pieces, otherCells: otherCells.items};
 };
 
-export const getJigsawPiecesWithCache = (cellsIndex: SudokuCellsIndex<JigsawPTM>): ReturnType<typeof getJigsawPieces> => {
-    return cellsIndex.cache.jigsawPieces = cellsIndex.cache.jigsawPieces ?? getJigsawPieces(cellsIndex);
-};
-
 export const getJigsawRegionWithCache = (context: PuzzleContext<JigsawPTM>, index: number): JigsawPieceRegion => {
     const {cache} = context.puzzleIndex;
     const key = `jigsawRegion${index}`;
@@ -79,21 +75,21 @@ export const getJigsawRegionWithCache = (context: PuzzleContext<JigsawPTM>, inde
 };
 
 export const getJigsawPieceIndexByCell = (
-    cellsIndex: SudokuCellsIndex<JigsawPTM>,
+    puzzle: PuzzleDefinition<JigsawPTM>,
     cell: Position,
 ): number | undefined => {
-    const index = getJigsawPiecesWithCache(cellsIndex).pieces.findIndex(
+    const index = puzzle.extension!.pieces.findIndex(
         ({cells}) => arrayContainsPosition(cells, cell)
     );
     return index >= 0 ? index : undefined;
 };
 
 export const getJigsawPieceIndexesByCell = (
-    cellsIndex: SudokuCellsIndex<JigsawPTM>,
+    puzzle: PuzzleDefinition<JigsawPTM>,
     piecePositions: JigsawFieldPieceState[],
     cell: Position,
 ) => {
-    const index = getJigsawPieceIndexByCell(cellsIndex, cell);
+    const index = getJigsawPieceIndexByCell(puzzle, cell);
 
     return index === undefined
         ? []
@@ -135,7 +131,7 @@ export interface JigsawPiecesGroup {
 }
 
 export const groupJigsawPiecesByZIndex = (context: PuzzleContext<JigsawPTM>): JigsawPiecesGroup[] => {
-    const {pieces} = getJigsawPiecesWithCache(context.puzzleIndex);
+    const pieces = context.puzzle.extension?.pieces ?? [];
 
     const piecesByZIndex: Record<number, JigsawPiecesGroupItem[]> = {};
 
