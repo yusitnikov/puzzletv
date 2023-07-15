@@ -21,6 +21,7 @@ import {comparer} from "mobx";
 import {observer} from "mobx-react-lite";
 import {useComputedValue} from "../../../hooks/useComputed";
 import {profiler} from "../../../utils/profiler";
+import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 
 const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandler(
     {context}: ControlButtonItemProps<JigsawPTM>
@@ -69,6 +70,29 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
         const activeZIndex = getActiveJigsawPieceZIndex(piecePositions);
         const groups = groupJigsawPiecesByZIndex(context);
 
+        const movePiece = (dx: number, dy: number) => {
+            if (highlightCurrentPiece && context.cellWriteMode === CellWriteMode.move) {
+                const activeGroup = groups.find(({zIndex}) => zIndex === activeZIndex);
+                if (activeGroup) {
+                    context.onStateChange(jigsawPieceStateChangeAction(
+                        undefined,
+                        myClientId,
+                        getNextActionId(),
+                        activeGroup.indexes,
+                        ({position: {top, left}}) => ({
+                            position: {
+                                top: top + dy,
+                                left: left + dx,
+                            },
+                            state: {animating: true},
+                        }),
+                        false
+                    ));
+                    ev.preventDefault();
+                }
+            }
+        };
+
         switch (code) {
             case "Tab":
                 const sortedPieceGroups = [...groups].sort(
@@ -94,6 +118,7 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
                 ev.preventDefault();
                 break;
             case "KeyR":
+            case "Space":
                 if (highlightCurrentPiece && angleStep) {
                     const activeGroup = groups.find(({zIndex}) => zIndex === activeZIndex);
                     if (activeGroup) {
@@ -120,6 +145,18 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
                     }
                 }
                 ev.preventDefault();
+                break;
+            case "ArrowDown":
+                movePiece(0, 1);
+                break;
+            case "ArrowUp":
+                movePiece(0, -1);
+                break;
+            case "ArrowRight":
+                movePiece(1, 0);
+                break;
+            case "ArrowLeft":
+                movePiece(-1, 0);
                 break;
         }
     });
