@@ -177,6 +177,8 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     },
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RotatableCluesPTM<T>> {
+        const keepCircles = puzzle.importOptions?.keepCircles;
+
         if (postProcessPuzzle) {
             puzzle = postProcessPuzzle(puzzle as unknown as PuzzleDefinition<T>) as unknown as PuzzleDefinition<RotatableCluesPTM<T>>;
         }
@@ -198,7 +200,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 tags?.includes(ellipseTag) && length === 1;
 
             const pivots = new PositionSet(puzzle.items.filter(isPivot).map(({cells: [cell]}) => cell));
-            const items = puzzle.items.filter((item) => !isPivot(item));
+            const items = keepCircles ? puzzle.items : puzzle.items.filter((item) => !isPivot(item));
 
             const getCluePivot = ({cells}: Constraint<RotatableCluesPTM<T>>) =>
                 cells.find((cell) => pivots.contains(cell));

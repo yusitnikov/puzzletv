@@ -324,6 +324,8 @@ class FPuzzlesImporter<T extends AnyPTM> {
             transparentArrowCircle = false,
             "product-arrow": productArrow,
             cosmeticsBehindFog,
+            rotatableClues,
+            keepCircles,
         } = this.importOptions;
 
         const offsetCoords = (position: PositionLiteral): Position => {
@@ -362,7 +364,11 @@ class FPuzzlesImporter<T extends AnyPTM> {
             && cells.length === 1
             && puzzleJson.fogofwar?.includes(cells[0]);
 
-        const cosmeticsLayer = cosmeticsBehindFog ? FieldLayer.regular : FieldLayer.afterLines;
+        const cosmeticsLayer = rotatableClues && keepCircles
+            ? FieldLayer.beforeSelection
+            : cosmeticsBehindFog
+            ? FieldLayer.regular
+            : FieldLayer.afterLines;
 
         const isVisibleGridCell = (cell: Position) => isVisibleCell(this.typeManager.getCellTypeProps?.(cell, this.puzzle));
 

@@ -38,6 +38,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     loopY?: boolean;
     jss?: boolean;
     rotatableClues?: boolean;
+    keepCircles?: boolean;
     sokoban?: boolean;
     "product-arrow"?: boolean;
     transparentArrowCircle?: boolean;
@@ -80,6 +81,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         loopY,
         jss,
         rotatableClues,
+        keepCircles,
         sokoban,
         "product-arrow": productArrow,
         transparentArrowCircle,
@@ -118,6 +120,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         loopY,
         jss,
         rotatableClues,
+        keepCircles,
         sokoban,
         "product-arrow": productArrow,
         transparentArrowCircle,
