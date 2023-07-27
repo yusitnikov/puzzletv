@@ -1,6 +1,6 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {RotatableCluesGameState, RotatableCluesProcessedGameState} from "./RotatableCluesGameState";
-import {PositionSet, stringifyPosition} from "../../../types/layout/Position";
+import {Position, stringifyPosition} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {RotatableCluesPTM} from "./RotatableCluesPTM";
 import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
@@ -9,7 +9,7 @@ import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {ControlButtonItem, ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {RotatableClue} from "./RotatableCluesPuzzleExtension";
 import {Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
-import {ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import {DecorativeShapeProps, ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {RotatableClueConstraint} from "../constraints/RotatableClue";
 import {RotateClueButton} from "../components/RotateClueButton";
@@ -196,14 +196,33 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                     : item
             );
 
-            const isPivot = ({tags, cells: {length}}: Constraint<RotatableCluesPTM<T>>) =>
-                tags?.includes(ellipseTag) && length === 1;
+            const isPivot = (item: Constraint<RotatableCluesPTM<T>, any>): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
+                !!item.tags?.includes(ellipseTag) && item.cells.length === 1;
 
-            const pivots = new PositionSet(puzzle.items.filter(isPivot).map(({cells: [cell]}) => cell));
+            const pivotsMap: Record<string, Position> = {};
+            for (const item of puzzle.items.filter(isPivot)) {
+                if (isPivot(item)) {
+                    const {cells: [cell], props: {width: diameter}} = item;
+                    const radius = keepCircles ? diameter / 2 : 0.5;
+
+                    for (let dx = -Math.floor(radius); dx <= radius; dx++) {
+                        for (let dy = -Math.floor(radius); dy <= radius; dy++) {
+                            if (dx * dx + dy * dy <= radius * radius) {
+                                pivotsMap[stringifyPosition({
+                                    left: cell.left + dx,
+                                    top: cell.top + dy,
+                                })] = cell;
+                            }
+                        }
+                    }
+                }
+            }
+
             const items = keepCircles ? puzzle.items : puzzle.items.filter((item) => !isPivot(item));
 
-            const getCluePivot = ({cells}: Constraint<RotatableCluesPTM<T>>) =>
-                cells.find((cell) => pivots.contains(cell));
+            const getCluePivot = ({cells}: Constraint<RotatableCluesPTM<T>>) => cells
+                .map((cell) => pivotsMap[stringifyPosition(cell)])
+                .find(Boolean);
             const cluesMap: Record<string, RotatableClue> = {};
             for (const clue of items) {
                 const pivot = getCluePivot(clue);
