@@ -53,7 +53,8 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => observe
                             return angle;
                         }
 
-                        return angle + direction;
+                        const clueCoeff = context.puzzle.extension?.clues?.[index]?.coeff ?? 1;
+                        return angle + direction * Math.sign(clueCoeff);
                     })
                 },
             })

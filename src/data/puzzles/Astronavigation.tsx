@@ -8,7 +8,9 @@ import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
+import {
+    ImportedRotatableCluesSudokuTypeManager
+} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {
     DecorativeShapeComponent,
@@ -62,7 +64,7 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Astronavigation",
     },
-    typeManager: RotatableCluesSudokuTypeManager(DigitSudokuTypeManager()),
+    typeManager: ImportedRotatableCluesSudokuTypeManager(DigitSudokuTypeManager()),
     fieldSize: FieldSize9,
     regions: Regions9,
     rules: () => <>

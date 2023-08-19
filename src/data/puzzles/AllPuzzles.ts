@@ -43,6 +43,7 @@ import {Sudokuban} from "./Sudokuban";
 import {Pacman} from "./Pacman";
 import {Astronavigation} from "./Astronavigation";
 import {CherryBlossom, Revolutionary, SumwhereAroundHere} from "./RotatableClues";
+import {Gears} from "./Gears";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -69,6 +70,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    Gears,
+
     Astronavigation,
     CherryBlossom,
     SumwhereAroundHere,

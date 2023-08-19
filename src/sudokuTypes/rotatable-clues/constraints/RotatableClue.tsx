@@ -14,7 +14,7 @@ const pivotRadius = 0.15;
 const pivotLineWidth = pivotRadius * 0.1;
 
 export const RotatableClueConstraint = <T extends AnyPTM>(
-    {clues, pivot}: RotatableClue,
+    {clues, pivot, coeff = 1}: RotatableClue,
     angle: number,
     animatedAngle: number,
 ): Constraint<RotatableCluesPTM<T>, any>[] => {
@@ -79,7 +79,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                             d={[
                                 "M", 0, -pivotRadius,
                                 "A", pivotRadius, pivotRadius,
-                                roundedAnimatedAngle, roundedAnimatedAngle < 180 ? 0 : 1, 1,
+                                roundedAnimatedAngle, ((roundedAnimatedAngle < 180) === (coeff > 0)) ? 0 : 1, coeff > 0 ? 1 : 0,
                                 pivotDirection.left, pivotDirection.top,
                                 "L", 0, 0,
                                 "z"

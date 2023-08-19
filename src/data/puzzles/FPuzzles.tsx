@@ -93,7 +93,9 @@ import {JssSudokuTypeManager} from "../../sudokuTypes/jss/types/JssSudokuTypeMan
 import {isVisibleCell} from "../../types/sudoku/CellTypeProps";
 import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
 import {RushHourSudokuTypeManager} from "../../sudokuTypes/rush-hour/types/RushHourSudokuTypeManager";
-import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
+import {
+    ImportedRotatableCluesSudokuTypeManager
+} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import {SokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/types/SokobanSudokuTypeManager";
 import {greenColor, purpleColor} from "../../components/app/globals";
 import {TetrisSudokuTypeManager} from "../../sudokuTypes/tetris/types/TetrisSudokuTypeManager";
@@ -231,7 +233,7 @@ const loadByImportOptions = (
         typeManager = JssSudokuTypeManager(typeManager);
     }
     if (rotatableClues) {
-        typeManager = RotatableCluesSudokuTypeManager(typeManager);
+        typeManager = ImportedRotatableCluesSudokuTypeManager(typeManager);
     }
 
     switch (digitType) {
