@@ -233,11 +233,14 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             puzzle = {
                 ...puzzle,
                 resultChecker: (context) => {
-                    if (!isValidFinishedPuzzleByConstraints(context)) {
+                    const result = resultChecker(context);
+
+                    const isCorrectResult = result === true || (typeof result === "object" && result.isCorrectResult);
+                    if (isCorrectResult && !isValidFinishedPuzzleByConstraints(context)) {
                         return false;
                     }
 
-                    return resultChecker(context);
+                    return result;
                 },
             };
         }

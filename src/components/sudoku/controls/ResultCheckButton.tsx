@@ -46,7 +46,7 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
 
     const [isShowingResult, setIsShowingResult] = useState(false);
 
-    const {isCorrectResult, resultPhrase} = context.resultCheck;
+    const {isCorrectResult, resultPhrase, forceShowResult = false} = context.resultCheck;
 
     const handleCheckResult = () => setIsShowingResult(true);
     const handleCloseCheckResult = () => {
@@ -58,10 +58,10 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
 
     const autoCheckOnFinish = settings.autoCheckOnFinish.get() || forceAutoCheckOnFinish;
     useEffectExceptInit(() => {
-        if (autoCheckOnFinish && resultChecker && isCorrectResult) {
+        if (autoCheckOnFinish && resultChecker && (isCorrectResult || forceShowResult)) {
             setIsShowingResult(true);
         }
-    }, [autoCheckOnFinish, resultChecker, isCorrectResult, resultPhrase, setIsShowingResult]);
+    }, [autoCheckOnFinish, resultChecker, isCorrectResult, forceShowResult, resultPhrase, setIsShowingResult]);
 
     useEffectExceptInit(() => {
         if (!lives) {

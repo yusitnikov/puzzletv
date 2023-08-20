@@ -1,6 +1,5 @@
 import {PuzzleDefinition} from "./PuzzleDefinition";
 import {
-    areSameGameStates,
     GameStateEx,
     gameStateGetCurrentGivenDigitsByCells,
     gameStateNormalizeLoopOffset,
@@ -610,6 +609,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             : {
                 isCorrectResult: result.isCorrectResult,
                 resultPhrase: this.translate(result.resultPhrase),
+                forceShowResult: result.forceShowResult,
             };
     }
 

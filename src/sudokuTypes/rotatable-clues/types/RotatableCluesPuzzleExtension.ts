@@ -25,7 +25,7 @@ export interface RotatableCluesPuzzleExtension {
 export const createRotatableClue = (
     pivotCells: PositionLiteral | PositionLiteral[],
     radius: number,
-    color: CellColorValue,
+    color: CellColorValue | undefined,
     clues: Constraint<AnyPTM, any>[],
     coeff = 1,
     dependentClues: RotatableClue[] = [],
@@ -34,9 +34,8 @@ export const createRotatableClue = (
         pivotCells = [pivotCells];
     }
 
-    return {
-        pivot: getAveragePosition(parsePositionLiterals(pivotCells)),
-        clues: [
+    if (radius && color) {
+        clues = [
             EllipseConstraint(
                 pivotCells,
                 radius * 2,
@@ -48,7 +47,12 @@ export const createRotatableClue = (
                 FieldLayer.beforeSelection,
             ),
             ...clues,
-        ],
+        ];
+    }
+
+    return {
+        pivot: getAveragePosition(parsePositionLiterals(pivotCells)),
+        clues,
         coeff,
         dependentClues,
     };

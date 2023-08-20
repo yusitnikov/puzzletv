@@ -44,6 +44,7 @@ import {Pacman} from "./Pacman";
 import {Astronavigation} from "./Astronavigation";
 import {CherryBlossom, Revolutionary, SumwhereAroundHere} from "./RotatableClues";
 import {Gears} from "./Gears";
+import {WheelsOnTheBus} from "./WheelsOnTheBus";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -70,6 +71,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    WheelsOnTheBus,
+
     Gears,
 
     Astronavigation,
