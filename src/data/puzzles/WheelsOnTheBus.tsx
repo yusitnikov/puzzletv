@@ -59,7 +59,9 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         </RulesParagraph>
         <RulesParagraph>
             Wheels: Digits in a circle have to be placed in the same circular order in the four cells that are touched by the circle.
-            The circle have to be rotated clockwise N times, where N is the digit in the cell inside the circle.
+            The circle have to be rotated 90° clockwise N times from the current position.
+            N is the digit in the cell inside the circle.
+            Example: R2C8=6, then R1C8=8 and R2C9=4.
         </RulesParagraph>
     </>,
     items: [DisjointGroupsConstraint(3)],
