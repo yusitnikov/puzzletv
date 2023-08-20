@@ -122,3 +122,6 @@ Africa.args = {_hash: "africa"};
 
 export const ReservedParking = Template.bind({});
 ReservedParking.args = {_hash: "reserved-parking"};
+
+export const WheelsOnTheBus = Template.bind({});
+WheelsOnTheBus.args = {_hash: "wheels-on-the-bus"};
