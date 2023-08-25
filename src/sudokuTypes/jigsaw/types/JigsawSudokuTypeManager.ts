@@ -70,7 +70,7 @@ interface JigsawSudokuTypeManagerOptions {
 }
 
 export const JigsawSudokuTypeManager = (
-    {angleStep, stickyDigits, shuffle}: PuzzleImportOptions,
+    {angleStep, stickyDigits, shuffle, hideZeroRegion}: PuzzleImportOptions,
     {
         supportGluePieces = true,
         phrases = {
@@ -521,7 +521,7 @@ export const JigsawSudokuTypeManager = (
             return getJigsawRegionWithCache(context, index);
         });
 
-        if (otherCells.length) {
+        if (!hideZeroRegion && otherCells.length) {
             regions.push({
                 top: 0,
                 left: 0,
