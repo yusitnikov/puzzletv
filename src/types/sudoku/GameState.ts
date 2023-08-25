@@ -160,6 +160,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
         initialCellWriteMode,
         initialAngle = 0,
         initialScale = 1,
+        initialPosition,
     } = typeManager;
 
     const fullSaveStateKey = getPuzzleFullSaveStateKey(puzzle);
@@ -196,7 +197,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
         dragAction: DragAction.SetUndefined,
 
         animating: false,
-        loopOffset: savedGameState?.[11] ?? emptyPosition,
+        loopOffset: savedGameState?.[11] ?? initialPosition ?? emptyPosition,
         angle: savedGameState?.[12] ?? initialAngle,
         scale: savedGameState?.[13] ?? initialScale,
 

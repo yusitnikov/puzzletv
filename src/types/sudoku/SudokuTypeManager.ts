@@ -135,6 +135,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     initialFieldStateExtension?: T["fieldStateEx"] | ((puzzle: PuzzleDefinition<T>) => T["fieldStateEx"]);
 
     allowMove?: boolean;
+    initialPosition?: Position;
 
     initialAngle?: number;
     angleStep?: number;
