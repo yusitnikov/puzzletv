@@ -514,11 +514,11 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
         || stateInitialDigits?.[cellPosition.top]?.[cellPosition.left]
         || usersDigit;
 
-    let filter: (cell: CellState<T>, initialDigit?: T["cell"]) => boolean;
+    let filter: (cell: CellState<T>, cellPosition: Position, initialDigit?: T["cell"]) => boolean;
     if (mainDigit) {
-        filter = ({usersDigit}, initialDigit) => {
+        filter = ({usersDigit}, cellPosition2, initialDigit) => {
             const otherMainDigit = initialDigit || usersDigit;
-            return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, context);
+            return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, context, cellPosition, cellPosition2);
         };
     } else if (colors.size) {
         filter = ({colors: otherColors}) => otherColors.containsOneOf(colors.items);
@@ -532,9 +532,10 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
 
     const matchingPositions: Position[] = indexes(rowsCount)
         .flatMap((top) => indexes(columnsCount).map((left) => ({top, left})))
-        .filter(({top, left}) => filter(
-            context.getCell(top, left),
-            initialDigits?.[top]?.[left] || stateInitialDigits?.[top]?.[left]
+        .filter((cell) => filter(
+            context.getCell(cell.top, cell.left),
+            cell,
+            initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left]
         ));
 
     return (context) => isAnyKeyDown || context.isMultiSelection
