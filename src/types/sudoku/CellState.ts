@@ -63,5 +63,5 @@ export const areCellStatesEqual = <T extends AnyPTM>(
     {usersDigit, centerDigits, cornerDigits, colors}: CellState<T>,
     {usersDigit: usersDigit2, centerDigits: centerDigits2, cornerDigits: cornerDigits2, colors: colors2}: CellState<T>
 ) =>
-    typeof usersDigit === typeof usersDigit2 && (!usersDigit || context.puzzle.typeManager.areSameCellData(usersDigit, usersDigit2!, context, false, false)) &&
+    typeof usersDigit === typeof usersDigit2 && (!usersDigit || context.puzzle.typeManager.areSameCellData(usersDigit, usersDigit2!, context)) &&
     centerDigits.equals(centerDigits2) && cornerDigits.equals(cornerDigits2) && colors.equals(colors2);

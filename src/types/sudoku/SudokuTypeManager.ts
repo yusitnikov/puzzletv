@@ -33,10 +33,10 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         data1: T["cell"],
         data2: T["cell"],
         context: PuzzleContext<T>,
-        // default: true
-        useState?: boolean,
-        // default: true
-        forConstraints?: boolean
+        // The positions are given when comparing the cells for constraints.
+        // The state (from the context) should be used only when the positions are given.
+        position1?: Position,
+        position2?: Position,
     ): boolean;
 
     compareCellData(

@@ -65,17 +65,17 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             name: "neighbors",
             cells: [],
             props: undefined,
-            isValidCell({top, left}, digits, regionCells, context): boolean {
-                const digit = digits[top][left]!;
+            isValidCell(cell, digits, regionCells, context): boolean {
+                const digit = digits[cell.top][cell.left]!;
 
                 const {puzzle, puzzleIndex} = context;
 
-                const {neighbors} = puzzleIndex.allCells[top][left];
+                const {neighbors} = puzzleIndex.allCells[cell.top][cell.left];
 
                 for (const neighbor of neighbors.items) {
                     const digit2 = digits[neighbor.top]?.[neighbor.left];
 
-                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, context)) {
+                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, context, cell, neighbor)) {
                         return false;
                     }
                 }

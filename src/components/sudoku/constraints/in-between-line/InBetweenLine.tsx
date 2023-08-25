@@ -78,22 +78,22 @@ export const InBetweenLineConstraint = <T extends AnyPTM>(
             const digit = digits[cell.top][cell.left]!;
 
             const edgeCells = [cells[0], cells[cells.length - 1]];
-            const [edgeDigit1, edgeDigit2] = edgeCells
-                .map(({top, left}) => digits[top]?.[left])
-                .filter(digit => digit !== undefined)
-                .sort((a, b) => compareCellData(a, b, context));
+            const [edgeCell1, edgeCell2] = edgeCells
+                .map(({top, left}) => ({top, left, digit: digits[top]?.[left]}))
+                .filter(({digit}) => digit !== undefined)
+                .sort((a, b) => compareCellData(a.digit, b.digit, context));
 
             // The current cell is an edge cell
             if (arrayContainsPosition(edgeCells, cell)) {
                 // Other edge cells shouldn't be the same
-                return edgeDigit2 === undefined || !areSameCellData(edgeDigit1, edgeDigit2, context);
+                return edgeCell2 === undefined || !areSameCellData(edgeCell1.digit, edgeCell2.digit, context, edgeCell1, edgeCell2);
             } else {
                 // The current cell is on the between line
-                if (edgeDigit1 !== undefined && edgeDigit2 !== undefined) {
-                    return compareCellData(digit, edgeDigit1, context) > 0
-                        && compareCellData(edgeDigit2, digit, context) > 0;
-                } else if (edgeDigit1 !== undefined) {
-                    return !areSameCellData(digit, edgeDigit1, context);
+                if (edgeCell1 !== undefined && edgeCell2 !== undefined) {
+                    return compareCellData(digit, edgeCell1.digit, context) > 0
+                        && compareCellData(edgeCell2.digit, digit, context) > 0;
+                } else if (edgeCell1 !== undefined) {
+                    return !areSameCellData(digit, edgeCell1.digit, context, cell, edgeCell1);
                 }
             }
 

@@ -92,7 +92,7 @@ export const areSameGivenDigitsMapsByContext = <T extends AnyPTM>(
 ) => areSameGivenDigitsMaps(
     map1,
     map2,
-    (a, b) => context.puzzle.typeManager.areSameCellData(a, b, context, false, false)
+    (a, b) => context.puzzle.typeManager.areSameCellData(a, b, context)
 );
 
 export const createGivenDigitsMapFromArray = <CellType>(array: (CellType | undefined)[][]): GivenDigitsMap<CellType> => {

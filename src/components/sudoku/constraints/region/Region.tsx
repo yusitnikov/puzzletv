@@ -50,7 +50,7 @@ export const isValidCellForRegion = <T extends AnyPTM>(
             continue;
         }
 
-        if (context.puzzle.typeManager.areSameCellData(constraintDigit, digit, context)) {
+        if (context.puzzle.typeManager.areSameCellData(constraintDigit, digit, context, regionCell, cell)) {
             return false;
         }
     }

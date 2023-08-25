@@ -517,7 +517,7 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
     if (mainDigit) {
         filter = ({usersDigit}, initialDigit) => {
             const otherMainDigit = initialDigit || usersDigit;
-            return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, context, false, false);
+            return otherMainDigit !== undefined && areSameCellData(mainDigit, otherMainDigit, context);
         };
     } else if (colors.size) {
         filter = ({colors: otherColors}) => otherColors.containsOneOf(colors.items);
@@ -853,7 +853,7 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
                 const digit = digits[digits.length - 2];
                 const newDigit = digits[digits.length - 1];
                 return newDigit !== undefined
-                    && (digit === undefined || !areSameCellData(digit, newDigit, newContext))
+                    && (digit === undefined || !areSameCellData(digit, newDigit, newContext, position, position))
                     && !isValidUserDigit(position, newDigits, context);
             },
             [digits, newDigits]

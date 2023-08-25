@@ -9,7 +9,7 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
     props: undefined,
     isObvious: true,
     isValidCell(
-        {left, top},
+        cell,
         digits,
         _,
         context
@@ -21,23 +21,23 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
             fieldSize: {rowsCount, columnsCount, fieldSize},
         } = context.puzzle;
 
-        const digit = digits[top][left]!;
+        const digit = digits[cell.top][cell.left]!;
 
         const isCenterIndex = (index: number) => (index % regionSize) * 2 + 1 === regionSize;
-        const isCurrentCellCenter = isCenterIndex(top) && isCenterIndex(left);
+        const isCurrentCellCenter = isCenterIndex(cell.top) && isCenterIndex(cell.left);
 
         for (let offset = -fieldSize; offset <= fieldSize; offset++) {
             if (offset === 0) {
                 continue;
             }
 
-            let x = left + offset;
+            let x = cell.left + offset;
             if (loopHorizontally) {
                 x = loop(x, columnsCount);
             }
 
             for (const coeff of [-1, 1]) {
-                let y = top + offset * coeff;
+                let y = cell.top + offset * coeff;
                 if (loopVertically) {
                     y = loop(y, rowsCount);
                 }
@@ -46,12 +46,13 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
                     continue;
                 }
 
-                if (isSamePosition({left, top}, {left: x, top: y})) {
+                const cell2 = {left: x, top: y};
+                if (isSamePosition(cell, cell2)) {
                     continue;
                 }
 
                 const digit2 = digits[y]?.[x];
-                if (digit2 !== undefined && areSameCellData(digit2, digit, context)) {
+                if (digit2 !== undefined && areSameCellData(digit2, digit, context, cell2, cell)) {
                     return false;
                 }
             }

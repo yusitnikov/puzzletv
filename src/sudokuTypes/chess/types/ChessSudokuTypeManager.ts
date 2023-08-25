@@ -16,9 +16,9 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         {type: type1, color: color1},
         {type: type2, color: color2},
         context,
-        useState = true,
-        forConstraints = true
+        cell1,
     ): boolean {
+        const forConstraints = cell1 !== undefined;
         return type1 === type2 && (forConstraints || color1 === color2);
     },
 

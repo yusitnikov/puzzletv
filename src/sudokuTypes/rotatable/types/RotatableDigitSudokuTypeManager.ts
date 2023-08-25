@@ -95,13 +95,13 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
         data1,
         data2,
         context,
-        useState = true,
-        forConstraint = true,
+        cell1,
     ) {
         const {puzzle} = context;
 
-        if (forConstraint) {
-            const angle = useState ? context.angle : 0;
+        const forConstraints = cell1 !== undefined;
+        if (forConstraints) {
+            const angle = context.angle;
             return rotateCellData(puzzle, data1, angle) === rotateCellData(puzzle, data2, angle);
         }
 

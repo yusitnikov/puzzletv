@@ -179,11 +179,11 @@ export const QuadleConstraint = <T extends AnyPTM>(
                 return true;
             }
 
-            const isHere = areSameCellData(data, digit.digit, context);
+            const isHere = areSameCellData(data, digit.digit, context, cell, cell);
             const hasEmpty = cells.some(({top, left}) => digitsMap[top]?.[left] === undefined);
-            const isSomewhere = cells.some(({top, left}) => {
-                const data = digitsMap[top]?.[left];
-                return data !== undefined && areSameCellData(data, digit.digit, context);
+            const isSomewhere = cells.some((cell2) => {
+                const data = digitsMap[cell2.top]?.[cell2.left];
+                return data !== undefined && areSameCellData(data, digit.digit, context, cell2, cell2);
             });
 
             switch (digit.type) {
@@ -204,7 +204,9 @@ export const QuadleConstraintBySolution = <T extends AnyPTM>(
 ): Constraint<T, QuadleProps<T["cell"]>> => {
     const {solution = {}, typeManager: {areSameCellData}} = context.puzzle;
 
-    const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
+    const cell = parsePositionLiteral(cellLiteral);
+
+    const actualDigits = getQuadCells(cell)
         .map(({top, left}) => solution[top]?.[left]);
 
     const hasEmptyDigits = actualDigits.some(digit => digit === undefined);
@@ -215,11 +217,11 @@ export const QuadleConstraintBySolution = <T extends AnyPTM>(
         }
 
         const actualDigit = actualDigits[index];
-        if (actualDigit !== undefined && areSameCellData(actualDigit, digit, context)) {
+        if (actualDigit !== undefined && areSameCellData(actualDigit, digit, context, cell, cell)) {
             return QuadleDigitType.here;
         }
 
-        if (actualDigits.some(actualDigit => actualDigit !== undefined && areSameCellData(actualDigit, digit, context))) {
+        if (actualDigits.some(actualDigit => actualDigit !== undefined && areSameCellData(actualDigit, digit, context, cell, cell))) {
             return QuadleDigitType.elsewhere;
         }
 

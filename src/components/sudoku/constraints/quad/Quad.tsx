@@ -128,26 +128,26 @@ export const QuadConstraint = <T extends AnyPTM>(
         },
         component: Quad,
         isObvious: true,
-        isValidCell({top, left}, digitsMap, cells, context) {
+        isValidCell(cell, digitsMap, cells, context) {
             const {puzzle} = context;
             const {typeManager: {areSameCellData}} = puzzle;
 
-            const data = digitsMap[top][left];
+            const data = digitsMap[cell.top][cell.left];
 
-            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, context))) {
+            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, context, cell, cell))) {
                 return false;
             }
 
             if (expectedDigits.length === 4) {
                 let remainingExpectedDigits = [...expectedDigits];
 
-                for (const {top, left} of cells) {
-                    const cellData = digitsMap[top]?.[left];
+                for (const cell2 of cells) {
+                    const cellData = digitsMap[cell2.top]?.[cell2.left];
                     if (cellData === undefined) {
                         continue;
                     }
 
-                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, context));
+                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, context, cell2, cell2));
                     if (matchingIndex < 0) {
                         return false;
                     }
@@ -158,8 +158,8 @@ export const QuadConstraint = <T extends AnyPTM>(
 
             return cells.some(({top, left}) => digitsMap[top]?.[left] === undefined)
                 || expectedDigits.every(expectedData => cells.some(
-                ({top, left}) => areSameCellData(digitsMap[top][left]!, expectedData, context)
-            ));
+                    (cell2) => areSameCellData(digitsMap[cell2.top][cell2.left]!, expectedData, context, cell2, cell2)
+                ));
         },
     });
 };
@@ -171,12 +171,14 @@ export const QuadConstraintBySolution = <T extends AnyPTM>(
     isRecent = false,
     radius = 0.3
 ): Constraint<T, QuadProps<T["cell"]>> => {
-    const actualDigits = getQuadCells(parsePositionLiteral(cellLiteral))
+    const cell = parsePositionLiteral(cellLiteral);
+
+    const actualDigits = getQuadCells(cell)
         .map(({top, left}) => context.puzzle.solution?.[top]?.[left])
         .filter(value => value !== undefined)
         .map(value => value!);
 
-    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => context.puzzle.typeManager.areSameCellData(digit, actualDigit, context))
+    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => context.puzzle.typeManager.areSameCellData(digit, actualDigit, context, cell, cell))
 
     return QuadConstraint(
         cellLiteral,

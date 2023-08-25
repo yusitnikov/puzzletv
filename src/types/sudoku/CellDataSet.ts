@@ -24,7 +24,7 @@ export class CellDataSet<T extends AnyPTM> extends HashSet<T["cell"]> {
         super(
             items,
             {
-                comparer: (a, b) => areSameCellData(a, b, context, false, false),
+                comparer: (a, b) => areSameCellData(a, b, context),
                 cloner: cloneCellData,
                 serializer: serializeCellData,
                 hasher: (data) => getCellDataHash(data, puzzle),
