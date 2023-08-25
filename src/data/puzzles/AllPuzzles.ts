@@ -45,6 +45,7 @@ import {Astronavigation} from "./Astronavigation";
 import {CherryBlossom, Revolutionary, SumwhereAroundHere} from "./RotatableClues";
 import {Gears} from "./Gears";
 import {WheelsOnTheBus} from "./WheelsOnTheBus";
+import {HappyBirthdayDumediat} from "./HbdDumediat";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -121,6 +122,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    HappyBirthdayDumediat,
+
     InfinityLoopIntro1,
     InfinityLoopIntro2,
     MisterFantastic,
