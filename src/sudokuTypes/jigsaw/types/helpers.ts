@@ -106,6 +106,20 @@ export const normalizeJigsawDigit = (puzzle: PuzzleDefinition<JigsawPTM>, {digit
     return {digit, angle};
 };
 
+export const rotateJigsawDigitByPiece = (
+    {puzzle, fieldExtension: {pieces}}: PuzzleContext<JigsawPTM>,
+    data: JigsawDigit,
+    cell: Position,
+): JigsawDigit => {
+    const regionIndex = getJigsawPieceIndexByCell(puzzle, cell);
+    return regionIndex !== undefined
+        ? normalizeJigsawDigit(puzzle, {
+            digit: data.digit,
+            angle: data.angle + pieces[regionIndex].angle,
+        })
+        : data;
+};
+
 export const getActiveJigsawPieceZIndex = (pieces: JigsawFieldPieceState[]) => {
     if (pieces.length === 0) {
         return 0;

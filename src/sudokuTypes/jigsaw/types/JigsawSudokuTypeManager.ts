@@ -22,6 +22,7 @@ import {
     groupJigsawPiecesByZIndex,
     moveJigsawPieceByGroupGesture,
     normalizeJigsawDigit,
+    rotateJigsawDigitByPiece,
     sortJigsawPiecesByPosition
 } from "./helpers";
 import {JigsawMoveCellWriteModeInfo} from "./JigsawMoveCellWriteModeInfo";
@@ -92,10 +93,15 @@ export const JigsawSudokuTypeManager = (
         getPieceCenter = ({boundingRect}) => getRectCenter(boundingRect),
     }: JigsawSudokuTypeManagerOptions = {}
 ): SudokuTypeManager<JigsawPTM> => ({
-    areSameCellData(
-        {digit: digit1, angle: angle1},
-        {digit: digit2, angle: angle2},
-    ): boolean {
+    areSameCellData(data1, data2, context, cell1, cell2): boolean {
+        if (!stickyDigits && cell1 !== undefined && cell2 !== undefined) {
+            data1 = rotateJigsawDigitByPiece(context, data1, cell1);
+            data2 = rotateJigsawDigitByPiece(context, data2, cell2);
+        }
+
+        const {digit: digit1, angle: angle1} = data1;
+        const {digit: digit2, angle: angle2} = data2;
+
         return digit1 === digit2 && angle1 === angle2;
     },
 
