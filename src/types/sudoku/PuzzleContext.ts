@@ -807,6 +807,18 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.puzzle.digitsCount ?? getDefaultDigitsCount(this.puzzle);
     }
 
+    get digitsCountInCurrentMode() {
+        profiler.trace();
+
+        const {
+            digitsCount: digitsCountFunc = this.digitsCount,
+        } = this.cellWriteModeInfo;
+
+        return typeof digitsCountFunc === "function"
+            ? digitsCountFunc(this)
+            : digitsCountFunc;
+    }
+
     translate<PhraseT = string>(phrase: PartiallyTranslatable<PhraseT>) {
         return translate(phrase, this.languageCode);
     }

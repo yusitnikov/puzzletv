@@ -141,21 +141,6 @@ export const getAllowedCellWriteModeInfos = <T extends AnyPTM>(
 export const incrementCellWriteMode = <T extends AnyPTM>(allowedModes: CellWriteModeInfo<T>[], mode: CellWriteMode, increment: number): CellWriteMode =>
     incrementArrayItem(allowedModes, item => item.mode === mode, increment).mode;
 
-export const resolveDigitsCountInCellWriteMode = <T extends AnyPTM>(context: PuzzleContext<T>) => {
-    const {
-        cellWriteModeInfo,
-        digitsCount,
-    } = context;
-
-    const {
-        digitsCount: digitsCountFunc = digitsCount,
-    } = cellWriteModeInfo;
-
-    return typeof digitsCountFunc === "function"
-        ? digitsCountFunc(context)
-        : digitsCountFunc;
-};
-
 export const useCellWriteModeHotkeys = <T extends AnyPTM>(context: PuzzleContext<T>) => {
     const {
         puzzle,

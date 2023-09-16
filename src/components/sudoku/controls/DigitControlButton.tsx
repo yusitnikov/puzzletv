@@ -14,13 +14,11 @@ import {profiler} from "../../../utils/profiler";
 
 export interface DigitControlButtonProps<T extends AnyPTM> {
     index: number;
-    // how many digits do we have in the current mode
-    count: number;
     context: PuzzleContext<T>;
 }
 
 export const DigitControlButton = observer(function DigitControlButton<T extends AnyPTM>(
-    {index, count, context}: DigitControlButtonProps<T>
+    {index, context}: DigitControlButtonProps<T>
 ) {
     profiler.trace();
 
@@ -36,6 +34,7 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
             setCurrentSecondaryButton,
         },
         cellSizeForSidePanel: cellSize,
+        digitsCountInCurrentMode: count,
     } = context;
 
     const {

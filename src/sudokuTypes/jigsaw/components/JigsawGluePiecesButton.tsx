@@ -17,7 +17,6 @@ import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {regionHighlightColor, textColor} from "../../../components/app/globals";
 import {formatSvgPointsArray, Position} from "../../../types/layout/Position";
 import {useTransformScale} from "../../../contexts/TransformContext";
-import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteModeInfo";
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {comparer} from "mobx";
 import {observer} from "mobx-react-lite";
@@ -30,8 +29,6 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton(
     profiler.trace();
 
     const {cellSizeForSidePanel: cellSize} = context;
-
-    const digitsCount = resolveDigitsCountInCellWriteMode(context);
 
     const translate = useTranslate();
 
@@ -130,7 +127,7 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton(
         }
     });
 
-    if (digitsCount > 6) {
+    if (context.digitsCountInCurrentMode > 6) {
         return null;
     }
 

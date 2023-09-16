@@ -10,7 +10,6 @@ import {ChessPTM} from "../types/ChessPTM";
 import {observer} from "mobx-react-lite";
 import {settings} from "../../../types/layout/Settings";
 import {profiler} from "../../../utils/profiler";
-import {resolveDigitsCountInCellWriteMode} from "../../../types/sudoku/CellWriteModeInfo";
 
 export const ChessMainControls = observer(function ChessMainControls(
     {context}: ControlButtonItemProps<ChessPTM>
@@ -53,7 +52,7 @@ export const ChessMainControls = observer(function ChessMainControls(
         }
     });
 
-    if (resolveDigitsCountInCellWriteMode(context) > 6) {
+    if (context.digitsCountInCurrentMode > 6) {
         return null;
     }
 
