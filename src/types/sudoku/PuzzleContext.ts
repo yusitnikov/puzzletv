@@ -1,4 +1,4 @@
-import {PuzzleDefinition} from "./PuzzleDefinition";
+import {getDefaultDigitsCount, PuzzleDefinition} from "./PuzzleDefinition";
 import {
     GameStateEx,
     gameStateGetCurrentGivenDigitsByCells,
@@ -800,6 +800,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get fogProps() {
         profiler.trace();
         return getFogPropsByContext(this);
+    }
+
+    get digitsCount() {
+        profiler.trace();
+        return this.puzzle.digitsCount ?? getDefaultDigitsCount(this.puzzle);
     }
 
     translate<PhraseT = string>(phrase: PartiallyTranslatable<PhraseT>) {

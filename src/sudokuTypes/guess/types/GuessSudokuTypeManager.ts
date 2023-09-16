@@ -8,7 +8,6 @@ import {CellOwnershipConstraint} from "../components/CellOwnership";
 import {indexes, indexesFromTo} from "../../../utils/indexes";
 import {getExcludedDigitDataHash, getMainDigitDataHash} from "../../../utils/playerDataHash";
 import {Position} from "../../../types/layout/Position";
-import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {CellDataSet} from "../../../types/sudoku/CellDataSet";
 import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
@@ -96,13 +95,13 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
             puzzle,
             multiPlayer: {isEnabled},
             playerObjects,
+            digitsCount,
         } = context;
 
         const {
             params = {},
             typeManager: {createCellDataByDisplayDigit},
             fieldSize: {rowsCount, columnsCount},
-            digitsCount = getDefaultDigitsCount(puzzle),
         } = puzzle;
 
         const isCompetitive = isEnabled && !params.share;

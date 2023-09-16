@@ -1,5 +1,4 @@
 import {Constraint} from "../../../../types/sudoku/Constraint";
-import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
 import {isValidCellForRegion} from "../region/Region";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
@@ -10,13 +9,11 @@ export const AutoRegionConstraint = <T extends AnyPTM>(): Constraint<T> => {
         props: undefined,
         isValidCell(cell, digits, cells, context, constraints, isFinalCheck) {
             const {
-                puzzle,
                 puzzleIndex,
+                digitsCount: expectedSize,
             } = context;
 
             const region = puzzleIndex.getCustomRegionByBorderLinesAt(context, cell);
-
-            const expectedSize = puzzle.digitsCount ?? getDefaultDigitsCount(puzzle);
 
             if (region.length < expectedSize) {
                 return false;

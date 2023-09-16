@@ -1,7 +1,6 @@
 import {ControlButtonItemProps, ControlButtonItemPropsGenericFc} from "./ControlButtonsManager";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {CellWriteModeButton} from "./CellWriteModeButton";
-import {getDefaultDigitsCount} from "../../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
@@ -11,11 +10,10 @@ export const MainDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
 ) {
     profiler.trace();
 
-    const {puzzle} = context;
+    const {puzzle, digitsCount} = context;
 
     const {
         typeManager: {createCellDataByDisplayDigit},
-        digitsCount = getDefaultDigitsCount(puzzle),
     } = puzzle;
 
     return <CellWriteModeButton

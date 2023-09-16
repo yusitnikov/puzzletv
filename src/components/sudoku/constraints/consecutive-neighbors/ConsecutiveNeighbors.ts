@@ -1,5 +1,4 @@
 import {Constraint, normalizeConstraintCells} from "../../../../types/sudoku/Constraint";
-import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
 import {Position} from "../../../../types/layout/Position";
 import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
 import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
@@ -73,11 +72,7 @@ const BaseConsecutiveNeighborsConstraint = <T extends AnyPTM>(
 ): Constraint<T> =>
     BaseNeighborsConstraint(
         invert ? "non-consecutive neighbors" : "consecutive neighbors",
-        (digit1, digit2, position1, position2, {puzzle}) => {
-            const {
-                digitsCount = getDefaultDigitsCount(puzzle),
-            } = puzzle;
-
+        (digit1, digit2, position1, position2, {digitsCount}) => {
             const diff = Math.abs(digit2 - digit1);
             const isConsecutive = diff === 1 || (allowLoop && diff === digitsCount - 1);
             return invert ? !isConsecutive : isConsecutive;

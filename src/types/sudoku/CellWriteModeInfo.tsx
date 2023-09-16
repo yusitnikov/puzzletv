@@ -1,6 +1,6 @@
 import {ComponentType, ReactNode} from "react";
 import {PuzzleContext} from "./PuzzleContext";
-import {getDefaultDigitsCount, PuzzleDefinition} from "./PuzzleDefinition";
+import {PuzzleDefinition} from "./PuzzleDefinition";
 import {CellDigits} from "../../components/sudoku/cell/CellDigits";
 import {CellBackground} from "../../components/sudoku/cell/CellBackground";
 import {CellDataSet} from "./CellDataSet";
@@ -143,13 +143,9 @@ export const incrementCellWriteMode = <T extends AnyPTM>(allowedModes: CellWrite
 
 export const resolveDigitsCountInCellWriteMode = <T extends AnyPTM>(context: PuzzleContext<T>) => {
     const {
-        puzzle,
         cellWriteModeInfo,
+        digitsCount,
     } = context;
-
-    const {
-        digitsCount = getDefaultDigitsCount(puzzle),
-    } = puzzle;
 
     const {
         digitsCount: digitsCountFunc = digitsCount,

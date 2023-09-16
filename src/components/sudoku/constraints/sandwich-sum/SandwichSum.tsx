@@ -3,7 +3,6 @@ import {parsePositionLiteral, Position, PositionLiteral} from "../../../../types
 import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {indexes} from "../../../../utils/indexes";
-import {getDefaultDigitsCount} from "../../../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
@@ -46,8 +45,8 @@ export const SandwichSumConstraint = <T extends AnyPTM>(
         props: {clueCell, sum},
         component: SandwichSum,
         isValidCell(cell, digits, cells, context, constraints, isFinalCheck) {
-            const {puzzle} = context;
-            const {typeManager: {getDigitByCellData}, digitsCount: maxDigit = getDefaultDigitsCount(puzzle)} = puzzle;
+            const {puzzle, digitsCount: maxDigit} = context;
+            const {typeManager: {getDigitByCellData}} = puzzle;
 
             const currentDigit = getDigitByCellData(digits[cell.top][cell.left], context, cell);
             if (currentDigit !== 1 && currentDigit !== maxDigit) {
