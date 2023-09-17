@@ -280,7 +280,7 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
         <RulesParagraph>
             If a Schrödinger cell falls within
             <RulesUnorderedList>
-                <li>an arrow, German whisper line, killer cage or tens line, both digits contribute their value;</li>
+                <li>an arrow, German whisper line or killer cage, both digits contribute their value;</li>
                 <li>
                     a Kropki dot, an Odd/Even cell or a Renban line, both digits must satisfy the condition
                     (i.e. both are consecutive with or both are in a ratio of 1:2 with the adjacent cell; both digits are odd or even; or both digits are part of a consecutive, non-repeating set of digits in any order).
