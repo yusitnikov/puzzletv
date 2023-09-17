@@ -1,4 +1,8 @@
-import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {
+    allDrawingModes,
+    isValidFinishedPuzzleByEmbeddedSolution,
+    PuzzleDefinition
+} from "../../types/sudoku/PuzzleDefinition";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {
@@ -27,7 +31,7 @@ import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
 import {GreaterConstraint} from "../../components/sudoku/constraints/greater/Greater";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
-import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
+import {createGivenDigitsMapFromArray, GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {CellColorValue} from "../../types/sudoku/CellColor";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {buildLink} from "../../utils/link";
@@ -129,11 +133,14 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     KillerCageConstraint(offsetCells("R1C2", "R2C2", "R3C2"), 10),
                     KillerCageConstraint(offsetCells("R5C1", "R4C1", "R4C2", "R4C3", "R5C3"), 27),
                     KillerCageConstraint(offsetCells("R5C2", "R6C2")),
+                    GreaterConstraint(offsetCell("R1C2"), offsetCell("R2C2")),
                     GreaterConstraint(offsetCell("R3C2"), offsetCell("R4C2")),
                     EvenConstraint(offsetCell("R4C2")),
                     EvenConstraint(offsetCell("R5C1")),
                     EvenConstraint(offsetCell("R5C3")),
                     OddConstraint(offsetCell("R6C2")),
+                    KropkiDotConstraint(offsetCell("R5C1"), offsetCell("R6C1"), false),
+                    KropkiDotConstraint(offsetCell("R5C3"), offsetCell("R6C3"), false),
                 ],
                 colors: mergeGivenDigitsMaps(
                     colorsMap(goldColor, "R5C1", "R4C1", "R4C2", "R4C3", "R5C3"),
@@ -159,8 +166,10 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
         case 6:
             return {
                 constraints: [
-                    KillerCageConstraint(offsetCells("R3C1", "R4C1", "R5C1", "R6C1"), 28),
+                    KillerCageConstraint(offsetCells("R3C1", "R4C1", "R5C1", "R6C1")),
                     KropkiDotConstraint(offsetCell("R2C1"), offsetCell("R3C1"), false),
+                    ...offset === 0 ? [] : [KropkiDotConstraint(offsetCell("R3C0"), offsetCell("R3C1"), false)],
+                    KropkiDotConstraint(offsetCell("R4C1"), offsetCell("R3C1"), false),
                     ArrowConstraint(offsetCell("R6C1"), offsetCells("R3C1")),
                     ArrowConstraint(offsetCell("R6C2"), offsetCells("R3C2")),
                     ArrowConstraint(offsetCell("R1C2"), offsetCells("R4C2")),
@@ -242,6 +251,8 @@ export const base: PuzzleDefinition<NumberPTM> = {
     allowDrawing: allDrawingModes,
 };
 
+const S = undefined;
+
 export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
     ...base,
     noIndex: true,
@@ -287,8 +298,6 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
         </RulesParagraph>
         <RulesParagraph>The digit "0" is by definition an even digit.</RulesParagraph>
         <RulesParagraph>The letter "V" indicates a greater/lesser-than relationship between those two cells.</RulesParagraph>
-        <RulesParagraph>MODIFIER:</RulesParagraph>
-        <RulesParagraph>Schrödinger certainty (natural): no Schrödinger cell will contain the digit "0".</RulesParagraph>
         <RulesParagraph>
             Spin the Wheel: You have ten rupees to spend! (the three green boxes will add up to ten total) -
             modify the grid, depending on what digits are placed in row 9, columns 2 / 5 / 8 (only one combination will be valid, to be deduced by the solver).
@@ -319,11 +328,11 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
             KillerCageConstraint(["R9C2"]),
             KillerCageConstraint(["R9C5"]),
             KillerCageConstraint(["R9C8"]),
-            KropkiDotConstraint("R1C8", "R1C9", true),
             KropkiDotConstraint("R7C2", "R8C2", true),
             KropkiDotConstraint("R8C8", "R9C8", true),
             KropkiDotConstraint("R7C4", "R7C5", false),
             KropkiDotConstraint("R7C5", "R7C6", false),
+            KropkiDotConstraint("R7C7", "R8C7", false),
             ...getShopItemsByContext(context).constraints,
         ].map(toDecorativeConstraint);
     },
@@ -359,6 +368,18 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
             8: [lightRedColor],
         },
     }),
+    solution: createGivenDigitsMapFromArray([
+        [0, 8, 5, 1, 9, 7, 4, 3, S],
+        [S, 9, 6, 4, 5, 2, 1, 0, 8],
+        [1, 2, 4, 3, 0, S, 5, 7, 9],
+        [9, 1, 3, 2, 4, 5, S, 6, 7],
+        [6, S, 8, 9, 3, 0, 2, 1, 4],
+        [2, 4, 0, S, 7, 1, 3, 9, 5],
+        [4, 3, 1, 7, 8, 9, 6, S, 0],
+        [5, 6, 9, 0, S, 4, 7, 8, 3],
+        [8, 0, S, 5, 6, 3, 9, 4, 1],
+    ]),
+    resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
 };
 
 export const BuySomethinWillYaShopItems: PuzzleDefinition<NumberPTM>[] = ["Compass", "Arrow", "Candle", "Hookshot", "Sword", "Flute", "Bow & Quiver", "Raft", "Bomb", "Super Bomb"].map((title, index) => {
