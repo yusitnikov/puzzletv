@@ -13,7 +13,6 @@ import {
     killerCagesExplained,
     oddExplained,
     renbanExplained,
-    tenLineExplained,
     whiteKropkiDotsExplained
 } from "../ruleSnippets";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
@@ -24,7 +23,6 @@ import {Constraint, toDecorativeConstraint} from "../../types/sudoku/Constraint"
 import {parsePositionLiteral, PositionLiteral} from "../../types/layout/Position";
 import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
-import {LineConstraint} from "../../components/sudoku/constraints/line/Line";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {GermanWhispersConstraint} from "../../components/sudoku/constraints/german-whispers/GermanWhispers";
 import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
@@ -45,8 +43,6 @@ const yellowColor = "#ffa";
 const blueColor = "#88f";
 const lightBlueColor = "#ccf";
 const greenColor = "#afa";
-
-const TenLineConstraint = (cells: PositionLiteral[]) => LineConstraint(cells, goldColor, 0.15);
 
 interface ShopItems {
     constraints: Constraint<NumberPTM, any>[];
@@ -205,7 +201,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
             return {
                 constraints: [
                     KillerCageConstraint(offsetCells("R5C1", "R5C2", "R6C1", "R6C2"), 30),
-                    TenLineConstraint(offsetCells("R5C2", "R4C3", "R3C2")),
+                    RenbanConstraint(offsetCells("R5C2", "R4C3", "R3C2")),
                     OddConstraint(offsetCell("R3C2")),
                 ],
                 colors: colorsMap(blueColor, "R5C1", "R5C2", "R6C1", "R6C2"),
@@ -214,7 +210,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
             return {
                 constraints: [
                     KillerCageConstraint(offsetCells("R3C2", "R4C1", "R4C2", "R4C3", "R5C1", "R5C2", "R5C3", "R6C1", "R6C2", "R6C3"), 45),
-                    TenLineConstraint(offsetCells("R3C2", "R2C2", "R2C3")),
+                    RenbanConstraint(offsetCells("R3C2", "R2C2", "R2C3")),
                     OddConstraint(offsetCell("R2C3")),
                 ],
                 colors: colorsMap(redColor, "R3C2", "R4C1", "R4C2", "R4C3", "R5C1", "R5C2", "R5C3", "R6C1", "R6C2", "R6C3"),
@@ -269,7 +265,7 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
         </RulesParagraph>
         <RulesParagraph>
             <details open={false}>
-                <summary>Normal arrow, German whisper (green), killer, kropki, odd/even and renban (pink) and tens (gold) rules apply.</summary>
+                <summary>Normal arrow, German whisper (green), killer, kropki, odd/even and renban (pink) rules apply.</summary>
                 <RulesUnorderedList>
                     <li>{translate(germanWhispersExplained())};</li>
                     <li>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)};</li>
@@ -277,12 +273,7 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
                     <li>{translate(blackKropkiDotsExplained)};</li>
                     <li>{translate(evenExplained)};</li>
                     <li>{translate(oddExplained)};</li>
-                    <li>{translate(renbanExplained())};</li>
-                    <li>{translate(tenLineExplained({
-                        [LanguageCode.en]: "gold",
-                        [LanguageCode.ru]: "Золотая",
-                        [LanguageCode.de]: "goldene",
-                    }))}.</li>
+                    <li>{translate(renbanExplained())}.</li>
                 </RulesUnorderedList>
             </details>
         </RulesParagraph>
