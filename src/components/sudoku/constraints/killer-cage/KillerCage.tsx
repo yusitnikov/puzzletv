@@ -160,7 +160,7 @@ const KillerCageSum = observer(function KillerCageSum<T extends AnyPTM>(
                 y={-size / 2}
                 width={width}
                 height={size}
-                fill={"white"}
+                fill={["white", "#fff", "#ffffff"].includes(color.toLowerCase()) ? "#000" : "#fff"}
             />
 
             {typeof sum === "number" && sum.toString().split("").map((digit, index) => <DigitSvgContent
