@@ -222,6 +222,18 @@ export const evenExplained: Translatable = {
     [LanguageCode.de]: "Graue Quadrate sind gerade Ziffern",
 };
 
+export const oddTitle: Translatable = {
+    [LanguageCode.en]: "Odd digits",
+    [LanguageCode.ru]: "Нечетные цифры",
+    [LanguageCode.de]: "Ungerade Ziffern",
+};
+
+export const oddExplained: Translatable = {
+    [LanguageCode.en]: "Grey circles are odd digits",
+    [LanguageCode.ru]: "В серых кругах находятся нечётные цифры",
+    [LanguageCode.de]: "Graue Kreise sind ungerade Ziffern",
+};
+
 export const renbanTitle: Translatable = {
     [LanguageCode.en]: "Renban lines",
     [LanguageCode.ru]: 'Линии "Ренбан"',
@@ -233,6 +245,31 @@ export const renbanExplained = (noColor = false): Translatable => ({
     [LanguageCode.ru]: `Цифры вдоль ${noColor ? "" : "фиолетовой"} линии должны образовывать набор последовательных цифр в любом порядке`,
     [LanguageCode.de]: `Die Ziffern entlang der ${noColor ? "" : "violetten"} Linie müssen in beliebiger Reihenfolge eine Reihe aufeinanderfolgender Ziffern bilden`,
 });
+
+export const tenLineTitle: Translatable = {
+    [LanguageCode.en]: "Ten lines",
+    [LanguageCode.ru]: 'Линии-десятки',
+    [LanguageCode.de]: "10-Linien",
+};
+
+export const tenLineExplained = (
+    color: TranslationItem | false = {
+        [LanguageCode.en]: "grey",
+        [LanguageCode.ru]: "Серая",
+        [LanguageCode.de]: "graue",
+    },
+): Translatable => {
+    color = color || {
+        [LanguageCode.en]: "",
+        [LanguageCode.ru]: "",
+        [LanguageCode.de]: "",
+    };
+    return ({
+        [LanguageCode.en]: `The ${color[LanguageCode.en]} line must be entirely divided into non-overlapping groups of cells along the line that sum to 10`,
+        [LanguageCode.ru]: `${color[LanguageCode.ru]} линия должна быть полностью разделена на непересекающиеся группы ячеек вдоль линии, сумма которых равна 10`,
+        [LanguageCode.de]: `Die ${color[LanguageCode.de]} Linie muss entlang der Linie vollständig in nicht überlappende Gruppen von Zellen unterteilt sein, die insgesamt 10 ergeben`,
+    });
+};
 
 export const inBetweenLineTitle: Translatable = {
     [LanguageCode.en]: "Between lines",

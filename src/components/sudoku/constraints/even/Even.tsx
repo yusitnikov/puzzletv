@@ -1,4 +1,4 @@
-import {lightGreyColor} from "../../../app/globals";
+import {darkGreyColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {
     parsePositionLiteral,
@@ -20,7 +20,8 @@ export const Even: ConstraintPropsGenericFcMap = {
             y={top + 0.5 - width / 2}
             width={width}
             height={width}
-            fill={lightGreyColor}
+            fill={darkGreyColor}
+            opacity={0.6}
         />;
     }),
 };

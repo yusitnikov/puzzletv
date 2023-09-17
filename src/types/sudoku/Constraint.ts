@@ -205,4 +205,11 @@ export const cloneConstraint = <T extends AnyPTM, DataT>(
     };
     return constraint.clone?.(constraint, {processCellCoords, processColor}) ?? constraint;
 };
+
+export const toDecorativeConstraint = <T extends AnyPTM, DataT>(constraint: Constraint<T, DataT>): Constraint<T, DataT> => ({
+    ...constraint,
+    isValidCell: undefined,
+    isValidPuzzle: undefined,
+    getInvalidUserLines: undefined,
+});
 // endregion

@@ -1,4 +1,4 @@
-import {lightGreyColor} from "../../../app/globals";
+import {darkGreyColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
 import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
@@ -14,7 +14,8 @@ export const Odd: ConstraintPropsGenericFcMap = {
             cx={left + 0.5}
             cy={top + 0.5}
             r={0.4}
-            fill={lightGreyColor}
+            fill={darkGreyColor}
+            opacity={0.6}
         />;
     }),
 };
