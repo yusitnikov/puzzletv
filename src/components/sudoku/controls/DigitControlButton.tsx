@@ -49,7 +49,7 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
     const selectableButtonContent = currentButton !== undefined;
 
     let digit = index + 1;
-    if (supportZero && digit === count) {
+    if (supportZero && isDigitMode && digit === count) {
         digit = 0;
     }
     const digitKey = digit === 10 ? 0 : digit;
