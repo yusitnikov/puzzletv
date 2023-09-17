@@ -899,7 +899,7 @@ export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
 
     switch (context.cellWriteMode) {
         case CellWriteMode.main:
-            if (gameStateIsAnySelectedCell(context, cell => !!cell.usersDigit)) {
+            if (gameStateIsAnySelectedCell(context, cell => cell.usersDigit !== undefined)) {
                 return gameStateProcessSelectedCells(context, clientId, actionId, () => ({
                     usersDigit: undefined
                 }));

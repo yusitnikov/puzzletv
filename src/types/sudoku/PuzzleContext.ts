@@ -810,8 +810,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get digitsCountInCurrentMode() {
         profiler.trace();
 
+        const {supportZero} = this.puzzle;
+
         const {
-            digitsCount: digitsCountFunc = this.digitsCount,
+            isDigitMode,
+            digitsCount: digitsCountFunc = this.digitsCount + (isDigitMode && supportZero ? 1 : 0),
         } = this.cellWriteModeInfo;
 
         return typeof digitsCountFunc === "function"

@@ -25,7 +25,15 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
     const translate = useTranslate();
 
     const {
-        puzzle,
+        puzzle: {
+            typeManager: {
+                createCellDataByDisplayDigit,
+                disableDigitShortcuts,
+                digitShortcuts = [],
+                digitShortcutTips = [],
+            },
+            supportZero,
+        },
         cellWriteMode,
         cellWriteModeInfo: {
             isDigitMode,
@@ -37,17 +45,13 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
         digitsCountInCurrentMode: count,
     } = context;
 
-    const {
-        createCellDataByDisplayDigit,
-        disableDigitShortcuts,
-        digitShortcuts = [],
-        digitShortcutTips = [],
-    } = puzzle.typeManager;
-
     const currentButton = getCurrentSecondaryButton?.(context);
     const selectableButtonContent = currentButton !== undefined;
 
-    const digit = index + 1;
+    let digit = index + 1;
+    if (supportZero && digit === count) {
+        digit = 0;
+    }
     const digitKey = digit === 10 ? 0 : digit;
     const cellData = createCellDataByDisplayDigit(digit, context);
     let shortcuts = (isDigitMode && digitShortcuts[index]) || [];

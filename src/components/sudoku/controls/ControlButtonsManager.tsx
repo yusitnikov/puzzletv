@@ -163,7 +163,6 @@ export class ControlButtonsManager<T extends AnyPTM> {
 
         const isRevertedBottom = this.isCompact && !this.isHorizontal;
         const bottomRow = this.isCompact ? 0 : 3;
-        const isColorMode = context.cellWriteMode === CellWriteMode.color;
 
         const isRevertedRight = this.isCompact === this.isHorizontal;
         const rightColumn = this.isCompact ? 1 : 4;
@@ -185,13 +184,22 @@ export class ControlButtonsManager<T extends AnyPTM> {
                 info={info}
             />)}
 
-            {bottom.map(({key, Component, info}, index) => (!isColorMode || index !== 1) && <Component
-                key={key}
-                context={context}
-                top={isRevertedBottom ? index : bottomRow}
-                left={isRevertedBottom ? bottomRow : index}
-                info={info}
-            />)}
+            {bottom.map(({key, Component, info}, index) => {
+                const content = <Component
+                    key={key}
+                    context={context}
+                    top={isRevertedBottom ? index : bottomRow}
+                    left={isRevertedBottom ? bottomRow : index}
+                    info={info}
+                />;
+
+                if (!(context.digitsCountInCurrentMode < 10 || index !== 1)) {
+                    // Render the button as hidden, but support the hotkeys
+                    return <div key={key} style={{display: "none"}}>{content}</div>;
+                }
+
+                return content;
+            })}
 
             {additional.map(({key, Component, info}, index) => <Component
                 key={key}

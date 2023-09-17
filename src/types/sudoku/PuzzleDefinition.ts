@@ -55,6 +55,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     ignoreRowsColumnCountInTheWrapper?: boolean;
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
+    supportZero?: boolean;
     initialDigits?: GivenDigitsMap<T["cell"]>;
     initialLetters?: GivenDigitsMap<string>;
     initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<T>) => GivenDigitsMap<CellColorValue[]>);

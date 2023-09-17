@@ -46,7 +46,7 @@ export const FieldCellDigits = observer(function FieldCellDigits<T extends AnyPT
     profiler.trace();
 
     const cellState = context.getCell(top, left);
-    const initialData = context.puzzle.initialDigits?.[top]?.[left] || context.stateInitialDigits?.[top]?.[left];
+    const initialData = context.puzzle.initialDigits?.[top]?.[left] ?? context.stateInitialDigits?.[top]?.[left];
     const cellExcludedDigits = context.excludedDigits[top][left];
 
     const cellPosition = useMemo((): Position => ({top, left}), [top, left]);
@@ -119,7 +119,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>(
     } = data;
 
     const initialDataSet = useMemo(
-        () => initialData && new CellDataSet(puzzle, [initialData]),
+        () => initialData === undefined ? undefined : new CellDataSet(puzzle, [initialData]),
         [puzzle, initialData]
     );
 
@@ -129,7 +129,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>(
     );
 
     const usersDigitSet = useMemo(
-        () => usersDigit && new CellDataSet(puzzle, [usersDigit]),
+        () => usersDigit === undefined ? undefined : new CellDataSet(puzzle, [usersDigit]),
         [puzzle, usersDigit]
     );
 
