@@ -30,6 +30,7 @@ export interface KillerCageProps {
     lineColor?: string;
     fontColor?: string;
     largeSum?: boolean;
+    inverted?: boolean;
 }
 
 export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
@@ -44,6 +45,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
                 lineColor = blackColor,
                 fontColor = blackColor,
                 largeSum,
+                inverted,
             },
         }: ConstraintProps<T, KillerCageProps>
     ) {
@@ -63,7 +65,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
             [cells, bottom]
         );
 
-        const borderPadding = prioritizeSelection ? 0.15 : 0.1;
+        const borderPadding = (inverted ? -1 : 1) * (prioritizeSelection ? 0.15 : 0.1);
         const sumPadding = prioritizeSelection ? 0.17 : largeSum ? 0.12 : borderPadding;
         const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.15;
 
@@ -192,6 +194,7 @@ export const DecorativeCageConstraint = <T extends AnyPTM>(
     lineColor?: string,
     fontColor?: string,
     largeSum = false,
+    inverted = false,
 ): Constraint<T, KillerCageProps> => ({
     name: "cage",
     tags: [cageTag],
@@ -203,6 +206,7 @@ export const DecorativeCageConstraint = <T extends AnyPTM>(
         lineColor,
         fontColor,
         largeSum,
+        inverted,
     },
     component: KillerCage,
 });
@@ -215,8 +219,9 @@ export const KillerCageConstraint = <T extends AnyPTM>(
     lineColor?: string,
     fontColor?: string,
     largeSum = false,
+    inverted = false,
 ): Constraint<T, KillerCageProps> => ({
-    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor, largeSum),
+    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor, largeSum, inverted),
     name: "killer cage",
     isObvious: true,
     isValidCell(
