@@ -265,7 +265,7 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
         </RulesParagraph>
         <RulesParagraph>
             <details open={false}>
-                <summary>Normal arrow, German whisper (green), killer, kropki, odd/even and renban (pink) rules apply.</summary>
+                <summary>Normal arrow, German whisper (green), killer, kropki, odd/even and renban (purple) rules apply.</summary>
                 <RulesUnorderedList>
                     <li>{translate(germanWhispersExplained())};</li>
                     <li>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)};</li>
