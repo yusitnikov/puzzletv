@@ -27,6 +27,7 @@ import {ChessPTM} from "../../sudokuTypes/chess/types/ChessPTM";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
 import {indexes, indexesFromTo} from "../../utils/indexes";
+import {AntiBishopConstraint} from "../../types/sudoku/constraints/AntiBishop";
 
 const mandatorySolutionPieces = chessInitialPiecesByCellNames({
     "g8": {color: ChessColor.black, type: ChessPieceType.knight},
@@ -231,6 +232,65 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
             "b4": {color: ChessColor.white, type: ChessPieceType.bishop},
             "c4": {color: ChessColor.black, type: ChessPieceType.knight},
             "g2": {color: ChessColor.white, type: ChessPieceType.rook},
+        })
+    ),
+};
+
+export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
+    noIndex: true,
+    title: {
+        [LanguageCode.en]: "A new discovery",
+    },
+    slug: "new-discovery",
+    author: {
+        [LanguageCode.en]: "ojppe",
+    },
+    rules: translate => <>
+        <RulesParagraph>{translate(chessSudokuRules)}.</RulesParagraph>
+        <RulesParagraph>{translate({
+            [LanguageCode.en]: "Chess pieces (white or black) cannot repeat in rows, columns, boxes and diagonally",
+            [LanguageCode.ru]: "Шахматные фигуры (белые или черные) не могут повторяться на каждой линии, в каждом регионе, огражденном жирными линиями, и диагонально",
+            [LanguageCode.de]: "Schachfiguren (weiß oder schwarz) dürfen sich nicht in Reihen, Spalten, Kästchen und diagonal wiederholen",
+        })}.</RulesParagraph>
+        <RulesParagraph>{translate(mateInOne)}.</RulesParagraph>
+        <RulesParagraph>{translate(noPastPromotions)}.</RulesParagraph>
+    </>,
+    typeManager: ChessSudokuTypeManager,
+    fieldSize: FieldSize8,
+    regions: Regions8,
+    fieldMargin: chessBoardIndexesMargin,
+    initialDigits: chessInitialPiecesByCellNames({
+        "a8": {color: ChessColor.black, type: ChessPieceType.rook},
+        "a7": {color: ChessColor.black, type: ChessPieceType.king},
+        "f8": {color: ChessColor.white, type: ChessPieceType.knight},
+        "g7": {color: ChessColor.black, type: ChessPieceType.pawn},
+        "b6": {color: ChessColor.black, type: ChessPieceType.pawn},
+        "e6": {color: ChessColor.white, type: ChessPieceType.queen},
+        "d5": {color: ChessColor.black, type: ChessPieceType.knight},
+        "h5": {color: ChessColor.black, type: ChessPieceType.rook},
+        "a4": {color: ChessColor.black, type: ChessPieceType.knight},
+        "e4": {color: ChessColor.black, type: ChessPieceType.bishop},
+        "b3": {color: ChessColor.white, type: ChessPieceType.rook},
+        "c3": {color: ChessColor.black, type: ChessPieceType.bishop},
+        "h3": {color: ChessColor.white, type: ChessPieceType.pawn},
+        "a2": {color: ChessColor.white, type: ChessPieceType.pawn},
+        "d1": {color: ChessColor.white, type: ChessPieceType.bishop},
+    }),
+    items: [
+        ChessBoardCellsBackgroundConstraint(),
+        ChessBoardIndexesConstraint(),
+        ValidChessPositionConstraint,
+        AntiBishopConstraint(),
+    ],
+    allowDrawing: allDrawingModes,
+    resultChecker: (context) => isValidSolution(
+        context,
+        chessInitialPiecesByCellNames({
+            "c7": {color: ChessColor.white, type: ChessPieceType.knight},
+            "e7": {color: ChessColor.white, type: ChessPieceType.rook},
+            "b5": {color: ChessColor.white, type: ChessPieceType.king},
+            "h2": {color: ChessColor.white, type: ChessPieceType.bishop},
+            "d4": {color: ChessColor.black, type: ChessPieceType.queen},
         })
     ),
 };

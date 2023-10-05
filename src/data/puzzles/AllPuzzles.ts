@@ -1,6 +1,6 @@
 import {loadPuzzle, PuzzleDefinitionOrLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
-import {RealChessPuzzle, RealChessPuzzle2, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
+import {NewDiscovery, RealChessPuzzle, RealChessPuzzle2, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
 import {
     EmptyChaosConstruction,
     EmptyChaosConstructionLoop,
@@ -74,6 +74,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    NewDiscovery,
+
     BuySomethinWillYa,
     ...BuySomethinWillYaShopItems,
 
