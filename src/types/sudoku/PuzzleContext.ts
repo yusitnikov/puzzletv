@@ -11,7 +11,7 @@ import {
     setAllShareState
 } from "./GameState";
 import {MessageWithClientId, myClientId, UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
-import {Dispatch} from "react";
+import {Dispatch, ReactNode} from "react";
 import {
     coreGameStateActionTypes,
     GameStateAction,
@@ -588,7 +588,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     }
     // endregion
 
-    get resultCheck(): PuzzleResultCheck<string> {
+    get resultCheck(): PuzzleResultCheck<ReactNode> {
         profiler.trace();
 
         if (this.lives === 0) {
@@ -608,7 +608,9 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             }
             : {
                 isCorrectResult: result.isCorrectResult,
-                resultPhrase: this.translate(result.resultPhrase),
+                resultPhrase: typeof result.resultPhrase === "string" || (result.resultPhrase && typeof result.resultPhrase === "object" && LanguageCode.en in result.resultPhrase)
+                    ? this.translate(result.resultPhrase as PartiallyTranslatable<ReactNode>)
+                    : result.resultPhrase,
                 forceShowResult: result.forceShowResult,
             };
     }

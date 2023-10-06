@@ -62,7 +62,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
     disableBackgroundColorOpacity?: boolean;
-    resultChecker?: (context: PuzzleContext<T>) => boolean | PuzzleResultCheck<PartiallyTranslatable>,
+    resultChecker?: (context: PuzzleContext<T>) => boolean | PuzzleResultCheck<ReactNode | PartiallyTranslatable<ReactNode>>,
     forceAutoCheckOnFinish?: boolean;
     items?: Constraint<T, any>[]
         | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
@@ -221,7 +221,7 @@ export const getPuzzleLineHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T
 const debugSolutionChecker = false;
 export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     context: PuzzleContext<T>
-): boolean | PuzzleResultCheck<PartiallyTranslatable> => {
+): boolean | PuzzleResultCheck<PartiallyTranslatable<ReactNode>> => {
     const timer = profiler.track("isValidFinishedPuzzleByEmbeddedSolution");
 
     const {

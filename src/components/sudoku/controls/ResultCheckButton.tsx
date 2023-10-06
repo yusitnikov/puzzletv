@@ -113,7 +113,9 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
                                     <div>{translate("Your score is %1").replace("%1", myScore.toString())}.</div>
                                 </>
                         )
-                        : resultPhrase.split("\n").map((line, lineIndex) => <div key={lineIndex}>{line}</div>)
+                        : typeof resultPhrase !== "string"
+                            ? resultPhrase
+                            : resultPhrase.split("\n").map((line, lineIndex) => <div key={lineIndex}>{line}</div>)
                 }
             </div>
 
