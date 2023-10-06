@@ -102,6 +102,7 @@ import {TetrisSudokuTypeManager} from "../../sudokuTypes/tetris/types/TetrisSudo
 import {
     QuadInputSudokuTypeManager
 } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
+import {Find3SudokuTypeManager} from "../../sudokuTypes/find3/types/Find3SudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -199,6 +200,7 @@ const loadByImportOptions = (
         rotatableClues,
         sokoban,
         fillableQuads,
+        find3,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager();
@@ -245,6 +247,9 @@ const loadByImportOptions = (
             allowRepeat: true,
             allowOverflow: true,
         });
+    }
+    if (find3) {
+        typeManager = Find3SudokuTypeManager(typeManager);
     }
 
     switch (digitType) {

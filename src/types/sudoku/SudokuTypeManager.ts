@@ -254,6 +254,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     getPlayerScore?(context: PuzzleContext<T>, clientId: string): string | number;
 
+    // TODO: transform into a component
     getAboveRules?(translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>, isPortrait: boolean): ReactNode;
 
     postProcessPuzzle?(puzzle: PuzzleDefinition<T>): typeof puzzle;

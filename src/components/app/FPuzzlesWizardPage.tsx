@@ -68,6 +68,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
     const [fillableQuads, setFillableQuads] = useBoolFromLocalStorage("fpwFillableQuads");
+    const [find3, setFind3] = useBoolFromLocalStorage("fpwFind3");
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
     const [transparentArrowCircle, setTransparentArrowCircle] = useBoolFromLocalStorage("fpwTransparentArrowCircle");
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
@@ -165,6 +166,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
         fillableQuads: !isSpecialGrid && fillableQuads,
+        find3,
         "product-arrow": hasArrows && productArrow,
         transparentArrowCircle: hasArrows && !transparentCirclesForced && transparentArrowCircle,
         yajilinFog: hasFog && yajilinFog,
@@ -368,6 +370,13 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                             </label>
                         </Paragraph>}
                     </>}
+
+                    <Paragraph>
+                        <label>
+                            Find the 3 (gifts):&nbsp;
+                            <input type={"checkbox"} checked={find3} onChange={ev => setFind3(ev.target.checked)}/>
+                        </label>
+                    </Paragraph>
                 </CollapsableFieldSet>
 
                 {isSafeCracker && <CollapsableFieldSet legend={"Safe cracker"}>
