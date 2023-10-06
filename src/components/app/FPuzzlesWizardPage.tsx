@@ -67,6 +67,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
+    const [fillableQuads, setFillableQuads] = useBoolFromLocalStorage("fpwFillableQuads");
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
     const [transparentArrowCircle, setTransparentArrowCircle] = useBoolFromLocalStorage("fpwTransparentArrowCircle");
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
@@ -163,6 +164,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         keepCircles: !isSpecialGrid && rotatableClues && keepCircles,
         sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
+        fillableQuads: !isSpecialGrid && fillableQuads,
         "product-arrow": hasArrows && productArrow,
         transparentArrowCircle: hasArrows && !transparentCirclesForced && transparentArrowCircle,
         yajilinFog: hasFog && yajilinFog,
@@ -322,6 +324,13 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                             <label>
                                 Tesseract:&nbsp;
                                 <input type={"checkbox"} checked={tesseract} onChange={ev => setTesseract(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Fillable quadruples:&nbsp;
+                                <input type={"checkbox"} checked={fillableQuads} onChange={ev => setFillableQuads(ev.target.checked)}/>
                             </label>
                         </Paragraph>
                     </>}

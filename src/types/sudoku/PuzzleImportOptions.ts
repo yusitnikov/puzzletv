@@ -32,6 +32,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     htmlRules?: boolean;
     digitsCount?: number;
     tesseract?: boolean;
+    fillableQuads?: boolean;
     fillableDigitalDisplay?: boolean;
     noSpecialRules?: boolean;
     loopX?: boolean;
@@ -76,6 +77,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         digitType,
         htmlRules,
         tesseract,
+        fillableQuads,
         fillableDigitalDisplay,
         noSpecialRules,
         loopX,
@@ -116,6 +118,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         digitType,
         htmlRules,
         tesseract,
+        fillableQuads,
         fillableDigitalDisplay,
         noSpecialRules,
         loopX,

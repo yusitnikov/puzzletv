@@ -99,6 +99,9 @@ import {
 import {SokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/types/SokobanSudokuTypeManager";
 import {greenColor, purpleColor} from "../../components/app/globals";
 import {TetrisSudokuTypeManager} from "../../sudokuTypes/tetris/types/TetrisSudokuTypeManager";
+import {
+    QuadInputSudokuTypeManager
+} from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -195,6 +198,7 @@ const loadByImportOptions = (
         jss,
         rotatableClues,
         sokoban,
+        fillableQuads,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager();
@@ -234,6 +238,13 @@ const loadByImportOptions = (
     }
     if (rotatableClues) {
         typeManager = ImportedRotatableCluesSudokuTypeManager(typeManager);
+    }
+    if (fillableQuads) {
+        typeManager = QuadInputSudokuTypeManager({
+            parent: typeManager,
+            allowRepeat: true,
+            allowOverflow: true,
+        });
     }
 
     switch (digitType) {
