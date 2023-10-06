@@ -6,7 +6,7 @@ import {profiler} from "../../../utils/profiler";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {getRectCenter} from "../../../types/layout/Rect";
 import {getVectorLength3D, Position3D, subtractVectors3D} from "../../../types/layout/Position3D";
-import {transformFullCubeCoords3D} from "../types/FullCubeTypeManager";
+import {transformFullCubeCoords3D} from "../helpers/fullCubeHelpers";
 import {GridRegion} from "../../../types/sudoku/GridRegion";
 import {Position} from "../../../types/layout/Position";
 import {indexes} from "../../../utils/indexes";
@@ -175,11 +175,11 @@ const FullCubeJss = {
             }))}
         </AutoSvg>;
     }),
-}
+};
 
-export const FullCubeJssConstraint = (): Constraint<FullCubePTM> => ({
+export const FullCubeJssConstraint: Constraint<FullCubePTM> = {
     name: "full cube JSS",
     cells: [],
     props: undefined,
     component: FullCubeJss,
-});
+};

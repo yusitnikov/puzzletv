@@ -99,6 +99,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         PuzzleImportPuzzleType.Rotatable,
         PuzzleImportPuzzleType.Jigsaw,
         PuzzleImportPuzzleType.Tetris,
+        PuzzleImportPuzzleType.RotatableCube,
     ].includes(type);
     const isSpecialGrid = isRotatableGrid || [
         PuzzleImportPuzzleType.Cubedoku,
@@ -110,6 +111,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         PuzzleImportPuzzleType.Regular,
         PuzzleImportPuzzleType.Jigsaw,
         PuzzleImportPuzzleType.Tetris,
+        PuzzleImportPuzzleType.RotatableCube,
     ].includes(type);
     const supportsJss = isRotatableGrid || (!isSpecialGrid && !loopX && !loopY);
 
@@ -245,6 +247,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                             <Select value={type} onChange={ev => setType(ev.target.value as PuzzleImportPuzzleType)}>
                                 <option value={PuzzleImportPuzzleType.Regular}>Regular</option>
                                 <option value={PuzzleImportPuzzleType.Cubedoku}>Cubedoku</option>
+                                <option value={PuzzleImportPuzzleType.RotatableCube}>Rotatable cube</option>
                                 <option value={PuzzleImportPuzzleType.InfiniteRings}>Infinite loop</option>
                                 <option value={PuzzleImportPuzzleType.Rotatable}>Rotatable</option>
                                 <option value={PuzzleImportPuzzleType.SafeCracker}>Safe cracker</option>

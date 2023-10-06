@@ -35,6 +35,7 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
     const {
         puzzle: {fieldSize: {fieldSize}},
         cellSize,
+        isReadonlyContext,
     } = context;
 
     const translate = useTranslate();
@@ -79,6 +80,10 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
                 break;
         }
     });
+
+    if (isReadonlyContext) {
+        return null;
+    }
 
     return <div style={{
         fontSize: cellSize / 2,

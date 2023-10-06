@@ -5,6 +5,7 @@ export enum PuzzleImportPuzzleType {
     Latin = "latin",
     Calculator = "calculator",
     Cubedoku = "cubedoku",
+    RotatableCube = "rotatable-cube",
     Rotatable = "rotatable",
     SafeCracker = "safe-cracker",
     InfiniteRings = "infinite-rings",

@@ -1,4 +1,4 @@
-import {GivenDigitsMap} from "./GivenDigitsMap";
+import {GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps} from "./GivenDigitsMap";
 import {ComponentType, ReactNode} from "react";
 import {SudokuTypeManager} from "./SudokuTypeManager";
 import {FieldSize} from "./FieldSize";
@@ -356,4 +356,31 @@ export const isStickyRegionCell = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>
     top -= stickyRegion.top;
     left -= stickyRegion.left;
     return top >= 0 && left >= 0 && top < stickyRegion.height && left < stickyRegion.width;
+};
+
+export const importGivenColorsAsSolution = <T extends AnyPTM>(
+    puzzle: PuzzleDefinition<T>,
+    isRegionCell: (cell: Position) => boolean = () => true,
+) => {
+    const {
+        initialColors = {},
+        solutionColors = {},
+    } = puzzle;
+    if (typeof initialColors !== "object" || typeof solutionColors !== "object") {
+        throw new Error("puzzle.initialColors and puzzle.solutionColors are expected to be objects");
+    }
+
+    puzzle.solutionColors = mergeGivenDigitsMaps(
+        solutionColors,
+        processGivenDigitsMaps(
+            ([colors], position) =>
+                isRegionCell(position) ? colors : undefined,
+            [initialColors]
+        )
+    );
+    puzzle.initialColors = processGivenDigitsMaps(
+        ([colors], position) =>
+            isRegionCell(position) ? undefined : colors,
+        [initialColors]
+    );
 };

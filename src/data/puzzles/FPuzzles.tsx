@@ -1,6 +1,6 @@
 import {ReactNode} from "react";
 import {
-    allDrawingModes,
+    allDrawingModes, importGivenColorsAsSolution,
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
     PuzzleDefinitionLoader
@@ -103,6 +103,8 @@ import {
     QuadInputSudokuTypeManager
 } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
 import {Find3SudokuTypeManager} from "../../sudokuTypes/find3/types/Find3SudokuTypeManager";
+import {FullCubeTypeManager} from "../../sudokuTypes/cube/types/FullCubeTypeManager";
+import {FullCubeJssConstraint} from "../../sudokuTypes/cube/constraints/FullCubeJss";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -209,6 +211,7 @@ const loadByImportOptions = (
         [PuzzleImportPuzzleType.Latin]: regularTypeManager,
         [PuzzleImportPuzzleType.Calculator]: regularTypeManager,
         [PuzzleImportPuzzleType.Cubedoku]: CubedokuTypeManager,
+        [PuzzleImportPuzzleType.RotatableCube]: FullCubeTypeManager(),
         [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
         [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
             size: digitsCount,
@@ -235,7 +238,7 @@ const loadByImportOptions = (
     if (yajilinFog) {
         typeManager = YajilinFogSudokuTypeManager(typeManager);
     }
-    if (jss) {
+    if (jss && type !== PuzzleImportPuzzleType.RotatableCube) {
         typeManager = JssSudokuTypeManager(typeManager);
     }
     if (rotatableClues) {
@@ -277,9 +280,16 @@ const loadByImportOptions = (
         rowsCount,
         columnsCount,
     });
+
     for (const {json, offsetX, offsetY} of allGrids) {
         importer.addGrid(json, offsetX, offsetY);
     }
+
+    if (jss && type === PuzzleImportPuzzleType.RotatableCube) {
+        importer.addItems(FullCubeJssConstraint);
+        importer.importGivenColorsAsSolution();
+    }
+
     return importer.finalize();
 };
 
@@ -968,6 +978,14 @@ class FPuzzlesImporter<T extends AnyPTM> {
 
             this.puzzle.prioritizeSelection = true;
         }
+    }
+
+    addItems(...items: Constraint<T, any>[]) {
+        this.items.push(...items);
+    }
+
+    importGivenColorsAsSolution() {
+        importGivenColorsAsSolution(this.puzzle);
     }
 
     finalize(): PuzzleDefinition<T> {

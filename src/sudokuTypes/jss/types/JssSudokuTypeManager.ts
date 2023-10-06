@@ -1,11 +1,11 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {getRegionCells, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {getRegionCells, importGivenColorsAsSolution, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {PositionSet} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {JssCell} from "./JssCell";
-import {GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
-import {resolveCellColorValue} from "../../../types/sudoku/CellColor";
+import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
+import {CellColorValue, resolveCellColorValue} from "../../../types/sudoku/CellColor";
 import {JssConstraint} from "../constraints/Jss";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
 
@@ -37,21 +37,9 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
 
             const allRegionCells = new PositionSet(puzzle.regions?.flatMap(getRegionCells));
 
-            puzzle.initialColors = puzzle.initialColors ?? {};
-            puzzle.solutionColors = puzzle.solutionColors ?? {};
-            if (typeof puzzle.initialColors !== "object" || typeof puzzle.solutionColors !== "object") {
-                throw new Error(`puzzle.initialColors and puzzle.solutionColors are expected to be objects for ${JssSudokuTypeManager.name}`);
-            }
-
             // Treat given colors inside active regions as solution colors
-            puzzle.solutionColors = mergeGivenDigitsMaps(
-                puzzle.solutionColors,
-                processGivenDigitsMaps(
-                    ([colors], position) =>
-                        allRegionCells.contains(position) ? colors : undefined,
-                    [puzzle.initialColors]
-                )
-            );
+            importGivenColorsAsSolution(puzzle, (position) => allRegionCells.contains(position));
+
             // Treat given colors outside active regions as JSS clues
             let jssCellsMap: GivenDigitsMap<JssCell> = processGivenDigitsMaps(
                 ([[color]], position): JssCell | undefined =>
@@ -61,7 +49,7 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
                             backgroundColor: resolveCellColorValue(color)
                         }
                         : undefined,
-                [puzzle.initialColors]
+                [puzzle.initialColors as GivenDigitsMap<CellColorValue[]>]
             );
             puzzle.initialColors = undefined;
 
