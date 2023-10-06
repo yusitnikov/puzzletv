@@ -106,7 +106,7 @@ const KClue = observer(function KClueFc({cell}: CellProps) {
 });
 
 const Extras = {
-    [FieldLayer.top]: observer(function Extras() {
+    [FieldLayer.afterLines]: observer(function Extras() {
         profiler.trace();
 
         return <>
