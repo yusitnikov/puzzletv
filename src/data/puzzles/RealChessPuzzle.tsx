@@ -28,6 +28,7 @@ import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {ChessPiece} from "../../sudokuTypes/chess/types/ChessPiece";
 import {indexes, indexesFromTo} from "../../utils/indexes";
 import {AntiBishopConstraint} from "../../types/sudoku/constraints/AntiBishop";
+import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 
 const mandatorySolutionPieces = chessInitialPiecesByCellNames({
     "g8": {color: ChessColor.black, type: ChessPieceType.knight},
@@ -281,6 +282,7 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
         ChessBoardIndexesConstraint(),
         ValidChessPositionConstraint,
         AntiBishopConstraint(),
+        TextConstraint(["R8C8"], "7", undefined, 0.7),
     ],
     allowDrawing: allDrawingModes,
     resultChecker: (context) => isValidSolution(
@@ -292,5 +294,22 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
             "h2": {color: ChessColor.white, type: ChessPieceType.bishop},
             "d4": {color: ChessColor.black, type: ChessPieceType.queen},
         })
-    ),
+    )
+        ? {
+            isCorrectResult: true,
+            resultPhrase: <>
+                <div>{context.translate("Congratulations")}!</div>
+                <div>{context.translate({
+                    [LanguageCode.en]: "The chess part completed successfully",
+                    [LanguageCode.ru]: "Шахматная часть выполнена успешно",
+                    [LanguageCode.de]: "Der Schachteil wurde erfolgreich abgeschlossen",
+                })}!</div>
+                <div style={{marginTop: "0.5em"}}><a href={"https://sudokupad.app/qx2toxcwwn"}>{context.translate({
+                    [LanguageCode.en]: "Go to the sudoku part",
+                    [LanguageCode.ru]: "Перейти к части судоку",
+                    [LanguageCode.de]: "Gehen Sie zum Sudoku-Teil",
+                })}</a></div>
+            </>,
+        }
+        : false,
 };
