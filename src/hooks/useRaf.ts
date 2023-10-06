@@ -7,6 +7,7 @@ interface TickEventData {
     delta: number;
 }
 
+// TODO: replace by mobx OOTB functionality
 class RafTime {
     time: number;
 
