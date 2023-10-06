@@ -10,7 +10,7 @@ import {getIsSamePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
 import {CellSelectionColor, CellSelectionByDataProps} from "../../components/sudoku/cell/CellSelection";
 import {GridRegion} from "./GridRegion";
 import {Constraint} from "./Constraint";
-import {PuzzleContext} from "./PuzzleContext";
+import {PuzzleContext, PuzzleContextProps} from "./PuzzleContext";
 import {CellStateEx} from "./CellState";
 import {CellWriteMode} from "./CellWriteMode";
 import {CellWriteModeInfo} from "./CellWriteModeInfo";
@@ -265,6 +265,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     mapImportedColors?: boolean;
 
     onCloseCorrectResultPopup?(context: PuzzleContext<T>): void;
+
+    fieldControlsComponent?: ComponentType<PuzzleContextProps<T>>;
 }
 
 // region Helper functions

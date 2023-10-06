@@ -70,6 +70,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
         fieldWrapperHandlesScale,
         gridBackgroundColor = "#fff",
         regionBackgroundColor,
+        fieldControlsComponent: FieldControls,
     } = typeManager;
 
     const autoIncrementId = useAutoIncrementId();
@@ -366,6 +367,15 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
                     />
                 </>}
             </FieldWrapper>
+
+            {FieldControls && <Absolute
+                top={fieldMargin * cellSize}
+                left={fieldMargin * cellSize}
+                width={rect.width - 2 * fieldMargin * cellSize}
+                height={rect.width - 2 * fieldMargin * cellSize}
+            >
+                <FieldControls context={context}/>
+            </Absolute>}
         </Absolute>
 
         {fogDemoFieldStateHistory && <Absolute {...rect} style={{
