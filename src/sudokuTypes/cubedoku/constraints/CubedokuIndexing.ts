@@ -1,5 +1,6 @@
 import {Constraint} from "../../../types/sudoku/Constraint";
-import {isSamePosition, Position, Position3D} from "../../../types/layout/Position";
+import {isSamePosition, Position} from "../../../types/layout/Position";
+import {Position3D} from "../../../types/layout/Position3D";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 
 export const CubedokuIndexingConstraint = <T extends AnyPTM>(): Constraint<T> => ({

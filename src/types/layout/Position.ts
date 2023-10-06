@@ -10,12 +10,6 @@ export interface PositionWithAngle extends Position {
     angle: number;
 }
 
-export interface Position3D {
-    x: number;
-    y: number;
-    z: number;
-}
-
 export interface Line {
     start: Position;
     end: Position;
