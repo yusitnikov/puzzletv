@@ -20,6 +20,9 @@ import {observer} from "mobx-react-lite";
 import {settings} from "../../../../types/layout/Settings";
 import {profiler} from "../../../../utils/profiler";
 
+// Temporarily disable collective solve while it's buggy
+const disableNetwork = true;
+
 export interface SettingsContentProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     cellSize: number;
@@ -69,7 +72,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
             <strong>{translate("Settings")}</strong>
         </div>
 
-        <SettingsItem noLabel={true}>
+        {!disableNetwork && <SettingsItem noLabel={true}>
             <i>{translate(isEnabled ? "Multi-player mode" : "Single-player mode")}.</i>
 
             {getNewHostedGameParams && <SettingsButton
@@ -112,7 +115,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
             >
                 {translate("Start collective solve")}
             </SettingsButton>}
-        </SettingsItem>
+        </SettingsItem>}
 
         {isEnabled && <SettingsItem>
             <div style={{display: "inline-flex", alignItems: "center"}}>
