@@ -5,11 +5,11 @@ import {initialCoordsBase3D, Position3D, rotateVector3D} from "../../../types/la
 
 export const transformFullCubeCoords3D = ({top, left}: Position, context: PuzzleContext<FullCubePTM>) => {
     const {
-        puzzle: {fieldSize: {fieldSize}},
+        puzzle: {fieldSize: {columnsCount}},
         processedGameStateExtension: {animatedCoordsBase: {ox, oy, oz}},
     } = context;
 
-    const realFieldSize = fieldSize / 2;
+    const realFieldSize = columnsCount / 3;
 
     let topQuad = top < realFieldSize ? 0 : top < realFieldSize * 2 ? 1 : 2;
     let leftQuad = left < realFieldSize ? 0 : left < realFieldSize * 2 ? 1 : 2;

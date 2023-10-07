@@ -68,8 +68,8 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
 
     fieldControlsComponent: FullCubeControls,
 
-    getCellTypeProps({top}, {fieldSize: {fieldSize}}): CellTypeProps<FullCubePTM> {
-        const realFieldSize = fieldSize / 2;
+    getCellTypeProps({top}, {fieldSize: {columnsCount}}): CellTypeProps<FullCubePTM> {
+        const realFieldSize = columnsCount / 3;
         return {isSelectable: top < realFieldSize * 2};
     },
 
@@ -130,13 +130,14 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     },
 
     transformCoords(position, context) {
-        const {puzzle: {fieldSize: {fieldSize}}} = context;
+        const {puzzle: {fieldSize: {columnsCount}}} = context;
+        const realFieldSize = columnsCount / 3;
 
         const {x, y, z} = transformFullCubeCoords3D(position, context);
 
         return {
-            left: fieldSize / 2 + x - z,
-            top: fieldSize / 2 + y + x / 2 + z / 2,
+            left: realFieldSize + x - z,
+            top: realFieldSize + y + x / 2 + z / 2,
         };
     },
 
@@ -144,11 +145,11 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         const {
             puzzle: {
                 typeManager: {transformCoords},
-                fieldSize: {fieldSize},
+                fieldSize: {columnsCount},
             },
         } = context;
 
-        const realFieldSize = fieldSize / 2;
+        const realFieldSize = columnsCount / 3;
 
         return [0, 1, 2].flatMap((left) => [0, 1, 2].map((top): GridRegion => {
             const rect: Rect = {
@@ -195,8 +196,8 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         }));
     },
 
-    getRegionsForRowsAndColumns({puzzle: {fieldSize: {fieldSize}}}): Constraint<FullCubePTM, any>[] {
-        const realFieldSize = fieldSize / 2;
+    getRegionsForRowsAndColumns({puzzle: {fieldSize: {columnsCount}}}): Constraint<FullCubePTM, any>[] {
+        const realFieldSize = columnsCount / 3;
 
         return [0, 1, 2].flatMap((left) => [0, 1].flatMap((top) => indexes(realFieldSize).flatMap((i) => [
             RegionConstraint(
@@ -218,20 +219,20 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         ])));
     },
 
-    // getAdditionalNeighbors({top, left}, {fieldSize: {fieldSize}}) {
-    //     const realFieldSize = fieldSize / 2;
+    // getAdditionalNeighbors({top, left}, {fieldSize: {columnsCount}}) {
+    //     const realFieldSize = columnsCount / 3;
     //
     //     if (true) {
     //         if (left === realFieldSize - 1 && top < realFieldSize) {
     //             return [{
     //                 top: realFieldSize,
-    //                 left: fieldSize - 1 - top,
+    //                 left: realFieldSize * 2 - 1 - top,
     //             }];
     //         }
     //
     //         if (top === realFieldSize && left >= realFieldSize) {
     //             return [{
-    //                 top: fieldSize - 1 - left,
+    //                 top: realFieldSize * 2 - 1 - left,
     //                 left: realFieldSize - 1,
     //             }];
     //         }
