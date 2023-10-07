@@ -13,18 +13,25 @@ import {initialCoordsBase3D} from "../../../types/layout/Position3D";
 import {KeyboardArrowUp, KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowLeft} from "@emotion-icons/material";
 import {useEventListener} from "../../../hooks/useEventListener";
 
-const StyledButton = styled("button", controlButtonOptions)([
+const StyledButton = styled("button", {
+    ...controlButtonOptions,
+    shouldForwardProp(propName) {
+        return controlButtonOptions.shouldForwardProp(propName) && propName !== "style";
+    },
+})([
     controlButtonStyles,
-    {
+    ({style}) => ({
+        ...style,
+        position: "absolute",
         pointerEvents: "all",
-        transform: "translate(-50%, -50%)",
+        transform: `translate(-50%, -50%) ${style?.transform}`,
         border: `1px solid ${textColor}`,
         width: "1em",
         height: "1em",
         boxSizing: "content-box",
         padding: "0.25em",
         lineHeight: "1em",
-    },
+    }),
 ]);
 
 export const FullCubeControls = observer(function FullCubeControlsFc(
@@ -90,9 +97,9 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
     }}>
         <StyledButton
             style={{
-                position: "absolute",
                 left: cellSize * (fieldSize / 4 - 0.55),
                 top: cellSize * (fieldSize * 7 / 8 + 0.6),
+                transform: `skewY(${skewAngle}deg)`,
             }}
             onClick={leftUp}
             title={buttonTitle("Q")}
@@ -101,9 +108,9 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
         </StyledButton>
         <StyledButton
             style={{
-                position: "absolute",
                 left: cellSize * (fieldSize / 4 + 0.55),
                 top: cellSize * (fieldSize * 7 / 8 + 1.15),
+                transform: `skewY(${skewAngle}deg)`,
             }}
             onClick={leftDown}
             title={buttonTitle("A")}
@@ -113,9 +120,9 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
 
         <StyledButton
             style={{
-                position: "absolute",
                 left: cellSize * (fieldSize * 3 / 4 - 0.55),
                 top: cellSize * (fieldSize * 7 / 8 + 1.15),
+                transform: `skewY(-${skewAngle}deg)`,
             }}
             onClick={rightUp}
             title={buttonTitle("R")}
@@ -124,9 +131,9 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
         </StyledButton>
         <StyledButton
             style={{
-                position: "absolute",
                 left: cellSize * (fieldSize * 3 / 4 + 0.55),
                 top: cellSize * (fieldSize * 7 / 8 + 0.6),
+                transform: `skewY(-${skewAngle}deg)`,
             }}
             onClick={rightDown}
             title={buttonTitle("F")}
@@ -136,9 +143,9 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
 
         <StyledButton
             style={{
-                position: "absolute",
-                left: cellSize * (fieldSize + 0.6),
-                top: cellSize * (fieldSize / 2 - 0.55),
+                left: cellSize * (fieldSize + 0.8),
+                top: cellSize * (fieldSize / 2 - 0.95),
+                transform: `skewY(-${skewAngle}deg)`,
             }}
             onClick={right}
             title={buttonTitle("D")}
@@ -147,9 +154,9 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
         </StyledButton>
         <StyledButton
             style={{
-                position: "absolute",
-                left: cellSize * (fieldSize + 0.6),
-                top: cellSize * (fieldSize / 2 + 0.55),
+                left: cellSize * (fieldSize + 0.8),
+                top: cellSize * (fieldSize / 2 + 0.15),
+                transform: `skewY(-${skewAngle}deg)`,
             }}
             onClick={left}
             title={buttonTitle("S")}
@@ -158,3 +165,5 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
         </StyledButton>
     </div>;
 });
+
+const skewAngle = Math.atan(0.5) * 180 / Math.PI;
