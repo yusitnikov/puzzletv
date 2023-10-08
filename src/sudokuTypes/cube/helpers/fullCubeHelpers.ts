@@ -3,11 +3,16 @@ import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FullCubePTM} from "../types/FullCubePTM";
 import {initialCoordsBase3D, Position3D, rotateVector3D} from "../../../types/layout/Position3D";
 
-export const transformFullCubeCoords3D = ({top, left}: Position, context: PuzzleContext<FullCubePTM>) => {
-    const {
-        puzzle: {fieldSize: {columnsCount}},
-        processedGameStateExtension: {animatedCoordsBase: {ox, oy, oz}},
-    } = context;
+export const transformFullCubeCoords3D = (
+    {top, left}: Position,
+    context: PuzzleContext<FullCubePTM>,
+    useAnimatedCoords = true,
+) => {
+    const {puzzle: {fieldSize: {columnsCount}}} = context;
+
+    const {ox, oy, oz} = useAnimatedCoords
+        ? context.processedGameStateExtension.animatedCoordsBase
+        : context.stateExtension.coordsBase;
 
     const realFieldSize = columnsCount / 3;
 

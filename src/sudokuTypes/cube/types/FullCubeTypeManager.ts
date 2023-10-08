@@ -2,7 +2,7 @@ import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
 import {
-    getLineVector,
+    getLineVector, Position,
     PositionWithAngle,
     rotateVectorClockwise,
     scaleVector
@@ -14,12 +14,17 @@ import {RegionConstraint} from "../../../components/sudoku/constraints/region/Re
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {FullCubePTM} from "./FullCubePTM";
-import {FullCubeGameState, ProcessedFullCubeGameState} from "./FullCubeGameState";
+import {FullCubeGameState, gameStateHandleRotateFullCube, ProcessedFullCubeGameState} from "./FullCubeGameState";
 import {
     addVectors3D,
+    getClosestAxis3D,
     initialCoordsBase3D,
+    normalizeVector3D,
     Position3D,
+    roundVector3D,
+    scalarMultiplication3D,
     scaleVector3D,
+    subtractVectors3D,
     vectorMultiplication3D
 } from "../../../types/layout/Position3D";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
@@ -217,6 +222,149 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
                 "row"
             ),
         ])));
+    },
+
+    processArrowDirection({top, left}, xDirection, yDirection, context) {
+        const {puzzle: {fieldSize: {columnsCount}}} = context;
+        const realFieldSize = columnsCount / 3;
+
+        const cellCenter: Position = {top: top + 0.5, left: left + 0.5};
+        const cellCenter3D = transformFullCubeCoords3D(cellCenter, context, false);
+        const dx = roundVector3D(normalizeVector3D(subtractVectors3D(
+            transformFullCubeCoords3D({top: cellCenter.top, left: cellCenter.left + 0.1}, context, false),
+            cellCenter3D,
+        )));
+        const dy = roundVector3D(normalizeVector3D(subtractVectors3D(
+            transformFullCubeCoords3D({top: cellCenter.top + 0.1, left: cellCenter.left}, context, false),
+            cellCenter3D,
+        )));
+
+        const cellDirection3D = getClosestAxis3D(cellCenter3D);
+
+        let direction3D: Position3D;
+        if (cellDirection3D.x !== 0) {
+            direction3D = {x: 0, y: yDirection, z: -xDirection};
+        } else if (cellDirection3D.y !== 0) {
+            direction3D = {x: xDirection, y: 0, z: yDirection};
+        } else {
+            direction3D = {x: xDirection, y: yDirection, z: 0};
+        }
+
+        xDirection = Math.round(scalarMultiplication3D(direction3D, dx));
+        yDirection = Math.round(scalarMultiplication3D(direction3D, dy));
+
+        let newTop = top + yDirection;
+        let newLeft = left + xDirection;
+
+        const faceX = Math.floor(left / realFieldSize);
+
+        if (top < realFieldSize) {
+            if (newLeft < 0 || newLeft >= realFieldSize * 3) {
+                newTop += realFieldSize;
+                newLeft = (newLeft + realFieldSize) % realFieldSize;
+            } else if (newTop < 0) {
+                switch (faceX) {
+                    case 0:
+                        newTop = realFieldSize * 2 - 1;
+                        newLeft += realFieldSize;
+                        break;
+                    case 1:
+                        newTop = realFieldSize * 3 - 1 - newLeft;
+                        newLeft = realFieldSize * 2 - 1;
+                        break;
+                    case 2:
+                        newTop = realFieldSize;
+                        newLeft = realFieldSize * 4 - 1 - newLeft;
+                        break;
+                }
+            } else if (newTop >= realFieldSize) {
+                switch (faceX) {
+                    case 0:
+                        newLeft += realFieldSize * 2;
+                        break;
+                    case 1:
+                        // noinspection JSSuspiciousNameCombination
+                        newTop = newLeft;
+                        newLeft = realFieldSize * 3 - 1;
+                        break;
+                    case 2:
+                        newTop = realFieldSize * 2 - 1;
+                        newLeft = realFieldSize * 5 - 1 - newLeft;
+                        break;
+                }
+            }
+        } else {
+            switch (faceX) {
+                case 0:
+                    if (newLeft < 0) {
+                        newTop -= realFieldSize;
+                        newLeft = realFieldSize * 3 - 1;
+                    } else if (newLeft >= realFieldSize) {
+                        newTop -= realFieldSize;
+                        newLeft = 0;
+                    } else if (newTop < realFieldSize) {
+                        newTop = realFieldSize + newLeft;
+                        newLeft = realFieldSize;
+                    } else if (newTop >= realFieldSize * 2) {
+                        newTop = realFieldSize * 2 - 1 - newLeft;
+                        newLeft = realFieldSize * 2;
+                    }
+                    break;
+                case 1:
+                    if (newLeft < realFieldSize) {
+                        newLeft = newTop - realFieldSize;
+                        newTop = realFieldSize;
+                    } else if (newLeft >= realFieldSize * 2) {
+                        newLeft = realFieldSize * 3 - 1 - newTop;
+                        newTop = 0;
+                    } else if (newTop < realFieldSize) {
+                        newTop = 0;
+                        newLeft = realFieldSize * 4 - 1 - newLeft;
+                    } else if (newTop >= realFieldSize * 2) {
+                        newTop = 0;
+                        newLeft -= realFieldSize;
+                    }
+                    break;
+                case 2:
+                    if (newLeft < realFieldSize * 2) {
+                        newLeft = realFieldSize * 2 - 1 - newTop;
+                        newTop = realFieldSize * 2 - 1;
+                    } else if (newLeft >= realFieldSize * 3) {
+                        // noinspection JSSuspiciousNameCombination
+                        newLeft = newTop;
+                        newTop = realFieldSize - 1;
+                    } else if (newTop < realFieldSize) {
+                        newTop = realFieldSize - 1;
+                        newLeft -= realFieldSize * 2;
+                    } else if (newTop >= realFieldSize * 2) {
+                        newTop = realFieldSize - 1;
+                        newLeft = realFieldSize * 5 - 1 - newLeft;
+                    }
+                    break;
+            }
+        }
+
+        const newCellDirection3D = getClosestAxis3D(transformFullCubeCoords3D(
+            {top: newTop + 0.5, left: newLeft + 0.5},
+            context,
+            false,
+        ));
+
+        // How good is the axis for the UI?
+        const [axisRank, newAxisRank] = [cellDirection3D, newCellDirection3D].map(
+            ({x, y, z}: Position3D) => (x < 0 || y > 0 || z < 0) ? 0 : y < 0 ? 1 : 2
+        );
+
+        return {
+            state: newAxisRank < axisRank
+                ? gameStateHandleRotateFullCube(
+                    context,
+                    vectorMultiplication3D(newCellDirection3D, cellDirection3D),
+                    90
+                )
+                : undefined,
+            cell: {top: newTop, left: newLeft},
+        };
     },
 
     // getAdditionalNeighbors({top, left}, {fieldSize: {columnsCount}}) {

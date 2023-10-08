@@ -49,6 +49,26 @@ export const scaleVector3D = ({x, y, z}: Position3D, coeff: number): Position3D 
 
 export const normalizeVector3D = (vector: Position3D): Position3D => scaleVector3D(vector, 1 / (getVectorLength3D(vector) || 1));
 
+export const roundVector3D = ({x, y, z}: Position3D): Position3D => ({
+    x: Math.round(x),
+    y: Math.round(y),
+    z: Math.round(z),
+});
+
+export const getClosestAxis3D = ({x, y, z}: Position3D): Position3D => {
+    const absX = Math.abs(x);
+    const absY = Math.abs(y);
+    const absZ = Math.abs(z);
+
+    if (absX > absY && absX > absZ) {
+        return {x: Math.sign(x), y: 0, z: 0};
+    } else if (absY > absZ) {
+        return {x: 0, y: Math.sign(y), z: 0};
+    } else {
+        return {x: 0, y: 0, z: Math.sign(z)};
+    }
+};
+
 export const scalarMultiplication3D = (a: Position3D, b: Position3D): number =>
     a.x * b.x + a.y * b.y + a.z * b.z;
 
