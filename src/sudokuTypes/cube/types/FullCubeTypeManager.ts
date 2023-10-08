@@ -35,6 +35,12 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {FullCubeJssConstraint} from "../constraints/FullCubeJss";
 import {transformFullCubeCoords3D} from "../helpers/fullCubeHelpers";
 
+/*
+ * TODO:
+ * - Fix rotation animation
+ * - Support bigger JSS clues.
+ */
+
 export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     ...DigitSudokuTypeManager<FullCubePTM>(),
 
