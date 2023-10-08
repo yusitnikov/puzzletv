@@ -373,28 +373,6 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         };
     },
 
-    // getAdditionalNeighbors({top, left}, {fieldSize: {columnsCount}}) {
-    //     const realFieldSize = columnsCount / 3;
-    //
-    //     if (true) {
-    //         if (left === realFieldSize - 1 && top < realFieldSize) {
-    //             return [{
-    //                 top: realFieldSize,
-    //                 left: realFieldSize * 2 - 1 - top,
-    //             }];
-    //         }
-    //
-    //         if (top === realFieldSize && left >= realFieldSize) {
-    //             return [{
-    //                 top: realFieldSize * 2 - 1 - left,
-    //                 left: realFieldSize - 1,
-    //             }];
-    //         }
-    //     }
-    //
-    //     return [];
-    // },
-
     borderColor: darkGreyColor,
 
     mapImportedColors: true,
