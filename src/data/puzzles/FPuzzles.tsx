@@ -203,6 +203,7 @@ const loadByImportOptions = (
         sokoban,
         fillableQuads,
         find3,
+        giftsInSight,
     } = importOptions;
 
     const regularTypeManager = DigitSudokuTypeManager();
@@ -252,7 +253,7 @@ const loadByImportOptions = (
         });
     }
     if (find3) {
-        typeManager = Find3SudokuTypeManager(typeManager);
+        typeManager = Find3SudokuTypeManager(typeManager, giftsInSight);
     }
 
     switch (digitType) {

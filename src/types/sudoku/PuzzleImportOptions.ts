@@ -35,6 +35,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     tesseract?: boolean;
     fillableQuads?: boolean;
     find3?: boolean;
+    giftsInSight?: boolean;
     fillableDigitalDisplay?: boolean;
     noSpecialRules?: boolean;
     loopX?: boolean;
@@ -81,6 +82,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         tesseract,
         fillableQuads,
         find3,
+        giftsInSight,
         fillableDigitalDisplay,
         noSpecialRules,
         loopX,
@@ -123,6 +125,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         tesseract,
         fillableQuads,
         find3,
+        giftsInSight,
         fillableDigitalDisplay,
         noSpecialRules,
         loopX,

@@ -11,17 +11,18 @@ import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
 import React, {useState} from "react";
 import {AnyFind3PTM} from "./Find3PTM";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {getRegionCells, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {IReactionDisposer, reaction} from "mobx";
 import {indexes} from "../../../utils/indexes";
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {Gift} from "@emotion-icons/fluentui-system-filled";
 import {Modal} from "../../../components/layout/modal/Modal";
-import {Position} from "../../../types/layout/Position";
+import {arrayContainsPosition, Position} from "../../../types/layout/Position";
 import {cancelOutsideClickProps} from "../../../utils/gestures";
 
 export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
     {initialGameStateExtension, serializeGameState, unserializeGameState, ...baseTypeManager}: SudokuTypeManager<any> = DigitSudokuTypeManager(),
+    giftsInSight = false,
 ): SudokuTypeManager<T> => ({
     ...baseTypeManager,
 
@@ -47,8 +48,10 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
 
         const {
             puzzle: {
-                typeManager: {createCellDataByTypedDigit},
+                fieldSize: {rowsCount, columnsCount},
+                typeManager: {createCellDataByTypedDigit, getDigitByCellData},
                 solution,
+                regions = [],
             },
             cellSizeForSidePanel: cellSize,
             stateExtension: {giftsCount},
@@ -92,6 +95,28 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                             return;
                         }
 
+                        if (giftsInSight) {
+                            const selectedCellRegion = regions
+                                .map(getRegionCells)
+                                .find((cells) => arrayContainsPosition(cells, selectedCell))
+                                ?? [];
+
+                            const sees3 = indexes(rowsCount).some((top) => indexes(columnsCount).some((left) => {
+                                if (top !== selectedCell.top && left !== selectedCell.left && !arrayContainsPosition(selectedCellRegion, {top, left})) {
+                                    return false;
+                                }
+
+                                const data = stateInitialDigits[top]?.[left];
+
+                                return data !== undefined && getDigitByCellData(data, context, {top, left}) === 3;
+                            }));
+
+                            if (!sees3) {
+                                setShowExplanation(true);
+                                return;
+                            }
+                        }
+
                         setConfirmationCell(selectedCell);
                     }}
                     style={{color: lightRedColor}}
@@ -102,9 +127,9 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
 
             {showExplanation && <Modal cellSize={cellSize} onClose={() => setShowExplanation(false)}>
                 <div>{context.translate({
-                    [LanguageCode.en]: "Please select one empty cell to reveal the digit in it",
-                    [LanguageCode.ru]: "Пожалуйста, выберите одну пустую ячейку, чтобы показать цифру в ней",
-                    [LanguageCode.de]: "Bitte wählen Sie eine leere Zelle aus, um die darin enthaltene Ziffer anzuzeigen",
+                    [LanguageCode.en]: "Please select one empty cell" + (giftsInSight ? " in sight of a 3" : "") + " to reveal the digit in it",
+                    [LanguageCode.ru]: "Пожалуйста, выберите одну пустую ячейку" + (giftsInSight ? " в зоне видимости тройки" : "") + ", чтобы показать цифру в ней",
+                    [LanguageCode.de]: "Bitte wählen Sie eine leere Zelle" + (giftsInSight ? " in Sichtweite einer 3" : "") + " aus, um die darin enthaltene Ziffer anzuzeigen",
                 })}!</div>
 
                 <Button
