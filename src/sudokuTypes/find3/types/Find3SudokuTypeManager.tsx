@@ -19,6 +19,7 @@ import {Gift} from "@emotion-icons/fluentui-system-filled";
 import {Modal} from "../../../components/layout/modal/Modal";
 import {arrayContainsPosition, Position} from "../../../types/layout/Position";
 import {cancelOutsideClickProps} from "../../../utils/gestures";
+import {fieldFireworksController} from "../../../components/sudoku/field/FieldFireworks";
 
 export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
     {initialGameStateExtension, serializeGameState, unserializeGameState, ...baseTypeManager}: SudokuTypeManager<any> = DigitSudokuTypeManager(),
@@ -218,6 +219,8 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                             ),
                             extension: {giftsCount: prev.stateExtension.giftsCount + 1},
                         }));
+
+                        fieldFireworksController.launch();
                     }
                 },
             ));

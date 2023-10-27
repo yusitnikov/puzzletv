@@ -33,6 +33,7 @@ import {observer} from "mobx-react-lite";
 import {settings} from "../../../types/layout/Settings";
 import {profiler} from "../../../utils/profiler";
 import {FieldCellsLayer} from "./FieldCellsLayer";
+import {FieldFireworks} from "./FieldFireworks";
 
 export interface FieldProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -368,14 +369,16 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
                 </>}
             </FieldWrapper>
 
-            {FieldControls && <Absolute
+            <Absolute
                 top={fieldMargin * cellSize}
                 left={fieldMargin * cellSize}
                 width={rect.width - 2 * fieldMargin * cellSize}
                 height={rect.width - 2 * fieldMargin * cellSize}
             >
-                <FieldControls context={context}/>
-            </Absolute>}
+                {FieldControls && <FieldControls context={context}/>}
+
+                <FieldFireworks/>
+            </Absolute>
         </Absolute>
 
         {fogDemoFieldStateHistory && <Absolute {...rect} style={{

@@ -16,6 +16,7 @@
         "@emotion-icons/material": "^3.14.0",
         "@emotion/react": "^11.10.6",
         "@emotion/styled": "^11.8.1",
+        "@fireworks-js/react": "^2.10.7",
         "@googlemaps/react-wrapper": "^1.1.32",
         "@types/pako": "^2.0.0",
         "ably": "^1.2.22",
