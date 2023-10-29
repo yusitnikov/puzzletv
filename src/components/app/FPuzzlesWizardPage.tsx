@@ -170,7 +170,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         tesseract: !isSpecialGrid && tesseract,
         fillableQuads: !isSpecialGrid && fillableQuads,
         find3,
-        giftsInSight,
+        giftsInSight: find3 && giftsInSight,
         "product-arrow": hasArrows && productArrow,
         transparentArrowCircle: hasArrows && !transparentCirclesForced && transparentArrowCircle,
         yajilinFog: hasFog && yajilinFog,
