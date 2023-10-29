@@ -34,7 +34,7 @@ export const setQuadPositionActionType = <T extends AnyQuadInputPTM>(
         }
 
         const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
-        if (!isMyTurn || !isQuadAllowedFn(context) || context.cellWriteMode !== CellWriteMode.quads) {
+        if (!isMyTurn || !isQuadAllowedFn(context, position) || context.cellWriteMode !== CellWriteMode.quads) {
             return {};
         }
 

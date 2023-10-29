@@ -32,7 +32,7 @@ export interface QuadInputSudokuTypeManagerOptions<T extends AnyQuadInputPTM> {
         digits: T["cell"][],
         isRecent: boolean
     ) => Constraint<T, any>;
-    isQuadAllowedFn?: (context: PuzzleContext<T>) => boolean;
+    isQuadAllowedFn?: (context: PuzzleContext<T>, position?: Position) => boolean;
     onQuadFinish?: (
         defaultResult: PartialGameStateEx<T>,
         isGlobal: boolean,
@@ -158,7 +158,7 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
             } = context;
 
             const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
-            if (!isMyTurn || !currentQuad || !isQuadAllowedFn(context) || cellWriteMode !== CellWriteMode.quads) {
+            if (!isMyTurn || !currentQuad || cellWriteMode !== CellWriteMode.quads || !isQuadAllowedFn(context, currentQuad.position)) {
                 return defaultResult;
             }
 
@@ -278,7 +278,7 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
 
             const isMyTurn = !isEnabled || currentPlayer === clientId || params?.share;
 
-            if (!isMyTurn || !isQuadAllowedFn(context) || cellWriteMode !== CellWriteMode.quads || !currentQuad) {
+            if (!isMyTurn || !currentQuad || cellWriteMode !== CellWriteMode.quads || !isQuadAllowedFn(context, currentQuad.position)) {
                 return {};
             }
 

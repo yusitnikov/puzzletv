@@ -11,6 +11,7 @@ import {decompressFromBase64} from "lz-string";
 import {sha1} from "hash.js";
 import {indexes} from "../../utils/indexes";
 import {
+    arrayContainsPosition,
     parsePositionLiteral,
     Position,
     PositionLiteral,
@@ -246,10 +247,21 @@ const loadByImportOptions = (
         typeManager = ImportedRotatableCluesSudokuTypeManager(typeManager);
     }
     if (fillableQuads) {
+        const givenQuads = allGrids
+            .flatMap(({json: {quadruple = []}}) => quadruple)
+            .map(({cells}) => parsePositionLiteral(cells[3]));
+
         typeManager = QuadInputSudokuTypeManager({
             parent: typeManager,
             allowRepeat: true,
             allowOverflow: true,
+            isQuadAllowedFn(_, position) {
+                if (givenQuads.length === 0) {
+                    return true;
+                }
+
+                return position !== undefined && arrayContainsPosition(givenQuads, position);
+            },
         });
     }
     if (find3) {
