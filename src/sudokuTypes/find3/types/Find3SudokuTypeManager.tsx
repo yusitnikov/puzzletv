@@ -11,7 +11,7 @@ import {Button} from "../../../components/layout/button/Button";
 import React, {useState} from "react";
 import {AnyFind3PTM} from "./Find3PTM";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {IReactionDisposer, reaction} from "mobx";
+import {computed, IReactionDisposer, reaction} from "mobx";
 import {indexes} from "../../../utils/indexes";
 import {Gift} from "@emotion-icons/fluentui-system-filled";
 import {Modal} from "../../../components/layout/modal/Modal";
@@ -242,13 +242,22 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
             },
         } = context;
 
-        return indexes(rowsCount)
-            .flatMap((top) => indexes(columnsCount).map((left) => ({top, left})))
-            .filter(({top, left}) => solution?.[top]?.[left] === 3)
-            .map(({top, left}) => reaction(
-                () => context.getCellDigit(top, left) === 3,
-                (is3) => {
-                    if (is3) {
+        const getThreesCount = computed(
+            () => indexes(rowsCount)
+                .flatMap((top) => indexes(columnsCount).map((left) => ({top, left})))
+                .filter((cell) => {
+                    const {top, left} = cell;
+                    const data = context.getCellDigit(top, left);
+                    return solution?.[top]?.[left] === 3 && data !== undefined && context.puzzle.typeManager.getDigitByCellData(data, context, cell) === 3;
+                })
+                .length
+        );
+
+        return [
+            reaction(
+                () => getThreesCount.get() - context.currentFieldState.extension.giftedCells.length,
+                (giftsCount) => {
+                    if (context.currentFieldState.extension.giftsCount !== giftsCount) {
                         context.onStateChange((prev) => ({
                             fieldStateHistory: fieldStateHistoryAddState(
                                 prev,
@@ -258,16 +267,23 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                                     ...prevState,
                                     extension: {
                                         ...prevState.extension,
-                                        giftsCount: prevState.extension.giftsCount + 1,
+                                        giftsCount,
                                     },
                                 }),
                             ),
                         }));
-
+                    }
+                }
+            ),
+            reaction(
+                () => getThreesCount.get(),
+                (threesCount, prevThreesCount) => {
+                    if (threesCount > prevThreesCount) {
                         fieldFireworksController.launch();
                     }
-                },
-            ));
+                }
+            ),
+        ];
     },
 
     getInitialDigits(context) {
