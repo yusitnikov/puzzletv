@@ -76,10 +76,7 @@ export const LockoutLineConstraint = <T extends AnyPTM>(
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;
 
             const edgeCells = [cells[0], cells[cells.length - 1]];
-            const edgeData = edgeCells.map((cell) => {
-                const data = digits[cell.top]?.[cell.left];
-                return data === undefined ? undefined : getDigitByCellData(data, context, cell);
-            });
+            const edgeData = edgeCells.map((cell) => digits[cell.top]?.[cell.left]);
             if (edgeData.some((data) => data === undefined)) {
                 return true;
             }
