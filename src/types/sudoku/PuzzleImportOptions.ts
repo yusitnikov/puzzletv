@@ -11,6 +11,7 @@ export enum PuzzleImportPuzzleType {
     InfiniteRings = "infinite-rings",
     Jigsaw = "jigsaw",
     Tetris = "tetris",
+    Shuffled = "shuffled",
     RushHour = "rush-hour",
 }
 

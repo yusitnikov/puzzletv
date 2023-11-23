@@ -114,6 +114,7 @@ import {
     regionSumLineColor,
     RegionSumLineConstraint
 } from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
+import {ShuffledSudokuTypeManager} from "../../sudokuTypes/shuffled/types/ShuffledSudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -235,6 +236,7 @@ const loadByImportOptions = (
         ),
         [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.Tetris]: TetrisSudokuTypeManager(importOptions),
+        [PuzzleImportPuzzleType.Shuffled]: ShuffledSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.RushHour]: RushHourSudokuTypeManager,
     };
 
