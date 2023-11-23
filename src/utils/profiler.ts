@@ -69,6 +69,16 @@ class Profiler {
     }
 }
 
+const nativeConsoleLog = console.log.bind(console);
+console.log = function(...args) {
+    const message = args[0];
+    if (typeof message === "string" && message.startsWith("[mobx.trace] ")) {
+        console.debug(...args);
+    } else {
+        nativeConsoleLog(...args);
+    }
+};
+
 interface ProfilerItem {
     count: number;
     time: number;
