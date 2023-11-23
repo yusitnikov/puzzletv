@@ -19,6 +19,8 @@ export const darkGreyColor = "#afafaf";
 export const darkBlueColor = "#006ddb";
 export const blueColor = "#86c4ff";
 export const lighterBlueColor = "#c0dfff";
+export const mutedBlueColor = "#aabeef";
+export const lighterMutedBlueColor = "#e7e6ff";
 export const greenColor = "#20ea20";
 export const purpleColor = "#ac68f1";
 export const pinkColor = "#ff6db6";
@@ -30,7 +32,7 @@ export const lightOrangeColor = "#ffb600";
 export const peachColor = "#ffac80";
 
 export const textColor = blackColor;
-export const errorColor = redColor;
+export const errorColor = lightRedColor;
 export const recentInfoColor = yellowColor;
 export const currentPlayerColor = greenColor;
 export const otherPlayerColor = purpleColor;

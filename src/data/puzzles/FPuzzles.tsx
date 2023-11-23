@@ -106,6 +106,14 @@ import {
 import {Find3SudokuTypeManager} from "../../sudokuTypes/find3/types/Find3SudokuTypeManager";
 import {FullCubeTypeManager} from "../../sudokuTypes/cube/types/FullCubeTypeManager";
 import {FullCubeJssConstraint} from "../../sudokuTypes/cube/constraints/FullCubeJss";
+import {
+    LockoutLineConstraint,
+    lockoutLineDiamondBackgroundColor, lockoutLineDiamondLineColor, lockoutLineLineColor
+} from "../../components/sudoku/constraints/lockout-line/LockoutLine";
+import {
+    regionSumLineColor,
+    RegionSumLineConstraint
+} from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -755,6 +763,32 @@ class FPuzzlesImporter<T extends AnyPTM> {
                     }));
                 }
             },
+            regionsumline: (regionSumLine) => {
+                if (regionSumLine instanceof Array) {
+                    this.items.push(...regionSumLine.flatMap(({lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles region sum line");
+
+                        return lines.map((cells) => RegionSumLineConstraint<T>(
+                            offsetCoordsArray(cells).filter(isVisibleGridCell),
+                            false,
+                            false
+                        ));
+                    }));
+                }
+            },
+            lockout: (lockoutLine) => {
+                if (lockoutLine instanceof Array) {
+                    this.items.push(...lockoutLine.flatMap(({lines, ...other}) => {
+                        ObjectParser.empty.parse(other, "f-puzzles lockout line");
+
+                        return lines.map((cells) => LockoutLineConstraint<T>(
+                            offsetCoordsArray(cells).filter(isVisibleGridCell),
+                            false,
+                            false
+                        ));
+                    }));
+                }
+            },
             minimum: (minimum) => {
                 if (minimum instanceof Array) {
                     this.items.push(...minimum.map(({cell, ...other}) => {
@@ -815,7 +849,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
             },
             line: (lineData) => {
                 if (lineData instanceof Array) {
-                    for (const {lines, outlineC, width, isNewConstraint, fromConstraint, ...other} of lineData) {
+                    for (const {lines, outlineC, width, isNewConstraint, fromConstraint, isLLConstraint, ...other} of lineData) {
                         ObjectParser.empty.parse(other, "f-puzzles line");
 
                         let color = outlineC;
@@ -826,6 +860,12 @@ class FPuzzlesImporter<T extends AnyPTM> {
                             case "Renban":
                                 color = purpleColor;
                                 break;
+                            case "Region Sum Line":
+                                color = regionSumLineColor;
+                                break;
+                        }
+                        if (isLLConstraint) {
+                            color = lockoutLineLineColor;
                         }
 
                         this.items.push(...lines.map((cells) => {
@@ -845,17 +885,24 @@ class FPuzzlesImporter<T extends AnyPTM> {
             },
             rectangle: (rectangle) => {
                 if (rectangle instanceof Array) {
-                    this.items.push(...rectangle.map(({cells: cellLiterals, width, height, baseC, outlineC, value, fontC, angle, ...other}) => {
+                    this.items.push(...rectangle.map(({cells: cellLiterals, width, height, baseC, outlineC, value, fontC, angle, isLLConstraint, ...other}) => {
                         ObjectParser.empty.parse(other, "f-puzzles rect");
 
                         const cells = offsetCoordsArray(cellLiterals);
                         checkForOutsideCells(cells);
 
+                        let outlineColor = outlineC;
+                        let baseColor = baseC;
+                        if (isLLConstraint) {
+                            outlineColor = lockoutLineDiamondLineColor;
+                            baseColor = lockoutLineDiamondBackgroundColor;
+                        }
+
                         return RectConstraint<T>(
                             cells.map(cell => this.typeManager.fixCellPosition?.(cell, this.puzzle) ?? cell),
                             {width, height},
-                            baseC,
-                            outlineC,
+                            baseColor,
+                            outlineColor,
                             value,
                             fontC,
                             angle,
@@ -973,6 +1020,11 @@ class FPuzzlesImporter<T extends AnyPTM> {
                             }
                         }
                     }
+                }
+            },
+            successMessage: (successMessage) => {
+                if (successMessage) {
+                    this.puzzle.successMessage = successMessage;
                 }
             },
             disabledlogic: undefined,

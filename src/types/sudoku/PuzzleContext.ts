@@ -1,4 +1,4 @@
-import {getDefaultDigitsCount, PuzzleDefinition} from "./PuzzleDefinition";
+import {getDefaultDigitsCount, getRegionCells, PuzzleDefinition} from "./PuzzleDefinition";
 import {
     GameStateEx,
     gameStateGetCurrentGivenDigitsByCells,
@@ -22,7 +22,7 @@ import {SudokuCellsIndex} from "./SudokuCellsIndex";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {comparer, computed, makeAutoObservable, runInAction} from "mobx";
 import {computedFn, createViewModel} from "mobx-utils";
-import {PositionSet} from "../layout/Position";
+import {Position, PositionSet} from "../layout/Position";
 import {isSelectableCell} from "./CellTypeProps";
 import {TransformedCustomCellBounds} from "./CustomCellBounds";
 import {controlKeysState} from "../../hooks/useControlKeysState";
@@ -35,7 +35,7 @@ import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
 import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
 import {UserLinesConstraint} from "../../components/sudoku/constraints/user-lines/UserLines";
-import {mergeGivenDigitsMaps} from "./GivenDigitsMap";
+import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
 import {getFogPropsByContext} from "../../components/sudoku/constraints/fog/Fog";
 import {setComparer, SetInterface} from "../struct/Set";
 import {PuzzleLine} from "./PuzzleLine";
@@ -670,6 +670,24 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             UserLinesConstraint(),
         ];
     }
+
+    private get regionCellsIndex() {
+        profiler.trace();
+
+        const map: GivenDigitsMap<{ index: number, cells: Position[] }> = {};
+        for (const [index, region] of (this.puzzle.regions ?? []).entries()) {
+            const cells = getRegionCells(region);
+            for (const {top, left} of cells) {
+                map[top] = map[top] ?? {};
+                map[top][left] = {index, cells};
+            }
+        }
+
+        return map;
+    }
+    readonly getRegionByCell = computedFn(function getRegionByCell(this: PuzzleContext<T>, top: number, left: number) {
+        return this.regionCellsIndex[top]?.[left];
+    });
 
     get allItems() {
         profiler.trace();

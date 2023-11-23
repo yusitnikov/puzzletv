@@ -11,7 +11,7 @@ import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
 import React, {useState} from "react";
 import {AnyFind3PTM} from "./Find3PTM";
-import {getRegionCells, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {IReactionDisposer, reaction} from "mobx";
 import {indexes} from "../../../utils/indexes";
 import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
@@ -52,7 +52,6 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                 fieldSize: {rowsCount, columnsCount},
                 typeManager: {createCellDataByTypedDigit, getDigitByCellData},
                 solution,
-                regions = [],
             },
             cellSizeForSidePanel: cellSize,
             stateExtension: {giftsCount},
@@ -73,6 +72,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                 justifyContent: "center",
                 gap: "0.1em",
             }}>
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 {indexes(giftsCount).map((index) => <a
                     key={index}
                     href={"#"}
@@ -97,10 +97,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                         }
 
                         if (giftsInSight) {
-                            const selectedCellRegion = regions
-                                .map(getRegionCells)
-                                .find((cells) => arrayContainsPosition(cells, selectedCell))
-                                ?? [];
+                            const selectedCellRegion = context.getRegionByCell(selectedCell.top, selectedCell.left)?.cells;
 
                             const sees3 = indexes(rowsCount).some((top) => indexes(columnsCount).some((left) => {
                                 if (top !== selectedCell.top && left !== selectedCell.left && !arrayContainsPosition(selectedCellRegion, {top, left})) {
