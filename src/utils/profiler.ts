@@ -6,7 +6,7 @@ class Profiler {
     data: Record<string, ProfilerItem> = {};
 
     constructor() {
-        this.enabled = process.env.NODE_ENV === "development";
+        this.enabled = process.env.NODE_ENV === "development" && localStorage.disableProfiler !== 'true';
     }
 
     flush() {
