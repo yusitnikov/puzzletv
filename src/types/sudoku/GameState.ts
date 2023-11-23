@@ -139,8 +139,8 @@ const maxSavedPuzzles = 10;
 
 const getSavedGameStates = (): SavedGameStates => unserializeFromLocalStorage(gameStateStorageKey, gameStateSerializerVersion) || [];
 
-const getPuzzleFullSaveStateKey = <T extends AnyPTM>({slug, params = {}, saveStateKey = slug}: PuzzleDefinition<T>): string =>
-    `${saveStateKey}-${params.host || ""}-${params.room || ""}`;
+const getPuzzleFullSaveStateKey = <T extends AnyPTM>({slug, params = {}, saveStateKey = slug, typeManager: {saveStateKeySuffix}}: PuzzleDefinition<T>): string =>
+    `${saveStateKey}-${params.host || ""}-${params.room || ""}${saveStateKeySuffix ? "-" + saveStateKeySuffix : ""}`;
 
 export const getEmptyGameState = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
@@ -495,10 +495,9 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
 ): GameStateActionOrCallback<any, T> => {
     const {
         puzzle,
-        stateInitialDigits,
+        allInitialDigits,
     } = context;
     const {
-        initialDigits,
         fieldSize: {rowsCount, columnsCount},
         typeManager: {areSameCellData},
     } = puzzle;
@@ -510,9 +509,7 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
         cornerDigits,
     } = context.getCell(cellPosition.top, cellPosition.left);
 
-    const mainDigit = initialDigits?.[cellPosition.top]?.[cellPosition.left]
-        || stateInitialDigits?.[cellPosition.top]?.[cellPosition.left]
-        || usersDigit;
+    const mainDigit = allInitialDigits[cellPosition.top]?.[cellPosition.left] ?? usersDigit;
 
     let filter: (cell: CellState<T>, cellPosition: Position, initialDigit?: T["cell"]) => boolean;
     if (mainDigit) {
@@ -535,7 +532,7 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
         .filter((cell) => filter(
             context.getCell(cell.top, cell.left),
             cell,
-            initialDigits?.[cell.top]?.[cell.left] || stateInitialDigits?.[cell.top]?.[cell.left]
+            allInitialDigits[cell.top]?.[cell.left]
         ));
 
     return (context) => isAnyKeyDown || context.isMultiSelection
@@ -753,13 +750,9 @@ const getDefaultDigitHandler = <T extends AnyPTM>(
     cellData: (position: Position) => T["cell"]
 ): (cellState: CellStateEx<T>, position: Position) => Partial<CellStateEx<T>> => {
     if (isGlobal) {
-        const {
-            puzzle: {initialDigits},
-            stateInitialDigits,
-        } = context;
+        const {allInitialDigits} = context;
 
-        const isInitialDigit = ({top, left}: Position): boolean =>
-            initialDigits?.[top]?.[left] !== undefined || stateInitialDigits[top]?.[left] !== undefined;
+        const isInitialDigit = ({top, left}: Position): boolean => allInitialDigits[top]?.[left] !== undefined;
 
         switch (context.cellWriteMode) {
             case CellWriteMode.main:
@@ -899,10 +892,16 @@ export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
 
     switch (context.cellWriteMode) {
         case CellWriteMode.main:
-            if (gameStateIsAnySelectedCell(context, cell => cell.usersDigit !== undefined)) {
-                return gameStateProcessSelectedCells(context, clientId, actionId, () => ({
-                    usersDigit: undefined
-                }));
+            if (gameStateIsAnySelectedCell(context, (cell, {top, left}) => context.allInitialDigits[top]?.[left] === undefined && cell.usersDigit !== undefined)) {
+                return gameStateProcessSelectedCells(
+                    context,
+                    clientId,
+                    actionId,
+                    (_, {top, left}) =>
+                        context.allInitialDigits[top]?.[left] === undefined
+                            ? {usersDigit: undefined}
+                            : {}
+                );
             }
 
             if (gameStateIsAnySelectedCell(context, cell => !!cell.centerDigits.size)) {

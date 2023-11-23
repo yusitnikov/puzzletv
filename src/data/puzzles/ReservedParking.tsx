@@ -85,13 +85,13 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                                         items: itemsFn,
                                         extension,
                                     },
-                                    stateInitialDigits = {},
+                                    allInitialDigits,
                                 } = context;
                                 const items = typeof itemsFn === "function" ? itemsFn(context) : itemsFn ?? [];
 
                                 const newInitialDigitsCandidates: (Position & {digit: number})[] = [];
                                 for (const {tags, cells: [cell], props} of items) {
-                                    if (tags?.includes(textTag) && !stateInitialDigits[cell.top]?.[cell.left]) {
+                                    if (tags?.includes(textTag) && !allInitialDigits[cell.top]?.[cell.left]) {
                                         newInitialDigitsCandidates.push({
                                             ...cell,
                                             digit: Number((props as TextProps).text),

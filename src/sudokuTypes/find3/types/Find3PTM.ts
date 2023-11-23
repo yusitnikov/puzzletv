@@ -1,20 +1,20 @@
 import {AnyPTM, PTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {Find3GameState} from "./Find3GameState";
+import {Find3FieldState} from "./Find3FieldState";
 
 export type Find3PTM<
     CellType = number,
-    GameStateExType extends Find3GameState = Find3GameState,
+    GameStateExType = {},
     ProcessedGameStateExType = {},
-    FieldStateEx = {},
+    FieldStateEx extends Find3FieldState = Find3FieldState,
     PuzzleExType = {}
 > = PTM<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx, PuzzleExType>;
 
 export type AnyFind3PTM<
     CellType = any,
-    GameStateExType extends Find3GameState = any,
+    GameStateExType = any,
     ProcessedGameStateExType = any,
-    FieldStateEx = any,
+    FieldStateEx extends Find3FieldState = any,
     PuzzleExType = any
 > = AnyPTM<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx, PuzzleExType>;
 
-export type ToFind3PTM<T extends AnyPTM> = Omit<T, "stateEx"> & {stateEx: T["stateEx"] & Find3GameState};
+export type ToFind3PTM<T extends AnyPTM> = Omit<T, "fieldStateEx"> & {fieldStateEx: T["fieldStateEx"] & Find3FieldState};

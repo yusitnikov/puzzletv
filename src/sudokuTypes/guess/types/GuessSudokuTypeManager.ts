@@ -27,7 +27,7 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
             puzzle: {solution = {}, params = {}},
             currentPlayer,
             selectedCells,
-            stateInitialDigits,
+            allInitialDigits,
             multiPlayer: {isEnabled},
         },
         defaultResult,
@@ -52,7 +52,7 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
         }
 
         const areAllCorrect: boolean = (cache.areAllPositive = cache.areAllPositive ?? selectedCells.items.every(
-            ({top, left}) => solution[top][left] === cellData || stateInitialDigits[top]?.[left] !== undefined)
+            ({top, left}) => solution[top][left] === cellData || allInitialDigits[top]?.[left] !== undefined)
         );
 
         if (solution[top][left] !== cellData) {

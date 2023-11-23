@@ -446,8 +446,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         profiler.trace();
 
         return mergeGivenDigitsMaps(
-            this.puzzle.initialDigits ?? {},
-            this.stateInitialDigits ?? {},
+            this.allInitialDigits,
             gameStateGetCurrentGivenDigitsByCells(this.cells),
         );
     }
@@ -470,7 +469,16 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     get stateInitialDigits() {
         profiler.trace();
-        return this.state.initialDigits;
+        return this.state.initialDigits ?? {};
+    }
+
+    get allInitialDigits() {
+        profiler.trace();
+        return mergeGivenDigitsMaps(
+            this.puzzle.initialDigits ?? {},
+            this.stateInitialDigits,
+            this.puzzle.typeManager.getInitialDigits?.(this) ?? {},
+        );
     }
 
     get excludedDigits() {

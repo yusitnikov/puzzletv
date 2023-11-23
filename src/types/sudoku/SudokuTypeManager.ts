@@ -23,6 +23,7 @@ import {ControlButtonItem} from "../../components/sudoku/controls/ControlButtons
 import {AnyPTM} from "./PuzzleTypeMap";
 import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
 import {IReactionDisposer} from "mobx";
+import {GivenDigitsMap} from "./GivenDigitsMap";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -154,6 +155,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     keepStateOnRestart?(context: PuzzleContext<T>): PartialGameStateEx<T>;
 
+    saveStateKeySuffix?: string;
+
     isReady?(context: PuzzleContext<T>): boolean;
 
     useProcessedGameStateExtension?(context: PuzzleContext<T>): T["processedStateEx"];
@@ -268,6 +271,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     onCloseCorrectResultPopup?(context: PuzzleContext<T>): void;
 
     fieldControlsComponent?: ComponentType<PuzzleContextProps<T>>;
+
+    getInitialDigits?: (context: PuzzleContext<T>) => GivenDigitsMap<T["cell"]>;
 }
 
 // region Helper functions

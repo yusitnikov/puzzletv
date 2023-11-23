@@ -227,12 +227,11 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const {
         puzzle,
         puzzleIndex,
-        stateInitialDigits,
+        userDigits,
         currentFieldStateWithFogDemo: {cells, marks},
     } = context;
     const {
         typeManager: {getDigitByCellData},
-        initialDigits: puzzleInitialDigits,
         initialCellMarks = [],
         solution = {},
         solutionColors = {},
@@ -253,7 +252,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         ? new ColorMapChecker()
         : new ExactColorChecker();
     for (const [top, row] of cells.entries()) {
-        for (const [left, {usersDigit, colors}] of row.entries()) {
+        for (const [left, {colors}] of row.entries()) {
             if (!isSolutionCheckCell(puzzleIndex.getCellTypeProps({top, left}))) {
                 continue;
             }
@@ -274,7 +273,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                 }
             }
             const actualMark = (initialCenterMarks?.[top]?.[left] ?? userCenterMarks?.[top]?.[left])?.type;
-            const actualDigit = puzzleInitialDigits?.[top]?.[left] ?? stateInitialDigits?.[top]?.[left] ?? usersDigit;
+            const actualDigit = userDigits[top]?.[left];
             const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, context, {top, left}) : actualMark;
             if (actualData !== expectedData) {
                 if (debugSolutionChecker) {

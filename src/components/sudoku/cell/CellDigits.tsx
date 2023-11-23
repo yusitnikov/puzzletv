@@ -46,7 +46,7 @@ export const FieldCellDigits = observer(function FieldCellDigits<T extends AnyPT
     profiler.trace();
 
     const cellState = context.getCell(top, left);
-    const initialData = context.puzzle.initialDigits?.[top]?.[left] ?? context.stateInitialDigits?.[top]?.[left];
+    const initialData = context.allInitialDigits?.[top]?.[left];
     const cellExcludedDigits = context.excludedDigits[top][left];
 
     const cellPosition = useMemo((): Position => ({top, left}), [top, left]);

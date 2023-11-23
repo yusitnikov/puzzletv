@@ -1,5 +1,4 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {Find3GameState} from "./Find3GameState";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {
     aboveRulesTextHeightCoeff,
@@ -14,32 +13,67 @@ import {AnyFind3PTM} from "./Find3PTM";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {IReactionDisposer, reaction} from "mobx";
 import {indexes} from "../../../utils/indexes";
-import {mergeGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {Gift} from "@emotion-icons/fluentui-system-filled";
 import {Modal} from "../../../components/layout/modal/Modal";
-import {arrayContainsPosition, Position} from "../../../types/layout/Position";
+import {arrayContainsPosition, isSamePosition, Position} from "../../../types/layout/Position";
 import {cancelOutsideClickProps} from "../../../utils/gestures";
 import {fieldFireworksController} from "../../../components/sudoku/field/FieldFireworks";
+import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
+import {myClientId} from "../../../hooks/useMultiPlayer";
+import {getNextActionId} from "../../../types/sudoku/GameStateAction";
+import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 
 export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
-    {initialGameStateExtension, serializeGameState, unserializeGameState, ...baseTypeManager}: SudokuTypeManager<any> = DigitSudokuTypeManager(),
+    {
+        initialFieldStateExtension,
+        serializeFieldStateExtension,
+        unserializeFieldStateExtension,
+        areFieldStateExtensionsEqual = (a: T["fieldStateEx"], b: T["fieldStateEx"]) => JSON.stringify(a) === JSON.stringify(b),
+        cloneFieldStateExtension = (extension: T["fieldStateEx"]) => JSON.parse(JSON.stringify(extension)),
+        ...baseTypeManager
+    }: SudokuTypeManager<any> = DigitSudokuTypeManager(),
     giftsInSight = false,
 ): SudokuTypeManager<T> => ({
     ...baseTypeManager,
 
-    initialGameStateExtension: (puzzle) => ({
+    initialFieldStateExtension: (puzzle) => ({
         ...(
-            typeof initialGameStateExtension === "function"
-                ? (initialGameStateExtension as ((puzzle: PuzzleDefinition<T>) => T["stateEx"]))(puzzle)
-                : initialGameStateExtension
+            typeof initialFieldStateExtension === "function"
+                ? (initialFieldStateExtension as ((puzzle: PuzzleDefinition<T>) => T["fieldStateEx"]))(puzzle)
+                : initialFieldStateExtension
         ),
         giftsCount: 0,
+        giftedCells: [],
     }),
-    serializeGameState({giftsCount, ...other}): any {
-        return {giftsCount, ...serializeGameState(other)};
+    serializeFieldStateExtension({giftsCount, giftedCells, ...other}): any {
+        return {
+            giftsCount,
+            giftedCells,
+            ...(serializeFieldStateExtension?.(other as T["fieldStateEx"]) ?? other),
+        };
     },
-    unserializeGameState({giftsCount = 0, ...other}: any): Partial<Find3GameState> {
-        return {giftsCount, ...unserializeGameState(other)};
+    unserializeFieldStateExtension({giftsCount = 0, giftedCells = [], ...other}: any): Partial<T["fieldStateEx"]> {
+        return {
+            giftsCount,
+            giftedCells,
+            ...(unserializeFieldStateExtension?.(other) ?? other),
+        };
+    },
+    areFieldStateExtensionsEqual(
+        {giftsCount: giftsCountA, giftedCells: giftedCellsA, ...a},
+        {giftsCount: giftsCountB, giftedCells: giftedCellsB, ...b}
+    ): boolean {
+        return areFieldStateExtensionsEqual(a, b)
+            && giftsCountA === giftsCountB
+            && giftedCellsA.length === giftedCellsB.length
+            && giftedCellsA.every((cellA: Position, index: number) => isSamePosition(cellA, giftedCellsB[index]));
+    },
+    cloneFieldStateExtension({giftsCount, giftedCells, ...other}): T["fieldStateEx"] {
+        return {
+            giftsCount,
+            giftedCells: [...giftedCells],
+            ...cloneFieldStateExtension(other),
+        };
     },
 
     getAboveRules: function Find3AboveRules(translate, context, isPortrait) {
@@ -50,11 +84,10 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
         const {
             puzzle: {
                 fieldSize: {rowsCount, columnsCount},
-                typeManager: {createCellDataByTypedDigit, getDigitByCellData},
-                solution,
+                typeManager: {getDigitByCellData},
             },
             cellSizeForSidePanel: cellSize,
-            stateExtension: {giftsCount},
+            currentFieldState: {extension: {giftsCount}},
         } = context;
 
         if (!giftsCount) {
@@ -82,7 +115,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
 
                         const {
                             selectedCells,
-                            stateInitialDigits,
+                            allInitialDigits,
                         } = context;
 
                         if (selectedCells.size !== 1) {
@@ -91,7 +124,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                         }
 
                         const selectedCell = selectedCells.first()!;
-                        if (stateInitialDigits[selectedCell.top]?.[selectedCell.left] !== undefined) {
+                        if (allInitialDigits[selectedCell.top]?.[selectedCell.left] !== undefined) {
                             setShowExplanation(true);
                             return;
                         }
@@ -104,7 +137,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                                     return false;
                                 }
 
-                                const data = stateInitialDigits[top]?.[left];
+                                const data = allInitialDigits[top]?.[left];
 
                                 return data !== undefined && getDigitByCellData(data, context, {top, left}) === 3;
                             }));
@@ -161,15 +194,23 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                         type={"button"}
                         cellSize={cellSize}
                         onClick={() => {
-                            const digit = Number(solution![confirmationCell.top][confirmationCell.left]);
-                            const data = createCellDataByTypedDigit(digit, context, confirmationCell);
-
                             context.onStateChange((prev) => ({
-                                initialDigits: mergeGivenDigitsMaps(
-                                    prev.stateInitialDigits,
-                                    {[confirmationCell.top]: {[confirmationCell.left]: data}}
+                                fieldStateHistory: fieldStateHistoryAddState(
+                                    prev,
+                                    myClientId,
+                                    getNextActionId(),
+                                    (prevState) => ({
+                                        ...prevState,
+                                        extension: {
+                                            ...prevState.extension,
+                                            giftsCount: prevState.extension.giftsCount - 1,
+                                            giftedCells: [
+                                                ...prevState.extension.giftedCells,
+                                                confirmationCell,
+                                            ],
+                                        },
+                                    }),
                                 ),
-                                extension: {giftsCount: prev.stateExtension.giftsCount - 1},
                             }));
 
                             setConfirmationCell(undefined);
@@ -196,7 +237,6 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
     getReactions(context): IReactionDisposer[] {
         const {
             puzzle: {
-                typeManager: {createCellDataByTypedDigit},
                 fieldSize: {rowsCount, columnsCount},
                 solution,
             },
@@ -206,20 +246,61 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
             .flatMap((top) => indexes(columnsCount).map((left) => ({top, left})))
             .filter(({top, left}) => solution?.[top]?.[left] === 3)
             .map(({top, left}) => reaction(
-                () => context.getCellDigit(top, left) === 3 && !context.stateInitialDigits[top]?.[left],
+                () => context.getCellDigit(top, left) === 3,
                 (is3) => {
                     if (is3) {
                         context.onStateChange((prev) => ({
-                            initialDigits: mergeGivenDigitsMaps(
-                                prev.stateInitialDigits,
-                                {[top]: {[left]: createCellDataByTypedDigit(3, prev, {top, left})}}
+                            fieldStateHistory: fieldStateHistoryAddState(
+                                prev,
+                                prev.currentFieldState.clientId,
+                                prev.currentFieldState.actionId,
+                                (prevState) => ({
+                                    ...prevState,
+                                    extension: {
+                                        ...prevState.extension,
+                                        giftsCount: prevState.extension.giftsCount + 1,
+                                    },
+                                }),
                             ),
-                            extension: {giftsCount: prev.stateExtension.giftsCount + 1},
                         }));
 
                         fieldFireworksController.launch();
                     }
                 },
             ));
-    }
+    },
+
+    getInitialDigits(context) {
+        const result: GivenDigitsMap<T["cell"]> = {};
+
+        const {
+            puzzle: {
+                solution,
+                typeManager: {
+                    createCellDataByTypedDigit,
+                    getDigitByCellData,
+                },
+            },
+            currentFieldState: {cells, extension: {giftedCells}},
+        } = context;
+
+        for (const cell of giftedCells) {
+            const {top, left} = cell;
+            result[top] ??= {};
+            result[top][left] = createCellDataByTypedDigit(Number(solution![top][left]), context, cell);
+        }
+
+        for (const [top, row] of cells.entries()) {
+            for (const [left, {usersDigit}] of row.entries()) {
+                if (Number(solution![top][left]) === 3 && usersDigit !== undefined && getDigitByCellData(usersDigit, context, {top, left}) === 3) {
+                    result[top] ??= {};
+                    result[top][left] = usersDigit;
+                }
+            }
+        }
+
+        return result;
+    },
+
+    saveStateKeySuffix: "v2",
 });

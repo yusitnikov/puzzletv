@@ -53,8 +53,7 @@ const isValidSolution = (
     );
 
     const correctFinalDigits = mergeGivenDigitsMaps(
-        context.puzzle.initialDigits!,
-        context.stateInitialDigits || {},
+        context.allInitialDigits || {},
         mandatorySolutionPieces,
         optionalSolutionPieces
     );
