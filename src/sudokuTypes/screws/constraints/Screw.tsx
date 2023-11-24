@@ -1,16 +1,23 @@
 import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
-import {isSamePosition, Position} from "../../../types/layout/Position";
+import {formatSvgPointsArray, isSamePosition, Position} from "../../../types/layout/Position";
 import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {lightGreyColor} from "../../../components/app/globals";
+import {darkGreyColor, lightGreyColor} from "../../../components/app/globals";
 import {observer} from "mobx-react-lite";
 import {ScrewsPTM} from "../types/ScrewsPTM";
 import {ReactElement} from "react";
 import {ScrewsPuzzleExtension} from "../types/ScrewsPuzzleExtension";
 import {CellDigits} from "../../../components/sudoku/cell/CellDigits";
+import {loop} from "../../../utils/math";
+import {indexes} from "../../../utils/indexes";
 
-const screwColor = lightGreyColor;
+const lightColor = lightGreyColor;
+const darkColor = darkGreyColor;
+const margin = 0.1;
+const hatHeight = 1 - margin;
+const tipHeight = 0.6;
+const lineWidth = 0.1;
 const digitSize = 0.5;
 
 interface ScrewProps {
@@ -40,25 +47,59 @@ const Screw = {
             }
         });
 
-        return <g opacity={0.5}>
-            <rect
-                x={left}
-                y={top + offset}
+        return <g opacity={0.7}>
+            <AutoSvg
+                left={left}
+                top={top + offset}
                 width={width}
-                height={1}
-                strokeWidth={0}
-                stroke={"none"}
-                fill={screwColor}
-            />
-            <rect
-                x={left + 0.5}
-                y={top + offset}
-                width={width - 1}
                 height={height}
-                strokeWidth={0}
-                stroke={"none"}
-                fill={screwColor}
-            />
+            >
+                <path
+                    d={[
+                        "M", margin, hatHeight,
+                        "L", margin, 0.5,
+                        "Q", margin, margin, width / 2, margin,
+                        "Q", width - margin, margin, width - margin, 0.5,
+                        "L", width - margin, hatHeight,
+                        "z"
+                    ].join(" ")}
+                    strokeWidth={0}
+                    stroke={"none"}
+                    fill={darkColor}
+                />
+
+                <polygon
+                    points={formatSvgPointsArray([
+                        {top: hatHeight, left: 0.5},
+                        {top: height - tipHeight, left: 0.5},
+                        {top: height, left: width / 2},
+                        {top: height - tipHeight, left: width - 0.5},
+                        {top: hatHeight, left: width - 0.5},
+                    ])}
+                    strokeWidth={0}
+                    stroke={"none"}
+                    fill={lightColor}
+                />
+
+                <AutoSvg
+                    top={hatHeight}
+                    width={width}
+                    height={height - tipHeight - hatHeight}
+                    clip={true}
+                >
+                    <AutoSvg top={0.5 - hatHeight - loop(offset, 2)}>
+                        {indexes(Math.ceil(height + 2), true).map((index) => <line
+                            key={index}
+                            x1={width - 0.5 + lineWidth / 3}
+                            y1={index}
+                            x2={0.5 - lineWidth / 3}
+                            y2={index + 1}
+                            strokeWidth={lineWidth}
+                            stroke={darkColor}
+                        />)}
+                    </AutoSvg>
+                </AutoSvg>
+            </AutoSvg>
 
             {offsetDigits.map(
                 ({digit, top, left}, index) => <AutoSvg
