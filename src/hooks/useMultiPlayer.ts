@@ -93,6 +93,21 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
         ];
     }
 
+    get playerScores() {
+        profiler.trace();
+
+        return this.allPlayerIds
+            .map(clientId => ({
+                clientId,
+                score: this.context.puzzle.typeManager.getPlayerScore?.(this.context, clientId) || 0,
+            }))
+            .sort((a, b) => a.score < b.score ? 1 : -1);
+    }
+
+    get myScore() {
+        return this.playerScores.find(({clientId}) => clientId === myClientId)!.score;
+    }
+
     get playerNicknames(): Record<string, string> {
         profiler.trace();
 

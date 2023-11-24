@@ -5,9 +5,8 @@ import {Modal} from "../../layout/modal/Modal";
 import {Button} from "../../layout/button/Button";
 import {globalPaddingCoeff, textColor} from "../../app/globals";
 import {useTranslate} from "../../../hooks/useTranslate";
-import {useMemo, useState} from "react";
+import {useState} from "react";
 import {useEffectExceptInit} from "../../../hooks/useEffectExceptInit";
-import {myClientId} from "../../../hooks/useMultiPlayer";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {settings} from "../../../types/layout/Settings";
@@ -21,7 +20,12 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
     const {
         cellSizeForSidePanel: cellSize,
         puzzle,
-        multiPlayer: {isEnabled, allPlayerIds, myPendingMessages},
+        multiPlayer: {
+            isEnabled,
+            playerScores,
+            myScore,
+            myPendingMessages,
+        },
         lmdSolutionCode,
         openedLmdOnce,
         lives,
@@ -69,22 +73,8 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
         }
     }, [lives]);
 
-    // TODO: probably wrong useMemo usage
-    const playerScores = useMemo(
-        () => allPlayerIds
-            .map(clientId => ({
-                clientId,
-                score: getPlayerScore?.(context, clientId) || 0,
-            }))
-            .sort((a, b) => a.score < b.score ? 1 : -1),
-        [context, allPlayerIds, getPlayerScore]
-    );
     const bestScore = playerScores[0]?.score || 0;
     const worstScore = playerScores[playerScores.length - 1]?.score || 0;
-    const myScore = useMemo(
-        () => playerScores.find(({clientId}) => clientId === myClientId)!.score,
-        [playerScores]
-    );
 
     if (fogDemoFieldStateHistory) {
         return null;
