@@ -50,7 +50,7 @@ export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: bool
     loadPuzzle: ({size: sizeStr, regionWidth: regionWidthStr, seed: seedStr, isRandom, host, ...otherParams}) => {
         const fieldSize = Number(sizeStr);
         const regionWidth = Number(regionWidthStr);
-        const randomSeed = daily ? getDailyRandomGeneratorSeed() : Number(seedStr);
+        const randomSeed = daily ? getDailyRandomGeneratorSeed(isQuadle ? 1 : 0) : Number(seedStr);
 
         return {
             noIndex: true,
