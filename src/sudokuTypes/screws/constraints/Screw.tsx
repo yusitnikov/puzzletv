@@ -7,10 +7,12 @@ import {darkGreyColor, lightGreyColor} from "../../../components/app/globals";
 import {observer} from "mobx-react-lite";
 import {ScrewsPTM} from "../types/ScrewsPTM";
 import {ReactElement} from "react";
-import {ScrewsPuzzleExtension} from "../types/ScrewsPuzzleExtension";
+import {ScrewDigit, ScrewsPuzzleExtension} from "../types/ScrewsPuzzleExtension";
 import {CellDigits} from "../../../components/sudoku/cell/CellDigits";
 import {loop} from "../../../utils/math";
 import {indexes} from "../../../utils/indexes";
+import {Rect} from "../../../types/layout/Rect";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 const lightColor = lightGreyColor;
 const darkColor = darkGreyColor;
@@ -29,95 +31,121 @@ const Screw = {
         const offset = context.processedGameStateExtension.screwOffsets[index];
 
         const {
-            initialPosition: {top, left, width, height},
+            initialPosition,
             digits,
         } = (context.puzzle.extension as ScrewsPuzzleExtension<T["cell"]>).screws[index];
 
-        const center = left + width / 2;
-        const offsetDigits = digits.map(({digit, position: {top, left}}) => {
-            top += 0.5;
-            left += 0.5;
-
-            const isRight = left > center;
-
-            return {
-                digit,
-                top: top + offset,
-                left: (left + (isRight ? -0.3 : 0.3) - center) * Math.cos(Math.PI * offset) + center,
-            }
-        });
-
-        return <g opacity={0.7}>
-            <AutoSvg
-                left={left}
-                top={top + offset}
-                width={width}
-                height={height}
-            >
-                <path
-                    d={[
-                        "M", margin, hatHeight,
-                        "L", margin, 0.5,
-                        "Q", margin, margin, width / 2, margin,
-                        "Q", width - margin, margin, width - margin, 0.5,
-                        "L", width - margin, hatHeight,
-                        "z"
-                    ].join(" ")}
-                    strokeWidth={0}
-                    stroke={"none"}
-                    fill={darkColor}
-                />
-
-                <polygon
-                    points={formatSvgPointsArray([
-                        {top: hatHeight, left: 0.5},
-                        {top: height - tipHeight, left: 0.5},
-                        {top: height, left: width / 2},
-                        {top: height - tipHeight, left: width - 0.5},
-                        {top: hatHeight, left: width - 0.5},
-                    ])}
-                    strokeWidth={0}
-                    stroke={"none"}
-                    fill={lightColor}
-                />
-
-                <AutoSvg
-                    top={hatHeight}
-                    width={width}
-                    height={height - tipHeight - hatHeight}
-                    clip={true}
-                >
-                    <AutoSvg top={0.5 - hatHeight - loop(offset, 2)}>
-                        {indexes(Math.ceil(height + 2), true).map((index) => <line
-                            key={index}
-                            x1={width - 0.5 + lineWidth / 3}
-                            y1={index}
-                            x2={0.5 - lineWidth / 3}
-                            y2={index + 1}
-                            strokeWidth={lineWidth}
-                            stroke={darkColor}
-                        />)}
-                    </AutoSvg>
-                </AutoSvg>
-            </AutoSvg>
-
-            {offsetDigits.map(
-                ({digit, top, left}, index) => <AutoSvg
-                    key={index}
-                    top={top - digitSize / 2}
-                    left={left - digitSize / 2}
-                >
-                    <CellDigits
-                        context={context}
-                        size={digitSize}
-                        data={{usersDigit: digit}}
-                        mainColor={true}
-                    />
-                </AutoSvg>
-            )}
-        </g>;
+        return <ScrewByData
+            context={context}
+            position={initialPosition}
+            digits={digits}
+            offset={offset}
+            opacity={0.7}
+        />;
     }) as <T extends AnyPTM>(props: ConstraintProps<ScrewsPTM<T>, ScrewProps>) => ReactElement,
 };
+
+interface ScrewByDataProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
+    position: Rect;
+    digits: ScrewDigit<T["cell"]>[];
+    offset: number;
+    opacity?: number;
+}
+
+export const ScrewByData = observer(function Screw<T extends AnyPTM>(
+    {
+        context,
+        position: {top, left, width, height},
+        digits,
+        offset,
+        opacity = 1,
+    }: ScrewByDataProps<T>
+) {
+    const center = left + width / 2;
+    const offsetDigits = digits.map(({digit, position: {top, left}}) => {
+        top += 0.5;
+        left += 0.5;
+
+        const isRight = left > center;
+
+        return {
+            digit,
+            top: top + offset,
+            left: (left + (isRight ? -0.3 : 0.3) - center) * Math.cos(Math.PI * offset) + center,
+        }
+    });
+
+    return <g opacity={opacity}>
+        <AutoSvg
+            left={left}
+            top={top + offset}
+            width={width}
+            height={height}
+        >
+            <path
+                d={[
+                    "M", margin, hatHeight,
+                    "L", margin, 0.5,
+                    "Q", margin, margin, width / 2, margin,
+                    "Q", width - margin, margin, width - margin, 0.5,
+                    "L", width - margin, hatHeight,
+                    "z"
+                ].join(" ")}
+                strokeWidth={0}
+                stroke={"none"}
+                fill={darkColor}
+            />
+
+            <polygon
+                points={formatSvgPointsArray([
+                    {top: hatHeight, left: 0.5},
+                    {top: height - tipHeight, left: 0.5},
+                    {top: height, left: width / 2},
+                    {top: height - tipHeight, left: width - 0.5},
+                    {top: hatHeight, left: width - 0.5},
+                ])}
+                strokeWidth={0}
+                stroke={"none"}
+                fill={lightColor}
+            />
+
+            <AutoSvg
+                top={hatHeight}
+                width={width}
+                height={height - tipHeight - hatHeight}
+                clip={true}
+            >
+                <AutoSvg top={0.5 - hatHeight - loop(offset, 2)}>
+                    {indexes(Math.ceil(height + 2), true).map((index) => <line
+                        key={index}
+                        x1={width - 0.5 + lineWidth / 3}
+                        y1={index}
+                        x2={0.5 - lineWidth / 3}
+                        y2={index + 1}
+                        strokeWidth={lineWidth}
+                        stroke={darkColor}
+                    />)}
+                </AutoSvg>
+            </AutoSvg>
+        </AutoSvg>
+
+        {offsetDigits.map(
+            ({digit, top, left}, index) => <AutoSvg
+                key={index}
+                top={top - digitSize / 2}
+                left={left - digitSize / 2}
+            >
+                <CellDigits
+                    context={context}
+                    size={digitSize}
+                    data={{usersDigit: digit}}
+                    mainColor={true}
+                />
+            </AutoSvg>
+        )}
+    </g>;
+}) as <T extends AnyPTM>(props: ScrewByDataProps<T>) => ReactElement;
 
 export const ScrewConstraint = <T extends AnyPTM>(index: number): Constraint<ScrewsPTM<T>, ScrewProps> => {
     return {

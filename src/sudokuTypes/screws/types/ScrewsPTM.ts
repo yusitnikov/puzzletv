@@ -10,11 +10,3 @@ export type ScrewsPTM<T extends AnyPTM> = PTM<
     T["fieldStateEx"] & ScrewsFieldState,
     T["puzzleEx"] & ScrewsPuzzleExtension<T["cell"]>
 >;
-
-export type AnyScrewsPTM<
-    CellType = any,
-    GameStateExType extends ScrewsGameState = any,
-    ProcessedGameStateExType extends ScrewsProcessedGameState = any,
-    FieldStateEx extends ScrewsFieldState = any,
-    PuzzleExType extends ScrewsPuzzleExtension<CellType> = any
-> = AnyPTM<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx, PuzzleExType>;

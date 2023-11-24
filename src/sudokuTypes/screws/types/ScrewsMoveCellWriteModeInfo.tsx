@@ -12,6 +12,58 @@ import {ScrewsPTM} from "./ScrewsPTM";
 import {Screw} from "./ScrewsPuzzleExtension";
 import {GameStateActionCallback} from "../../../types/sudoku/GameStateAction";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
+import {
+    ControlButtonItemProps,
+    ControlButtonItemPropsGenericFc
+} from "../../../components/sudoku/controls/ControlButtonsManager";
+import {observer} from "mobx-react-lite";
+import {profiler} from "../../../utils/profiler";
+import {useTranslate} from "../../../hooks/useTranslate";
+import {CellWriteModeButton} from "../../../components/sudoku/controls/CellWriteModeButton";
+import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
+import {textColor} from "../../../components/app/globals";
+import {ScrewByData} from "../constraints/Screw";
+
+const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function ScrewsMoveButton<T extends AnyPTM>(
+    {context, top, left, info}: ControlButtonItemProps<T>
+) {
+    profiler.trace();
+
+    const translate = useTranslate();
+
+    return <>
+        <CellWriteModeButton
+            top={top}
+            left={left}
+            cellWriteMode={CellWriteMode.move}
+            data={(size) => <AutoSvg
+                width={size}
+                height={size}
+                viewBox={{
+                    top: -1.1,
+                    left: -1.1,
+                    width: 2.2,
+                    height: 2.2,
+                }}
+            >
+                <line x1={-0.6} y1={-1} x2={-0.6} y2={1} stroke={textColor} strokeWidth={0.15}/>
+                <polyline points={"-0.3,-0.7 -0.6,-1 -0.9,-0.7"} stroke={textColor} strokeWidth={0.15}/>
+                <polyline points={"-0.3,0.7 -0.6,1 -0.9,0.7"} stroke={textColor} strokeWidth={0.15}/>
+                <g transform={"scale(0.55)"}>
+                    <ScrewByData
+                        context={context}
+                        position={{top: -2, left: -0.2, width: 2, height: 4}}
+                        digits={[]}
+                        offset={0}
+                    />
+                </g>
+            </AutoSvg>}
+            noBorders={true}
+            title={`${translate(info?.title!)} (${translate("shortcut")}: ${info!.hotKeyStr})`}
+            context={context}
+        />
+    </>;
+});
 
 export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<ScrewsPTM<T>> => {
     const base = MoveCellWriteModeInfo<ScrewsPTM<T>>();
@@ -24,7 +76,7 @@ export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeIn
         mode: CellWriteMode.move,
         isNoSelectionMode: true,
         digitsCount: 0,
-        mainButtonContent: base.mainButtonContent,
+        mainButtonContent: ScrewsMoveButton,
         hotKeyStr: base.hotKeyStr,
         isValidGesture: base.isValidGesture,
         onMove(props, context) {
