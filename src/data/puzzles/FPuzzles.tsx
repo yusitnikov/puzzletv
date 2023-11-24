@@ -115,6 +115,7 @@ import {
     RegionSumLineConstraint
 } from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
 import {ShuffledSudokuTypeManager} from "../../sudokuTypes/shuffled/types/ShuffledSudokuTypeManager";
+import {ImportedScrewsSudokuTypeManager} from "../../sudokuTypes/screws/types/ScrewsSudokuTypeManager";
 
 export enum FPuzzleColor {
     white = "#FFFFFF",
@@ -211,6 +212,7 @@ const loadByImportOptions = (
         jss,
         rotatableClues,
         sokoban,
+        screws,
         fillableQuads,
         find3,
         giftsInSight,
@@ -255,6 +257,9 @@ const loadByImportOptions = (
     }
     if (rotatableClues) {
         typeManager = ImportedRotatableCluesSudokuTypeManager(typeManager);
+    }
+    if (screws) {
+        typeManager = ImportedScrewsSudokuTypeManager(typeManager);
     }
     if (fillableQuads) {
         const givenQuads = allGrids

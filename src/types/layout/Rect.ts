@@ -86,3 +86,6 @@ export const getPointsBoundingBox = (...points: Position[]): Rect => {
 
 // noinspection JSUnusedGlobalSymbols
 export const getRectsBoundingBox = (...rects: Rect[]) => getPointsBoundingBox(...rects.flatMap(getRectPoints));
+
+export const isPointInRect = ({top, left, width, height}: Rect, point: Position) =>
+    point.left >= left && point.left <= left + width && point.top >= top && point.top <= top + height;

@@ -62,6 +62,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const [isJss, setIsJss] = useBoolFromLocalStorage("fpwIsJss");
     const [rotatableClues, setRotatableClues] = useBoolFromLocalStorage("fpwRotatableClues");
     const [keepCircles, setKeepCircles] = useBoolFromLocalStorage("fpwKeepCircles");
+    const [screws, setScrews] = useBoolFromLocalStorage("fpwScrews");
     const [sokoban, setSokoban] = useBoolFromLocalStorage("fpwSokoban");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
@@ -167,6 +168,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         jss: supportsJss && isJss,
         rotatableClues: !isSpecialGrid && rotatableClues,
         keepCircles: !isSpecialGrid && rotatableClues && keepCircles,
+        screws: !isSpecialGrid && screws,
         sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
         fillableQuads: !isSpecialGrid && fillableQuads,
@@ -321,6 +323,13 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                                 <input type={"checkbox"} checked={keepCircles} onChange={ev => setKeepCircles(ev.target.checked)}/>
                             </label>
                         </Paragraph>}
+
+                        <Paragraph>
+                            <label>
+                                Screws:&nbsp;
+                                <input type={"checkbox"} checked={screws} onChange={ev => setScrews(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
 
                         <Paragraph>
                             <label>
