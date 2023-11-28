@@ -125,3 +125,6 @@ ReservedParking.args = {_hash: "reserved-parking"};
 
 export const WheelsOnTheBus = Template.bind({});
 WheelsOnTheBus.args = {_hash: "wheels-on-the-bus"};
+
+export const Screws = Template.bind({});
+Screws.args = {_hash: "screws"};

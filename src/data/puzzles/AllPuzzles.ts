@@ -48,6 +48,7 @@ import {WheelsOnTheBus} from "./WheelsOnTheBus";
 import {HappyBirthdayDumediat} from "./HbdDumediat";
 import {ChessMoves} from "./ChessMoves";
 import {BuySomethinWillYa, BuySomethinWillYaShopItems} from "./BuySomethinWillYa";
+import {Screws} from "./Screws";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -74,6 +75,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    Screws,
+
     NewDiscovery,
 
     BuySomethinWillYa,
