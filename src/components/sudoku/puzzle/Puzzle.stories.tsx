@@ -128,3 +128,6 @@ WheelsOnTheBus.args = {_hash: "wheels-on-the-bus"};
 
 export const Screws = Template.bind({});
 Screws.args = {_hash: "screws"};
+
+export const Shuffled = Template.bind({});
+Shuffled.args = {_hash: "shuffled"};

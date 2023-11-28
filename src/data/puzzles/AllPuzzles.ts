@@ -50,6 +50,7 @@ import {ChessMoves} from "./ChessMoves";
 import {BuySomethinWillYa, BuySomethinWillYaShopItems} from "./BuySomethinWillYa";
 import {Screws} from "./Screws";
 import {Find3} from "./Find3";
+import {Shuffled} from "./Shuffled";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -76,6 +77,7 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    Shuffled,
     Screws,
     Find3,
 
