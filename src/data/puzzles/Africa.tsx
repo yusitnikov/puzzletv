@@ -20,6 +20,7 @@ import {GoogleMapsPTM} from "../../sudokuTypes/google-maps/types/GoogleMapsPTM";
 import {indexes} from "../../utils/indexes";
 
 export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
+    noIndex: true,
     slug: "africa",
     title: {
         [LanguageCode.en]: "Africa",
