@@ -49,6 +49,7 @@ import {HappyBirthdayDumediat} from "./HbdDumediat";
 import {ChessMoves} from "./ChessMoves";
 import {BuySomethinWillYa, BuySomethinWillYaShopItems} from "./BuySomethinWillYa";
 import {Screws} from "./Screws";
+import {Find3} from "./Find3";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -76,6 +77,7 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
 
     // region Other authors
     Screws,
+    Find3,
 
     NewDiscovery,
 
