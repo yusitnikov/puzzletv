@@ -88,6 +88,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
     const [splitUnconnectedRegions, setSplitUnconnectedRegions] = useBoolFromLocalStorage("fpwSplitUnconnectedRegions");
     const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
+    const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
@@ -162,6 +163,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
         digitsCount: digitsCount === fieldSize && !filteredExtraGrids.length ? undefined : digitsCount,
+        supportZero,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
@@ -538,15 +540,22 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
 
                 <CollapsableFieldSet legend={"Miscellaneous"}>
                     <Paragraph>
-                        Digits count:&nbsp;
-                        <input
-                            type={"number"}
-                            value={digitsCount}
-                            min={1}
-                            max={Math.min(fieldSize, 9)}
-                            step={1}
-                            onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
-                        />
+                        <label>
+                            Digits count:&nbsp;
+                            <input
+                                type={"number"}
+                                value={digitsCount}
+                                min={1}
+                                max={Math.min(fieldSize, 9)}
+                                step={1}
+                                onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
+                            />
+                        </label>
+                        &nbsp;
+                        <label>
+                            Support zero:&nbsp;
+                            <input type={"checkbox"} checked={supportZero} onChange={ev => setSupportZero(ev.target.checked)}/>
+                        </label>
                     </Paragraph>
 
                     <Paragraph>

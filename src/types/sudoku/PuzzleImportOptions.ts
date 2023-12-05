@@ -64,6 +64,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     splitUnconnectedRegions?: boolean;
     hideZeroRegion?: boolean;
     givenDigitsBlockCars?: boolean;
+    supportZero?: boolean;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -113,6 +114,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         splitUnconnectedRegions,
         hideZeroRegion,
         givenDigitsBlockCars,
+        supportZero,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -168,6 +170,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         splitUnconnectedRegions,
         hideZeroRegion,
         givenDigitsBlockCars,
+        supportZero,
     };
 
     return result;

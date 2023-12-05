@@ -344,6 +344,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
             loopX,
             loopY,
             allowOverrideColors = false,
+            supportZero,
         } = importOptions;
 
         this.puzzle = {
@@ -364,6 +365,7 @@ class FPuzzlesImporter<T extends AnyPTM> {
             solutionColors: this.solutionColors,
             items: this.items,
             allowOverridingInitialColors: allowOverrideColors,
+            supportZero,
             importOptions,
             resultChecker: noSpecialRules ? isValidFinishedPuzzleByConstraints : undefined,
         };
