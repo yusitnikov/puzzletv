@@ -16,14 +16,12 @@ import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {FullCubePTM} from "./FullCubePTM";
 import {FullCubeGameState, gameStateHandleRotateFullCube, ProcessedFullCubeGameState} from "./FullCubeGameState";
 import {
-    addVectors3D,
     getClosestAxis3D,
     initialCoordsBase3D,
     normalizeVector3D,
     Position3D,
     roundVector3D,
     scalarMultiplication3D,
-    scaleVector3D,
     subtractVectors3D,
     vectorMultiplication3D
 } from "../../../types/layout/Position3D";
@@ -34,6 +32,7 @@ import {FullCubeControls} from "../components/FullCubeControls";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {FullCubeJssConstraint} from "../constraints/FullCubeJss";
 import {transformFullCubeCoords3D} from "../helpers/fullCubeHelpers";
+import {vector4} from "xyzw";
 
 /*
  * TODO:
@@ -59,16 +58,10 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
                 coordsBase,
                 settings.animationSpeed.get(),
                 (a, b, coeff) => {
-                    // TODO: implement the real rotation of the coords bases
-                    const mix = (a: Position3D, b: Position3D) => addVectors3D(
-                        scaleVector3D(a, 1 - coeff),
-                        scaleVector3D(b, coeff),
-                    );
-                    return {
-                        ox: mix(a.ox, b.ox),
-                        oy: mix(a.oy, b.oy),
-                        oz: mix(a.oz, b.oz),
-                    };
+                    // See https://en.wikipedia.org/wiki/Slerp
+                    const result = vector4.RotationSlerp(a, b, coeff);
+                    // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
+                    return Number.isFinite(result.w) ? result : b;
                 },
             )
         };
@@ -400,7 +393,9 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
             ignoreRowsColumnCountInTheWrapper: true,
             allowDrawing: allowDrawing?.filter((item) => item === "center-mark"),
         };
-    }
+    },
+
+    saveStateKeySuffix: "v2",
 });
 
 export const createFullCubeFieldSize = (fieldSize: number, withJss = false): FieldSize => ({

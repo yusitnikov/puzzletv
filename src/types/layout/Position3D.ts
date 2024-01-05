@@ -1,4 +1,5 @@
 import {rotateVectorClockwise} from "./Position";
+import {matrix3, vector3, vector4} from "xyzw";
 
 export interface Position3D {
     x: number;
@@ -6,18 +7,11 @@ export interface Position3D {
     z: number;
 }
 
-export interface CoordsBase3D {
-    ox: Position3D;
-    oy: Position3D;
-    oz: Position3D;
-}
-
 export const emptyPosition3D: Position3D = {x: 0, y: 0, z: 0};
-export const initialCoordsBase3D: CoordsBase3D = {
-    ox: {x: 1, y: 0, z: 0},
-    oy: {x: 0, y: 1, z: 0},
-    oz: {x: 0, y: 0, z: 1},
-};
+export const vectorOx = vector3.AxisX();
+export const vectorOy = vector3.AxisY();
+export const vectorOz = vector3.AxisZ();
+export const initialCoordsBase3D = vector4.RotationMatrix3(matrix3.Identity());
 
 export const isSamePosition3D = (a: Position3D, b: Position3D) => a.x === b.x && a.y === b.y;
 
@@ -96,8 +90,7 @@ export const rotateVector3D = (vector: Position3D, axis: Position3D, angle: numb
     );
 };
 
-export const rotateCoordsBase3D = ({ox, oy, oz}: CoordsBase3D, axis: Position3D, angle: number): CoordsBase3D => ({
-    ox: normalizeVector3D(rotateVector3D(ox, axis, angle)),
-    oy: normalizeVector3D(rotateVector3D(oy, axis, angle)),
-    oz: normalizeVector3D(rotateVector3D(oz, axis, angle)),
-});
+export const rotateCoordsBase3D = (coordsBase: vector4.Vector4, axis: vector3.Vector3, angle: number) => vector4.Outer(
+    vector4.RotationAxis(axis, angle * Math.PI / 180),
+    coordsBase,
+);

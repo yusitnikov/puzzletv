@@ -34,7 +34,8 @@
         "react-error-boundary": "^4.0.0",
         "react-input-slider": "^6.0.1",
         "react-scripts": "^5.0.0",
-        "ua-parser-js": "^1.0.35"
+        "ua-parser-js": "^1.0.35",
+        "xyzw": "^2.8.0"
     },
     "devDependencies": {
         "@storybook/addon-actions": "^6.5.16",

@@ -1,7 +1,13 @@
 import {Position} from "../../../types/layout/Position";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {FullCubePTM} from "../types/FullCubePTM";
-import {initialCoordsBase3D, Position3D, rotateVector3D} from "../../../types/layout/Position3D";
+import {
+    Position3D,
+    rotateVector3D,
+    vectorOx,
+    vectorOy
+} from "../../../types/layout/Position3D";
+import {matrix3, vector3} from "xyzw";
 
 export const transformFullCubeCoords3D = (
     {top, left}: Position,
@@ -10,7 +16,7 @@ export const transformFullCubeCoords3D = (
 ) => {
     const {puzzle: {fieldSize: {columnsCount}}} = context;
 
-    const {ox, oy, oz} = useAnimatedCoords
+    const coordsBase = useAnimatedCoords
         ? context.processedGameStateExtension.animatedCoordsBase
         : context.stateExtension.coordsBase;
 
@@ -39,10 +45,10 @@ export const transformFullCubeCoords3D = (
 
     switch (topQuad) {
         case 0:
-            realPoint = rotateVector3D(realPoint, initialCoordsBase3D.oy, leftQuad * 90);
+            realPoint = rotateVector3D(realPoint, vectorOy, leftQuad * 90);
             break;
         case 1:
-            realPoint = rotateVector3D(realPoint, initialCoordsBase3D.ox, leftQuad * 90);
+            realPoint = rotateVector3D(realPoint, vectorOx, leftQuad * 90);
             break;
         case 2:
             switch (leftQuad) {
@@ -50,11 +56,11 @@ export const transformFullCubeCoords3D = (
                     realPoint.x -= realFieldSize;
                     break;
                 case 1:
-                    realPoint = rotateVector3D(realPoint, initialCoordsBase3D.ox, 90);
+                    realPoint = rotateVector3D(realPoint, vectorOx, 90);
                     realPoint.x -= realFieldSize;
                     break;
                 case 2:
-                    realPoint = rotateVector3D(realPoint, initialCoordsBase3D.ox, 90);
+                    realPoint = rotateVector3D(realPoint, vectorOx, 90);
                     realPoint.z -= realFieldSize;
                     break;
             }
@@ -62,12 +68,7 @@ export const transformFullCubeCoords3D = (
     }
 
     if (topQuad !== 2) {
-        const {x, y, z} = realPoint;
-        realPoint = {
-            x: ox.x * x + oy.x * y + oz.x * z,
-            y: ox.y * x + oy.y * y + oz.y * z,
-            z: ox.z * x + oy.z * y + oz.z * z,
-        };
+        realPoint = vector3.MultiplyMatrix3(matrix3.Quaternion(coordsBase), realPoint);
     }
 
     return realPoint;

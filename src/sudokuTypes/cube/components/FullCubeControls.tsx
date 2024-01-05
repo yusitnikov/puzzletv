@@ -8,7 +8,7 @@ import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
 import {FullCubePTM} from "../types/FullCubePTM";
 import {gameStateHandleRotateFullCube} from "../types/FullCubeGameState";
-import {initialCoordsBase3D} from "../../../types/layout/Position3D";
+import {vectorOx, vectorOy, vectorOz} from "../../../types/layout/Position3D";
 import {KeyboardArrowUp, KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowLeft} from "@emotion-icons/material";
 import {useEventListener} from "../../../hooks/useEventListener";
 
@@ -47,12 +47,12 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
     const translate = useTranslate();
     const buttonTitle = (key: string) => `${translate("Rotate the puzzle")} (${translate("shortcut")}: ${key})`;
 
-    const leftUp = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, initialCoordsBase3D.ox, 90));
-    const leftDown = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, initialCoordsBase3D.ox, -90));
-    const rightUp = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, initialCoordsBase3D.oz, -90));
-    const rightDown = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, initialCoordsBase3D.oz, 90));
-    const right = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, initialCoordsBase3D.oy, 90));
-    const left = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, initialCoordsBase3D.oy, -90));
+    const leftUp = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, vectorOx, 90));
+    const leftDown = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, vectorOx, -90));
+    const rightUp = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, vectorOz, -90));
+    const rightDown = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, vectorOz, 90));
+    const right = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, vectorOy, 90));
+    const left = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, vectorOy, -90));
 
     useEventListener(window, "keydown", (ev) => {
         if (ev.ctrlKey || ev.metaKey || ev.altKey || ev.shiftKey) {
