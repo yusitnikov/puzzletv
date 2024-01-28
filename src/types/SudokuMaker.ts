@@ -5,7 +5,6 @@ export interface CustomConstraintDefinition {
     components: CustomConstraintComponent[]
 }
 
-// TODO: support actual elements and stuff
 export type CustomConstraintInputType = 'raw'
 
 export interface CustomConstraintInput<T extends CustomConstraintInputType = CustomConstraintInputType> {
@@ -273,7 +272,6 @@ export interface LookAndSayCagesConstraintConfig {
 }
 
 export interface LittleKiller {
-    // TODO: make editors store clues with undefined values in their own state, instead of in the actual config
     value: number | undefined
     outerCell: OuterCellId
     diagonal: DiagonalType
@@ -382,21 +380,18 @@ export interface SandwichSumsConstraintConfig {
 
 export interface XSumsConstraintConfig {
     type: ConstraintType.XSums
-    // TODO: make editors store clues with undefined values in their own state, instead of in the actual config
     clues: OuterClue<number | undefined>[]
     style: OuterClueStyle
 }
 
 export interface SkyscrapersConstraintConfig {
     type: ConstraintType.Skyscrapers
-    // TODO: make editors store clues with undefined values in their own state, instead of in the actual config
     clues: OuterClue<number | undefined>[]
     style: OuterClueStyle
 }
 
 export interface NumberedRoomsConstraintConfig {
     type: ConstraintType.NumberedRooms
-    // TODO: make editors store clues with undefined values in their own state, instead of in the actual config
     clues: OuterClue<number | undefined>[]
     style: OuterClueStyle
 }
