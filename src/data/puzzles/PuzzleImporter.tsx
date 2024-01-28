@@ -69,12 +69,13 @@ import {
     RowIndexerConstraint
 } from "../../components/sudoku/constraints/indexer/Indexer";
 import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
-import {InBetweenLineConstraint} from "../../components/sudoku/constraints/in-between-line/InBetweenLine";
+import {BetweenLineConstraint} from "../../components/sudoku/constraints/between-line/BetweenLine";
 import {LockoutLineConstraint} from "../../components/sudoku/constraints/lockout-line/LockoutLine";
 import {LineConstraint} from "../../components/sudoku/constraints/line/Line";
 import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
+import {DoubleArrowConstraint} from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
 
 export class PuzzleImporter<T extends AnyPTM> {
     private readonly regions: Position[][] = [];
@@ -470,7 +471,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         lineColor?: string,
         lineWidth?: number,
     ) {
-        this.addItems(InBetweenLineConstraint(
+        this.addItems(BetweenLineConstraint(
             gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
             false,
             lineColor,
@@ -480,29 +481,32 @@ export class PuzzleImporter<T extends AnyPTM> {
     addDoubleArrowLine(
         gridParser: GridParser<T, any>,
         cells: PositionLiteral[],
+        display: boolean,
         lineColor?: string,
         lineWidth?: number,
     ) {
-        // TODO
-        this.addItems(InBetweenLineConstraint(
+        const constraint = DoubleArrowConstraint<T>(
             gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
             false,
             lineColor,
             lineWidth,
-        ));
+        );
+        this.addItems(display ? constraint : toInvisibleConstraint(constraint));
     }
     addLockoutLine(
         gridParser: GridParser<T, any>,
         cells: PositionLiteral[],
+        display: boolean,
         lineColor?: string,
         lineWidth?: number,
     ) {
-        this.addItems(LockoutLineConstraint(
+        const constraint = LockoutLineConstraint<T>(
             gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
             false,
             lineColor,
             lineWidth,
-        ));
+        );
+        this.addItems(display ? constraint : toInvisibleConstraint(constraint));
     }
     // endregion
 

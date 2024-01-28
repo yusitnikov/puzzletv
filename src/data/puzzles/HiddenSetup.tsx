@@ -20,7 +20,7 @@ import {
 } from "../ruleSnippets";
 import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
-import {InBetweenLineConstraint} from "../../components/sudoku/constraints/in-between-line/InBetweenLine";
+import {BetweenLineConstraint} from "../../components/sudoku/constraints/between-line/BetweenLine";
 import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
 import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
@@ -204,7 +204,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
             KillerCageConstraintByRect("R6C6", 4, 1, 12),
             RenbanConstraint(["R1C6", "R4C6", "R4C9"]),
             RenbanConstraint(["R5C1", "R5C5", "R9C5"]),
-            InBetweenLineConstraint(["R6C1", "R6C4", "R9C4"]),
+            BetweenLineConstraint(["R6C1", "R6C4", "R9C4"]),
             EvenConstraint("R1C6"),
             EvenConstraint("R3C6"),
             EvenConstraint("R4C7"),

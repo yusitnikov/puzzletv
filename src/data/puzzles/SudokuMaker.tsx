@@ -555,7 +555,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     {style: {lines: {color, thickness}, endPoints: {size, fill, stroke}}}
                                 ) => {
                                     for (const cells of lines) {
-                                        importer.addLockoutLine(this, this.parseCellIds(cells), color, thickness);
+                                        importer.addLockoutLine(this, this.parseCellIds(cells), true, color, thickness);
                                     }
                                 },
                                 style: lineWithEndpointsValidator.bind("lockout line style"),
@@ -609,7 +609,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     {style: {lines: {color, thickness}, endPoints: {size, fill, stroke}}}
                                 ) => {
                                     for (const cells of lines) {
-                                        importer.addDoubleArrowLine(this, this.parseCellIds(cells), color, thickness);
+                                        importer.addDoubleArrowLine(this, this.parseCellIds(cells), true, color, thickness);
                                     }
                                 },
                                 style: lineWithEndpointsValidator.bind("double arrow line style"),

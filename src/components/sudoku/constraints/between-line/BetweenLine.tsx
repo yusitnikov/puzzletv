@@ -17,7 +17,7 @@ import {LineProps} from "../line/Line";
 const circleRadius = 0.4;
 const backgroundColor = lighterGreyColor;
 
-export const InBetweenLine: ConstraintPropsGenericFcMap<LineProps> = {
+export const BetweenLine: ConstraintPropsGenericFcMap<LineProps> = {
     [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({cells, color: lineColor = darkGreyColor, props: {width: lineWidth = 0.1}}: ConstraintProps<T, LineProps>) {
         profiler.trace();
 
@@ -57,11 +57,11 @@ export const InBetweenLine: ConstraintPropsGenericFcMap<LineProps> = {
     }),
 };
 
-export const InBetweenLineConstraint = <T extends AnyPTM>(
+export const BetweenLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
-    lineColor = darkGreyColor,
-    width: number | undefined = undefined,
+    lineColor?: string,
+    width?: number,
 ): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
@@ -69,9 +69,9 @@ export const InBetweenLineConstraint = <T extends AnyPTM>(
     }
 
     return {
-        name: "in-between line",
+        name: "between line",
         cells,
-        component: InBetweenLine,
+        component: BetweenLine,
         color: lineColor,
         props: {width},
         isValidCell(cell, digits, cells, context) {

@@ -305,7 +305,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                         ObjectParser.empty.parse(other, "f-puzzles double arrow line");
 
                         for (const cells of lines) {
-                            importer.addDoubleArrowLine(this, cells);
+                            importer.addDoubleArrowLine(this, cells, false);
                         }
                     }
                 }
@@ -327,7 +327,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                         ObjectParser.empty.parse(other, "f-puzzles lockout line");
 
                         for (const cells of lines) {
-                            importer.addLockoutLine(this, cells);
+                            importer.addLockoutLine(this, cells, false);
                         }
                     }
                 }
