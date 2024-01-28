@@ -755,7 +755,9 @@ export class PuzzleImporter<T extends AnyPTM> {
                     // TODO: extract to a type manager
                     this.items.push(FillableCalculatorDigitConstraint({top: offsetTop, left: offsetLeft}, value));
                 } else {
-                    this.addSolutionDigit(gridParser, top, left, value);
+                    if (gridParser.hasSolution) {
+                        this.addSolutionDigit(gridParser, top, left, value);
+                    }
                     this.initialDigits[offsetTop] = this.initialDigits[offsetTop] || {};
                     this.initialDigits[offsetTop][offsetLeft] = this.typeManager.createCellDataByImportedDigit(value);
                 }
