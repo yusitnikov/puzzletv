@@ -24,7 +24,7 @@ import {parsePositionLiteral, PositionLiteral} from "../../types/layout/Position
 import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
 import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {GermanWhispersConstraint} from "../../components/sudoku/constraints/german-whispers/GermanWhispers";
+import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
 import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
 import {GreaterConstraint} from "../../components/sudoku/constraints/greater/Greater";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
@@ -79,7 +79,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     EvenConstraint(offsetCell("R5C1")),
                     EvenConstraint(offsetCell("R5C3")),
                     EvenConstraint(offsetCell("R6C2")),
-                    GermanWhispersConstraint(offsetCells("R5C2", "R5C1", "R4C2", "R5C3")),
+                    WhispersConstraint(offsetCells("R5C2", "R5C1", "R4C2", "R5C3")),
                     RenbanConstraint(offsetCells("R5C2", "R5C3", "R6C2", "R5C1")),
                 ],
                 colors: colorsMap(redColor, "R4C1", "R4C2", "R4C3", "R5C1", "R5C3", "R6C1", "R6C2", "R6C3"),
@@ -88,8 +88,8 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
             return {
                 constraints: [
                     ArrowConstraint(offsetCell("R6C2"), offsetCells("R1C2")),
-                    GermanWhispersConstraint(offsetCells("R5C1", "R4C2", "R5C3")),
-                    GermanWhispersConstraint(offsetCells("R6C1", "R5C2", "R6C3")),
+                    WhispersConstraint(offsetCells("R5C1", "R4C2", "R5C3")),
+                    WhispersConstraint(offsetCells("R6C1", "R5C2", "R6C3")),
                     EvenConstraint(offsetCell("R4C2")),
                     EvenConstraint(offsetCell("R5C2")),
                 ],
@@ -169,7 +169,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     ArrowConstraint(offsetCell("R6C1"), offsetCells("R3C1")),
                     ArrowConstraint(offsetCell("R6C2"), offsetCells("R3C2")),
                     ArrowConstraint(offsetCell("R1C2"), offsetCells("R4C2")),
-                    GermanWhispersConstraint(offsetCells("R1C2", "R2C3", "R5C3", "R6C2")),
+                    WhispersConstraint(offsetCells("R1C2", "R2C3", "R5C3", "R6C2")),
                 ],
                 colors: colorsMap(yellowColor, "R3C1", "R4C1", "R5C1", "R6C1"),
             };

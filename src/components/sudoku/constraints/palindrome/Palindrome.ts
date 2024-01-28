@@ -43,11 +43,16 @@ export const BasePalindromeConstraint = <T extends AnyPTM>(
     };
 };
 
-export const PalindromeConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], split = true) => BasePalindromeConstraint<T>(
+export const PalindromeConstraint = <T extends AnyPTM>(
+    cellLiterals: PositionLiteral[],
+    split = true,
+    color = lightGreyColor,
+    width: number | undefined = undefined,
+) => BasePalindromeConstraint<T>(
     "palindrome",
-    lightGreyColor,
+    color,
     cellLiterals,
     undefined,
-    undefined,
+    width,
     split,
 );

@@ -211,7 +211,7 @@ export const germanWhispersExplained = (noColor = false): Translatable => ({
 });
 
 export const evenTitle: Translatable = {
-    [LanguageCode.en]: "Even digits",
+    [LanguageCode.en]: "Indexer digits",
     [LanguageCode.ru]: "Четные цифры",
     [LanguageCode.de]: "Gerade Ziffern",
 };

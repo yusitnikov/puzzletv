@@ -13,6 +13,7 @@ import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
 import {RoundedPolyLine} from "../../../svg/rounded-poly-line/RoundedPolyLine";
+import {LineProps} from "../line/Line";
 
 const diamondWidth = 0.4;
 const diamondLineWidth = 0.05;
@@ -37,8 +38,8 @@ const LockoutLineDiamond = observer(function LockoutLineDiamond(center: Position
     />;
 });
 
-export const LockoutLine: ConstraintPropsGenericFcMap = {
-    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({cells}: ConstraintProps<T>) {
+export const LockoutLine: ConstraintPropsGenericFcMap<LineProps> = {
+    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({cells, color = lockoutLineLineColor, props: {width = 0.1}}: ConstraintProps<T, LineProps>) {
         profiler.trace();
 
         cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
@@ -46,8 +47,8 @@ export const LockoutLine: ConstraintPropsGenericFcMap = {
         return <>
             <RoundedPolyLine
                 points={cells}
-                strokeWidth={0.1}
-                stroke={lockoutLineLineColor}
+                strokeWidth={width}
+                stroke={color}
             />
             <LockoutLineDiamond {...cells[0]}/>
             <LockoutLineDiamond {...cells[cells.length - 1]}/>
@@ -57,9 +58,10 @@ export const LockoutLine: ConstraintPropsGenericFcMap = {
 
 export const LockoutLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
-    display = true,
     split = true,
-): Constraint<T> => {
+    color = purpleColor,
+    width: number | undefined = undefined,
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);
@@ -68,9 +70,9 @@ export const LockoutLineConstraint = <T extends AnyPTM>(
     return {
         name: "lockout line",
         cells,
-        color: purpleColor,
-        component: display ? LockoutLine : undefined,
-        props: undefined,
+        color,
+        component: LockoutLine,
+        props: {width},
         isObvious: false,
         isValidCell(cell, digits, cells, context) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;

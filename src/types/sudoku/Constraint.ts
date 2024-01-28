@@ -212,4 +212,9 @@ export const toDecorativeConstraint = <T extends AnyPTM, DataT>(constraint: Cons
     isValidPuzzle: undefined,
     getInvalidUserLines: undefined,
 });
+
+export const toInvisibleConstraint = <T extends AnyPTM, DataT>(constraint: Constraint<T, DataT>): Constraint<T, DataT> => ({
+    ...constraint,
+    component: undefined,
+});
 // endregion

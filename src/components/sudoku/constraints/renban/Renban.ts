@@ -8,8 +8,9 @@ import {purpleColor} from "../../../app/globals";
 
 export const RenbanConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
-    display = true,
     split = true,
+    color = purpleColor,
+    width: number | undefined = undefined,
 ): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
@@ -19,9 +20,9 @@ export const RenbanConstraint = <T extends AnyPTM>(
     return {
         name: "renban line",
         cells,
-        color: purpleColor,
-        component: display ? LineComponent : undefined,
-        props: {},
+        color,
+        component: LineComponent,
+        props: {width},
         isObvious: true,
         isValidCell(
             cell,

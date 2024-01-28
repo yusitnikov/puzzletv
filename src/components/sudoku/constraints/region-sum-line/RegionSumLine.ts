@@ -9,8 +9,9 @@ export const regionSumLineColor = blueColor;
 
 export const RegionSumLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
-    display = true,
     split = true,
+    color = regionSumLineColor,
+    width: number | undefined = undefined,
 ): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
@@ -20,9 +21,9 @@ export const RegionSumLineConstraint = <T extends AnyPTM>(
     return {
         name: "region sum line",
         cells,
-        color: regionSumLineColor,
-        component: display ? LineComponent : undefined,
-        props: {},
+        color,
+        component: LineComponent,
+        props: {width},
         isObvious: false,
         isValidCell(
             cell,

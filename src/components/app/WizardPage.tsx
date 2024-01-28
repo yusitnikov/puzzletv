@@ -1,10 +1,10 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled/macro";
 import {buildLink} from "../../utils/link";
-import {Children, FC, FormEvent, useMemo, useRef, useState} from "react";
+import {Children, FC, FormEvent, ReactElement, useMemo, useRef, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
-import {decodeFPuzzlesString, FPuzzles} from "../../data/puzzles/FPuzzles";
-import {useLanguageCode, useTranslate} from "../../hooks/useTranslate";
+import {getPuzzleImportLoader} from "../../data/puzzles/Import";
+import {useLanguageCode} from "../../hooks/useTranslate";
 import {darkGreyColor, headerPadding} from "./globals";
 import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
 import {usePureMemo} from "../../hooks/usePureMemo";
@@ -20,8 +20,8 @@ import {
 import {loadPuzzle} from "../../types/sudoku/PuzzleDefinition";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
-
-export const fPuzzlesWizardPageTitle = "Import from f-puzzles";
+import {GridParserFactory} from "../../data/puzzles/GridParser";
+import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 
 let autoIncrement = 0;
 
@@ -43,13 +43,16 @@ const FieldSet = styled("fieldset")({
 const Details = styled("div")({marginTop: "0.25em", color: "#888"});
 const Select = styled("select")({font: "inherit"});
 
-interface FPuzzlesWizardPageProps {
+interface WizardPageProps<T extends AnyPTM, JsonT> {
     load: string;
+    slug: string;
+    title: string;
+    typeLabel: string;
+    gridParserFactory: GridParserFactory<T, JsonT>;
 }
 
-export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => {
+export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title, typeLabel, gridParserFactory}: WizardPageProps<T, JsonT>) => {
     const languageCode = useLanguageCode();
-    const translate = useTranslate();
 
     const {width, height} = useWindowSize();
     const previewSize = Math.min(width, height) - 2 * headerPadding;
@@ -133,26 +136,26 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
     const globalOffsetY = -Math.min(0, ...filteredExtraGrids.map(({offsetY}) => offsetY));
 
     const finalIsFirstGridSticky = isJigsawLike && filteredExtraGrids.length !== 0 && (isFirstStickyGrid || isShuffled);
-    const puzzles = useMemo(() => {
-        const result = [decodeFPuzzlesString(load)];
+    const gridParsers = useMemo(() => {
+        const result = [gridParserFactory(load, globalOffsetX, globalOffsetY)];
 
         for (const extraGrid of extraGrids) {
             try {
-                result.push(decodeFPuzzlesString(extraGrid.load));
+                result.push(gridParserFactory(extraGrid.load, extraGrid.offsetX, extraGrid.offsetY));
             } catch (e) {
                 console.error(e);
             }
         }
 
         return result;
-    }, [load, extraGrids]);
+    }, [load, globalOffsetX, globalOffsetY, extraGrids, gridParserFactory]);
 
-    const fieldSize = puzzles[0].size;
-    const hasSolution = puzzles.some((puzzle) => puzzle.solution);
-    const hasFog = puzzles.some((puzzle) => puzzle.fogofwar || puzzle.foglight);
-    const hasCosmeticElements = puzzles.some((puzzle) => puzzle.text?.length || puzzle.line?.length || puzzle.rectangle?.length || puzzle.circle?.length || puzzle.cage?.length);
-    const hasInitialColors = puzzles.some((puzzle) => puzzle.grid.some(row => row.some(cell => cell.c || cell.cArray?.length)));
-    const hasArrows = puzzles.some((puzzle) => puzzle.arrow);
+    const fieldSize = gridParsers[0].size;
+    const hasSolution = gridParsers.some((gridParser) => gridParser.hasSolution);
+    const hasFog = gridParsers.some((gridParser) => gridParser.hasFog);
+    const hasCosmeticElements = gridParsers.some((gridParser) => gridParser.hasCosmeticElements);
+    const hasInitialColors = gridParsers.some((gridParser) => gridParser.hasInitialColors);
+    const hasArrows = gridParsers.some((gridParser) => gridParser.hasArrows);
     // Transparent arrow circles are always on for the rotatable clues puzzles, so don't allow to change the flag
     const transparentCirclesForced = rotatableClues;
 
@@ -213,7 +216,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         const version = ++autoIncrement;
         try {
             return {
-                puzzle: loadPuzzle(FPuzzles, importOptions),
+                puzzle: loadPuzzle(getPuzzleImportLoader(slug, gridParserFactory), importOptions),
                 version,
             };
         } catch (error: unknown) {
@@ -223,18 +226,19 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                 version,
             };
         }
-    }, [importOptions]);
+    }, [importOptions, slug, gridParserFactory]);
 
     const handleSubmit = (ev: FormEvent) => {
         ev.preventDefault();
 
-        window.location.hash = buildLink("f-puzzles", languageCode, importOptions);
+        window.location.hash = buildLink(slug, languageCode, importOptions);
 
         return false;
     };
 
     const isValidForm = !isInfiniteRings || visibleRingsCount !== 0;
 
+    // TODO: different script for SudokuMaker
     // eslint-disable-next-line no-script-url
     const copyIdBookmarkletCode = "javascript:(()=>{const d=document,b=d.body,e=d.createElement('input');e.value=exportPuzzle();b.append(e);e.select();d.execCommand('copy');e.remove();})()";
 
@@ -244,7 +248,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
         gap: "1em",
     }}>
         <div style={{flex: 1, minWidth: 0}}>
-            <PageTitle>{translate(fPuzzlesWizardPageTitle)}</PageTitle>
+            <PageTitle>{title}</PageTitle>
 
             <form onSubmit={handleSubmit}>
                 <CollapsableFieldSet legend={"Puzzle type"}>
@@ -587,7 +591,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                             <input type={"checkbox"} checked={splitUnconnectedRegions} onChange={ev => setSplitUnconnectedRegions(ev.target.checked)}/>
                         </label>
                         <Details>
-                            If multiple cells marked as the same region in f-puzzles, but not connected to each other,
+                            If multiple cells marked as the same region in {typeLabel}, but not connected to each other,
                             treat them as different regions.
                         </Details>
                     </Paragraph>
@@ -686,12 +690,12 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
                                         Copy the link of the page that opened in the tab to here.
                                     </Details>
                                     <Details>
-                                        Alternative: copy the f-puzzles ID to the clipboard by installing and using this bookmarklet: <a href={copyIdBookmarkletCode}>Copy f-puzzles ID</a>.
+                                        Alternative: copy the {typeLabel} ID to the clipboard by installing and using this bookmarklet: <a href={copyIdBookmarkletCode}>Copy {typeLabel} ID</a>.
                                     </Details>
                                     <Details>
                                         <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
                                         Also, If you edited the puzzle, it's a must to use the "open with link" feature
-                                        (because the link of the current f-puzzles tab doesn't include the latest
+                                        (because the link of the current {typeLabel} tab doesn't include the latest
                                         information).
                                     </Details>
                                 </Paragraph>
@@ -712,7 +716,7 @@ export const FPuzzlesWizardPage = observer(({load}: FPuzzlesWizardPageProps) => 
             width={previewSize}
         />
     </div>;
-});
+}) as <T extends AnyPTM, JsonT>(props: WizardPageProps<T, JsonT>) => ReactElement;
 
 interface CollapsableFieldSetProps {
     legend: string;

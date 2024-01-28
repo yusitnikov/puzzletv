@@ -13,17 +13,19 @@ import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {getLineCellsByOutsideCell} from "../outside-clue/OutsideClue";
 
 const lineWidth = 0.03;
 
 export interface LittleKillerProps {
     direction: Position;
     sum?: number;
+    lineColor?: string;
 }
 
 export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
     [FieldLayer.regular]: observer(function LittleKiller<T extends AnyPTM>(
-        {context: {puzzle}, cells: [{top, left}], props: {direction, sum}}: ConstraintProps<T, LittleKillerProps>
+        {context: {puzzle}, cells: [{top, left}], color: fontColor = textColor, props: {direction, sum, lineColor = textColor}}: ConstraintProps<T, LittleKillerProps>
     ) {
         profiler.trace();
 
@@ -52,7 +54,7 @@ export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
                 x2={line.end.left}
                 y2={line.end.top}
                 strokeWidth={lineWidth}
-                stroke={textColor}
+                stroke={lineColor}
             />
 
             <ArrowEnd
@@ -60,11 +62,12 @@ export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
                 direction={direction}
                 arrowSize={0.1}
                 lineWidth={lineWidth}
-                color={textColor}
+                color={lineColor}
             />
 
             {sum !== undefined && <DigitSvgContent
                 puzzle={puzzle}
+                color={fontColor}
                 digit={sum}
                 size={0.5}
                 left={left - 0.5 * direction.left}
@@ -74,43 +77,35 @@ export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
     }),
 };
 
-export const getLittleKillerCellsByStartAndDirection = (
-    startCellLiteral: PositionLiteral,
-    directionLiteral: PositionLiteral,
-    {rowsCount, columnsCount}: FieldSize,
-) => {
-    const startCell = parsePositionLiteral(startCellLiteral);
-    const direction = parsePositionLiteral(directionLiteral);
-
-    const cells: Position[] = [];
-    for (let {top, left} = startCell; top >= 0 && top < rowsCount && left >= 0 && left < columnsCount; top += direction.top, left += direction.left) {
-        cells.push({top, left});
-    }
-
-    return cells;
-};
-
 export const LittleKillerConstraint = <T extends AnyPTM>(
     startCell: PositionLiteral,
     direction: PositionLiteral,
     fieldSize: FieldSize,
-    sum?: number
+    sum?: number,
+    color?: string,
+    lineColor = color,
 ) => LittleKillerConstraintByCells<T>(
-    getLittleKillerCellsByStartAndDirection(startCell, direction, fieldSize),
+    getLineCellsByOutsideCell(startCell, fieldSize, direction),
     direction,
-    sum
+    sum,
+    color,
+    lineColor,
 );
 
 export const LittleKillerConstraintByCells = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     directionLiteral: PositionLiteral,
-    sum?: number
+    sum?: number,
+    color?: string,
+    lineColor = color,
 ): Constraint<T, LittleKillerProps> => ({
     name: "little killer",
     cells: parsePositionLiterals(cellLiterals),
+    color,
     props: {
         direction: parsePositionLiteral(directionLiteral),
         sum,
+        lineColor,
     },
     component: LittleKiller,
     isValidCell(_, digits, cells, context) {

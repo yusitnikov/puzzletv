@@ -11,11 +11,14 @@ import {GamesList} from "./GamesList";
 import {HomePage} from "./HomePage";
 import {ContactMe} from "./ContactMe";
 import {ForSetters} from "./ForSetters";
-import {FPuzzlesWizardPage, fPuzzlesWizardPageTitle} from "./FPuzzlesWizardPage";
+import {WizardPage} from "./WizardPage";
 import {HowToImport} from "./HowToImport";
 import {useGesturesGlobalEvents} from "../../utils/gestures";
 import {observer} from "mobx-react-lite";
 import {useUpdateControlKeysState} from "../../hooks/useControlKeysState";
+import {FPuzzlesGridParserFactory} from "../../data/puzzles/FPuzzles";
+import {SudokuMakerGridParserFactory} from "../../data/puzzles/SudokuMaker";
+import {LanguageCode} from "../../types/translations/LanguageCode";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -92,14 +95,48 @@ export const App = observer(({onPageLoaded}: AppProps) => {
             >
                 <ContactMe/>
             </PageLayout>;
-        case "f-puzzles-wizard":
+        case "f-puzzles-wizard": {
+            const title = translate({
+                [LanguageCode.en]: "Import from f-puzzles",
+                [LanguageCode.ru]: "Импорт из f-puzzles",
+                [LanguageCode.de]: "Aus f-puzzles importieren",
+            });
+
             return <PageLayout
                 scrollable={true}
-                title={translate(fPuzzlesWizardPageTitle)}
+                title={title}
                 hideTitleHeader={true}
             >
-                <FPuzzlesWizardPage load={params.load}/>
+                <WizardPage
+                    load={params.load}
+                    slug={"f-puzzles"}
+                    title={title}
+                    typeLabel={"f-puzzles"}
+                    gridParserFactory={FPuzzlesGridParserFactory}
+                />
             </PageLayout>;
+        }
+        case "sudokumaker-wizard": {
+            const title = translate({
+                [LanguageCode.en]: "Import from SudokuMaker",
+                [LanguageCode.ru]: "Импорт из SudokuMaker'а",
+                [LanguageCode.de]: "Aus SudokuMaker importieren",
+            });
+
+            return <PageLayout
+                scrollable={true}
+                title={title}
+                hideTitleHeader={true}
+            >
+                <WizardPage
+                    load={params.load}
+                    slug={"sudokumaker"}
+                    title={title}
+                    typeLabel={"SudokuMaker"}
+                    gridParserFactory={SudokuMakerGridParserFactory}
+                />
+            </PageLayout>;
+        }
     }
 
     if (puzzle) {

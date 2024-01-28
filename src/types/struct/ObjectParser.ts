@@ -1,9 +1,9 @@
-type FieldMap<ObjectT> = {
+export type ObjectParserFieldMap<ObjectT> = {
     [KeyT in keyof ObjectT]?: (fieldValue: ObjectT[KeyT], objectValue: ObjectT) => void | boolean;
 };
 
 export class ObjectParser<ObjectT> {
-    constructor(private fieldMap: FieldMap<ObjectT>, private fieldsOrder: (keyof ObjectT)[] = []) {}
+    constructor(private fieldMap: ObjectParserFieldMap<ObjectT>, private fieldsOrder: (keyof ObjectT)[] = []) {}
 
     parse(object: ObjectT, objectDescriptionForDebug = "object") {
         if (typeof object !== "object" || object === null || object instanceof Array) {
@@ -25,6 +25,10 @@ export class ObjectParser<ObjectT> {
                 console.warn(`Unsupported feature "${key}" while parsing ${objectDescriptionForDebug}, value is`, object[key]);
             }
         }
+    }
+
+    bind(objectDescriptionForDebug = "object") {
+        return (object: ObjectT) => this.parse(object, objectDescriptionForDebug);
     }
 
     static empty = new ObjectParser<any>({});

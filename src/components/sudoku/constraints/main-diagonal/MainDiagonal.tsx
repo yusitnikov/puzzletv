@@ -34,7 +34,7 @@ export const DiagonalComponent: ConstraintPropsGenericFcMap<LineProps> = {
 };
 
 const BaseDiagonalConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[]): Constraint<T, LineProps> => ({
-    ...RenbanConstraint<T>(cellLiterals, false),
+    ...RenbanConstraint<T>(cellLiterals),
     name: "main diagonal",
     color: diagonalColor,
     props: {width: diagonalWidth},

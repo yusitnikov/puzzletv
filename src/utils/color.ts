@@ -42,3 +42,14 @@ export const getAverageColorsStr = (colors: string[]) => rgbToColorStr(processRg
 ));
 
 export const lightenColorStr = (color: string, coeff = 0.5) => mixColorsStr(color, "#fff", coeff);
+
+export const parseColorWithOpacity = (color: string) => {
+    if (/^#[0-9a-f]{8}$/i.test(color)) {
+        return {
+            rgb: color.substring(0, 7),
+            a: parseInt(color.substring(7), 16) / 255,
+        };
+    } else {
+        return {rgb: color};
+    }
+};

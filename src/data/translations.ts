@@ -125,10 +125,6 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Контакты",
         [LanguageCode.de]: "Kontakte",
     },
-    "Import from f-puzzles": {
-        [LanguageCode.ru]: "Импорт из f-puzzles",
-        [LanguageCode.de]: "Aus f-puzzles importieren",
-    },
     // endregion
     // region Common for controls
     "Shortcut": {

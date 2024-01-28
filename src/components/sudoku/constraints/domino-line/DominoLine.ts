@@ -12,7 +12,6 @@ export const DominoLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     isValidDomino: (digit1: number, digit2: number, context: PuzzleContext<T>) => boolean,
     width: number | undefined = undefined,
-    display = true,
     split = true,
 ): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
@@ -25,7 +24,7 @@ export const DominoLineConstraint = <T extends AnyPTM>(
         cells,
         color,
         props: {width},
-        component: display ? LineComponent : undefined,
+        component: LineComponent,
         isObvious,
         isValidCell(cell, digits, cells, context) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;

@@ -7,7 +7,7 @@ import {Constraint} from "../../../../types/sudoku/Constraint";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
 // noinspection JSUnusedGlobalSymbols
-export const AlternatingParityLineConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], display = true, split = true) =>
+export const AlternatingParityLineConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], split = true) =>
     DominoLineConstraint<T>(
         "alternating parity line",
         true,
@@ -15,12 +15,11 @@ export const AlternatingParityLineConstraint = <T extends AnyPTM>(cellLiterals: 
         cellLiterals,
         (digit1, digit2) => Math.abs(digit1 - digit2) % 2 === 1,
         undefined,
-        display,
         split,
     );
 
 export const SameParityLineConstraint = <T extends AnyPTM>(
-    cellLiterals: PositionLiteral[], display = true, split = true
+    cellLiterals: PositionLiteral[], split = true
 ): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
@@ -32,7 +31,7 @@ export const SameParityLineConstraint = <T extends AnyPTM>(
         cells,
         color: peachColor,
         props: {},
-        component: display ? LineComponent : undefined,
+        component: LineComponent,
         isObvious: true,
         isValidCell(cell, digits, cells, context) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;

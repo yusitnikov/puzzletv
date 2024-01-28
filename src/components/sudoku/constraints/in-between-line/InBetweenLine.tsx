@@ -12,13 +12,13 @@ import {darkGreyColor, lighterGreyColor} from "../../../app/globals";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {LineProps} from "../line/Line";
 
-const lineWidth = 0.1;
 const circleRadius = 0.4;
 const backgroundColor = lighterGreyColor;
 
-export const InBetweenLine: ConstraintPropsGenericFcMap = {
-    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({cells}: ConstraintProps<T>) {
+export const InBetweenLine: ConstraintPropsGenericFcMap<LineProps> = {
+    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({cells, color: lineColor = darkGreyColor, props: {width: lineWidth = 0.1}}: ConstraintProps<T, LineProps>) {
         profiler.trace();
 
         cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
@@ -33,7 +33,7 @@ export const InBetweenLine: ConstraintPropsGenericFcMap = {
             <RoundedPolyLine
                 points={cells}
                 strokeWidth={lineWidth}
-                stroke={darkGreyColor}
+                stroke={lineColor}
             />
 
             <circle
@@ -41,7 +41,7 @@ export const InBetweenLine: ConstraintPropsGenericFcMap = {
                 cy={edge1.top}
                 r={circleRadius}
                 strokeWidth={lineWidth}
-                stroke={darkGreyColor}
+                stroke={lineColor}
                 fill={backgroundColor}
             />
 
@@ -50,7 +50,7 @@ export const InBetweenLine: ConstraintPropsGenericFcMap = {
                 cy={edge2.top}
                 r={circleRadius}
                 strokeWidth={lineWidth}
-                stroke={darkGreyColor}
+                stroke={lineColor}
                 fill={backgroundColor}
             />
         </>;
@@ -60,7 +60,9 @@ export const InBetweenLine: ConstraintPropsGenericFcMap = {
 export const InBetweenLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
-): Constraint<T> => {
+    lineColor = darkGreyColor,
+    width: number | undefined = undefined,
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);
@@ -70,7 +72,8 @@ export const InBetweenLineConstraint = <T extends AnyPTM>(
         name: "in-between line",
         cells,
         component: InBetweenLine,
-        props: undefined,
+        color: lineColor,
+        props: {width},
         isValidCell(cell, digits, cells, context) {
             const {puzzle} = context;
             const {typeManager: {areSameCellData, compareCellData}} = puzzle;

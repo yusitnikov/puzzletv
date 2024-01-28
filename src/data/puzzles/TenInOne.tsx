@@ -40,8 +40,8 @@ import {RulesIndentedBlock} from "../../components/sudoku/rules/RulesIndentedBlo
 import {processTranslations} from "../../utils/translate";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
-import {Constraint} from "../../types/sudoku/Constraint";
-import {GermanWhispersConstraint} from "../../components/sudoku/constraints/german-whispers/GermanWhispers";
+import {Constraint, toDecorativeConstraint, toInvisibleConstraint} from "../../types/sudoku/Constraint";
+import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
 import {Position, PositionLiteral} from "../../types/layout/Position";
 import {AmbiguousLineConstraint} from "../../components/sudoku/constraints/ambiguous-line/AmbiguousLine";
 import {SameParityLineConstraint} from "../../components/sudoku/constraints/parity-line/ParityLine";
@@ -254,27 +254,23 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
         let lines: Constraint<MultiStagePTM, any>[] = [
             RenbanConstraint(["R3C3", "R2C3", "R1C4", "R2C5"]),
             RenbanConstraint(["R5C6", "R6C6", "R6C7", "R5C8"]),
-            GermanWhispersConstraint(["R5C5", "R4C4", "R6C2", "R8C2", "R8C6"]),
+            WhispersConstraint(["R5C5", "R4C4", "R6C2", "R8C2", "R8C6"]),
         ];
         if (stage === 1) {
             // Make the line constraints decorative (UI-only)
-            lines = lines.map(constraint => ({
-                ...constraint,
-                isValidCell: undefined,
-                isValidPuzzle: undefined,
-            }));
+            lines = lines.map(toDecorativeConstraint);
 
             // Add parts of the lines in each box separately
-            lines.push(
-                RenbanConstraint(["R3C3", "R2C3"], false),
-                RenbanConstraint(["R1C4", "R2C5"], false),
-                RenbanConstraint(["R5C6", "R6C6"], false),
-                RenbanConstraint(["R6C7", "R5C8"], false),
-                GermanWhispersConstraint(["R5C5", "R4C4"], false),
-                GermanWhispersConstraint(["R5C3", "R6C2"], false),
-                GermanWhispersConstraint(["R7C2", "R8C2", "R8C3"], false),
-                GermanWhispersConstraint(["R8C4", "R8C6"], false),
-            );
+            lines.push(...[
+                RenbanConstraint(["R3C3", "R2C3"]),
+                RenbanConstraint(["R1C4", "R2C5"]),
+                RenbanConstraint(["R5C6", "R6C6"]),
+                RenbanConstraint(["R6C7", "R5C8"]),
+                WhispersConstraint(["R5C5", "R4C4"]),
+                WhispersConstraint(["R5C3", "R6C2"]),
+                WhispersConstraint(["R7C2", "R8C2", "R8C3"]),
+                WhispersConstraint(["R8C4", "R8C6"]),
+            ].map(toInvisibleConstraint));
         }
 
         return [
@@ -283,7 +279,7 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
             // these lines are always in one box
             RenbanConstraint(["R4C1", "R4C2"]),
             RenbanConstraint(["R8C8", "R8C9"]),
-            GermanWhispersConstraint(["R3C8", "R3C9"]),
+            WhispersConstraint(["R3C8", "R3C9"]),
 
             ArrowConstraint(["R3C1", "R3C2"], ["R2C1", "R1C2"], true, "R3C1"),
             ArrowConstraint(["R1C5", "R1C6"], ["R1C4", "R3C6"], true, "R1C5"),
@@ -302,7 +298,7 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
 
 const MoodyLineConstraint = (cellLiterals: PositionLiteral[], visible = true) => AmbiguousLineConstraint<MultiStagePTM>(
     cellLiterals,
-    [RenbanConstraint, GermanWhispersConstraint, SameParityLineConstraint],
+    [RenbanConstraint, WhispersConstraint, SameParityLineConstraint],
     visible ? undefined : 0,
     peachColor
 );

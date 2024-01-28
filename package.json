@@ -59,7 +59,7 @@
         "@types/ua-parser-js": "^0.7.36",
         "babel-plugin-named-exports-order": "^0.0.2",
         "chromatic": "^6.17.1",
-        "fpuzzles-data": "^1.0.5",
+        "fpuzzles-data": "^1.0.7",
         "geojson": "^0.5.0",
         "http-server": "^14.1.1",
         "prop-types": "^15.8.1",

@@ -3,17 +3,22 @@ import {DominoLineConstraint} from "../domino-line/DominoLine";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {greenColor} from "../../../app/globals";
 
-export const GermanWhispersConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], display = true, split = true) => {
+export const WhispersConstraint = <T extends AnyPTM>(
+    cellLiterals: PositionLiteral[],
+    split = true,
+    minDifference: number | undefined = undefined,
+    color = greenColor,
+    width: number | undefined = undefined,
+) => {
     return DominoLineConstraint<T>(
-        "german whispers",
+        "whispers",
         true,
-        greenColor,
+        color,
         cellLiterals,
         (digit1, digit2, {digitsCount}) => {
-            return Math.abs(digit1 - digit2) >= Math.ceil(digitsCount / 2);
+            return Math.abs(digit1 - digit2) >= (minDifference ?? Math.ceil(digitsCount / 2));
         },
-        undefined,
-        display,
+        width,
         split,
     );
 };

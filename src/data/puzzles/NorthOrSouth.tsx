@@ -4,7 +4,7 @@ import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-do
 import React from "react";
 import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
 import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {GermanWhispersConstraint} from "../../components/sudoku/constraints/german-whispers/GermanWhispers";
+import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
 import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
@@ -85,7 +85,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
         ThermometerConstraint(["R2C8", "R3C7"]),
         ThermometerConstraint(["R1C2", "R2C2"]),
         ArrowConstraint("R5C9", ["R5C7", "R4C7"]),
-        GermanWhispersConstraint(["R2C6", "R3C5", "R3C8"]),
+        WhispersConstraint(["R2C6", "R3C5", "R3C8"]),
         KillerCageConstraint(["R5C1", "R5C2", "R6C1"], 12, true),
         KillerCageConstraint(["R8C6", "R8C7", "R9C5", "R9C6"], 22, true),
         XMarkConstraint("R8C7", "R8C8"),
@@ -138,7 +138,7 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
     items: [
         AntiKnightConstraint(),
         ThermometerConstraint(["R1C3", "R2C3", "R2C4", "R1C5", "R1C4"]),
-        GermanWhispersConstraint(["R3C7", "R3C6", "R2C6", "R1C7", "R2C8"]),
+        WhispersConstraint(["R3C7", "R3C6", "R2C6", "R1C7", "R2C8"]),
         ArrowConstraint("R5C9", ["R5C7", "R4C7"]),
         KillerCageConstraint(["R5C1", "R5C2", "R6C1"], 12, true),
         KillerCageConstraint(["R7C4", "R7C5", "R7C6", "R8C6"], 22, true),

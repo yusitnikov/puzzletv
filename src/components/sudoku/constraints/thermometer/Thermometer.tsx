@@ -7,14 +7,16 @@ import {splitMultiLine} from "../../../../utils/lines";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {LineProps} from "../line/Line";
 
-export const Thermometer: ConstraintPropsGenericFcMap = {
+export const Thermometer: ConstraintPropsGenericFcMap<LineProps> = {
     [FieldLayer.regular]: observer(function Thermometer<T extends AnyPTM>(
         {
             cells: points,
             color = darkGreyColor,
+            props: {width = 0.35},
             context: {puzzleIndex},
-        }: ConstraintProps<T>
+        }: ConstraintProps<T, LineProps>
     ) {
         profiler.trace();
 
@@ -37,7 +39,7 @@ export const Thermometer: ConstraintPropsGenericFcMap = {
 
             <RoundedPolyLine
                 points={points.map((point) => getPointInfo(point, 0.175))}
-                strokeWidth={0.35}
+                strokeWidth={width}
                 stroke={color}
             />
         </g>;
@@ -46,9 +48,10 @@ export const Thermometer: ConstraintPropsGenericFcMap = {
 
 export const ThermometerConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
-    color?: string,
     split = true,
-): Constraint<T> => {
+    color?: string,
+    width?: number,
+): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);
@@ -58,7 +61,7 @@ export const ThermometerConstraint = <T extends AnyPTM>(
         name: "thermometer",
         cells,
         component: Thermometer,
-        props: undefined,
+        props: {width},
         color,
         isObvious: true,
         isValidCell(cell, digits, cells, context) {

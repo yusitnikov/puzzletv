@@ -24,6 +24,7 @@ import {HiddenSetup} from "./HiddenSetup";
 import {SonataSemplice} from "./SonataSemplice";
 import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
 import {FPuzzles} from "./FPuzzles";
+import {SudokuMaker} from "./SudokuMaker";
 import {HeartsCube} from "./HeartsCube";
 import {AbstractKillerDots, DollHouse, LegoHouse, MoodyLines} from "./TenInOne";
 import {TheOnlyThingThatMatters, TheOnlyThingThatMattersNoGivens} from "./TheOnlyThingThatMatters";
@@ -68,6 +69,7 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     FPuzzles,
+    SudokuMaker,
 
     // region Games
     generateQuadMasters("quadle", false, true),
