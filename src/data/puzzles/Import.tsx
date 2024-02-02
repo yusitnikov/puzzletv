@@ -84,7 +84,6 @@ const loadByImportOptions = <T extends AnyPTM, JsonT>(
     }
 
     const {
-        digitsCount = mainGridParser.size,
         tesseract,
         yajilinFog,
         fillableDigitalDisplay,
@@ -99,6 +98,8 @@ const loadByImportOptions = <T extends AnyPTM, JsonT>(
         find3,
         giftsInSight,
     } = importOptions;
+
+    const digitsCount = mainGridParser.maxDigit ?? importOptions.digitsCount ?? mainGridParser.size;
 
     const regularTypeManager = DigitSudokuTypeManager();
     const typesMap: Record<PuzzleImportPuzzleType, SudokuTypeManager<AnyPTM>> = {

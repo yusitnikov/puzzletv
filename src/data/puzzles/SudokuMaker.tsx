@@ -115,6 +115,8 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             size,
             width,
             height,
+            puzzleJson.minDigit ?? 1,
+            puzzleJson.maxDigit ?? size,
             sudokuMakerColorsMap,
         );
     }
@@ -899,6 +901,8 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             size: undefined,
             width: undefined,
             height: undefined,
+            minDigit: undefined,
+            maxDigit: undefined,
         }, ["type"]).parse(this.puzzleJson, "SudokuMaker data");
     }
 

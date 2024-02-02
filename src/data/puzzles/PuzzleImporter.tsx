@@ -140,9 +140,18 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     addGrid<JsonT>(gridParser: GridParser<T, JsonT>) {
-        this.inactiveCells = this.inactiveCells.bulkRemove(gridParser.offsetCoordsArray(indexes(gridParser.rowsCount).flatMap(
-            (top) => indexes(gridParser.columnsCount).map((left) => ({top, left}))
+        const {columnsCount, rowsCount, minDigit, maxDigit} = gridParser;
+
+        this.inactiveCells = this.inactiveCells.bulkRemove(gridParser.offsetCoordsArray(indexes(rowsCount).flatMap(
+            (top) => indexes(columnsCount).map((left) => ({top, left}))
         )));
+
+        if (minDigit === 0) {
+            this.puzzle.supportZero = true;
+        }
+        if (maxDigit !== undefined) {
+            this.puzzle.digitsCount = Math.max(this.puzzle.digitsCount ?? 0, maxDigit);
+        }
 
         gridParser.addToImporter(this);
     }

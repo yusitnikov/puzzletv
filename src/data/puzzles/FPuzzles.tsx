@@ -29,6 +29,8 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             puzzleJson.size,
             puzzleJson.size,
             puzzleJson.size,
+            undefined,
+            undefined,
             fPuzzleColorsMap,
         );
     }

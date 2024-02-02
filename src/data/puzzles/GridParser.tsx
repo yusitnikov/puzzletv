@@ -12,6 +12,8 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
         public size: number,
         public columnsCount: number,
         public rowsCount: number,
+        public minDigit: number | undefined,
+        public maxDigit: number | undefined,
         public colorsMap: Record<string, CellColor>,
     ) {}
 

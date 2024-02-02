@@ -150,7 +150,13 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         return result;
     }, [load, globalOffsetX, globalOffsetY, extraGrids, gridParserFactory]);
 
-    const {columnsCount, rowsCount, size: fieldSize} = gridParsers[0];
+    const {
+        columnsCount,
+        rowsCount,
+        size: fieldSize,
+        minDigit,
+        maxDigit,
+    } = gridParsers[0];
     const hasSolution = gridParsers.some((gridParser) => gridParser.hasSolution);
     const hasFog = gridParsers.some((gridParser) => gridParser.hasFog);
     const hasCosmeticElements = gridParsers.some((gridParser) => gridParser.hasCosmeticElements);
@@ -159,14 +165,14 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     // Transparent arrow circles are always on for the rotatable clues puzzles, so don't allow to change the flag
     const transparentCirclesForced = rotatableClues;
 
-    const [digitsCount, setDigitsCount] = useState(Math.min(fieldSize, 9));
+    const [digitsCount, setDigitsCount] = useState(maxDigit ?? Math.min(fieldSize, 9));
 
     const importOptions = usePureMemo<PuzzleImportOptions>({
         type,
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
-        digitsCount: digitsCount === fieldSize && !filteredExtraGrids.length ? undefined : digitsCount,
-        supportZero,
+        digitsCount: maxDigit === undefined && digitsCount === fieldSize && !filteredExtraGrids.length ? undefined : digitsCount,
+        supportZero: minDigit === undefined && supportZero,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
         loopY: !isSpecialGrid && loopY,
@@ -543,8 +549,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                 </CollapsableFieldSet>}
 
                 <CollapsableFieldSet legend={"Miscellaneous"}>
-                    <Paragraph>
-                        <label>
+                    {(maxDigit === undefined || minDigit === undefined) && <Paragraph>
+                        {maxDigit === undefined && <label>
                             Digits count:&nbsp;
                             <input
                                 type={"number"}
@@ -554,13 +560,13 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                                 step={1}
                                 onChange={ev => setDigitsCount(ev.target.valueAsNumber)}
                             />
-                        </label>
+                        </label>}
                         &nbsp;
-                        <label>
+                        {minDigit === undefined && <label>
                             Support zero:&nbsp;
                             <input type={"checkbox"} checked={supportZero} onChange={ev => setSupportZero(ev.target.checked)}/>
-                        </label>
-                    </Paragraph>
+                        </label>}
+                    </Paragraph>}
 
                     <Paragraph>
                         <label>
