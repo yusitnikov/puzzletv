@@ -1,22 +1,9 @@
 import {parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {DominoLineConstraint} from "../domino-line/DominoLine";
 import {peachColor} from "../../../app/globals";
 import {LineComponent, LineProps} from "../line/Line";
 import {splitMultiLine} from "../../../../utils/lines";
 import {Constraint} from "../../../../types/sudoku/Constraint";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-
-// noinspection JSUnusedGlobalSymbols
-export const AlternatingParityLineConstraint = <T extends AnyPTM>(cellLiterals: PositionLiteral[], split = true) =>
-    DominoLineConstraint<T>(
-        "alternating parity line",
-        true,
-        peachColor,
-        cellLiterals,
-        (digit1, digit2) => Math.abs(digit1 - digit2) % 2 === 1,
-        undefined,
-        split,
-    );
 
 export const SameParityLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[], split = true

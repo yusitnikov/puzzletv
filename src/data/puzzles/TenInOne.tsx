@@ -44,7 +44,7 @@ import {Constraint, toDecorativeConstraint, toInvisibleConstraint} from "../../t
 import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
 import {Position, PositionLiteral} from "../../types/layout/Position";
 import {AmbiguousLineConstraint} from "../../components/sudoku/constraints/ambiguous-line/AmbiguousLine";
-import {SameParityLineConstraint} from "../../components/sudoku/constraints/parity-line/ParityLine";
+import {SameParityLineConstraint} from "../../components/sudoku/constraints/same-parity-line/SameParityLine";
 import {peachColor} from "../../components/app/globals";
 import {MultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
 
