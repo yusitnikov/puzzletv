@@ -85,13 +85,13 @@ import {Constraint} from "../../types/sudoku/Constraint";
 import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
 import {PalindromeConstraint} from "../../components/sudoku/constraints/palindrome/Palindrome";
 import {RegionSumLineConstraint} from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
-import {LineConstraint} from "../../components/sudoku/constraints/line/Line";
 import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
 import {OutsideClueLineDirectionType} from "../../components/sudoku/constraints/outside-clue/OutsideClue";
 import {XSumConstraint} from "../../components/sudoku/constraints/x-sum/XSum";
 import {NumberedRoomConstraint} from "../../components/sudoku/constraints/numbered-room/NumberedRoom";
 import {SkyscraperConstraint} from "../../components/sudoku/constraints/skyscraper/Skyscraper";
 import {BaseEntropicLineConstraint} from "../../components/sudoku/constraints/entropy-line/EntropicLine";
+import {SequenceLineConstraint} from "../../components/sudoku/constraints/sequence-line/SequenceLine";
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {
     constructor(puzzleJson: CompressedPuzzle, offsetX: number, offsetY: number) {
@@ -538,17 +538,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                             );
                             break;
                         case ConstraintType.Sequence:
-                            this.addSimpleLineConstraint(
-                                importer,
-                                constraint,
-                                // TODO
-                                (cells, split, color, thickness) => LineConstraint(
-                                    cells,
-                                    color,
-                                    thickness,
-                                    split,
-                                ),
-                            );
+                            this.addSimpleLineConstraint(importer, constraint, SequenceLineConstraint);
                             break;
                         case ConstraintType.EntropyLines:
                             this.addSimpleLineConstraint(
@@ -845,7 +835,6 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                         console.warn("Unrecognized SudokuMaker cosmetic symbol type", (params as any).type);
                                         break;
                                 }
-                                // TODO
                             };
 
                             if ("params" in constraint) {
