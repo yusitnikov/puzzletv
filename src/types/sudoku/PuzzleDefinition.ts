@@ -49,6 +49,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     typeManager: SudokuTypeManager<T>;
     fieldSize: FieldSize;
     regions?: (Position[] | Constraint<T, any>)[];
+    disableSudokuRules?: boolean;
     fieldMargin?: number;
     fieldWrapperComponent?: ComponentType<PuzzleContextProps<T>>;
     fieldFitsWrapper?: boolean;

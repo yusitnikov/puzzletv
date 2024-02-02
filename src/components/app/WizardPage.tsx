@@ -150,7 +150,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         return result;
     }, [load, globalOffsetX, globalOffsetY, extraGrids, gridParserFactory]);
 
-    const fieldSize = gridParsers[0].size;
+    const {columnsCount, rowsCount, size: fieldSize} = gridParsers[0];
     const hasSolution = gridParsers.some((gridParser) => gridParser.hasSolution);
     const hasFog = gridParsers.some((gridParser) => gridParser.hasFog);
     const hasCosmeticElements = gridParsers.some((gridParser) => gridParser.hasCosmeticElements);
@@ -194,8 +194,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         stickyRegion: finalIsFirstGridSticky ? {
             top: globalOffsetY,
             left: globalOffsetX,
-            width: fieldSize,
-            height: fieldSize,
+            width: columnsCount,
+            height: rowsCount,
         } : undefined,
         noStickyRegionValidation: finalIsFirstGridSticky && !isShuffled && noStickyRegionValidation,
         stickyDigits: !!finalAngleStep && stickyDigits,
@@ -680,7 +680,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                                             ...extraGrids,
                                             {
                                                 load: ev.target.value,
-                                                offsetX: fieldSize + 1,
+                                                offsetX: columnsCount + 1,
                                                 offsetY: 0,
                                             },
                                         ])}/>

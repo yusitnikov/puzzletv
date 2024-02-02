@@ -623,12 +623,17 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             };
     }
 
-    get regionsForRowsAndColumns() {
+    get regionsForRowsAndColumns(): Constraint<T, any>[] {
         profiler.trace();
 
         const {
-            getRegionsForRowsAndColumns = getDefaultRegionsForRowsAndColumns,
-        } = this.puzzle.typeManager;
+            disableSudokuRules,
+            typeManager: {
+                getRegionsForRowsAndColumns = disableSudokuRules
+                    ? (() => [])
+                    : getDefaultRegionsForRowsAndColumns,
+            },
+        } = this.puzzle;
 
         return getRegionsForRowsAndColumns(this);
     }

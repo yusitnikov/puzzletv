@@ -2,7 +2,7 @@ import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {PuzzleImporter} from "./PuzzleImporter";
 import {parsePositionLiteral, Position, PositionLiteral} from "../../types/layout/Position";
 import {CellColor} from "../../types/sudoku/CellColor";
-import {calculateDefaultRegionWidth, FieldSize} from "../../types/sudoku/FieldSize";
+import {FieldSize} from "../../types/sudoku/FieldSize";
 
 export abstract class GridParser<T extends AnyPTM, JsonT> {
     protected constructor(
@@ -10,22 +10,34 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
         public offsetX: number,
         public offsetY: number,
         public size: number,
+        public columnsCount: number,
+        public rowsCount: number,
         public colorsMap: Record<string, CellColor>,
     ) {}
 
     abstract addToImporter(importer: PuzzleImporter<T>): void;
 
     get regionWidth() {
-        return calculateDefaultRegionWidth(this.size);
+        const {rowsCount} = this;
+
+        let bestHeight = 1;
+
+        for (let height = 2; height * height <= rowsCount; height++) {
+            if (rowsCount % height === 0) {
+                bestHeight = height;
+            }
+        }
+
+        return rowsCount / bestHeight;
     }
     get regionHeight() {
-        return this.size / this.regionWidth;
+        return this.columnsCount / this.regionWidth;
     }
     get fieldSize(): FieldSize {
         return {
             fieldSize: this.size,
-            rowsCount: this.size,
-            columnsCount: this.size,
+            rowsCount: this.rowsCount,
+            columnsCount: this.columnsCount,
             regionWidth: this.regionWidth,
             regionHeight: this.regionHeight,
         };

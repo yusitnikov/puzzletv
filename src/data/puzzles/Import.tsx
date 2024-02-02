@@ -67,8 +67,8 @@ const loadByImportOptions = <T extends AnyPTM, JsonT>(
         mainGridParser,
         ...extraGridParsers,
     ];
-    const columnsCount = Math.max(...allGridParsers.map(({offsetX, size}) => offsetX + size));
-    const rowsCount = Math.max(...allGridParsers.map(({offsetY, size}) => offsetY + size));
+    const columnsCount = Math.max(...allGridParsers.map(({offsetX, columnsCount}) => offsetX + columnsCount));
+    const rowsCount = Math.max(...allGridParsers.map(({offsetY, rowsCount}) => offsetY + rowsCount));
 
     console.debug("Importing from", slug, ...allGridParsers);
 

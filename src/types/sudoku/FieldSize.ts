@@ -50,18 +50,6 @@ export function createRegularRegions(
     );
 }
 
-export const calculateDefaultRegionWidth = (fieldSize: number) => {
-    let bestHeight = 1;
-
-    for (let height = 2; height * height <= fieldSize; height++) {
-        if (fieldSize % height === 0) {
-            bestHeight = height;
-        }
-    }
-
-    return fieldSize / bestHeight;
-}
-
 export function createRegularFieldSize(
     fieldSize: number, regionWidth: number, regionHeight?: number
 ): Required<FieldSize>;

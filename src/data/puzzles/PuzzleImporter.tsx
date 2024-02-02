@@ -140,8 +140,8 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     addGrid<JsonT>(gridParser: GridParser<T, JsonT>) {
-        this.inactiveCells = this.inactiveCells.bulkRemove(gridParser.offsetCoordsArray(indexes(gridParser.size).flatMap(
-            (top) => indexes(gridParser.size).map((left) => ({top, left}))
+        this.inactiveCells = this.inactiveCells.bulkRemove(gridParser.offsetCoordsArray(indexes(gridParser.rowsCount).flatMap(
+            (top) => indexes(gridParser.columnsCount).map((left) => ({top, left}))
         )));
 
         gridParser.addToImporter(this);
@@ -195,6 +195,8 @@ export class PuzzleImporter<T extends AnyPTM> {
     addRegions<JsonT>(gridParser: GridParser<T, JsonT>, cellRegions: (number|null|undefined)[][]) {
         const {
             size,
+            columnsCount,
+            rowsCount,
             regionWidth,
             regionHeight,
             offsetX,
@@ -213,8 +215,8 @@ export class PuzzleImporter<T extends AnyPTM> {
         const faces = this.typeManager.getRegionsWithSameCoordsTransformation?.(emptyContext, true) ?? [{
             top: offsetY,
             left: offsetX,
-            width: size,
-            height: size,
+            width: columnsCount,
+            height: rowsCount,
         }];
         const regions = faces.flatMap(face => {
             const validFaceCells = validGridCells.filter((cell) => doesGridRegionContainCell(face, cell));
@@ -236,6 +238,10 @@ export class PuzzleImporter<T extends AnyPTM> {
         if (regions.length > 1) {
             this.regions.push(...regions);
         }
+    }
+
+    toggleSudokuRules(enable: boolean) {
+        this.puzzle.disableSudokuRules = !enable;
     }
 
     addItems(...items: Constraint<T, any>[]) {

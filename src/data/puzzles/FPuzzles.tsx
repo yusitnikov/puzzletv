@@ -27,6 +27,8 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             offsetX,
             offsetY,
             puzzleJson.size,
+            puzzleJson.size,
+            puzzleJson.size,
             fPuzzleColorsMap,
         );
     }
@@ -504,7 +506,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                             const num = Number(value);
                             return Number.isFinite(num) ? num : value;
                         }),
-                        this.size
+                        this.columnsCount
                     );
                     for (const [top, row] of solutionArray.entries()) {
                         for (const [left, value] of row.entries()) {

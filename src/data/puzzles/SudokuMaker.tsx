@@ -6,7 +6,8 @@ import {
     ArrowConstraintConfig,
     ArrowStyle,
     ArrowSymbolParams,
-    BasicShapeStyle, BetweenLinesConstraintConfig,
+    BasicShapeStyle,
+    BetweenLinesConstraintConfig,
     BulbWithArrows,
     Cage,
     CageStyle,
@@ -29,7 +30,8 @@ import {
     DiagonalType,
     DifferenceConstraintConfig,
     DifferentValuesConstraintConfig,
-    DisjointGroupsConstraintConfig, DoubleArrowConstraintConfig,
+    DisjointGroupsConstraintConfig,
+    DoubleArrowConstraintConfig,
     EdgeClue,
     EdgeId,
     EllipseSymbolParams,
@@ -51,6 +53,7 @@ import {
     OddConstraintConfig,
     OuterCellId,
     OuterClue,
+    PuzzleType,
     QuadrupleClue,
     QuadrupleConstraintConfig,
     RatioConstraintConfig,
@@ -61,7 +64,7 @@ import {
     SkyscrapersConstraintConfig,
     Stroke,
     SudokuBlob,
-    SudokuLayer,
+    SudokuLayer, SudokuRulesConstraintConfig,
     SymbolParams,
     SymbolType,
     TextSymbolParams,
@@ -91,19 +94,38 @@ import {SkyscraperConstraint} from "../../components/sudoku/constraints/skyscrap
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {
     constructor(puzzleJson: CompressedPuzzle, offsetX: number, offsetY: number) {
+        let {width, height, size, cells: {length}} = puzzleJson;
+        if (width !== undefined) {
+            height ??= length / width;
+        }
+        if (height !== undefined) {
+            width ??= length / height;
+        }
+        if (width !== undefined && height !== undefined) {
+            size ??= Math.max(width, height);
+        }
+        size ??= Math.round(Math.sqrt(length));
+        width ??= size;
+        height ??= size;
+
         super(
             puzzleJson,
             offsetX,
             offsetY,
-            Math.round(Math.sqrt(puzzleJson.cells.length)),
+            size,
+            width,
+            height,
             sudokuMakerColorsMap,
         );
     }
 
     addToImporter(importer: PuzzleImporter<T>) {
         new ObjectParser<CompressedPuzzle>({
+            type: (type) => {
+                importer.toggleSudokuRules(type !== PuzzleType.Custom);
+            },
             cells: (cellsFlat) => {
-                const cells = splitArrayIntoChunks(cellsFlat, this.size);
+                const cells = splitArrayIntoChunks(cellsFlat, this.columnsCount);
 
                 const allGridCells: (CompressedCell & Position)[] = cells.flatMap(
                     (row, top) => row.map(
@@ -147,7 +169,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                             new ObjectParser<RegionsConstraintConfig>({
                                 type: undefined,
                                 regions: (cellsFlat) => {
-                                    const cells = splitArrayIntoChunks(cellsFlat, this.size);
+                                    const cells = splitArrayIntoChunks(cellsFlat, this.columnsCount);
                                     importer.addRegions(this, cells);
                                 },
                             }).parse(constraint, "regions");
@@ -857,7 +879,13 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                             }
                             break;
                         case ConstraintType.SudokuRules:
-                            // TODO
+                            new ObjectParser<SudokuRulesConstraintConfig>({
+                                type: undefined,
+                                areas: (areas) => {
+                                    // TODO: what's that?
+                                },
+                            }).parse(constraint, "sudoku rules");
+                            importer.toggleSudokuRules(true);
                             break;
                         default:
                             console.warn("Unrecognized SudokuMaker constraint type", (constraint as any).type);
@@ -868,7 +896,10 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             name: (title) => importer.setTitle(title),
             author: (author) => importer.setAuthor(author),
             comment: (ruleset) => importer.setRuleset(ruleset),
-        }).parse(this.puzzleJson, "SudokuMaker data");
+            size: undefined,
+            width: undefined,
+            height: undefined,
+        }, ["type"]).parse(this.puzzleJson, "SudokuMaker data");
     }
 
     private addSimpleLineConstraint<ConstraintT extends (LineConstraintConfigBase & {type: ConstraintType})>(
@@ -931,8 +962,8 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
 
     parseCellId(cellId: CellId, offset = false): Position {
         const result: Position = {
-            top: Math.floor(cellId / this.size),
-            left: cellId % this.size,
+            top: Math.floor(cellId / this.columnsCount),
+            left: cellId % this.columnsCount,
         };
         return offset ? this.offsetCoords(result) : result;
     }
@@ -942,21 +973,21 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
 
     parseCornerId(cellId: CornerId): Position {
         return {
-            top: Math.floor(cellId / (this.size + 1)),
-            left: cellId % (this.size + 1),
+            top: Math.floor(cellId / (this.columnsCount + 1)),
+            left: cellId % (this.columnsCount + 1),
         };
     }
 
     parseOuterCellId(cellId: OuterCellId): Position {
         return {
-            top: Math.floor(cellId / (this.size + 2)) - 1,
-            left: cellId % (this.size + 2) - 1,
+            top: Math.floor(cellId / (this.columnsCount + 2)) - 1,
+            left: cellId % (this.columnsCount + 2) - 1,
         };
     }
 
     parseEdgeId(edgeId: EdgeId): [Position, Position] {
-        const left = edgeId % this.size;
-        const topPair = Math.floor(edgeId / this.size);
+        const left = edgeId % this.columnsCount;
+        const topPair = Math.floor(edgeId / this.columnsCount);
         const top = Math.floor(topPair / 2);
         return topPair % 2 === 0
             ? [
