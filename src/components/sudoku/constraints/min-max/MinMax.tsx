@@ -10,6 +10,7 @@ import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../..
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {parseColorWithOpacity, rgba} from "../../../../utils/color";
 
 const arrowWidth = 0.1;
 const arrowHeight = 0.05;
@@ -19,16 +20,18 @@ export interface MinMaxProps {
 }
 
 export const MinMax: ConstraintPropsGenericFcMap<MinMaxProps> = {
-    [FieldLayer.beforeSelection]: observer(function MinMaxRect<T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T, MinMaxProps>) {
+    [FieldLayer.beforeSelection]: observer(function MinMaxRect<T extends AnyPTM>({cells: [{left, top}], color = rgba(lightGreyColor, 0.5)}: ConstraintProps<T, MinMaxProps>) {
         profiler.trace();
+
+        const {rgb, a} = parseColorWithOpacity(color);
 
         return <rect
             x={left}
             y={top}
             width={1}
             height={1}
-            fill={lightGreyColor}
-            fillOpacity={0.5}
+            fill={rgb}
+            fillOpacity={a}
         />;
     }),
     [FieldLayer.regular]: observer(function MinMaxArrows<T extends AnyPTM>({cells: [{left, top}], props: {coeff}}: ConstraintProps<T, MinMaxProps>) {
@@ -87,7 +90,8 @@ const Arrow = observer(function ArrowFc({cx, cy, dx, dy, coeff}: ArrowProps) {
 const MinMaxConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
     name: string,
-    coeff: number
+    coeff: number,
+    color?: string,
 ): Constraint<T, MinMaxProps> => {
     const mainCell = parsePositionLiteral(cellLiteral);
 
@@ -103,6 +107,7 @@ const MinMaxConstraint = <T extends AnyPTM>(
         component: MinMax,
         renderSingleCellInUserArea: true,
         props: {coeff},
+        color,
         isObvious: true,
         isValidCell(cell, digits, [mainCell, ...neighborCells], context) {
             const {typeManager: {compareCellData}} = context.puzzle;
@@ -123,7 +128,7 @@ const MinMaxConstraint = <T extends AnyPTM>(
     });
 };
 
-export const MinConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral) =>
-    MinMaxConstraint<T>(cellLiteral, "min", -1);
-export const MaxConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral) =>
-    MinMaxConstraint<T>(cellLiteral, "max", 1);
+export const MinConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral, color?: string) =>
+    MinMaxConstraint<T>(cellLiteral, "min", -1, color);
+export const MaxConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral, color?: string) =>
+    MinMaxConstraint<T>(cellLiteral, "max", 1, color);

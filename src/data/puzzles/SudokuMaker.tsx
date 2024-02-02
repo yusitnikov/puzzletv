@@ -227,48 +227,44 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                         case ConstraintType.Even:
                             new ObjectParser<EvenConstraintConfig>({
                                 type: undefined,
-                                cells: (cells) => {
+                                cells: (cells, {style: {size, color}}) => {
                                     for (const cell of cells) {
-                                        importer.addEven(this, this.parseCellId(cell));
+                                        importer.addEven(this, this.parseCellId(cell), color, size);
                                     }
                                 },
-                                // TODO
                                 style: undefined,
                             }).parse(constraint, "even");
                             break;
                         case ConstraintType.Odd:
                             new ObjectParser<OddConstraintConfig>({
                                 type: undefined,
-                                cells: (cells) => {
+                                cells: (cells, {style: {size, color}}) => {
                                     for (const cell of cells) {
-                                        importer.addOdd(this, this.parseCellId(cell));
+                                        importer.addOdd(this, this.parseCellId(cell), color, size);
                                     }
                                 },
-                                // TODO
                                 style: undefined,
                             }).parse(constraint, "odd");
                             break;
                         case ConstraintType.Maximum:
                             new ObjectParser<MaximumConstraintConfig>({
                                 type: undefined,
-                                cells: (cells) => {
+                                cells: (cells, {style: {color}}) => {
                                     for (const cell of cells) {
-                                        importer.addMaximum(this, this.parseCellId(cell));
+                                        importer.addMaximum(this, this.parseCellId(cell), color);
                                     }
                                 },
-                                // TODO
                                 style: undefined,
                             }).parse(constraint, "maximum");
                             break;
                         case ConstraintType.Minimum:
                             new ObjectParser<MinimumConstraintConfig>({
                                 type: undefined,
-                                cells: (cells) => {
+                                cells: (cells, {style: {color}}) => {
                                     for (const cell of cells) {
-                                        importer.addMinimum(this, this.parseCellId(cell));
+                                        importer.addMinimum(this, this.parseCellId(cell), color);
                                     }
                                 },
-                                // TODO
                                 style: undefined,
                             }).parse(constraint, "minimum");
                             break;
@@ -358,18 +354,16 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                 thermometers: (
                                     thermometers,
                                     {
-                                        // TODO
                                         slow,
                                         style: {
                                             color,
                                             thickness,
-                                            // TODO
                                             bulbRadius,
                                         },
                                     }
                                 ) => {
                                     for (const cells of thermometers) {
-                                        importer.addThermometer(this, this.parseCellIds(cells), color, thickness);
+                                        importer.addThermometer(this, this.parseCellIds(cells), slow, color, thickness, bulbRadius);
                                     }
                                 },
                                 slow: undefined,

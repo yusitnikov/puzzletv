@@ -8,17 +8,24 @@ import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
 import {LineProps} from "../line/Line";
+import {parseColorWithOpacity, rgba} from "../../../../utils/color";
 
-export const Thermometer: ConstraintPropsGenericFcMap<LineProps> = {
+export interface ThermometerProps extends LineProps {
+    bulbRadius?: number;
+}
+
+export const Thermometer: ConstraintPropsGenericFcMap<ThermometerProps> = {
     [FieldLayer.regular]: observer(function Thermometer<T extends AnyPTM>(
         {
             cells: points,
-            color = darkGreyColor,
-            props: {width = 0.35},
+            color = rgba(darkGreyColor, 0.5),
+            props: {width = 0.35, bulbRadius = 0.4},
             context: {puzzleIndex},
-        }: ConstraintProps<T, LineProps>
+        }: ConstraintProps<T, ThermometerProps>
     ) {
         profiler.trace();
+
+        const {rgb, a} = parseColorWithOpacity(color);
 
         const getPointInfo = ({top, left}: Position, radius: number) => {
             const cellInfo = puzzleIndex.allCells[top]?.[left];
@@ -27,20 +34,20 @@ export const Thermometer: ConstraintPropsGenericFcMap<LineProps> = {
                 : {left: left + 0.5, top: top + 0.5, radius};
         };
 
-        const startPoint = getPointInfo(points[0], 0.4);
+        const startPoint = getPointInfo(points[0], bulbRadius);
 
-        return <g opacity={0.5}>
+        return <g opacity={a}>
             <circle
                 cx={startPoint.left}
                 cy={startPoint.top}
                 r={startPoint.radius}
-                fill={color}
+                fill={rgb}
             />
 
             <RoundedPolyLine
-                points={points.map((point) => getPointInfo(point, 0.175))}
+                points={points.map((point) => getPointInfo(point, width / 2))}
                 strokeWidth={width}
-                stroke={color}
+                stroke={rgb}
             />
         </g>;
     }),
@@ -49,9 +56,11 @@ export const Thermometer: ConstraintPropsGenericFcMap<LineProps> = {
 export const ThermometerConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
+    slow = false,
     color?: string,
     width?: number,
-): Constraint<T, LineProps> => {
+    bulbRadius?: number,
+): Constraint<T, ThermometerProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);
@@ -61,7 +70,7 @@ export const ThermometerConstraint = <T extends AnyPTM>(
         name: "thermometer",
         cells,
         component: Thermometer,
-        props: {width},
+        props: {width, bulbRadius},
         color,
         isObvious: true,
         isValidCell(cell, digits, cells, context) {
@@ -82,7 +91,11 @@ export const ThermometerConstraint = <T extends AnyPTM>(
 
                 const comparison = context.puzzle.typeManager.compareCellData(constraintDigit, digit, context);
                 if (comparison === 0) {
-                    return false;
+                    if (slow) {
+                        continue;
+                    } else {
+                        return false;
+                    }
                 }
 
                 const isLowerThanCurrentCell = comparison < 0;

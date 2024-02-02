@@ -8,7 +8,7 @@ import {
     AfricaCountriesBounds,
     AfricaCountriesEnum
 } from "./africa-data/AfricaCountries";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import {isValidFinishedPuzzleByConstraints, toInvisibleConstraint} from "../../types/sudoku/Constraint";
 import {processGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {latLngLiteralToPosition} from "../../sudokuTypes/google-maps/utils/googleMapsCoords";
 import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
@@ -84,16 +84,18 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
                 return true;
             },
         },
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Egypt}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Niger}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Chad}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Sudan}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Senegal}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Benin}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Cameroon}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.CentAfrRep}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.SouthSudan}, false),
-        OddConstraint({top: 0, left: AfricaCountriesEnum.Gabon}, false),
+        ...[
+            AfricaCountriesEnum.Egypt,
+            AfricaCountriesEnum.Niger,
+            AfricaCountriesEnum.Chad,
+            AfricaCountriesEnum.Sudan,
+            AfricaCountriesEnum.Senegal,
+            AfricaCountriesEnum.Benin,
+            AfricaCountriesEnum.Cameroon,
+            AfricaCountriesEnum.CentAfrRep,
+            AfricaCountriesEnum.SouthSudan,
+            AfricaCountriesEnum.Gabon,
+        ].map((left: number) => toInvisibleConstraint(OddConstraint({top: 0, left}))),
     ],
     resultChecker: (context) => {
         if (!isValidFinishedPuzzleByConstraints(context)) {

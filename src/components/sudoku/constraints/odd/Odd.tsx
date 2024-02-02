@@ -5,30 +5,38 @@ import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../..
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {parseColorWithOpacity, rgba} from "../../../../utils/color";
 
-export const Odd: ConstraintPropsGenericFcMap = {
-    [FieldLayer.beforeSelection]: observer(function Odd<T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T>) {
+export interface OddProps {
+    size?: number;
+}
+
+export const Odd: ConstraintPropsGenericFcMap<OddProps> = {
+    [FieldLayer.beforeSelection]: observer(function Odd<T extends AnyPTM>({cells: [{left, top}], color = rgba(darkGreyColor, 0.6), props: {size = 0.8}}: ConstraintProps<T, OddProps>) {
         profiler.trace();
+
+        const {rgb, a} = parseColorWithOpacity(color);
 
         return <circle
             cx={left + 0.5}
             cy={top + 0.5}
-            r={0.4}
-            fill={darkGreyColor}
-            opacity={0.6}
+            r={size / 2}
+            fill={rgb}
+            opacity={a}
         />;
     }),
 };
 
-export const OddConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral, visible = true): Constraint<T> => {
+export const OddConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral, color?: string, size?: number): Constraint<T, OddProps> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     return {
         name: "odd",
         cells: [cell],
-        component: visible ? Odd : undefined,
+        component: Odd,
         renderSingleCellInUserArea: true,
-        props: undefined,
+        props: {size},
+        color,
         isObvious: true,
         isValidCell(cell, digits, _, context) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;

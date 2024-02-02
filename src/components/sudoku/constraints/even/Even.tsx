@@ -8,25 +8,30 @@ import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../..
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {parseColorWithOpacity, rgba} from "../../../../utils/color";
 
-const width = 0.8;
+export interface EvenProps {
+    size?: number;
+}
 
-export const Even: ConstraintPropsGenericFcMap = {
-    [FieldLayer.beforeSelection]: observer(function Even<T extends AnyPTM>({cells: [{left, top}]}: ConstraintProps<T>) {
+export const Even: ConstraintPropsGenericFcMap<EvenProps> = {
+    [FieldLayer.beforeSelection]: observer(function Even<T extends AnyPTM>({cells: [{left, top}], color = rgba(darkGreyColor, 0.6), props: {size = 0.8}}: ConstraintProps<T, EvenProps>) {
         profiler.trace();
 
+        const {rgb, a} = parseColorWithOpacity(color);
+
         return <rect
-            x={left + 0.5 - width / 2}
-            y={top + 0.5 - width / 2}
-            width={width}
-            height={width}
-            fill={darkGreyColor}
-            opacity={0.6}
+            x={left + 0.5 - size / 2}
+            y={top + 0.5 - size / 2}
+            width={size}
+            height={size}
+            fill={rgb}
+            opacity={a}
         />;
     }),
 };
 
-export const EvenConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral): Constraint<T> => {
+export const EvenConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral, color?: string, size?: number): Constraint<T, EvenProps> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     return {
@@ -34,7 +39,8 @@ export const EvenConstraint = <T extends AnyPTM>(cellLiteral: PositionLiteral): 
         cells: [cell],
         component: Even,
         renderSingleCellInUserArea: true,
-        props: undefined,
+        props: {size},
+        color,
         isObvious: true,
         isValidCell(cell, digits, _, context) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;

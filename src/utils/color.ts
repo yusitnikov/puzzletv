@@ -26,8 +26,10 @@ export const processRgb = <T1, T2>(processor: (...values: T1[]) => T2, ...colors
     blue: processor(...colors.map(({blue}) => blue)),
 });
 
+const colorPartToHex = (num: number) => Math.round(num).toString(16).padStart(2, "0");
+
 export const rgbToColorStr = (color: RGB) => {
-    const {red, green, blue} = processRgb(num => Math.round(num).toString(16).padStart(2, "0"), color);
+    const {red, green, blue} = processRgb(colorPartToHex, color);
 
     return `#${red}${green}${blue}`;
 };
@@ -42,6 +44,8 @@ export const getAverageColorsStr = (colors: string[]) => rgbToColorStr(processRg
 ));
 
 export const lightenColorStr = (color: string, coeff = 0.5) => mixColorsStr(color, "#fff", coeff);
+
+export const rgba = (rgb: string, a: number) => normalizeColorStr(rgb) + colorPartToHex(a * 255);
 
 export const parseColorWithOpacity = (color: string) => {
     if (/^#[0-9a-f]{8}$/i.test(color)) {

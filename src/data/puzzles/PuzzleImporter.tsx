@@ -475,10 +475,26 @@ export class PuzzleImporter<T extends AnyPTM> {
     addThermometer(
         gridParser: GridParser<T, any>,
         cells: PositionLiteral[],
+        slow = false,
         lineColor?: string,
         lineWidth?: number,
+        bulbRadius?: number,
     ) {
-        this.addSimpleLineConstraint(gridParser, cells, true, ThermometerConstraint, lineColor, lineWidth);
+        this.addSimpleLineConstraint(
+            gridParser,
+            cells,
+            true,
+            (cells, split, lineColor, lineWidth) => ThermometerConstraint(
+                cells,
+                split,
+                slow,
+                lineColor,
+                lineWidth,
+                bulbRadius,
+            ),
+            lineColor,
+            lineWidth,
+        );
     }
     addBetweenLine(
         gridParser: GridParser<T, any>,
@@ -526,17 +542,17 @@ export class PuzzleImporter<T extends AnyPTM> {
     // endregion
 
     // region Single cell
-    addEven(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral) {
-        this.addItems(EvenConstraint(gridParser.offsetCoords(cellLiteral)));
+    addEven(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string, size?: number) {
+        this.addItems(EvenConstraint(gridParser.offsetCoords(cellLiteral), color, size));
     }
-    addOdd(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral) {
-        this.addItems(OddConstraint(gridParser.offsetCoords(cellLiteral)));
+    addOdd(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string, size?: number) {
+        this.addItems(OddConstraint(gridParser.offsetCoords(cellLiteral), color, size));
     }
-    addMaximum(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral) {
-        this.addItems(MaxConstraint(gridParser.offsetCoords(cellLiteral)));
+    addMaximum(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string) {
+        this.addItems(MaxConstraint(gridParser.offsetCoords(cellLiteral), color));
     }
-    addMinimum(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral) {
-        this.addItems(MinConstraint(gridParser.offsetCoords(cellLiteral)));
+    addMinimum(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string) {
+        this.addItems(MinConstraint(gridParser.offsetCoords(cellLiteral), color));
     }
     addRowIndexer(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string) {
         this.addItems(RowIndexerConstraint(gridParser.offsetCoords(cellLiteral), gridParser.fieldSize, color));

@@ -12,13 +12,13 @@ import {profiler} from "../../../../utils/profiler";
 import {blueColor, greenColor, lightRedColor} from "../../../app/globals";
 import {FieldSize} from "../../../../types/sudoku/FieldSize";
 import {indexes} from "../../../../utils/indexes";
-import {parseColorWithOpacity} from "../../../../utils/color";
+import {parseColorWithOpacity, rgba} from "../../../../utils/color";
 
 const Indexer: ConstraintPropsGenericFcMap = {
-    [FieldLayer.beforeSelection]: observer(function Even<T extends AnyPTM>({cells: [{left, top}], color}: ConstraintProps<T>) {
+    [FieldLayer.beforeSelection]: observer(function Indexer<T extends AnyPTM>({cells: [{left, top}], color}: ConstraintProps<T>) {
         profiler.trace();
 
-        const {rgb, a = 0.6} = parseColorWithOpacity(color!);
+        const {rgb, a} = parseColorWithOpacity(color!);
 
         return <rect
             x={left}
@@ -74,7 +74,7 @@ export const IndexerConstraint = <T extends AnyPTM>(
 export const RowIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
     {columnsCount}: FieldSize,
-    color = greenColor,
+    color = rgba(greenColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
 
@@ -90,7 +90,7 @@ export const RowIndexerConstraint = <T extends AnyPTM>(
 export const ColumnIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
     {rowsCount}: FieldSize,
-    color = lightRedColor,
+    color = rgba(lightRedColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
 
@@ -106,7 +106,7 @@ export const ColumnIndexerConstraint = <T extends AnyPTM>(
 export const BoxIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
     {columnsCount, regionWidth = columnsCount, regionHeight = 1}: FieldSize,
-    color = blueColor,
+    color = rgba(blueColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
 
