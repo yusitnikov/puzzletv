@@ -10,11 +10,14 @@ import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {resolveCellColorValue} from "../../../../types/sudoku/CellColor";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
+import {parseColorWithOpacity} from "../../../../utils/color";
 
 export interface DecorativeShapeProps extends Size {
     borderColor?: string;
     text?: string;
     textColor?: string;
+    borderWidth?: number;
 }
 
 export const DecorativeShapeComponent = <T extends AnyPTM>(
@@ -27,6 +30,7 @@ export const DecorativeShapeComponent = <T extends AnyPTM>(
             width,
             height,
             borderColor,
+            borderWidth = 0.03,
             text,
             textColor: textC = textColor,
         },
@@ -48,7 +52,7 @@ export const DecorativeShapeComponent = <T extends AnyPTM>(
             height={height}
             fill={backgroundColor}
             stroke={borderColor || "none"}
-            strokeWidth={borderColor ? 0.03 : 0}
+            strokeWidth={borderColor ? borderWidth : 0}
         />
 
         {!!text && <CenteredText
@@ -82,6 +86,30 @@ const EllipseComponent = DecorativeShapeComponent(observer(function EllipseFc({w
     />;
 }));
 
+const ArrowComponent = DecorativeShapeComponent(observer(function ArrowFc({width, height, stroke = textColor, strokeWidth = 0}) {
+    profiler.trace();
+
+    const {rgb, a} = parseColorWithOpacity(stroke);
+    strokeWidth = Number(strokeWidth);
+
+    return <g opacity={a}>
+        <line
+            x1={-width / 2}
+            x2={width / 2 - strokeWidth / 2}
+            stroke={rgb}
+            strokeWidth={strokeWidth}
+        />
+
+        <ArrowEnd
+            position={{top: 0, left: width / 2 - strokeWidth / Math.SQRT2}}
+            direction={{top: 0, left: 1}}
+            arrowSize={height / Math.SQRT2}
+            lineWidth={strokeWidth}
+            color={rgb}
+        />
+    </g>;
+}));
+
 export const DecorativeShapeConstraint = <T extends AnyPTM>(
     name: string,
     layer: FieldLayer,
@@ -90,6 +118,7 @@ export const DecorativeShapeConstraint = <T extends AnyPTM>(
     size: Size | number,
     backgroundColor?: string,
     borderColor?: string,
+    borderWidth?: number,
     text?: string,
     textColor?: string,
     angle?: number
@@ -104,6 +133,7 @@ export const DecorativeShapeConstraint = <T extends AnyPTM>(
             borderColor,
             text,
             textColor,
+            borderWidth,
         },
         color: backgroundColor,
         angle,
@@ -131,11 +161,12 @@ export const RectConstraint = <T extends AnyPTM>(
     size: Size | number,
     backgroundColor?: string,
     borderColor?: string,
+    borderWidth?: number,
     text?: string,
     textColor?: string,
     angle?: number,
     layer = FieldLayer.afterLines,
-) => DecorativeShapeConstraint<T>(rectTag, layer, RectComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>(rectTag, layer, RectComponent, cellLiterals, size, backgroundColor, borderColor, borderWidth, text, textColor, angle);
 
 export const ellipseTag = "ellipse";
 export const EllipseConstraint = <T extends AnyPTM>(
@@ -143,8 +174,34 @@ export const EllipseConstraint = <T extends AnyPTM>(
     size: Size | number,
     backgroundColor?: string,
     borderColor?: string,
+    borderWidth?: number,
     text?: string,
     textColor?: string,
     angle?: number,
     layer = FieldLayer.afterLines,
-) => DecorativeShapeConstraint<T>(ellipseTag, layer, EllipseComponent, cellLiterals, size, backgroundColor, borderColor, text, textColor, angle);
+) => DecorativeShapeConstraint<T>(ellipseTag, layer, EllipseComponent, cellLiterals, size, backgroundColor, borderColor, borderWidth, text, textColor, angle);
+
+export const cosmeticArrowTag = "cosmetic arrow";
+export const CosmeticArrowConstraint = <T extends AnyPTM>(
+    cellLiterals: PositionLiteral[],
+    length: number,
+    headSize: number,
+    borderColor?: string,
+    borderWidth?: number,
+    text?: string,
+    textColor?: string,
+    angle?: number,
+    layer = FieldLayer.afterLines,
+) => DecorativeShapeConstraint<T>(
+    cosmeticArrowTag,
+    layer,
+    ArrowComponent,
+    cellLiterals,
+    {width: length, height: headSize},
+    undefined,
+    borderColor,
+    borderWidth,
+    text,
+    textColor,
+    angle,
+);

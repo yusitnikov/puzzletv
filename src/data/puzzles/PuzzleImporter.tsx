@@ -72,7 +72,11 @@ import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
 import {BetweenLineConstraint} from "../../components/sudoku/constraints/between-line/BetweenLine";
 import {LockoutLineConstraint} from "../../components/sudoku/constraints/lockout-line/LockoutLine";
 import {LineConstraint} from "../../components/sudoku/constraints/line/Line";
-import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import {
+    CosmeticArrowConstraint,
+    EllipseConstraint,
+    RectConstraint
+} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {DoubleArrowConstraint} from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
@@ -135,10 +139,10 @@ export class PuzzleImporter<T extends AnyPTM> {
         ));
     }
 
-    private get cosmeticsLayer() {
+    private cosmeticsLayer(beforeLines = false) {
         return this.importOptions.rotatableClues && this.importOptions.keepCircles
             ? FieldLayer.beforeSelection
-            : this.importOptions.cosmeticsBehindFog
+            : beforeLines || this.importOptions.cosmeticsBehindFog
                 ? FieldLayer.regular
                 : FieldLayer.afterLines;
     }
@@ -697,12 +701,19 @@ export class PuzzleImporter<T extends AnyPTM> {
         cells: PositionLiteral[],
         lineColor?: string,
         lineWidth?: number,
+        beforeGridLines = true,
     ) {
         this.addSimpleLineConstraint(
             gridParser,
             cells,
             true,
-            (cells, split, lineColor, lineWidth) => LineConstraint(cells, lineColor, lineWidth, split),
+            (cells, split, lineColor, lineWidth) => LineConstraint(
+                cells,
+                lineColor,
+                lineWidth,
+                split,
+                this.cosmeticsLayer(beforeGridLines),
+            ),
             lineColor,
             lineWidth,
         );
@@ -714,9 +725,11 @@ export class PuzzleImporter<T extends AnyPTM> {
         height: number,
         backgroundColor?: string,
         borderColor?: string,
+        borderWidth?: number,
         text?: string,
         textColor?: string,
         angle?: number,
+        beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(cells);
@@ -725,10 +738,11 @@ export class PuzzleImporter<T extends AnyPTM> {
             {width, height},
             backgroundColor,
             borderColor,
+            borderWidth,
             text,
             textColor,
             angle,
-            this.cosmeticsLayer,
+            this.cosmeticsLayer(beforeLines),
         ));
     }
     addCosmeticCircle(
@@ -738,9 +752,11 @@ export class PuzzleImporter<T extends AnyPTM> {
         height: number,
         backgroundColor?: string,
         borderColor?: string,
+        borderWidth?: number,
         text?: string,
         textColor?: string,
         angle?: number,
+        beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(cells);
@@ -749,10 +765,37 @@ export class PuzzleImporter<T extends AnyPTM> {
             {width, height},
             backgroundColor,
             borderColor,
+            borderWidth,
             text,
             textColor,
             angle,
-            this.cosmeticsLayer,
+            this.cosmeticsLayer(beforeLines),
+        ));
+    }
+    addCosmeticArrow(
+        gridParser: GridParser<T, any>,
+        cellLiterals: PositionLiteral[],
+        length: number,
+        headSize: number,
+        borderColor?: string,
+        borderWidth?: number,
+        text?: string,
+        textColor?: string,
+        angle?: number,
+        beforeLines?: boolean,
+    ) {
+        const cells = gridParser.offsetCoordsArray(cellLiterals);
+        this.checkForOutsideCells(cells);
+        this.addItems(CosmeticArrowConstraint(
+            this.fixCellPositions(cells),
+            length,
+            headSize,
+            borderColor,
+            borderWidth,
+            text,
+            textColor,
+            angle,
+            this.cosmeticsLayer(beforeLines),
         ));
     }
     addCosmeticText(
@@ -762,6 +805,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         color?: string,
         size?: number,
         angle?: number,
+        beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(cells);
@@ -771,7 +815,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             color,
             size,
             angle,
-            this.cosmeticsLayer,
+            this.cosmeticsLayer(beforeLines),
         ));
     }
     addCosmeticCage(

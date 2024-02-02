@@ -44,6 +44,7 @@ export const createRotatableClue = (
                 undefined,
                 undefined,
                 undefined,
+                undefined,
                 FieldLayer.beforeSelection,
             ),
             ...clues,

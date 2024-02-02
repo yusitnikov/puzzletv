@@ -64,7 +64,8 @@ import {
     SkyscrapersConstraintConfig,
     Stroke,
     SudokuBlob,
-    SudokuLayer, SudokuRulesConstraintConfig,
+    SudokuLayer,
+    SudokuRulesConstraintConfig,
     SymbolParams,
     SymbolType,
     TextSymbolParams,
@@ -716,6 +717,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                             })),
                                             color,
                                             thickness,
+                                            parseLayer(layer),
                                         );
                                     }
                                 },
@@ -764,6 +766,8 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     left: x - 0.5,
                                 };
 
+                                const beforeLines = parseLayer(layer);
+
                                 switch (params.type) {
                                     case SymbolType.Ellipse:
                                         new ObjectParser<EllipseSymbolParams>({
@@ -776,10 +780,11 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                                     ry * 2,
                                                     fill,
                                                     stroke,
+                                                    strokeWidth,
                                                     undefined,
                                                     undefined,
                                                     angle,
-                                                    // TODO: layer
+                                                    beforeLines,
                                                 );
                                             },
                                             ry: undefined,
@@ -796,10 +801,11 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                                     height,
                                                     fill,
                                                     stroke,
+                                                    strokeWidth,
                                                     undefined,
                                                     undefined,
                                                     angle,
-                                                    // TODO: layer
+                                                    beforeLines,
                                                 );
                                             },
                                             height: undefined,
@@ -816,7 +822,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                                     fill,
                                                     size,
                                                     angle,
-                                                    // TODO: layer
+                                                    beforeLines,
                                                 );
                                             },
                                             size: undefined,
@@ -825,8 +831,19 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     case SymbolType.Arrow:
                                         new ObjectParser<ArrowSymbolParams>({
                                             ...baseSymbolValidator,
-                                            length: (length, {headSize, fill, stroke, strokeWidth, angle}) => {
-                                                // TODO
+                                            length: (length, {headSize, stroke, strokeWidth, angle}) => {
+                                                importer.addCosmeticArrow(
+                                                    this,
+                                                    [cell],
+                                                    length,
+                                                    headSize,
+                                                    stroke,
+                                                    strokeWidth,
+                                                    undefined,
+                                                    undefined,
+                                                    angle,
+                                                    beforeLines,
+                                                );
                                             },
                                             headSize: undefined,
                                         }).parse(params, "decorative arrow");
@@ -1019,6 +1036,9 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
 }
 
 type OutsideClueConstraintConfig = SandwichSumsConstraintConfig | XSumsConstraintConfig | SkyscrapersConstraintConfig | NumberedRoomsConstraintConfig;
+
+// Returns whether the clue should be displayed before the grid lines
+const parseLayer = (layer?: SudokuLayer) => layer === SudokuLayer.Background || layer === SudokuLayer.Default;
 
 const parseDiagonalType = (type: DiagonalType | undefined): OutsideClueLineDirectionType => {
     switch (type) {

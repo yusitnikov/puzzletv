@@ -48,6 +48,7 @@ const DecorativeArrowConstraint = (
         textColor,
         undefined,
         undefined,
+        undefined,
         angle
     ),
     EllipseConstraint([cellLiteral], 1),

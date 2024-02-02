@@ -453,7 +453,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                             baseColor = lockoutLineDiamondBackgroundColor;
                         }
 
-                        importer.addCosmeticRect(this, cells, width, height, baseColor, outlineColor, value, fontC, angle);
+                        importer.addCosmeticRect(this, cells, width, height, baseColor, outlineColor, undefined, value, fontC, angle);
                     }
                 }
             },
@@ -462,7 +462,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                     for (const {cells, width, height, baseC, outlineC, value, fontC, angle, fromConstraint, ...other} of items) {
                         ObjectParser.empty.parse(other, "f-puzzles circle");
 
-                        importer.addCosmeticCircle(this, cells, width, height, baseC, outlineC, value, fontC, angle);
+                        importer.addCosmeticCircle(this, cells, width, height, baseC, outlineC, undefined, value, fontC, angle);
                     }
                 }
             },
