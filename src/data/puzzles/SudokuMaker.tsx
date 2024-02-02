@@ -91,6 +91,7 @@ import {OutsideClueLineDirectionType} from "../../components/sudoku/constraints/
 import {XSumConstraint} from "../../components/sudoku/constraints/x-sum/XSum";
 import {NumberedRoomConstraint} from "../../components/sudoku/constraints/numbered-room/NumberedRoom";
 import {SkyscraperConstraint} from "../../components/sudoku/constraints/skyscraper/Skyscraper";
+import {BaseEntropicLineConstraint} from "../../components/sudoku/constraints/entropy-line/EntropicLine";
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {
     constructor(puzzleJson: CompressedPuzzle, offsetX: number, offsetY: number) {
@@ -553,14 +554,14 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                             this.addSimpleLineConstraint(
                                 importer,
                                 constraint,
-                                // TODO
-                                (cells, split, color, thickness) => LineConstraint(
+                                (cells, split, color, thickness) => BaseEntropicLineConstraint(
+                                    "entropic line",
                                     cells,
+                                    constraint.groups.map((bitMask) => (digit) => ((bitMask >> digit) & 1) === 1),
+                                    split,
                                     color,
                                     thickness,
-                                    split,
                                 ),
-                                // TODO
                                 {groups: undefined},
                             );
                             break;

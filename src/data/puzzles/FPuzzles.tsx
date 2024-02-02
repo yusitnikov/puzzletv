@@ -387,6 +387,28 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                     }
                 }
             },
+            entropicline: (items) => {
+                if (items instanceof Array) {
+                    for (const {lines, ...other} of items) {
+                        ObjectParser.empty.parse(other, "f-puzzles entropic line");
+
+                        for (const cells of lines) {
+                            importer.addEntropicLine(this, cells, false);
+                        }
+                    }
+                }
+            },
+            modularline: (items) => {
+                if (items instanceof Array) {
+                    for (const {lines, ...other} of items) {
+                        ObjectParser.empty.parse(other, "f-puzzles modular line");
+
+                        for (const cells of lines) {
+                            importer.addModularLine(this, cells, false);
+                        }
+                    }
+                }
+            },
             line: (items) => {
                 if (items instanceof Array) {
                     for (const {lines, outlineC, width, isNewConstraint, fromConstraint, isLLConstraint, ...other} of items) {

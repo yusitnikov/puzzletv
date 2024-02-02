@@ -76,6 +76,10 @@ import {EllipseConstraint, RectConstraint} from "../../components/sudoku/constra
 import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {DoubleArrowConstraint} from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
+import {
+    EntropicLineConstraint, ModularLineConstraint,
+    ParityLineConstraint
+} from "../../components/sudoku/constraints/entropy-line/EntropicLine";
 
 export class PuzzleImporter<T extends AnyPTM> {
     private readonly regions: Position[][] = [];
@@ -462,6 +466,34 @@ export class PuzzleImporter<T extends AnyPTM> {
             lineColor,
             lineWidth,
         );
+    }
+    addEntropicLine(
+        gridParser: GridParser<T, any>,
+        cells: PositionLiteral[],
+        display: boolean,
+        lineColor?: string,
+        lineWidth?: number,
+    ) {
+        this.addSimpleLineConstraint(gridParser, cells, display, EntropicLineConstraint, lineColor, lineWidth);
+    }
+    addModularLine(
+        gridParser: GridParser<T, any>,
+        cells: PositionLiteral[],
+        display: boolean,
+        lineColor?: string,
+        lineWidth?: number,
+    ) {
+        this.addSimpleLineConstraint(gridParser, cells, display, ModularLineConstraint, lineColor, lineWidth);
+    }
+    // noinspection JSUnusedGlobalSymbols
+    addParityLine(
+        gridParser: GridParser<T, any>,
+        cells: PositionLiteral[],
+        display: boolean,
+        lineColor?: string,
+        lineWidth?: number,
+    ) {
+        this.addSimpleLineConstraint(gridParser, cells, display, ParityLineConstraint, lineColor, lineWidth);
     }
     addPalindrome(
         gridParser: GridParser<T, any>,
