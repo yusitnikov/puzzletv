@@ -127,7 +127,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         () => !supportsExtraGrids ? [] : extraGrids
             .map((grid) => ({
                 ...grid,
-                load: grid.load.split("?load=")[1] ?? grid.load,
+                load: grid.load.split(/\?(?:load|puzzle)=/)[1] ?? grid.load,
             }))
             .filter(({load}) => load),
         [supportsExtraGrids, extraGrids]
@@ -244,7 +244,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
 
     const isValidForm = !isInfiniteRings || visibleRingsCount !== 0;
 
-    // TODO: different script for SudokuMaker
+    const isFPuzzles = slug === "f-puzzles";
+
     // eslint-disable-next-line no-script-url
     const copyIdBookmarkletCode = "javascript:(()=>{const d=document,b=d.body,e=d.createElement('input');e.value=exportPuzzle();b.append(e);e.select();d.execCommand('copy');e.remove();})()";
 
@@ -642,7 +643,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                                 return <li key={`extra-grid-${index}`}>
                                     <Paragraph>
                                         <label>
-                                            F-Puzzles link or ID:&nbsp;
+                                            {typeLabel} link or ID:&nbsp;
                                             <input type={"text"} value={grid.load}
                                                    onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
                                         </label>
@@ -681,7 +682,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                             <li key={`extra-grid-${extraGrids.length}`}>
                                 <Paragraph>
                                     <label>
-                                        F-Puzzles link or ID:&nbsp;
+                                        {typeLabel} link or ID:&nbsp;
                                         <input type={"text"} value={""} onChange={ev => setExtraGrids([
                                             ...extraGrids,
                                             {
@@ -692,18 +693,20 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                                         ])}/>
                                     </label>
                                     <Details>
-                                        Create the additional grid in F-Puzzles, then click "Export" and "Open With Link".
-                                        Copy the link of the page that opened in the tab to here.
+                                        Create the additional grid in {typeLabel}{isFPuzzles && ', then click "Export" and "Open With Link"'}.
+                                        Copy the link of the page {isFPuzzles && "that opened in the tab"} to here.
                                     </Details>
-                                    <Details>
-                                        Alternative: copy the {typeLabel} ID to the clipboard by installing and using this bookmarklet: <a href={copyIdBookmarkletCode}>Copy {typeLabel} ID</a>.
-                                    </Details>
-                                    <Details>
-                                        <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
-                                        Also, If you edited the puzzle, it's a must to use the "open with link" feature
-                                        (because the link of the current {typeLabel} tab doesn't include the latest
-                                        information).
-                                    </Details>
+                                    {isFPuzzles && <>
+                                        <Details>
+                                            Alternative: copy the {typeLabel} ID to the clipboard by installing and using
+                                            this bookmarklet: <a href={copyIdBookmarkletCode}>Copy {typeLabel} ID</a>.
+                                        </Details>
+                                        <Details>
+                                            <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
+                                            Also, If you edited the puzzle, it's a must to use the "open with link" feature
+                                            (because the link of the current {typeLabel} tab doesn't include the latest information).
+                                        </Details>
+                                    </>}
                                 </Paragraph>
                             </li>
                         </ul>
