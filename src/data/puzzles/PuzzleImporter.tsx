@@ -604,16 +604,18 @@ export class PuzzleImporter<T extends AnyPTM> {
     // region Main diagonal
     addDiagonalConstraint(
         gridParser: GridParser<T, any>,
-        factory: (size: number) => Constraint<T, any>,
+        factory: (size: number, color?: string, width?: number) => Constraint<T, any>,
+        color?: string,
+        width?: number,
     ) {
         // TODO: support grid offset
-        this.addItems(factory(gridParser.size));
+        this.addItems(factory(gridParser.size, color, width));
     }
-    addPositiveDiagonal(gridParser: GridParser<T, any>) {
-        this.addDiagonalConstraint(gridParser, PositiveDiagonalConstraint);
+    addPositiveDiagonal(gridParser: GridParser<T, any>, color?: string, width?: number) {
+        this.addDiagonalConstraint(gridParser, PositiveDiagonalConstraint, color, width);
     }
-    addNegativeDiagonal(gridParser: GridParser<T, any>) {
-        this.addDiagonalConstraint(gridParser, NegativeDiagonalConstraint);
+    addNegativeDiagonal(gridParser: GridParser<T, any>, color?: string, width?: number) {
+        this.addDiagonalConstraint(gridParser, NegativeDiagonalConstraint, color, width);
     }
     // endregion
 

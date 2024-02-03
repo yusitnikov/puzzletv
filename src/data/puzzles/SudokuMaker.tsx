@@ -181,18 +181,16 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                         case ConstraintType.DiagonalMinus:
                             new ObjectParser<DiagonalMinusConstraintConfig>({
                                 type: undefined,
-                                // TODO
                                 style: lineStyleValidator.bind("diagonal style"),
                             }).parse(constraint, "diagonal-");
-                            importer.addNegativeDiagonal(this);
+                            importer.addNegativeDiagonal(this, constraint.style.color, constraint.style.thickness);
                             break;
                         case ConstraintType.DiagonalPlus:
                             new ObjectParser<DiagonalPlusConstraintConfig>({
                                 type: undefined,
-                                // TODO
                                 style: lineStyleValidator.bind("diagonal style"),
                             }).parse(constraint, "diagonal+");
-                            importer.addPositiveDiagonal(this);
+                            importer.addPositiveDiagonal(this, constraint.style.color, constraint.style.thickness);
                             break;
                         case ConstraintType.Antiking:
                             new ObjectParser<AntikingConstraintConfig>({
