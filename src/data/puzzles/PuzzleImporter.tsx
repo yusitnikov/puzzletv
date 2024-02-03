@@ -9,7 +9,7 @@ import {
     PuzzleDefinition
 } from "../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
+import {ColorsImportMode, PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
 import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
 import {FieldSize} from "../../types/sudoku/FieldSize";
 import {LanguageCode} from "../../types/translations/LanguageCode";
@@ -81,7 +81,8 @@ import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
 import {DoubleArrowConstraint} from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
 import {
-    EntropicLineConstraint, ModularLineConstraint,
+    EntropicLineConstraint,
+    ModularLineConstraint,
     ParityLineConstraint
 } from "../../components/sudoku/constraints/entropy-line/EntropicLine";
 
@@ -892,7 +893,16 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.puzzle.solution[top][left] = value;
     }
 
+    private get colorsImportMode() {
+        return this.typeManager.colorsImportMode ?? this.importOptions.colorsImportMode;
+    }
+
     addInitialColors(gridParser: GridParser<T, any>, top: number, left: number, ...colors: CellColorValue[]) {
+        if (this.colorsImportMode === ColorsImportMode.Solution) {
+            this.addSolutionColors(gridParser, top, left, ...colors);
+            return;
+        }
+
         const offsetCoords = gridParser.offsetCoords({top, left});
         top = offsetCoords.top;
         left = offsetCoords.left;
@@ -905,6 +915,11 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     addSolutionColors(gridParser: GridParser<T, any>, top: number, left: number, ...colors: CellColorValue[]) {
+        if (this.colorsImportMode === ColorsImportMode.Initials) {
+            this.addInitialColors(gridParser, top, left, ...colors);
+            return;
+        }
+
         const offsetCoords = gridParser.offsetCoords({top, left});
         top = offsetCoords.top;
         left = offsetCoords.left;

@@ -579,6 +579,9 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
     get hasInitialColors() {
         return this.puzzleJson.grid.some(row => row.some(cell => cell.c || cell.cArray?.length));
     }
+    get hasSolutionColors() {
+        return this.puzzleJson.grid.some(row => row.some(cell => cell.highlight || cell.highlightArray?.length));
+    }
     get hasArrows() {
         return !!this.puzzleJson.arrow;
     }

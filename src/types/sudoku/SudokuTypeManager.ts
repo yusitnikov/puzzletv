@@ -24,6 +24,7 @@ import {AnyPTM} from "./PuzzleTypeMap";
 import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
 import {IReactionDisposer} from "mobx";
 import {GivenDigitsMap} from "./GivenDigitsMap";
+import {ColorsImportMode} from "./PuzzleImportOptions";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -268,6 +269,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     mapImportedColors?: boolean;
 
+    colorsImportMode?: ColorsImportMode;
+
     onCloseCorrectResultPopup?(context: PuzzleContext<T>): void;
 
     fieldControlsComponent?: ComponentType<PuzzleContextProps<T>>;
@@ -318,7 +321,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
     xDirection: number,
     yDirection: number,
     {puzzleIndex}: PuzzleContext<T>,
-    isMainKeyboard?: boolean,
+    _isMainKeyboard?: boolean,
     enableBackwardSteps = true,
 ): {cell?: Position, state?: undefined} => {
     const {center, neighbors} = puzzleIndex.allCells[top][left];

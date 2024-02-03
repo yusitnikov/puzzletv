@@ -1,7 +1,4 @@
-import {
-    PuzzleDefinition,
-    PuzzleDefinitionLoader
-} from "../../types/sudoku/PuzzleDefinition";
+import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {sha1} from "hash.js";
 import {arrayContainsPosition} from "../../types/layout/Position";
@@ -42,35 +39,41 @@ import {FullCubeJssConstraint} from "../../sudokuTypes/cube/constraints/FullCube
 import {ShuffledSudokuTypeManager} from "../../sudokuTypes/shuffled/types/ShuffledSudokuTypeManager";
 import {ImportedScrewsSudokuTypeManager} from "../../sudokuTypes/screws/types/ScrewsSudokuTypeManager";
 import {PuzzleImporter} from "./PuzzleImporter";
-import {GridParserFactory} from "./GridParser";
+import {GridParser, GridParserFactory} from "./GridParser";
 import {FullCubePTM} from "../../sudokuTypes/cube/types/FullCubePTM";
 
-const loadByImportOptions = <T extends AnyPTM, JsonT>(
-    slug: string,
+const getGridParsersByImportOptions = <T extends AnyPTM, JsonT>(
     importOptions: PuzzleImportOptions,
     gridParserFactory: GridParserFactory<T, JsonT>
-): PuzzleDefinition<T> => {
-    let {
+): GridParser<T, JsonT>[] => {
+    const {
         load,
         offsetX: firstOffsetX = 0,
         offsetY: firstOffsetY = 0,
         extraGrids: extraGridLoad = {},
-        type = PuzzleImportPuzzleType.Regular,
-        digitType = PuzzleImportDigitType.Regular,
     } = importOptions;
 
     const mainGridParser = gridParserFactory(load, firstOffsetX, firstOffsetY);
 
     const extraGridParsers = (Array.isArray(extraGridLoad) ? extraGridLoad : Object.values(extraGridLoad))
         .map(({load, offsetX = 0, offsetY = 0}) => gridParserFactory(load, offsetX, offsetY));
-    const allGridParsers = [
+
+    return [
         mainGridParser,
         ...extraGridParsers,
     ];
-    const columnsCount = Math.max(...allGridParsers.map(({offsetX, columnsCount}) => offsetX + columnsCount));
-    const rowsCount = Math.max(...allGridParsers.map(({offsetY, rowsCount}) => offsetY + rowsCount));
+};
 
-    console.debug("Importing from", slug, ...allGridParsers);
+export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
+    importOptions: PuzzleImportOptions,
+    allGridParsers: GridParser<T, JsonT>[],
+): SudokuTypeManager<AnyPTM> => {
+    let {
+        type = PuzzleImportPuzzleType.Regular,
+        digitType = PuzzleImportDigitType.Regular,
+    } = importOptions;
+
+    const mainGridParser = allGridParsers[0];
 
     switch (type) {
         case PuzzleImportPuzzleType.Calculator:
@@ -184,6 +187,28 @@ const loadByImportOptions = <T extends AnyPTM, JsonT>(
             typeManager = LatinDigitSudokuTypeManager(typeManager);
             break;
     }
+
+    return typeManager;
+};
+
+const loadByImportOptions = <T extends AnyPTM, JsonT>(
+    slug: string,
+    importOptions: PuzzleImportOptions,
+    gridParserFactory: GridParserFactory<T, JsonT>
+): PuzzleDefinition<T> => {
+    const {
+        type = PuzzleImportPuzzleType.Regular,
+        jss,
+    } = importOptions;
+
+    const allGridParsers = getGridParsersByImportOptions(importOptions, gridParserFactory);
+
+    const columnsCount = Math.max(...allGridParsers.map(({offsetX, columnsCount}) => offsetX + columnsCount));
+    const rowsCount = Math.max(...allGridParsers.map(({offsetY, rowsCount}) => offsetY + rowsCount));
+
+    console.debug("Importing from", slug, ...allGridParsers);
+
+    const typeManager = detectTypeManagerByImportOptions(importOptions, allGridParsers);
 
     const importer = new PuzzleImporter<T>(slug, importOptions, typeManager as unknown as SudokuTypeManager<T>, {
         fieldSize: Math.max(rowsCount, columnsCount),

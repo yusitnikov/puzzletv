@@ -3,7 +3,7 @@ import styled from "@emotion/styled/macro";
 import {buildLink} from "../../utils/link";
 import {Children, FC, FormEvent, ReactElement, useMemo, useRef, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
-import {getPuzzleImportLoader} from "../../data/puzzles/Import";
+import {detectTypeManagerByImportOptions, getPuzzleImportLoader} from "../../data/puzzles/Import";
 import {useLanguageCode} from "../../hooks/useTranslate";
 import {darkGreyColor, headerPadding} from "./globals";
 import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
@@ -12,6 +12,7 @@ import {FieldPreview} from "../sudoku/field/FieldPreview";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {PageTitle} from "../layout/page-layout/PageLayout";
 import {
+    ColorsImportMode,
     PuzzleGridImportOptions,
     PuzzleImportDigitType,
     PuzzleImportOptions,
@@ -22,6 +23,7 @@ import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
 import {GridParserFactory} from "../../data/puzzles/GridParser";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
+import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 
 let autoIncrement = 0;
 
@@ -160,14 +162,22 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const hasSolution = gridParsers.some((gridParser) => gridParser.hasSolution);
     const hasFog = gridParsers.some((gridParser) => gridParser.hasFog);
     const hasCosmeticElements = gridParsers.some((gridParser) => gridParser.hasCosmeticElements);
-    const hasInitialColors = gridParsers.some((gridParser) => gridParser.hasInitialColors);
+    const hasInitialColorsByGrid = gridParsers.some((gridParser) => gridParser.hasInitialColors);
+    const hasSolutionColorsByGrid = gridParsers.some((gridParser) => gridParser.hasSolutionColors);
+    const hasColors = hasInitialColorsByGrid || hasSolutionColorsByGrid;
     const hasArrows = gridParsers.some((gridParser) => gridParser.hasArrows);
     // Transparent arrow circles are always on for the rotatable clues puzzles, so don't allow to change the flag
     const transparentCirclesForced = rotatableClues;
 
     const [digitsCount, setDigitsCount] = useState(maxDigit ?? Math.min(fieldSize, 9));
 
-    const importOptions = usePureMemo<PuzzleImportOptions>({
+    const [colorsImportModeState, setColorsImportMode] = useStringFromLocalStorage<ColorsImportMode>("fpwColorsImportMode", ColorsImportMode.Auto);
+
+    const getHasInitialColors = (colorsImportMode: ColorsImportMode) => hasColors
+        && colorsImportMode !== ColorsImportMode.Solution
+        && (hasInitialColorsByGrid || colorsImportMode === ColorsImportMode.Initials);
+
+    const getImportOptions = (colorsImportMode: ColorsImportMode): PuzzleImportOptions => ({
         type,
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
@@ -193,7 +203,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         visibleRingsCount: isInfiniteRings ? (visibleRingsCount || (fieldSize / 2 - 1)) : undefined,
         startOffset: isInfiniteRings ? startOffset : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
-        allowOverrideColors: hasInitialColors && allowOverrideColors,
+        allowOverrideColors: getHasInitialColors(colorsImportMode) && allowOverrideColors,
+        colorsImportMode: hasColors ? colorsImportMode : undefined,
         angleStep: finalAngleStep,
         shuffle: isJigsaw && filteredExtraGrids.length === 0 && shuffle,
         noPieceRegions: (isJigsawLike && noPieceRegions) || isShuffled,
@@ -217,6 +228,21 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
             offsetY: offsetY + globalOffsetY,
         })),
     });
+
+    const importOptionsPreview = usePureMemo<PuzzleImportOptions>(getImportOptions(colorsImportModeState));
+
+    const typeManagerPreview = useMemo(() => {
+        try {
+            return detectTypeManagerByImportOptions(importOptionsPreview, gridParsers);
+        } catch (e: unknown) {
+            return DigitSudokuTypeManager();
+        }
+    }, [importOptionsPreview, gridParsers]);
+
+    const colorsImportMode = typeManagerPreview.colorsImportMode ?? colorsImportModeState;
+
+    const hasInitialColors = getHasInitialColors(colorsImportMode);
+    const importOptions = usePureMemo<PuzzleImportOptions>(getImportOptions(colorsImportMode));
 
     const importedPuzzle = useMemo(() => {
         const version = ++autoIncrement;
@@ -602,6 +628,17 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                             treat them as different regions.
                         </Details>
                     </Paragraph>
+
+                    {hasColors && !typeManagerPreview.colorsImportMode && <Paragraph>
+                        <label>
+                            Import colors as:&nbsp;
+                            <Select value={colorsImportMode} onChange={ev => setColorsImportMode(ev.target.value as ColorsImportMode)}>
+                                <option value={ColorsImportMode.Auto}>based on input</option>
+                                <option value={ColorsImportMode.Initials}>initial colors</option>
+                                <option value={ColorsImportMode.Solution}>solution colors</option>
+                            </Select>
+                        </label>
+                    </Paragraph>}
 
                     {hasInitialColors && <Paragraph>
                         <label>

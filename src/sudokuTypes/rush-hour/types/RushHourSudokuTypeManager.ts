@@ -24,6 +24,7 @@ import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {createRandomGenerator} from "../../../utils/random";
 import {cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {settings} from "../../../types/layout/Settings";
+import {ColorsImportMode} from "../../../types/sudoku/PuzzleImportOptions";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...DigitSudokuTypeManager<RushHourPTM>(),
@@ -165,6 +166,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     },
 
     mapImportedColors: true,
+    colorsImportMode: ColorsImportMode.Initials,
 
     disabledCellWriteModes: [CellWriteMode.move],
     extraCellWriteModes: [RushHourMoveCellWriteModeInfo()],

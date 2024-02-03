@@ -1020,6 +1020,9 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             ].includes(type)
         );
     }
+    get hasSolutionColors() {
+        return this.puzzleJson.cells.some((cell) => cell?.colors);
+    }
     get hasArrows() {
         return this.puzzleJson.constraints.some(({type}) => type === ConstraintType.Arrow);
     }

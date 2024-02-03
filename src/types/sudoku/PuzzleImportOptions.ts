@@ -21,6 +21,12 @@ export enum PuzzleImportDigitType {
     Calculator = "calculator",
 }
 
+export enum ColorsImportMode {
+    Auto = "auto",
+    Initials = "initials",
+    Solution = "solution",
+}
+
 export interface PuzzleGridImportOptions {
     load: string;
     offsetX?: number;
@@ -54,6 +60,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     visibleRingsCount?: number;
     startOffset?: number;
     allowOverrideColors?: boolean;
+    colorsImportMode?: ColorsImportMode;
     angleStep?: number;
     shuffle?: boolean;
     noPieceRegions?: boolean;
@@ -103,6 +110,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         visibleRingsCount,
         startOffset = 0,
         allowOverrideColors,
+        colorsImportMode,
         digitsCount,
         angleStep = 0,
         shuffle,
@@ -152,6 +160,9 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
             : Number(visibleRingsCount),
         startOffset: Number(startOffset),
         allowOverrideColors,
+        colorsImportMode: colorsImportMode === ColorsImportMode.Auto
+            ? undefined as unknown as ColorsImportMode
+            : colorsImportMode,
         digitsCount: digitsCount === undefined
             ? undefined as unknown as number
             : Number(digitsCount),

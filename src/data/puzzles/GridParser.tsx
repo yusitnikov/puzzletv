@@ -68,6 +68,9 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     get hasInitialColors() {
         return false;
     }
+    get hasSolutionColors() {
+        return false;
+    }
     get hasArrows() {
         return false;
     }
