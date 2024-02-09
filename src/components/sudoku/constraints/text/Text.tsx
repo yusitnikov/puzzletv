@@ -7,6 +7,60 @@ import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {profiler} from "../../../../utils/profiler";
 import {observer} from "mobx-react-lite";
+import {ChessPieceType} from "../../../../sudokuTypes/chess/types/ChessPieceType";
+import {ChessColor} from "../../../../sudokuTypes/chess/types/ChessColor";
+import {ChessPiece} from "../../../../sudokuTypes/chess/components/ChessPiece";
+
+const chessPiecesMap: Record<string, { type: ChessPieceType; color: ChessColor; }> = {
+    "♙": {
+        type: ChessPieceType.pawn,
+        color: ChessColor.white,
+    },
+    "♘": {
+        type: ChessPieceType.knight,
+        color: ChessColor.white,
+    },
+    "♗": {
+        type: ChessPieceType.bishop,
+        color: ChessColor.white,
+    },
+    "♖": {
+        type: ChessPieceType.rook,
+        color: ChessColor.white,
+    },
+    "♕": {
+        type: ChessPieceType.queen,
+        color: ChessColor.white,
+    },
+    "♔": {
+        type: ChessPieceType.king,
+        color: ChessColor.white,
+    },
+    "♟": {
+        type: ChessPieceType.pawn,
+        color: ChessColor.white,
+    },
+    "♞": {
+        type: ChessPieceType.knight,
+        color: ChessColor.white,
+    },
+    "♝": {
+        type: ChessPieceType.bishop,
+        color: ChessColor.white,
+    },
+    "♜": {
+        type: ChessPieceType.rook,
+        color: ChessColor.white,
+    },
+    "♛": {
+        type: ChessPieceType.queen,
+        color: ChessColor.white,
+    },
+    "♚": {
+        type: ChessPieceType.king,
+        color: ChessColor.white,
+    },
+};
 
 export interface TextProps {
     text: string;
@@ -20,17 +74,26 @@ export const TextComponent: ConstraintPropsGenericFc<TextProps> = observer(funct
 
     const {top, left} = getAveragePosition(cells);
 
+    const chessPiece = chessPiecesMap[text];
+
     return <AutoSvg
         top={top + 0.5}
         left={left + 0.5}
         angle={angle}
     >
-        <CenteredText
+        {!chessPiece && <CenteredText
             size={size}
             fill={color}
         >
             {text}
-        </CenteredText>
+        </CenteredText>}
+
+        {chessPiece && <ChessPiece
+            type={chessPiece.type}
+            pieceColor={chessPiece.color}
+            size={size * 0.8}
+            fontColor={color}
+        />}
     </AutoSvg>;
 });
 
