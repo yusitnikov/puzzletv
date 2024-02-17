@@ -1,6 +1,10 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
+import {
+    allDrawingModes,
+    isValidFinishedPuzzleByEmbeddedSolution,
+    PuzzleDefinition
+} from "../../types/sudoku/PuzzleDefinition";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
@@ -22,7 +26,7 @@ import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {usePuzzleContainer} from "../../contexts/PuzzleContainerContext";
 import {createPortal} from "react-dom";
 import {
-    blueColor,
+    blueColor, darkBlueColor,
     darkGreyColor,
     greenColor,
     headerHeight,
@@ -47,6 +51,8 @@ import {useRaf} from "../../hooks/useRaf";
 import {useDiffEffect} from "../../hooks/useDiffEffect";
 import {VolumeUp} from "@emotion-icons/material";
 import {DecorativeCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
+import {createGivenDigitsMapFromArray} from "../../types/sudoku/GivenDigitsMap";
 
 (window as any).player = [];
 
@@ -109,7 +115,7 @@ const Audio = observer(function Audio(
     const playPauseButton = (player || isPreview) && <>
         <circle
             r={0.25}
-            stroke={textColor}
+            stroke={veryDarkGreyColor}
             strokeWidth={0.03}
             fill={isActive ? lightGreyColor : "#fff"}
             style={{cursor: "pointer", pointerEvents: "all"}}
@@ -128,7 +134,7 @@ const Audio = observer(function Audio(
 
         {isPaused && <path
             d={"M -0.07 -0.1 V 0.1 L 0.13 0 z"}
-            fill={textColor}
+            fill={veryDarkGreyColor}
             strokeWidth={0}
             stroke={"none"}
         />}
@@ -136,7 +142,7 @@ const Audio = observer(function Audio(
             d={"M -0.05 -0.1 V 0.1 z M 0.05 -0.1 V 0.1 z"}
             fill={"none"}
             strokeWidth={0.03}
-            stroke={textColor}
+            stroke={veryDarkGreyColor}
         />}
     </>;
 
@@ -295,6 +301,8 @@ const BoxConstraint = (cellLiterals: PositionLiteral[], color: string): Constrai
 
 const PillConstraint = (cells: PositionLiteral[]) => ArrowConstraint<NumberPTM>(cells, [], true);
 
+const CageConstraint = (cells: PositionLiteral[], sum?: number) => DecorativeCageConstraint(cells, sum, undefined, undefined, undefined, undefined, true);
+
 export const Karaoke: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "karaoke-poc",
@@ -318,7 +326,21 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
     regions: Regions9,
     digitsCount: 9,
     rules: (translate) => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}</RulesParagraph>
+        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+        <RulesParagraph>
+            {translate({
+                [LanguageCode.en]: 'There are different clues in the grid with "play" buttons attached to them',
+            })}. {translate({
+                [LanguageCode.en]: "Click the button to play a song that will explain the meaning of the clue",
+            })}.
+        </RulesParagraph>
+        <RulesParagraph>
+            {translate({
+                [LanguageCode.en]: "Note: some of the clues have visuals of standard sudoku variant constraints, and some of the clues don't",
+            })}. {translate({
+                [LanguageCode.en]: "Please don't assume that the clue has standard notation, unless the attached song proves that",
+            })}!
+        </RulesParagraph>
     </>,
     items: [
         AudioConstraint("DGEz_vJ6BTc", "R8C2.5", "Broken Arrows"),
@@ -334,7 +356,7 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
 
         AudioConstraint("boaJCrHNRMA", "R9.5C3", "Jenny Jenny"),
         PillConstraint(["R9C1", "R9C6"]),
-        EllipseConstraint(["R9C5", "R9C6"], {width: 0.25, height: 0.4}, "#fff", textColor, 0.07),
+        EllipseConstraint(["R9C5", "R9C6"], {width: 0.25, height: 0.45}, "#fff", darkBlueColor, 0.06),
 
         AudioConstraint("t590jjWEJ5s", "R3.5C8", "'74 '75", 0, "74"),
         AudioConstraint("t590jjWEJ5s", "R4.5C9", "'74 '75", 0, "75"),
@@ -343,13 +365,28 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
 
         // TODO: find better song (to not repeat Queen)
         AudioConstraint("2ZBtPf7FOoM", "R1.5C8", "Killer Queen", 7),
-        DecorativeCageConstraint(["R1C7", "R1C8"], 17),
+        CageConstraint(["R1C7", "R1C8"], 17),
 
         AudioConstraint("n1p8K7CdYVM", "R6.5C3", "WYSIWYG"),
-        DecorativeCageConstraint(["R6C2", "R6C3"], 17),
+        CageConstraint(["R6C2", "R6C3"], 17),
 
         AudioConstraint("0p_1QSUsbsM", "R5C5", "A kind of magic", 6),
-        DecorativeCageConstraint(["R4C4", "R4C5", "R4C6", "R5C4", "R5C5", "R5C6", "R6C4", "R6C5", "R6C6"]),
+        CageConstraint(["R4C4", "R4C5", "R4C6", "R5C4", "R5C5", "R5C6", "R6C4", "R6C5", "R6C6"]),
+
+        AudioConstraint("X7JKdpsCxKs", "R8C8", "Rise above this"),
+        toDecorativeConstraint(ThermometerConstraint(["R9C8", "R7C8"])),
     ],
+    solution: createGivenDigitsMapFromArray([
+        [6, 3, 4, 1, 7, 5, 9, 8, 2],
+        [7, 9, 8, 3, 4, 2, 1, 5, 6],
+        [2, 5, 1, 9, 8, 6, 7, 4, 3],
+        [9, 4, 2, 6, 1, 8, 3, 7, 5],
+        [1, 8, 6, 7, 5, 3, 4, 2, 9],
+        [5, 7, 3, 2, 9, 4, 8, 6, 1],
+        [3, 1, 5, 4, 2, 7, 6, 9, 8],
+        [4, 2, 9, 8, 6, 1, 5, 3, 7],
+        [8, 6, 7, 5, 3, 9, 2, 1, 4],
+    ]),
+    resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
     allowDrawing: allDrawingModes,
 };
