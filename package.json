@@ -34,6 +34,7 @@
         "react-error-boundary": "^4.0.0",
         "react-input-slider": "^6.0.1",
         "react-scripts": "^5.0.0",
+        "react-youtube": "^10.1.0",
         "ua-parser-js": "^1.0.35",
         "xyzw": "^2.8.0"
     },
@@ -57,6 +58,7 @@
         "@types/react-dom": "^17.0.14",
         "@types/styled-components": "^5.1.24",
         "@types/ua-parser-js": "^0.7.36",
+        "@types/youtube-player": "^5.5.11",
         "babel-plugin-named-exports-order": "^0.0.2",
         "chromatic": "^6.17.1",
         "fpuzzles-data": "^1.0.7",

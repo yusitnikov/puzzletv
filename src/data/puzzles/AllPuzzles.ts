@@ -52,6 +52,7 @@ import {BuySomethinWillYa, BuySomethinWillYaShopItems} from "./BuySomethinWillYa
 import {Screws} from "./Screws";
 import {Find3} from "./Find3";
 import {Shuffled} from "./Shuffled";
+import {Karaoke} from "./Karaoke";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -140,6 +141,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    Karaoke,
+
     HappyBirthdayDumediat,
 
     InfinityLoopIntro1,

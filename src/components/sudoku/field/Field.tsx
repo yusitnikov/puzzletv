@@ -324,6 +324,10 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
                                             true,
                                         )}
                                     </g>}
+
+                                    <g data-layer="items-interactive">
+                                        <FieldItems layer={FieldLayer.interactive} {...itemsProps}/>
+                                    </g>
                                 </>;
                             }}
                         </FieldRegionsWithSameCoordsTransformation>
