@@ -110,15 +110,18 @@ export const PageTitle: FC = observer(function PageTitle({children}) {
 });
 
 
-const StyledPageContainer = styled("div")({
-    position: "absolute",
-    inset: 0,
-    overflow: "hidden",
-    touchAction: "none",
-    userSelect: "none",
-    color: textColor,
-    fontFamily: "Lato, sans-serif",
-});
+const StyledPageContainer = styled("div")`
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  color: ${textColor};
+  font-family: Lato, sans-serif;
+  * {
+    -webkit-tap-highlight-color: transparent;
+  },
+`;
 
 const StyledHeaderContainer = styled("div")({
     position: "absolute",
