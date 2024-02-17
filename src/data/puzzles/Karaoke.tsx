@@ -110,7 +110,7 @@ const Audio = observer(function Audio(
         }
     });
 
-    const playerHeight = (puzzleContainer?.height ?? 0) * 0.08;
+    const playerHeight = (puzzleContainer?.height ?? 0) * 0.07;
 
     const playPauseButton = (player || isPreview) && <>
         <circle
@@ -373,7 +373,7 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
         AudioConstraint("0p_1QSUsbsM", "R5C5", "A kind of magic", 6),
         CageConstraint(["R4C4", "R4C5", "R4C6", "R5C4", "R5C5", "R5C6", "R6C4", "R6C5", "R6C6"]),
 
-        AudioConstraint("X7JKdpsCxKs", "R8C8", "Rise above this"),
+        AudioConstraint("X7JKdpsCxKs", "R10C8", "Rise above this"),
         toDecorativeConstraint(ThermometerConstraint(["R9C8", "R7C8"])),
     ],
     solution: createGivenDigitsMapFromArray([
