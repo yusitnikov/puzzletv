@@ -354,7 +354,7 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
         AudioConstraint("bpWZXkv7eAw", "R1.5C5", "Seventeen"),
         PillConstraint(["R1C4", "R1C5"]),
 
-        AudioConstraint("boaJCrHNRMA", "R9.5C3", "Jenny Jenny"),
+        AudioConstraint("boaJCrHNRMA", "R9.5C4", "Jenny Jenny"),
         PillConstraint(["R9C1", "R9C6"]),
         EllipseConstraint(["R9C5", "R9C6"], {width: 0.25, height: 0.45}, "#fff", darkBlueColor, 0.06),
 
