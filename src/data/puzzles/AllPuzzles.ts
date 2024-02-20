@@ -53,6 +53,7 @@ import {Screws} from "./Screws";
 import {Find3} from "./Find3";
 import {Shuffled} from "./Shuffled";
 import {Karaoke} from "./Karaoke";
+import {NationalGeographic} from "./NationalGeographic";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -141,6 +142,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    NationalGeographic,
+
     Karaoke,
 
     HappyBirthdayDumediat,

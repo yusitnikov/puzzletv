@@ -26,14 +26,14 @@ import {FieldLayer} from "../../types/sudoku/FieldLayer";
 import {usePuzzleContainer} from "../../contexts/PuzzleContainerContext";
 import {createPortal} from "react-dom";
 import {
-    blueColor, darkBlueColor,
+    blueColor,
+    darkBlueColor,
     darkGreyColor,
     greenColor,
     headerHeight,
     lighterGreyColor,
     lightGreyColor,
     pinkColor,
-    textColor,
     veryDarkGreyColor,
     yellowColor
 } from "../../components/app/globals";

@@ -32,6 +32,7 @@ export const AutoSvg = observer(function AutoSvg({children, viewBox, clip, style
         width = 0,
         height = 0,
         angle = 0,
+        scale = 1,
     } = props;
 
     if (!svgParentExists) {
@@ -76,13 +77,17 @@ export const AutoSvg = observer(function AutoSvg({children, viewBox, clip, style
         </>;
     }
 
-    if (left || top || angle || style) {
+    if (left || top || angle || scale !== 1 || style) {
         if (angle !== 0) {
             children = <TransformAngleContextProvider angle={angle}>{children}</TransformAngleContextProvider>;
         }
 
+        if (scale !== 1) {
+            children = <TransformScaleContextProvider scale={scale}>{children}</TransformScaleContextProvider>;
+        }
+
         return <g
-            transform={`translate(${left} ${top}) rotate(${angle})`}
+            transform={`translate(${left} ${top}) rotate(${angle}) scale(${scale})`}
             style={style}
         >
             {children}

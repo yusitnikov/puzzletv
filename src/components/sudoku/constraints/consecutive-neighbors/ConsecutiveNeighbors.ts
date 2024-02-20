@@ -5,7 +5,7 @@ import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 import {KropkiDotTag} from "../kropki-dot/KropkiDot";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 
-const BaseNeighborsConstraint = <T extends AnyPTM>(
+export const BaseNeighborsConstraint = <T extends AnyPTM>(
     name: string,
     areValidNeighborDigits: (
         digit1: number,
