@@ -297,7 +297,12 @@ export const NationalGeographic: PuzzleDefinition<NumberPTM> = {
     title: {
         [LanguageCode.en]: "National Geographic",
     },
-    typeManager: DigitSudokuTypeManager(AnimalDigitComponentType),
+    typeManager: {
+        ...DigitSudokuTypeManager(AnimalDigitComponentType),
+        digitShortcuts: [["H", "O"], ["D"], ["C"], ["M"], ["E"], ["P", "U"]],
+        disableArrowLetterShortcuts: true,
+        disableCellModeLetterShortcuts: true,
+    },
     fieldSize: FieldSize6,
     regions: Regions6,
     rules: () => <>
