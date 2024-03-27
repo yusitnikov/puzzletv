@@ -332,6 +332,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             value,
             undefined,
             autoShowValue || value !== 1,
+            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
         ));
     }
     addBlackKropki(gridParser: GridParser<T, any>, cell1: PositionLiteral, cell2: PositionLiteral, value?: number, autoShowValue = true) {
@@ -342,18 +343,21 @@ export class PuzzleImporter<T extends AnyPTM> {
             value,
             undefined,
             autoShowValue || value !== 2,
+            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
         ));
     }
     addX(gridParser: GridParser<T, any>, cell1: PositionLiteral, cell2: PositionLiteral) {
         this.addItems(XMarkConstraint(
             this.fixCellPosition(gridParser.offsetCoords(cell1)),
             this.fixCellPosition(gridParser.offsetCoords(cell2)),
+            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
         ));
     }
     addV(gridParser: GridParser<T, any>, cell1: PositionLiteral, cell2: PositionLiteral) {
         this.addItems(VMarkConstraint(
             this.fixCellPosition(gridParser.offsetCoords(cell1)),
             this.fixCellPosition(gridParser.offsetCoords(cell2)),
+            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
         ));
     }
     // endregion

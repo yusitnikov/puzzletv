@@ -1,7 +1,11 @@
 import {blackColor, textColor} from "../../../app/globals";
 import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
 import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
+import {
+    Constraint,
+    ConstraintProps,
+    ConstraintPropsGenericFc
+} from "../../../../types/sudoku/Constraint";
 import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
@@ -16,43 +20,41 @@ export interface KropkiDotProps {
     showValue?: boolean;
 }
 
-export const KropkiDot: ConstraintPropsGenericFcMap<KropkiDotProps> = {
-    [FieldLayer.afterLines]: observer(function KropkiDot<T extends AnyPTM>(
-        {
-            cells: [cell1, cell2],
-            color = blackColor,
-            props: {
-                value,
-                showValue = true
-            },
-        }: ConstraintProps<T, KropkiDotProps>
-    ) {
-        profiler.trace();
+export const KropkiDot: ConstraintPropsGenericFc<KropkiDotProps> = observer(function KropkiDot<T extends AnyPTM>(
+    {
+        cells: [cell1, cell2],
+        color = blackColor,
+        props: {
+            value,
+            showValue = true
+        },
+    }: ConstraintProps<T, KropkiDotProps>
+) {
+    profiler.trace();
 
-        const top = (cell1.top + cell2.top) / 2 + 0.5;
-        const left = (cell1.left + cell2.left) / 2 + 0.5;
+    const top = (cell1.top + cell2.top) / 2 + 0.5;
+    const left = (cell1.left + cell2.left) / 2 + 0.5;
 
-        return <>
-            <circle
-                cx={left}
-                cy={top}
-                r={radius}
-                strokeWidth={0.02}
-                stroke={blackColor}
-                fill={color}
-            />
+    return <>
+        <circle
+            cx={left}
+            cy={top}
+            r={radius}
+            strokeWidth={0.02}
+            stroke={blackColor}
+            fill={color}
+        />
 
-            {value && showValue && <CenteredText
-                top={top}
-                left={left}
-                size={radius * (typeof value === "number" ? 1.75 : 1.25)}
-                fill={[blackColor, textColor, "black", "#000", "#000000"].includes(color) ? "white" : blackColor}
-            >
-                {typeof value === "number" ? value : value.join(":")}
-            </CenteredText>}
-        </>;
-    }),
-};
+        {value && showValue && <CenteredText
+            top={top}
+            left={left}
+            size={radius * (typeof value === "number" ? 1.75 : 1.25)}
+            fill={[blackColor, textColor, "black", "#000", "#000000"].includes(color) ? "white" : blackColor}
+        >
+            {typeof value === "number" ? value : value.join(":")}
+        </CenteredText>}
+    </>;
+});
 
 export const KropkiDotConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,
@@ -60,7 +62,8 @@ export const KropkiDotConstraint = <T extends AnyPTM>(
     isRatio: boolean,
     value?: number | [number, number],
     color = isRatio ? blackColor : "white",
-    showValue = true
+    showValue = true,
+    layer = FieldLayer.afterLines,
 ): Constraint<T, KropkiDotProps> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
@@ -74,7 +77,7 @@ export const KropkiDotConstraint = <T extends AnyPTM>(
             value,
             showValue,
         },
-        component: KropkiDot,
+        component: {[layer]: KropkiDot},
         isObvious: true,
         isValidCell(cell, digits, [cell1, cell2], context) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;

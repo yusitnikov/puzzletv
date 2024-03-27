@@ -58,7 +58,8 @@ const XVConstraint = <T extends AnyPTM>(
     cellLiteral2: PositionLiteral,
     name: string,
     component: ComponentType<ConstraintProps<T>>,
-    expectedSum: number
+    expectedSum: number,
+    layer = FieldLayer.afterLines
 ): Constraint<T> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
@@ -66,7 +67,7 @@ const XVConstraint = <T extends AnyPTM>(
     return {
         name,
         cells: [cell1, cell2],
-        component: {[FieldLayer.afterLines]: component},
+        component: {[layer]: component},
         props: undefined,
         isObvious: true,
         isValidCell(cell, digits, [cell1, cell2], context) {
@@ -82,8 +83,8 @@ const XVConstraint = <T extends AnyPTM>(
     };
 };
 
-export const XMarkConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
-    XVConstraint<T>(cellLiteral1, cellLiteral2, "X", XMark, 10);
+export const XMarkConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, layer = FieldLayer.afterLines) =>
+    XVConstraint<T>(cellLiteral1, cellLiteral2, "X", XMark, 10, layer);
 
-export const VMarkConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral) =>
-    XVConstraint<T>(cellLiteral1, cellLiteral2, "V", VMark, 5);
+export const VMarkConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, layer = FieldLayer.afterLines) =>
+    XVConstraint<T>(cellLiteral1, cellLiteral2, "V", VMark, 5, layer);
