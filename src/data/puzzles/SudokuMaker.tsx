@@ -733,6 +733,10 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                 type: undefined,
                                 cages: (cages, {style: {cage: {color: cageColor}, text: {color: fontColor}}}) => {
                                     for (const cage of cages) {
+                                        if (isFowCage(cage)) {
+                                            continue;
+                                        }
+
                                         new ObjectParser<Cage>({
                                             cells: (cells, {value}) => {
                                                 importer.addCosmeticCage(
@@ -903,6 +907,18 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             minDigit: undefined,
             maxDigit: undefined,
         }, ["type"]).parse(this.puzzleJson, "SudokuMaker data");
+
+        if (this.hasFog) {
+            importer.addFog(
+                this,
+                [],
+                this.puzzleJson.constraints
+                    .filter((item) => item.type === ConstraintType.CosmeticCage)
+                    .flatMap((item) => (item as CosmeticCageConstraintConfig).cages)
+                    .filter(isFowCage)
+                    .flatMap((cage) => this.parseCellIds(cage.cells))
+            );
+        }
     }
 
     private addSimpleLineConstraint<ConstraintT extends (LineConstraintConfigBase & {type: ConstraintType})>(
@@ -1009,7 +1025,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
         );
     }
     get hasFog() {
-        return false;
+        return this.puzzleJson.constraints.some((item) => item.type === ConstraintType.CosmeticCage && item.cages.some(isFowCage));
     }
     get hasCosmeticElements() {
         return this.puzzleJson.constraints.some(
@@ -1049,6 +1065,8 @@ const parseDiagonalType = (type: DiagonalType | undefined): OutsideClueLineDirec
         default: return OutsideClueLineDirectionType.straight;
     }
 }
+
+const isFowCage = (cage: Cage) => cage.value?.toLowerCase() === "foglight";
 
 const colorStyleValidator = new ObjectParser<{color: string}>({color: undefined});
 const outerClueStyleValidator = colorStyleValidator;
