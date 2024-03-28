@@ -15,6 +15,7 @@ import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types
 import {InfiniteSudokuTypeManager} from "../../sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager";
 import {TesseractSudokuTypeManager} from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
 import {YajilinFogSudokuTypeManager} from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
+import {FogStarsSudokuTypeManager} from "../../sudokuTypes/fog-stars/types/FogStarsSudokuTypeManager";
 import {JigsawSudokuTypeManager} from "../../sudokuTypes/jigsaw/types/JigsawSudokuTypeManager";
 import {
     PuzzleImportDigitType,
@@ -89,6 +90,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     const {
         tesseract,
         yajilinFog,
+        fogStars,
         fillableDigitalDisplay,
         safeCrackerCodeLength = 6,
         visibleRingsCount = 2,
@@ -137,6 +139,9 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     }
     if (yajilinFog) {
         typeManager = YajilinFogSudokuTypeManager(typeManager);
+    }
+    if (fogStars) {
+        typeManager = FogStarsSudokuTypeManager(typeManager);
     }
     if (jss && type !== PuzzleImportPuzzleType.RotatableCube) {
         typeManager = JssSudokuTypeManager(typeManager);

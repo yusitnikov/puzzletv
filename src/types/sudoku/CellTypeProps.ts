@@ -9,6 +9,7 @@ export interface CellTypeProps<T extends AnyPTM> {
     isCheckingSolution?: boolean;
     forceCellWriteMode?: CellWriteModeInfo<T>;
     noInteraction?: boolean;
+    noMainDigit?: (context: PuzzleContext<T>) => boolean;
     noBorders?: boolean;
 }
 

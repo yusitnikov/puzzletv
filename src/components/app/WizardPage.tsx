@@ -79,6 +79,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
     const [transparentArrowCircle, setTransparentArrowCircle] = useBoolFromLocalStorage("fpwTransparentArrowCircle");
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
+    const [fogStars, setFogStars] = useBoolFromLocalStorage("fpwFogStars");
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
     const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
@@ -198,6 +199,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         "product-arrow": hasArrows && productArrow,
         transparentArrowCircle: hasArrows && !transparentCirclesForced && transparentArrowCircle,
         yajilinFog: hasFog && yajilinFog,
+        fogStars: hasFog && fogStars,
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
         visibleRingsCount: isInfiniteRings ? (visibleRingsCount || (fieldSize / 2 - 1)) : undefined,
@@ -414,6 +416,13 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                             <label>
                                 Yajilin fog:&nbsp;
                                 <input type={"checkbox"} checked={yajilinFog} onChange={ev => setYajilinFog(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Fog stars:&nbsp;
+                                <input type={"checkbox"} checked={fogStars} onChange={ev => setFogStars(ev.target.checked)}/>
                             </label>
                         </Paragraph>
 

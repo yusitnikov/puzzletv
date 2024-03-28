@@ -36,7 +36,7 @@ import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
 import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
 import {UserLinesConstraint} from "../../components/sudoku/constraints/user-lines/UserLines";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
-import {getFogPropsByContext} from "../../components/sudoku/constraints/fog/Fog";
+import {getFogPropsByContext, getFogVisibleCells} from "../../components/sudoku/constraints/fog/Fog";
 import {setComparer, SetInterface} from "../struct/Set";
 import {PuzzleLine} from "./PuzzleLine";
 import {CellMark} from "./CellMark";
@@ -833,6 +833,12 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get fogProps() {
         profiler.trace();
         return getFogPropsByContext(this);
+    }
+
+    get fogVisibleCells() {
+        profiler.trace();
+        const {fogProps} = this;
+        return fogProps && getFogVisibleCells(this, fogProps);
     }
 
     get digitsCount() {

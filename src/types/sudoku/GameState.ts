@@ -756,11 +756,12 @@ const getDefaultDigitHandler = <T extends AnyPTM>(
 
         switch (context.cellWriteMode) {
             case CellWriteMode.main:
-                return ({centerDigits, cornerDigits}, position) => isInitialDigit(position) ? {} : {
-                    usersDigit: cellData(position),
-                    centerDigits: centerDigits.clear(),
-                    cornerDigits: cornerDigits.clear(),
-                };
+                return ({centerDigits, cornerDigits}, position) =>
+                    isInitialDigit(position) || context.puzzleIndex.getCellTypeProps(position).noMainDigit?.(context) ? {} : {
+                        usersDigit: cellData(position),
+                        centerDigits: centerDigits.clear(),
+                        cornerDigits: cornerDigits.clear(),
+                    };
 
             case CellWriteMode.center:
                 const areAllCentersEnabled = gameStateAreAllSelectedCells(

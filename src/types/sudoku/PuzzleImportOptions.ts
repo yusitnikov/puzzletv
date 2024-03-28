@@ -55,6 +55,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     "product-arrow"?: boolean;
     transparentArrowCircle?: boolean;
     yajilinFog?: boolean;
+    fogStars?: boolean;
     cosmeticsBehindFog?: boolean;
     safeCrackerCodeLength?: number;
     visibleRingsCount?: number;
@@ -105,6 +106,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         "product-arrow": productArrow,
         transparentArrowCircle,
         yajilinFog,
+        fogStars,
         cosmeticsBehindFog,
         safeCrackerCodeLength,
         visibleRingsCount,
@@ -151,6 +153,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         "product-arrow": productArrow,
         transparentArrowCircle,
         yajilinFog,
+        fogStars,
         cosmeticsBehindFog,
         safeCrackerCodeLength: safeCrackerCodeLength === undefined
             ? undefined as unknown as number
