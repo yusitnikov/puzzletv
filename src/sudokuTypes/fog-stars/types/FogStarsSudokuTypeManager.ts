@@ -48,7 +48,7 @@ export const FogStarsSudokuTypeManager = <T extends AnyPTM>(
                     items: originalItems.map((item) => {
                         const {tags, props, cells, color} = item;
 
-                        return tags?.includes(textTag) && ["s", "star"].includes((props as TextProps).text.toLowerCase())
+                        return tags?.includes(textTag) && ["★", "s", "star"].includes((props as TextProps).text.toLowerCase())
                             ? FogStarConstraint(cells, color)
                             : item;
                     }),
