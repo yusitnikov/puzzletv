@@ -92,8 +92,8 @@ export const WheelConstraint = <T extends AnyPTM>(
         },
         component: Wheel,
         isObvious: true,
-        isValidCell(cell, digits, cells, context): boolean {
-            if (context.puzzle.importOptions?.freeRotation) {
+        isValidCell(cell, digits, cells, context, constraints, isFinalCheck): boolean {
+            if (!isFinalCheck && context.puzzle.importOptions?.freeRotation) {
                 return true;
             }
 
