@@ -9,14 +9,15 @@ export const HowToImport = observer(function HowToImport() {
     const translate = useTranslate();
 
     const fPuzzlesLink = <a href="https://f-puzzles.com" target="_blank">f-puzzles</a>;
+    const sudokuMakerLink = <a href="https://sudokumaker.app" target="_blank">Sudoku Maker</a>;
     // eslint-disable-next-line no-script-url
-    const bookmarkletCode = "javascript:void(d=window.exportPuzzle&&exportPuzzle(),d?open('https://yusitnikov.github.io/puzzletv/#f-puzzles-wizard:load='+d):alert('Unable to extract a puzzle definition'))";
+    const bookmarkletCode = "javascript:void(h=location.href,d=window.exportPuzzle&&exportPuzzle()||h.split(/(\\?puzzleid=fpuzzles|\\.app\\/\\?puzzle=|\\.app\\/fpuzzles|[?:]load=)/)[2],d?open('https://yusitnikov.github.io/puzzletv/#'+(h.includes('sudokumaker')?'sudokumaker':'f-puzzles')+'-wizard:load='+d):alert('Unable to extract a puzzle definition'))";
 
     return <ol>
         <li>{translate({
-            [LanguageCode.en]: <>Create the puzzle in {fPuzzlesLink} (like you do it for SudokuPad)</>,
-            [LanguageCode.ru]: <>Создайте головоломку в {fPuzzlesLink} (так же, как Вы делаете это для SudokuPad)</>,
-            [LanguageCode.de]: <>Erstellen Sie das Rätsel in {fPuzzlesLink} (wie Sie es für SudokuPad tun)</>,
+            [LanguageCode.en]: <>Create the puzzle in {fPuzzlesLink} or {sudokuMakerLink} (like you do it for SudokuPad)</>,
+            [LanguageCode.ru]: <>Создайте головоломку в {fPuzzlesLink} или {sudokuMakerLink}'е (так же, как Вы делаете это для SudokuPad)</>,
+            [LanguageCode.de]: <>Erstellen Sie das Rätsel in {fPuzzlesLink} oder {sudokuMakerLink} (wie Sie es für SudokuPad tun)</>,
         })}.</li>
         <li>{translate({
             [LanguageCode.en]: "Drag&drop the following bookmarklet into your bookmarks bar (only once)",

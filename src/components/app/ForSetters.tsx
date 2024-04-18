@@ -13,6 +13,7 @@ export const ForSetters = observer(function ForSetters() {
     const translate = useTranslate();
 
     const fPuzzlesLink = <a href="https://f-puzzles.com" target="_blank">f-puzzles</a>;
+    const sudokuMakerLink = <a href="https://sudokumaker.app" target="_blank">Sudoku Maker</a>;
     const importLink = buildLink("how-to-import-puzzle", language);
 
     return <>
@@ -24,9 +25,9 @@ export const ForSetters = observer(function ForSetters() {
             })}>
                 <p>
                     {translate({
-                        [LanguageCode.en]: <>Several popular puzzle genres (e.g. wraparound, rotational, infinity loop, etc.) could be imported from {fPuzzlesLink}. See the details <a href={importLink}>here</a></>,
-                        [LanguageCode.ru]: <>Некоторые популярные жанры (тороидное поле, перевёртыш, бесконечный цикл и т.д.) можно импортировать из {fPuzzlesLink}. Подробнее <a href={importLink}>здесь</a></>,
-                        [LanguageCode.de]: <>Mehrere beliebte Rätselgenres (z. B. Wraparound, Rotation, Infinity Loop usw.) könnten aus {fPuzzlesLink} importiert werden. Die Details finden Sie <a href={importLink}>hier</a></>,
+                        [LanguageCode.en]: <>Several popular puzzle genres (e.g. wraparound, rotational, infinity loop, etc.) could be imported from {fPuzzlesLink} or {sudokuMakerLink}. See the details <a href={importLink}>here</a></>,
+                        [LanguageCode.ru]: <>Некоторые популярные жанры (тороидное поле, перевёртыш, бесконечный цикл и т.д.) можно импортировать из {fPuzzlesLink} или {sudokuMakerLink}'а. Подробнее <a href={importLink}>здесь</a></>,
+                        [LanguageCode.de]: <>Mehrere beliebte Rätselgenres (z. B. Wraparound, Rotation, Infinity Loop usw.) könnten aus {fPuzzlesLink} oder {sudokuMakerLink} importiert werden. Die Details finden Sie <a href={importLink}>hier</a></>,
                     })}.
                 </p>
 
