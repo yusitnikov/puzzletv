@@ -65,8 +65,12 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
             cells: [pivot],
             props: undefined,
             component: {
-                [FieldLayer.top]: observer(function RotatableCluePivot({cells: [{top, left}]}) {
+                [FieldLayer.top]: observer(function RotatableCluePivot({cells: [{top, left}], context: {puzzle}}) {
                     profiler.trace();
+
+                    if (puzzle.importOptions?.freeRotation) {
+                        return null;
+                    }
 
                     return <AutoSvg top={top + 0.5} left={left + 0.5}>
                         <circle
