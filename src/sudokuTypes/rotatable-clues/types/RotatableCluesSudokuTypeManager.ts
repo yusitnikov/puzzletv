@@ -1,6 +1,6 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {RotatableCluesGameState, RotatableCluesProcessedGameState} from "./RotatableCluesGameState";
-import {stringifyPosition} from "../../../types/layout/Position";
+import {getAveragePosition, stringifyPosition} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {RotatableCluesPTM} from "./RotatableCluesPTM";
 import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
@@ -18,6 +18,8 @@ import {loop} from "../../../utils/math";
 import {ArrowProps, isArrowConstraint} from "../../../components/sudoku/constraints/arrow/Arrow";
 import {comparer, IReactionDisposer, reaction} from "mobx";
 import {settings} from "../../../types/layout/Settings";
+import {createWheel} from "../../../components/sudoku/constraints/wheel/Wheel";
+import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -279,6 +281,7 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager,
     true,
     (puzzle) => {
+        const isWheels = puzzle.importOptions?.wheels;
         const keepCircles = puzzle.importOptions?.keepCircles;
 
         let {items} = puzzle;
@@ -303,7 +306,7 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 .filter(isPivot)
                 .map(({cells: [cell], props: {width: diameter}}) => ({
                     cell,
-                    radius: keepCircles ? diameter / 2 : 0.5,
+                    radius: (keepCircles && !isWheels) ? diameter / 2 : 0.5,
                 }));
 
             if (!keepCircles) {
@@ -338,7 +341,42 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 };
                 cluesMap[key].clues.push(clue);
             }
-            const clues = Object.values(cluesMap);
+            let clues = Object.values(cluesMap);
+            if (isWheels) {
+                clues = clues.map(({pivot, clues}) => {
+                    const digits = Array<number | undefined>(4).fill(undefined);
+
+                    for (const {tags, cells, props} of clues) {
+                        if (!tags?.includes(textTag) || cells.length > 2) {
+                            continue;
+                        }
+
+                        const value = Number((props as TextProps).text);
+                        if (!Number.isFinite(value)) {
+                            continue;
+                        }
+
+                        const {top, left} = getAveragePosition(cells);
+                        const dx = pivot.left - left;
+                        const dy = pivot.top - top;
+
+                        if (dx === 0 && dy === -0.5) {
+                            digits[3] = value;
+                        }
+                        if (dx === 0.5 && dy === 0) {
+                            digits[0] = value;
+                        }
+                        if (dx === 0 && dy === 0.5) {
+                            digits[1] = value;
+                        }
+                        if (dx === -0.5 && dy === 0) {
+                            digits[2] = value;
+                        }
+                    }
+
+                    return createWheel(pivot, ...digits);
+                });
+            }
             const noPivotItems = items.filter((clue) => !getCluePivot(clue));
 
             return {

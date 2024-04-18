@@ -10,19 +10,10 @@ import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
 import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
 import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {createRotatableClue} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPuzzleExtension";
-import {PositionLiteral} from "../../types/layout/Position";
-import {WheelConstraint} from "../../components/sudoku/constraints/wheel/Wheel";
+import {createWheel} from "../../components/sudoku/constraints/wheel/Wheel";
 import {createGivenDigitsMapFromArray} from "../../types/sudoku/GivenDigitsMap";
 import {indexes} from "../../utils/indexes";
 import {DisjointGroupsConstraint} from "../../types/sudoku/constraints/DisjointGroups";
-
-const createWheel = (cell: PositionLiteral, ...digits: (number|undefined)[]) => createRotatableClue(
-    cell,
-    0,
-    undefined,
-    [WheelConstraint(cell, digits)],
-);
 
 const U = undefined;
 

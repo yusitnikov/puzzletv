@@ -49,6 +49,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     loopY?: boolean;
     jss?: boolean;
     rotatableClues?: boolean;
+    wheels?: boolean;
     freeRotation?: boolean;
     keepCircles?: boolean;
     screws?: boolean;
@@ -101,6 +102,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         loopY,
         jss,
         rotatableClues,
+        wheels,
         freeRotation,
         keepCircles,
         screws,
@@ -149,6 +151,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         loopY,
         jss,
         rotatableClues,
+        wheels,
         freeRotation,
         keepCircles,
         screws,

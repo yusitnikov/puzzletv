@@ -66,6 +66,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [isJss, setIsJss] = useBoolFromLocalStorage("fpwIsJss");
     const [rotatableClues, setRotatableClues] = useBoolFromLocalStorage("fpwRotatableClues");
+    const [wheels, setWheels] = useBoolFromLocalStorage("fpwWheels");
     const [freeRotation, setFreeRotation] = useBoolFromLocalStorage("fpwFreeRotation");
     const [keepCircles, setKeepCircles] = useBoolFromLocalStorage("fpwKeepCircles");
     const [screws, setScrews] = useBoolFromLocalStorage("fpwScrews");
@@ -190,8 +191,9 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         loopY: !isSpecialGrid && loopY,
         jss: supportsJss && isJss,
         rotatableClues: !isSpecialGrid && rotatableClues,
+        wheels: !isSpecialGrid && rotatableClues && wheels,
         freeRotation: !isSpecialGrid && rotatableClues && freeRotation,
-        keepCircles: !isSpecialGrid && rotatableClues && keepCircles,
+        keepCircles: !isSpecialGrid && rotatableClues && !wheels && keepCircles,
         screws: !isSpecialGrid && screws,
         sokoban: !isSpecialGrid && sokoban,
         tesseract: !isSpecialGrid && tesseract,
@@ -363,16 +365,22 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                         {rotatableClues && <CollapsableFieldSet legend={"Rotatable clues"}>
                             <Paragraph>
                                 <label>
-                                    Free rotation:&nbsp;
-                                    <input type={"checkbox"} checked={freeRotation} onChange={ev => setFreeRotation(ev.target.checked)}/>
+                                    Wheels:&nbsp;
+                                    <input type={"checkbox"} checked={wheels} onChange={ev => setWheels(ev.target.checked)}/>
                                 </label>
                             </Paragraph>
                             <Paragraph>
                                 <label>
+                                    Free rotation:&nbsp;
+                                    <input type={"checkbox"} checked={freeRotation} onChange={ev => setFreeRotation(ev.target.checked)}/>
+                                </label>
+                            </Paragraph>
+                            {!wheels && <Paragraph>
+                                <label>
                                     Keep imported circle shapes and colors:&nbsp;
                                     <input type={"checkbox"} checked={keepCircles} onChange={ev => setKeepCircles(ev.target.checked)}/>
                                 </label>
-                            </Paragraph>
+                            </Paragraph>}
                         </CollapsableFieldSet>}
 
                         <Paragraph>

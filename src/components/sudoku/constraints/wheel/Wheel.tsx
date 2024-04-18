@@ -8,6 +8,7 @@ import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {useTransformAngle} from "../../../../contexts/TransformContext";
+import {createRotatableClue} from "../../../../sudokuTypes/rotatable-clues/types/RotatableCluesPuzzleExtension";
 
 const digitRadius = 0.15;
 const wheelRadius = Math.SQRT1_2;
@@ -114,3 +115,10 @@ export const WheelConstraint = <T extends AnyPTM>(
         renderSingleCellInUserArea: true,
     };
 };
+
+export const createWheel = (cell: PositionLiteral, ...digits: (number|undefined)[]) => createRotatableClue(
+    cell,
+    0,
+    undefined,
+    [WheelConstraint(cell, digits)],
+);
