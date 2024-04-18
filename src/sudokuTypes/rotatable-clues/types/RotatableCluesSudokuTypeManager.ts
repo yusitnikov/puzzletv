@@ -129,7 +129,6 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     getReactions(context: PuzzleContext<RotatableCluesPTM<T>>): IReactionDisposer[] {
         const baseReactions = baseTypeManager.getReactions?.(context as unknown as PuzzleContext<T>) ?? [];
 
-        console.log(context.puzzle.importOptions);
         if (context.puzzle.importOptions?.freeRotation) {
             return baseReactions;
         }
