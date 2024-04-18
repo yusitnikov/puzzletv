@@ -31,12 +31,13 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) => observe
     const isShift = !isClockwise;
 
     const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
+    const freeRotation = puzzle.importOptions?.freeRotation;
     const selectedClueIndexes = clues
         .map(({pivot}, index) => ({
             pivot,
             index,
         }))
-        .filter(({pivot}) => context.isSelectedCell(pivot.top, pivot.left) && context.getCellDigit(pivot.top, pivot.left) === undefined)
+        .filter(({pivot}) => context.isSelectedCell(pivot.top, pivot.left) && (freeRotation || context.getCellDigit(pivot.top, pivot.left) === undefined))
         .map(({index}) => index);
 
     const handleRotate = () => context.onStateChange((context) => ({

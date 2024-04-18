@@ -66,6 +66,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [isJss, setIsJss] = useBoolFromLocalStorage("fpwIsJss");
     const [rotatableClues, setRotatableClues] = useBoolFromLocalStorage("fpwRotatableClues");
+    const [freeRotation, setFreeRotation] = useBoolFromLocalStorage("fpwFreeRotation");
     const [keepCircles, setKeepCircles] = useBoolFromLocalStorage("fpwKeepCircles");
     const [screws, setScrews] = useBoolFromLocalStorage("fpwScrews");
     const [sokoban, setSokoban] = useBoolFromLocalStorage("fpwSokoban");
@@ -189,6 +190,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         loopY: !isSpecialGrid && loopY,
         jss: supportsJss && isJss,
         rotatableClues: !isSpecialGrid && rotatableClues,
+        freeRotation: !isSpecialGrid && rotatableClues && freeRotation,
         keepCircles: !isSpecialGrid && rotatableClues && keepCircles,
         screws: !isSpecialGrid && screws,
         sokoban: !isSpecialGrid && sokoban,
@@ -358,12 +360,20 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                             </label>
                         </Paragraph>
 
-                        {rotatableClues && <Paragraph>
-                            <label>
-                                Keep imported circle shapes and colors:&nbsp;
-                                <input type={"checkbox"} checked={keepCircles} onChange={ev => setKeepCircles(ev.target.checked)}/>
-                            </label>
-                        </Paragraph>}
+                        {rotatableClues && <CollapsableFieldSet legend={"Rotatable clues"}>
+                            <Paragraph>
+                                <label>
+                                    Free rotation:&nbsp;
+                                    <input type={"checkbox"} checked={freeRotation} onChange={ev => setFreeRotation(ev.target.checked)}/>
+                                </label>
+                            </Paragraph>
+                            <Paragraph>
+                                <label>
+                                    Keep imported circle shapes and colors:&nbsp;
+                                    <input type={"checkbox"} checked={keepCircles} onChange={ev => setKeepCircles(ev.target.checked)}/>
+                                </label>
+                            </Paragraph>
+                        </CollapsableFieldSet>}
 
                         <Paragraph>
                             <label>
