@@ -107,11 +107,12 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                 return processedCells.every(({top, left}) => allCells[top]?.[left]);
             },
             isValidCell(cell, digits, regionCells, context, constraints, isFinalCheck): boolean {
-                if (!isFinalCheck) {
+                const {puzzle: {typeManager: {getDigitByCellData}, importOptions}} = context;
+
+                if (!isFinalCheck || importOptions?.freeRotation) {
                     return true;
                 }
 
-                const {puzzle: {typeManager: {getDigitByCellData}}} = context;
                 const digit = getDigitByCellData(digits[cell.top][cell.left], context, cell);
 
                 return loop(digit * 90 - angle, 360) === 0;
