@@ -297,7 +297,8 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             );
 
             const isPivot = (item: Constraint<RotatableCluesPTM<T>, any>): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
-                !!item.tags?.includes(ellipseTag) && item.cells.length === 1;
+                !!item.tags?.includes(ellipseTag) && item.cells.length === 1
+                && item.cells[0].top % 1 === 0 && item.cells[0].left % 1 === 0;
 
             const pivotsMap: Record<string, Position> = {};
             for (const item of items.filter(isPivot)) {
