@@ -93,6 +93,10 @@ export const WheelConstraint = <T extends AnyPTM>(
         component: Wheel,
         isObvious: true,
         isValidCell(cell, digits, cells, context): boolean {
+            if (context.puzzle.importOptions?.freeRotation) {
+                return true;
+            }
+
             // Check the wheel only when the center digit is filled
             if (!digits[centerCell.top]?.[centerCell.left]) {
                 return true;
