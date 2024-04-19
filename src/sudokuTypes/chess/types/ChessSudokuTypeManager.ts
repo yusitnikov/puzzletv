@@ -10,8 +10,9 @@ import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlBu
 import {ChessMainControls} from "../components/ChessMainControls";
 import {ChessPTM} from "./ChessPTM";
 import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
+import {addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
-export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
+export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = addGameStateExToSudokuManager<ChessPTM, ChessGameState, {}>({
     areSameCellData(
         {type: type1, color: color1},
         {type: type2, color: color2},
@@ -48,14 +49,6 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         return data as ChessPiece;
     },
 
-    serializeGameState({selectedColor}) {
-        return {selectedColor};
-    },
-
-    unserializeGameState({selectedColor}): Partial<ChessGameState> {
-        return {selectedColor};
-    },
-
     createCellDataByDisplayDigit(digit, {stateExtension: {selectedColor}}): ChessPiece {
         return {
             type: digit,
@@ -85,10 +78,6 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     digitComponentType: RegularDigitComponentType(),
 
     cellDataComponentType: ChessPieceCellDataComponentType,
-
-    initialGameStateExtension: {
-        selectedColor: ChessColor.black,
-    },
 
     controlButtons: [
         {
@@ -120,5 +109,9 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         {selectedColor}
     ): PartialGameStateEx<ChessPTM> {
         return {extension: {selectedColor}};
-    }
-};
+    },
+}, {
+    initialGameStateExtension: {
+        selectedColor: ChessColor.black,
+    },
+});

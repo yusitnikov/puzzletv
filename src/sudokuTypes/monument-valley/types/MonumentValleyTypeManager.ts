@@ -18,8 +18,7 @@ import {rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 
 export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
-    ...DigitSudokuTypeManager(),
-    ...RotatableDigitSudokuTypeManagerBase<number>(0, 120, true, false),
+    ...RotatableDigitSudokuTypeManagerBase(DigitSudokuTypeManager(), 0, 120, true, false),
 
     disableDigitShortcuts: true,
     digitShortcuts: [

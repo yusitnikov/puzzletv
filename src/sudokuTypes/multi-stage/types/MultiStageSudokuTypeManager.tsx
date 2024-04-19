@@ -1,5 +1,4 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {MultiStageGameState} from "./MultiStageGameState";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {
     mergeGameStateUpdates,
@@ -19,7 +18,7 @@ import {isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constrai
 import {PartiallyTranslatable} from "../../../types/translations/Translatable";
 import {processTranslations} from "../../../utils/translate";
 import {AnyMultiStagePTM} from "./MultiStagePTM";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 interface MultiStageSudokuOptions<T extends AnyMultiStagePTM> {
     baseTypeManager?: SudokuTypeManager<any>;
@@ -31,29 +30,16 @@ interface MultiStageSudokuOptions<T extends AnyMultiStagePTM> {
 
 export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>(
     {
-        baseTypeManager: {initialGameStateExtension, serializeGameState, unserializeGameState, ...baseTypeManager} = DigitSudokuTypeManager(),
+        baseTypeManager = DigitSudokuTypeManager(),
         getStage,
         onStageChange,
         getStageCompletionText,
         getStageButtonText,
     }: MultiStageSudokuOptions<T>
 ): SudokuTypeManager<T> => ({
-    ...baseTypeManager,
-
-    initialGameStateExtension: (puzzle) => ({
-        ...(
-            typeof initialGameStateExtension === "function"
-                ? (initialGameStateExtension as ((puzzle: PuzzleDefinition<T>) => T["stateEx"]))(puzzle)
-                : initialGameStateExtension
-        ),
-        stage: 1,
+    ...addGameStateExToSudokuManager(baseTypeManager, {
+        initialGameStateExtension: {stage: 1}
     }),
-    serializeGameState({stage, ...other}): any {
-        return {stage, ...serializeGameState(other)};
-    },
-    unserializeGameState({stage = 1, ...other}: any): Partial<MultiStageGameState> {
-        return {stage, ...unserializeGameState(other)};
-    },
 
     getAboveRules: (translate, context, isPortrait) => {
         const {cellSizeForSidePanel: cellSize} = context;

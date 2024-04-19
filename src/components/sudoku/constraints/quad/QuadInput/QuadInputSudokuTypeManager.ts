@@ -18,6 +18,8 @@ import {QuadInputModeButton} from "./QuadInputModeButton";
 import {AnyQuadInputPTM} from "./QuadInputPTM";
 import {GestureOnContinueProps, GestureOnStartProps} from "../../../../../utils/gestures";
 import {CellGestureExtraData} from "../../../../../types/sudoku/CellGestureExtraData";
+import {addGameStateExToSudokuManager} from "../../../../../types/sudoku/SudokuTypeManagerPlugin";
+import {QuadInputGameState} from "./QuadInputGameState";
 
 // TODO: support CellType operations!
 
@@ -66,33 +68,12 @@ export const QuadInputSudokuTypeManager = <T extends AnyQuadInputPTM>(
     ) => context.onStateChange(setQuadPositionAction(corner, options, `gesture-${id}`));
 
     return {
-        ...parent,
-
-        initialGameStateExtension: (puzzle) => ({
-            ...(
-                typeof parent.initialGameStateExtension === "function"
-                    ? parent.initialGameStateExtension(puzzle)
-                    : parent.initialGameStateExtension!
-            ),
-            currentQuad: undefined,
-            allQuads: [],
-        }),
-
-        serializeGameState(data): any {
-            return {
-                ...parent.serializeGameState?.(data),
-                currentQuad: data.currentQuad,
-                allQuads: data.allQuads,
-            };
-        },
-
-        unserializeGameState(data): Partial<T["stateEx"]> {
-            return {
-                ...parent.unserializeGameState?.(data),
-                currentQuad: data.currentQuad,
-                allQuads: data.allQuads,
-            };
-        },
+        ...addGameStateExToSudokuManager<T, QuadInputGameState<T["cell"]>, {}>(parent, {
+            initialGameStateExtension: {
+                currentQuad: undefined,
+                allQuads: [],
+            },
+        }) as unknown as SudokuTypeManager<T>,
 
         items: (context): Constraint<T, any>[] => {
             const {

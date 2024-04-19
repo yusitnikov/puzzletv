@@ -24,62 +24,59 @@ import {createRandomGenerator} from "../../../utils/random";
 import {cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {settings} from "../../../types/layout/Settings";
 import {ColorsImportMode} from "../../../types/sudoku/PuzzleImportOptions";
-import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {
+    addFieldStateExToSudokuManager,
+    addGameStateExToSudokuManager
+} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {RushHourFieldState} from "./RushHourFieldState";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
-    ...addFieldStateExToSudokuManager(
-        DigitSudokuTypeManager(),
+    ...addGameStateExToSudokuManager(
+        addFieldStateExToSudokuManager(
+            DigitSudokuTypeManager(),
+            {
+                initialFieldStateExtension(puzzle): RushHourFieldState {
+                    return {
+                        cars: puzzle?.extension?.cars.map(() => ({
+                            top: 0,
+                            left: -puzzle.fieldSize.rowsCount,
+                        })) ?? [],
+                    };
+                },
+            }
+        ),
         {
-            initialFieldStateExtension(puzzle) {
+            initialGameStateExtension(puzzle): RushHourGameState {
                 return {
-                    cars: puzzle?.extension?.cars.map(() => ({
-                        top: 0,
-                        left: -puzzle.fieldSize.rowsCount,
-                    })) ?? [],
+                    cars: puzzle?.extension?.cars.map(() => ({animating: false})) ?? [],
+                    hideCars: false,
                 };
+            },
+            useProcessedGameStateExtension(
+                {
+                    fieldExtension: {cars: carPositions},
+                    stateExtension: {cars: carAnimations},
+                }
+            ): RushHourProcessedGameState {
+                return {
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    cars: (carPositions as RushHourFieldState["cars"]).map((position, index) => useAnimatedValue(
+                        position,
+                        carAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
+                        (a, b, coeff) => {
+                            return {
+                                top: mixAnimatedValue(a.top, b.top, coeff),
+                                left: mixAnimatedValue(a.left, b.left, coeff),
+                            };
+                        }
+                    )),
+                };
+            },
+            getProcessedGameStateExtension({fieldExtension: {cars}}): RushHourProcessedGameState {
+                return {cars};
             },
         }
     ),
-
-    serializeGameState({cars, hideCars}): any {
-        return {cars, hideCars};
-    },
-
-    unserializeGameState({cars, hideCars = false}): Partial<RushHourGameState> {
-        return {cars, hideCars};
-    },
-
-    initialGameStateExtension: (puzzle) => {
-        return {
-            cars: puzzle.extension?.cars.map(() => ({animating: false})) ?? [],
-            hideCars: false,
-        };
-    },
-
-    useProcessedGameStateExtension(
-        {
-            fieldExtension: {cars: carPositions},
-            stateExtension: {cars: carAnimations},
-        }
-    ): RushHourProcessedGameState {
-        return {
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            cars: carPositions.map((position, index) => useAnimatedValue(
-                position,
-                carAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
-                (a, b, coeff) => {
-                    return {
-                        top: mixAnimatedValue(a.top, b.top, coeff),
-                        left: mixAnimatedValue(a.left, b.left, coeff),
-                    };
-                }
-            )),
-        };
-    },
-
-    getProcessedGameStateExtension({fieldExtension: {cars}}): RushHourProcessedGameState {
-        return {cars};
-    },
 
     processArrowDirection(
         {top, left}, xDirection, yDirection, {puzzle: {fieldSize: {fieldSize}}}

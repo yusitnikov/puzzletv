@@ -31,14 +31,6 @@ export const DigitSudokuTypeManager = <T extends AnyNumberPTM>(
         return digit as number;
     },
 
-    serializeGameState(): any {
-        return {};
-    },
-
-    unserializeGameState(): Partial<T["stateEx"]> {
-        return {};
-    },
-
     createCellDataByDisplayDigit(digit: number): number {
         return digit;
     },

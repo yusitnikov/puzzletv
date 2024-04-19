@@ -1,5 +1,5 @@
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {defaultSokobanDirection, SokobanGameState, SokobanProcessedGameState} from "./SokobanGameState";
+import {defaultSokobanDirection, SokobanProcessedGameState} from "./SokobanGameState";
 import {mixAnimatedValue, useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {SokobanPTM} from "./SokobanPTM";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
@@ -14,61 +14,56 @@ import {SokobanPlayerConstraint} from "../constraints/SokobanPlayer";
 import {moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo} from "./SokobanMovePlayerCellWriteModeInfo";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {settings} from "../../../types/layout/Settings";
-import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {
+    addFieldStateExToSudokuManager,
+    addGameStateExToSudokuManager
+} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {SokobanFieldState} from "./SokobanFieldState";
 
 export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
-    ...addFieldStateExToSudokuManager(
-        DigitSudokuTypeManager(),
+    ...addGameStateExToSudokuManager(
+        addFieldStateExToSudokuManager(
+            DigitSudokuTypeManager(),
+            {
+                initialFieldStateExtension(puzzle): SokobanFieldState {
+                    return {
+                        cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
+                        sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
+                    };
+                },
+            }
+        ),
         {
-            initialFieldStateExtension(puzzle) {
-                return {
-                    cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
-                    sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
-                };
+            initialGameStateExtension: {animating: false, sokobanDirection: defaultSokobanDirection},
+            useProcessedGameStateExtension(
+                {
+                    fieldExtension,
+                    stateExtension: {animating},
+                }
+            ): SokobanProcessedGameState {
+                return useAnimatedValue(
+                    fieldExtension as SokobanFieldState,
+                    animating ? settings.animationSpeed.get() / 2 : 0,
+                    (a, b, coeff) => ({
+                        cluePositions: a.cluePositions.map((positionA, index) => {
+                            const positionB = b.cluePositions[index];
+                            return {
+                                top: mixAnimatedValue(positionA.top, positionB.top, coeff),
+                                left: mixAnimatedValue(positionA.left, positionB.left, coeff),
+                            };
+                        }),
+                        sokobanPosition: {
+                            top: mixAnimatedValue(a.sokobanPosition.top, b.sokobanPosition.top, coeff),
+                            left: mixAnimatedValue(a.sokobanPosition.left, b.sokobanPosition.left, coeff),
+                        },
+                    })
+                );
+            },
+            getProcessedGameStateExtension({fieldExtension}): SokobanProcessedGameState {
+                return fieldExtension;
             },
         }
     ),
-
-    serializeGameState({animating, sokobanDirection}): any {
-        return {animating, sokobanDirection};
-    },
-
-    unserializeGameState({animating, sokobanDirection = defaultSokobanDirection}): Partial<SokobanGameState> {
-        return {animating, sokobanDirection};
-    },
-
-    initialGameStateExtension: () => {
-        return {animating: false, sokobanDirection: defaultSokobanDirection};
-    },
-
-    useProcessedGameStateExtension(
-        {
-            fieldExtension,
-            stateExtension: {animating},
-        }
-    ): SokobanProcessedGameState {
-        return useAnimatedValue(
-            fieldExtension,
-            animating ? settings.animationSpeed.get() / 2 : 0,
-            (a, b, coeff) => ({
-                cluePositions: a.cluePositions.map((positionA, index) => {
-                    const positionB = b.cluePositions[index];
-                    return {
-                        top: mixAnimatedValue(positionA.top, positionB.top, coeff),
-                        left: mixAnimatedValue(positionA.left, positionB.left, coeff),
-                    };
-                }),
-                sokobanPosition: {
-                    top: mixAnimatedValue(a.sokobanPosition.top, b.sokobanPosition.top, coeff),
-                    left: mixAnimatedValue(a.sokobanPosition.left, b.sokobanPosition.left, coeff),
-                },
-            })
-        );
-    },
-
-    getProcessedGameStateExtension({fieldExtension}): SokobanProcessedGameState {
-        return fieldExtension;
-    },
 
     processArrowDirection(
         currentCell, xDirection, yDirection, context, isMainKeyboard

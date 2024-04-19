@@ -59,9 +59,9 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     unserializeCellData(data: any): T["cell"];
 
-    serializeGameState(data: Partial<T["stateEx"]>): any;
+    serializeGameState?(data: Partial<T["stateEx"]>): any;
 
-    unserializeGameState(data: any): Partial<T["stateEx"]>;
+    unserializeGameState?(data: any): Partial<T["stateEx"]>;
 
     serializeFieldStateExtension?(data: Partial<T["fieldStateEx"]>): any;
 

@@ -19,7 +19,8 @@ import {comparer, IReactionDisposer, reaction} from "mobx";
 import {settings} from "../../../types/layout/Settings";
 import {createWheel} from "../../../components/sudoku/constraints/wheel/Wheel";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
-import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {addFieldStateExToSudokuManager, addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -28,11 +29,6 @@ interface CluesImporterResult<T extends AnyPTM> {
 
 export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     {
-        serializeGameState,
-        unserializeGameState,
-        initialGameStateExtension,
-        useProcessedGameStateExtension,
-        getProcessedGameStateExtension,
         postProcessPuzzle,
         controlButtons = [],
         ...baseTypeManager
@@ -41,59 +37,42 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     isEquivalentLoop: boolean,
     cluesImporter?: (puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => CluesImporterResult<T>,
 ): SudokuTypeManager<RotatableCluesPTM<T>> => ({
-    ...addFieldStateExToSudokuManager(
-        baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>,
+    ...addGameStateExToSudokuManager(
+        addFieldStateExToSudokuManager(
+            baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>,
+            {
+                initialFieldStateExtension(puzzle): RotatableCluesFieldState {
+                    return {
+                        clueAngles: puzzle?.extension?.clues.map(() => 0) ?? [],
+                    };
+                },
+            }
+        ),
         {
-            initialFieldStateExtension(puzzle) {
+            initialGameStateExtension(puzzle): RotatableCluesGameState {
                 return {
-                    clueAngles: puzzle?.extension?.clues.map(() => 0) ?? [],
+                    clues: puzzle?.extension?.clues.map(() => ({animating: false})) ?? [],
                 };
+            },
+            useProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
+                const {
+                    fieldExtension: {clueAngles},
+                    stateExtension: {clues: clueAnimations},
+                } = context;
+
+                return {
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    clueAngles: (clueAngles as number[]).map((angle, index) => useAnimatedValue(
+                        angle,
+                        clueAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0
+                    )),
+                };
+            },
+            getProcessedGameStateExtension({fieldExtension: {clueAngles}}): RotatableCluesProcessedGameState {
+                return {clueAngles};
             },
         }
     ),
-
-    serializeGameState({clues, ...other}): any {
-        return {clues, ...serializeGameState(other as T["stateEx"])};
-    },
-
-    unserializeGameState({clues, ...other}): Partial<RotatableCluesGameState> {
-        return {clues, ...unserializeGameState(other)};
-    },
-
-    initialGameStateExtension: (puzzle) => {
-        return {
-            ...(
-                typeof initialGameStateExtension === "function"
-                    ? (initialGameStateExtension as ((puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => T["stateEx"]))(puzzle)
-                    : initialGameStateExtension
-            ),
-            clues: puzzle.extension?.clues.map(() => ({animating: false})) ?? [],
-        };
-    },
-
-    useProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
-        const {
-            fieldExtension: {clueAngles},
-            stateExtension: {clues: clueAnimations},
-        } = context;
-
-        return {
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            ...useProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>),
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            clueAngles: (clueAngles as number[]).map((angle, index) => useAnimatedValue(
-                angle,
-                clueAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0
-            )),
-        };
-    },
-
-    getProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
-        return {
-            ...getProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>),
-            clueAngles: context.fieldExtension.clueAngles,
-        };
-    },
 
     getReactions(context: PuzzleContext<RotatableCluesPTM<T>>): IReactionDisposer[] {
         const baseReactions = baseTypeManager.getReactions?.(context as unknown as PuzzleContext<T>) ?? [];

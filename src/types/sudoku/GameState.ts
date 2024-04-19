@@ -214,7 +214,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
                     ? (initialGameStateExtension as (puz: typeof puzzle) => T["stateEx"])(puzzle)
                     : initialGameStateExtension
             ),
-            ...(savedGameState && unserializeGameState(savedGameState[2]))
+            ...(savedGameState && (unserializeGameState?.(savedGameState[2]) ?? savedGameState[2]))
         } as T["stateEx"],
     };
 };
@@ -248,7 +248,7 @@ export const saveGameState = <T extends AnyPTM>(context: PuzzleContext<T>): void
             [
                 fullSaveStateKey,
                 serializeFieldState(currentFieldStateWithFogDemo, puzzle),
-                puzzle.typeManager.serializeGameState(stateExtension),
+                puzzle.typeManager.serializeGameState?.(stateExtension) ?? stateExtension,
                 serializeGivenDigitsMap(stateInitialDigits, puzzle.typeManager.serializeCellData),
                 serializeGivenDigitsMap(excludedDigits, (excludedDigits) => excludedDigits.serialize()),
                 persistentCellWriteMode,
@@ -280,7 +280,7 @@ export const getAllShareState = <T extends AnyPTM>({puzzle, myGameState}: Puzzle
 
     return {
         field: serializeFieldState(fieldStateHistory.current, puzzle),
-        extension: typeManager.serializeGameState(extension),
+        extension: typeManager.serializeGameState?.(extension) ?? extension,
         initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
         excludedDigits: serializeGivenDigitsMap(excludedDigits, item => item.serialize()),
         lives,
@@ -305,7 +305,7 @@ export const setAllShareState = <T extends AnyPTM>(context: PuzzleContext<T>, ne
             initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
             excludedDigits: unserializeGivenDigitsMap(excludedDigits, item => CellDataSet.unserialize(context.puzzle, item)),
             lives,
-            extension: unserializeGameState(extension),
+            extension: unserializeGameState?.(extension) ?? extension,
         }
     );
 

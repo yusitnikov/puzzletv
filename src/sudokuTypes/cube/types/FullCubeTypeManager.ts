@@ -14,7 +14,7 @@ import {RegionConstraint} from "../../../components/sudoku/constraints/region/Re
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {FullCubePTM} from "./FullCubePTM";
-import {FullCubeGameState, gameStateHandleRotateFullCube, ProcessedFullCubeGameState} from "./FullCubeGameState";
+import {gameStateHandleRotateFullCube, ProcessedFullCubeGameState} from "./FullCubeGameState";
 import {
     getClosestAxis3D,
     initialCoordsBase3D,
@@ -33,6 +33,7 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {FullCubeJssConstraint} from "../constraints/FullCubeJss";
 import {transformFullCubeCoords3D} from "../helpers/fullCubeHelpers";
 import {vector4} from "xyzw";
+import {addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 /*
  * TODO:
@@ -41,34 +42,31 @@ import {vector4} from "xyzw";
  */
 
 export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
-    ...DigitSudokuTypeManager<FullCubePTM>(),
-
-    initialGameStateExtension: {
-        coordsBase: initialCoordsBase3D,
-    },
-    serializeGameState({coordsBase}: Partial<FullCubeGameState>): any {
-        return {coordsBase};
-    },
-    unserializeGameState({coordsBase}: any): Partial<FullCubeGameState> {
-        return {coordsBase};
-    },
-    useProcessedGameStateExtension({stateExtension: {coordsBase}}): ProcessedFullCubeGameState {
-        return {
-            animatedCoordsBase: useAnimatedValue(
-                coordsBase,
-                settings.animationSpeed.get(),
-                (a, b, coeff) => {
-                    // See https://en.wikipedia.org/wiki/Slerp
-                    const result = vector4.RotationSlerp(a, b, coeff);
-                    // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
-                    return Number.isFinite(result.w) ? result : b;
-                },
-            )
-        };
-    },
-    getProcessedGameStateExtension({stateExtension: {coordsBase}}): ProcessedFullCubeGameState {
-        return {animatedCoordsBase: coordsBase};
-    },
+    ...addGameStateExToSudokuManager(
+        DigitSudokuTypeManager<FullCubePTM>(),
+        {
+            initialGameStateExtension: {
+                coordsBase: initialCoordsBase3D,
+            },
+            useProcessedGameStateExtension({stateExtension: {coordsBase}}): ProcessedFullCubeGameState {
+                return {
+                    animatedCoordsBase: useAnimatedValue(
+                        coordsBase,
+                        settings.animationSpeed.get(),
+                        (a, b, coeff) => {
+                            // See https://en.wikipedia.org/wiki/Slerp
+                            const result = vector4.RotationSlerp(a, b, coeff);
+                            // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
+                            return Number.isFinite(result.w) ? result : b;
+                        },
+                    )
+                };
+            },
+            getProcessedGameStateExtension({stateExtension: {coordsBase}}): ProcessedFullCubeGameState {
+                return {animatedCoordsBase: coordsBase};
+            },
+        }
+    ),
 
     fieldControlsComponent: FullCubeControls,
 

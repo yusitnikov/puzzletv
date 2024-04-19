@@ -1,6 +1,5 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {GuessSudokuTypeManager} from "../../guess/types/GuessSudokuTypeManager";
-import {QuadMastersGameState} from "./QuadMastersGameState";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {
     GameStateEx,
@@ -17,6 +16,9 @@ import {QuadleConstraintBySolution} from "../../../components/sudoku/constraints
 import {QuadInputSudokuTypeManager} from "../../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
 import {QuadMastersPTM} from "./QuadMastersPTM";
 import {IReactionDisposer, reaction} from "mobx";
+import {addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {QuadMastersGameState} from "./QuadMastersGameState";
+import {QuadInputGameState} from "../../../components/sudoku/constraints/quad/QuadInput/QuadInputGameState";
 
 export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManager<QuadMastersPTM> => {
     const parent = QuadInputSudokuTypeManager<QuadMastersPTM>({
@@ -33,30 +35,9 @@ export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManag
 
     // TODO: call parent in every method
     return ({
-        ...parent,
-
-        initialGameStateExtension: (puzzle) => ({
-            ...(
-                typeof parent.initialGameStateExtension === "function"
-                    ? parent.initialGameStateExtension(puzzle)
-                    : parent.initialGameStateExtension!
-            ),
-            isQuadTurn: true,
+        ...addGameStateExToSudokuManager<QuadMastersPTM, Omit<QuadMastersGameState, keyof QuadInputGameState<number>>, {}>(parent, {
+            initialGameStateExtension: {isQuadTurn: true}
         }),
-
-        serializeGameState(data): any {
-            return {
-                ...parent.serializeGameState?.(data),
-                isQuadTurn: data.isQuadTurn,
-            };
-        },
-
-        unserializeGameState(data): Partial<QuadMastersGameState> {
-            return {
-                ...parent.unserializeGameState?.(data),
-                isQuadTurn: data.isQuadTurn,
-            };
-        },
 
         items: (context) => {
             return [

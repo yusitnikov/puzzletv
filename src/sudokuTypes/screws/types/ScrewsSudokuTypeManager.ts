@@ -11,14 +11,17 @@ import {
     DecorativeShapeProps,
     rectTag
 } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {settings} from "../../../types/layout/Settings";
 import {Rect} from "../../../types/layout/Rect";
 import {indexes} from "../../../utils/indexes";
 import {ScrewConstraint} from "../constraints/Screw";
 import {ScrewsMoveCellWriteModeInfo} from "./ScrewsMoveCellWriteModeInfo";
 import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
-import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {
+    addFieldStateExToSudokuManager,
+    addGameStateExToSudokuManager
+} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {ScrewsFieldState} from "./ScrewsFieldState";
 
 interface ScrewsImporterResult<T extends AnyPTM> {
     screws: Rect[];
@@ -27,70 +30,48 @@ interface ScrewsImporterResult<T extends AnyPTM> {
 
 export const ScrewsSudokuTypeManager = <T extends AnyPTM>(
     {
-        serializeGameState,
-        unserializeGameState,
-        initialGameStateExtension,
-        useProcessedGameStateExtension,
-        getProcessedGameStateExtension,
         postProcessPuzzle,
         controlButtons = [],
         ...baseTypeManager
     }: SudokuTypeManager<T>,
     screwsImporter?: (puzzle: PuzzleDefinition<ScrewsPTM<T>>) => ScrewsImporterResult<T>,
 ): SudokuTypeManager<ScrewsPTM<T>> => ({
-    ...addFieldStateExToSudokuManager(
-        baseTypeManager as unknown as SudokuTypeManager<ScrewsPTM<T>>,
+    ...addGameStateExToSudokuManager(
+        addFieldStateExToSudokuManager(
+            baseTypeManager as unknown as SudokuTypeManager<ScrewsPTM<T>>,
+            {
+                initialFieldStateExtension(puzzle): ScrewsFieldState {
+                    return {
+                        screwOffsets: puzzle?.extension?.screws.map(() => 0) ?? [],
+                    };
+                },
+            }
+        ),
         {
-            initialFieldStateExtension(puzzle) {
+            initialGameStateExtension(puzzle): ScrewsGameState {
                 return {
-                    screwOffsets: puzzle?.extension?.screws.map(() => 0) ?? [],
+                    screws: puzzle?.extension?.screws.map(() => ({animating: false})) ?? [],
                 };
+            },
+            useProcessedGameStateExtension(context): ScrewsProcessedGameState {
+                const {
+                    fieldExtension: {screwOffsets},
+                    stateExtension: {screws: screwsAnimations},
+                } = context;
+
+                return {
+                    // eslint-disable-next-line react-hooks/rules-of-hooks
+                    screwOffsets: (screwOffsets as number[]).map((offset, index) => useAnimatedValue(
+                        offset,
+                        screwsAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0
+                    )),
+                };
+            },
+            getProcessedGameStateExtension(context): ScrewsProcessedGameState {
+                return {screwOffsets: context.fieldExtension.screwOffsets};
             },
         }
     ),
-
-    serializeGameState({screws, ...other}): any {
-        return {screws, ...serializeGameState(other as T["stateEx"])};
-    },
-
-    unserializeGameState({screws, ...other}): Partial<ScrewsGameState> {
-        return {screws, ...unserializeGameState(other)};
-    },
-
-    initialGameStateExtension: (puzzle) => {
-        return {
-            ...(
-                typeof initialGameStateExtension === "function"
-                    ? (initialGameStateExtension as ((puzzle: PuzzleDefinition<ScrewsPTM<T>>) => T["stateEx"]))(puzzle)
-                    : initialGameStateExtension
-            ),
-            screws: puzzle.extension?.screws.map(() => ({animating: false})) ?? [],
-        };
-    },
-
-    useProcessedGameStateExtension(context): ScrewsProcessedGameState {
-        const {
-            fieldExtension: {screwOffsets},
-            stateExtension: {screws: screwsAnimations},
-        } = context;
-
-        return {
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            ...useProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>),
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            screwOffsets: (screwOffsets as number[]).map((offset, index) => useAnimatedValue(
-                offset,
-                screwsAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0
-            )),
-        };
-    },
-
-    getProcessedGameStateExtension(context): ScrewsProcessedGameState {
-        return {
-            ...getProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>),
-            screwOffsets: context.fieldExtension.screwOffsets,
-        };
-    },
 
     postProcessPuzzle(puzzle): PuzzleDefinition<ScrewsPTM<T>> {
         if (postProcessPuzzle) {
