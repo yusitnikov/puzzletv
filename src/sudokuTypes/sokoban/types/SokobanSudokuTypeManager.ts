@@ -1,6 +1,6 @@
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {defaultSokobanDirection, SokobanProcessedGameState} from "./SokobanGameState";
-import {mixAnimatedValue, useAnimatedValue} from "../../../hooks/useAnimatedValue";
+import {defaultSokobanDirection, SokobanGameState} from "./SokobanGameState";
+import {AnimatedValue} from "../../../hooks/useAnimatedValue";
 import {SokobanPTM} from "./SokobanPTM";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
@@ -18,52 +18,73 @@ import {
     addFieldStateExToSudokuManager,
     addGameStateExToSudokuManager
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
-import {SokobanFieldState} from "./SokobanFieldState";
+import {SokobanFieldState, sokobanFieldStateAnimationMixer} from "./SokobanFieldState";
+import {comparer, IReactionDisposer, reaction} from "mobx";
+
+const initialFieldStateExtension = (puzzle?: PuzzleDefinition<SokobanPTM>): SokobanFieldState => {
+    return {
+        cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
+        sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
+    };
+};
 
 export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
     ...addGameStateExToSudokuManager(
         addFieldStateExToSudokuManager(
             DigitSudokuTypeManager(),
             {
-                initialFieldStateExtension(puzzle): SokobanFieldState {
-                    return {
-                        cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
-                        sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
-                    };
-                },
+                initialFieldStateExtension,
             }
         ),
         {
-            initialGameStateExtension: {animating: false, sokobanDirection: defaultSokobanDirection},
-            useProcessedGameStateExtension(
-                {
-                    fieldExtension,
-                    stateExtension: {animating},
-                }
-            ): SokobanProcessedGameState {
-                return useAnimatedValue(
-                    fieldExtension as SokobanFieldState,
-                    animating ? settings.animationSpeed.get() / 2 : 0,
-                    (a, b, coeff) => ({
-                        cluePositions: a.cluePositions.map((positionA, index) => {
-                            const positionB = b.cluePositions[index];
-                            return {
-                                top: mixAnimatedValue(positionA.top, positionB.top, coeff),
-                                left: mixAnimatedValue(positionA.left, positionB.left, coeff),
-                            };
-                        }),
-                        sokobanPosition: {
-                            top: mixAnimatedValue(a.sokobanPosition.top, b.sokobanPosition.top, coeff),
-                            left: mixAnimatedValue(a.sokobanPosition.left, b.sokobanPosition.left, coeff),
-                        },
-                    })
-                );
+            initialGameStateExtension(puzzle): SokobanGameState {
+                return {
+                    animationManager: new AnimatedValue(
+                        initialFieldStateExtension(puzzle),
+                        0,
+                        sokobanFieldStateAnimationMixer
+                    ),
+                    animating: false,
+                    sokobanDirection: defaultSokobanDirection,
+                };
             },
-            getProcessedGameStateExtension({fieldExtension}): SokobanProcessedGameState {
-                return fieldExtension;
+            serializeGameState({animationManager, ...state}: Partial<SokobanGameState>): any {
+                return state;
+            },
+            unserializeGameState(state: any): Partial<SokobanGameState> {
+                return {
+                    ...state,
+                    animationManager: new AnimatedValue(
+                        initialFieldStateExtension(),
+                        0,
+                        sokobanFieldStateAnimationMixer
+                    ),
+                    animating: false,
+                };
             },
         }
     ),
+
+    getReactions(context): IReactionDisposer[] {
+        return [
+            reaction(
+                () => {
+                    return {
+                        value: context.fieldExtension,
+                        animationTime: context.stateExtension.animating ? settings.animationSpeed.get() / 2 : 0,
+                    };
+                },
+                ({value, animationTime}) => {
+                    context.stateExtension.animationManager.update(value, animationTime);
+                },
+                {
+                    name: "update sokoban animation",
+                    equals: comparer.structural,
+                    fireImmediately: true,
+                }
+            ),
+        ];
+    },
 
     processArrowDirection(
         currentCell, xDirection, yDirection, context, isMainKeyboard
@@ -96,15 +117,15 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
             items: (
                 {
                     fieldExtension: {cluePositions},
-                    processedGameStateExtension,
+                    stateExtension: {animationManager: {animatedValue}},
                 }
             ): Constraint<SokobanPTM, any>[] => [
                 ...clues.map((clue, index) => SokobanClueConstraint(
                     clue,
                     cluePositions[index],
-                    processedGameStateExtension.cluePositions[index],
+                    animatedValue.cluePositions[index],
                 )),
-                SokobanPlayerConstraint(processedGameStateExtension.sokobanPosition),
+                SokobanPlayerConstraint(animatedValue.sokobanPosition),
                 ...otherItems,
             ],
             extension: {

@@ -1,11 +1,11 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {ScrewsGameState, ScrewsProcessedGameState} from "./ScrewsGameState";
+import {ScrewsGameState} from "./ScrewsGameState";
 import {getAveragePosition} from "../../../types/layout/Position";
-import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
+import {AnimatedValue} from "../../../hooks/useAnimatedValue";
 import {ScrewsPTM} from "./ScrewsPTM";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {Screw} from "./ScrewsPuzzleExtension";
+import {Screw, ScrewsPuzzleExtension} from "./ScrewsPuzzleExtension";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {
     DecorativeShapeProps,
@@ -22,6 +22,9 @@ import {
     addGameStateExToSudokuManager
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import {ScrewsFieldState} from "./ScrewsFieldState";
+import {ScrewsGameClueState} from "./ScrewsGameClueState";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {comparer, IReactionDisposer, reaction} from "mobx";
 
 interface ScrewsImporterResult<T extends AnyPTM> {
     screws: Rect[];
@@ -50,28 +53,54 @@ export const ScrewsSudokuTypeManager = <T extends AnyPTM>(
         {
             initialGameStateExtension(puzzle): ScrewsGameState {
                 return {
-                    screws: puzzle?.extension?.screws.map(() => ({animating: false})) ?? [],
+                    screws: puzzle?.extension?.screws.map((): ScrewsGameClueState => ({
+                        animationManager: new AnimatedValue(0, 0),
+                        animating: false,
+                    })) ?? [],
                 };
             },
-            useProcessedGameStateExtension(context): ScrewsProcessedGameState {
-                const {
-                    fieldExtension: {screwOffsets},
-                    stateExtension: {screws: screwsAnimations},
-                } = context;
-
+            serializeGameState({screws = []}: Partial<ScrewsGameState>): any {
                 return {
-                    // eslint-disable-next-line react-hooks/rules-of-hooks
-                    screwOffsets: (screwOffsets as number[]).map((offset, index) => useAnimatedValue(
-                        offset,
-                        screwsAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0
-                    )),
+                    screws: screws.map(({animating}) => ({animating})),
                 };
             },
-            getProcessedGameStateExtension(context): ScrewsProcessedGameState {
-                return {screwOffsets: context.fieldExtension.screwOffsets};
+            unserializeGameState({screws}: any): Partial<ScrewsGameState> {
+                return {
+                    screws: screws?.map((): ScrewsGameClueState => ({
+                        animationManager: new AnimatedValue(0, 0),
+                        animating: false,
+                    })) ?? [],
+                };
             },
         }
     ),
+
+    getReactions(context): IReactionDisposer[] {
+        return [
+            ...baseTypeManager.getReactions?.(context as unknown as PuzzleContext<T>) ?? [],
+            ...(context.puzzle.extension as ScrewsPuzzleExtension<T>)?.screws?.map((_, index) => reaction(
+                () => {
+                    const {
+                        fieldExtension: {screwOffsets},
+                        stateExtension: {screws: screwsAnimations},
+                    } = context;
+
+                    return {
+                        value: screwOffsets[index],
+                        animationTime: screwsAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
+                    };
+                },
+                ({value, animationTime}) => {
+                    (context.stateExtension as ScrewsGameState).screws[index].animationManager.update(value, animationTime);
+                },
+                {
+                    name: `update screw[${index}] animation manager`,
+                    equals: comparer.structural,
+                    fireImmediately: true,
+                }
+            )) ?? [],
+        ];
+    },
 
     postProcessPuzzle(puzzle): PuzzleDefinition<ScrewsPTM<T>> {
         if (postProcessPuzzle) {

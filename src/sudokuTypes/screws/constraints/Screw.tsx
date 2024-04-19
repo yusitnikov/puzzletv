@@ -13,6 +13,7 @@ import {loop} from "../../../utils/math";
 import {indexes} from "../../../utils/indexes";
 import {Rect} from "../../../types/layout/Rect";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
+import {ScrewsGameState} from "../types/ScrewsGameState";
 
 const lightColor = lightGreyColor;
 const darkColor = darkGreyColor;
@@ -28,7 +29,7 @@ interface ScrewProps {
 
 const Screw = {
     [FieldLayer.beforeSelection]: observer(function Screw<T extends AnyPTM>({context, props: {index}}: ConstraintProps<ScrewsPTM<T>, ScrewProps>) {
-        const offset = context.processedGameStateExtension.screwOffsets[index];
+        const offset = (context.stateExtension as ScrewsGameState).screws[index].animationManager.animatedValue;
 
         const {
             initialPosition,
@@ -157,7 +158,7 @@ export const ScrewConstraint = <T extends AnyPTM>(index: number): Constraint<Scr
         isValidCell(cell, digits, regionCells, context): boolean {
             const digit = digits[cell.top][cell.left];
 
-            const offset = Math.round(context.processedGameStateExtension.screwOffsets[index]);
+            const offset = Math.round((context.stateExtension as ScrewsGameState).screws[index].animationManager.animatedValue);
 
             const {
                 initialPosition: {top, left, width, height},

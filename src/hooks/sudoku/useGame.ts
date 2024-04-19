@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
     getEmptyGameState,
     ProcessedGameStateAnimatedValues,
@@ -88,15 +88,16 @@ export const useGame = <T extends AnyPTM>(
         [context]
     );
 
+    const disposers = useMemo(() => {
+        return context.puzzle.typeManager.getReactions?.(context) ?? [];
+    }, [context]);
     useEffect(() => {
-        const disposers = context.puzzle.typeManager.getReactions?.(context) ?? [];
-
         return () => {
             for (const disposer of disposers) {
                 disposer();
             }
         };
-    }, [context]);
+    }, [disposers]);
 
     timer.stop();
 

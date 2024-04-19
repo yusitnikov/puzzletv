@@ -4,9 +4,11 @@ import {comparer, computed, makeAutoObservable} from "mobx";
 import {useLastValueRef} from "./useLastValueRef";
 import {profiler} from "../utils/profiler";
 
-export const mixAnimatedValue = (a: number, b: number, coeff: number) => a + (b - a) * Math.max(0, Math.min(1, coeff));
+export type AnimatedValueMixer<T> = (a: T, b: T, coeff: number) => T;
 
-class AnimatedValue<T> {
+export const mixAnimatedValue: AnimatedValueMixer<number> = (a, b, coeff) => a + (b - a) * Math.max(0, Math.min(1, coeff));
+
+export class AnimatedValue<T> {
     private startValue: T;
     private targetValue: T;
     private startTime: number;
@@ -15,11 +17,12 @@ class AnimatedValue<T> {
     constructor(
         targetValue: T,
         animationTime: number,
-        private valueMixer: (a: T, b: T, coeff: number) => T = mixAnimatedValue as any,
+        private valueMixer: AnimatedValueMixer<T> = mixAnimatedValue as any,
     ) {
         makeAutoObservable<this, "valueMixer">(this, {
             valueMixer: false,
-            value: computed({equals: comparer.structural}),
+            finalValue: false,
+            animatedValue: computed({equals: comparer.structural}),
         });
 
         this.startValue = targetValue;
@@ -32,14 +35,23 @@ class AnimatedValue<T> {
         return this.animationTime ? Math.min((rafTime() - this.startTime) / this.animationTime, 1) : 1;
     }
 
-    get value() {
+    get finalValue() {
+        return this.targetValue;
+    }
+
+    get animatedValue() {
         profiler.trace();
         return this.valueMixer(this.startValue, this.targetValue, this.coeff);
     }
 
+    get isAnimating() {
+        profiler.trace();
+        return this.coeff < 1;
+    }
+
     update(targetValue: T, animationTime: number) {
         // The calculation of this.value must happen before updating any other values!
-        this.startValue = this.value;
+        this.startValue = this.animatedValue;
 
         this.targetValue = targetValue;
         this.animationTime = animationTime;
@@ -48,11 +60,11 @@ class AnimatedValue<T> {
 }
 
 export function useAnimatedValue(targetValue: number, animationTime: number): number;
-export function useAnimatedValue<T>(targetValue: T, animationTime: number, valueMixer: (a: T, b: T, coeff: number) => T): T;
+export function useAnimatedValue<T>(targetValue: T, animationTime: number, valueMixer: AnimatedValueMixer<T>): T;
 export function useAnimatedValue<T>(
     targetValue: T,
     animationTime: number,
-    valueMixer: (a: T, b: T, coeff: number) => T = mixAnimatedValue as any
+    valueMixer: AnimatedValueMixer<T> = mixAnimatedValue as any
 ): T {
     const valueMixerRef = useLastValueRef(valueMixer);
 
@@ -69,5 +81,5 @@ export function useAnimatedValue<T>(
         [JSON.stringify(targetValue), animationTime]
     );
 
-    return manager.value;
+    return manager.animatedValue;
 }
