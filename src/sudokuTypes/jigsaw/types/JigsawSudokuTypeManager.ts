@@ -3,7 +3,6 @@ import {JigsawGameState, JigsawJssCluesVisibility, JigsawProcessedGameState} fro
 import {JigsawDigit} from "./JigsawDigit";
 import {
     getLineVector,
-    isSamePosition,
     Position,
     PositionWithAngle,
     rotateVectorClockwise
@@ -61,6 +60,7 @@ import {indexes} from "../../../utils/indexes";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {JigsawSudokuPhrases} from "./JigsawSudokuPhrases";
 import {JigsawPieceInfo} from "./JigsawPieceInfo";
+import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 
 interface JigsawSudokuTypeManagerOptions {
@@ -92,7 +92,7 @@ export const JigsawSudokuTypeManager = (
         } as JigsawSudokuPhrases,
         getPieceCenter = ({boundingRect}) => getRectCenter(boundingRect),
     }: JigsawSudokuTypeManagerOptions = {}
-): SudokuTypeManager<JigsawPTM> => ({
+): SudokuTypeManager<JigsawPTM> => addFieldStateExToSudokuManager<JigsawPTM, JigsawFieldState>({
     areSameCellData(data1, data2, context, cell1, cell2): boolean {
         if (!stickyDigits && cell1 !== undefined && cell2 !== undefined) {
             data1 = rotateJigsawDigitByPiece(context, data1, cell1);
@@ -267,66 +267,6 @@ export const JigsawSudokuTypeManager = (
             pieces: puzzle.extension?.pieces?.map(() => ({animating: false})) ?? [],
             highlightCurrentPiece: false,
             jssCluesVisibility: JigsawJssCluesVisibility.All,
-        };
-    },
-    initialFieldStateExtension: (puzzle) => {
-        const {
-            importOptions: {shuffle, angleStep} = {},
-            typeManager: {initialScale = 1},
-        } = puzzle;
-        const randomizer = createRandomGenerator(0);
-        const centerTop = puzzle.fieldSize.rowsCount / 2;
-        const centerLeft = puzzle.fieldSize.columnsCount / 2;
-        const pieces = puzzle.extension?.pieces ?? [];
-
-        const piecePositions = pieces.map(({boundingRect}): PositionWithAngle => {
-            const {top, left} = getRectCenter(boundingRect);
-
-            return {
-                top: shuffle
-                    ? centerTop - top + (centerTop / initialScale - boundingRect.height / 2) * (randomizer() * 2 - 1)
-                    : 0,
-                left: shuffle
-                    ? centerLeft - left + (centerLeft / initialScale - boundingRect.width / 2) * (randomizer() * 2 - 1)
-                    : 0,
-                angle: shuffle && angleStep
-                    ? roundToStep(randomizer() * 360, angleStep)
-                    : 0,
-            };
-        });
-        const pieceSortIndexesByPosition = getReverseIndexMap(sortJigsawPiecesByPosition(pieces, piecePositions));
-
-        return {
-            pieces: piecePositions.map((position, index) => {
-                return {
-                    ...position,
-                    zIndex: pieces.length - pieceSortIndexesByPosition[index],
-                };
-            }),
-        };
-    },
-
-    areFieldStateExtensionsEqual(a, b): boolean {
-        return a.pieces.every((pieceA, index) => {
-            const pieceB = b.pieces[index];
-            return isSamePosition(pieceA, pieceB) && pieceA.angle === pieceB.angle && pieceA.zIndex === pieceB.zIndex;
-        })
-    },
-
-    cloneFieldStateExtension({pieces}): JigsawFieldState {
-        return {
-            pieces: pieces.map((position) => ({...position})),
-        };
-    },
-
-    unserializeFieldStateExtension({pieces}: any): Partial<JigsawFieldState> {
-        return {
-            pieces: pieces?.map(({top, left, angle, zIndex}: any, index: number): JigsawFieldPieceState => ({
-                top,
-                left,
-                angle,
-                zIndex: zIndex ?? pieces.length - index,
-            })),
         };
     },
 
@@ -710,4 +650,55 @@ export const JigsawSudokuTypeManager = (
     compensateConstraintDigitAngle: stickyDigits,
 
     // TODO: support shared games
+}, {
+    initialFieldStateExtension(puzzle): JigsawFieldState {
+        if (!puzzle) {
+            return {pieces: []};
+        }
+
+        const {
+            importOptions: {shuffle, angleStep} = {},
+            typeManager: {initialScale = 1},
+        } = puzzle;
+        const randomizer = createRandomGenerator(0);
+        const centerTop = puzzle.fieldSize.rowsCount / 2;
+        const centerLeft = puzzle.fieldSize.columnsCount / 2;
+        const pieces = puzzle.extension?.pieces ?? [];
+
+        const piecePositions = pieces.map(({boundingRect}): PositionWithAngle => {
+            const {top, left} = getRectCenter(boundingRect);
+
+            return {
+                top: shuffle
+                    ? centerTop - top + (centerTop / initialScale - boundingRect.height / 2) * (randomizer() * 2 - 1)
+                    : 0,
+                left: shuffle
+                    ? centerLeft - left + (centerLeft / initialScale - boundingRect.width / 2) * (randomizer() * 2 - 1)
+                    : 0,
+                angle: shuffle && angleStep
+                    ? roundToStep(randomizer() * 360, angleStep)
+                    : 0,
+            };
+        });
+        const pieceSortIndexesByPosition = getReverseIndexMap(sortJigsawPiecesByPosition(pieces, piecePositions));
+
+        return {
+            pieces: piecePositions.map((position, index) => {
+                return {
+                    ...position,
+                    zIndex: pieces.length - pieceSortIndexesByPosition[index],
+                };
+            }),
+        };
+    },
+    unserializeFieldStateExtension({pieces}: any): Partial<JigsawFieldState> {
+        return {
+            pieces: pieces?.map(({top, left, angle, zIndex}: any, index: number): JigsawFieldPieceState => ({
+                top,
+                left,
+                angle,
+                zIndex: zIndex ?? pieces.length - index,
+            })),
+        };
+    },
 });

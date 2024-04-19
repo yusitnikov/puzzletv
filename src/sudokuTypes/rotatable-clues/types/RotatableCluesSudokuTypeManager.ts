@@ -3,7 +3,6 @@ import {RotatableCluesGameState, RotatableCluesProcessedGameState} from "./Rotat
 import {getAveragePosition, stringifyPosition} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {RotatableCluesPTM} from "./RotatableCluesPTM";
-import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {ControlButtonItem, ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
@@ -20,6 +19,7 @@ import {comparer, IReactionDisposer, reaction} from "mobx";
 import {settings} from "../../../types/layout/Settings";
 import {createWheel} from "../../../components/sudoku/constraints/wheel/Wheel";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
+import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -31,13 +31,8 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
         serializeGameState,
         unserializeGameState,
         initialGameStateExtension,
-        initialFieldStateExtension,
         useProcessedGameStateExtension,
         getProcessedGameStateExtension,
-        areFieldStateExtensionsEqual = (a: T["fieldStateEx"], b: T["fieldStateEx"]) => JSON.stringify(a) === JSON.stringify(b),
-        cloneFieldStateExtension = (extension: T["fieldStateEx"]) => JSON.parse(JSON.stringify(extension)),
-        serializeFieldStateExtension,
-        unserializeFieldStateExtension,
         postProcessPuzzle,
         controlButtons = [],
         ...baseTypeManager
@@ -46,7 +41,16 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     isEquivalentLoop: boolean,
     cluesImporter?: (puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => CluesImporterResult<T>,
 ): SudokuTypeManager<RotatableCluesPTM<T>> => ({
-    ...(baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>),
+    ...addFieldStateExToSudokuManager(
+        baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>,
+        {
+            initialFieldStateExtension(puzzle) {
+                return {
+                    clueAngles: puzzle?.extension?.clues.map(() => 0) ?? [],
+                };
+            },
+        }
+    ),
 
     serializeGameState({clues, ...other}): any {
         return {clues, ...serializeGameState(other as T["stateEx"])};
@@ -64,43 +68,6 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                     : initialGameStateExtension
             ),
             clues: puzzle.extension?.clues.map(() => ({animating: false})) ?? [],
-        };
-    },
-
-    initialFieldStateExtension: (puzzle) => {
-        return {
-            ...(
-                typeof initialFieldStateExtension === "function"
-                    ? (initialFieldStateExtension as ((puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => T["fieldStateEx"]))(puzzle)
-                    : initialFieldStateExtension
-            ),
-            clueAngles: puzzle.extension?.clues.map(() => 0) ?? [],
-        };
-    },
-
-    areFieldStateExtensionsEqual({clueAngles: anglesA, ...a}, {clueAngles: anglesB, ...b}): boolean {
-        return areFieldStateExtensionsEqual(a, b)
-            && (anglesA as number[]).every((angleA, index) => angleA === anglesB[index])
-    },
-
-    cloneFieldStateExtension({clueAngles, ...other}): RotatableCluesFieldState {
-        return {
-            clueAngles: [...clueAngles],
-            ...cloneFieldStateExtension(other),
-        };
-    },
-
-    serializeFieldStateExtension({clueAngles, ...other}: Partial<RotatableCluesPTM<T>["fieldStateEx"]>): any {
-        return {
-            clueAngles,
-            ...(serializeFieldStateExtension?.(other as T["fieldStateEx"]) ?? other),
-        };
-    },
-
-    unserializeFieldStateExtension({clueAngles, ...other}: any): Partial<RotatableCluesPTM<T>["fieldStateEx"]> {
-        return {
-            clueAngles,
-            ...(unserializeFieldStateExtension?.(other) ?? other),
         };
     },
 

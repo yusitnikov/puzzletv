@@ -1,12 +1,11 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {RushHourGameState, RushHourProcessedGameState} from "./RushHourGameState";
-import {isSamePosition, Position} from "../../../types/layout/Position";
+import {Position} from "../../../types/layout/Position";
 import {mixAnimatedValue, useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {RushHourMoveCellWriteModeInfo} from "./RushHourMoveCellWriteModeInfo";
 import {GridRegion, transformCoordsByRegions} from "../../../types/sudoku/GridRegion";
 import {RushHourPTM} from "./RushHourPTM";
-import {RushHourFieldState} from "./RushHourFieldState";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
@@ -25,9 +24,22 @@ import {createRandomGenerator} from "../../../utils/random";
 import {cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
 import {settings} from "../../../types/layout/Settings";
 import {ColorsImportMode} from "../../../types/sudoku/PuzzleImportOptions";
+import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
-    ...DigitSudokuTypeManager<RushHourPTM>(),
+    ...addFieldStateExToSudokuManager(
+        DigitSudokuTypeManager(),
+        {
+            initialFieldStateExtension(puzzle) {
+                return {
+                    cars: puzzle?.extension?.cars.map(() => ({
+                        top: 0,
+                        left: -puzzle.fieldSize.rowsCount,
+                    })) ?? [],
+                };
+            },
+        }
+    ),
 
     serializeGameState({cars, hideCars}): any {
         return {cars, hideCars};
@@ -41,26 +53,6 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         return {
             cars: puzzle.extension?.cars.map(() => ({animating: false})) ?? [],
             hideCars: false,
-        };
-    },
-    initialFieldStateExtension: (puzzle) => {
-        return {
-            cars: puzzle.extension?.cars.map(() => ({
-                top: 0,
-                left: -puzzle.fieldSize.rowsCount,
-            })) ?? [],
-        };
-    },
-
-    areFieldStateExtensionsEqual(a, b): boolean {
-        return a.cars.every((carA, index) => {
-            return isSamePosition(carA, b.cars[index]);
-        })
-    },
-
-    cloneFieldStateExtension({cars}): RushHourFieldState {
-        return {
-            cars: cars.map((position) => ({...position})),
         };
     },
 

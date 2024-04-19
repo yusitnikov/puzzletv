@@ -3,7 +3,6 @@ import {ScrewsGameState, ScrewsProcessedGameState} from "./ScrewsGameState";
 import {getAveragePosition} from "../../../types/layout/Position";
 import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {ScrewsPTM} from "./ScrewsPTM";
-import {ScrewsFieldState} from "./ScrewsFieldState";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {Screw} from "./ScrewsPuzzleExtension";
@@ -19,6 +18,7 @@ import {indexes} from "../../../utils/indexes";
 import {ScrewConstraint} from "../constraints/Screw";
 import {ScrewsMoveCellWriteModeInfo} from "./ScrewsMoveCellWriteModeInfo";
 import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
+import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 interface ScrewsImporterResult<T extends AnyPTM> {
     screws: Rect[];
@@ -30,20 +30,24 @@ export const ScrewsSudokuTypeManager = <T extends AnyPTM>(
         serializeGameState,
         unserializeGameState,
         initialGameStateExtension,
-        initialFieldStateExtension,
         useProcessedGameStateExtension,
         getProcessedGameStateExtension,
-        areFieldStateExtensionsEqual = (a: T["fieldStateEx"], b: T["fieldStateEx"]) => JSON.stringify(a) === JSON.stringify(b),
-        cloneFieldStateExtension = (extension: T["fieldStateEx"]) => JSON.parse(JSON.stringify(extension)),
-        serializeFieldStateExtension,
-        unserializeFieldStateExtension,
         postProcessPuzzle,
         controlButtons = [],
         ...baseTypeManager
     }: SudokuTypeManager<T>,
     screwsImporter?: (puzzle: PuzzleDefinition<ScrewsPTM<T>>) => ScrewsImporterResult<T>,
 ): SudokuTypeManager<ScrewsPTM<T>> => ({
-    ...(baseTypeManager as unknown as SudokuTypeManager<ScrewsPTM<T>>),
+    ...addFieldStateExToSudokuManager(
+        baseTypeManager as unknown as SudokuTypeManager<ScrewsPTM<T>>,
+        {
+            initialFieldStateExtension(puzzle) {
+                return {
+                    screwOffsets: puzzle?.extension?.screws.map(() => 0) ?? [],
+                };
+            },
+        }
+    ),
 
     serializeGameState({screws, ...other}): any {
         return {screws, ...serializeGameState(other as T["stateEx"])};
@@ -61,43 +65,6 @@ export const ScrewsSudokuTypeManager = <T extends AnyPTM>(
                     : initialGameStateExtension
             ),
             screws: puzzle.extension?.screws.map(() => ({animating: false})) ?? [],
-        };
-    },
-
-    initialFieldStateExtension: (puzzle) => {
-        return {
-            ...(
-                typeof initialFieldStateExtension === "function"
-                    ? (initialFieldStateExtension as ((puzzle: PuzzleDefinition<ScrewsPTM<T>>) => T["fieldStateEx"]))(puzzle)
-                    : initialFieldStateExtension
-            ),
-            screwOffsets: puzzle.extension?.screws.map(() => 0) ?? [],
-        };
-    },
-
-    areFieldStateExtensionsEqual({screwOffsets: offsetsA, ...a}, {screwOffsets: offsetsB, ...b}): boolean {
-        return areFieldStateExtensionsEqual(a, b)
-            && (offsetsA as number[]).every((offsetA, index) => offsetA === offsetsB[index])
-    },
-
-    cloneFieldStateExtension({screwOffsets, ...other}): ScrewsFieldState {
-        return {
-            screwOffsets: [...screwOffsets],
-            ...cloneFieldStateExtension(other),
-        };
-    },
-
-    serializeFieldStateExtension({screwOffsets, ...other}: Partial<ScrewsPTM<T>["fieldStateEx"]>): any {
-        return {
-            screwOffsets,
-            ...(serializeFieldStateExtension?.(other as T["fieldStateEx"]) ?? other),
-        };
-    },
-
-    unserializeFieldStateExtension({screwOffsets, ...other}: any): Partial<ScrewsPTM<T>["fieldStateEx"]> {
-        return {
-            screwOffsets,
-            ...(unserializeFieldStateExtension?.(other) ?? other),
         };
     },
 

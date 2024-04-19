@@ -10,71 +10,32 @@ import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {Button} from "../../../components/layout/button/Button";
 import React, {useState} from "react";
 import {AnyFind3PTM} from "./Find3PTM";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {computed, IReactionDisposer, reaction} from "mobx";
 import {indexes} from "../../../utils/indexes";
 import {Gift} from "@emotion-icons/fluentui-system-filled";
 import {Modal} from "../../../components/layout/modal/Modal";
-import {arrayContainsPosition, isSamePosition, Position} from "../../../types/layout/Position";
+import {arrayContainsPosition, Position} from "../../../types/layout/Position";
 import {cancelOutsideClickProps} from "../../../utils/gestures";
 import {fieldFireworksController} from "../../../components/sudoku/field/FieldFireworks";
 import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
-    {
-        initialFieldStateExtension,
-        serializeFieldStateExtension,
-        unserializeFieldStateExtension,
-        areFieldStateExtensionsEqual = (a: T["fieldStateEx"], b: T["fieldStateEx"]) => JSON.stringify(a) === JSON.stringify(b),
-        cloneFieldStateExtension = (extension: T["fieldStateEx"]) => JSON.parse(JSON.stringify(extension)),
-        ...baseTypeManager
-    }: SudokuTypeManager<any> = DigitSudokuTypeManager(),
+    baseTypeManager: SudokuTypeManager<any> = DigitSudokuTypeManager(),
     giftsInSight = false,
 ): SudokuTypeManager<T> => ({
-    ...baseTypeManager,
-
-    initialFieldStateExtension: (puzzle) => ({
-        ...(
-            typeof initialFieldStateExtension === "function"
-                ? (initialFieldStateExtension as ((puzzle: PuzzleDefinition<T>) => T["fieldStateEx"]))(puzzle)
-                : initialFieldStateExtension
-        ),
-        giftsCount: 0,
-        giftedCells: [],
-    }),
-    serializeFieldStateExtension({giftsCount, giftedCells, ...other}): any {
-        return {
-            giftsCount,
-            giftedCells,
-            ...(serializeFieldStateExtension?.(other as T["fieldStateEx"]) ?? other),
-        };
-    },
-    unserializeFieldStateExtension({giftsCount = 0, giftedCells = [], ...other}: any): Partial<T["fieldStateEx"]> {
-        return {
-            giftsCount,
-            giftedCells,
-            ...(unserializeFieldStateExtension?.(other) ?? other),
-        };
-    },
-    areFieldStateExtensionsEqual(
-        {giftsCount: giftsCountA, giftedCells: giftedCellsA, ...a},
-        {giftsCount: giftsCountB, giftedCells: giftedCellsB, ...b}
-    ): boolean {
-        return areFieldStateExtensionsEqual(a, b)
-            && giftsCountA === giftsCountB
-            && giftedCellsA.length === giftedCellsB.length
-            && giftedCellsA.every((cellA: Position, index: number) => isSamePosition(cellA, giftedCellsB[index]));
-    },
-    cloneFieldStateExtension({giftsCount, giftedCells, ...other}): T["fieldStateEx"] {
-        return {
-            giftsCount,
-            giftedCells: [...giftedCells],
-            ...cloneFieldStateExtension(other),
-        };
-    },
+    ...addFieldStateExToSudokuManager(
+        baseTypeManager,
+        {
+            initialFieldStateExtension: {
+                giftsCount: 0,
+                giftedCells: [],
+            },
+        },
+    ),
 
     getAboveRules: function Find3AboveRules(translate, context, isPortrait) {
         // Cell to use as a gift - a confirmation popup will be shown when it's set

@@ -3,10 +3,9 @@ import {defaultSokobanDirection, SokobanGameState, SokobanProcessedGameState} fr
 import {mixAnimatedValue, useAnimatedValue} from "../../../hooks/useAnimatedValue";
 import {SokobanPTM} from "./SokobanPTM";
 import {PartialGameStateEx} from "../../../types/sudoku/GameState";
-import {SokobanFieldState} from "./SokobanFieldState";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {emptyPosition, isSamePosition, Position} from "../../../types/layout/Position";
+import {emptyPosition, Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {cageTag} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
@@ -15,9 +14,20 @@ import {SokobanPlayerConstraint} from "../constraints/SokobanPlayer";
 import {moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo} from "./SokobanMovePlayerCellWriteModeInfo";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
 import {settings} from "../../../types/layout/Settings";
+import {addFieldStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
-    ...DigitSudokuTypeManager(),
+    ...addFieldStateExToSudokuManager(
+        DigitSudokuTypeManager(),
+        {
+            initialFieldStateExtension(puzzle) {
+                return {
+                    cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
+                    sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
+                };
+            },
+        }
+    ),
 
     serializeGameState({animating, sokobanDirection}): any {
         return {animating, sokobanDirection};
@@ -29,25 +39,6 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
 
     initialGameStateExtension: () => {
         return {animating: false, sokobanDirection: defaultSokobanDirection};
-    },
-
-    initialFieldStateExtension: ({extension}) => {
-        return {
-            cluePositions: extension?.clues.map(() => emptyPosition) ?? [],
-            sokobanPosition: extension?.sokobanStartPosition ?? emptyPosition,
-        };
-    },
-
-    areFieldStateExtensionsEqual(a, b): boolean {
-        return isSamePosition(a.sokobanPosition, b.sokobanPosition) &&
-            a.cluePositions.every((positionA, index) => isSamePosition(positionA, b.cluePositions[index]));
-    },
-
-    cloneFieldStateExtension({cluePositions, sokobanPosition}): SokobanFieldState {
-        return {
-            cluePositions: cluePositions.map((position) => ({...position})),
-            sokobanPosition: {...sokobanPosition},
-        };
     },
 
     useProcessedGameStateExtension(
