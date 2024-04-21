@@ -16,13 +16,24 @@ import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
 import {Absolute} from "../../../components/layout/absolute/Absolute";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
+import {SokobanClue} from "./SokobanPuzzleExtension";
+import {Position} from "../../../types/layout/Position";
 
 const base = MoveCellWriteModeInfo<SokobanPTM>();
 
 export const moveSokobanPlayer = (xDirection: number, yDirection: number)
     : GameStateActionCallback<SokobanPTM> => (context) => {
     const {puzzleIndex: {allCells}, puzzle} = context;
+    const {
+        distinctMovementSteps,
+        isLightClue,
+        isSmashableClue,
+    } = puzzle.extension?.options ?? {};
     const clues = puzzle.extension?.clues ?? [];
+
+    if (distinctMovementSteps && context.stateExtension.animationManager.isAnimating) {
+        return {};
+    }
 
     return {
         extension: {
@@ -34,7 +45,7 @@ export const moveSokobanPlayer = (xDirection: number, yDirection: number)
             myClientId,
             getNextActionId(),
             (fieldState) => {
-                const {extension: {cluePositions, sokobanPosition}} = fieldState;
+                const {extension: {cluePositions, clueSmashed, sokobanPosition}} = fieldState;
 
                 const newTop = sokobanPosition.top + yDirection;
                 const newLeft = sokobanPosition.left + xDirection;
@@ -42,46 +53,104 @@ export const moveSokobanPlayer = (xDirection: number, yDirection: number)
                     return fieldState;
                 }
 
-                const offsetClueCells = clues.map(({cells}, index) => {
+                interface OffsetClueInfo {
+                    clue: SokobanClue;
+                    index: number;
+                    cells: Position[];
+                }
+                const offsetClueCells = clues.map((clue, index): OffsetClueInfo => {
                     const offset = cluePositions[index];
-                    return cells.map(({top, left}) => ({
-                        top: top + offset.top,
-                        left: left + offset.left,
-                    }));
+                    const smashed = clueSmashed[index];
+                    return {
+                        clue,
+                        index,
+                        cells: smashed ? [] : clue.cells.map(({top, left}) => ({
+                            top: top + offset.top,
+                            left: left + offset.left,
+                        })),
+                    };
                 });
-                const cellsMap: GivenDigitsMap<number> = {};
-                for (const [index, cells] of offsetClueCells.entries()) {
-                    for (const {top, left} of cells) {
+                const cellsMap: GivenDigitsMap<OffsetClueInfo> = {};
+                for (const clue of offsetClueCells) {
+                    for (const {top, left} of clue.cells) {
                         cellsMap[top] = cellsMap[top] ?? {};
-                        cellsMap[top][left] = index;
+                        cellsMap[top][left] = clue;
                     }
                 }
 
-                const movingIndex = cellsMap[newTop]?.[newLeft];
-                if (movingIndex !== undefined) {
-                    for (const {top, left} of offsetClueCells[movingIndex]) {
-                        const offsetTop = top + yDirection;
-                        const offsetLeft = left + xDirection;
-                        if (!allCells[offsetTop]?.[offsetLeft]) {
-                            return fieldState;
+                const movingClue = cellsMap[newTop]?.[newLeft];
+                let moveClues: OffsetClueInfo[] = [];
+                let smashClues: OffsetClueInfo[] = [];
+                if (movingClue !== undefined) {
+                    const tryMoveClue = (clue: OffsetClueInfo): {move: OffsetClueInfo[], smash: OffsetClueInfo[]} => {
+                        const isSmashable = isSmashableClue?.(clue.clue);
+                        const chainedClues = new Set<OffsetClueInfo>();
+
+                        for (const {top, left} of clue.cells) {
+                            const offsetTop = top + yDirection;
+                            const offsetLeft = left + xDirection;
+                            if (!allCells[offsetTop]?.[offsetLeft]) {
+                                return {move: [], smash: isSmashable ? [clue] : []};
+                            }
+                            const offsetClue = cellsMap[offsetTop]?.[offsetLeft];
+                            if (offsetClue !== undefined && offsetClue !== clue) {
+                                if (isLightClue?.(offsetClue.clue)) {
+                                    chainedClues.add(offsetClue);
+                                } else {
+                                    return {move: [], smash: isSmashable ? [clue] : []};
+                                }
+                            }
                         }
-                        const offsetIndex = cellsMap[offsetTop]?.[offsetLeft];
-                        if (offsetIndex !== undefined && offsetIndex !== movingIndex) {
-                            return fieldState;
+
+                        if (chainedClues.size === 0) {
+                            return {move: [clue], smash: []};
                         }
+
+                        const move: OffsetClueInfo[] = [];
+                        const smash: OffsetClueInfo[] = [];
+                        for (const chainedClue of chainedClues) {
+                            const result = tryMoveClue(chainedClue);
+                            if (!result.move.length && !result.smash.length) {
+                                return {move: [], smash: isSmashable ? [clue] : []};
+                            }
+                            move.push(...result.move);
+                            smash.push(...result.smash);
+                        }
+                        if (isSmashable && smash.length) {
+                            smash.push(clue);
+                        } else {
+                            move.push(clue);
+                        }
+
+                        return {move, smash};
+                    };
+
+                    const {move, smash} = tryMoveClue(movingClue);
+                    if (!move.length && !smash.length) {
+                        return fieldState;
                     }
+                    moveClues = move;
+                    smashClues = smash;
                 }
+
+                const moveIndexes = moveClues.map(({index}) => index);
+                const smashIndexes = smashClues.map(({index}) => index);
+
+                // TODO: falling clues
 
                 return {
                     ...fieldState,
                     extension: {
                         cluePositions: cluePositions.map(
-                            (position, index) => index === movingIndex
+                            (position, index) => moveIndexes.includes(index)
                                 ? {
                                     top: position.top + yDirection,
                                     left: position.left + xDirection,
                                 }
                                 : position
+                        ),
+                        clueSmashed: clueSmashed.map(
+                            (smashed, index) => smashed || smashIndexes.includes(index)
                         ),
                         sokobanPosition: {top: newTop, left: newLeft},
                     },

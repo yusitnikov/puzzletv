@@ -3,6 +3,7 @@ import {AnimatedValueMixer, mixAnimatedValue} from "../../../hooks/useAnimatedVa
 
 export interface SokobanFieldState {
     cluePositions: Position[];
+    clueSmashed: boolean[];
     sokobanPosition: Position;
 }
 
@@ -13,6 +14,10 @@ export const sokobanFieldStateAnimationMixer: AnimatedValueMixer<SokobanFieldSta
             top: mixAnimatedValue(positionA.top, positionB.top, coeff),
             left: mixAnimatedValue(positionA.left, positionB.left, coeff),
         };
+    }),
+    clueSmashed: b.clueSmashed.map((smashedB, index) => {
+        const smashedA = a.clueSmashed[index];
+        return mixAnimatedValue(smashedA ? 1 : 0, smashedB ? 1 : 0, coeff) >= 0.5;
     }),
     sokobanPosition: {
         top: mixAnimatedValue(a.sokobanPosition.top, b.sokobanPosition.top, coeff),

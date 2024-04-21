@@ -9,7 +9,7 @@ import {emptyPosition, Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {isCageConstraint} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {SokobanClueConstraint} from "../constraints/SokobanClue";
+import {SokobanClueConstraint, sokobanTag} from "../constraints/SokobanClue";
 import {SokobanPlayerConstraint} from "../constraints/SokobanPlayer";
 import {moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo} from "./SokobanMovePlayerCellWriteModeInfo";
 import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
@@ -20,15 +20,17 @@ import {
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import {SokobanFieldState, sokobanFieldStateAnimationMixer} from "./SokobanFieldState";
 import {comparer, IReactionDisposer, reaction} from "mobx";
+import {SokobanOptions} from "./SokobanOptions";
 
 const initialFieldStateExtension = (puzzle?: PuzzleDefinition<SokobanPTM>): SokobanFieldState => {
     return {
         cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
+        clueSmashed: puzzle?.extension?.clues.map(() => false) ?? [],
         sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
     };
 };
 
-export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
+export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTypeManager<SokobanPTM> => ({
     ...addGameStateExToSudokuManager(
         addFieldStateExToSudokuManager(
             DigitSudokuTypeManager(),
@@ -103,7 +105,7 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
             throw new Error("puzzle.items is expected to be an array for SokobanSudokuTypeManager");
         }
 
-        const isSokobanClue = isCageConstraint;
+        const isSokobanClue = (item: Constraint<SokobanPTM, any>) => item.tags?.includes(sokobanTag) || isCageConstraint(item);
         const isSokobanPlayer = ({tags, cells: {length}}: Constraint<SokobanPTM, any>) => tags?.includes(ellipseTag) && length === 1;
         const sokobanPlayer = items.find(isSokobanPlayer);
         if (!sokobanPlayer) {
@@ -116,7 +118,7 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
             ...puzzle,
             items: (
                 {
-                    fieldExtension: {cluePositions},
+                    fieldExtension: {cluePositions, clueSmashed},
                     stateExtension: {animationManager: {animatedValue}},
                 }
             ): Constraint<SokobanPTM, any>[] => [
@@ -124,6 +126,9 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
                     clue,
                     cluePositions[index],
                     animatedValue.cluePositions[index],
+                    clueSmashed[index],
+                    animatedValue.clueSmashed[index],
+                    options.smashedComponent,
                 )),
                 SokobanPlayerConstraint(animatedValue.sokobanPosition),
                 ...otherItems,
@@ -131,6 +136,7 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
             extension: {
                 clues,
                 sokobanStartPosition: sokobanPlayer.cells[0],
+                options,
             },
         };
     },
@@ -141,4 +147,4 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
     ],
 
     // TODO: support shared games
-};
+});

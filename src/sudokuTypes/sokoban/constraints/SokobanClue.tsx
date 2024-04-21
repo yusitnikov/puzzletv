@@ -3,29 +3,44 @@ import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import {getLineVector, Position} from "../../../types/layout/Position";
 import {SokobanPTM} from "../types/SokobanPTM";
 import {SokobanClue} from "../types/SokobanPuzzleExtension";
-import {KillerCageProps} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
+import {isCageConstraint, KillerCageProps} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
+
+export const sokobanTag = "sokoban";
 
 export const SokobanClueConstraint = (
-    {isValidCell, ...clue}: SokobanClue,
+    {isValidCell, isValidPuzzle, ...clue}: SokobanClue,
     position: Position,
     animatedPosition: Position,
+    smashed: boolean,
+    animatedSmashed: boolean,
+    smashedComponent?: SokobanClue["component"],
 ): SokobanClue => ({
-    ...cloneConstraint(clue, {
-        processCellCoords: ({top, left}) => ({
-            top: top + position.top,
-            left: left + position.left,
-        }),
-    }),
-    component: clue.component && Object.fromEntries(Object.entries(clue.component).map(([layer, Component]) => [
+    ...cloneConstraint(
+        {
+            ...clue,
+            props: isCageConstraint(clue)
+                ? {...clue.props, largeSum: true} as KillerCageProps
+                : clue.props,
+        },
+        {
+            processCellCoords: ({top, left}) => ({
+                top: top + position.top,
+                left: left + position.left,
+            }),
+        }
+    ),
+    component: animatedSmashed && smashedComponent || clue.component && Object.fromEntries(Object.entries(clue.component).map(([layer, Component]) => [
         layer,
-        (props: ConstraintProps<SokobanPTM, KillerCageProps>) => <AutoSvg
+        (props: ConstraintProps<SokobanPTM, any>) => <AutoSvg
             {...getLineVector({start: position, end: animatedPosition})}
         >
-            <Component {...props} props={{...props.props, largeSum: true}}/>
+            <g opacity={animatedSmashed ? 0.3 : 1}>
+                <Component {...props}/>
+            </g>
         </AutoSvg>,
     ])),
     renderSingleCellInUserArea: false,
-    isValidCell: isValidCell && ((
+    isValidCell: smashed ? undefined : isValidCell && ((
         cell,
         digits,
         regionCells,
@@ -35,5 +50,8 @@ export const SokobanClueConstraint = (
         ...args
     ): boolean => !isFinalCheck || isValidCell(
         cell, digits, regionCells, context, constraints, isFinalCheck, ...args
-    ))
+    )),
+    isValidPuzzle(...args): boolean {
+        return !smashed && !!isValidPuzzle?.(...args);
+    },
 });
