@@ -125,9 +125,9 @@ export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTy
                 ...clues.map((clue, index) => SokobanClueConstraint(
                     clue,
                     cluePositions[index],
-                    animatedValue.cluePositions[index],
+                    animatedValue.cluePositions[index] ?? emptyPosition,
                     clueSmashed[index],
-                    animatedValue.clueSmashed[index],
+                    animatedValue.clueSmashed[index] ?? false,
                     options.smashedComponent,
                 )),
                 SokobanPlayerConstraint(animatedValue.sokobanPosition),
