@@ -7,7 +7,7 @@ import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
 import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
 import {emptyPosition, Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
-import {cageTag} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
+import {isCageConstraint} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {SokobanClueConstraint} from "../constraints/SokobanClue";
 import {SokobanPlayerConstraint} from "../constraints/SokobanPlayer";
@@ -103,7 +103,7 @@ export const SokobanSudokuTypeManager: SudokuTypeManager<SokobanPTM> = {
             throw new Error("puzzle.items is expected to be an array for SokobanSudokuTypeManager");
         }
 
-        const isSokobanClue = ({tags}: Constraint<SokobanPTM, any>) => tags?.includes(cageTag);
+        const isSokobanClue = isCageConstraint;
         const isSokobanPlayer = ({tags, cells: {length}}: Constraint<SokobanPTM, any>) => tags?.includes(ellipseTag) && length === 1;
         const sokobanPlayer = items.find(isSokobanPlayer);
         if (!sokobanPlayer) {

@@ -6,7 +6,7 @@ import {ToMultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM
 import {FPuzzles} from "./FPuzzles";
 import {RushHourPTM} from "../../sudokuTypes/rush-hour/types/RushHourPTM";
 import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
-import {cageTag} from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import {isCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import {Rect} from "../../types/layout/Rect";
 import {getRegionBoundingBox} from "../../utils/regions";
 import {AutoSvg} from "../../components/svg/auto-svg/AutoSvg";
@@ -140,7 +140,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                 const baseItems = typeof items === "function" ? items(context) : items ?? [];
 
                 return baseItems.map((item) => {
-                    if (item.tags?.includes(cageTag)) {
+                    if (isCageConstraint(item)) {
                         if (item.cells.length === 2) {
                             const boundingBox = getRegionBoundingBox(item.cells, 1);
 

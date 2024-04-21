@@ -6,7 +6,7 @@ import {PositionWithAngle} from "../../../types/layout/Position";
 import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {CenteredCalculatorDigitComponentType} from "../../../components/sudoku/digit/CalculatorDigit";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {cageTag, KillerCageProps} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
+import {isCageConstraint, KillerCageProps} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
 import {RotateLeftButton, RotateRightButton} from "../components/RotateButton";
 import {StickyModeButton} from "../components/StickyModeButton";
@@ -218,7 +218,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
             return {
                 ...puzzle,
                 items: (context) => (typeof items === "function" ? items(context) : items).map(
-                    (item) => item.tags?.includes(cageTag)
+                    (item) => isCageConstraint(item)
                         ? {
                             ...item,
                             props: {

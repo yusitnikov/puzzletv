@@ -280,3 +280,5 @@ export const KillerCageConstraintByRect = <T extends AnyPTM>(
         sumPointIndex,
     );
 };
+
+export const isCageConstraint = <T extends AnyPTM>(item: Constraint<T, any>): item is Constraint<T, KillerCageProps> => !!item.tags?.includes(cageTag);
