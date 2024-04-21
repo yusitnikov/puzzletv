@@ -42,6 +42,7 @@ import {ImportedScrewsSudokuTypeManager} from "../../sudokuTypes/screws/types/Sc
 import {PuzzleImporter} from "./PuzzleImporter";
 import {GridParser, GridParserFactory} from "./GridParser";
 import {FullCubePTM} from "../../sudokuTypes/cube/types/FullCubePTM";
+import {EggSokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/egg/types/EggSokobanSudokuTypeManager";
 
 const getGridParsersByImportOptions = <T extends AnyPTM, JsonT>(
     importOptions: PuzzleImportOptions,
@@ -98,6 +99,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         jss,
         rotatableClues,
         sokoban,
+        eggs,
         screws,
         fillableQuads,
         find3,
@@ -132,7 +134,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
 
     let typeManager = typesMap[type] ?? regularTypeManager;
     if (sokoban) {
-        typeManager = SokobanSudokuTypeManager;
+        typeManager = eggs ? EggSokobanSudokuTypeManager : SokobanSudokuTypeManager();
     }
     if (tesseract) {
         typeManager = TesseractSudokuTypeManager(typeManager);

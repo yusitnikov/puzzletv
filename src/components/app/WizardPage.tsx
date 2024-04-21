@@ -71,6 +71,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [keepCircles, setKeepCircles] = useBoolFromLocalStorage("fpwKeepCircles");
     const [screws, setScrews] = useBoolFromLocalStorage("fpwScrews");
     const [sokoban, setSokoban] = useBoolFromLocalStorage("fpwSokoban");
+    const [eggs, setEggs] = useBoolFromLocalStorage("fpwEggs");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
@@ -196,6 +197,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         keepCircles: !isSpecialGrid && rotatableClues && !wheels && keepCircles,
         screws: !isSpecialGrid && screws,
         sokoban: !isSpecialGrid && sokoban,
+        eggs: !isSpecialGrid && sokoban && eggs,
         tesseract: !isSpecialGrid && tesseract,
         fillableQuads: !isSpecialGrid && fillableQuads,
         find3,
@@ -396,6 +398,13 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                                 <input type={"checkbox"} checked={sokoban} onChange={ev => setSokoban(ev.target.checked)}/>
                             </label>
                         </Paragraph>
+
+                        {sokoban && <Paragraph>
+                            <label>
+                                Eggs:&nbsp;
+                                <input type={"checkbox"} checked={eggs} onChange={ev => setEggs(ev.target.checked)}/>
+                            </label>
+                        </Paragraph>}
 
                         <Paragraph>
                             <label>
