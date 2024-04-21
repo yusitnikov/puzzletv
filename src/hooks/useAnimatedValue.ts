@@ -8,6 +8,13 @@ export type AnimatedValueMixer<T> = (a: T, b: T, coeff: number) => T;
 
 export const mixAnimatedValue: AnimatedValueMixer<number> = (a, b, coeff) => a + (b - a) * Math.max(0, Math.min(1, coeff));
 
+export const mixAnimatedBool: AnimatedValueMixer<boolean> = (a, b, coeff) => mixAnimatedValue(a ? 1 : 0, b ? 1 : 0, coeff) >= 0.5;
+
+export const mixAnimatedArray = <T>(
+    a: T[], b: T[], coeff: number,
+    mixer: AnimatedValueMixer<T> = mixAnimatedValue as any
+) => b.map((bi, index) => mixer(a[index], bi, coeff));
+
 export class AnimatedValue<T> {
     private startValue: T;
     private targetValue: T;

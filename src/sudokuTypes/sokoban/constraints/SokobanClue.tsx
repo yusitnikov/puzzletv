@@ -29,7 +29,7 @@ export const SokobanClueConstraint = (
             }),
         }
     ),
-    component: animatedSmashed && smashedComponent || clue.component && Object.fromEntries(Object.entries(clue.component).map(([layer, Component]) => [
+    component: (animatedSmashed && smashedComponent) || (clue.component && Object.fromEntries(Object.entries(clue.component).map(([layer, Component]) => [
         layer,
         (props: ConstraintProps<SokobanPTM, any>) => <AutoSvg
             {...getLineVector({start: position, end: animatedPosition})}
@@ -38,7 +38,7 @@ export const SokobanClueConstraint = (
                 <Component {...props}/>
             </g>
         </AutoSvg>,
-    ])),
+    ]))),
     renderSingleCellInUserArea: false,
     isValidCell: smashed ? undefined : isValidCell && ((
         cell,

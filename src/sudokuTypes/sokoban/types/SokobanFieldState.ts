@@ -1,5 +1,5 @@
 import {emptyPosition, Position} from "../../../types/layout/Position";
-import {AnimatedValueMixer, mixAnimatedValue} from "../../../hooks/useAnimatedValue";
+import {AnimatedValueMixer, mixAnimatedArray, mixAnimatedBool, mixAnimatedValue} from "../../../hooks/useAnimatedValue";
 
 export interface SokobanFieldState {
     cluePositions: Position[];
@@ -8,17 +8,14 @@ export interface SokobanFieldState {
 }
 
 export const sokobanFieldStateAnimationMixer: AnimatedValueMixer<SokobanFieldState> = (a, b, coeff) => ({
-    cluePositions: b.cluePositions.map((positionB, index) => {
-        const positionA = a.cluePositions[index] ?? emptyPosition;
-        return {
-            top: mixAnimatedValue(positionA.top, positionB.top, coeff),
-            left: mixAnimatedValue(positionA.left, positionB.left, coeff),
-        };
-    }),
-    clueSmashed: b.clueSmashed.map((smashedB, index) => {
-        const smashedA = a.clueSmashed[index];
-        return mixAnimatedValue(smashedA ? 1 : 0, smashedB ? 1 : 0, coeff) >= 0.5;
-    }),
+    cluePositions: mixAnimatedArray(
+        a.cluePositions, b.cluePositions, coeff,
+        (a = emptyPosition, b = emptyPosition) => ({
+            top: mixAnimatedValue(a.top, b.top, coeff),
+            left: mixAnimatedValue(a.left, b.left, coeff),
+        })
+    ),
+    clueSmashed: mixAnimatedArray(a.clueSmashed, b.clueSmashed, coeff, mixAnimatedBool),
     sokobanPosition: {
         top: mixAnimatedValue(a.sokobanPosition.top, b.sokobanPosition.top, coeff),
         left: mixAnimatedValue(a.sokobanPosition.left, b.sokobanPosition.left, coeff),
