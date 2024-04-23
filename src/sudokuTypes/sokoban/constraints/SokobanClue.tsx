@@ -52,6 +52,6 @@ export const SokobanClueConstraint = (
         cell, digits, regionCells, context, constraints, isFinalCheck, ...args
     )),
     isValidPuzzle(...args): boolean {
-        return !smashed && !!isValidPuzzle?.(...args);
+        return !smashed && isValidPuzzle?.(...args) !== false;
     },
 });
