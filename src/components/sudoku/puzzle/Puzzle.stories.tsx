@@ -131,3 +131,6 @@ Screws.args = {_hash: "screws"};
 
 export const Shuffled = Template.bind({});
 Shuffled.args = {_hash: "shuffled"};
+
+export const EasterSokoban = Template.bind({});
+EasterSokoban.args = {_hash: "easter-sokoban"};

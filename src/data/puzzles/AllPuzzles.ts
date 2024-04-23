@@ -40,7 +40,7 @@ import {RushHour} from "./RushHour";
 import {InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdge} from "./InfinityLoop";
 import {ReservedParking} from "./ReservedParking";
 import {JssChicken, MakeAPicture} from "./JigsawJss";
-import {Sudokuban} from "./Sudokuban";
+import {EasterSokoban, Sudokuban} from "./Sudokuban";
 import {Pacman} from "./Pacman";
 import {Astronavigation} from "./Astronavigation";
 import {CherryBlossom, Revolutionary, SumwhereAroundHere} from "./RotatableClues";
@@ -142,6 +142,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    EasterSokoban,
+
     NationalGeographic,
 
     Karaoke,
