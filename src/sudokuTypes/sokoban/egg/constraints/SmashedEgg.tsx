@@ -7,7 +7,7 @@ import {profiler} from "../../../../utils/profiler";
 import {lightGreyColor, lightOrangeColor, yellowColor} from "../../../../components/app/globals";
 import {AutoSvg} from "../../../../components/svg/auto-svg/AutoSvg";
 import {lightenColorStr} from "../../../../utils/color";
-import {SplineLoop} from "../../../../components/svg/spline-loop/SplineLoop";
+import {SplineLoop} from "../../../../components/svg/spline/SplineLoop";
 
 export const SmashedEgg: SokobanClue["component"] = {
     [FieldLayer.beforeSelection]: observer(function SmashedEgg({cells: [{top, left}]}: ConstraintProps<SokobanPTM>) {
