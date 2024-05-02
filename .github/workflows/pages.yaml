@@ -41,11 +41,16 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+      - run: mv build builds
+      - run: git checkout before-mobx
+      - run: echo PUBLIC_URL=/puzzletv/stage > .env.production
+      - run: npm run build
+      - run: mv build builds/stage
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: './build'
+          path: './builds'
 
       - name: Deploy to GitHub Pages
         id: deployment
