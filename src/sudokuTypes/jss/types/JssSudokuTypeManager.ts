@@ -12,7 +12,7 @@ import {JssCell} from "./JssCell";
 import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
 import {CellColorValue, resolveCellColorValue} from "../../../types/sudoku/CellColor";
 import {JssConstraint} from "../constraints/Jss";
-import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
+import {isTextConstraint, TextProps} from "../../../components/sudoku/constraints/text/Text";
 
 export const JssSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager: SudokuTypeManager<T>,
@@ -69,8 +69,8 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
                 throw new Error(`puzzle.items is expected to be an array for ${JssSudokuTypeManager.name}`);
             }
             const isJssTextClue = (constraint: Constraint<T, any>): constraint is Constraint<T, TextProps> => {
-                const {tags = [], cells: {length, 0: cell}} = constraint;
-                return tags.includes(textTag) && length === 1 && cell.top % 1 === 0 && cell.left % 1 === 0;
+                const {cells: {length, 0: cell}} = constraint;
+                return isTextConstraint(constraint) && length === 1 && cell.top % 1 === 0 && cell.left % 1 === 0 && constraint.props.text !== "";
             };
             for (const constraint of puzzle.items) {
                 if (isJssTextClue(constraint)) {
