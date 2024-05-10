@@ -1,7 +1,7 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
+import {isTextConstraint} from "../../../components/sudoku/constraints/text/Text";
 import {FogStarConstraint, fogStarTag} from "../constraints/FogStarConstraint";
 import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
 import {arrayContainsPosition} from "../../../types/layout/Position";
@@ -46,9 +46,9 @@ export const FogStarsSudokuTypeManager = <T extends AnyPTM>(
                 puzzle = {
                     ...puzzle,
                     items: originalItems.map((item) => {
-                        const {tags, props, cells, color} = item;
+                        const {cells, color} = item;
 
-                        return tags?.includes(textTag) && ["★", "s", "star"].includes((props as TextProps).text.toLowerCase())
+                        return isTextConstraint(item) && ["★", "s", "star"].includes(item.props.text.toLowerCase())
                             ? FogStarConstraint(cells, color)
                             : item;
                     }),

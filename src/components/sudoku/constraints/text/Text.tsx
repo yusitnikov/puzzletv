@@ -119,3 +119,6 @@ export const TextConstraint = <T extends AnyPTM>(
         renderSingleCellInUserArea: true,
     };
 };
+
+export const isTextConstraint = <T extends AnyPTM>(constraint: Constraint<T, any>): constraint is Constraint<T, TextProps> =>
+    (constraint.tags ?? []).includes(textTag);

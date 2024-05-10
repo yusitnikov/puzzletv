@@ -11,7 +11,7 @@ import {indexes} from "../../../utils/indexes";
 import {safeCrackerArrowsCellWriteModeInfo} from "./LeftRightArrow";
 import {BaseSafeCrackerPuzzle} from "./BaseSafeCrackerPuzzle";
 import {getDefaultDigitsCount, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
+import {isTextConstraint} from "../../../components/sudoku/constraints/text/Text";
 import {CellMarkType, parseCellMark} from "../../../types/sudoku/CellMark";
 import {CellColor} from "../../../types/sudoku/CellColor";
 import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
@@ -135,12 +135,12 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
             const originalItems = puzzle.items;
             if (Array.isArray(originalItems)) {
                 for (const item of originalItems) {
-                    if (!(item.tags?.includes(textTag) && item.cells.length === 1)) {
+                    if (!(isTextConstraint(item) && item.cells.length === 1)) {
                         items.push(item);
                         continue;
                     }
 
-                    if (!processText((item.props as TextProps).text, item.cells, item.layer)) {
+                    if (!processText(item.props.text, item.cells, item.layer)) {
                         items.push(item);
                     }
                 }

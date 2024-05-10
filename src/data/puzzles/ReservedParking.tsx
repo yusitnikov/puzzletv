@@ -15,7 +15,7 @@ import {CellWriteModeInfo} from "../../types/sudoku/CellWriteModeInfo";
 import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {MultiStageGameState} from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
 import {carMargin} from "../../sudokuTypes/rush-hour/components/RushHourCar";
-import {TextProps, textTag} from "../../components/sudoku/constraints/text/Text";
+import {isTextConstraint} from "../../components/sudoku/constraints/text/Text";
 import {GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
 import {Position} from "../../types/layout/Position";
 import {LanguageCode} from "../../types/translations/LanguageCode";
@@ -90,11 +90,12 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                                 const items = typeof itemsFn === "function" ? itemsFn(context) : itemsFn ?? [];
 
                                 const newInitialDigitsCandidates: (Position & {digit: number})[] = [];
-                                for (const {tags, cells: [cell], props} of items) {
-                                    if (tags?.includes(textTag) && !allInitialDigits[cell.top]?.[cell.left]) {
+                                for (const item of items) {
+                                    const {cells: [cell]} = item;
+                                    if (isTextConstraint(item) && !allInitialDigits[cell.top]?.[cell.left]) {
                                         newInitialDigitsCandidates.push({
                                             ...cell,
-                                            digit: Number((props as TextProps).text),
+                                            digit: Number(item.props.text),
                                         });
                                     }
                                 }
@@ -177,7 +178,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                         }
                     }
 
-                    if (item.tags?.includes(textTag)) {
+                    if (isTextConstraint(item)) {
                         // Hide all "white digits"
                         return {...item, component: undefined};
                     }

@@ -18,7 +18,7 @@ import {ArrowProps, isArrowConstraint} from "../../../components/sudoku/constrai
 import {comparer, IReactionDisposer, reaction} from "mobx";
 import {settings} from "../../../types/layout/Settings";
 import {createWheel} from "../../../components/sudoku/constraints/wheel/Wheel";
-import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
+import {isTextConstraint} from "../../../components/sudoku/constraints/text/Text";
 import {addFieldStateExToSudokuManager, addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
 
@@ -292,12 +292,13 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 clues = clues.map(({pivot, clues}) => {
                     const digits = Array<number | undefined>(4).fill(undefined);
 
-                    for (const {tags, cells, props} of clues) {
-                        if (!tags?.includes(textTag) || cells.length > 2) {
+                    for (const clue of clues) {
+                        const {cells} = clue;
+                        if (!isTextConstraint(clue) || cells.length > 2) {
                             continue;
                         }
 
-                        const value = Number((props as TextProps).text);
+                        const value = Number(clue.props.text);
                         if (!Number.isFinite(value)) {
                             continue;
                         }
