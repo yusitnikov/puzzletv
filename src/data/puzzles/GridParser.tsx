@@ -74,6 +74,9 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     get hasArrows() {
         return false;
     }
+    get hasZeroRegion() {
+        return false;
+    }
 
     get quadruplePositions(): Position[] {
         return [];

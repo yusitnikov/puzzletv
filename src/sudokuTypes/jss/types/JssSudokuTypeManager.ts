@@ -10,7 +10,8 @@ import {JssConstraint} from "../constraints/Jss";
 import {TextProps, textTag} from "../../../components/sudoku/constraints/text/Text";
 
 export const JssSudokuTypeManager = <T extends AnyPTM>(
-    baseTypeManager: SudokuTypeManager<T>
+    baseTypeManager: SudokuTypeManager<T>,
+    puzzleHasZeroRegion = false,
 ): SudokuTypeManager<T> => {
     return {
         ...baseTypeManager,
@@ -22,16 +23,19 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
             };
 
             if (puzzle.regions?.length) {
-                const [inactiveRegion, ...activeRegions] = [...puzzle.regions]
+                const activeRegions = [...puzzle.regions]
                     .sort((a, b) => getRegionCells(b).length - getRegionCells(a).length);
+                const inactiveCells = puzzle.inactiveCells ?? [];
+
+                if (puzzleHasZeroRegion) {
+                    const inactiveRegion = activeRegions.shift()!;
+                    inactiveCells.push(...getRegionCells(inactiveRegion));
+                }
 
                 puzzle = {
                     ...puzzle,
                     regions: activeRegions,
-                    inactiveCells: [
-                        ...(puzzle.inactiveCells ?? []),
-                        ...getRegionCells(inactiveRegion),
-                    ],
+                    inactiveCells,
                 };
             }
 

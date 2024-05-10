@@ -585,6 +585,9 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
     get hasArrows() {
         return !!this.puzzleJson.arrow;
     }
+    get hasZeroRegion(): boolean {
+        return true;
+    }
 
     get quadruplePositions() {
         return this.puzzleJson.quadruple?.map(({cells}) => parsePositionLiteral(cells[3])) ?? [];

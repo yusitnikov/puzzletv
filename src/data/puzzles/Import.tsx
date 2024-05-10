@@ -146,7 +146,8 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         typeManager = FogStarsSudokuTypeManager(typeManager);
     }
     if (jss && type !== PuzzleImportPuzzleType.RotatableCube) {
-        typeManager = JssSudokuTypeManager(typeManager);
+        const hasZeroRegion = allGridParsers.some(({hasZeroRegion}) => hasZeroRegion);
+        typeManager = JssSudokuTypeManager(typeManager, hasZeroRegion);
     }
     if (rotatableClues) {
         typeManager = ImportedRotatableCluesSudokuTypeManager(typeManager);
