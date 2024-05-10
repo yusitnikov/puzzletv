@@ -1,6 +1,11 @@
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {getRegionCells, importGivenColorsAsSolution, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {
+    getRegionCells,
+    importGivenColorsAsSolution,
+    importSolutionColorsAsGiven,
+    PuzzleDefinition
+} from "../../../types/sudoku/PuzzleDefinition";
 import {PositionSet} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {JssCell} from "./JssCell";
@@ -43,6 +48,8 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
 
             // Treat given colors inside active regions as solution colors
             importGivenColorsAsSolution(puzzle, (position) => allRegionCells.contains(position));
+            // Treat solution colors outside active regions as given colors
+            importSolutionColorsAsGiven(puzzle, (position) => !allRegionCells.contains(position));
 
             // Treat given colors outside active regions as JSS clues
             let jssCellsMap: GivenDigitsMap<JssCell> = processGivenDigitsMaps(

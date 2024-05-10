@@ -384,3 +384,30 @@ export const importGivenColorsAsSolution = <T extends AnyPTM>(
         [initialColors]
     );
 };
+
+export const importSolutionColorsAsGiven = <T extends AnyPTM>(
+    puzzle: PuzzleDefinition<T>,
+    isRegionCell: (cell: Position) => boolean = () => true,
+) => {
+    const {
+        initialColors = {},
+        solutionColors = {},
+    } = puzzle;
+    if (typeof initialColors !== "object" || typeof solutionColors !== "object") {
+        throw new Error("puzzle.initialColors and puzzle.solutionColors are expected to be objects");
+    }
+
+    puzzle.initialColors = mergeGivenDigitsMaps(
+        initialColors,
+        processGivenDigitsMaps(
+            ([colors], position) =>
+                isRegionCell(position) && colors.length ? colors : undefined,
+            [solutionColors]
+        )
+    );
+    puzzle.solutionColors = processGivenDigitsMaps(
+        ([colors], position) =>
+            isRegionCell(position) ? undefined : colors,
+        [solutionColors]
+    );
+};
