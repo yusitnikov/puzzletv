@@ -91,6 +91,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [hasStickyJigsawPiece, setHasStickyJigsawPiece] = useBoolFromLocalStorage("fpwHasStickyJigsawPiece", false);
     const [stickyJigsawPiece, setStickyJigsawPiece] = useNumberFromLocalStorage("fpwStickyJigsawPiece", 1);
     const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", false);
+    const [hideZeroRegion, setHideZeroRegion] = useBoolFromLocalStorage("fpwHideZeroRegion", false);
     const [noPieceRegions, setNoPieceRegions] = useBoolFromLocalStorage("fpwNoPieceRegions", false);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
     const [noStickyRegionValidation, setNoStickyRegionValidation] = useBoolFromLocalStorage("fpwNoStickyRegionValidation");
@@ -215,6 +216,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         colorsImportMode: hasColors ? colorsImportMode : undefined,
         angleStep: finalAngleStep,
         shuffle: isJigsaw && filteredExtraGrids.length === 0 && shuffle,
+        hideZeroRegion: isJigsaw && hideZeroRegion,
         noPieceRegions: (isJigsawLike && noPieceRegions) || isShuffled,
         stickyRegion: finalIsFirstGridSticky ? {
             top: globalOffsetY,
@@ -587,6 +589,13 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                         <label>
                             Shuffle:&nbsp;
                             <input type={"checkbox"} checked={shuffle} onChange={ev => setShuffle(ev.target.checked)}/>
+                        </label>
+                    </Paragraph>}
+
+                    {isJigsaw && <Paragraph>
+                        <label>
+                            Hide everything outside of jigsaw pieces:&nbsp;
+                            <input type={"checkbox"} checked={hideZeroRegion} onChange={ev => setHideZeroRegion(ev.target.checked)}/>
                         </label>
                     </Paragraph>}
 
