@@ -228,6 +228,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
             if (puzzle !== undefined) {
                 (window as any).puzzle = this.puzzle;
+                (window as any).context = this;
                 this.puzzle = puzzle;
             }
             if ("processedGameStateExtension" in updates) {
