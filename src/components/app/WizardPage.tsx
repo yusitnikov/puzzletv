@@ -73,6 +73,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [sokoban, setSokoban] = useBoolFromLocalStorage("fpwSokoban");
     const [eggs, setEggs] = useBoolFromLocalStorage("fpwEggs");
     const [noSpecialRules, setNoSpecialRules] = useBoolFromLocalStorage("fpwNoSpecialRules");
+    const [noSudoku, setNoSudoku] = useBoolFromLocalStorage("fpwNoSudoku");
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
@@ -216,6 +217,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         colorsImportMode: hasColors ? colorsImportMode : undefined,
         angleStep: finalAngleStep,
         shuffle: isJigsaw && filteredExtraGrids.length === 0 && shuffle,
+        noSudoku: isJigsawLike && noSudoku,
         hideZeroRegion: isJigsaw && hideZeroRegion,
         noPieceRegions: (isJigsawLike && noPieceRegions) || isShuffled,
         stickyRegion: finalIsFirstGridSticky ? {
@@ -603,6 +605,13 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                         <label>
                             Treat {isTetris ? "tetris figures" : "jigsaw pieces"} as sudoku regions:&nbsp;
                             <input type={"checkbox"} checked={!noPieceRegions} onChange={ev => setNoPieceRegions(!ev.target.checked)}/>
+                        </label>
+                    </Paragraph>
+
+                    <Paragraph>
+                        <label>
+                            Verify sudoku rows/columns:&nbsp;
+                            <input type={"checkbox"} checked={!noSudoku} onChange={ev => setNoSudoku(!ev.target.checked)}/>
                         </label>
                     </Paragraph>
                 </CollapsableFieldSet>}

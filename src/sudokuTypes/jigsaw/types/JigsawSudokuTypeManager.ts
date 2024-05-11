@@ -390,6 +390,10 @@ export const JigsawSudokuTypeManager = (
     regionSpecificUserMarks: true,
 
     getRegionsForRowsAndColumns(context): Constraint<JigsawPTM, any>[] {
+        if (context.puzzle.importOptions?.noSudoku) {
+            return [];
+        }
+
         const regions = context.regions!
             .filter(({noInteraction}) => !noInteraction)
             .sort((a, b) => (a.zIndex ?? -1) - (b.zIndex ?? -1));

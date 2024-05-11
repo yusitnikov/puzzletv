@@ -45,6 +45,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     giftsInSight?: boolean;
     fillableDigitalDisplay?: boolean;
     noSpecialRules?: boolean;
+    noSudoku?: boolean;
     loopX?: boolean;
     loopY?: boolean;
     jss?: boolean;
@@ -99,6 +100,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         giftsInSight,
         fillableDigitalDisplay,
         noSpecialRules,
+        noSudoku,
         loopX,
         loopY,
         jss,
@@ -149,6 +151,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         giftsInSight,
         fillableDigitalDisplay,
         noSpecialRules,
+        noSudoku,
         loopX,
         loopY,
         jss,
