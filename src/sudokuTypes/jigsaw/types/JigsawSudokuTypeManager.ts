@@ -4,6 +4,7 @@ import {JigsawDigit} from "./JigsawDigit";
 import {
     getLineVector,
     Position,
+    PositionSet,
     PositionWithAngle,
     rotateVectorClockwise
 } from "../../../types/layout/Position";
@@ -64,6 +65,7 @@ import {
     addFieldStateExToSudokuManager,
     addGameStateExToSudokuManager
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import {createEmptyContextForPuzzle} from "../../../types/sudoku/PuzzleContext";
 
 
 interface JigsawSudokuTypeManagerOptions {
@@ -470,7 +472,20 @@ export const JigsawSudokuTypeManager = (
             JigsawGluedPiecesConstraint,
         ];
 
-        const {items, resultChecker} = puzzle;
+        const {items, inactiveCells, resultChecker} = puzzle;
+
+        // Mark all cells that don't belong to a region as inactive
+        let newInactiveCells = new PositionSet(inactiveCells);
+        const contextDraft = createEmptyContextForPuzzle(puzzle);
+        for (let top = 0; top < puzzle.fieldSize.rowsCount; top++) {
+            for (let left = 0; left < puzzle.fieldSize.columnsCount; left++) {
+                const region = contextDraft.getCellRegion(top, left);
+                if (!region || region.noInteraction) {
+                    newInactiveCells = newInactiveCells.add({top, left});
+                }
+            }
+        }
+        puzzle = {...puzzle, inactiveCells: newInactiveCells.items};
 
         switch (typeof items) {
             case "function":

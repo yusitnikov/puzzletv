@@ -46,6 +46,7 @@ import {translate} from "../../utils/translate";
 import {PartiallyTranslatable} from "../translations/Translatable";
 import {PuzzleResultCheck} from "./PuzzleResultCheck";
 import {profiler} from "../../utils/profiler";
+import {getGridRegionCells, GridRegion} from "./GridRegion";
 
 const emptyObject = {};
 
@@ -92,6 +93,26 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         profiler.trace();
         return this.puzzle.typeManager.getRegionsWithSameCoordsTransformation?.(this);
     }
+
+    private get regionsByCellsMap() {
+        profiler.trace();
+
+        const result: GivenDigitsMap<GridRegion> = {};
+        for (const region of this.regions ?? []) {
+            for (const {top, left} of getGridRegionCells(region)) {
+                result[top] ??= {};
+                result[top][left] = region;
+            }
+        }
+
+        return result;
+    }
+
+    readonly getCellRegion = computedFn(
+        function getCellRegion(this: PuzzleContext<T>, top: number, left: number): GridRegion | undefined {
+            return this.regionsByCellsMap[top]?.[left];
+        }
+    );
 
     private _animated?: ProcessedGameStateAnimatedValues;
     get animated(): ProcessedGameStateAnimatedValues {
