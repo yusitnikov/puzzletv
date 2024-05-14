@@ -504,11 +504,17 @@ export const JigsawSudokuTypeManager = (
             puzzle = {
                 ...puzzle,
                 resultChecker: (context) => {
+                    const result = resultChecker(context);
+
+                    if (result === false || (typeof result === "object" && !result.isCorrectResult)) {
+                        return result;
+                    }
+
                     if (resultChecker !== isValidFinishedPuzzleByConstraints && !isValidFinishedPuzzleByConstraints(context)) {
                         return false;
                     }
 
-                    return resultChecker(context);
+                    return result;
                 },
             };
         }

@@ -22,6 +22,8 @@ class Settings {
 
     readonly nickname = localStorageManager.getStringManager("nickname");
 
+    readonly debugSolutionChecker = localStorageManager.getBoolManager("debugSolutionChecker");
+
     constructor() {
         makeAutoObservable(this);
     }
@@ -32,3 +34,4 @@ class Settings {
 }
 
 export const settings = new Settings();
+(window as any).settings = settings;

@@ -29,6 +29,7 @@ import {AnyPTM} from "./PuzzleTypeMap";
 import {isSolutionCheckCell} from "./CellTypeProps";
 import {profiler} from "../../utils/profiler";
 import {ColorChecker, ColorMapChecker, ExactColorChecker} from "./ColorChecker";
+import {settings} from "../layout/Settings";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
     // The field is required. Marking it as optional here only to avoid adding empty object to each puzzle.
@@ -219,7 +220,6 @@ export const getIsSamePuzzleLine = <T extends AnyPTM>(puzzle: PuzzleDefinition<T
 export const getPuzzleLineHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
     (line: Line) => stringifyLine(normalizePuzzleLine(line, puzzle));
 
-const debugSolutionChecker = false;
 export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     context: PuzzleContext<T>
 ): boolean | PuzzleResultCheck<PartiallyTranslatable<ReactNode>> => {
@@ -252,6 +252,8 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const colorsBySolutionChecker: ColorChecker<string> = allowMappingSolutionColors
         ? new ColorMapChecker()
         : new ExactColorChecker();
+    let loggedEmptyDigits = false;
+    let loggedEmptyColors = false;
     for (const [top, row] of cells.entries()) {
         for (const [left, {colors}] of row.entries()) {
             if (!isSolutionCheckCell(puzzleIndex.getCellTypeProps({top, left}))) {
@@ -277,8 +279,13 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             const actualDigit = userDigits[top]?.[left];
             const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, context, {top, left}) : actualMark;
             if (actualData !== expectedData) {
-                if (debugSolutionChecker) {
-                    console.warn("Wrong digit at", stringifyCellCoords({top, left}), "expected", expectedData, "got", actualData);
+                if (settings.debugSolutionChecker.get()) {
+                    if (actualData !== undefined || !loggedEmptyDigits) {
+                        console.warn("Wrong digit at", stringifyCellCoords({top, left}), "expected", expectedData, "got", actualData);
+                    }
+                    if (actualData === undefined) {
+                        loggedEmptyDigits = true;
+                    }
                 }
                 areCorrectDigits = false;
             }
@@ -294,8 +301,13 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
 
             if (hasSolutionColors && (expectedColor || !ignoreEmptySolutionColors)) {
                 if (!colorsBySolutionChecker.isValidData(actualColor, expectedColor)) {
-                    if (debugSolutionChecker) {
-                        console.warn("Wrong color at", stringifyCellCoords({top, left}), "expected", expectedColor, "got", actualColor);
+                    if (settings.debugSolutionChecker.get()) {
+                        if (actualColor || !loggedEmptyColors) {
+                            console.warn("Wrong color at", stringifyCellCoords({top, left}), "expected", expectedColor, "got", actualColor);
+                        }
+                        if (!actualColor) {
+                            loggedEmptyColors = true;
+                        }
                     }
                     timer.stop();
                     return false;
