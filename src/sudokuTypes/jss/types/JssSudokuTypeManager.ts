@@ -28,12 +28,15 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
             };
 
             if (puzzle.regions?.length) {
-                const activeRegions = [...puzzle.regions]
-                    .sort((a, b) => getRegionCells(b).length - getRegionCells(a).length);
+                let activeRegions = puzzle.regions;
                 const inactiveCells = puzzle.inactiveCells ?? [];
 
                 if (puzzleHasZeroRegion) {
-                    const inactiveRegion = activeRegions.shift()!;
+                    // Get the largest region
+                    const inactiveRegion = activeRegions.reduce(
+                        (a, b) => getRegionCells(a).length > getRegionCells(b).length ? a : b
+                    );
+                    activeRegions = activeRegions.filter((region) => region !== inactiveRegion);
                     inactiveCells.push(...getRegionCells(inactiveRegion));
                 }
 

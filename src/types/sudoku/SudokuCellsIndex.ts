@@ -517,10 +517,16 @@ export class SudokuCellsIndex<T extends AnyPTM> {
     }
 
     splitUnconnectedRegions(regions: Position[][]): Position[][] {
-        const cellRegions = this.allCells.map((row) => row.map(() => ({
+        interface RegionInfo {
+            index: number;
+            id: number;
+            cells: Position[];
+        }
+
+        const cellRegions = this.allCells.map((row) => row.map((): RegionInfo => ({
             index: 0,
             id: 0,
-            cells: [] as Position[],
+            cells: [],
         })));
         let autoIncrementId = 0;
         for (const [regionIndex, region] of regions.entries()) {
@@ -545,16 +551,19 @@ export class SudokuCellsIndex<T extends AnyPTM> {
             }
         }
 
-        const newRegionsMap: Record<number, Position[]> = {};
+        const newRegionsMap: Record<number, RegionInfo> = {};
         for (const row of cellRegions) {
-            for (const {id, cells} of row) {
-                if (cells.length) {
-                    newRegionsMap[id] = cells;
+            for (const info of row) {
+                if (info.cells.length) {
+                    newRegionsMap[info.id] = info;
                 }
             }
         }
 
-        return Object.values(newRegionsMap);
+        return Object.values(newRegionsMap)
+            // preserve the original regions' order
+            .sort((a, b) => a.index - b.index || a.id - b.id)
+            .map(({cells}) => cells);
     }
     // endregion
 
