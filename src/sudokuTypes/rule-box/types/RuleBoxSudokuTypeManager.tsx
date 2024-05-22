@@ -25,6 +25,8 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
     ...extendedTypeManager,
 
     postProcessPuzzle(puzzle) {
+      puzzle = extendedTypeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
+
       const {items = []} = puzzle;
 
       const processItems = (items: Constraint<ToRuleBoxPTM<T>, any>[]): Constraint<ToRuleBoxPTM<T>, any>[] => items.map(
