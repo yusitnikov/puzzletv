@@ -43,6 +43,7 @@ import {PuzzleImporter} from "./PuzzleImporter";
 import {GridParser, GridParserFactory} from "./GridParser";
 import {FullCubePTM} from "../../sudokuTypes/cube/types/FullCubePTM";
 import {EggSokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/egg/types/EggSokobanSudokuTypeManager";
+import {RuleBoxSudokuTypeManager} from "../../sudokuTypes/rule-box/types/RuleBoxSudokuTypeManager";
 
 const getGridParsersByImportOptions = <T extends AnyPTM, JsonT>(
     importOptions: PuzzleImportOptions,
@@ -175,6 +176,8 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     if (find3) {
         typeManager = Find3SudokuTypeManager(typeManager, giftsInSight);
     }
+
+    typeManager = RuleBoxSudokuTypeManager(typeManager);
 
     switch (digitType) {
         case PuzzleImportDigitType.Regular:

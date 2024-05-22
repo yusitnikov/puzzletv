@@ -58,11 +58,11 @@ export type ConstraintProps<T extends AnyPTM, DataT = undefined> =
     regionIndex?: number;
 }
 
-export type ConstraintPropsGenericFc<DataT = undefined> = <T extends AnyPTM>(
+export type ConstraintPropsGenericFc<DataT = undefined, BaseT extends AnyPTM = AnyPTM> = <T extends BaseT>(
     props: ConstraintProps<T, DataT>
 ) => (ReactElement | null);
 
-export type ConstraintPropsGenericFcMap<DataT = undefined> = Partial<Record<FieldLayer, ConstraintPropsGenericFc<DataT>>>;
+export type ConstraintPropsGenericFcMap<DataT = undefined, BaseT extends AnyPTM = AnyPTM> = Partial<Record<FieldLayer, ConstraintPropsGenericFc<DataT, BaseT>>>;
 
 // region Helper methods
 export const normalizeConstraintCells = <T extends AnyPTM>(positions: Position[], puzzle: PuzzleDefinition<T>) =>
