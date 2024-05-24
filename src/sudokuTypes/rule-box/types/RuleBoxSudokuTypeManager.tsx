@@ -6,6 +6,7 @@ import {ToRuleBoxPTM} from "./RuleBoxPTM";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {isCageConstraint} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {RuleBoxConstraint} from "../components/RuleBox";
+import {RulesParagraph} from "../../../components/sudoku/rules/RulesParagraph";
 
 const rulePrefix = "rule:";
 
@@ -40,6 +41,18 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
         items: typeof items === "function"
           ? ((...args) => processItems(items(...args)))
           : processItems(items),
+      };
+
+      const baseRules = puzzle.rules;
+      puzzle = {
+        ...puzzle,
+        rules: (translate, context) => <>
+          {baseRules?.(translate, context)}
+
+          {Object.entries((context.stateExtension as RuleBoxGameState).ruleBoxes ?? {}).map(([ruleText, wasClicked]) => wasClicked && <RulesParagraph key={ruleText}>
+            {ruleText}
+          </RulesParagraph>)}
+        </>,
       };
 
       return puzzle;
