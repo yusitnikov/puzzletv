@@ -14,6 +14,30 @@ import {ReactNode} from "react";
 import {Constraint, ConstraintProps, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
 import {parsePositionLiteral, PositionLiteral} from "../../types/layout/Position";
 import {FieldLayer} from "../../types/sudoku/FieldLayer";
+import {CellColor, cellColors} from "../../types/sudoku/CellColor";
+import {localStorageManager} from "../../utils/localStorage";
+import {SettingsContentProps} from "../../components/sudoku/controls/settings/SettingsContent";
+import {SettingsItem} from "../../components/sudoku/controls/settings/SettingsItem";
+import {SettingsCheckbox} from "../../components/sudoku/controls/settings/SettingsCheckbox";
+
+// region Settings
+const withColorsSetting = localStorageManager.getBoolManager("bodoniWithColors");
+
+export const BodoniSettings = observer(function BodoniSettings({cellSize}: SettingsContentProps<NumberPTM>) {
+    profiler.trace();
+
+    return <SettingsItem>
+        Add unique background colors to the glyphs:
+
+        <SettingsCheckbox
+            type={"checkbox"}
+            cellSize={cellSize}
+            checked={withColorsSetting.get()}
+            onChange={(ev) => withColorsSetting.set(ev.target.checked)}
+        />
+    </SettingsItem>;
+});
+// endregion
 
 // region Glyphs
 const smallWidth = 0.1;
@@ -143,6 +167,8 @@ const glyphsMap: Record<number, ReactNode[]> = {
 // endregion
 
 // region Custom digit
+const colorsMap = cellColors;
+
 const BodoniDigit = observer(function BodoniDigit({puzzle, digit, size, color = textColor, ...containerProps}: DigitProps<NumberPTM>) {
     profiler.trace();
 
@@ -171,6 +197,17 @@ const BodoniDigitSvgContent = observer(function BodoniDigitSvgContent({digit, si
         style={{color}}
         scale={size}
     >
+        {withColorsSetting.get() && <rect
+            fill={colorsMap[(digit - 1) as CellColor]}
+            fillOpacity={0.5}
+            stroke={"none"}
+            strokeWidth={0}
+            x={-0.5}
+            y={-0.5}
+            width={1}
+            height={1}
+        />}
+
         {glyphsMap[digit]}
     </AutoSvg>;
 });
@@ -221,7 +258,10 @@ export const BodoniSudoku: PuzzleDefinition<NumberPTM> = {
     title: {
         [LanguageCode.en]: "Bodoni Sudoku",
     },
-    typeManager: DigitSudokuTypeManager(BodoniDigitComponentType, 1),
+    typeManager: {
+        ...DigitSudokuTypeManager(BodoniDigitComponentType, 1),
+        settingsComponents: [BodoniSettings],
+    },
     fieldSize: FieldSize9,
     regions: Regions9,
     rules: () => <>
