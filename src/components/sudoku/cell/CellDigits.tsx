@@ -108,6 +108,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>(
             cellDataDigitComponentType = digitComponentType,
             cellDataComponentType: {
                 widthCoeff = cellDataDigitComponentType.widthCoeff,
+                cellSizeCoeff = mainDigitCoeff,
             },
         },
     } = puzzle;
@@ -192,7 +193,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>(
                     context={context}
                     cellPosition={cellPosition}
                     digits={initialDataSet}
-                    digitSize={size * mainDigitCoeff}
+                    digitSize={size * cellSizeCoeff}
                     positionFunction={emptyPositionFunction}
                     isInitial={true}
                     isValid={true}
@@ -204,7 +205,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>(
                         context={context}
                         cellPosition={cellPosition}
                         digits={usersDigitSet}
-                        digitSize={size * mainDigitCoeff}
+                        digitSize={size * cellSizeCoeff}
                         positionFunction={emptyPositionFunction}
                         isInitial={mainColor}
                         isValid={isValidMainDigit}

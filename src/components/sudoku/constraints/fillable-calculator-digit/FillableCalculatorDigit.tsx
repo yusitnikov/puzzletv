@@ -18,11 +18,13 @@ export const FillableCalculatorDigit: ConstraintPropsGenericFcMap<FillableCalcul
     ) {
         profiler.trace();
 
+        const {typeManager: {cellDataComponentType: {cellSizeCoeff = mainDigitCoeff}}} = puzzle;
+
         return <RegularCalculatorDigit
             puzzle={puzzle}
             left={left + 0.5}
             top={top + 0.5}
-            size={mainDigitCoeff}
+            size={cellSizeCoeff}
             digit={digit}
             color={darkGreyColor}
         />;

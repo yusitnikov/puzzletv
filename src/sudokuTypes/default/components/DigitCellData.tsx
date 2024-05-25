@@ -34,6 +34,7 @@ export const DigitCellData = observer(function DigitCellData<T extends AnyNumber
     />;
 }) as <T extends AnyNumberPTM>(props: CellDataProps<T>) => ReactElement;
 
-export const DigitCellDataComponentType = <T extends AnyNumberPTM>(): CellDataComponentType<T> => ({
+export const DigitCellDataComponentType = <T extends AnyNumberPTM>(cellSizeCoeff?: number): CellDataComponentType<T> => ({
     component: DigitCellData,
+    cellSizeCoeff,
 });

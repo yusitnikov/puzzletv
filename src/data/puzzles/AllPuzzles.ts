@@ -54,6 +54,7 @@ import {Find3} from "./Find3";
 import {Shuffled} from "./Shuffled";
 import {Karaoke} from "./Karaoke";
 import {NationalGeographic} from "./NationalGeographic";
+import {BodoniSudoku} from "./BodoniSudoku";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -81,6 +82,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    BodoniSudoku,
+
     Shuffled,
     Screws,
     Find3,
