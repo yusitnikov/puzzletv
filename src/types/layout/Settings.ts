@@ -27,7 +27,7 @@ class Settings {
 
     readonly simplifiedGraphics = localStorageManager.getBoolManager(
         "simplifiedGraphics",
-        (new UAParser()).getResult().device.vendor !== "apple"
+        !process.env.STORYBOOK && (new UAParser()).getResult().device.vendor !== "apple"
     );
 
     constructor() {
