@@ -246,6 +246,21 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
         </SettingsItem>}
 
         <SettingsItem>
+            {translate({
+                [LanguageCode.en]: "Simplified graphics",
+                [LanguageCode.ru]: "Упрощенная графика",
+                [LanguageCode.de]: "Vereinfachte Grafiken",
+            })}:
+
+            <SettingsCheckbox
+                type={"checkbox"}
+                cellSize={cellSize}
+                checked={settings.simplifiedGraphics.get()}
+                onChange={(ev) => settings.simplifiedGraphics.set(ev.target.checked)}
+            />
+        </SettingsItem>
+
+        <SettingsItem>
             <span>{translate({
                 [LanguageCode.en]: "Animation speed",
                 [LanguageCode.ru]: "Скорость анимации",

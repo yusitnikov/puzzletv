@@ -2,6 +2,7 @@ import {makeAutoObservable} from "mobx";
 import {localStorageManager} from "../../utils/localStorage";
 import {PencilmarksCheckerMode} from "../sudoku/PencilmarksCheckerMode";
 import {AnimationSpeed} from "../sudoku/AnimationSpeed";
+import {UAParser} from "ua-parser-js";
 
 class Settings {
     isOpened = false;
@@ -23,6 +24,11 @@ class Settings {
     readonly nickname = localStorageManager.getStringManager("nickname");
 
     readonly debugSolutionChecker = localStorageManager.getBoolManager("debugSolutionChecker");
+
+    readonly simplifiedGraphics = localStorageManager.getBoolManager(
+        "simplifiedGraphics",
+        (new UAParser()).getResult().device.vendor !== "apple"
+    );
 
     constructor() {
         makeAutoObservable(this);

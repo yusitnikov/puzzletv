@@ -28,7 +28,6 @@ import {useAutoIncrementId} from "../../../hooks/useAutoIncrementId";
 import {FieldItems, FieldItemsProps} from "./FieldItems";
 import {FieldLoop} from "./FieldLoop";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {useUserAgentParser} from "../../../hooks/useUserAgentParser";
 import {observer} from "mobx-react-lite";
 import {settings} from "../../../types/layout/Settings";
 import {profiler} from "../../../utils/profiler";
@@ -197,8 +196,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
         )}
     </g>;
 
-    const {device: {vendor}} = useUserAgentParser();
-    const applyShadowFilter = vendor?.toLowerCase() !== "apple";
+    const applyShadowFilter = !settings.simplifiedGraphics.get();
     const shadowFilterId = `field-shadow-${autoIncrementId}`;
     const shadowFilterStr = applyShadowFilter ? `url(#${shadowFilterId})` : undefined;
 

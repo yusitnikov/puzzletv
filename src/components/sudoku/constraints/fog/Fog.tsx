@@ -23,9 +23,9 @@ import {PuzzleLineSet} from "../../../../types/sudoku/PuzzleLineSet";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {settings} from "../../../../types/layout/Settings";
 
 export const fogTag = "fog";
-const shadowSize = 0.07;
 
 export interface FogProps<T extends AnyPTM> {
     startCells?: Position[];
@@ -126,17 +126,19 @@ export const Fog = {
         const visible = getFogVisibleCells(context, props);
 
         const id = useAutoIncrementId();
+        const enableShadow = !settings.simplifiedGraphics.get();
         const blurFilterId = `blur-filter-${id}`;
         const fogMaskId = `fog-mask-${id}`;
         const fogBulbId = `fog-bulb-${id}`;
+        const shadowSize = enableShadow ? 0.07 : 0;
 
         return <>
             <defs>
-                <filter id={blurFilterId}>
+                {enableShadow && <filter id={blurFilterId}>
                     <feGaussianBlur stdDeviation={shadowSize}/>
-                </filter>
+                </filter>}
                 <mask id={fogMaskId}>
-                    <g filter={`url(#${blurFilterId})`}>
+                    <g filter={enableShadow ? `url(#${blurFilterId})` : undefined}>
                         <DarkReaderRectOverride
                             width={columnsCount}
                             height={rowsCount}
