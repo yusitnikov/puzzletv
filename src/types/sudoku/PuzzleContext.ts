@@ -863,6 +863,12 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return fogProps && getFogVisibleCells(this, fogProps);
     }
 
+    get disableFogDemo(): boolean {
+        const {puzzle: {typeManager: {disableFogDemo}}} = this;
+
+        return typeof disableFogDemo === "function" ? disableFogDemo(this) : !!disableFogDemo;
+    }
+
     get digitsCount() {
         profiler.trace();
         return this.puzzle.digitsCount ?? getDefaultDigitsCount(this.puzzle);

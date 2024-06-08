@@ -68,6 +68,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({rect, context}: 
         lives,
         fogDemoFieldStateHistory,
         fogProps,
+        disableFogDemo,
         cellSizeForSidePanel: cellSize,
         multiPlayer: {isEnabled},
     } = context;
@@ -172,7 +173,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({rect, context}: 
             {!lives && translate("You lost") + "!"}
         </div>}
 
-        {fogProps && <div
+        {!disableFogDemo && fogProps && <div
             style={{
                 marginBottom: cellSize * rulesMarginCoeff,
                 lineHeight: `${cellSize * textHeightCoeff}px`,

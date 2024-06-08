@@ -57,5 +57,15 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
 
       return puzzle;
     },
+
+    disableFogDemo: (context) => {
+      for (const rule in (context.stateExtension as RuleBoxGameState).ruleBoxes) {
+        if (/\b(?:fow|fog of war)\b/i.test(rule)) {
+          return false;
+        }
+      }
+
+      return true;
+    },
   };
 };

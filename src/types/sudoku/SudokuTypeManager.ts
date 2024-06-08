@@ -276,6 +276,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     fieldControlsComponent?: ComponentType<PuzzleContextProps<T>>;
 
     getInitialDigits?: (context: PuzzleContext<T>) => GivenDigitsMap<T["cell"]>;
+
+    disableFogDemo?: boolean | ((context: PuzzleContext<T>) => boolean);
 }
 
 // region Helper functions
