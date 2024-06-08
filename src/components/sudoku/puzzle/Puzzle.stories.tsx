@@ -134,3 +134,6 @@ Shuffled.args = {_hash: "shuffled"};
 
 export const EasterSokoban = Template.bind({});
 EasterSokoban.args = {_hash: "easter-sokoban"};
+
+export const EndlessChristmas = Template.bind({});
+EndlessChristmas.args = {_hash: "endless-christmas"};

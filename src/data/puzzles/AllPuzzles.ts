@@ -55,6 +55,7 @@ import {Shuffled} from "./Shuffled";
 import {Karaoke} from "./Karaoke";
 import {NationalGeographic} from "./NationalGeographic";
 import {BodoniSudoku} from "./BodoniSudoku";
+import {EndlessChristmas} from "./EndlessChristmas";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -145,6 +146,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    EndlessChristmas,
+
     EasterSokoban,
 
     NationalGeographic,
