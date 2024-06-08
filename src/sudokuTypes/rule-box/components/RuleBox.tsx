@@ -14,6 +14,8 @@ import {Button} from "../../../components/layout/button/Button";
 import {AnyRuleBoxPTM} from "../types/RuleBoxPTM";
 import {RuleBoxGameState} from "../types/RuleBoxGameState";
 
+const ruleBoxTag = "rule-box";
+
 export interface RuleBoxProps {
     rules: string;
 }
@@ -104,7 +106,11 @@ const StyledClickArea = styled("g")({
 
 export const RuleBoxConstraint = <T extends AnyRuleBoxPTM>(cells: PositionLiteral[], rules: string): Constraint<T, RuleBoxProps> => ({
     name: "rules box",
+    tags: [ruleBoxTag],
     cells: parsePositionLiterals(cells),
     component: RuleBox,
     props: {rules},
 });
+
+export const isRuleBoxConstraint = <T extends AnyRuleBoxPTM>(constraint: Constraint<T, any>): constraint is Constraint<T, RuleBoxProps> =>
+  (constraint.tags ?? []).includes(ruleBoxTag);

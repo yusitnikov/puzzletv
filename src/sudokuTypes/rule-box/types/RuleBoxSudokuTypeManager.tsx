@@ -5,7 +5,7 @@ import {RuleBoxGameState} from "./RuleBoxGameState";
 import {ToRuleBoxPTM} from "./RuleBoxPTM";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {isCageConstraint} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
-import {RuleBoxConstraint} from "../components/RuleBox";
+import {isRuleBoxConstraint, RuleBoxConstraint} from "../components/RuleBox";
 import {RulesParagraph} from "../../../components/sudoku/rules/RulesParagraph";
 
 const rulePrefix = "rule:";
@@ -59,6 +59,10 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
     },
 
     disableFogDemo: (context) => {
+      if (!context.resolvedPuzzleItems.some(isRuleBoxConstraint)) {
+        return false;
+      }
+
       for (const rule in (context.stateExtension as RuleBoxGameState).ruleBoxes) {
         if (/\b(?:fow|fog of war)\b/i.test(rule)) {
           return false;
