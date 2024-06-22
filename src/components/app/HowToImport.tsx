@@ -2,6 +2,25 @@ import {useTranslate} from "../../hooks/useTranslate";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
+import {Tabs} from "../layout/tabs/Tabs";
+import {CubeIt} from "../../data/puzzles/Cubedoku";
+import {SudokuMaker} from "../../data/puzzles/SudokuMaker";
+import {PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
+import {ToroidalYinYang} from "../../data/puzzles/ToroidalYinYang";
+import {ExampleTab} from "./how-to-import/ExampleTab";
+import {MappingIllustration} from "./how-to-import/MappingIllustration";
+import {
+    seeIllustration,
+    selectAdditionalConstraintTranslation,
+    selectGridTypeTranslation
+} from "./how-to-import/translations";
+import {NorthOrSouth2} from "../../data/puzzles/NorthOrSouth";
+import {RushHour, RushHourSource} from "../../data/puzzles/RushHour";
+import {EasterSokoban, EasterSokobanSource, Sudokuban, SudokubanSource} from "../../data/puzzles/Sudokuban";
+import {Revolutionary} from "../../data/puzzles/RotatableClues";
+import {JssChicken} from "../../data/puzzles/JigsawJss";
+import {EndlessChristmas} from "../../data/puzzles/EndlessChristmas";
+import {normalSudokuRulesApply} from "../../data/ruleSnippets";
 
 export const HowToImport = observer(function HowToImport() {
     profiler.trace();
@@ -13,35 +32,283 @@ export const HowToImport = observer(function HowToImport() {
     // eslint-disable-next-line no-script-url
     const bookmarkletCode = "javascript:void(h=location.href,d=window.exportPuzzle&&exportPuzzle()||h.split(/(\\?puzzleid=fpuzzles|\\.app\\/\\?puzzle=|\\.app\\/fpuzzles|[?:]load=)/)[2],d?open('https://yusitnikov.github.io/puzzletv/#'+(h.includes('sudokumaker')?'sudokumaker':'f-puzzles')+'-wizard:load='+d):alert('Unable to extract a puzzle definition'))";
 
-    return <ol>
-        <li>{translate({
-            [LanguageCode.en]: <>Create the puzzle in {fPuzzlesLink} or {sudokuMakerLink} (like you do it for SudokuPad)</>,
-            [LanguageCode.ru]: <>Создайте головоломку в {fPuzzlesLink} или {sudokuMakerLink}'е (так же, как Вы делаете это для SudokuPad)</>,
-            [LanguageCode.de]: <>Erstellen Sie das Rätsel in {fPuzzlesLink} oder {sudokuMakerLink} (wie Sie es für SudokuPad tun)</>,
-        })}.</li>
-        <li>{translate({
-            [LanguageCode.en]: "Drag&drop the following bookmarklet into your bookmarks bar (only once)",
-            [LanguageCode.ru]: "Перетащите следующий букмарклет в Вашу панель закладок (только один раз)",
-            [LanguageCode.de]: "Ziehen Sie das folgende Lesezeichen per Drag&Drop in Ihre Lesezeichenleiste (nur einmal)",
-        })}: <a href={bookmarkletCode}>{translate({
-            [LanguageCode.en]: "Export to PuzzleTV",
-            [LanguageCode.ru]: "Экспорт в PuzzleTV",
-            [LanguageCode.de]: "Export nach PuzzleTV",
-        })}</a>.</li>
-        <li>{translate({
-            [LanguageCode.en]: "Click the bookmark",
-            [LanguageCode.ru]: "Нажмите на закладку",
-            [LanguageCode.de]: "Klicken Sie auf das Lesezeichen",
-        })}.</li>
-        <li>{translate({
-            [LanguageCode.en]: 'Select puzzle options and click "Load"',
-            [LanguageCode.ru]: 'Выберите опции головоломки и нажмите "Загрузить"',
-            [LanguageCode.de]: 'Wählen Sie die Puzzle-Optionen und klicken Sie auf "Laden"',
-        })}.</li>
-        <li>{translate({
-            [LanguageCode.en]: "Done! Now you can share the link to the puzzle",
-            [LanguageCode.ru]: "Готово! Теперь Вы можете поделиться ссылкой на головоломку",
-            [LanguageCode.de]: "Erledigt! Nun können Sie den Link zum Rätsel teilen",
-        })}.</li>
-    </ol>;
+    return <>
+        <ol>
+            <li>{translate({
+                [LanguageCode.en]: <>Create the puzzle in {fPuzzlesLink} or {sudokuMakerLink} (like you do it for SudokuPad)</>,
+                [LanguageCode.ru]: <>Создайте головоломку в {fPuzzlesLink} или {sudokuMakerLink}'е (так же, как Вы делаете это для SudokuPad)</>,
+                [LanguageCode.de]: <>Erstellen Sie das Rätsel in {fPuzzlesLink} oder {sudokuMakerLink} (wie Sie es für SudokuPad tun)</>,
+            })}.</li>
+            <li>{translate({
+                [LanguageCode.en]: "Drag&drop the following bookmarklet into your bookmarks bar (only once)",
+                [LanguageCode.ru]: "Перетащите следующий букмарклет в Вашу панель закладок (только один раз)",
+                [LanguageCode.de]: "Ziehen Sie das folgende Lesezeichen per Drag&Drop in Ihre Lesezeichenleiste (nur einmal)",
+            })}: <a href={bookmarkletCode}>{translate({
+                [LanguageCode.en]: "Export to PuzzleTV",
+                [LanguageCode.ru]: "Экспорт в PuzzleTV",
+                [LanguageCode.de]: "Export nach PuzzleTV",
+            })}</a>.</li>
+            <li>{translate({
+                [LanguageCode.en]: "Click the bookmark",
+                [LanguageCode.ru]: "Нажмите на закладку",
+                [LanguageCode.de]: "Klicken Sie auf das Lesezeichen",
+            })}.</li>
+            <li>{translate({
+                [LanguageCode.en]: 'Select puzzle options and click "Load"',
+                [LanguageCode.ru]: 'Выберите опции головоломки и нажмите "Загрузить"',
+                [LanguageCode.de]: 'Wählen Sie die Puzzle-Optionen und klicken Sie auf "Laden"',
+            })}.</li>
+            <li>{translate({
+                [LanguageCode.en]: "Done! Now you can share the link to the puzzle",
+                [LanguageCode.ru]: "Готово! Теперь Вы можете поделиться ссылкой на головоломку",
+                [LanguageCode.de]: "Erledigt! Nun können Sie den Link zum Rätsel teilen",
+            })}.</li>
+        </ol>
+
+        <p>{translate({
+            [LanguageCode.en]: "Click puzzle type below to see type-specific details for importing it to Puzzle TV",
+            [LanguageCode.ru]: "Нажмите на тип головоломки ниже, чтобы просмотреть детали, специфические для импорта этого типа головоломки в Puzzle TV",
+            [LanguageCode.de]: "Klicken Sie unten auf den Puzzletyp, um typspezifische Details zum Importieren in Puzzle TV anzuzeigen",
+        })}:</p>
+
+        <Tabs
+            urlParam={"type"}
+            tabs={[
+                {
+                    id: PuzzleImportPuzzleType.Cubedoku,
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Cubedoku",
+                            [LanguageCode.ru]: "Кубдоку",
+                        })}
+                        puzzle={CubeIt}
+                    />,
+                    contents: <>
+                        <p>{translate({
+                            [LanguageCode.en]: "Create a puzzle twice the size of the cube's face",
+                            [LanguageCode.ru]: "Создайте головоломку размером в два раза больше стороны куба",
+                            [LanguageCode.de]: "Erstellen Sie ein Puzzle, das doppelt so groß ist wie die Fläche des Würfels",
+                        })}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: "Define the regions if necessary (it's ok to use the same region number for several unconnected regions)",
+                            [LanguageCode.ru]: "Добавьте регионы, если нужно (можно использовать один и тот же номер региона для нескольких несвязанных регионов)",
+                            [LanguageCode.de]: "Definieren Sie die Regionen, falls erforderlich (es ist in Ordnung, die gleiche Regionsnummer für mehrere nicht verbundene Regionen zu verwenden)",
+                        })}.</p>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: "The top left quadrant of the source grid will become the top face of the cube",
+                                [LanguageCode.ru]: "Верхний левый квадрант исходной сетки станет верхней гранью куба",
+                                [LanguageCode.de]: "Der obere linke Quadrant des Quellrasters wird zur oberen Fläche des Würfels",
+                            })}. {translate({
+                                [LanguageCode.en]: "The top right quadrant will be ignored",
+                                [LanguageCode.ru]: "Верхний правый квадрант будет игнорироваться",
+                                [LanguageCode.de]: "Der obere rechte Quadrant wird ignoriert",
+                            })}. {translate({
+                                [LanguageCode.en]: "The bottom left and the bottom right quadrants will become the left and the right faces of the cube, accordingly",
+                                [LanguageCode.ru]: "Нижний левый и нижний правый квадранты станут левой и правой гранями куба, соответственно",
+                                [LanguageCode.de]: "Die unteren linken und unteren rechten Quadranten werden die linken und rechten Flächen des Würfels, entsprechend",
+                            })}. {translate(seeIllustration)}:
+                        </p>
+                        <MappingIllustration puzzle={(plain) => SudokuMaker.loadPuzzle(
+                            {
+                                type: plain ? PuzzleImportPuzzleType.Regular : PuzzleImportPuzzleType.Cubedoku,
+                                splitUnconnectedRegions: true,
+                                load: "N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQBMJADCADQgAOArgF7MA2KBoOcMnhAOV4oO6dAAJ0jACYQA1o1og4jBAAtoBEAGE1wjriUBjCDD44EWpQgCe9fiCON0CU0oDumaeoIAOOmoomADmapb4-iDwAB4AIiGY4QAsdEYibOgEANrAAL40eQX5hSXFZUUVpZXlVbU19dWNdU0NzW2tHS1d7d1lALqpuC5QcJgWmfg5ILb2BJTF03b8RHRQKMHYOBNZlDS7%2BzQAtCvHRycrFzSXpzfnNGT3jw%2B3Z68AzDQfX68vpyn-NBSBwOAFYaGCIVcoZcAGw0OEIp5IgDsNFR6M%2BmK%2BfQWM34ZEolAeDDgIxg21AeK0CBQ0UsdBpdK0RCUWGY-BSyhwwQ4czow3kKAA6l4fPhdiABXIHABiMDyhVKMCYNhsLRysCEwnykC4pbU2n06aGrRkVmYdkETlwbm88X8hBQQUi7xqPmSx2C9UKxV0ZWq72arU6vWzQiMo0RrRvc2W-DW238CVS4Wit32j1O6WBn1KlVqwgarWUEMFRZh41MhkmwgADVjHLoNp5SYdWdTrvdKZzvvA%2BcDxZDA0lNhgACMIBlslkHg8JdIUGAVGxLAMZ-CoSAF0vGCuQGvEcTt8vVzQsnCHh8t4uT-ucTjckA",
+                            },
+                            true
+                        )}/>
+                        <p>{translate(selectGridTypeTranslation("Cubedoku"))}.</p>
+                    </>,
+                },
+                {
+                    id: "toroidal",
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Toroidal grid",
+                            [LanguageCode.ru]: "Тороидальное поле",
+                            [LanguageCode.de]: "Toroidales Gitter",
+                        })}
+                        puzzle={ToroidalYinYang}
+                    />,
+                    contents: <>
+                        <p>{translate(selectGridTypeTranslation("Regular"))}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: `Use "Loop horizontally" and "Loop vertically" checkboxes to define in which dimensions the grid should loop`,
+                            [LanguageCode.ru]: `Используйте флажки «Loop horizontally» и «Loop vertically», чтобы определить, в каких измерениях сетка должна зацикливаться`,
+                            [LanguageCode.de]: `Verwenden Sie die Kontrollkästchen "Loop horizontally" und "Loop vertically", um festzulegen, in welchen Dimensionen das Raster schleifen soll`,
+                        })}.</p>
+                    </>,
+                },
+                {
+                    id: PuzzleImportPuzzleType.Rotatable,
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Rotatable grid",
+                            [LanguageCode.ru]: "Вращающееся поле",
+                            [LanguageCode.de]: "Drehbares Gitter",
+                        })}
+                        puzzle={NorthOrSouth2}
+                    />,
+                    contents: <>
+                        <p>{translate(selectGridTypeTranslation("Rotatable"))}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: `Optionally, change "Digit type" to "Calculator" to make "2" and "5" rotationally symmetric`,
+                            [LanguageCode.ru]: `При желании измените «Digit type» на «Calculator», чтобы сделать «2» и «5» симметричными при вращении вокруг оси`,
+                            [LanguageCode.de]: `Ändern Sie optional "Digit type" in "Calculator", um "2" und "5" rotationssymmetrisch zu machen`,
+                        })}.</p>
+                    </>,
+                },
+                {
+                    id: PuzzleImportPuzzleType.RushHour,
+                    title: <ExampleTab
+                        title={translate({[LanguageCode.en]: "Rush hour"})}
+                        puzzle={RushHour}
+                    />,
+                    contents: <>
+                        <p>{translate(selectGridTypeTranslation("Rush hour"))}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: "Use cell background colors to mark the initial positions of the cars",
+                            [LanguageCode.ru]: "Используйте цвета фона ячеек, чтобы отметить начальные положения автомобилей",
+                            [LanguageCode.de]: "Verwenden Sie Zellhintergrundfarben, um die Anfangspositionen der Autos zu markieren",
+                        })}. {translate(seeIllustration)}:</p>
+                        <MappingIllustration puzzle={(plain) => plain ? RushHourSource : RushHour}/>
+                    </>,
+                },
+                {
+                    id: "sokoban",
+                    title: <ExampleTab
+                        title={translate({[LanguageCode.en]: "Sokoban"})}
+                        puzzle={Sudokuban}
+                    />,
+                    contents: <>
+                        <p>
+                            {translate(selectGridTypeTranslation("Regular"))}.<br/>
+                            {translate(selectAdditionalConstraintTranslation("Sokoban"))}.
+                        </p>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: "Use cosmetic circle to mark the initial position of the sokoban player",
+                                [LanguageCode.ru]: "Используйте косметический круг, чтобы отметить начальную позицию игрока сокобан",
+                                [LanguageCode.de]: "Verwenden Sie einen kosmetischen Kreis, um die Anfangsposition des Sokoban-Spielers zu markieren",
+                            })}. {translate({
+                            [LanguageCode.en]: "Use killer cages to mark the initial positions of the sokoban crates",
+                            [LanguageCode.ru]: "Используйте клетки (killer cages), чтобы отметить начальные позиции ящиков сокобан",
+                            [LanguageCode.de]: "Markieren Sie mit Killerkäfigen die Ausgangspositionen der Sokoban-Kisten",
+                        })}. {translate(seeIllustration)}:
+                        </p>
+                        <MappingIllustration puzzle={(plain) => plain ? SudokubanSource : Sudokuban}/>
+                        <p>
+                            {translate(selectAdditionalConstraintTranslation("Egg"))}
+                            {translate({
+                                [LanguageCode.en]: " to create a sokoban puzzle with eggs",
+                                [LanguageCode.ru]: ", чтобы создать головоломку сокобан с яйцами",
+                                [LanguageCode.de]: ", um ein Sokoban-Puzzle mit Eiern zu erstellen",
+                            })}. {translate({
+                                [LanguageCode.en]: "Use cosmetic cages to mark the initial positions and colors of the eggs",
+                                [LanguageCode.ru]: "Используйте косметические клетки, чтобы отметить исходное положение и цвет яиц",
+                                [LanguageCode.de]: "Verwenden Sie kosmetische Käfige, um die ursprünglichen Positionen und Farben der Eier zu markieren",
+                            })}. {translate(seeIllustration)}:
+                        </p>
+                        <MappingIllustration puzzle={(plain) => plain ? EasterSokobanSource : EasterSokoban}/>
+                    </>,
+                },
+                {
+                    id: "rotatable-clues",
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Rotatable clues",
+                            [LanguageCode.ru]: "Вращающиеся подсказки",
+                            [LanguageCode.de]: "Drehbare Hinweise",
+                        })}
+                        puzzle={Revolutionary}
+                    />,
+                    contents: <>
+                        <p>{translate(selectGridTypeTranslation("Regular"))}.</p>
+                        <p>{translate(selectAdditionalConstraintTranslation("Rotatable clues"))}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: "Use cosmetic circles to mark the rotation points of the clues",
+                            [LanguageCode.ru]: "Используйте косметические круги, чтобы отметить точки вращения подсказок",
+                            [LanguageCode.de]: "Verwenden Sie kosmetische Kreise, um die Rotationspunkte der Hinweise zu markieren",
+                        })}.</p>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: "By default, the digit in the circle will control the angle of the clue",
+                                [LanguageCode.ru]: "По умолчанию цифра в круге будет управлять углом подсказки",
+                                [LanguageCode.de]: "Standardmäßig steuert die Ziffer im Kreis den Winkel des Hinweises",
+                            })}. {translate({
+                                [LanguageCode.en]: `Turn on the "Free rotation" flag to allow rotating the clue independently of the digit`,
+                                [LanguageCode.ru]: `Включите флаг «Free rotation», чтобы разрешить вращение подсказки независимо от цифры`,
+                                [LanguageCode.de]: `Aktivieren Sie die Option „Free rotation“, um die Rotation des Hinweises unabhängig von der Ziffer zu ermöglichen`,
+                            })}.
+                        </p>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: `Turn on the "Wheels" flag to create a wheels puzzle`,
+                                [LanguageCode.ru]: `Включите флаг «Wheels», чтобы создать головоломку с колесами`,
+                                [LanguageCode.de]: `Aktivieren Sie die Option "Wheels", um ein Räderpuzzle zu erstellen`,
+                            })}. {translate({
+                                [LanguageCode.en]: "Use cosmetic text for the digits on the wheels",
+                                [LanguageCode.ru]: "Используйте косметический текст для цифр на колесах",
+                                [LanguageCode.de]: "Verwenden Sie kosmetischen Text für die Ziffern auf den Rädern",
+                            })}.
+                        </p>
+                    </>,
+                },
+                {
+                    id: PuzzleImportPuzzleType.Jigsaw,
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Jigsaw",
+                            [LanguageCode.ru]: "Пазл (мозаика)",
+                            [LanguageCode.de]: "Puzzle",
+                        })}
+                        puzzle={JssChicken}
+                    />,
+                    contents: <>
+                        <p>{translate(selectGridTypeTranslation("Jigsaw"))}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: "Use sudoku regions to define the jigsaw pieces",
+                            [LanguageCode.ru]: "Используйте регионы судоку, чтобы определить части мозаики",
+                            [LanguageCode.de]: "Verwenden Sie Sudoku-Regionen, um die Puzzleteile zu definieren",
+                        })}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: `Configure the options in the "Jigsaw" section to control rotation, visual representation and validation of the pieces`,
+                            [LanguageCode.ru]: `Настройте параметры в разделе «Jigsaw», чтобы контролировать вращение, визуальное представление и валидацию частей пазла`,
+                            [LanguageCode.de]: `Konfigurieren Sie die Optionen im Abschnitt "Jigsaw", um die Drehung, die visuelle Darstellung und die Validierung der Teile zu steuern`,
+                        })}.</p>
+                    </>,
+                },
+                {
+                    id: "rule-gifts",
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Rule gifts",
+                            [LanguageCode.ru]: "Правила-подарки",
+                            [LanguageCode.de]: "Regelgeschenke",
+                        })}
+                        puzzle={EndlessChristmas}
+                    />,
+                    contents: <>
+                        <p>{translate(selectGridTypeTranslation("Regular"))}.</p>
+                        <p>{translate({
+                            [LanguageCode.en]: "Add the fog lights as you do it for SudokuPad",
+                            [LanguageCode.ru]: "Добавьте освещение тумана, как вы это делаете для SudokuPad",
+                            [LanguageCode.de]: "Fügen Sie die Nebelscheinwerfer hinzu, wie Sie es für SudokuPad tun",
+                        })}.</p>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: `Use 1-cell cosmetic cages with the text that starts with "rule:" and then describes the rule for the gift boxes`,
+                                [LanguageCode.ru]: `Используйте одноклеточные косметические клетки с текстом, который начинается с «rule:», а затем описывает правило для подарочных коробок`,
+                                [LanguageCode.de]: `Verwenden Sie 1-Zellen-Kosmetikkäfige mit dem Text, der mit "rule:" beginnt und dann die Regel für die Geschenkboxen beschreibt`,
+                            })}. {translate({
+                                [LanguageCode.en]: "For instance,",
+                                [LanguageCode.ru]: `Например,`,
+                                [LanguageCode.de]: `Zum Beispiel`,
+                            })} "rule: {translate(normalSudokuRulesApply)}".
+                        </p>
+                    </>,
+                },
+            ]}
+        />
+    </>;
 });
