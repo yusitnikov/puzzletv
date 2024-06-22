@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+import styled from "@emotion/styled";
 import {Absolute} from "../../layout/absolute/Absolute";
 import {Rect} from "../../../types/layout/Rect";
 import {useEventListener} from "../../../hooks/useEventListener";
@@ -201,7 +203,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
     const shadowFilterStr = applyShadowFilter ? `url(#${shadowFilterId})` : undefined;
 
     return <>
-        <Absolute
+        <StyledWrapper
             {...rect}
             style={{
                 backgroundColor: gridBackgroundColor,
@@ -381,7 +383,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
 
                 <FieldFireworks/>
             </Absolute>
-        </Absolute>
+        </StyledWrapper>
 
         {fogDemoFieldStateHistory && <Absolute {...rect} style={{
             opacity: 0.2,
@@ -400,3 +402,11 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
         </Absolute>}
     </>;
 }) as <T extends AnyPTM>(props: FieldProps<T>) => ReactElement;
+
+const StyledWrapper = styled(Absolute)`
+    touch-action: none;
+    user-select: none;
+    * {
+        -webkit-tap-highlight-color: transparent;
+    },
+`;
