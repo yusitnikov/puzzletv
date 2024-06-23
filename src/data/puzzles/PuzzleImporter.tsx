@@ -221,6 +221,8 @@ export class PuzzleImporter<T extends AnyPTM> {
             offsetY,
         } = gridParser;
 
+        let maxRegion = Math.max(size - 1, ...(cellRegions.flat().filter(Boolean) as number[]));
+
         const allGridCells: (Position & {region: number|null|undefined})[] = cellRegions
             .flatMap(
                 (row, top) => row.map(
@@ -239,7 +241,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         const regions = faces.flatMap(face => {
             const validFaceCells = validGridCells.filter((cell) => doesGridRegionContainCell(face, cell));
 
-            return indexes(size)
+            return indexes(maxRegion + 1)
                 .map(regionIndex => validFaceCells.filter(
                     ({top, left, region}) => {
                         if (region === undefined) {
