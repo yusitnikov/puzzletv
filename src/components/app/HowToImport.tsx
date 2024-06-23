@@ -10,6 +10,8 @@ import {ToroidalYinYang} from "../../data/puzzles/ToroidalYinYang";
 import {ExampleTab} from "./how-to-import/ExampleTab";
 import {MappingIllustration} from "./how-to-import/MappingIllustration";
 import {
+    addEmbeddedSolution,
+    addRegularFog, seeExample,
     seeIllustration,
     selectAdditionalConstraintTranslation,
     selectGridTypeTranslation
@@ -21,6 +23,7 @@ import {Revolutionary} from "../../data/puzzles/RotatableClues";
 import {JssChicken} from "../../data/puzzles/JigsawJss";
 import {EndlessChristmas} from "../../data/puzzles/EndlessChristmas";
 import {normalSudokuRulesApply} from "../../data/ruleSnippets";
+import {Embark, embarkLoadString} from "../../data/puzzles/Embark";
 
 export const HowToImport = observer(function HowToImport() {
     profiler.trace();
@@ -290,11 +293,7 @@ export const HowToImport = observer(function HowToImport() {
                     />,
                     contents: <>
                         <p>{translate(selectGridTypeTranslation("Regular"))}.</p>
-                        <p>{translate({
-                            [LanguageCode.en]: "Add the fog lights as you do it for SudokuPad",
-                            [LanguageCode.ru]: "Добавьте освещение тумана, как вы это делаете для SudokuPad",
-                            [LanguageCode.de]: "Fügen Sie die Nebelscheinwerfer hinzu, wie Sie es für SudokuPad tun",
-                        })}.</p>
+                        <p>{translate(addRegularFog)}.</p>
                         <p>
                             {translate({
                                 [LanguageCode.en]: `Use 1-cell cosmetic cages with the text that starts with "rule:" and then describes the rule for the gift boxes`,
@@ -306,6 +305,40 @@ export const HowToImport = observer(function HowToImport() {
                                 [LanguageCode.de]: `Zum Beispiel`,
                             })} "rule: {translate(normalSudokuRulesApply)}".
                         </p>
+                    </>,
+                },
+                {
+                    id: "yajilin-fog",
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Yajilin fog",
+                            [LanguageCode.ru]: "Туман яджилин",
+                            [LanguageCode.de]: "Yajilin-Nebel",
+                        })}
+                        puzzle={Embark}
+                    />,
+                    contents: <>
+                        <p>{translate(addRegularFog)}.</p>
+                        <p>{translate(addEmbeddedSolution)}.</p>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: "Use black cell background color for given black cells",
+                                [LanguageCode.ru]: "Используйте черный цвет фона ячейки для заданных черных ячеек",
+                                [LanguageCode.de]: "Verwende die schwarze Einfärbung um gegebebe schwarze Zellen zu erzeugen",
+                            })}. {translate({
+                                [LanguageCode.en]: "Use grey cell background color for embedded solution for cell backgrounds",
+                                [LanguageCode.ru]: "Используйте серый цвет фона ячейки для встроенного решения для фона ячеек",
+                                [LanguageCode.de]: "Verwende die graue Einfärbung um schwarze Zellen für den Lösungs-Check zu erstellen",
+                            })}. {translate({
+                                [LanguageCode.en]: "Use black cosmetic lines for embedded solution for lines",
+                                [LanguageCode.ru]: "Используйте черные косметические линии для встроенного решения для линий",
+                                [LanguageCode.de]: "Verwenden Sie schwarze kosmetische Linien für eine eingebettete Lösung für Linien",
+                            })}.
+                        </p>
+                        <p>{translate(seeExample)}: <a href={"https://f-puzzles.com/?load=" + embarkLoadString} target={"_blank"}>Embark</a>.</p>
+                        <p>{translate(selectGridTypeTranslation("Regular"))}.</p>
+                        <p>{translate(selectAdditionalConstraintTranslation("Yajilin fog"))}.</p>
+                        <p>{translate(selectAdditionalConstraintTranslation("Hide cosmetic elements behind the fog"))}.</p>
                     </>,
                 },
             ]}
