@@ -12,6 +12,7 @@ import {lightGreyColor} from "../../../app/globals";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {cosmeticTag} from "../decorative-shape/DecorativeShape";
 
 export const lineTag = "line";
 
@@ -59,7 +60,7 @@ export const LineConstraint = <T extends AnyPTM>(
 
     return {
         name: "line",
-        tags: [lineTag],
+        tags: [lineTag, cosmeticTag],
         cells,
         color,
         props: {width},

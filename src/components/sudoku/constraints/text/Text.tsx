@@ -10,6 +10,7 @@ import {observer} from "mobx-react-lite";
 import {ChessPieceType} from "../../../../sudokuTypes/chess/types/ChessPieceType";
 import {ChessColor} from "../../../../sudokuTypes/chess/types/ChessColor";
 import {ChessPiece} from "../../../../sudokuTypes/chess/components/ChessPiece";
+import {cosmeticTag} from "../decorative-shape/DecorativeShape";
 
 const chessPiecesMap: Record<string, { type: ChessPieceType; color: ChessColor; }> = {
     "♙": {
@@ -109,7 +110,7 @@ export const TextConstraint = <T extends AnyPTM>(
 ): Constraint<T, TextProps> => {
     return {
         name: `text: ${text}`,
-        tags: [textTag],
+        tags: [textTag, cosmeticTag],
         cells: parsePositionLiterals(cellLiterals),
         props: {text, size},
         color,

@@ -20,6 +20,7 @@ import {useTransformAngle} from "../../../../contexts/TransformContext";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {cosmeticTag} from "../decorative-shape/DecorativeShape";
 
 export const cageTag = "cage";
 
@@ -197,7 +198,7 @@ export const DecorativeCageConstraint = <T extends AnyPTM>(
     inverted = false,
 ): Constraint<T, KillerCageProps> => ({
     name: "cage",
-    tags: [cageTag],
+    tags: [cageTag, cosmeticTag],
     cells: parsePositionLiterals(cellLiterals),
     props: {
         sum,

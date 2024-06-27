@@ -13,6 +13,8 @@ import {profiler} from "../../../../utils/profiler";
 import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
 import {parseColorWithOpacity} from "../../../../utils/color";
 
+export const cosmeticTag = "cosmetic";
+
 export interface DecorativeShapeProps extends Size {
     borderColor?: string;
     text?: string;
@@ -125,7 +127,7 @@ export const DecorativeShapeConstraint = <T extends AnyPTM>(
 ): Constraint<T, DecorativeShapeProps> => {
     return {
         name,
-        tags: [name],
+        tags: [name, cosmeticTag],
         cells: parsePositionLiterals(cellLiterals),
         props: {
             width: typeof size === "number" ? size : size.width,

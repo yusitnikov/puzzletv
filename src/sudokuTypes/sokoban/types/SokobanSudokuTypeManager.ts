@@ -8,7 +8,7 @@ import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager
 import {emptyPosition, Position} from "../../../types/layout/Position";
 import {Constraint} from "../../../types/sudoku/Constraint";
 import {isCageConstraint} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
-import {ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import {cosmeticTag, ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import {SokobanClueConstraint, sokobanTag} from "../constraints/SokobanClue";
 import {SokobanPlayerConstraint} from "../constraints/SokobanPlayer";
 import {moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo} from "./SokobanMovePlayerCellWriteModeInfo";
@@ -21,6 +21,7 @@ import {
 import {SokobanFieldState, sokobanFieldStateAnimationMixer} from "./SokobanFieldState";
 import {comparer, IReactionDisposer, reaction} from "mobx";
 import {SokobanOptions} from "./SokobanOptions";
+import {isPointInRect} from "../../../types/layout/Rect";
 
 const initialFieldStateExtension = (puzzle?: PuzzleDefinition<SokobanPTM>): SokobanFieldState => {
     return {
@@ -113,7 +114,42 @@ export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTy
         }
 
         const clues = items.filter(isSokobanClue);
-        const otherItems = items.filter((item) => !isSokobanClue(item) && !isSokobanPlayer(item));
+        const draggedClues = clues.map((clue, index) => ({
+            clue,
+            index,
+            isCrate: true,
+        }));
+        const otherItems: Constraint<SokobanPTM, any>[] = [];
+        for (const item of items) {
+            if (isSokobanPlayer(item) || isSokobanClue(item)) {
+                continue;
+            }
+
+            // Drag cosmetic elements that are fully inside the crate together with the crate
+            if (item.tags?.includes(cosmeticTag)) {
+                const index = clues.findIndex(
+                  (clue) => item.cells.every(
+                    ({top, left}) => clue.cells.some(
+                      (cell) => isPointInRect(
+                        {...cell, width: 1, height: 1},
+                        {top: top + 0.5, left: left + 0.5}
+                      )
+                    )
+                  )
+                );
+                if (index >= 0) {
+                    draggedClues.push({
+                        clue: item,
+                        index,
+                        isCrate: false,
+                    });
+                    continue;
+                }
+            }
+
+            otherItems.push(item);
+        }
+
         return {
             ...puzzle,
             items: (
@@ -122,13 +158,13 @@ export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTy
                     stateExtension: {animationManager: {animatedValue}},
                 }
             ): Constraint<SokobanPTM, any>[] => [
-                ...clues.map((clue, index) => SokobanClueConstraint(
+                ...draggedClues.map(({clue, index, isCrate}) => SokobanClueConstraint(
                     clue,
                     cluePositions[index],
                     animatedValue.cluePositions[index] ?? emptyPosition,
                     clueSmashed[index],
                     animatedValue.clueSmashed[index] ?? false,
-                    options.smashedComponent,
+                    isCrate ? options.smashedComponent : {},
                 )),
                 SokobanPlayerConstraint(animatedValue.sokobanPosition),
                 ...otherItems,
