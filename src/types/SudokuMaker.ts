@@ -628,7 +628,11 @@ export interface CompressedCosmeticConfig {
     ][]
 }
 
-export type CompressedConstraintConfig = ConstraintConfig | CompressedCosmeticConfig
+export type CompressedConstraint = (ConstraintConfig | CompressedCosmeticConfig) &
+  {
+      name?: string
+      disabled?: boolean
+  }
 
 export type CompressedSpec = {
     type?: PuzzleType
@@ -641,7 +645,7 @@ export type CompressedSpec = {
 
 export interface CompressedPuzzle extends CompressedSpec {
     cells: (CompressedCell | undefined)[],
-    constraints: CompressedConstraintConfig[]
+    constraints: CompressedConstraint[]
     name: string
     author: string
     comment: string

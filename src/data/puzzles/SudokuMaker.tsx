@@ -162,7 +162,11 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                 }
             },
             constraints: (constraints) => {
-                for (const constraint of constraints) {
+                for (const {name, disabled, ...constraint} of constraints) {
+                    if (disabled) {
+                        continue;
+                    }
+
                     switch (constraint.type) {
                         case ConstraintType.Givens:
                             new ObjectParser<GivensConstraintConfig>({
