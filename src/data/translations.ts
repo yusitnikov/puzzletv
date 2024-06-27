@@ -101,10 +101,6 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Перейти к списку судоку",
         [LanguageCode.de]: "Alle Rätsel ansehen",
     },
-    "Home page": {
-        [LanguageCode.ru]: "Домашняя страница",
-        [LanguageCode.de]: "Startseite",
-    },
     "Puzzles": {
         [LanguageCode.ru]: "Судоку",
         [LanguageCode.de]: "Rätsel",
@@ -112,10 +108,6 @@ export const translationsExactType = {
     "Games": {
         [LanguageCode.ru]: "Игры",
         [LanguageCode.de]: "Spiele",
-    },
-    "For setters": {
-        [LanguageCode.ru]: "Для авторов головоломок",
-        [LanguageCode.de]: "Für Setter",
     },
     "How to import puzzle": {
         [LanguageCode.ru]: "Как импортировать головоломку",

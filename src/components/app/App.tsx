@@ -77,7 +77,11 @@ export const App = observer(({onPageLoaded}: AppProps) => {
         case "for-setters":
             return <PageLayout
                 scrollable={true}
-                title={translate("For setters")}
+                title={translate({
+                    [LanguageCode.en]: "For setters",
+                    [LanguageCode.ru]: "Для авторов головоломок",
+                    [LanguageCode.de]: "Für Setter",
+                })}
             >
                 <ForSetters/>
             </PageLayout>;

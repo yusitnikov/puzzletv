@@ -10,6 +10,7 @@ import {Title} from "../title/Title";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
 import {LanguageSelector} from "../language-selector/LanguageSelector";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 export interface PageLayoutProps {
     addPadding?: boolean;
@@ -33,7 +34,11 @@ export const PageLayout = observer(function PageLayout(
 
     const menuItems: MenuItem[] = [
         {
-            name: translate("Home page"),
+            name: translate({
+                [LanguageCode.en]: "Home page",
+                [LanguageCode.ru]: showHorizontalMenu ? "Домашняя" : "Домашняя страница",
+                [LanguageCode.de]: "Startseite",
+            }),
             slug: "",
             fallbackSlugs: ["home"],
         },
@@ -47,7 +52,11 @@ export const PageLayout = observer(function PageLayout(
             slug: "games",
         },
         {
-            name: translate("For setters"),
+            name: translate({
+                [LanguageCode.en]: "For setters",
+                [LanguageCode.ru]: showHorizontalMenu ? "Для авторов" : "Для авторов головоломок",
+                [LanguageCode.de]: "Für Setter",
+            }),
             slug: "for-setters",
         },
     ];
