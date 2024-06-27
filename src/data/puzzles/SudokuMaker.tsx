@@ -150,7 +150,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                         },
                         given: undefined,
                         colors: (colorsBitMask = 0) => {
-                            for (let color = 0; color < 10; color++) {
+                            for (let color = 0; color < 19; color++) {
                                 if ((colorsBitMask & (1 << color)) !== 0) {
                                     importer.addSolutionColors(this, top, left, sudokuMakerColors[color]);
                                 }
@@ -1111,6 +1111,15 @@ enum SudokuMakerColor {
     blue = "#8197e4",
     purple = "#b569cc",
     pink = "#f376ed",
+    lightGrey = "#d1d1d1",
+    darkGrey = "#a0a0a0",
+    black = "#606060",
+    contrastPink = "#e900a7",
+    contrastOrange = "#ff9207",
+    contrastGreen = "#a1e301",
+    contrastCyan = "#00ced3",
+    contrastBlue = "#3793fc",
+    contrastPurple = "#9840ff",
 }
 const sudokuMakerColors = [
     SudokuMakerColor.white,
@@ -1123,6 +1132,15 @@ const sudokuMakerColors = [
     SudokuMakerColor.blue,
     SudokuMakerColor.purple,
     SudokuMakerColor.pink,
+    SudokuMakerColor.lightGrey,
+    SudokuMakerColor.darkGrey,
+    SudokuMakerColor.black,
+    SudokuMakerColor.contrastPink,
+    SudokuMakerColor.contrastOrange,
+    SudokuMakerColor.contrastGreen,
+    SudokuMakerColor.contrastCyan,
+    SudokuMakerColor.contrastBlue,
+    SudokuMakerColor.contrastPurple,
 ];
 const sudokuMakerColorsMap: Record<SudokuMakerColor, CellColor> = {
     [SudokuMakerColor.white]: CellColor.white,
@@ -1135,4 +1153,13 @@ const sudokuMakerColorsMap: Record<SudokuMakerColor, CellColor> = {
     [SudokuMakerColor.blue]: CellColor.blue,
     [SudokuMakerColor.purple]: CellColor.purple,
     [SudokuMakerColor.pink]: CellColor.purple,
+    [SudokuMakerColor.lightGrey]: CellColor.lightGrey,
+    [SudokuMakerColor.darkGrey]: CellColor.darkGrey,
+    [SudokuMakerColor.black]: CellColor.black,
+    [SudokuMakerColor.contrastPink]: CellColor.purple,
+    [SudokuMakerColor.contrastOrange]: CellColor.orange,
+    [SudokuMakerColor.contrastGreen]: CellColor.green,
+    [SudokuMakerColor.contrastCyan]: CellColor.blue,
+    [SudokuMakerColor.contrastBlue]: CellColor.blue,
+    [SudokuMakerColor.contrastPurple]: CellColor.purple,
 };
