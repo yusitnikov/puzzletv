@@ -77,7 +77,7 @@ export const App = observer(({onPageLoaded}: AppProps) => {
         case "for-setters":
             return <PageLayout
                 scrollable={true}
-                title={translate("For Setters")}
+                title={translate("For setters")}
             >
                 <ForSetters/>
             </PageLayout>;

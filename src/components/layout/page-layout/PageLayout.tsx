@@ -46,6 +46,10 @@ export const PageLayout = observer(function PageLayout(
             name: translate("Games"),
             slug: "games",
         },
+        {
+            name: translate("For setters"),
+            slug: "for-setters",
+        },
     ];
 
     return <StyledPageContainer>

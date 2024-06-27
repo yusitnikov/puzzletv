@@ -113,7 +113,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Игры",
         [LanguageCode.de]: "Spiele",
     },
-    "For Setters": {
+    "For setters": {
         [LanguageCode.ru]: "Для авторов головоломок",
         [LanguageCode.de]: "Für Setter",
     },
