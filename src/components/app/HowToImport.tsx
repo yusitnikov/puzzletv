@@ -301,9 +301,13 @@ export const HowToImport = observer(function HowToImport() {
                                 [LanguageCode.de]: `Verwenden Sie 1-Zellen-Kosmetikkäfige mit dem Text, der mit "rule:" beginnt und dann die Regel für die Geschenkboxen beschreibt`,
                             })}. {translate({
                                 [LanguageCode.en]: "For instance,",
-                                [LanguageCode.ru]: `Например,`,
-                                [LanguageCode.de]: `Zum Beispiel`,
-                            })} "rule: {translate(normalSudokuRulesApply)}".
+                                [LanguageCode.ru]: "Например,",
+                                [LanguageCode.de]: "Zum Beispiel",
+                            })} "rule: {translate(normalSudokuRulesApply)}" ({translate({
+                                [LanguageCode.en]: "no double quotes",
+                                [LanguageCode.ru]: "без двойных кавычек",
+                                [LanguageCode.de]: "ohne Anführungszeichen",
+                            })}!).
                         </p>
                     </>,
                 },
