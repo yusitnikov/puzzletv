@@ -544,12 +544,20 @@ export class PuzzleImporter<T extends AnyPTM> {
         cells: PositionLiteral[],
         lineColor?: string,
         lineWidth?: number,
+        bulbRadius?: number,
+        bulbBackgroundColor?: string,
+        bulbLineColor?: string,
+        bulbLineWidth?: number,
     ) {
         this.addItems(BetweenLineConstraint(
             gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
             false,
             lineColor,
             lineWidth,
+            bulbRadius,
+            bulbBackgroundColor,
+            bulbLineColor,
+            bulbLineWidth
         ));
     }
     addDoubleArrowLine(
@@ -558,12 +566,20 @@ export class PuzzleImporter<T extends AnyPTM> {
         display: boolean,
         lineColor?: string,
         lineWidth?: number,
+        bulbRadius?: number,
+        bulbBackgroundColor?: string,
+        bulbLineColor?: string,
+        bulbLineWidth?: number,
     ) {
         const constraint = DoubleArrowConstraint<T>(
             gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
             false,
             lineColor,
             lineWidth,
+            bulbRadius,
+            bulbBackgroundColor,
+            bulbLineColor,
+            bulbLineWidth
         );
         this.addItems(display ? constraint : toInvisibleConstraint(constraint));
     }

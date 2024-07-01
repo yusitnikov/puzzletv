@@ -12,13 +12,30 @@ import {darkGreyColor, lighterGreyColor} from "../../../app/globals";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
-import {LineProps} from "../line/Line";
 
-const circleRadius = 0.4;
-const backgroundColor = lighterGreyColor;
+export interface BetweenLineProps {
+    lineColor?: string;
+    lineWidth?: number;
+    bulbRadius?: number;
+    bulbBackgroundColor?: string;
+    bulbLineColor?: string;
+    bulbLineWidth?: number;
+}
 
-export const BetweenLine: ConstraintPropsGenericFcMap<LineProps> = {
-    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({cells, color: lineColor = darkGreyColor, props: {width: lineWidth = 0.1}}: ConstraintProps<T, LineProps>) {
+export const BetweenLine: ConstraintPropsGenericFcMap<BetweenLineProps> = {
+    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>(
+        {
+            cells,
+            props: {
+                lineColor = darkGreyColor,
+                lineWidth = 0.1,
+                bulbRadius = 0.4,
+                bulbBackgroundColor = lighterGreyColor,
+                bulbLineColor = darkGreyColor,
+                bulbLineWidth = 0.1,
+            },
+        }: ConstraintProps<T, BetweenLineProps>
+    ) {
         profiler.trace();
 
         cells = cells.map(({left, top}) => ({left: left + 0.5, top: top + 0.5}));
@@ -26,8 +43,8 @@ export const BetweenLine: ConstraintPropsGenericFcMap<LineProps> = {
         const edge1 = cells[0];
         const edge2 = cells[cells.length - 1];
 
-        cells[0] = getCircleConnectionPoint(edge1, cells[1], circleRadius);
-        cells[cells.length - 1] = getCircleConnectionPoint(edge2, cells[cells.length - 2], circleRadius);
+        cells[0] = getCircleConnectionPoint(edge1, cells[1], bulbRadius);
+        cells[cells.length - 1] = getCircleConnectionPoint(edge2, cells[cells.length - 2], bulbRadius);
 
         return <>
             <RoundedPolyLine
@@ -39,19 +56,19 @@ export const BetweenLine: ConstraintPropsGenericFcMap<LineProps> = {
             <circle
                 cx={edge1.left}
                 cy={edge1.top}
-                r={circleRadius}
-                strokeWidth={lineWidth}
-                stroke={lineColor}
-                fill={backgroundColor}
+                r={bulbRadius}
+                strokeWidth={bulbLineWidth}
+                stroke={bulbLineColor}
+                fill={bulbBackgroundColor}
             />
 
             <circle
                 cx={edge2.left}
                 cy={edge2.top}
-                r={circleRadius}
-                strokeWidth={lineWidth}
-                stroke={lineColor}
-                fill={backgroundColor}
+                r={bulbRadius}
+                strokeWidth={bulbLineWidth}
+                stroke={bulbLineColor}
+                fill={bulbBackgroundColor}
             />
         </>;
     }),
@@ -61,8 +78,12 @@ export const BetweenLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
     lineColor?: string,
-    width?: number,
-): Constraint<T, LineProps> => {
+    lineWidth?: number,
+    bulbRadius?: number,
+    bulbBackgroundColor?: string,
+    bulbLineColor = lineColor,
+    bulbLineWidth = lineWidth,
+): Constraint<T, BetweenLineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);
@@ -73,7 +94,14 @@ export const BetweenLineConstraint = <T extends AnyPTM>(
         cells,
         component: BetweenLine,
         color: lineColor,
-        props: {width},
+        props: {
+            lineColor,
+            lineWidth,
+            bulbRadius,
+            bulbBackgroundColor,
+            bulbLineColor,
+            bulbLineWidth,
+        },
         isValidCell(cell, digits, cells, context) {
             const {puzzle} = context;
             const {typeManager: {areSameCellData, compareCellData}} = puzzle;

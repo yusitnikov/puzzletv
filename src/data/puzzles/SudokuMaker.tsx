@@ -521,11 +521,10 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                 type: undefined,
                                 lines: (
                                     lines,
-                                    // TODO
                                     {style: {lines: {color, thickness}, endPoints: {size, fill, stroke}}}
                                 ) => {
                                     for (const cells of lines) {
-                                        importer.addBetweenLine(this, this.parseCellIds(cells), color, thickness);
+                                        importer.addBetweenLine(this, this.parseCellIds(cells), color, thickness, size / 2, fill, stroke.color, stroke.thickness);
                                     }
                                 },
                                 style: lineWithEndpointsValidator.bind("between line style"),
@@ -617,11 +616,10 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                 type: undefined,
                                 lines: (
                                     lines,
-                                    // TODO
                                     {style: {lines: {color, thickness}, endPoints: {size, fill, stroke}}}
                                 ) => {
                                     for (const cells of lines) {
-                                        importer.addDoubleArrowLine(this, this.parseCellIds(cells), true, color, thickness);
+                                        importer.addDoubleArrowLine(this, this.parseCellIds(cells), true, color, thickness, size / 2, fill, stroke.color, stroke.thickness);
                                     }
                                 },
                                 style: lineWithEndpointsValidator.bind("double arrow line style"),

@@ -5,15 +5,18 @@ import {
 import {Constraint} from "../../../../types/sudoku/Constraint";
 import {splitMultiLine} from "../../../../utils/lines";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {LineProps} from "../line/Line";
-import {BetweenLine} from "../between-line/BetweenLine";
+import {BetweenLine, BetweenLineProps} from "../between-line/BetweenLine";
 
 export const DoubleArrowConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
     lineColor?: string,
-    width?: number,
-): Constraint<T, LineProps> => {
+    lineWidth?: number,
+    bulbRadius?: number,
+    bulbBackgroundColor?: string,
+    bulbLineColor = lineColor,
+    bulbLineWidth = lineWidth,
+): Constraint<T, BetweenLineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {
         cells = splitMultiLine(cells);
@@ -24,7 +27,14 @@ export const DoubleArrowConstraint = <T extends AnyPTM>(
         cells,
         component: BetweenLine,
         color: lineColor,
-        props: {width},
+        props: {
+            lineColor,
+            lineWidth,
+            bulbRadius,
+            bulbBackgroundColor,
+            bulbLineColor,
+            bulbLineWidth,
+        },
         isValidCell(cell, digits, cells, context) {
             let sum = 0;
             for (const [index, cell] of cells.entries()) {
