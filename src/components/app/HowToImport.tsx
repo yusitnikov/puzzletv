@@ -24,6 +24,15 @@ import {JssChicken} from "../../data/puzzles/JigsawJss";
 import {EndlessChristmas} from "../../data/puzzles/EndlessChristmas";
 import {normalSudokuRulesApply} from "../../data/ruleSnippets";
 import {Embark, embarkLoadString} from "../../data/puzzles/Embark";
+import {
+    InfinityLoopDotsExample, InfinityLoopDotsExampleSource,
+    infinityLoopTemplateLink,
+    MisterFantastic,
+    MisterFantasticPreview,
+    MisterFantasticPreviewNoOffset,
+    MisterFantasticSource
+} from "../../data/puzzles/InfinityLoop";
+import {OpenInNew} from "@emotion-icons/material";
 
 export const HowToImport = observer(function HowToImport() {
     profiler.trace();
@@ -343,6 +352,75 @@ export const HowToImport = observer(function HowToImport() {
                         <p>{translate(selectGridTypeTranslation("Regular"))}.</p>
                         <p>{translate(selectAdditionalConstraintTranslation("Yajilin fog"))}.</p>
                         <p>{translate(selectAdditionalConstraintTranslation("Hide cosmetic elements behind the fog"))}.</p>
+                    </>,
+                },
+                {
+                    id: PuzzleImportPuzzleType.InfiniteRings,
+                    title: <ExampleTab
+                        title={translate({
+                            [LanguageCode.en]: "Infinite loop",
+                            [LanguageCode.ru]: "Бесконечный цикл",
+                            [LanguageCode.de]: "Endlosschleife",
+                        })}
+                        puzzle={MisterFantastic}
+                    />,
+                    contents: <>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: "For a puzzle with N rings, create a custom grid of size 2N+2",
+                                [LanguageCode.ru]: "Для головоломки с N кольцами создайте поле размером 2N+2",
+                                [LanguageCode.de]: "Für ein Puzzle mit N Ringen erstellen Sie ein benutzerdefiniertes Raster der Größe 2N+2",
+                            })}. {translate({
+                                [LanguageCode.en]: "Here's a Sudoku Maker template for 4 rings",
+                                [LanguageCode.ru]: "Вот шаблон Sudoku Maker для 4 колец",
+                                [LanguageCode.de]: "Hier ist eine Sudoku Maker-Vorlage für 4 Ringe",
+                            })}: <a href={infinityLoopTemplateLink} target="_blank">
+                                {translate("external link")}&nbsp;<OpenInNew size={"1em"}/>
+                            </a>.
+                        </p>
+                        <p>
+                            {translate({
+                                [LanguageCode.en]: "Cells on the main diagonals will be mapped to the corners of the rings",
+                                [LanguageCode.ru]: "Клетки на главных диагоналях будут соответствовать углам колец",
+                                [LanguageCode.de]: "Zellen auf den Hauptdiagonalen werden auf die Ecken der Ringe abgebildet",
+                            })}. {translate({
+                                [LanguageCode.en]: "The central 2 rows and 2 columns will be mapped to the middle cells of the rings",
+                                [LanguageCode.ru]: "Центральные 2 строки и 2 столбца будут соответствовать средним клеткам колец",
+                                [LanguageCode.de]: "Die mittleren 2 Zeilen und 2 Spalten werden den mittleren Zellen der Ringe zugeordnet",
+                            })}. {translate({
+                                [LanguageCode.en]: "All other cells of the source grid will be ignored",
+                                [LanguageCode.ru]: "Все остальные клетки исходного поля будут проигнорированы",
+                                [LanguageCode.de]: "Alle anderen Zellen des Quellrasters werden ignoriert",
+                            })}.
+                        </p>
+                        <p>{translate({
+                            [LanguageCode.en]: "It's safe to draw line constraints through the ignored cells, the validation will check only the real cells",
+                            [LanguageCode.ru]: "Можно без риска рисовать линии через игнорируемые клетки, при проверке будут использоваться только реальные клетки",
+                            [LanguageCode.de]: "Es ist sicher, Linienbeschränkungen durch die ignorierten Zellen zu ziehen, die Validierung überprüft nur die echten Zellen",
+                        })}.</p>
+
+                        <p>{translate(selectGridTypeTranslation("Infinite loop"))}. {translate(seeIllustration)}:</p>
+                        <MappingIllustration puzzle={(plain) => plain ? MisterFantasticSource : MisterFantasticPreviewNoOffset}/>
+
+                        <p>{translate({
+                            [LanguageCode.en]: `Change the "Initial zooming" to choose which ring will be focused initially when opening the puzzle`,
+                            [LanguageCode.ru]: `Измените «Initial zooming», чтобы выбрать, какое кольцо будет изначально сфокусировано при открытии головоломки`,
+                            [LanguageCode.de]: `Ändern Sie das "Initial zooming", um auszuwählen, welcher Ring beim Öffnen des Puzzles zunächst fokussiert wird`,
+                        })}:</p>
+                        <MappingIllustration puzzle={(plain) => plain ? MisterFantasticPreviewNoOffset : MisterFantasticPreview}/>
+
+                        <p>{translate({
+                            [LanguageCode.en]: "In order to draw a kropki dot between 2 cells that have an ignored cells between them, place the dot on the border of the cell in the middle row/column in the direction of the second cell",
+                            [LanguageCode.ru]: "Чтобы нарисовать точку «кропки» между двумя клетками, между которыми есть игнорируемые клетки, поместите точку на границе клетки в средней строке/столбце в направлении второй клетки",
+                            [LanguageCode.de]: "Um einen Kropki-Punkt zwischen zwei Zellen zu zeichnen, zwischen denen sich eine ignorierte Zelle befindet, platzieren Sie den Punkt am Rand der Zelle in der mittleren Zeile/Spalte in Richtung der zweiten Zelle",
+                        })}.</p>
+                        <MappingIllustration puzzle={(plain) => plain ? InfinityLoopDotsExampleSource : InfinityLoopDotsExample}/>
+
+                        <p>{translate({
+                            [LanguageCode.en]: "Cages are currently not supported",
+                            [LanguageCode.ru]: "Клетки в настоящее время не поддерживаются",
+                            [LanguageCode.de]: "Käfige werden derzeit nicht unterstützt",
+                        })}.</p>
                     </>,
                 },
             ]}
