@@ -24,6 +24,7 @@ import {profiler} from "../../utils/profiler";
 import {GridParserFactory} from "../../data/puzzles/GridParser";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import {OpenInNew} from "@emotion-icons/material";
 
 let autoIncrement = 0;
 
@@ -806,6 +807,26 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
 
                 <Paragraph>
                     <button type={"submit"} disabled={!isValidForm}>Load</button>
+
+                    <a
+                      href={isValidForm ? buildLink(slug, languageCode, importOptions) : "#"}
+                      target={"_blank"}
+                      onClick={(ev) => {
+                          if (!isValidForm) {
+                              ev.preventDefault();
+                          }
+                      }}
+                      style={{
+                          marginLeft: "1em",
+                          ...(!isValidForm && {
+                              cursor: "inherit",
+                              color: darkGreyColor,
+                              textDecoration: "none",
+                          }),
+                      }}
+                    >
+                        Load in a new tab&nbsp;<OpenInNew size={"1em"}/>
+                    </a>
                 </Paragraph>
             </form>
         </div>
