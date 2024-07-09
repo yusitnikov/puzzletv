@@ -138,6 +138,9 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.inactiveCells = new PositionSet(indexes(fieldSize.rowsCount).flatMap(
             (top) => indexes(fieldSize.columnsCount).map((left) => ({top, left}))
         ));
+
+        this.setTitle(importOptions.title);
+        this.setAuthor(importOptions.author);
     }
 
     private cosmeticsLayer(beforeLines = false) {
@@ -162,22 +165,32 @@ export class PuzzleImporter<T extends AnyPTM> {
             this.puzzle.digitsCount = Math.max(this.puzzle.digitsCount ?? 0, maxDigit);
         }
 
+        this.puzzle.typeManager.preProcessImportGrid?.(this.puzzle, this, gridParser);
         gridParser.addToImporter(this);
     }
 
     setTitle(title = "") {
-        if (title && !this.importedTitle) {
-            this.puzzle.title = {[LanguageCode.en]: title};
-            this.importedTitle = true;
+        if (title) {
+            const translatedTitle = {[LanguageCode.en]: title};
+
+            const appliedHook = this.puzzle.typeManager.onImportPuzzleProp?.(this.puzzle, "title", translatedTitle);
+
+            if (!appliedHook && !this.importedTitle) {
+                this.puzzle.title = translatedTitle;
+                this.importedTitle = true;
+            }
         }
     }
     setAuthor(author = "") {
         if (author) {
-            this.puzzle.author ??= {[LanguageCode.en]: author};
+            const translatedAuthor = {[LanguageCode.en]: author};
+            if (!this.puzzle.typeManager.onImportPuzzleProp?.(this.puzzle, "author", translatedAuthor)) {
+                this.puzzle.author ??= translatedAuthor;
+            }
         }
     }
     setRuleset(ruleset = "") {
-        if (ruleset && !this.puzzle.rules) {
+        if (ruleset) {
             let parsedRules: ReactNode;
             if (this.importOptions.htmlRules) {
                 parsedRules = <ParsedRulesHtml>{ruleset}</ParsedRulesHtml>;
@@ -186,7 +199,11 @@ export class PuzzleImporter<T extends AnyPTM> {
                     (line, index) => <RulesParagraph key={index}>{line || <span>&nbsp;</span>}</RulesParagraph>
                 )}</>;
             }
-            this.puzzle.rules = () => parsedRules;
+            const rulesCallback = () => parsedRules;
+
+            if (!this.puzzle.typeManager.onImportPuzzleProp?.(this.puzzle, "rules", rulesCallback)) {
+                this.puzzle.rules ||= rulesCallback;
+            }
         }
     }
     setSuccessMessage(message: string) {

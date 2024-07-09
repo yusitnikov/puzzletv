@@ -25,6 +25,8 @@ import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
 import {IReactionDisposer} from "mobx";
 import {GivenDigitsMap} from "./GivenDigitsMap";
 import {ColorsImportMode} from "./PuzzleImportOptions";
+import {PuzzleImporter} from "../../data/puzzles/PuzzleImporter";
+import {GridParser} from "../../data/puzzles/GridParser";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -262,6 +264,14 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     getAboveRules?(translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>, isPortrait: boolean): ReactNode;
 
     postProcessPuzzle?(puzzle: PuzzleDefinition<T>): typeof puzzle;
+
+    preProcessImportGrid?(puzzle: PuzzleDefinition<T>, importer: PuzzleImporter<T>, gridParser: GridParser<T, any>): void;
+
+    onImportPuzzleProp?<P extends keyof PuzzleDefinition<T>>(
+        puzzle: PuzzleDefinition<T>,
+        prop: P,
+        value: PuzzleDefinition<T>[P],
+    ): boolean;
 
     fixCellPosition?(position: Position, puzzle: PuzzleDefinition<T>): Position | undefined;
 

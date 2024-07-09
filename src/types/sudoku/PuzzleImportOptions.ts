@@ -35,6 +35,8 @@ export interface PuzzleGridImportOptions {
 
 export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     extraGrids?: PuzzleGridImportOptions[] | Record<string | number, PuzzleGridImportOptions>;
+    title?: string;
+    author?: string;
     type?: PuzzleImportPuzzleType;
     digitType?: PuzzleImportDigitType;
     htmlRules?: boolean;
@@ -77,6 +79,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     hideZeroRegion?: boolean;
     givenDigitsBlockCars?: boolean;
     supportZero?: boolean;
+    caterpillar?: boolean;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -91,6 +94,8 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
 
     const {
         extraGrids = {},
+        title,
+        author,
         type,
         digitType,
         htmlRules,
@@ -133,6 +138,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         hideZeroRegion,
         givenDigitsBlockCars,
         supportZero,
+        caterpillar,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -142,6 +148,8 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
             [...(Array.isArray(extraGrids) ? extraGrids.entries() : Object.entries(extraGrids))]
                 .map(([key, grid]) => [key, sanitizeGridImportOptions(grid)]),
         ),
+        title,
+        author,
         type,
         digitType,
         htmlRules,
@@ -197,6 +205,7 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
         hideZeroRegion,
         givenDigitsBlockCars,
         supportZero,
+        caterpillar,
     };
 
     return result;

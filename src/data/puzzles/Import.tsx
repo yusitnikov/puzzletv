@@ -44,6 +44,7 @@ import {GridParser, GridParserFactory} from "./GridParser";
 import {FullCubePTM} from "../../sudokuTypes/cube/types/FullCubePTM";
 import {EggSokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/egg/types/EggSokobanSudokuTypeManager";
 import {RuleBoxSudokuTypeManager} from "../../sudokuTypes/rule-box/types/RuleBoxSudokuTypeManager";
+import {CaterpillarSudokuTypeManager} from "../../sudokuTypes/caterpillar/types/CaterpillarSudokuTypeManager";
 
 const getGridParsersByImportOptions = <T extends AnyPTM, JsonT>(
     importOptions: PuzzleImportOptions,
@@ -105,6 +106,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         fillableQuads,
         find3,
         giftsInSight,
+        caterpillar,
     } = importOptions;
 
     const digitsCount = mainGridParser.maxDigit ?? importOptions.digitsCount ?? mainGridParser.size;
@@ -175,6 +177,9 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     }
     if (find3) {
         typeManager = Find3SudokuTypeManager(typeManager, giftsInSight);
+    }
+    if (caterpillar) {
+        typeManager = CaterpillarSudokuTypeManager(typeManager);
     }
 
     typeManager = RuleBoxSudokuTypeManager(typeManager);

@@ -102,6 +102,9 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
     const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
+    const [caterpillar, setCaterpillar] = useBoolFromLocalStorage("fpwCaterpillar");
+    const [customTitle, setCustomTitle] = useState("");
+    const [customAuthor, setCustomAuthor] = useState("");
 
     const isCalculator = digitType === PuzzleImportDigitType.Calculator;
     const isSafeCracker = type === PuzzleImportPuzzleType.SafeCracker;
@@ -144,6 +147,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const globalOffsetX = -Math.min(0, ...filteredExtraGrids.map(({offsetX}) => offsetX));
     const globalOffsetY = -Math.min(0, ...filteredExtraGrids.map(({offsetY}) => offsetY));
 
+    const supportsCaterpillar = type === PuzzleImportPuzzleType.Regular && filteredExtraGrids.length > 0;
+
     const finalIsFirstGridSticky = isJigsawLike && filteredExtraGrids.length !== 0 && (isFirstStickyGrid || isShuffled);
     const gridParsers = useMemo(() => {
         const result = [gridParserFactory(load, globalOffsetX, globalOffsetY)];
@@ -185,6 +190,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         && (hasInitialColorsByGrid || colorsImportMode === ColorsImportMode.Initials);
 
     const getImportOptions = (colorsImportMode: ColorsImportMode): PuzzleImportOptions => ({
+        title: customTitle.trim() || undefined,
+        author: customAuthor.trim() || undefined,
         type,
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
@@ -240,6 +247,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
             offsetX: offsetX + globalOffsetX,
             offsetY: offsetY + globalOffsetY,
         })),
+        caterpillar: supportsCaterpillar && caterpillar,
     });
 
     const importOptionsPreview = usePureMemo<PuzzleImportOptions>(getImportOptions(colorsImportModeState));
@@ -628,6 +636,31 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                             />
                         </label>
                     </Paragraph>
+                </CollapsableFieldSet>}
+
+                {supportsCaterpillar && <CollapsableFieldSet legend={"Caterpillar"}>
+                    <Paragraph>
+                        <label>
+                            Enable caterpillar:&nbsp;
+                            <input type={"checkbox"} checked={caterpillar} onChange={ev => setCaterpillar(ev.target.checked)}/>
+                        </label>
+                    </Paragraph>
+
+                    {caterpillar && <>
+                        <Paragraph>
+                            <label>
+                                Title:&nbsp;
+                                <input type={"text"} value={customTitle} onChange={ev => setCustomTitle(ev.target.value)}/>
+                            </label>
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Author:&nbsp;
+                                <input type={"text"} value={customAuthor} onChange={ev => setCustomAuthor(ev.target.value)}/>
+                            </label>
+                        </Paragraph>
+                    </>}
                 </CollapsableFieldSet>}
 
                 <CollapsableFieldSet legend={"Miscellaneous"}>

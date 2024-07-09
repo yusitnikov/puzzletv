@@ -63,7 +63,7 @@ export const parseLink = (hash: string) => {
     for (const encodedParam of encodedParams) {
         const [key, ...valueParts] = encodedParam.split("=");
         const keyParts = parseQueryParamKeyParts(key);
-        const value = valueParts.join("=");
+        const value = decodeURIComponent(valueParts.join("="));
 
         let container = params;
         for (const [keyPartIndex, keyPart] of keyParts.entries()) {

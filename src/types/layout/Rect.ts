@@ -89,3 +89,6 @@ export const getRectsBoundingBox = (...rects: Rect[]) => getPointsBoundingBox(..
 
 export const isPointInRect = ({top, left, width, height}: Rect, point: Position) =>
     point.left >= left && point.left <= left + width && point.top >= top && point.top <= top + height;
+
+export const isCellInRect = ({top, left, width, height}: Rect, point: Position) =>
+    point.left >= left && point.left < left + width && point.top >= top && point.top < top + height;
