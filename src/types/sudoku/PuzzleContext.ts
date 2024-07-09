@@ -70,6 +70,7 @@ export interface PuzzleContextOptions<T extends AnyPTM> {
 // It's not a React context! Just a regular class.
 export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> {
     puzzle: PuzzleDefinition<T>;
+    puzzleIndex: SudokuCellsIndex<T>;
     myGameState: GameStateEx<T>;
     cellSize: number;
     cellSizeForSidePanel: number;
@@ -155,11 +156,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         GameStateActionOrCallback<any, T>[]
     >;
 
-    get puzzleIndex() {
-        profiler.trace();
-        return new SudokuCellsIndex(this.puzzle);
-    }
-
     constructor(
         {
             puzzle,
@@ -197,6 +193,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         }, {});
 
         this.puzzle = puzzle;
+        this.puzzleIndex = new SudokuCellsIndex(this.puzzle);
         this._processedGameStateExtension = processedGameStateExtension;
         this._animated = animated;
         this.myGameState = myGameState;
@@ -230,6 +227,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 (window as any).puzzle = this.puzzle;
                 (window as any).context = this;
                 this.puzzle = puzzle;
+                this.puzzleIndex = new SudokuCellsIndex(this.puzzle);
             }
             if ("processedGameStateExtension" in updates) {
                 this._processedGameStateExtension = processedGameStateExtension;
