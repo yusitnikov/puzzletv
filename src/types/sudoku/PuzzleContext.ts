@@ -52,6 +52,7 @@ const emptyObject = {};
 
 export interface PuzzleContextOptions<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
+    puzzleIndex?: SudokuCellsIndex<T>;
     processedGameStateExtension?: T["processedStateEx"];
     animated?: ProcessedGameStateAnimatedValues;
     myGameState: GameStateEx<T>;
@@ -159,6 +160,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     constructor(
         {
             puzzle,
+            puzzleIndex,
             processedGameStateExtension,
             animated,
             myGameState,
@@ -193,7 +195,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         }, {});
 
         this.puzzle = puzzle;
-        this.puzzleIndex = new SudokuCellsIndex(this.puzzle);
+        this.puzzleIndex = puzzleIndex ?? new SudokuCellsIndex(this.puzzle);
         this._processedGameStateExtension = processedGameStateExtension;
         this._animated = animated;
         this.myGameState = myGameState;
