@@ -56,6 +56,7 @@ import {Karaoke} from "./Karaoke";
 import {NationalGeographic} from "./NationalGeographic";
 import {BodoniSudoku} from "./BodoniSudoku";
 import {EndlessChristmas} from "./EndlessChristmas";
+import {CaterpillarPoc} from "./Caterpillar";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -83,6 +84,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    CaterpillarPoc,
+
     BodoniSudoku,
 
     Shuffled,
