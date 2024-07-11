@@ -111,3 +111,8 @@ export const unserializeFromLocalStorage = (key: string, version = 1): any | und
 
     return JSON.parse(jsonParts.join(":"));
 };
+
+export const useObjectFromLocalStorage = <T>(key: string, defaultValue?: T) => useStateWithStorage<T>(
+    () => unserializeFromLocalStorage(key) ?? defaultValue,
+    useCallback(value => serializeToLocalStorage(key, value), [key])
+);

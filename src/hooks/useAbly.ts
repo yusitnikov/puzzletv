@@ -6,6 +6,7 @@ import {Chain} from "../utils/chain";
 import {useThrottleData} from "./useThrottle";
 import {unzip, zip} from "../utils/zip";
 import {useLastValueRef} from "./useLastValueRef";
+import {useObjectFromLocalStorage} from "../utils/localStorage";
 
 export const useAbly = (options: Types.ClientOptions, enabled = true) => useSingleton(
     "ably",
@@ -55,7 +56,7 @@ export const useAblyChannelState = <T>(
 
     const chain = useSingleton(`ably-state-chain-${channelName}`, () => new Chain())!;
 
-    const [state, setState] = usePureState(initialState);
+    const [state, setState] = useObjectFromLocalStorage<T>("ablyState-" + channelName, initialState);
     const [connected, setConnected] = useState(false);
     console.log("State is", state);
     console.log("Channel state is", channel?.state);
