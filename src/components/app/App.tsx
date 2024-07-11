@@ -20,6 +20,7 @@ import {FPuzzlesGridParserFactory} from "../../data/puzzles/FPuzzles";
 import {SudokuMakerGridParserFactory} from "../../data/puzzles/SudokuMaker";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {Caterpillar} from "./Caterpillar";
+import {SyncedLabel} from "./SyncedLabel";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -148,6 +149,11 @@ export const App = observer(({onPageLoaded}: AppProps) => {
             </PageLayout>;
         case "caterpillar-consumer":
             return <Caterpillar readOnly={true}/>;
+        case "label":
+            if (params.channel) {
+                return <SyncedLabel name={params.channel}/>;
+            }
+            break;
     }
 
     if (puzzle) {
