@@ -151,7 +151,7 @@ export const App = observer(({onPageLoaded}: AppProps) => {
             return <Caterpillar readOnly={true}/>;
         case "label":
             if (params.channel) {
-                return <SyncedLabel name={params.channel}/>;
+                return <SyncedLabel name={params.channel} isObs={params.obs}/>;
             }
             break;
     }

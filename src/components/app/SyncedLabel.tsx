@@ -7,9 +7,10 @@ import {useEventListener} from "../../hooks/useEventListener";
 
 export interface SyncedLabelProps {
     name: string;
+    isObs?: boolean;
 }
 
-export const SyncedLabel = observer(function SyncedLabel({name}: SyncedLabelProps) {
+export const SyncedLabel = observer(function SyncedLabel({name, isObs}: SyncedLabelProps) {
     profiler.trace();
 
     const [text = "", setText, connected] = useAblyChannelState<string>(ablyOptions, "label-sync-" + name);
@@ -64,7 +65,7 @@ export const SyncedLabel = observer(function SyncedLabel({name}: SyncedLabelProp
             }
         }}
     >
-        {!isEditing && <span>{text || "click to edit..."}</span>}
+        {!isEditing && <span>{text || (isObs ? "" : "click to edit...")}</span>}
 
         {isEditing && <input
             type={"text"}
