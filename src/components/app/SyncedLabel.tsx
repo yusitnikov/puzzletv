@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+import styled from "@emotion/styled";
 import {useState} from "react";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
@@ -9,6 +11,33 @@ export interface SyncedLabelProps {
     name: string;
     isObs?: boolean;
 }
+
+const StyledContainer = styled.div`
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Lato, sans-serif;
+    font-size: 50px;
+    font-weight: bold;
+    -webkit-text-stroke: 1px white;
+    text-shadow: 0 0 2px white;
+`;
+
+const StyledInput = styled.input({
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    border: "none",
+    outline: "none",
+    font: "inherit",
+    background: "transparent",
+    textAlign: "center",
+    padding: 0,
+    margin: 0,
+});
 
 export const SyncedLabel = observer(function SyncedLabel({name, isObs}: SyncedLabelProps) {
     profiler.trace();
@@ -50,15 +79,7 @@ export const SyncedLabel = observer(function SyncedLabel({name, isObs}: SyncedLa
         }
     });
 
-    return <div
-        style={{
-            position: "fixed",
-            inset: 0,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            fontSize: "50px",
-        }}
+    return <StyledContainer
         onClick={() => {
             if (connected && !isEditing) {
                 start();
@@ -67,25 +88,12 @@ export const SyncedLabel = observer(function SyncedLabel({name, isObs}: SyncedLa
     >
         {!isEditing && <span>{text || (isObs ? "" : "click to edit...")}</span>}
 
-        {isEditing && <input
+        {isEditing && <StyledInput
             type={"text"}
             placeholder={"Start typing..."}
             value={textInput}
             onInput={(ev) => setTextInput(ev.currentTarget.value)}
             autoFocus={true}
-            style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                border: "none",
-                outline: "none",
-                font: "inherit",
-                background: "transparent",
-                textAlign: "center",
-                padding: 0,
-                margin: 0,
-            }}
         />}
-    </div>;
+    </StyledContainer>;
 });
