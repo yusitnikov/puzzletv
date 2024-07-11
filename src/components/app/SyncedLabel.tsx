@@ -81,6 +81,7 @@ export const SyncedLabel = observer(function SyncedLabel({name, isObs}: SyncedLa
                 border: "none",
                 outline: "none",
                 font: "inherit",
+                background: "transparent",
                 textAlign: "center",
                 padding: 0,
                 margin: 0,
