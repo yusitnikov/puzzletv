@@ -1,6 +1,6 @@
 import {Realtime, Types} from "ably/promises";
 import {useSingleton} from "./useSingleton";
-import {useEffect} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {usePureState} from "./usePureState";
 import {Chain} from "../utils/chain";
 import {useThrottleData} from "./useThrottle";
@@ -19,7 +19,7 @@ export const useAblyChannel = (options: Types.ClientOptions, name: string, enabl
 
     return useSingleton(
         `ably-channel-${name}`,
-        () => ably!.channels.get(name),
+        () => ably!.channels.get("persist:" + name, {params: {rewind: "1"}}),
         undefined,
         enabled
     );
@@ -43,6 +43,52 @@ export const useAblyChannelMessages = (options: Types.ClientOptions, channelName
             chain.then(() => channel.unsubscribe(callback));
         };
     }, [channel, callbackRef, enabled, chain]);
+};
+
+export const useAblyChannelState = <T>(
+    options: Types.ClientOptions,
+    channelName: string,
+    initialState: T | undefined = undefined,
+    enabled = true,
+): [T | undefined, (value: T) => void, boolean] => {
+    const channel = useAblyChannel(options, channelName, enabled);
+
+    const chain = useSingleton(`ably-state-chain-${channelName}`, () => new Chain())!;
+
+    const [state, setState] = usePureState(initialState);
+    const [connected, setConnected] = useState(false);
+    console.log("State is", state);
+    console.log("Channel state is", channel?.state);
+    console.log("Channel connected", connected);
+    const updateState = useCallback((newState: T) => {
+        if (!enabled || !channel) {
+            return;
+        }
+
+        chain
+            .then(() => channel.publish("state", newState))
+            .then(() => setState(newState));
+    }, [enabled, channel, chain, setState]);
+    (window as any).updateState = updateState;
+
+    useEffect(() => {
+        if (!enabled || !channel) {
+            return;
+        }
+
+        channel.whenState("attached").then(() => setConnected(true));
+
+        const callback = (message: Types.Message) => {
+            console.log("Got message!", message.data);
+            setState(message.data);
+        };
+        chain.then(() => channel.subscribe(callback));
+        return () => {
+            chain.then(() => channel.unsubscribe(callback));
+        };
+    }, [channel, enabled, chain, setState, setConnected]);
+
+    return [state, updateState, connected];
 };
 
 const noMessages: Types.PresenceMessage[] = [];

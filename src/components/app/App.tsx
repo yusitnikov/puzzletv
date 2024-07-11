@@ -19,6 +19,7 @@ import {useUpdateControlKeysState} from "../../hooks/useControlKeysState";
 import {FPuzzlesGridParserFactory} from "../../data/puzzles/FPuzzles";
 import {SudokuMakerGridParserFactory} from "../../data/puzzles/SudokuMaker";
 import {LanguageCode} from "../../types/translations/LanguageCode";
+import {Caterpillar} from "./Caterpillar";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -141,6 +142,12 @@ export const App = observer(({onPageLoaded}: AppProps) => {
                 />
             </PageLayout>;
         }
+        case "caterpillar-editor":
+            return <PageLayout scrollable={false}>
+                <Caterpillar readOnly={false}/>
+            </PageLayout>;
+        case "caterpillar-consumer":
+            return <Caterpillar readOnly={true}/>;
     }
 
     if (puzzle) {
