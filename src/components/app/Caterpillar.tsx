@@ -43,7 +43,6 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
     profiler.trace();
 
     const windowSize = useWindowSize(!readOnly);
-    const size = Math.min(windowSize.width, windowSize.height);
 
     const [grids = [], setGrids, connected] = useAblyChannelState<CaterpillarGrid[]>(ablyOptions, "caterpillar", []);
 
@@ -53,44 +52,48 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
     boundingRect.left -= padding;
     boundingRect.width += padding * 2;
     boundingRect.height += padding * 2;
-    const boundingSize = Math.floor(Math.max(boundingRect.width, boundingRect.height));
-    const coeff = size / boundingSize;
+
+    const coeff = Math.min(windowSize.width / boundingRect.width, windowSize.height / boundingRect.height);
+
+    const transformRect = ({top, left, width, height}: Rect): Rect => ({
+        top: (top - boundingRect.top - regionBorderWidth / 2) * coeff,
+        left: (left - boundingRect.left - regionBorderWidth / 2) * coeff,
+        width: width * coeff,
+        height: height * coeff,
+    });
 
     return <>
-        <Absolute width={size} height={size} style={{background: "#fff"}}>
+        <Absolute {...windowSize}>
             {!readOnly && <div>
-                {indexes(boundingSize, true).map((x) => <Absolute
+                {indexes(Math.ceil(windowSize.width / coeff), true).map((x) => <Absolute
                     key={"column" + x}
                     top={0}
                     left={x * coeff}
                     width={1}
-                    height={size}
+                    height={windowSize.height}
                     style={{background: lightGreyColor}}
                 />)}
-                {indexes(boundingSize, true).map((y) => <Absolute
+                {indexes(Math.ceil(windowSize.height / coeff), true).map((y) => <Absolute
                     key={"row" + y}
                     left={0}
                     top={y * coeff}
                     height={1}
-                    width={size}
+                    width={windowSize.width}
                     style={{background: lightGreyColor}}
                 />)}
             </div>}
             <div>
-                {grids.map((grid, index) => {
-                    const {left, top, width, height} = getGridRect(grid);
+                {grids.map(({offset, size = 6}, index) => <Absolute
+                    key={"background" + index}
+                    {...transformRect({...offset, width: size, height: size})}
+                    style={{background: "#fff"}}
+                />)}
 
-                    return <SudokuPad
-                        key={index}
-                        data={grid.data}
-                        bounds={{
-                            top: (top - boundingRect.top - regionBorderWidth / 2) * coeff,
-                            left: (left - boundingRect.left - regionBorderWidth / 2) * coeff,
-                            width: width * coeff,
-                            height: height * coeff,
-                        }}
-                    />;
-                })}
+                {grids.map((grid, index) => <SudokuPad
+                    key={"SudokuPad" + index}
+                    data={grid.data}
+                    bounds={transformRect(getGridRect(grid))}
+                />)}
             </div>
         </Absolute>
         {!readOnly && <Absolute
