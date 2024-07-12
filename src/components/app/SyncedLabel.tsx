@@ -16,7 +16,7 @@ const StyledContainer = styled.div`
     position: fixed;
     inset: 0;
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     font-family: Lato, sans-serif;
     font-size: 50px;
@@ -34,7 +34,7 @@ const StyledInput = styled.input({
     outline: "none",
     font: "inherit",
     background: "transparent",
-    textAlign: "center",
+    textAlign: "left",
     padding: 0,
     margin: 0,
 });
