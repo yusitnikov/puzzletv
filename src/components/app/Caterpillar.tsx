@@ -1,10 +1,8 @@
-import {useEffect} from "react";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {Absolute} from "../layout/absolute/Absolute";
 import {getRectsBoundingBox, Rect} from "../../types/layout/Rect";
-import {useStringFromLocalStorage} from "../../utils/localStorage";
 import {useAblyChannelState} from "../../hooks/useAbly";
 import {ablyOptions} from "../../hooks/useMultiPlayer";
 import {Position} from "../../types/layout/Position";
@@ -12,7 +10,7 @@ import {greenColor, lightGreyColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
 
 interface CaterpillarGrid {
-    id: string;
+    data: string;
     offset: Position;
     size?: number;
     margin: {
@@ -84,7 +82,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
 
                     return <SudokuPad
                         key={index}
-                        id={grid.id}
+                        data={grid.data}
                         bounds={{
                             top: (top - boundingRect.top - regionBorderWidth / 2) * coeff,
                             left: (left - boundingRect.left - regionBorderWidth / 2) * coeff,
@@ -95,7 +93,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
                 })}
             </div>
         </Absolute>
-        <Absolute
+        {!readOnly && <Absolute
             left={windowSize.width - 30}
             top={windowSize.height - 30}
             width={20}
@@ -104,37 +102,20 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
                 borderRadius: "50%",
                 background: connected ? greenColor : lightRedColor,
             }}
-        />
+        />}
     </>;
 });
 
 interface SudokuPadProps {
-    id : string;
+    data: string;
     bounds: Rect;
 }
 
-const SudokuPad = observer(function SudokuPad({id, bounds}: SudokuPadProps) {
+const SudokuPad = observer(function SudokuPad({data, bounds}: SudokuPadProps) {
     profiler.trace();
 
-    const [contents, setContents] = useStringFromLocalStorage(`sp_${id}`);
-
-    useEffect(() => {
-        if (contents) {
-            return;
-        }
-
-        fetch(`https://sudokupad.app/api/puzzle/${id}`)
-            .then(data => data.text())
-            .then(setContents)
-            .catch(console.error);
-    }, [id, contents, setContents]);
-
-    if (!contents) {
-        return null;
-    }
-
     return <img
-        src={`https://api.sudokupad.com/thumbnail/${contents}_512x512.svg`}
+        src={`https://api.sudokupad.com/thumbnail/${data}_512x512.svg`}
         style={{
             position: "absolute",
             ...bounds,
