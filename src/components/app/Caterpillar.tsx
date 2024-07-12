@@ -397,6 +397,11 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
     };
     const submit = () => onSubmit(newGrid);
 
+    const previewBounds = getGridRect({
+        ...newGrid,
+        offset: {left: maxMargin, top: maxMargin}
+    });
+
     return <Modal
         cellSize={cellSize * 2}
         onClose={onCancel}
@@ -454,23 +459,23 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
                         height: cellSize * (size + maxMargin * 2),
                         background: lightGreyColor,
                     }}>
-                        <Absolute scale={cellSize}>
-                            <Absolute
-                                left={maxMargin}
-                                top={maxMargin}
-                                width={size}
-                                height={size}
-                                style={{background: "#fff"}}
-                            />
+                        <Absolute
+                            left={maxMargin * cellSize}
+                            top={maxMargin * cellSize}
+                            width={size * cellSize}
+                            height={size * cellSize}
+                            style={{background: "#fff"}}
+                        />
 
-                            {!!data && <SudokuPad
-                                data={data}
-                                bounds={getGridRect({
-                                    ...newGrid,
-                                    offset: {left: maxMargin, top: maxMargin}
-                                })}
-                            />}
-                        </Absolute>
+                        {!!data && <SudokuPad
+                            data={data}
+                            bounds={{
+                                left: previewBounds.left * cellSize,
+                                top: previewBounds.top * cellSize,
+                                width: previewBounds.width * cellSize,
+                                height: previewBounds.height * cellSize,
+                            }}
+                        />}
                     </div>
                 </td>
                 <td>
