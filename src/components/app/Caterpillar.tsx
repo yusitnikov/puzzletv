@@ -6,7 +6,7 @@ import {getRectsBoundingBox, Rect} from "../../types/layout/Rect";
 import {useAblyChannelState} from "../../hooks/useAbly";
 import {ablyOptions} from "../../hooks/useMultiPlayer";
 import {emptyPosition, Position} from "../../types/layout/Position";
-import {greenColor, lightGreyColor, lightRedColor} from "./globals";
+import {darkGreyColor, greenColor, lightGreyColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
 import {MouseEvent, useState} from "react";
 import {CellSelectionColor} from "../sudoku/cell/CellSelection";
@@ -432,23 +432,27 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
         <table style={{marginTop: 16}}>
             <tbody>
             <tr>
-                <td></td>
-                <td>
+                <td colSpan={3}>
+                    The white square should match the sudoku grid!
+                </td>
+            </tr>
+            <tr>
+                <td colSpan={3}>
                     <label>
                         Grid size:&nbsp;
                         <NumberInput value={size} onChange={setSize}/>
                     </label>
                     <label style={{marginLeft: 16}}>
-                        Margin:&nbsp;
+                        Outside rows:&nbsp;
                         <NumberInput value={marginTop} onChange={setMarginTop}/>
                     </label>
                 </td>
-                <td></td>
             </tr>
             <tr>
                 <td>
                     <label>
-                        Margin:<br/>
+                        Outside<br/>
+                        columns:<br/>
                         <NumberInput value={marginLeft} onChange={setMarginLeft}/>
                     </label>
                 </td>
@@ -459,6 +463,14 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
                         height: cellSize * (size + maxMargin * 2),
                         background: lightGreyColor,
                     }}>
+                        <Absolute
+                            left={(maxMargin - marginLeft) * cellSize}
+                            top={(maxMargin - marginTop) * cellSize}
+                            width={(size + marginLeft + marginRight) * cellSize}
+                            height={(size + marginTop + marginBottom) * cellSize}
+                            style={{background: darkGreyColor}}
+                        />
+
                         <Absolute
                             left={maxMargin * cellSize}
                             top={maxMargin * cellSize}
@@ -480,20 +492,19 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
                 </td>
                 <td>
                     <label>
-                        Margin:<br/>
+                        Outside<br/>
+                        columns:<br/>
                         <NumberInput value={marginRight} onChange={setMarginRight}/>
                     </label>
                 </td>
             </tr>
             <tr>
-                <td></td>
-                <td>
+                <td colSpan={3}>
                     <label>
-                        Margin:&nbsp;
+                        Outside rows:&nbsp;
                         <NumberInput value={marginBottom} onChange={setMarginBottom}/>
                     </label>
                 </td>
-                <td></td>
             </tr>
             </tbody>
         </table>
