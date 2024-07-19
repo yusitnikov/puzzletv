@@ -59,10 +59,10 @@ const getGridParsersByImportOptions = <T extends AnyPTM>(
         extraGrids: extraGridLoad = {},
     } = importOptions;
 
-    const mainGridParser = gridParserFactory(load, firstOffsetX, firstOffsetY);
+    const mainGridParser = gridParserFactory(load, firstOffsetX, firstOffsetY, {});
 
     const extraGridParsers = (Array.isArray(extraGridLoad) ? extraGridLoad : Object.values(extraGridLoad))
-        .map(({source, load, offsetX = 0, offsetY = 0}) => getGridParserFactoryByName<T, any>(source!)(load, offsetX, offsetY));
+        .map(({source, load, offsetX = 0, offsetY = 0, overrides = {}}) => getGridParserFactoryByName<T, any>(source!)(load, offsetX, offsetY, overrides));
 
     return [
         mainGridParser,

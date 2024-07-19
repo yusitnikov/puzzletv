@@ -47,6 +47,7 @@ import {PartiallyTranslatable} from "../translations/Translatable";
 import {PuzzleResultCheck} from "./PuzzleResultCheck";
 import {profiler} from "../../utils/profiler";
 import {getGridRegionCells, GridRegion} from "./GridRegion";
+import {PuzzleImportOptions} from "./PuzzleImportOptions";
 
 const emptyObject = {};
 
@@ -192,6 +193,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 return areFieldStateExtensionsEqual(a, b);
             }}),
             resultCheck: computed({equals: comparer.structural}),
+            importOptionOverrides: computed({equals: comparer.structural}),
         }, {});
 
         this.puzzle = puzzle;
@@ -869,9 +871,16 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return typeof disableFogDemo === "function" ? disableFogDemo(this) : !!disableFogDemo;
     }
 
+    get importOptionOverrides(): Partial<PuzzleImportOptions> {
+        profiler.trace();
+        return this.puzzle.typeManager.importOptionOverrides?.(this) ?? {};
+    }
+
     get digitsCount() {
         profiler.trace();
-        return this.puzzle.digitsCount ?? getDefaultDigitsCount(this.puzzle);
+        return this.importOptionOverrides.digitsCount
+            ?? this.puzzle.digitsCount
+            ?? getDefaultDigitsCount(this.puzzle);
     }
 
     get digitsCountInCurrentMode() {

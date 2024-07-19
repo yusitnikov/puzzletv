@@ -41,6 +41,7 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
                     height: gridParser.rowsCount,
                 },
                 props: {},
+                overrides: gridParser.importOptionOverrides,
             };
             puzzle.extension = {
                 ...puzzle.extension,
@@ -118,6 +119,21 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
                     </div>;
                 },
             };
+        },
+
+        importOptionOverrides(context) {
+            let result = typedBaseTypeManager.importOptionOverrides?.(context) ?? {};
+
+            const grids = (context.puzzle.extension as CaterpillarPuzzleExtension)?.caterpillarGrids ?? [];
+            const selectedCells = context.selectedCells.items;
+
+            for (const {bounds, overrides} of grids) {
+                if (selectedCells.some((cell) => isCellInRect(bounds, cell))) {
+                    result = {...result, ...overrides};
+                }
+            }
+
+            return result;
         },
     };
 };

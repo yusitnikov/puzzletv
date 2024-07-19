@@ -14,9 +14,10 @@ import {
 import {greenColor, purpleColor} from "../../components/app/globals";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {decompressFromBase64} from "lz-string";
+import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
 
 export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzlesPuzzle> {
-    constructor(puzzleJson: FPuzzlesPuzzle, offsetX: number, offsetY: number) {
+    constructor(puzzleJson: FPuzzlesPuzzle, offsetX: number, offsetY: number, importOptionOverrides: Partial<PuzzleImportOptions>) {
         super(
             puzzleJson,
             offsetX,
@@ -27,6 +28,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             undefined,
             undefined,
             fPuzzleColorsMap,
+            importOptionOverrides,
         );
     }
 
@@ -88,7 +90,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             title: (title) => importer.setTitle(title),
             author: (author) => importer.setAuthor(author),
-            ruleset: (ruleset) => importer.setRuleset(ruleset),
+            ruleset: (ruleset) => importer.setRuleset(this, ruleset),
             // region Constraints
             littlekillersum: (items) => {
                 if (items instanceof Array) {
@@ -589,14 +591,19 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
     }
 }
 
-export const FPuzzlesGridParserFactory = <T extends AnyPTM>(load: string, offsetX: number, offsetY: number) => {
+export const FPuzzlesGridParserFactory = <T extends AnyPTM>(
+    load: string,
+    offsetX: number,
+    offsetY: number,
+    importOptionOverrides: Partial<PuzzleImportOptions>,
+) => {
     load = decodeURIComponent(load);
     const jsonStr = decompressFromBase64(load);
     if (typeof jsonStr !== "string" || jsonStr[0] !== "{" || jsonStr[jsonStr.length - 1] !== "}") {
         throw new Error("Failed to decode");
     }
     const json: FPuzzlesPuzzle = JSON.parse(jsonStr);
-    return new FPuzzlesGridParser<T>(json, offsetX, offsetY);
+    return new FPuzzlesGridParser<T>(json, offsetX, offsetY, importOptionOverrides);
 };
 
 enum FPuzzleColor {

@@ -161,11 +161,11 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
 
     const finalIsFirstGridSticky = isJigsawLike && filteredExtraGrids.length !== 0 && (isFirstStickyGrid || isShuffled);
     const gridParsers = useMemo(() => {
-        const result = [getGridParserFactoryByName(source)(load, globalOffsetX, globalOffsetY)];
+        const result = [getGridParserFactoryByName(source)(load, globalOffsetX, globalOffsetY, {})];
 
-        for (const extraGrid of extraGrids) {
+        for (const {source, load, offsetX, offsetY, overrides} of extraGrids) {
             try {
-                result.push(getGridParserFactoryByName(extraGrid.source)(extraGrid.load, extraGrid.offsetX, extraGrid.offsetY));
+                result.push(getGridParserFactoryByName(source)(load, offsetX, offsetY, overrides));
             } catch (e) {
                 console.error(e);
             }
@@ -252,11 +252,12 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
         offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
-        extraGrids: filteredExtraGrids.map(({source, load, offsetX, offsetY}): Required<PuzzleGridImportOptions> => ({
+        extraGrids: filteredExtraGrids.map(({source, load, offsetX, offsetY, overrides}): Required<PuzzleGridImportOptions> => ({
             source,
             load,
             offsetX: offsetX + globalOffsetX,
             offsetY: offsetY + globalOffsetY,
+            overrides,
         })),
         caterpillar: supportsCaterpillar && caterpillar,
     });
@@ -840,6 +841,7 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
                                                     load,
                                                     offsetX: columnsCount + 1,
                                                     offsetY: 0,
+                                                    overrides: {},
                                                 },
                                             ]);
                                         }}/>

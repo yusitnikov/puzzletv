@@ -24,7 +24,7 @@ import {AnyPTM} from "./PuzzleTypeMap";
 import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
 import {IReactionDisposer} from "mobx";
 import {GivenDigitsMap} from "./GivenDigitsMap";
-import {ColorsImportMode} from "./PuzzleImportOptions";
+import {ColorsImportMode, PuzzleImportOptions} from "./PuzzleImportOptions";
 import {PuzzleImporter} from "../../data/puzzles/PuzzleImporter";
 import {GridParser} from "../../data/puzzles/GridParser";
 
@@ -288,6 +288,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     getInitialDigits?: (context: PuzzleContext<T>) => GivenDigitsMap<T["cell"]>;
 
     disableFogDemo?: boolean | ((context: PuzzleContext<T>) => boolean);
+
+    importOptionOverrides?: (context: PuzzleContext<T>) => Partial<PuzzleImportOptions>;
 }
 
 // region Helper functions

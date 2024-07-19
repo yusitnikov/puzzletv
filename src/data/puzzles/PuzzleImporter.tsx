@@ -143,10 +143,20 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.setAuthor(importOptions.author);
     }
 
-    private cosmeticsLayer(beforeLines = false) {
-        return this.importOptions.rotatableClues && this.importOptions.keepCircles
+    private finalImportOptions(gridParser: GridParser<T, any>): PuzzleImportOptions {
+        return {...this.importOptions, ...gridParser.importOptionOverrides};
+    }
+
+    private cosmeticsLayer(gridParser: GridParser<T, any>, beforeLines = false) {
+        const {
+            rotatableClues,
+            keepCircles,
+            cosmeticsBehindFog,
+        } = this.finalImportOptions(gridParser);
+
+        return rotatableClues && keepCircles
             ? FieldLayer.beforeSelection
-            : beforeLines || this.importOptions.cosmeticsBehindFog
+            : beforeLines || cosmeticsBehindFog
                 ? FieldLayer.regular
                 : FieldLayer.afterLines;
     }
@@ -189,10 +199,10 @@ export class PuzzleImporter<T extends AnyPTM> {
             }
         }
     }
-    setRuleset(ruleset = "") {
+    setRuleset(gridParser: GridParser<T, any>, ruleset = "") {
         if (ruleset) {
             let parsedRules: ReactNode;
-            if (this.importOptions.htmlRules) {
+            if (this.finalImportOptions(gridParser).htmlRules) {
                 parsedRules = <ParsedRulesHtml>{ruleset}</ParsedRulesHtml>;
             } else {
                 parsedRules = <>{ruleset.split("\n").map(
@@ -415,14 +425,19 @@ export class PuzzleImporter<T extends AnyPTM> {
         circleCellLiterals: PositionLiteral[],
         [lineStartLiteral, ...lineLiterals]: PositionLiteral[],
     ) {
+        const {
+            transparentArrowCircle,
+            "product-arrow": productArrow,
+        } = this.finalImportOptions(gridParser);
+
         this.addItems(ArrowConstraint(
             gridParser.offsetCoordsArray(circleCellLiterals)
                 .filter((cell) => this.isVisibleGridCell(cell)),
             gridParser.offsetCoordsArray(lineLiterals)
                 .filter((cell) => this.isVisibleGridCell(cell)),
-            this.importOptions.transparentArrowCircle,
+            transparentArrowCircle,
             lineStartLiteral && gridParser.offsetCoords(lineStartLiteral),
-            !!this.importOptions["product-arrow"],
+            productArrow,
             false,
         ));
     }
@@ -754,7 +769,7 @@ export class PuzzleImporter<T extends AnyPTM> {
                 lineColor,
                 lineWidth,
                 split,
-                this.cosmeticsLayer(beforeGridLines),
+                this.cosmeticsLayer(gridParser, beforeGridLines),
             ),
             lineColor,
             lineWidth,
@@ -784,7 +799,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             text,
             textColor,
             angle,
-            this.cosmeticsLayer(beforeLines),
+            this.cosmeticsLayer(gridParser, beforeLines),
         ));
     }
     addCosmeticCircle(
@@ -811,7 +826,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             text,
             textColor,
             angle,
-            this.cosmeticsLayer(beforeLines),
+            this.cosmeticsLayer(gridParser, beforeLines),
         ));
     }
     addCosmeticArrow(
@@ -837,7 +852,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             text,
             textColor,
             angle,
-            this.cosmeticsLayer(beforeLines),
+            this.cosmeticsLayer(gridParser, beforeLines),
         ));
     }
     addCosmeticText(
@@ -857,7 +872,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             color,
             size,
             angle,
-            this.cosmeticsLayer(beforeLines),
+            this.cosmeticsLayer(gridParser, beforeLines),
         ));
     }
     addCosmeticCage(
@@ -904,7 +919,7 @@ export class PuzzleImporter<T extends AnyPTM> {
 
         switch (typeof value) {
             case "number":
-                if (this.importOptions.fillableDigitalDisplay) {
+                if (this.finalImportOptions(gridParser).fillableDigitalDisplay) {
                     // TODO: extract to a type manager
                     this.items.push(FillableCalculatorDigitConstraint({top: offsetTop, left: offsetLeft}, value));
                 } else {
@@ -932,12 +947,12 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.puzzle.solution[top][left] = value;
     }
 
-    private get colorsImportMode() {
-        return this.typeManager.colorsImportMode ?? this.importOptions.colorsImportMode;
+    private colorsImportMode(gridParser: GridParser<T, any>) {
+        return this.typeManager.colorsImportMode ?? this.finalImportOptions(gridParser).colorsImportMode;
     }
 
     addInitialColors(gridParser: GridParser<T, any>, top: number, left: number, ...colors: CellColorValue[]) {
-        if (this.colorsImportMode === ColorsImportMode.Solution) {
+        if (this.colorsImportMode(gridParser) === ColorsImportMode.Solution) {
             this.addSolutionColors(gridParser, top, left, ...colors);
             return;
         }
@@ -954,7 +969,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     addSolutionColors(gridParser: GridParser<T, any>, top: number, left: number, ...colors: CellColorValue[]) {
-        if (this.colorsImportMode === ColorsImportMode.Initials) {
+        if (this.colorsImportMode(gridParser) === ColorsImportMode.Initials) {
             this.addInitialColors(gridParser, top, left, ...colors);
             return;
         }

@@ -3,6 +3,7 @@ import {PuzzleImporter} from "./PuzzleImporter";
 import {parsePositionLiteral, Position, PositionLiteral} from "../../types/layout/Position";
 import {CellColor} from "../../types/sudoku/CellColor";
 import {FieldSize} from "../../types/sudoku/FieldSize";
+import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
 
 export abstract class GridParser<T extends AnyPTM, JsonT> {
     protected constructor(
@@ -15,6 +16,7 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
         public minDigit: number | undefined,
         public maxDigit: number | undefined,
         public colorsMap: Record<string, CellColor>,
+        public importOptionOverrides: Partial<PuzzleImportOptions>,
     ) {}
 
     abstract addToImporter(importer: PuzzleImporter<T>): void;
@@ -83,4 +85,9 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     }
 }
 
-export type GridParserFactory<T extends AnyPTM, JsonT> = (load: string, offsetX: number, offsetY: number) => GridParser<T, JsonT>;
+export type GridParserFactory<T extends AnyPTM, JsonT> = (
+    load: string,
+    offsetX: number,
+    offsetY: number,
+    importOptionOverrides: Partial<PuzzleImportOptions>,
+) => GridParser<T, JsonT>;

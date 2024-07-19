@@ -91,11 +91,12 @@ import {XSumConstraint} from "../../components/sudoku/constraints/x-sum/XSum";
 import {NumberedRoomConstraint} from "../../components/sudoku/constraints/numbered-room/NumberedRoom";
 import {SkyscraperConstraint} from "../../components/sudoku/constraints/skyscraper/Skyscraper";
 import {BaseEntropicLineConstraint} from "../../components/sudoku/constraints/entropy-line/EntropicLine";
+import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
 import {SequenceLineConstraint} from "../../components/sudoku/constraints/sequence-line/SequenceLine";
 import {loop} from "../../utils/math";
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {
-    constructor(puzzleJson: CompressedPuzzle, offsetX: number, offsetY: number) {
+    constructor(puzzleJson: CompressedPuzzle, offsetX: number, offsetY: number, importOptionOverrides: Partial<PuzzleImportOptions>) {
         let {width, height, size, cells: {length}} = puzzleJson;
         if (width !== undefined) {
             height ??= length / width;
@@ -120,6 +121,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             puzzleJson.minDigit ?? 1,
             puzzleJson.maxDigit ?? size,
             sudokuMakerColorsMap,
+            importOptionOverrides,
         );
     }
 
@@ -914,7 +916,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             },
             name: (title) => importer.setTitle(title),
             author: (author) => importer.setAuthor(author),
-            comment: (ruleset) => importer.setRuleset(ruleset),
+            comment: (ruleset) => importer.setRuleset(this, ruleset),
             size: undefined,
             width: undefined,
             height: undefined,
@@ -1102,14 +1104,19 @@ const cageStyleValidator = new ObjectParser<CageStyle>({
     text: colorStyleValidator.bind("cage text style"),
 });
 
-export const SudokuMakerGridParserFactory = <T extends AnyPTM>(load: string, offsetX: number, offsetY: number) => {
+export const SudokuMakerGridParserFactory = <T extends AnyPTM>(
+    load: string,
+    offsetX: number,
+    offsetY: number,
+    importOptionOverrides: Partial<PuzzleImportOptions>
+) => {
     load = decodeURIComponent(load);
     const jsonStr = decompressFromEncodedURIComponent(load);
     if (typeof jsonStr !== "string" || jsonStr[0] !== "{" || jsonStr[jsonStr.length - 1] !== "}") {
         throw new Error("Failed to decode");
     }
     const json = JSON.parse(jsonStr) as SudokuBlob;
-    return new SudokuMakerGridParser<T>(json.puzzle, offsetX, offsetY);
+    return new SudokuMakerGridParser<T>(json.puzzle, offsetX, offsetY, importOptionOverrides);
 };
 
 enum SudokuMakerColor {

@@ -37,6 +37,7 @@ export interface PuzzleGridImportOptions {
     load: string;
     offsetX?: number;
     offsetY?: number;
+    overrides?: Partial<PuzzleImportOptions>;
 }
 
 export interface PuzzleImportOptions extends PuzzleGridImportOptions {
@@ -94,13 +95,15 @@ const sanitizeGridImportOptions = (
         source,
         load,
         offsetX = 0,
-        offsetY = 0
+        offsetY = 0,
+        overrides = {},
     }: Omit<PuzzleGridImportOptions, "source"> & Required<Pick<PuzzleGridImportOptions, "source">>
 ): Required<PuzzleGridImportOptions> => ({
     source,
     load,
     offsetX: Number(offsetX),
     offsetY: Number(offsetY),
+    overrides,
 });
 export const sanitizeImportOptions = (
     importOptions: PuzzleImportOptions,
