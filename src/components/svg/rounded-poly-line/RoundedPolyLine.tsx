@@ -6,6 +6,7 @@ import {
     normalizeVector,
     Position
 } from "../../../types/layout/Position";
+import {parseColorWithOpacity} from "../../../utils/color";
 
 export interface PolyLinePoint extends Position {
     radius?: number;
@@ -44,21 +45,23 @@ export const RoundedPolyLine = ({points, strokeWidth, stroke, rounded = true}: R
             />;
     }
 
-    return <>
+    const {rgb, a} = parseColorWithOpacity(stroke);
+
+    return <g opacity={a}>
         {points.map((start, index) => {
             const end = points[index + 1];
             if (!end) {
                 return undefined;
             }
 
-            return <RoundedLineSegment key={`line-${index}`} start={start} end={end} defaultRadius={defaultRadius} color={stroke}/>;
+            return <RoundedLineSegment key={`line-${index}`} start={start} end={end} defaultRadius={defaultRadius} color={rgb}/>;
         })}
 
         {/*note: rendering circles even if `rounded` is false is intended, because it's the case when the line widths are different*/}
         {points.map(({top, left, radius = defaultRadius}, index) => {
-            return <circle key={`circle-${index}`} cx={left} cy={top} r={radius} fill={stroke}/>;
+            return <circle key={`circle-${index}`} cx={left} cy={top} r={radius} fill={rgb}/>;
         })}
-    </>;
+    </g>;
 };
 
 interface RoundedLineSegmentProps {
