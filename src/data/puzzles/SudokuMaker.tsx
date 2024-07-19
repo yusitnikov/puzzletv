@@ -92,6 +92,7 @@ import {NumberedRoomConstraint} from "../../components/sudoku/constraints/number
 import {SkyscraperConstraint} from "../../components/sudoku/constraints/skyscraper/Skyscraper";
 import {BaseEntropicLineConstraint} from "../../components/sudoku/constraints/entropy-line/EntropicLine";
 import {SequenceLineConstraint} from "../../components/sudoku/constraints/sequence-line/SequenceLine";
+import {loop} from "../../utils/math";
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {
     constructor(puzzleJson: CompressedPuzzle, offsetX: number, offsetY: number) {
@@ -707,6 +708,16 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                             new ObjectParser<CosmeticLineConstraintConfig>({
                                 type: undefined,
                                 lines: (lines, {style: {color, thickness, layer}}) => {
+                                    const beforeGridLines = layer
+                                        ? parseLayer(layer)
+                                        : lines.every((line) => !line.some((point1, index) => {
+                                            const point2 = line[index + 1];
+                                            return point2
+                                                && (point1.x === point2.x || point1.y === point2.y)
+                                                && (point1.x % 1 === 0 || point1.y % 1 === 0)
+                                                && (point2.x % 1 === 0 || point2.y % 1 === 0);
+                                        }));
+
                                     for (const line of lines) {
                                         importer.addCosmeticLine(
                                             this,
@@ -716,7 +727,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                             })),
                                             color,
                                             thickness,
-                                            parseLayer(layer),
+                                            beforeGridLines,
                                         );
                                     }
                                 },
@@ -769,7 +780,9 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     left: x - 0.5,
                                 };
 
-                                const beforeLines = parseLayer(layer);
+                                const beforeLines = layer
+                                    ? parseLayer(layer)
+                                    : loop(x, 1) >= 0.25 && loop(x, 1) <= 0.75 && loop(y, 1) >= 0.25 && loop(y, 1) <= 0.75;
 
                                 switch (params.type) {
                                     case SymbolType.Ellipse:
@@ -1056,7 +1069,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
 type OutsideClueConstraintConfig = SandwichSumsConstraintConfig | XSumsConstraintConfig | SkyscrapersConstraintConfig | NumberedRoomsConstraintConfig;
 
 // Returns whether the clue should be displayed before the grid lines
-const parseLayer = (layer?: SudokuLayer) => layer === SudokuLayer.Background || layer === SudokuLayer.Default;
+const parseLayer = (layer: SudokuLayer) => layer === SudokuLayer.Background || layer === SudokuLayer.Default;
 
 const parseDiagonalType = (type: DiagonalType | undefined): OutsideClueLineDirectionType => {
     switch (type) {
