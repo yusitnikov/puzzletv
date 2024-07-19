@@ -16,7 +16,7 @@ import {LanguageCode} from "../../types/translations/LanguageCode";
 import {indexes} from "../../utils/indexes";
 import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
 import {isVisibleCell} from "../../types/sudoku/CellTypeProps";
-import {createEmptyContextForPuzzle} from "../../types/sudoku/PuzzleContext";
+import {createEmptyContextForPuzzle, PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {doesGridRegionContainCell} from "../../types/sudoku/GridRegion";
 import {
     FillableCalculatorDigitConstraint
@@ -94,6 +94,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     private readonly solutionColors: GivenDigitsMap<CellColorValue[]> = {};
     private readonly items: Constraint<T, any>[] = [];
     private readonly puzzle: PuzzleDefinition<T>;
+    private emptyContextCache?: PuzzleContext<T>;
     private inactiveCells: PositionSet;
     private importedTitle = false;
 
@@ -258,8 +259,8 @@ export class PuzzleImporter<T extends AnyPTM> {
             );
         const validGridCells = allGridCells.filter((cell) => this.isVisibleGridCell(cell));
 
-        const emptyContext = createEmptyContextForPuzzle(this.puzzle);
-        const faces = this.typeManager.getRegionsWithSameCoordsTransformation?.(emptyContext, true) ?? [{
+        this.emptyContextCache ??= createEmptyContextForPuzzle(this.puzzle);
+        const faces = this.typeManager.getRegionsWithSameCoordsTransformation?.(this.emptyContextCache, true) ?? [{
             top: offsetY,
             left: offsetX,
             width: columnsCount,
