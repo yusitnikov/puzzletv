@@ -3,7 +3,7 @@ import React from "react";
 import {MultiStageSudokuTypeManager} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
 import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
 import {ToMultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
-import {FPuzzles} from "./FPuzzles";
+import {FPuzzles} from "./Import";
 import {RushHourPTM} from "../../sudokuTypes/rush-hour/types/RushHourPTM";
 import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
 import {isCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";

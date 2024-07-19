@@ -4,7 +4,7 @@ import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
 import {Tabs} from "../layout/tabs/Tabs";
 import {CubeIt} from "../../data/puzzles/Cubedoku";
-import {SudokuMaker} from "../../data/puzzles/SudokuMaker";
+import {SudokuMaker} from "../../data/puzzles/Import";
 import {PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
 import {ToroidalYinYang} from "../../data/puzzles/ToroidalYinYang";
 import {ExampleTab} from "./how-to-import/ExampleTab";

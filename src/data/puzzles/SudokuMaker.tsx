@@ -80,7 +80,6 @@ import {CellColor} from "../../types/sudoku/CellColor";
 import {ObjectParser, ObjectParserFieldMap} from "../../types/struct/ObjectParser";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {decompressFromEncodedURIComponent} from "lz-string";
-import {getPuzzleImportLoader} from "./Import";
 import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
 import {Constraint} from "../../types/sudoku/Constraint";
 import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
@@ -1099,8 +1098,6 @@ export const SudokuMakerGridParserFactory = <T extends AnyPTM>(load: string, off
     const json = JSON.parse(jsonStr) as SudokuBlob;
     return new SudokuMakerGridParser<T>(json.puzzle, offsetX, offsetY);
 };
-
-export const SudokuMaker = getPuzzleImportLoader("sudokumaker", SudokuMakerGridParserFactory);
 
 enum SudokuMakerColor {
     white = "#ffffff",

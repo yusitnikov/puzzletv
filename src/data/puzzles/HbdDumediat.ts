@@ -1,4 +1,4 @@
-import {FPuzzles} from "./FPuzzles";
+import {FPuzzles} from "./Import";
 import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {JigsawPTM} from "../../sudokuTypes/jigsaw/types/JigsawPTM";
 import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";

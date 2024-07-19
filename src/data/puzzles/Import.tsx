@@ -20,7 +20,7 @@ import {JigsawSudokuTypeManager} from "../../sudokuTypes/jigsaw/types/JigsawSudo
 import {
     PuzzleImportDigitType,
     PuzzleImportOptions,
-    PuzzleImportPuzzleType,
+    PuzzleImportPuzzleType, PuzzleImportSource,
     sanitizeImportOptions
 } from "../../types/sudoku/PuzzleImportOptions";
 import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
@@ -45,11 +45,13 @@ import {FullCubePTM} from "../../sudokuTypes/cube/types/FullCubePTM";
 import {EggSokobanSudokuTypeManager} from "../../sudokuTypes/sokoban/egg/types/EggSokobanSudokuTypeManager";
 import {RuleBoxSudokuTypeManager} from "../../sudokuTypes/rule-box/types/RuleBoxSudokuTypeManager";
 import {CaterpillarSudokuTypeManager} from "../../sudokuTypes/caterpillar/types/CaterpillarSudokuTypeManager";
+import {FPuzzlesGridParserFactory} from "./FPuzzles";
+import {SudokuMakerGridParserFactory} from "./SudokuMaker";
 
-const getGridParsersByImportOptions = <T extends AnyPTM, JsonT>(
+const getGridParsersByImportOptions = <T extends AnyPTM>(
     importOptions: PuzzleImportOptions,
-    gridParserFactory: GridParserFactory<T, JsonT>
-): GridParser<T, JsonT>[] => {
+    gridParserFactory: GridParserFactory<T, any>
+): GridParser<T, any>[] => {
     const {
         load,
         offsetX: firstOffsetX = 0,
@@ -60,7 +62,7 @@ const getGridParsersByImportOptions = <T extends AnyPTM, JsonT>(
     const mainGridParser = gridParserFactory(load, firstOffsetX, firstOffsetY);
 
     const extraGridParsers = (Array.isArray(extraGridLoad) ? extraGridLoad : Object.values(extraGridLoad))
-        .map(({load, offsetX = 0, offsetY = 0}) => gridParserFactory(load, offsetX, offsetY));
+        .map(({source, load, offsetX = 0, offsetY = 0}) => getGridParserFactoryByName<T, any>(source!)(load, offsetX, offsetY));
 
     return [
         mainGridParser,
@@ -207,10 +209,10 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     return typeManager;
 };
 
-const loadByImportOptions = <T extends AnyPTM, JsonT>(
+const loadByImportOptions = <T extends AnyPTM>(
     slug: string,
     importOptions: PuzzleImportOptions,
-    gridParserFactory: GridParserFactory<T, JsonT>
+    gridParserFactory: GridParserFactory<T, any>
 ): PuzzleDefinition<T> => {
     const {
         type = PuzzleImportPuzzleType.Regular,
@@ -244,9 +246,16 @@ const loadByImportOptions = <T extends AnyPTM, JsonT>(
     return importer.finalize();
 };
 
-export const getPuzzleImportLoader = <T extends AnyPTM, JsonT>(
+const gridParserFactoryMap = {
+    [PuzzleImportSource.FPuzzles]: FPuzzlesGridParserFactory,
+    [PuzzleImportSource.SudokuMaker]: SudokuMakerGridParserFactory,
+};
+export const getGridParserFactoryByName = <T extends AnyPTM, JsonT>(source: PuzzleImportSource) =>
+    gridParserFactoryMap[source] as unknown as GridParserFactory<T, JsonT>;
+
+export const getPuzzleImportLoader = <T extends AnyPTM>(
     slug: string,
-    gridParserFactory: GridParserFactory<T, JsonT>
+    source: PuzzleImportSource,
 ): PuzzleDefinitionLoader<T> => ({
     noIndex: true,
     slug,
@@ -255,11 +264,14 @@ export const getPuzzleImportLoader = <T extends AnyPTM, JsonT>(
             throw new Error("Missing parameter");
         }
 
-        params = sanitizeImportOptions(params);
+        params = sanitizeImportOptions(params, source);
 
         return {
-            ...loadByImportOptions(slug, params, gridParserFactory),
+            ...loadByImportOptions(slug, params, getGridParserFactoryByName(source)),
             saveStateKey: `${slug}-${sha1().update(JSON.stringify(params)).digest("hex").substring(0, 20)}`,
         };
     }
 });
+
+export const FPuzzles = getPuzzleImportLoader("f-puzzles", PuzzleImportSource.FPuzzles);
+export const SudokuMaker = getPuzzleImportLoader("sudokumaker", PuzzleImportSource.SudokuMaker);

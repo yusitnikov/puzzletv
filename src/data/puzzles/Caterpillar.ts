@@ -1,4 +1,4 @@
-import {SudokuMaker} from "./SudokuMaker";
+import {SudokuMaker} from "./Import";
 import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
 import {PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
 import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";

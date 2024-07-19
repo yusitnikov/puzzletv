@@ -16,11 +16,10 @@ import {HowToImport} from "./HowToImport";
 import {useGesturesGlobalEvents} from "../../utils/gestures";
 import {observer} from "mobx-react-lite";
 import {useUpdateControlKeysState} from "../../hooks/useControlKeysState";
-import {FPuzzlesGridParserFactory} from "../../data/puzzles/FPuzzles";
-import {SudokuMakerGridParserFactory} from "../../data/puzzles/SudokuMaker";
 import {LanguageCode} from "../../types/translations/LanguageCode";
 import {Caterpillar} from "./Caterpillar";
 import {SyncedLabel} from "./SyncedLabel";
+import {PuzzleImportSource} from "../../types/sudoku/PuzzleImportOptions";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -117,8 +116,7 @@ export const App = observer(({onPageLoaded}: AppProps) => {
                     load={params.load}
                     slug={"f-puzzles"}
                     title={title}
-                    typeLabel={"f-puzzles"}
-                    gridParserFactory={FPuzzlesGridParserFactory}
+                    source={PuzzleImportSource.FPuzzles}
                 />
             </PageLayout>;
         }
@@ -138,8 +136,7 @@ export const App = observer(({onPageLoaded}: AppProps) => {
                     load={params.load}
                     slug={"sudokumaker"}
                     title={title}
-                    typeLabel={"SudokuMaker"}
-                    gridParserFactory={SudokuMakerGridParserFactory}
+                    source={PuzzleImportSource.SudokuMaker}
                 />
             </PageLayout>;
         }

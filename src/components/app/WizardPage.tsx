@@ -1,9 +1,13 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled/macro";
 import {buildLink} from "../../utils/link";
-import {Children, FC, FormEvent, ReactElement, useMemo, useRef, useState} from "react";
+import {Children, FC, FormEvent, useMemo, useRef, useState} from "react";
 import {useBoolFromLocalStorage, useNumberFromLocalStorage, useStringFromLocalStorage} from "../../utils/localStorage";
-import {detectTypeManagerByImportOptions, getPuzzleImportLoader} from "../../data/puzzles/Import";
+import {
+    detectTypeManagerByImportOptions,
+    getGridParserFactoryByName,
+    getPuzzleImportLoader
+} from "../../data/puzzles/Import";
 import {useLanguageCode} from "../../hooks/useTranslate";
 import {darkGreyColor, headerPadding} from "./globals";
 import {allowedRulesHtmlTags} from "../sudoku/rules/ParsedRulesHtml";
@@ -16,13 +20,12 @@ import {
     PuzzleGridImportOptions,
     PuzzleImportDigitType,
     PuzzleImportOptions,
-    PuzzleImportPuzzleType
+    PuzzleImportPuzzleType,
+    PuzzleImportSource
 } from "../../types/sudoku/PuzzleImportOptions";
 import {loadPuzzle} from "../../types/sudoku/PuzzleDefinition";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
-import {GridParserFactory} from "../../data/puzzles/GridParser";
-import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {OpenInNew} from "@emotion-icons/material";
 
@@ -46,19 +49,25 @@ const FieldSet = styled("fieldset")({
 const Details = styled("div")({marginTop: "0.25em", color: "#888"});
 const Select = styled("select")({font: "inherit"});
 
-interface WizardPageProps<T extends AnyPTM, JsonT> {
+const typeLabelMap: Record<PuzzleImportSource, string> = {
+    [PuzzleImportSource.FPuzzles]: "F-Puzzles",
+    [PuzzleImportSource.SudokuMaker]: "Sudoku Maker",
+}
+
+interface WizardPageProps {
     load: string;
     slug: string;
     title: string;
-    typeLabel: string;
-    gridParserFactory: GridParserFactory<T, JsonT>;
+    source: PuzzleImportSource;
 }
 
-export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title, typeLabel, gridParserFactory}: WizardPageProps<T, JsonT>) => {
+export const WizardPage = observer(({load, slug, title, source}: WizardPageProps) => {
     const languageCode = useLanguageCode();
 
     const {width, height} = useWindowSize();
     const previewSize = Math.min(width, height) - 2 * headerPadding;
+
+    const typeLabel = typeLabelMap[source];
 
     const [type, setType] = useStringFromLocalStorage<PuzzleImportPuzzleType>("fpwType", PuzzleImportPuzzleType.Regular);
     const [digitType, setDigitType] = useStringFromLocalStorage<PuzzleImportDigitType>("fpwDigitType", PuzzleImportDigitType.Regular);
@@ -102,6 +111,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
     const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
     const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
+    const [extraGridSource, setExtraGridSource] = useState(source);
     const [caterpillar, setCaterpillar] = useBoolFromLocalStorage("fpwCaterpillar");
     const [customTitle, setCustomTitle] = useState("");
     const [customAuthor, setCustomAuthor] = useState("");
@@ -151,18 +161,18 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
 
     const finalIsFirstGridSticky = isJigsawLike && filteredExtraGrids.length !== 0 && (isFirstStickyGrid || isShuffled);
     const gridParsers = useMemo(() => {
-        const result = [gridParserFactory(load, globalOffsetX, globalOffsetY)];
+        const result = [getGridParserFactoryByName(source)(load, globalOffsetX, globalOffsetY)];
 
         for (const extraGrid of extraGrids) {
             try {
-                result.push(gridParserFactory(extraGrid.load, extraGrid.offsetX, extraGrid.offsetY));
+                result.push(getGridParserFactoryByName(extraGrid.source)(extraGrid.load, extraGrid.offsetX, extraGrid.offsetY));
             } catch (e) {
                 console.error(e);
             }
         }
 
         return result;
-    }, [load, globalOffsetX, globalOffsetY, extraGrids, gridParserFactory]);
+    }, [load, globalOffsetX, globalOffsetY, extraGrids, source]);
 
     const {
         columnsCount,
@@ -242,7 +252,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
         offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
-        extraGrids: filteredExtraGrids.map(({load, offsetX, offsetY}) => ({
+        extraGrids: filteredExtraGrids.map(({source, load, offsetX, offsetY}): Required<PuzzleGridImportOptions> => ({
+            source,
             load,
             offsetX: offsetX + globalOffsetX,
             offsetY: offsetY + globalOffsetY,
@@ -269,7 +280,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
         const version = ++autoIncrement;
         try {
             return {
-                puzzle: loadPuzzle(getPuzzleImportLoader(slug, gridParserFactory), importOptions),
+                puzzle: loadPuzzle(getPuzzleImportLoader(slug, source), importOptions),
                 version,
             };
         } catch (error: unknown) {
@@ -279,7 +290,7 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                 version,
             };
         }
-    }, [importOptions, slug, gridParserFactory]);
+    }, [importOptions, slug, source]);
 
     const handleSubmit = (ev: FormEvent) => {
         ev.preventDefault();
@@ -291,7 +302,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
 
     const isValidForm = !isInfiniteRings || visibleRingsCount !== 0;
 
-    const isFPuzzles = slug === "f-puzzles";
+    const extraGridTypeLabel = typeLabelMap[extraGridSource];
+    const isExtraGridFPuzzles = extraGridSource === PuzzleImportSource.FPuzzles;
 
     // eslint-disable-next-line no-script-url
     const copyIdBookmarkletCode = "javascript:(()=>{const d=document,b=d.body,e=d.createElement('input');e.value=exportPuzzle();b.append(e);e.select();d.execCommand('copy');e.remove();})()";
@@ -768,7 +780,8 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                                 return <li key={`extra-grid-${index}`}>
                                     <Paragraph>
                                         <label>
-                                            {typeLabel} link or ID:&nbsp;
+                                            <PuzzleImportSourceSelect value={grid.source} onChange={(source) => mergeCurrentItem({source})} />
+                                            &nbsp;link or ID:&nbsp;
                                             <input type={"text"} value={grid.load}
                                                    onChange={ev => mergeCurrentItem({load: ev.target.value})}/>
                                         </label>
@@ -807,29 +820,43 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
                             <li key={`extra-grid-${extraGrids.length}`}>
                                 <Paragraph>
                                     <label>
-                                        {typeLabel} link or ID:&nbsp;
-                                        <input type={"text"} value={""} onChange={ev => setExtraGrids([
-                                            ...extraGrids,
-                                            {
-                                                load: ev.target.value,
-                                                offsetX: columnsCount + 1,
-                                                offsetY: 0,
-                                            },
-                                        ])}/>
+                                        <PuzzleImportSourceSelect value={extraGridSource} onChange={setExtraGridSource} />
+                                        &nbsp;link or ID:&nbsp;
+                                        <input type={"text"} value={""} onChange={ev => {
+                                            let newSource = extraGridSource;
+                                            const load = ev.target.value;
+                                            if (load.includes("?load=")) {
+                                                newSource = PuzzleImportSource.FPuzzles;
+                                                setExtraGridSource(newSource);
+                                            } else if (load.includes("?puzzle=")) {
+                                                newSource = PuzzleImportSource.SudokuMaker;
+                                                setExtraGridSource(newSource);
+                                            }
+
+                                            setExtraGrids([
+                                                ...extraGrids,
+                                                {
+                                                    source: newSource,
+                                                    load,
+                                                    offsetX: columnsCount + 1,
+                                                    offsetY: 0,
+                                                },
+                                            ]);
+                                        }}/>
                                     </label>
                                     <Details>
-                                        Create the additional grid in {typeLabel}{isFPuzzles && ', then click "Export" and "Open With Link"'}.
-                                        Copy the link of the page {isFPuzzles && "that opened in the tab"} to here.
+                                        Create the additional grid in {extraGridTypeLabel}{isExtraGridFPuzzles && ', then click "Export" and "Open With Link"'}.
+                                        Copy the link of the page {isExtraGridFPuzzles && "that opened in the tab"} to here.
                                     </Details>
-                                    {isFPuzzles && <>
+                                    {isExtraGridFPuzzles && <>
                                         <Details>
-                                            Alternative: copy the {typeLabel} ID to the clipboard by installing and using
-                                            this bookmarklet: <a href={copyIdBookmarkletCode}>Copy {typeLabel} ID</a>.
+                                            Alternative: copy the {extraGridTypeLabel} ID to the clipboard by installing and using
+                                            this bookmarklet: <a href={copyIdBookmarkletCode}>Copy {extraGridTypeLabel} ID</a>.
                                         </Details>
                                         <Details>
                                             <strong>Important!</strong> Please don't copy the "compressed" link, it will not work!
-                                            Also, If you edited the puzzle, it's a must to use the "open with link" feature
-                                            (because the link of the current {typeLabel} tab doesn't include the latest information).
+                                            Also, if you edited the puzzle, it's a must to use the "open with link" feature
+                                            (because the link of the current {extraGridTypeLabel} tab doesn't include the latest information).
                                         </Details>
                                     </>}
                                 </Paragraph>
@@ -870,7 +897,22 @@ export const WizardPage = observer(<T extends AnyPTM, JsonT>({load, slug, title,
             width={previewSize}
         />
     </div>;
-}) as <T extends AnyPTM, JsonT>(props: WizardPageProps<T, JsonT>) => ReactElement;
+});
+
+interface PuzzleImportSourceSelectProps {
+    value: PuzzleImportSource;
+    onChange: (value: PuzzleImportSource) => void;
+}
+const PuzzleImportSourceSelect = observer(function PuzzleImportSourceSelect({value, onChange}: PuzzleImportSourceSelectProps) {
+    return <Select
+        value={value}
+        onChange={ev => onChange(ev.target.value as PuzzleImportSource)}
+    >
+        {Object.entries(typeLabelMap).map(
+            ([value, label]) => <option key={value} value={value}>{label}</option>
+        )}
+    </Select>;
+})
 
 interface CollapsableFieldSetProps {
     legend: string;

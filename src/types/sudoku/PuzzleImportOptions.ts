@@ -27,7 +27,13 @@ export enum ColorsImportMode {
     Solution = "solution",
 }
 
+export enum PuzzleImportSource {
+    FPuzzles = "f-puzzles",
+    SudokuMaker = "sudoku-maker",
+}
+
 export interface PuzzleGridImportOptions {
+    source?: PuzzleImportSource;
     load: string;
     offsetX?: number;
     offsetY?: number;
@@ -83,13 +89,23 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
-const sanitizeGridImportOptions = ({load, offsetX = 0, offsetY = 0}: PuzzleGridImportOptions)
-    : Required<PuzzleGridImportOptions> => ({
+const sanitizeGridImportOptions = (
+    {
+        source,
+        load,
+        offsetX = 0,
+        offsetY = 0
+    }: Omit<PuzzleGridImportOptions, "source"> & Required<Pick<PuzzleGridImportOptions, "source">>
+): Required<PuzzleGridImportOptions> => ({
+    source,
     load,
     offsetX: Number(offsetX),
     offsetY: Number(offsetY),
 });
-export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): PuzzleImportOptions => {
+export const sanitizeImportOptions = (
+    importOptions: PuzzleImportOptions,
+    source: PuzzleImportSource,
+): PuzzleImportOptions => {
     // typescript trick: treat all properties as "required", to ensure that no property was accidentally forgotten
 
     const {
@@ -143,10 +159,10 @@ export const sanitizeImportOptions = (importOptions: PuzzleImportOptions): Puzzl
 
     // noinspection UnnecessaryLocalVariableJS
     const result: Required<PuzzleImportOptions> = {
-        ...sanitizeGridImportOptions(importOptions),
+        ...sanitizeGridImportOptions({source, ...importOptions}),
         extraGrids: Object.fromEntries(
             [...(Array.isArray(extraGrids) ? extraGrids.entries() : Object.entries(extraGrids))]
-                .map(([key, grid]) => [key, sanitizeGridImportOptions(grid)]),
+                .map(([key, grid]) => [key, sanitizeGridImportOptions({source, ...grid})]),
         ),
         title,
         author,

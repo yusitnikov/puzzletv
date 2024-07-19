@@ -2,11 +2,7 @@ import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
 import {GridParser} from "./GridParser";
 import {FPuzzlesGridCell, FPuzzlesPuzzle, FPuzzlesText} from "fpuzzles-data";
 import {PuzzleImporter} from "./PuzzleImporter";
-import {
-    parsePositionLiteral,
-    Position,
-    stringifyCellCoords
-} from "../../types/layout/Position";
+import {parsePositionLiteral, Position, stringifyCellCoords} from "../../types/layout/Position";
 import {CellColor} from "../../types/sudoku/CellColor";
 import {ObjectParser} from "../../types/struct/ObjectParser";
 import {regionSumLineColor} from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
@@ -18,7 +14,6 @@ import {
 import {greenColor, purpleColor} from "../../components/app/globals";
 import {splitArrayIntoChunks} from "../../utils/array";
 import {decompressFromBase64} from "lz-string";
-import {getPuzzleImportLoader} from "./Import";
 
 export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzlesPuzzle> {
     constructor(puzzleJson: FPuzzlesPuzzle, offsetX: number, offsetY: number) {
@@ -603,8 +598,6 @@ export const FPuzzlesGridParserFactory = <T extends AnyPTM>(load: string, offset
     const json: FPuzzlesPuzzle = JSON.parse(jsonStr);
     return new FPuzzlesGridParser<T>(json, offsetX, offsetY);
 };
-
-export const FPuzzles = getPuzzleImportLoader("f-puzzles", FPuzzlesGridParserFactory);
 
 enum FPuzzleColor {
     white = "#FFFFFF",
