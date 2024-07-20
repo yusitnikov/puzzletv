@@ -266,6 +266,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     postProcessPuzzle?(puzzle: PuzzleDefinition<T>): typeof puzzle;
 
     preProcessImportGrid?(puzzle: PuzzleDefinition<T>, importer: PuzzleImporter<T>, gridParser: GridParser<T, any>): void;
+    postProcessImportGrid?(puzzle: PuzzleDefinition<T>, importer: PuzzleImporter<T>, gridParser: GridParser<T, any>): void;
 
     onImportPuzzleProp?<P extends keyof PuzzleDefinition<T>>(
         puzzle: PuzzleDefinition<T>,

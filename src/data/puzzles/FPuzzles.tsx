@@ -20,10 +20,12 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
     constructor(puzzleJson: FPuzzlesPuzzle, offsetX: number, offsetY: number, importOptionOverrides: Partial<PuzzleImportOptions>) {
         super(
             puzzleJson,
-            offsetX,
-            offsetY,
-            puzzleJson.size,
-            puzzleJson.size,
+            {
+                left: offsetX,
+                top: offsetY,
+                width: puzzleJson.size,
+                height: puzzleJson.size,
+            },
             puzzleJson.size,
             undefined,
             undefined,

@@ -4,6 +4,7 @@ import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 
 export interface CaterpillarGrid {
   bounds: Rect;
+  outsideBounds: Rect;
   props: Partial<PuzzleDefinition<any>>;
   overrides: Partial<PuzzleImportOptions>;
 }

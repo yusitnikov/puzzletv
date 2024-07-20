@@ -178,6 +178,7 @@ export class PuzzleImporter<T extends AnyPTM> {
 
         this.puzzle.typeManager.preProcessImportGrid?.(this.puzzle, this, gridParser);
         gridParser.addToImporter(this);
+        this.puzzle.typeManager.postProcessImportGrid?.(this.puzzle, this, gridParser);
     }
 
     setTitle(title = "") {
@@ -466,7 +467,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         lineWidth?: number,
     ) {
         const visibleCells = gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell));
-        this.checkForOutsideCells(visibleCells);
+        this.checkForOutsideCells(gridParser, visibleCells);
         const constraint = factory(visibleCells, false, lineColor, lineWidth);
         this.addItems(display ? constraint : toInvisibleConstraint(constraint));
     }
@@ -687,7 +688,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         const direction = detectOutsideClueDirection(startCell, gridParser.fieldSize, directionLiteral);
         const offsetLineCells = gridParser.offsetCoordsArray(getLineCellsByOutsideCell(startCell, gridParser.fieldSize, direction));
 
-        this.checkForOutsideCells([
+        this.checkForOutsideCells(gridParser, [
             {
                 top: offsetLineCells[0].top - direction.top,
                 left: offsetLineCells[0].left - direction.left,
@@ -712,7 +713,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         directionLiteral: OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType.straight,
     ) {
         const offsetClueCell = gridParser.offsetCoords(cellLiteral);
-        this.checkForOutsideCells([offsetClueCell]);
+        this.checkForOutsideCells(gridParser, [offsetClueCell]);
 
         this.addItems(factory(
             offsetClueCell,
@@ -797,7 +798,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
-        this.checkForOutsideCells(cells);
+        this.checkForOutsideCells(gridParser, cells);
         this.addItems(RectConstraint(
             this.fixCellPositions(cells),
             {width, height},
@@ -824,7 +825,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
-        this.checkForOutsideCells(cells);
+        this.checkForOutsideCells(gridParser, cells);
         this.addItems(EllipseConstraint(
             this.fixCellPositions(cells),
             {width, height},
@@ -850,7 +851,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
-        this.checkForOutsideCells(cells);
+        this.checkForOutsideCells(gridParser, cells);
         this.addItems(CosmeticArrowConstraint(
             this.fixCellPositions(cells),
             length,
@@ -873,7 +874,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
-        this.checkForOutsideCells(cells);
+        this.checkForOutsideCells(gridParser, cells);
         this.addItems(TextConstraint(
             this.fixCellPositions(cells),
             text,
@@ -892,7 +893,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     ) {
         const visibleCells = gridParser.offsetCoordsArray(cells)
             .filter((cell) => this.isVisibleGridCell(cell));
-        this.checkForOutsideCells(visibleCells);
+        this.checkForOutsideCells(gridParser, visibleCells);
         this.addItems(DecorativeCageConstraint(
             visibleCells,
             text,
@@ -908,7 +909,9 @@ export class PuzzleImporter<T extends AnyPTM> {
     private addMargin(margin = 1) {
         this.puzzle.fieldMargin = Math.max(this.puzzle.fieldMargin ?? 0, margin);
     }
-    checkForOutsideCells(cells: Position[]) {
+    checkForOutsideCells(gridParser: GridParser<T, any>, cells: Position[]) {
+        gridParser.extendOutsideBoundsByCells(cells);
+
         const margin = Math.max(0, ...cells.flatMap(({top, left}) => [
             -top,
             -left,

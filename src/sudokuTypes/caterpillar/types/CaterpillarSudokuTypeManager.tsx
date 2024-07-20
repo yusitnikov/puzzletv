@@ -34,12 +34,8 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
             typedBaseTypeManager.preProcessImportGrid?.(puzzle, importer, gridParser);
 
             const newGrid: CaterpillarGrid = {
-                bounds: {
-                    left: gridParser.offsetX,
-                    top: gridParser.offsetY,
-                    width: gridParser.columnsCount,
-                    height: gridParser.rowsCount,
-                },
+                bounds: gridParser.bounds,
+                outsideBounds: gridParser.outsideBounds,
                 props: {},
                 overrides: gridParser.importOptionOverrides,
             };
@@ -50,6 +46,12 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
                     newGrid,
                 ],
             };
+        },
+        postProcessImportGrid(puzzle, importer, gridParser) {
+            typedBaseTypeManager.postProcessImportGrid?.(puzzle, importer, gridParser);
+
+            const {caterpillarGrids} = puzzle.extension as CaterpillarPuzzleExtension;
+            caterpillarGrids[caterpillarGrids.length - 1].outsideBounds = gridParser.outsideBounds;
         },
 
         onImportPuzzleProp<P extends keyof PuzzleDefinition<CaterpillarPTM<T>>>(

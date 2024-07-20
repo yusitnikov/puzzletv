@@ -4,22 +4,37 @@ import {parsePositionLiteral, Position, PositionLiteral} from "../../types/layou
 import {CellColor} from "../../types/sudoku/CellColor";
 import {FieldSize} from "../../types/sudoku/FieldSize";
 import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
+import {Rect} from "../../types/layout/Rect";
 
 export abstract class GridParser<T extends AnyPTM, JsonT> {
+    public readonly outsideBounds: Rect;
+
     protected constructor(
         public puzzleJson: JsonT,
-        public offsetX: number,
-        public offsetY: number,
+        public bounds: Rect,
         public size: number,
-        public columnsCount: number,
-        public rowsCount: number,
         public minDigit: number | undefined,
         public maxDigit: number | undefined,
         public colorsMap: Record<string, CellColor>,
         public importOptionOverrides: Partial<PuzzleImportOptions>,
-    ) {}
+    ) {
+        this.outsideBounds = {...bounds};
+    }
 
     abstract addToImporter(importer: PuzzleImporter<T>): void;
+
+    get offsetX() {
+        return this.bounds.left;
+    }
+    get offsetY() {
+        return this.bounds.top;
+    }
+    get columnsCount() {
+        return this.bounds.width;
+    }
+    get rowsCount() {
+        return this.bounds.height;
+    }
 
     get regionWidth() {
         const {rowsCount} = this;
@@ -56,6 +71,25 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     }
     offsetCoordsArray(positions: PositionLiteral[]) {
         return positions.map((position) => this.offsetCoords(position));
+    }
+
+    extendOutsideBoundsByCells(cells: Position[]) {
+        let {left, top, width, height} = this.outsideBounds;
+
+        let right = left + width;
+        let bottom = top + height;
+
+        for (const cell of cells) {
+            left = Math.min(left, cell.left);
+            top = Math.min(top, cell.top);
+            right = Math.max(right, cell.left + 1);
+            bottom = Math.max(bottom, cell.top + 1);
+        }
+
+        this.outsideBounds.left = left;
+        this.outsideBounds.top = top;
+        this.outsideBounds.width = right - left;
+        this.outsideBounds.height = bottom - top;
     }
 
     get hasSolution() {

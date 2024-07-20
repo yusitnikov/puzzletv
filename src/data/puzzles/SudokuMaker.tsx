@@ -113,11 +113,13 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
 
         super(
             puzzleJson,
-            offsetX,
-            offsetY,
+            {
+                left: offsetX,
+                top: offsetY,
+                width,
+                height,
+            },
             size,
-            width,
-            height,
             puzzleJson.minDigit ?? 1,
             puzzleJson.maxDigit ?? size,
             sudokuMakerColorsMap,
