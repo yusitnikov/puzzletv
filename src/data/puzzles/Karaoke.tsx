@@ -30,7 +30,6 @@ import {
     darkBlueColor,
     darkGreyColor,
     greenColor,
-    headerHeight,
     lighterGreyColor,
     lightGreyColor,
     pinkColor,
@@ -80,7 +79,7 @@ const Audio = observer(function Audio(
 ) {
     profiler.trace();
 
-    const puzzleContainer = usePuzzleContainer();
+    const puzzleContainer = usePuzzleContainer(true);
 
     const [player, setPlayer] = useState<YouTubePlayer | undefined>();
 
@@ -155,7 +154,6 @@ const Audio = observer(function Audio(
                 style={{
                     position: "absolute",
                     ...puzzleContainer,
-                    top: headerHeight + puzzleContainer.top,
                     display: isActive ? "block" : "none",
                     pointerEvents: "none",
                 }}

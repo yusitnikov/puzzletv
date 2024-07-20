@@ -40,12 +40,18 @@ import {incrementArrayItem} from "../../utils/array";
 import {CellColor, CellColorValue} from "./CellColor";
 import {CellPart} from "./CellPart";
 import {loop} from "../../utils/math";
-import {applyMetricsDiff, emptyGestureMetrics, GestureMetrics} from "../../utils/gestures";
+import {
+    applyMetricsDiff,
+    emptyGestureMetrics,
+    GestureMetrics,
+    transformPointCoordsMetricsBaseToAbsolute
+} from "../../utils/gestures";
 import {AnyPTM} from "./PuzzleTypeMap";
 import {isSelectableCell} from "./CellTypeProps";
 import {PuzzleLine} from "./PuzzleLine";
 import {CellGestureExtraData} from "./CellGestureExtraData";
 import {GameStateActionCallback, GameStateActionOrCallback} from "./GameStateAction";
+import {getRectCenter, Rect} from "../layout/Rect";
 
 export interface GameState<T extends AnyPTM> {
     fieldStateHistory: FieldStateHistory<T>;
@@ -1277,6 +1283,46 @@ export const gameStateHandleZoomClick = <T extends AnyPTM>(context: PuzzleContex
         undefined,
         emptyGestureMetrics,
         {...emptyGestureMetrics, scale: increment ? scaleStep : 1 / scaleStep},
+        true,
+        true,
+    );
+};
+
+export const gameStateFocusRect = <T extends AnyPTM>(context: PuzzleContext<T>, rect: Rect, fieldRect: Rect) => {
+    const {
+        puzzle: {
+            fieldSize: {rowsCount, columnsCount},
+        },
+        cellSize,
+    } = context;
+
+    const center = getRectCenter(rect);
+
+    gameStateApplyFieldDragGesture(
+        context,
+        undefined,
+        // Drag from the desired rect's corners
+        {
+            ...emptyGestureMetrics,
+            ...transformPointCoordsMetricsBaseToAbsolute(
+                {
+                    x: center.left - columnsCount / 2,
+                    y: center.top - rowsCount / 2,
+                },
+                {
+                    x: context.loopOffset.left,
+                    y: context.loopOffset.top,
+                    scale: context.scale,
+                    rotation: context.angle,
+                }
+            ),
+            scale: (Math.max(rect.width, rect.height) * Math.SQRT2 + 1) * context.scale,
+        },
+        // Drag to the field rect corners
+        {
+            ...emptyGestureMetrics,
+            scale: Math.hypot(fieldRect.width, fieldRect.height) / cellSize,
+        },
         true,
         true,
     );

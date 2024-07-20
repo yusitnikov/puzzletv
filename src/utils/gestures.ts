@@ -126,7 +126,7 @@ export const applyMetricsDiff = (current: GestureMetrics, metricsFrom: GestureMe
     };
 };
 
-const transformPointCoordsMetricsBaseToAbsolute = ({x, y}: GestureMetricsPoint, {x: baseX, y: baseY, scale, rotation}: GestureMetrics): GestureMetricsPoint => {
+export const transformPointCoordsMetricsBaseToAbsolute = ({x, y}: GestureMetricsPoint, {x: baseX, y: baseY, scale, rotation}: GestureMetrics): GestureMetricsPoint => {
     rotation *= Math.PI / 180;
     return {
         x: baseX + scale * (x * Math.cos(rotation) - y * Math.sin(rotation)),

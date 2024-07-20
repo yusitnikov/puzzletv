@@ -13,6 +13,8 @@ const StyledButton = styled("button", {
     }
 })(({cellSize}: {cellSize: number}) => [
     {
+        display: "inline-flex",
+        alignItems: "center",
         cursor: "pointer",
         border: `1px solid ${textColor}`,
         outline: 0,

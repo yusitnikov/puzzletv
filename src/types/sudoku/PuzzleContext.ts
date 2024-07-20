@@ -466,7 +466,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.currentFieldState.extension;
     }
 
-    get userDigits() {
+    get userDigits(): GivenDigitsMap<T["cell"]> {
         profiler.trace();
 
         return mergeGivenDigitsMaps(
@@ -474,6 +474,12 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             gameStateGetCurrentGivenDigitsByCells(this.cells),
         );
     }
+    readonly getUserDigit = computedFn(
+        function getUserDigit(this: PuzzleContext<T>, top: number, left: number): T["cell"] | undefined {
+            return this.userDigits[top]?.[left];
+        },
+        {equals: comparer.structural}
+    );
     // endregion
 
     get currentFieldStateWithFogDemo() {
@@ -496,7 +502,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.state.initialDigits ?? {};
     }
 
-    get allInitialDigits() {
+    get allInitialDigits(): GivenDigitsMap<T["cell"]> {
         profiler.trace();
         return mergeGivenDigitsMaps(
             this.puzzle.initialDigits ?? {},

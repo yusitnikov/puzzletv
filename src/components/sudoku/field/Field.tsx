@@ -80,7 +80,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
     // region Pointer events
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
 
-    const fieldOuterRect = usePuzzleContainer()!;
+    const fieldOuterRect = usePuzzleContainer(true)!;
 
     const createCellWriteModeGestureHandlers = (forField: boolean) => !isReady ? [] : context.allCellWriteModeInfos
         .filter(({applyToWholeField, disableCellHandlers}) => forField ? applyToWholeField : !disableCellHandlers)
@@ -89,10 +89,7 @@ export const Field = observer(function Field<T extends AnyPTM>({context, rect}: 
             cellWriteModeInfo,
             isDeleteSelectedCellsStroke,
             setIsDeleteSelectedCellsStroke,
-            {
-                ...fieldOuterRect,
-                top: fieldOuterRect.top + headerHeight,
-            },
+            fieldOuterRect,
         ));
     const fieldGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(true));
     const cellGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(false));

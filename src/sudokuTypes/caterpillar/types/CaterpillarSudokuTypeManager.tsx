@@ -10,6 +10,7 @@ import {RulesParagraph} from "../../../components/sudoku/rules/RulesParagraph";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {CaterpillarGridFocusConstraint} from "../constraints/CaterpillarGridFocus";
 import {lightGreyColor} from "../../../components/app/globals";
+import {FocusButtonItem, FocusButtonRule} from "../components/FocusButton";
 
 export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager: SudokuTypeManager<T>
@@ -28,6 +29,7 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
             ...(typedBaseTypeManager.controlButtons ?? []),
             ZoomInButtonItem(),
             ZoomOutButtonItem(),
+            FocusButtonItem(),
         ],
 
         preProcessImportGrid(puzzle, importer, gridParser) {
@@ -109,11 +111,15 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
                         .filter(Boolean);
 
                     if (gridRules.length === 0) {
-                        return <RulesParagraph>{translate({
-                            [LanguageCode.en]: "Click on a grid to see its rules",
-                            [LanguageCode.ru]: "Нажмите на поле, чтобы увидеть его правила",
-                            [LanguageCode.de]: "Klicken Sie auf ein Raster, um dessen Regeln anzuzeigen",
-                        })}.</RulesParagraph>;
+                        return <>
+                            <RulesParagraph>{translate({
+                                [LanguageCode.en]: "Click on a grid to see its rules",
+                                [LanguageCode.ru]: "Нажмите на поле, чтобы увидеть его правила",
+                                [LanguageCode.de]: "Klicken Sie auf ein Raster, um dessen Regeln anzuzeigen",
+                            })}.</RulesParagraph>
+
+                            <RulesParagraph><FocusButtonRule context={context}/></RulesParagraph>
+                        </>;
                     }
 
                     return <div style={{display: "flex", flexDirection: "column", gap: "1em"}}>
