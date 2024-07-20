@@ -635,8 +635,6 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     {style: {text: {color: textColor}, arrow: {color: arrowColor}}}
                                 ) => {
                                     for (const clue of clues) {
-                                        importer.addMargin();
-
                                         new ObjectParser<LittleKiller>({
                                             outerCell: (outerCellId, {value, diagonal}) => {
                                                 const outerCell = this.parseOuterCellId(outerCellId);

@@ -684,12 +684,18 @@ export class PuzzleImporter<T extends AnyPTM> {
         textColor?: string,
         arrowColor?: string,
     ) {
-        this.addMargin();
-
         const direction = detectOutsideClueDirection(startCell, gridParser.fieldSize, directionLiteral);
+        const offsetLineCells = gridParser.offsetCoordsArray(getLineCellsByOutsideCell(startCell, gridParser.fieldSize, direction));
+
+        this.checkForOutsideCells([
+            {
+                top: offsetLineCells[0].top - direction.top,
+                left: offsetLineCells[0].left - direction.left,
+            },
+        ]);
 
         this.addItems(LittleKillerConstraintByCells<T>(
-            gridParser.offsetCoordsArray(getLineCellsByOutsideCell(startCell, gridParser.fieldSize, direction)),
+            offsetLineCells,
             direction,
             value,
             textColor,
@@ -705,10 +711,11 @@ export class PuzzleImporter<T extends AnyPTM> {
         color?: string,
         directionLiteral: OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType.straight,
     ) {
-        this.addMargin();
+        const offsetClueCell = gridParser.offsetCoords(cellLiteral);
+        this.checkForOutsideCells([offsetClueCell]);
 
         this.addItems(factory(
-            gridParser.offsetCoords(cellLiteral),
+            offsetClueCell,
             gridParser.offsetCoordsArray(getLineCellsByOutsideCell(cellLiteral, gridParser.fieldSize, directionLiteral)),
             value,
             color,
@@ -898,7 +905,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     // endregion
     // endregion
 
-    addMargin(margin = 1) {
+    private addMargin(margin = 1) {
         this.puzzle.fieldMargin = Math.max(this.puzzle.fieldMargin ?? 0, margin);
     }
     checkForOutsideCells(cells: Position[]) {
