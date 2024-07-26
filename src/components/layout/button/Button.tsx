@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {lightGreyColor, textColor, textHeightCoeff} from "../../app/globals";
+import {darkGreyColor, lightGreyColor, textColor, textHeightCoeff} from "../../app/globals";
 import {ButtonHTMLAttributes, useLayoutEffect, useRef} from "react";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
 import {runInAction} from "mobx";
@@ -11,20 +11,23 @@ const StyledButton = styled("button", {
     shouldForwardProp(propName) {
         return propName !== "cellSize";
     }
-})(({cellSize}: {cellSize: number}) => [
+})<{cellSize: number}>(({cellSize, disabled}) => [
     {
         display: "inline-flex",
         alignItems: "center",
-        cursor: "pointer",
-        border: `1px solid ${textColor}`,
+        border: `1px solid ${darkGreyColor}`,
         outline: 0,
-        "&:focus, &:active": {
-            outline: `1px solid ${textColor}`,
-        },
         backgroundColor: "#fff",
         fontSize: cellSize * textHeightCoeff,
     },
-    !isTouchDevice && {
+    !disabled && {
+        cursor: "pointer",
+        border: `1px solid ${textColor}`,
+        "&:focus, &:active": {
+            outline: `1px solid ${textColor}`,
+        },
+    },
+    !disabled && !isTouchDevice && {
         "&:hover": {
             backgroundColor: lightGreyColor,
         },
