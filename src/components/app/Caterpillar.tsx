@@ -283,7 +283,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
                 <div>
                     <Button
                         component={"a"}
-                        href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(grids, null, 2))}
+                        href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(viewGrids, null, 2))}
                         download={"caterpillar.json"}
                     >
                         Download backup
