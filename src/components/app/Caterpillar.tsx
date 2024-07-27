@@ -12,6 +12,7 @@ import {MouseEvent, useState} from "react";
 import {CellSelectionColor} from "../sudoku/cell/CellSelection";
 import {useEventListener} from "../../hooks/useEventListener";
 import {Modal} from "../layout/modal/Modal";
+import {Button} from "../layout/button/Button";
 
 interface CaterpillarGrid {
     guid: number;
@@ -263,24 +264,34 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
                 }}
             >
                 <div>
-                    <button type={"button"} onClick={add}>Add grid</button>
+                    <Button type={"button"} onClick={add}>Add grid</Button>
                 </div>
 
                 {selectedGrids.length === 1 && <div>
-                    <button type={"button"} onClick={() => editByGuid(selectedGrids[0])}>Edit grid</button>
+                    <Button type={"button"} onClick={() => editByGuid(selectedGrids[0])}>Edit grid</Button>
                 </div>}
 
                 {!!gridsEdit && <>
                     <div>
-                        <button type={"button"} onClick={submit}>Submit changes</button>
+                        <Button type={"button"} onClick={submit}>Submit changes</Button>
                     </div>
                     <div>
-                        <button type={"button"} onClick={cancel}>Cancel changes</button>
+                        <Button type={"button"} onClick={cancel}>Cancel changes</Button>
                     </div>
                 </>}
 
                 <div>
-                    <button type={"button"} onClick={() => setShowHelp(true)}>Show help</button>
+                    <Button
+                        component={"a"}
+                        href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(grids, null, 2))}
+                        download={"caterpillar.json"}
+                    >
+                        Download backup
+                    </Button>
+                </div>
+
+                <div>
+                    <Button type={"button"} onClick={() => setShowHelp(true)}>Show help</Button>
                 </div>
             </Absolute>
 
@@ -334,14 +345,14 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
                     </div>
 
                     <div style={{textAlign: "center"}}>
-                        <button
+                        <Button
                             type={"button"}
                             onClick={() => setShowHelp(false)}
                             autoFocus={true}
                             style={{font: "inherit"}}
                         >
                             Gotcha!
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </Modal>}
@@ -510,8 +521,8 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
         </table>
 
         <div style={{display: "flex", gap: 16, justifyContent: "center", marginTop: 16}}>
-            <button type={"button"} disabled={!data} onClick={submit}>Save</button>
-            <button type={"button"} onClick={onCancel}>Cancel</button>
+            <Button type={"button"} disabled={!data} onClick={submit}>Save</Button>
+            <Button type={"button"} onClick={onCancel}>Cancel</Button>
         </div>
     </Modal>;
 });
