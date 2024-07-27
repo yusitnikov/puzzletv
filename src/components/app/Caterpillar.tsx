@@ -172,6 +172,15 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
         }
     });
 
+    useEventListener(window, "beforeunload", (ev) => {
+        if (!gridsEdit) {
+            return;
+        }
+
+        ev.returnValue = "Are you sure? Changes you made may not be saved";
+        return "Are you sure? Changes you made may not be saved";
+    });
+
     const modalCellSize = Math.min(windowSize.width, windowSize.height) * 0.05;
 
     return <>
