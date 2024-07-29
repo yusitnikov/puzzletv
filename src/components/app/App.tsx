@@ -145,7 +145,7 @@ export const App = observer(({onPageLoaded}: AppProps) => {
                 <Caterpillar key={params.chunk} readOnly={false} chunk={params.chunk}/>
             </PageLayout>;
         case "caterpillar-consumer":
-            return <Caterpillar readOnly={true}/>;
+            return <Caterpillar key={params.chunk} readOnly={true} chunk={params.chunk}/>;
         case "label":
             if (params.channel) {
                 return <SyncedLabel name={params.channel} isObs={params.obs}/>;
