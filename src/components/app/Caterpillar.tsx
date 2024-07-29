@@ -92,7 +92,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}:
     const showAnyModal = showHelp || showNicknameModal || !!otherEditor;
 
     const padding = readOnly ? 1 : 6;
-    const boundingRect = getRectsBoundingBox(...viewGrids.map(getGridRect));
+    const boundingRect = {...getRectsBoundingBox(...viewGrids.map(getGridRect))};
     boundingRect.top -= padding;
     boundingRect.left -= padding;
     boundingRect.width += padding * 2;
