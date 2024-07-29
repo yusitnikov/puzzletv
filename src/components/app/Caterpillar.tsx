@@ -3,16 +3,20 @@ import {profiler} from "../../utils/profiler";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {Absolute} from "../layout/absolute/Absolute";
 import {getRectsBoundingBox, Rect} from "../../types/layout/Rect";
-import {useAblyChannelState} from "../../hooks/useAbly";
-import {ablyOptions} from "../../hooks/useMultiPlayer";
+import {useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
+import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
 import {emptyPosition, Position} from "../../types/layout/Position";
 import {darkGreyColor, greenColor, lightGreyColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
-import {MouseEvent, useState} from "react";
+import {MouseEvent, useMemo, useState} from "react";
 import {CellSelectionColor} from "../sudoku/cell/CellSelection";
 import {useEventListener} from "../../hooks/useEventListener";
 import {Modal} from "../layout/modal/Modal";
 import {Button} from "../layout/button/Button";
+import {settings} from "../../types/layout/Settings";
+import {SettingsTextBox} from "../sudoku/controls/settings/SettingsTextBox";
+import {SettingsItem} from "../sudoku/controls/settings/SettingsItem";
+import {Edit} from "@emotion-icons/material";
 
 interface CaterpillarGrid {
     guid: number;
@@ -41,6 +45,11 @@ const getGridRect = ({offset, size = 6, margin: {top = 0, left = 0, bottom = 0, 
     };
 };
 
+interface PresenceData {
+    nickname: string;
+    isEditing: boolean;
+}
+
 export interface CaterpillarProps {
     readOnly: boolean;
 }
@@ -50,9 +59,11 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
 
     const windowSize = useWindowSize(!readOnly);
 
-    const [grids = [], setGrids, connected] = useAblyChannelState<CaterpillarGrid[]>(ablyOptions, "caterpillar", []);
+    const channelName = "caterpillar";
+    const [grids = [], setGrids, connected] = useAblyChannelState<CaterpillarGrid[]>(ablyOptions, channelName, []);
     const [gridsEdit, setGridsEdit] = useState<CaterpillarGrid[]>();
     const viewGrids = gridsEdit ?? grids;
+    const hasUnsubmittedChanges = !!gridsEdit;
 
     const [selectedGridsState, setSelectedGrids] = useState<number[]>([]);
     const selectedGrids = selectedGridsState.filter(
@@ -62,6 +73,22 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
     const [editingGrid, setEditingGrid] = useState<CaterpillarGrid>();
 
     const [showHelp, setShowHelp] = useState(false);
+
+    const myNickname = settings.nickname.get();
+    const [showNicknameModal, setShowNicknameModal] = useState(() => !myNickname);
+
+    const myPresenceData = useMemo((): PresenceData => ({
+        nickname: myNickname,
+        isEditing: hasUnsubmittedChanges,
+    }), [myNickname, hasUnsubmittedChanges]);
+    useSetMyAblyChannelPresence(ablyOptions, channelName, myPresenceData, !readOnly);
+    const [presenceMessages] = useAblyChannelPresence(ablyOptions, channelName, !readOnly);
+    const otherPeople = presenceMessages
+        .filter(({clientId}) => clientId !== myClientId)
+        .map(({data}) => data as PresenceData);
+    const otherEditor = otherPeople.find(({isEditing}) => isEditing);
+
+    const showAnyModal = showHelp || showNicknameModal || !!otherEditor;
 
     const padding = readOnly ? 1 : 6;
     const boundingRect = getRectsBoundingBox(...viewGrids.map(getGridRect));
@@ -80,7 +107,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
     });
 
     const submit = () => {
-        if (gridsEdit) {
+        if (hasUnsubmittedChanges) {
             setGrids(gridsEdit);
             setGridsEdit(undefined);
         }
@@ -118,7 +145,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
     });
 
     useEventListener(window, "keydown", (ev) => {
-        if (readOnly || editingGrid || showHelp) {
+        if (readOnly || editingGrid || showAnyModal) {
             return;
         }
 
@@ -173,7 +200,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
     });
 
     useEventListener(window, "beforeunload", (ev) => {
-        if (!gridsEdit) {
+        if (!hasUnsubmittedChanges) {
             return;
         }
 
@@ -250,20 +277,45 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
         </Absolute>
         {!readOnly && <>
             <Absolute
-                left={windowSize.width - 30}
-                top={windowSize.height - 30}
-                width={20}
-                height={20}
+                left={10}
+                top={0}
+                height={40}
+                width={windowSize.width - 20}
                 style={{
-                    borderRadius: "50%",
-                    background: connected ? greenColor : lightRedColor,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
                 }}
-            />
+            >
+                <div
+                    style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        background: connected ? greenColor : lightRedColor,
+                    }}
+                />
+
+                <div
+                    style={{
+                        pointerEvents: "all",
+                        cursor: "pointer",
+                    }}
+                    onClick={() => setShowNicknameModal(true)}
+                >
+                    {myNickname} (you) <Edit size={"1em"}/>
+                </div>
+
+                {otherPeople.map(({nickname, isEditing}, index) => <div key={index}>
+                    {nickname || "Anonymous"}
+                    {isEditing && " (editing)"}
+                </div>)}
+            </Absolute>
 
             <Absolute
                 left={10}
                 top={windowSize.height - 40}
-                width={windowSize.width - 50}
+                width={windowSize.width - 20}
                 height={40}
                 pointerEvents={true}
                 style={{
@@ -280,7 +332,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
                     <Button type={"button"} onClick={() => editByGuid(selectedGrids[0])}>Edit grid</Button>
                 </div>}
 
-                {!!gridsEdit && <>
+                {hasUnsubmittedChanges && <>
                     <div>
                         <Button type={"button"} onClick={submit}>Submit changes</Button>
                     </div>
@@ -364,6 +416,47 @@ export const Caterpillar = observer(function Caterpillar({readOnly}: Caterpillar
                         </Button>
                     </div>
                 </div>
+            </Modal>}
+
+            {showNicknameModal && <Modal
+                cellSize={modalCellSize * 2.5}
+                onClose={() => {
+                    if (settings.nickname.get()) {
+                        setShowNicknameModal(false);
+                    }
+                }}
+            >
+                <form
+                    onSubmit={(ev) => {
+                        ev.preventDefault();
+
+                        setShowNicknameModal(false);
+                    }}
+                >
+                    <SettingsItem>
+                        <span>Your nickname:</span>
+
+                        <SettingsTextBox
+                            type={"text"}
+                            cellSize={modalCellSize * 2.5}
+                            value={myNickname}
+                            onChange={(ev) => settings.nickname.set(ev.target.value)}
+                        />
+                    </SettingsItem>
+
+                    <div style={{marginTop: "2em"}}>
+                        <Button
+                            type={"submit"}
+                            disabled={!myNickname}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                </form>
+            </Modal>}
+
+            {otherEditor && <Modal cellSize={modalCellSize * 2.5}>
+                {otherEditor.nickname || "Other person"} is editing the grids, please wait...
             </Modal>}
         </>}
     </>;
