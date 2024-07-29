@@ -649,6 +649,9 @@ export interface CompressedPuzzle extends CompressedSpec {
     name: string
     author: string
     comment: string
+    messages?: {
+        completion?: string
+    }
 }
 
 export interface SudokuBlob {
