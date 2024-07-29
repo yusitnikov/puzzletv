@@ -142,7 +142,7 @@ export const App = observer(({onPageLoaded}: AppProps) => {
         }
         case "caterpillar-editor":
             return <PageLayout scrollable={false}>
-                <Caterpillar readOnly={false}/>
+                <Caterpillar key={params.chunk} readOnly={false} chunk={params.chunk}/>
             </PageLayout>;
         case "caterpillar-consumer":
             return <Caterpillar readOnly={true}/>;

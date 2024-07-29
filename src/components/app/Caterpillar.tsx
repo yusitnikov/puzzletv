@@ -52,14 +52,15 @@ interface PresenceData {
 
 export interface CaterpillarProps {
     readOnly: boolean;
+    chunk?: string;
 }
 
-export const Caterpillar = observer(function Caterpillar({readOnly}: CaterpillarProps) {
+export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}: CaterpillarProps) {
     profiler.trace();
 
     const windowSize = useWindowSize(!readOnly);
 
-    const channelName = "caterpillar";
+    const channelName = "caterpillar" + chunk;
     const [grids = [], setGrids, connected] = useAblyChannelState<CaterpillarGrid[]>(ablyOptions, channelName, []);
     const [gridsEdit, setGridsEdit] = useState<CaterpillarGrid[]>();
     const viewGrids = gridsEdit ?? grids;
