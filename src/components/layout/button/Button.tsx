@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
 import {darkGreyColor, lightGreyColor, textColor, textHeightCoeff} from "../../app/globals";
-import {AnchorHTMLAttributes, ButtonHTMLAttributes, useLayoutEffect, useRef} from "react";
+import {AnchorHTMLAttributes, ButtonHTMLAttributes, useLayoutEffect, useMemo, useRef} from "react";
 import {isTouchDevice} from "../../../utils/isTouchDevice";
 import {runInAction} from "mobx";
 import {profiler} from "../../../utils/profiler";
@@ -16,7 +16,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, Om
 export const Button = observer(function ButtonFc({component = "button", autoFocus, children, onClick, ...buttonProps}: ButtonProps) {
     profiler.trace();
 
-    const StyledButton = styled(component as "button", {
+    const StyledButton = useMemo(() => styled(component as "button", {
         shouldForwardProp(propName) {
             return propName !== "cellSize";
         }
@@ -45,7 +45,7 @@ export const Button = observer(function ButtonFc({component = "button", autoFocu
                 backgroundColor: lightGreyColor,
             },
         },
-    ]);
+    ]), [component]);
 
     const ref = useRef<HTMLButtonElement>(null);
 
