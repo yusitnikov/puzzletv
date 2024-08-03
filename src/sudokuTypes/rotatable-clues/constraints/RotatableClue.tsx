@@ -68,7 +68,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                 [FieldLayer.top]: observer(function RotatableCluePivot({cells: [{top, left}], context: {puzzle}}) {
                     profiler.trace();
 
-                    if (puzzle.importOptions?.freeRotation) {
+                    if (puzzle.importOptions?.freeRotation && puzzle.importOptions?.wheels) {
                         return null;
                     }
 
