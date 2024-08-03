@@ -231,10 +231,15 @@ export const KillerCageConstraint = <T extends AnyPTM>(
         cells,
         context,
         constraints,
+        constraint,
         isFinalCheck,
         onlyObvious
     ) {
         const {puzzle} = context;
+
+        const expectedSum = puzzle.typeManager.transformNumber
+            ? puzzle.typeManager.transformNumber(sum ?? 0, context, cells[0], constraint)
+            : sum;
 
         if (!isValidCellForRegion(cells, cell, digits, context)) {
             return false;
@@ -255,10 +260,6 @@ export const KillerCageConstraint = <T extends AnyPTM>(
 
             realSum += puzzle.typeManager.getDigitByCellData(constraintDigit, context, constraintCell);
         }
-
-        const expectedSum = puzzle.typeManager.transformNumber
-            ? puzzle.typeManager.transformNumber(sum, context, cells[0])
-            : sum;
 
         return realSum === expectedSum;
     },

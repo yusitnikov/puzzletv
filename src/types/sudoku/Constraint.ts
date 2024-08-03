@@ -31,6 +31,7 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
         regionCells: Position[],
         context: PuzzleContext<T>,
         constraints: Constraint<T, any>[],
+        constraint: Constraint<T, DataT>,
         isFinalCheck?: boolean,
         onlyObvious?: boolean,
     ): boolean;
@@ -84,7 +85,9 @@ export const isValidUserDigit = <T extends AnyPTM>(
     const constraints = context.allItems;
     const isFogPuzzle = !!context.fogProps;
 
-    for (const {cells, isValidCell, isObvious, isCheckingFog, noPencilmarkCheck} of constraints) {
+    for (const constraint of constraints) {
+        const {cells, isValidCell, isObvious, isCheckingFog, noPencilmarkCheck} = constraint;
+
         if (onlyObvious && !isObvious) {
             continue;
         }
@@ -107,7 +110,7 @@ export const isValidUserDigit = <T extends AnyPTM>(
             }
         }
 
-        if (isValidCell && !isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, isFinalCheck, onlyObvious)) {
+        if (isValidCell && !isValidCell(cell, userDigits, normalizedConstraintCells, context, constraints, constraint, isFinalCheck, onlyObvious)) {
             return false;
         }
     }

@@ -90,7 +90,12 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     getNumberByDigits?(digits: number[]): number | undefined;
 
-    transformNumber?(num: number, context: PuzzleContext<T>, cellPosition: Position): number;
+    transformNumber?(
+        num: number,
+        context: PuzzleContext<T>,
+        cellPosition: Position,
+        constraint?: Constraint<T, any>,
+    ): number;
 
     processCellDataPosition?(
         puzzle: PuzzleContext<T>,

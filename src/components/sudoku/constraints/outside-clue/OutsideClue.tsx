@@ -130,7 +130,7 @@ export const OutsideClueConstraint = <T extends AnyPTM>(
         color,
         props: {clueCell, value},
         component: OutsideClue,
-        isValidCell(cell, digits, cells, context, constraints, isFinalCheck = false) {
+        isValidCell(cell, digits, cells, context, constraints, constraint, isFinalCheck = false) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;
 
             const currentDigit = getDigitByCellData(digits[cell.top][cell.left], context, cell);

@@ -21,6 +21,7 @@ import {createWheel} from "../../../components/sudoku/constraints/wheel/Wheel";
 import {isTextConstraint} from "../../../components/sudoku/constraints/text/Text";
 import {addFieldStateExToSudokuManager, addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
+import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -35,7 +36,8 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     }: SudokuTypeManager<T>,
     // Do all clues remain the same when the pivot is turned 360 degrees?
     isEquivalentLoop: boolean,
-    cluesImporter?: (puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => CluesImporterResult<T>,
+    compensateConstraintDigitAngle = true,
+    cluesImporter: ((puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => CluesImporterResult<T>) | undefined = undefined,
 ): SudokuTypeManager<RotatableCluesPTM<T>> => ({
     ...addGameStateExToSudokuManager(
         addFieldStateExToSudokuManager(
@@ -216,16 +218,31 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
         },
     ],
 
-    compensateConstraintDigitAngle: true,
+    compensateConstraintDigitAngle,
+    transformNumber(num, context, _cell, constraint): number {
+        if (constraint && !compensateConstraintDigitAngle) {
+            const angle = loop((constraint as any)._rotatableClueAngle ?? 0, 360);
+
+            switch (angle) {
+                case 0: return num;
+                case 180: return rotateNumber(context.puzzle, num);
+                default: return Number.NaN;
+            }
+        }
+
+        return num;
+    },
 
     // TODO: support shared games
 });
 
 export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
-    baseTypeManager: SudokuTypeManager<T>
+    baseTypeManager: SudokuTypeManager<T>,
+    compensateConstraintDigitAngle = true,
 ) => RotatableCluesSudokuTypeManager(
     baseTypeManager,
     true,
+    compensateConstraintDigitAngle,
     (puzzle) => {
         const isWheels = puzzle.importOptions?.wheels;
         const keepCircles = puzzle.importOptions?.keepCircles;

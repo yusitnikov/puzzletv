@@ -79,6 +79,7 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
     const [wheels, setWheels] = useBoolFromLocalStorage("fpwWheels");
     const [freeRotation, setFreeRotation] = useBoolFromLocalStorage("fpwFreeRotation");
     const [keepCircles, setKeepCircles] = useBoolFromLocalStorage("fpwKeepCircles");
+    const [stickyConstraintDigitAngle, setStickyConstraintDigitAngle] = useBoolFromLocalStorage("fpwStickyConstraintDigitAngle");
     const [screws, setScrews] = useBoolFromLocalStorage("fpwScrews");
     const [sokoban, setSokoban] = useBoolFromLocalStorage("fpwSokoban");
     const [eggs, setEggs] = useBoolFromLocalStorage("fpwEggs");
@@ -215,6 +216,7 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
         wheels: !isSpecialGrid && rotatableClues && wheels,
         freeRotation: !isSpecialGrid && rotatableClues && freeRotation,
         keepCircles: !isSpecialGrid && rotatableClues && !wheels && keepCircles,
+        stickyConstraintDigitAngle: !isSpecialGrid && rotatableClues && !wheels && stickyConstraintDigitAngle,
         screws: !isSpecialGrid && screws,
         sokoban: !isSpecialGrid && sokoban,
         eggs: !isSpecialGrid && sokoban && eggs,
@@ -403,12 +405,20 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
                                     <input type={"checkbox"} checked={freeRotation} onChange={ev => setFreeRotation(ev.target.checked)}/>
                                 </label>
                             </Paragraph>
-                            {!wheels && <Paragraph>
-                                <label>
-                                    Keep imported circle shapes and colors:&nbsp;
-                                    <input type={"checkbox"} checked={keepCircles} onChange={ev => setKeepCircles(ev.target.checked)}/>
-                                </label>
-                            </Paragraph>}
+                            {!wheels && <>
+                                <Paragraph>
+                                    <label>
+                                        Keep imported circle shapes and colors:&nbsp;
+                                        <input type={"checkbox"} checked={keepCircles} onChange={ev => setKeepCircles(ev.target.checked)}/>
+                                    </label>
+                                </Paragraph>
+                                <Paragraph>
+                                    <label>
+                                        Rotate constraint clue digits (e.g. killer cage sum) together with the constraint:&nbsp;
+                                        <input type={"checkbox"} checked={stickyConstraintDigitAngle} onChange={ev => setStickyConstraintDigitAngle(ev.target.checked)}/>
+                                    </label>
+                                </Paragraph>
+                            </>}
                         </CollapsableFieldSet>}
 
                         <Paragraph>

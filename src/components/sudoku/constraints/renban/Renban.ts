@@ -30,6 +30,7 @@ export const RenbanConstraint = <T extends AnyPTM>(
             cells,
             context,
             constraints,
+            constraint,
             isFinalCheck,
             onlyObvious
         ) {

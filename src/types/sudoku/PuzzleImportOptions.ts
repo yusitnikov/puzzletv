@@ -62,6 +62,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     wheels?: boolean;
     freeRotation?: boolean;
     keepCircles?: boolean;
+    stickyConstraintDigitAngle?: boolean;
     screws?: boolean;
     sokoban?: boolean;
     eggs?: boolean;
@@ -132,6 +133,7 @@ export const sanitizeImportOptions = (
         wheels,
         freeRotation,
         keepCircles,
+        stickyConstraintDigitAngle,
         screws,
         sokoban,
         eggs,
@@ -186,6 +188,7 @@ export const sanitizeImportOptions = (
         wheels,
         freeRotation,
         keepCircles,
+        stickyConstraintDigitAngle,
         screws,
         sokoban,
         eggs,

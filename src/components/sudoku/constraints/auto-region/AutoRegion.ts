@@ -7,7 +7,7 @@ export const AutoRegionConstraint = <T extends AnyPTM>(): Constraint<T> => {
         name: "auto-region",
         cells: [],
         props: undefined,
-        isValidCell(cell, digits, cells, context, constraints, isFinalCheck) {
+        isValidCell(cell, digits, cells, context, constraints, constraint, isFinalCheck) {
             const {
                 puzzleIndex,
                 digitsCount: expectedSize,
