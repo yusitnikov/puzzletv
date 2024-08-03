@@ -170,7 +170,7 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
                 "sortUpsideDownIndexes"
             );
 
-            const upsideDownPosition = positionFunction(upsideDownIndexes[dataIndex]);
+            const upsideDownPosition = positionFunction(upsideDownIndexes[dataIndex] ?? 0);
             if (!upsideDownPosition) {
                 return undefined;
             }
@@ -179,13 +179,13 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
             const angleCoeff = Math.abs(loop(animatedAngle, 360) / 180 - 1);
             const getAnimatedValue = (straight: number, upsideDown: number) => straight * angleCoeff + upsideDown * (1 - angleCoeff);
 
-            const {digit, sticky} = dataSet.at(dataIndex)!;
+            const data = dataSet.at(dataIndex);
 
             return {
                 left: getAnimatedValue(basePosition.left, -upsideDownPosition.left),
                 top: getAnimatedValue(basePosition.top, -upsideDownPosition.top),
                 angle: getAnimatedValue(basePosition.angle, -upsideDownPosition.angle)
-                    + (sticky || !isRotatableDigit(puzzle, digit) ? -animatedAngle : 0),
+                    + (!data || data.sticky || !isRotatableDigit(puzzle, data.digit) ? -animatedAngle : 0),
             };
         },
 

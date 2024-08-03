@@ -242,7 +242,7 @@ export const JigsawSudokuTypeManager = (
             `sortRotatedIndexes-${roundedAngle}`
         );
 
-        const rotatedPosition = positionFunction(rotatedIndexes[dataIndex]);
+        const rotatedPosition = positionFunction(rotatedIndexes[dataIndex] ?? 0);
         if (!rotatedPosition) {
             return undefined;
         }
