@@ -121,7 +121,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             },
             size,
             puzzleJson.minDigit ?? 1,
-            puzzleJson.maxDigit ?? size,
+            puzzleJson.maxDigit ?? Math.min(size, 9),
             sudokuMakerColorsMap,
             importOptionOverrides,
         );
