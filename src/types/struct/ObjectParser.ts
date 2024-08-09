@@ -2,6 +2,8 @@ export type ObjectParserFieldMap<ObjectT> = {
     [KeyT in keyof ObjectT]?: (fieldValue: ObjectT[KeyT], objectValue: ObjectT) => void | boolean;
 };
 
+export type ObjectByParser<ParserT> = ParserT extends ObjectParser<infer ObjectT> ? ObjectT : never;
+
 export class ObjectParser<ObjectT> {
     constructor(private fieldMap: ObjectParserFieldMap<ObjectT>, private fieldsOrder: (keyof ObjectT)[] = []) {}
 

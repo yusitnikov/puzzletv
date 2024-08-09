@@ -6,9 +6,9 @@ import {getRectsBoundingBox, Rect} from "../../types/layout/Rect";
 import {useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
 import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
 import {emptyPosition, Position} from "../../types/layout/Position";
-import {darkGreyColor, greenColor, lightGreyColor, lightRedColor} from "./globals";
+import {greenColor, lightGreyColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
-import {MouseEvent, useMemo, useState} from "react";
+import {HTMLAttributes, MouseEvent, useMemo, useState} from "react";
 import {CellSelectionColor} from "../sudoku/cell/CellSelection";
 import {useEventListener} from "../../hooks/useEventListener";
 import {Modal} from "../layout/modal/Modal";
@@ -17,29 +17,24 @@ import {settings} from "../../types/layout/Settings";
 import {SettingsTextBox} from "../sudoku/controls/settings/SettingsTextBox";
 import {SettingsItem} from "../sudoku/controls/settings/SettingsItem";
 import {Edit} from "@emotion-icons/material";
+import {puzzleIdToScl, sclToPuzzleId} from "../../utils/sudokuPad";
 
 interface CaterpillarGrid {
     guid: number;
     data: string;
     offset: Position;
     size?: number;
-    margin: {
-        top?: number;
-        left?: number;
-        bottom?: number;
-        right?: number;
-    };
 }
 
 const regionBorderWidth = 0.07;
-const getGridRect = ({offset, size = 6, margin: {top = 0, left = 0, bottom = 0, right = 0}}: CaterpillarGrid): Rect => {
-    const fullWidth = size + left + right + regionBorderWidth;
-    const fullHeight = size + top + bottom + regionBorderWidth;
+const getGridRect = ({offset, size = 6}: CaterpillarGrid): Rect => {
+    const fullWidth = size + safetyMargin * 2 + regionBorderWidth;
+    const fullHeight = size + safetyMargin * 2 + regionBorderWidth;
     const fullSize = Math.max(fullWidth, fullHeight);
 
     return {
-        top: offset.top - top - (fullSize - fullHeight) / 2,
-        left: offset.left - left - (fullSize - fullWidth) / 2,
+        top: offset.top - safetyMargin - (fullSize - fullHeight) / 2,
+        left: offset.left - safetyMargin - (fullSize - fullWidth) / 2,
         width: fullSize,
         height: fullSize,
     };
@@ -123,9 +118,8 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
     const add = () => setEditingGrid({
         guid: Date.now(),
-        data: "",
+        data: "fpuzN4IgzglgXgpiBcA2ANCA5gJwgEwQbT2AF9ljSSzKiBdZQih8p42+5xq1q99rj/8nx7cW1IkA",
         offset: viewGrids[viewGrids.length - 1]?.offset ?? emptyPosition,
-        margin: {},
     });
 
     useEventListener(window, "keydown", (ev) => {
@@ -509,6 +503,8 @@ const GridsCompilation = ({grids: viewGrids, readOnly, onClick, onDoubleClick, s
 };
 
 
+const safetyMargin = 6;
+
 interface SudokuPadProps {
     data: string;
     bounds: Rect;
@@ -517,14 +513,56 @@ interface SudokuPadProps {
 const SudokuPad = observer(function SudokuPad({data, bounds}: SudokuPadProps) {
     profiler.trace();
 
-    return <img
-        src={`https://api.sudokupad.com/thumbnail/${data}_512x512.svg`}
-        alt={"Grid image"}
+    const fixedData = useMemo(() => {
+        try {
+            const parsedData = puzzleIdToScl(data);
+
+            const width = parsedData.cells[0].length;
+            const height = parsedData.cells.length;
+
+            parsedData.underlays ??= [];
+            parsedData.underlays.push({
+                center: [height / 2, width / 2],
+                width: width + 2 * safetyMargin,
+                height: height + 2 * safetyMargin,
+                angle: 0,
+                stroke: "none",
+                thickness: 0,
+                backgroundColor: "transparent",
+                borderColor: "transparent",
+            } as typeof parsedData.underlays[0]);
+
+            return sclToPuzzleId(parsedData);
+        } catch {
+            return undefined;
+        }
+    }, [data]);
+
+    if (!fixedData) {
+        return null;
+    }
+
+    return <SudokuPadImage
+        data={fixedData}
         style={{
             position: "absolute",
             pointerEvents: "none",
             ...bounds,
         }}
+    />;
+});
+
+interface SudokuPadImageProps extends Omit<HTMLAttributes<HTMLImageElement>, "src" | "alt"> {
+    data: string;
+}
+
+const SudokuPadImage = observer(function SudokuPadImage({data, ...imgProps}: SudokuPadImageProps) {
+    profiler.trace();
+
+    return <img
+        {...imgProps}
+        src={`https://api.sudokupad.com/thumbnail/${data}_512x512.svg`}
+        alt={"Grid image"}
     />;
 });
 
@@ -537,30 +575,24 @@ interface GridEditorProps {
 
 const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellSize}: GridEditorProps) {
     const [data, setData] = useState(grid.data);
-    const [size, setSize] = useState(grid.size ?? 6);
-    const [marginLeft, setMarginLeft] = useState(grid.margin.left ?? 0);
-    const [marginRight, setMarginRight] = useState(grid.margin.right ?? 0);
-    const [marginTop, setMarginTop] = useState(grid.margin.top ?? 0);
-    const [marginBottom, setMarginBottom] = useState(grid.margin.bottom ?? 0);
-    const maxMargin = Math.max(marginLeft, marginRight, marginTop, marginBottom) + 0.5;
+
+    const parsedGrid = useMemo(() => {
+        try {
+            return puzzleIdToScl(data);
+        } catch {
+            return undefined;
+        }
+    }, [data]);
+    const parsedGridWidth = parsedGrid?.cells?.[0]?.length;
+    const parsedGridHeight = parsedGrid?.cells?.length;
+    const isGridOk = !!parsedGrid && parsedGridWidth === parsedGridHeight;
 
     const newGrid: CaterpillarGrid = {
         ...grid,
         data,
-        size,
-        margin: {
-            left: marginLeft || undefined,
-            right: marginRight || undefined,
-            top: marginTop || undefined,
-            bottom: marginBottom || undefined,
-        },
+        size: parsedGridHeight,
     };
     const submit = () => onSubmit(newGrid);
-
-    const previewBounds = getGridRect({
-        ...newGrid,
-        offset: {left: maxMargin, top: maxMargin}
-    });
 
     return <Modal
         cellSize={cellSize * 2}
@@ -589,108 +621,20 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
             </a>
         </div>
 
-        <table style={{marginTop: 16}}>
-            <tbody>
-            <tr>
-                <td colSpan={3}>
-                    The white square should match the sudoku grid!
-                </td>
-            </tr>
-            <tr>
-                <td colSpan={3}>
-                    <label>
-                        Grid size:&nbsp;
-                        <NumberInput value={size} onChange={setSize}/>
-                    </label>
-                    <label style={{marginLeft: 16}}>
-                        Outside rows:&nbsp;
-                        <NumberInput value={marginTop} onChange={setMarginTop}/>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label>
-                        Outside<br/>
-                        columns:<br/>
-                        <NumberInput value={marginLeft} onChange={setMarginLeft}/>
-                    </label>
-                </td>
-                <td>
-                    <div style={{
-                        position: "relative",
-                        width: cellSize * (size + maxMargin * 2),
-                        height: cellSize * (size + maxMargin * 2),
-                        background: lightGreyColor,
-                    }}>
-                        <Absolute
-                            left={(maxMargin - marginLeft) * cellSize}
-                            top={(maxMargin - marginTop) * cellSize}
-                            width={(size + marginLeft + marginRight) * cellSize}
-                            height={(size + marginTop + marginBottom) * cellSize}
-                            style={{background: darkGreyColor}}
-                        />
-
-                        <Absolute
-                            left={maxMargin * cellSize}
-                            top={maxMargin * cellSize}
-                            width={size * cellSize}
-                            height={size * cellSize}
-                            style={{background: "#fff"}}
-                        />
-
-                        {!!data && <SudokuPad
-                            data={data}
-                            bounds={{
-                                left: previewBounds.left * cellSize,
-                                top: previewBounds.top * cellSize,
-                                width: previewBounds.width * cellSize,
-                                height: previewBounds.height * cellSize,
-                            }}
-                        />}
-                    </div>
-                </td>
-                <td>
-                    <label>
-                        Outside<br/>
-                        columns:<br/>
-                        <NumberInput value={marginRight} onChange={setMarginRight}/>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td colSpan={3}>
-                    <label>
-                        Outside rows:&nbsp;
-                        <NumberInput value={marginBottom} onChange={setMarginBottom}/>
-                    </label>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        {!parsedGrid && <div>Error: failed to parse the grid data.</div>}
+        {parsedGrid && !isGridOk && <div>Error: the grid should be a square.</div>}
+        {isGridOk && <SudokuPadImage
+            data={data}
+            style={{
+                marginTop: 16,
+                width: cellSize * 12,
+                height: cellSize * 12,
+            }}
+        />}
 
         <div style={{display: "flex", gap: 16, justifyContent: "center", marginTop: 16}}>
-            <Button type={"button"} disabled={!data} onClick={submit}>Save</Button>
+            <Button type={"button"} disabled={!isGridOk} onClick={submit}>Save</Button>
             <Button type={"button"} onClick={onCancel}>Cancel</Button>
         </div>
     </Modal>;
-});
-
-interface NumberInputProps {
-    value: number;
-    onChange: (value: number) => void;
-}
-
-const NumberInput = observer(function NumberInput({value, onChange}: NumberInputProps) {
-    return <input
-        type={"number"}
-        min={0}
-        value={value}
-        onChange={(ev) => onChange(ev.target.valueAsNumber)}
-        style={{
-            width: 40,
-            textAlign: "center",
-            font: "inherit",
-        }}
-    />;
 });

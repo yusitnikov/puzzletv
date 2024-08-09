@@ -58,9 +58,9 @@ export const useAblyChannelState = <T>(
 
     const [state, setState] = useObjectFromLocalStorage<T>("ablyState-" + channelName, initialState);
     const [connected, setConnected] = useState(false);
-    console.log("State is", state);
-    console.log("Channel state is", channel?.state);
-    console.log("Channel connected", connected);
+    // console.log("State is", state);
+    // console.log("Channel state is", channel?.state);
+    // console.log("Channel connected", connected);
     const updateState = useCallback((newState: T) => {
         if (!enabled || !channel) {
             return;
@@ -80,7 +80,7 @@ export const useAblyChannelState = <T>(
         channel.whenState("attached").then(() => setConnected(true));
 
         const callback = (message: Types.Message) => {
-            console.log("Got message!", message.data);
+            // console.log("Got message!", message.data);
             setState(message.data);
         };
         chain.then(() => channel.subscribe(callback));
