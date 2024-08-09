@@ -51,17 +51,14 @@ interface PresenceData {
 }
 
 export interface CaterpillarProps {
-    readOnly: boolean;
     chunk?: string;
 }
 
-export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}: CaterpillarProps) {
+export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: CaterpillarProps) {
     profiler.trace();
 
-    const windowSize = useWindowSize(!readOnly);
-
-    const channelName = "caterpillar" + chunk;
-    const [grids = [], setGrids, connected] = useAblyChannelState<CaterpillarGrid[]>(ablyOptions, channelName, []);
+    const channelName = getChannelName(chunk);
+    const [grids = [], setGrids, connected] = useGrids(chunk);
     const [gridsEdit, setGridsEdit] = useState<CaterpillarGrid[]>();
     const viewGrids = gridsEdit ?? grids;
     const hasUnsubmittedChanges = !!gridsEdit;
@@ -82,8 +79,8 @@ export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}:
         nickname: myNickname,
         isEditing: hasUnsubmittedChanges,
     }), [myNickname, hasUnsubmittedChanges]);
-    useSetMyAblyChannelPresence(ablyOptions, channelName, myPresenceData, !readOnly);
-    const [presenceMessages] = useAblyChannelPresence(ablyOptions, channelName, !readOnly);
+    useSetMyAblyChannelPresence(ablyOptions, channelName, myPresenceData);
+    const [presenceMessages] = useAblyChannelPresence(ablyOptions, channelName);
     const otherPeople = presenceMessages
         .filter(({clientId}) => clientId !== myClientId)
         .map(({data}) => data as PresenceData);
@@ -91,21 +88,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}:
 
     const showAnyModal = showHelp || showNicknameModal || !!otherEditor;
 
-    const padding = readOnly ? 1 : 6;
-    const boundingRect = {...getRectsBoundingBox(...viewGrids.map(getGridRect))};
-    boundingRect.top -= padding;
-    boundingRect.left -= padding;
-    boundingRect.width += padding * 2;
-    boundingRect.height += padding * 2;
-
-    const coeff = Math.min(windowSize.width / boundingRect.width, windowSize.height / boundingRect.height);
-
-    const transformRect = ({top, left, width, height}: Rect): Rect => ({
-        top: (top - boundingRect.top - regionBorderWidth / 2) * coeff,
-        left: (left - boundingRect.left - regionBorderWidth / 2) * coeff,
-        width: width * coeff,
-        height: height * coeff,
-    });
+    const {windowSize, coeff} = useDimensions(viewGrids, false);
 
     const submit = () => {
         if (hasUnsubmittedChanges) {
@@ -146,7 +129,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}:
     });
 
     useEventListener(window, "keydown", (ev) => {
-        if (readOnly || editingGrid || showAnyModal) {
+        if (editingGrid || showAnyModal) {
             return;
         }
 
@@ -213,7 +196,7 @@ export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}:
 
     return <>
         <Absolute {...windowSize} pointerEvents={true} onClick={() => setSelectedGrids([])}>
-            {!readOnly && <div>
+            <div>
                 {indexes(Math.ceil(windowSize.width / coeff), true).map((x) => <Absolute
                     key={"column" + x}
                     top={0}
@@ -230,238 +213,301 @@ export const Caterpillar = observer(function Caterpillar({readOnly, chunk = ""}:
                     width={windowSize.width}
                     style={{background: lightGreyColor}}
                 />)}
-            </div>}
+            </div>
+
+            <GridsCompilation
+                grids={viewGrids}
+                readOnly={false}
+                onClick={({guid}, isCtrl) => {
+                    setSelectedGrids(
+                        (prev) => prev.includes(guid)
+                            ? prev.filter(guid2 => guid2 !== guid)
+                            : isCtrl ? [...prev, guid] : [guid]
+                    );
+                }}
+                onDoubleClick={(grid) => {
+                    setEditingGrid(grid);
+                }}
+                selectedGrids={selectedGrids}
+            />
+        </Absolute>
+
+        <Absolute
+            left={10}
+            top={0}
+            height={40}
+            width={windowSize.width - 20}
+            style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+            }}
+        >
+            <div
+                style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: "50%",
+                    background: connected ? greenColor : lightRedColor,
+                }}
+            />
+
+            <div
+                style={{
+                    pointerEvents: "all",
+                    cursor: "pointer",
+                }}
+                onClick={() => setShowNicknameModal(true)}
+            >
+                {myNickname} (you) <Edit size={"1em"}/>
+            </div>
+
+            {otherPeople.map(({nickname, isEditing}, index) => <div key={index}>
+                {nickname || "Anonymous"}
+                {isEditing && " (editing)"}
+            </div>)}
+        </Absolute>
+
+        <Absolute
+            left={10}
+            top={windowSize.height - 40}
+            width={windowSize.width - 20}
+            height={40}
+            pointerEvents={true}
+            style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+            }}
+        >
             <div>
-                {viewGrids.map((grid) => {
-                    const {guid, offset, size = 6} = grid;
+                <Button type={"button"} onClick={add}>Add grid</Button>
+            </div>
 
-                    return <Absolute
-                        key={"background" + guid}
-                        {...transformRect({...offset, width: size, height: size})}
-                        style={{
-                            background: "#fff",
-                            pointerEvents: readOnly ? "none" : "all",
-                            cursor: "pointer",
-                        }}
-                        onClick={(ev: MouseEvent<HTMLDivElement>) => {
-                            ev.preventDefault();
-                            ev.stopPropagation();
+            {selectedGrids.length === 1 && <div>
+                <Button type={"button"} onClick={() => editByGuid(selectedGrids[0])}>Edit grid</Button>
+            </div>}
 
-                            setSelectedGrids(
-                                (prev) => prev.includes(guid)
-                                    ? prev.filter(guid2 => guid2 !== guid)
-                                    : (ev.ctrlKey || ev.metaKey) ? [...prev, guid] : [guid]
-                            );
-                        }}
-                        onDoubleClick={(ev: MouseEvent<HTMLDivElement>) => {
-                            ev.preventDefault();
-                            ev.stopPropagation();
+            {hasUnsubmittedChanges && <>
+                <div>
+                    <Button type={"button"} onClick={submit}>Submit changes</Button>
+                </div>
+                <div>
+                    <Button type={"button"} onClick={cancel}>Cancel changes</Button>
+                </div>
+            </>}
 
-                            setEditingGrid(grid);
-                        }}
-                    />;
-                })}
+            <div>
+                <Button
+                    component={"a"}
+                    href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(viewGrids, null, 2))}
+                    download={"caterpillar.json"}
+                >
+                    Download backup
+                </Button>
+            </div>
 
-                {viewGrids.map(({guid, offset, size = 6}) => selectedGrids.includes(guid) && <Absolute
-                    key={"selection" + guid}
-                    {...transformRect({...offset, width: size, height: size})}
-                    borderColor={CellSelectionColor.mainCurrent}
-                    borderWidth={5}
-                />)}
-
-                {viewGrids.map((grid) => <SudokuPad
-                    key={"SudokuPad" + grid.guid}
-                    data={grid.data}
-                    bounds={transformRect(getGridRect(grid))}
-                />)}
+            <div>
+                <Button type={"button"} onClick={() => setShowHelp(true)}>Show help</Button>
             </div>
         </Absolute>
-        {!readOnly && <>
-            <Absolute
-                left={10}
-                top={0}
-                height={40}
-                width={windowSize.width - 20}
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                }}
-            >
-                <div
-                    style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: "50%",
-                        background: connected ? greenColor : lightRedColor,
-                    }}
-                />
 
-                <div
-                    style={{
-                        pointerEvents: "all",
-                        cursor: "pointer",
-                    }}
-                    onClick={() => setShowNicknameModal(true)}
-                >
-                    {myNickname} (you) <Edit size={"1em"}/>
+        {editingGrid && <GridEditor
+            grid={editingGrid}
+            onSubmit={(newGrid) => {
+                const newGrids: CaterpillarGrid[] = [];
+                let found = false;
+                for (const grid of viewGrids) {
+                    if (grid.guid === newGrid.guid) {
+                        newGrids.push(newGrid);
+                        found = true;
+                    } else {
+                        newGrids.push(grid);
+                    }
+                }
+                if (!found) {
+                    newGrids.push(newGrid);
+                }
+
+                setGridsEdit(newGrids);
+                setEditingGrid(undefined);
+                setSelectedGrids([newGrid.guid]);
+            }}
+            onCancel={() => setEditingGrid(undefined)}
+            cellSize={modalCellSize}
+        />}
+
+        {showHelp && <Modal cellSize={modalCellSize * 2.5} onClose={() => setShowHelp(false)}>
+            <div style={{display: "flex", flexDirection: "column", gap: "1em", textAlign: "left"}}>
+                <div>
+                    The caterpillar can be edited by using the buttons in the bottom of the page and using the keyboard.
                 </div>
 
-                {otherPeople.map(({nickname, isEditing}, index) => <div key={index}>
-                    {nickname || "Anonymous"}
-                    {isEditing && " (editing)"}
-                </div>)}
-            </Absolute>
-
-            <Absolute
-                left={10}
-                top={windowSize.height - 40}
-                width={windowSize.width - 20}
-                height={40}
-                pointerEvents={true}
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                }}
-            >
                 <div>
-                    <Button type={"button"} onClick={add}>Add grid</Button>
+                    Every change you make will be synced to other team members over the internet, but only after you click "submit changes" (hotkey: Ctrl+Enter).<br/>
+                    Alternatively, you can cancel all your last changes by clicking "cancel changes" (hotkey: Escape).
                 </div>
 
-                {selectedGrids.length === 1 && <div>
-                    <Button type={"button"} onClick={() => editByGuid(selectedGrids[0])}>Edit grid</Button>
-                </div>}
-
-                {hasUnsubmittedChanges && <>
-                    <div>
-                        <Button type={"button"} onClick={submit}>Submit changes</Button>
-                    </div>
-                    <div>
-                        <Button type={"button"} onClick={cancel}>Cancel changes</Button>
-                    </div>
-                </>}
+                <div>
+                    Click the "add grid" button to add a new grid.<br/>
+                    In the grid editor modal, copy-paste the puzzle data from SudokuPad (use the bookmarklet that you see in the modal).<br/>
+                    If the puzzle has outside clues, update the "outside rows/columns" fields according to the number of outsides lines from each side.<br/>
+                    When all dimensions are configured properly, the white square in the preview should match the sudoku grid.<br/>
+                    The new grid will be inserted at the place of the last grid, and can be moved with arrow keys later.
+                </div>
 
                 <div>
+                    Select the grids by clicking on them (hold Ctrl to multi-select).<br/>
+                    Selected grids could be edited by clicking "edit grid" button or double-click, moved with the arrow keys, or removed with the Delete key.
+                </div>
+
+                <div style={{textAlign: "center"}}>
                     <Button
-                        component={"a"}
-                        href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(viewGrids, null, 2))}
-                        download={"caterpillar.json"}
+                        type={"button"}
+                        onClick={() => setShowHelp(false)}
+                        autoFocus={true}
+                        style={{font: "inherit"}}
                     >
-                        Download backup
+                        Gotcha!
                     </Button>
                 </div>
+            </div>
+        </Modal>}
 
-                <div>
-                    <Button type={"button"} onClick={() => setShowHelp(true)}>Show help</Button>
-                </div>
-            </Absolute>
+        {showNicknameModal && <Modal
+            cellSize={modalCellSize * 2.5}
+            onClose={() => {
+                if (settings.nickname.get()) {
+                    setShowNicknameModal(false);
+                }
+            }}
+        >
+            <form
+                onSubmit={(ev) => {
+                    ev.preventDefault();
 
-            {editingGrid && <GridEditor
-                grid={editingGrid}
-                onSubmit={(newGrid) => {
-                    const newGrids: CaterpillarGrid[] = [];
-                    let found = false;
-                    for (const grid of viewGrids) {
-                        if (grid.guid === newGrid.guid) {
-                            newGrids.push(newGrid);
-                            found = true;
-                        } else {
-                            newGrids.push(grid);
-                        }
-                    }
-                    if (!found) {
-                        newGrids.push(newGrid);
-                    }
-
-                    setGridsEdit(newGrids);
-                    setEditingGrid(undefined);
-                    setSelectedGrids([newGrid.guid]);
-                }}
-                onCancel={() => setEditingGrid(undefined)}
-                cellSize={modalCellSize}
-            />}
-
-            {showHelp && <Modal cellSize={modalCellSize * 2.5} onClose={() => setShowHelp(false)}>
-                <div style={{display: "flex", flexDirection: "column", gap: "1em", textAlign: "left"}}>
-                    <div>
-                        The caterpillar can be edited by using the buttons in the bottom of the page and using the keyboard.
-                    </div>
-
-                    <div>
-                        Every change you make will be synced to other team members over the internet, but only after you click "submit changes" (hotkey: Ctrl+Enter).<br/>
-                        Alternatively, you can cancel all your last changes by clicking "cancel changes" (hotkey: Escape).
-                    </div>
-
-                    <div>
-                        Click the "add grid" button to add a new grid.<br/>
-                        In the grid editor modal, copy-paste the puzzle data from SudokuPad (use the bookmarklet that you see in the modal).<br/>
-                        If the puzzle has outside clues, update the "outside rows/columns" fields according to the number of outsides lines from each side.<br/>
-                        When all dimensions are configured properly, the white square in the preview should match the sudoku grid.<br/>
-                        The new grid will be inserted at the place of the last grid, and can be moved with arrow keys later.
-                    </div>
-
-                    <div>
-                        Select the grids by clicking on them (hold Ctrl to multi-select).<br/>
-                        Selected grids could be edited by clicking "edit grid" button or double-click, moved with the arrow keys, or removed with the Delete key.
-                    </div>
-
-                    <div style={{textAlign: "center"}}>
-                        <Button
-                            type={"button"}
-                            onClick={() => setShowHelp(false)}
-                            autoFocus={true}
-                            style={{font: "inherit"}}
-                        >
-                            Gotcha!
-                        </Button>
-                    </div>
-                </div>
-            </Modal>}
-
-            {showNicknameModal && <Modal
-                cellSize={modalCellSize * 2.5}
-                onClose={() => {
-                    if (settings.nickname.get()) {
-                        setShowNicknameModal(false);
-                    }
+                    setShowNicknameModal(false);
                 }}
             >
-                <form
-                    onSubmit={(ev) => {
-                        ev.preventDefault();
+                <SettingsItem>
+                    <span>Your nickname:</span>
 
-                        setShowNicknameModal(false);
-                    }}
-                >
-                    <SettingsItem>
-                        <span>Your nickname:</span>
+                    <SettingsTextBox
+                        type={"text"}
+                        cellSize={modalCellSize * 2.5}
+                        value={myNickname}
+                        onChange={(ev) => settings.nickname.set(ev.target.value)}
+                    />
+                </SettingsItem>
 
-                        <SettingsTextBox
-                            type={"text"}
-                            cellSize={modalCellSize * 2.5}
-                            value={myNickname}
-                            onChange={(ev) => settings.nickname.set(ev.target.value)}
-                        />
-                    </SettingsItem>
+                <div style={{marginTop: "2em"}}>
+                    <Button
+                        type={"submit"}
+                        disabled={!myNickname}
+                    >
+                        Save
+                    </Button>
+                </div>
+            </form>
+        </Modal>}
 
-                    <div style={{marginTop: "2em"}}>
-                        <Button
-                            type={"submit"}
-                            disabled={!myNickname}
-                        >
-                            Save
-                        </Button>
-                    </div>
-                </form>
-            </Modal>}
-
-            {otherEditor && <Modal cellSize={modalCellSize * 2.5}>
-                {otherEditor.nickname || "Other person"} is editing the grids, please wait...
-            </Modal>}
-        </>}
+        {otherEditor && <Modal cellSize={modalCellSize * 2.5}>
+            {otherEditor.nickname || "Other person"} is editing the grids, please wait...
+        </Modal>}
     </>;
 });
+
+export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk}: CaterpillarProps) {
+    profiler.trace();
+
+    const [grids = []] = useGrids(chunk);
+
+    const windowSize = useWindowSize(false);
+
+    return <Absolute {...windowSize}>
+        <GridsCompilation grids={grids} readOnly={true}/>
+    </Absolute>;
+});
+
+const getChannelName = (chunk = "") => "caterpillar" + chunk;
+
+const useGrids = (chunk = "") => useAblyChannelState<CaterpillarGrid[]>(ablyOptions, getChannelName(chunk), []);
+
+const useDimensions = (grids: CaterpillarGrid[], readOnly: boolean) => {
+    const windowSize = useWindowSize(!readOnly);
+
+    const padding = readOnly ? 1 : 6;
+    const boundingRect = {...getRectsBoundingBox(...grids.map(getGridRect))};
+    boundingRect.top -= padding;
+    boundingRect.left -= padding;
+    boundingRect.width += padding * 2;
+    boundingRect.height += padding * 2;
+
+    const coeff = Math.min(windowSize.width / boundingRect.width, windowSize.height / boundingRect.height);
+
+    const transformRect = ({top, left, width, height}: Rect): Rect => ({
+        top: (top - boundingRect.top - regionBorderWidth / 2) * coeff,
+        left: (left - boundingRect.left - regionBorderWidth / 2) * coeff,
+        width: width * coeff,
+        height: height * coeff,
+    });
+
+    return {windowSize, coeff, transformRect};
+};
+
+interface GridsCompilationProps {
+    grids: CaterpillarGrid[];
+    readOnly: boolean;
+    onClick?: (grid: CaterpillarGrid, isCtrl: boolean) => void;
+    onDoubleClick?: (grid: CaterpillarGrid) => void;
+    selectedGrids?: number[];
+}
+
+const GridsCompilation = ({grids: viewGrids, readOnly, onClick, onDoubleClick, selectedGrids}: GridsCompilationProps) => {
+    const {transformRect} = useDimensions(viewGrids, readOnly);
+
+    return <div>
+        {viewGrids.map((grid) => {
+            const {guid, offset, size = 6} = grid;
+
+            return <Absolute
+                key={"background" + guid}
+                {...transformRect({...offset, width: size, height: size})}
+                style={{
+                    background: "#fff",
+                    pointerEvents: readOnly ? "none" : "all",
+                    cursor: "pointer",
+                }}
+                onClick={(ev: MouseEvent<HTMLDivElement>) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+
+                    onClick?.(grid, ev.ctrlKey || ev.metaKey);
+                }}
+                onDoubleClick={(ev: MouseEvent<HTMLDivElement>) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+
+                    onDoubleClick?.(grid);
+                }}
+            />;
+        })}
+
+        {viewGrids.map(({guid, offset, size = 6}) => selectedGrids?.includes(guid) && <Absolute
+            key={"selection" + guid}
+            {...transformRect({...offset, width: size, height: size})}
+            borderColor={CellSelectionColor.mainCurrent}
+            borderWidth={5}
+        />)}
+
+        {viewGrids.map((grid) => <SudokuPad
+            key={"SudokuPad" + grid.guid}
+            data={grid.data}
+            bounds={transformRect(getGridRect(grid))}
+        />)}
+    </div>;
+};
+
 
 interface SudokuPadProps {
     data: string;

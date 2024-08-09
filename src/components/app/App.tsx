@@ -17,7 +17,7 @@ import {useGesturesGlobalEvents} from "../../utils/gestures";
 import {observer} from "mobx-react-lite";
 import {useUpdateControlKeysState} from "../../hooks/useControlKeysState";
 import {LanguageCode} from "../../types/translations/LanguageCode";
-import {Caterpillar} from "./Caterpillar";
+import {CaterpillarEditor, CaterpillarConsumer} from "./Caterpillar";
 import {SyncedLabel} from "./SyncedLabel";
 import {PuzzleImportSource} from "../../types/sudoku/PuzzleImportOptions";
 
@@ -142,10 +142,10 @@ export const App = observer(({onPageLoaded}: AppProps) => {
         }
         case "caterpillar-editor":
             return <PageLayout scrollable={false}>
-                <Caterpillar key={params.chunk} readOnly={false} chunk={params.chunk}/>
+                <CaterpillarEditor key={params.chunk} chunk={params.chunk}/>
             </PageLayout>;
         case "caterpillar-consumer":
-            return <Caterpillar key={params.chunk} readOnly={true} chunk={params.chunk}/>;
+            return <CaterpillarConsumer key={params.chunk} chunk={params.chunk}/>;
         case "label":
             if (params.channel) {
                 return <SyncedLabel name={params.channel} isObs={params.obs}/>;
