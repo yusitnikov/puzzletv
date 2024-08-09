@@ -411,10 +411,12 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
     </>;
 });
 
-export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk}: CaterpillarProps) {
+export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk = ""}: CaterpillarProps) {
     profiler.trace();
 
-    const [grids = []] = useGrids(chunk);
+    const chunks = chunk.split(",");
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const grids = chunks.flatMap(chunk => useGrids(chunk)[0] ?? []);
 
     const windowSize = useWindowSize(false);
 
