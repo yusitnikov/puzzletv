@@ -127,7 +127,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
             return;
         }
 
-        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
+        const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey, shiftKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
         const moveCoeff = ctrlKey ? 4 : 1;
 
@@ -172,6 +172,14 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
                 if (ctrlKey) {
                     ev.preventDefault();
                     setSelectedGrids(viewGrids.map(({guid}) => guid));
+                }
+                break;
+            case "Tab":
+                if (!ctrlKey && viewGrids.length) {
+                    ev.preventDefault();
+                    const lastSelected = selectedGrids[selectedGrids.length - 1];
+                    const currentIndex = viewGrids.findIndex((grid) => grid.guid === lastSelected);
+                    setSelectedGrids([viewGrids[(currentIndex + (shiftKey ? viewGrids.length - 1 : 1)) % viewGrids.length].guid]);
                 }
                 break;
         }
