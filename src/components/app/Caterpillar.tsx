@@ -579,10 +579,25 @@ interface SudokuPadImageProps extends Omit<HTMLAttributes<HTMLImageElement>, "sr
 const SudokuPadImage = observer(function SudokuPadImage({data, ...imgProps}: SudokuPadImageProps) {
     profiler.trace();
 
+    const [errorData, setErrorData] = useState("");
+
+    if (errorData === data) {
+        return <div style={{
+            ...imgProps.style,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "red",
+            fontSize: typeof imgProps.style?.height === "number" ? imgProps.style.height * 0.08 : undefined,
+        }}>
+            ERROR
+        </div>;
+    }
     return <img
         {...imgProps}
         src={`https://api.sudokupad.com/thumbnail/${data}_512x512.svg`}
         alt={"Grid image"}
+        onError={() => setErrorData(data)}
     />;
 });
 
