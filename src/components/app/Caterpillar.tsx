@@ -707,7 +707,7 @@ const compileGrids = (grids: CaterpillarGrid[]) => {
                 return undefined;
             }
 
-            const result = /^(source|title|author|rules|solution): ([^\x00]*)$/.exec(value);
+            const result = /^(source|title|author|rules|solution|msgcorrect): ([^\x00]*)$/.exec(value);
             if (!result) {
                 return undefined;
             }
