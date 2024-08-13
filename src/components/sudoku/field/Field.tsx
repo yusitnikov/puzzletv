@@ -19,7 +19,6 @@ import {FieldCellMouseHandler} from "./FieldCellMouseHandler";
 import {getCellWriteModeGestureHandler} from "../../../types/sudoku/CellWriteModeInfo";
 import {PassThrough} from "../../layout/pass-through/PassThrough";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {headerHeight} from "../../app/globals";
 import {LanguageCode} from "../../../types/translations/LanguageCode";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {FieldRegionsWithSameCoordsTransformation} from "./FieldRegionsWithSameCoordsTransformation";

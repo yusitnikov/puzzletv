@@ -8,7 +8,7 @@ import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
 import {emptyPosition, Position} from "../../types/layout/Position";
 import {greenColor, lightGreyColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
-import {HTMLAttributes, MouseEvent, useMemo, useState} from "react";
+import {HTMLAttributes, MouseEvent, useEffect, useMemo, useState} from "react";
 import {CellSelectionColor} from "../sudoku/cell/CellSelection";
 import {useEventListener} from "../../hooks/useEventListener";
 import {Modal} from "../layout/modal/Modal";
@@ -18,6 +18,7 @@ import {SettingsTextBox} from "../sudoku/controls/settings/SettingsTextBox";
 import {SettingsItem} from "../sudoku/controls/settings/SettingsItem";
 import {Edit} from "@emotion-icons/material";
 import {puzzleIdToScl, Scl, sclToPuzzleId} from "../../utils/sudokuPad";
+import {JsonEditor} from "../layout/json-editor/JsonEditor";
 
 interface CaterpillarGrid {
     guid: number;
@@ -618,13 +619,21 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
             return undefined;
         }
     }, [data]);
-    const parsedGridWidth = parsedGrid?.cells?.[0]?.length;
-    const parsedGridHeight = parsedGrid?.cells?.length;
-    const isGridOk = !!parsedGrid && parsedGridWidth === parsedGridHeight;
+
+    const [editedParsedGrid, setEditedParsedGrid] = useState(parsedGrid);
+    useEffect(() => {
+        setEditedParsedGrid(parsedGrid);
+    }, [parsedGrid]);
+
+    const editedData = editedParsedGrid ? sclToPuzzleId(editedParsedGrid) : data;
+
+    const parsedGridWidth = editedParsedGrid?.cells?.[0]?.length;
+    const parsedGridHeight = editedParsedGrid?.cells?.length;
+    const isGridOk = !!editedParsedGrid && parsedGridWidth === parsedGridHeight;
 
     const newGrid: CaterpillarGrid = {
         ...grid,
-        data,
+        data: editedData,
         size: parsedGridHeight,
     };
     const submit = () => onSubmit(newGrid);
@@ -656,16 +665,25 @@ const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellS
             </a>
         </div>
 
-        {!parsedGrid && <div>Error: failed to parse the grid data.</div>}
-        {parsedGrid && !isGridOk && <div>Error: the grid should be a square.</div>}
-        {isGridOk && <SudokuPadImage
-            data={data}
-            style={{
-                marginTop: 16,
-                width: cellSize * 12,
-                height: cellSize * 12,
-            }}
-        />}
+        {!editedParsedGrid && <div>Error: failed to parse the grid data.</div>}
+        {editedParsedGrid && !isGridOk && <div>Error: the grid should be a square.</div>}
+        {editedParsedGrid && <div style={{marginTop: 16, display: "flex", flexDirection: "row"}}>
+            <JsonEditor
+                style={{
+                    width: cellSize * 12,
+                    height: cellSize * 12,
+                }}
+                value={editedParsedGrid}
+                onChange={setEditedParsedGrid}
+            />
+            {isGridOk && <SudokuPadImage
+                data={editedData}
+                style={{
+                    width: cellSize * 12,
+                    height: cellSize * 12,
+                }}
+            />}
+        </div>}
 
         <div style={{display: "flex", gap: 16, justifyContent: "center", marginTop: 16}}>
             <Button type={"button"} disabled={!isGridOk} onClick={submit}>Save</Button>
