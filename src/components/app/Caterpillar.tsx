@@ -304,7 +304,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
                 <Button
                     component={"a"}
                     href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(viewGrids, null, 2))}
-                    download={"caterpillar.json"}
+                    download={`caterpillar-${chunk}.json`}
                 >
                     Download backup
                 </Button>
