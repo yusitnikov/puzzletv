@@ -74,6 +74,7 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
         {editedParsedGrid && !isGridOk && <div>Error: the grid should be a square.</div>}
         {editedParsedGrid && <div style={{marginTop: 16, display: "flex", flexDirection: "row"}}>
             <JsonEditor
+                key={data}
                 style={{
                     width: cellSize * 12,
                     height: cellSize * 12,

@@ -1,5 +1,5 @@
 import {observer} from "mobx-react-lite";
-import {HTMLAttributes, useEffect, useMemo, useRef, useState} from "react";
+import {HTMLAttributes, useEffect, useMemo, useState} from "react";
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.min.css";
 import {useLastValueRef} from "../../../hooks/useLastValueRef";
@@ -18,38 +18,35 @@ export const JsonEditor = observer(function JsonEditor(
 ) {
     const [ref, setRef] = useState<HTMLDivElement | null>(null);
 
-    const valueRef = useRef<any>();
+    const [initialValue] = useState(value);
     const onChangeRef = useLastValueRef(onChange);
 
     const editor = useMemo(
-        () => ref && new JSONEditor(ref, {
-            mode: "code",
-            onChangeText: (text) => {
-                try {
-                    const value = JSON.parse(text);
-                    valueRef.current = value;
-                    onChangeRef.current?.(value);
-                } catch {
-                    // NOOP
-                }
-            },
-            search: false,
-            enableSort: false,
-            enableTransform: false,
-        }),
-        [ref, onChangeRef]
+        () => {
+            if (!ref) {
+                return undefined;
+            }
+            const editor = new JSONEditor(ref, {
+                mode: "code",
+                onChangeText: (text) => {
+                    try {
+                        const value = JSON.parse(text);
+                        onChangeRef.current?.(value);
+                    } catch {
+                        // NOOP
+                    }
+                },
+                search: false,
+                enableSort: false,
+                enableTransform: false,
+            });
+            editor.set(initialValue);
+            return editor;
+        },
+        [ref, initialValue, onChangeRef]
     );
 
     useEffect(() => {
-        if (editor && value !== valueRef.current) {
-            valueRef.current = value;
-            editor.set(value);
-        }
-    }, [editor, value]);
-
-    useEffect(() => {
-        editor?.expandAll?.();
-
         return () => {
             editor?.destroy();
         };
