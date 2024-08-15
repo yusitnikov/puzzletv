@@ -2,14 +2,12 @@ import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import {Absolute} from "../layout/absolute/Absolute";
-import {getRectsBoundingBox, Rect} from "../../types/layout/Rect";
 import {useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
 import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
-import {emptyPosition, Position} from "../../types/layout/Position";
+import {emptyPosition} from "../../types/layout/Position";
 import {greenColor, lightGreyColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
-import {HTMLAttributes, MouseEvent, useEffect, useMemo, useState} from "react";
-import {CellSelectionColor} from "../sudoku/cell/CellSelection";
+import {useMemo, useState} from "react";
 import {useEventListener} from "../../hooks/useEventListener";
 import {Modal} from "../layout/modal/Modal";
 import {Button} from "../layout/button/Button";
@@ -17,29 +15,11 @@ import {settings} from "../../types/layout/Settings";
 import {SettingsTextBox} from "../sudoku/controls/settings/SettingsTextBox";
 import {SettingsItem} from "../sudoku/controls/settings/SettingsItem";
 import {Edit} from "@emotion-icons/material";
-import {puzzleIdToScl, Scl, sclToPuzzleId} from "../../utils/sudokuPad";
-import {JsonEditor} from "../layout/json-editor/JsonEditor";
-
-interface CaterpillarGrid {
-    guid: number;
-    data: string;
-    offset: Position;
-    size?: number;
-}
-
-const regionBorderWidth = 0.07;
-const getGridRect = ({offset, size = 6}: CaterpillarGrid): Rect => {
-    const fullWidth = size + safetyMargin * 2 + regionBorderWidth;
-    const fullHeight = size + safetyMargin * 2 + regionBorderWidth;
-    const fullSize = Math.max(fullWidth, fullHeight);
-
-    return {
-        top: offset.top - safetyMargin - (fullSize - fullHeight) / 2,
-        left: offset.left - safetyMargin - (fullSize - fullWidth) / 2,
-        width: fullSize,
-        height: fullSize,
-    };
-};
+import {CaterpillarGrid} from "./caterpillar/types";
+import {getDimensions} from "./caterpillar/utils";
+import {GridEditor} from "./caterpillar/GridEditor";
+import {compileGrids} from "./caterpillar/compileGrids";
+import {GridsCompilation} from "./caterpillar/GridsCompilation";
 
 interface PresenceData {
     nickname: string;
@@ -84,7 +64,8 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
     const showAnyModal = showHelp || showNicknameModal || !!otherEditor;
 
-    const {windowSize, coeff} = useDimensions(viewGrids, false);
+    const windowSize = useWindowSize();
+    const {coeff} = getDimensions(viewGrids, windowSize, false);
 
     const submit = () => {
         if (hasUnsubmittedChanges) {
@@ -220,6 +201,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
             <GridsCompilation
                 grids={viewGrids}
+                windowSize={windowSize}
                 readOnly={false}
                 onClick={({guid}, isCtrl) => {
                     setSelectedGrids(
@@ -430,7 +412,7 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
     const windowSize = useWindowSize(false);
 
     return <Absolute {...windowSize}>
-        <GridsCompilation grids={grids} readOnly={true}/>
+        <GridsCompilation grids={grids} windowSize={windowSize} readOnly={true}/>
 
         {settings.nickname.get() === "Chameleon" && <div style={{
             position: "absolute",
@@ -447,381 +429,3 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
 const getChannelName = (chunk = "") => "caterpillar" + chunk;
 
 const useGrids = (chunk = "") => useAblyChannelState<CaterpillarGrid[]>(ablyOptions, getChannelName(chunk), []);
-
-const useDimensions = (grids: CaterpillarGrid[], readOnly: boolean) => {
-    const windowSize = useWindowSize(!readOnly);
-
-    const padding = readOnly ? 1 : 6;
-    const boundingRect = {...getRectsBoundingBox(...grids.map(getGridRect))};
-    boundingRect.top -= padding;
-    boundingRect.left -= padding;
-    boundingRect.width += padding * 2;
-    boundingRect.height += padding * 2;
-
-    const coeff = Math.min(windowSize.width / boundingRect.width, windowSize.height / boundingRect.height);
-
-    const transformRect = ({top, left, width, height}: Rect): Rect => ({
-        top: (top - boundingRect.top - regionBorderWidth / 2) * coeff,
-        left: (left - boundingRect.left - regionBorderWidth / 2) * coeff,
-        width: width * coeff,
-        height: height * coeff,
-    });
-
-    return {windowSize, coeff, transformRect};
-};
-
-interface GridsCompilationProps {
-    grids: CaterpillarGrid[];
-    readOnly: boolean;
-    onClick?: (grid: CaterpillarGrid, isCtrl: boolean) => void;
-    onDoubleClick?: (grid: CaterpillarGrid) => void;
-    selectedGrids?: number[];
-}
-
-const GridsCompilation = ({grids: viewGrids, readOnly, onClick, onDoubleClick, selectedGrids}: GridsCompilationProps) => {
-    const {transformRect} = useDimensions(viewGrids, readOnly);
-
-    return <div>
-        {viewGrids.map((grid) => {
-            const {guid, offset, size = 6} = grid;
-
-            return <Absolute
-                key={"background" + guid}
-                {...transformRect({...offset, width: size, height: size})}
-                style={{
-                    background: "#fff",
-                    pointerEvents: readOnly ? "none" : "all",
-                    cursor: "pointer",
-                }}
-                onClick={(ev: MouseEvent<HTMLDivElement>) => {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-
-                    onClick?.(grid, ev.ctrlKey || ev.metaKey);
-                }}
-                onDoubleClick={(ev: MouseEvent<HTMLDivElement>) => {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-
-                    onDoubleClick?.(grid);
-                }}
-            />;
-        })}
-
-        {viewGrids.map(({guid, offset, size = 6}) => selectedGrids?.includes(guid) && <Absolute
-            key={"selection" + guid}
-            {...transformRect({...offset, width: size, height: size})}
-            borderColor={CellSelectionColor.mainCurrent}
-            borderWidth={5}
-        />)}
-
-        {viewGrids.map((grid) => <SudokuPad
-            key={"SudokuPad" + grid.guid}
-            data={grid.data}
-            bounds={transformRect(getGridRect(grid))}
-        />)}
-    </div>;
-};
-
-
-const safetyMargin = 6;
-
-interface SudokuPadProps {
-    data: string;
-    bounds: Rect;
-}
-
-const SudokuPad = observer(function SudokuPad({data, bounds}: SudokuPadProps) {
-    profiler.trace();
-
-    const fixedData = useMemo(() => {
-        try {
-            const parsedData = puzzleIdToScl(data);
-
-            const width = parsedData.cells[0].length;
-            const height = parsedData.cells.length;
-
-            parsedData.underlays ??= [];
-            parsedData.underlays.push({
-                center: [height / 2, width / 2],
-                width: width + 2 * safetyMargin,
-                height: height + 2 * safetyMargin,
-                angle: 0,
-                stroke: "none",
-                thickness: 0,
-                backgroundColor: "transparent",
-                borderColor: "transparent",
-            } as typeof parsedData.underlays[0]);
-
-            return sclToPuzzleId(parsedData);
-        } catch {
-            return undefined;
-        }
-    }, [data]);
-
-    if (!fixedData) {
-        return null;
-    }
-
-    return <SudokuPadImage
-        data={fixedData}
-        style={{
-            position: "absolute",
-            pointerEvents: "none",
-            ...bounds,
-        }}
-    />;
-});
-
-interface SudokuPadImageProps extends Omit<HTMLAttributes<HTMLImageElement>, "src" | "alt"> {
-    data: string;
-}
-
-const SudokuPadImage = observer(function SudokuPadImage({data, ...imgProps}: SudokuPadImageProps) {
-    profiler.trace();
-
-    const [errorData, setErrorData] = useState("");
-
-    if (errorData === data) {
-        return <div style={{
-            ...imgProps.style,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "red",
-            fontSize: typeof imgProps.style?.height === "number" ? imgProps.style.height * 0.08 : undefined,
-        }}>
-            ERROR
-        </div>;
-    }
-    return <img
-        {...imgProps}
-        src={`https://api.sudokupad.com/thumbnail/${data}_512x512.svg`}
-        alt={"Grid image"}
-        onError={() => setErrorData(data)}
-    />;
-});
-
-interface GridEditorProps {
-    grid: CaterpillarGrid;
-    onSubmit: (grid: CaterpillarGrid) => void;
-    onCancel: () => void;
-    cellSize: number;
-}
-
-const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellSize}: GridEditorProps) {
-    const [data, setData] = useState(grid.data);
-
-    const parsedGrid = useMemo(() => {
-        try {
-            return puzzleIdToScl(data);
-        } catch {
-            return undefined;
-        }
-    }, [data]);
-
-    const [editedParsedGrid, setEditedParsedGrid] = useState(parsedGrid);
-    useEffect(() => {
-        setEditedParsedGrid(parsedGrid);
-    }, [parsedGrid]);
-
-    const editedData = editedParsedGrid ? sclToPuzzleId(editedParsedGrid) : data;
-
-    const parsedGridWidth = editedParsedGrid?.cells?.[0]?.length;
-    const parsedGridHeight = editedParsedGrid?.cells?.length;
-    const isGridOk = !!editedParsedGrid && parsedGridWidth === parsedGridHeight;
-
-    const newGrid: CaterpillarGrid = {
-        ...grid,
-        data: editedData,
-        size: parsedGridHeight,
-    };
-    const submit = () => onSubmit(newGrid);
-
-    return <Modal
-        cellSize={cellSize * 2}
-        onClose={onCancel}
-        textAlign={"center"}
-    >
-        <div>
-            <label>
-                Puzzle data:&nbsp;
-                <input
-                    type={"text"}
-                    placeholder={data || "Paste puzzle data string..."}
-                    value={""}
-                    onInput={(ev) => setData(ev.currentTarget.value)}
-                    style={{
-                        width: cellSize * 7,
-                        font: "inherit",
-                    }}
-                />
-            </label>
-        </div>
-        <div>
-            Use this bookmarklet in the SudokuPad tab to copy the data:<br/>
-            <a href={"javascript:PuzzleLoader.fetchPuzzle(getPuzzleId()).then(data => navigator.clipboard.writeText(data)).then(() => alert('Copied!'))"}>
-                Copy SudokuPad puzzle data
-            </a>
-        </div>
-
-        {!editedParsedGrid && <div>Error: failed to parse the grid data.</div>}
-        {editedParsedGrid && !isGridOk && <div>Error: the grid should be a square.</div>}
-        {editedParsedGrid && <div style={{marginTop: 16, display: "flex", flexDirection: "row"}}>
-            <JsonEditor
-                style={{
-                    width: cellSize * 12,
-                    height: cellSize * 12,
-                }}
-                value={editedParsedGrid}
-                onChange={setEditedParsedGrid}
-            />
-            {isGridOk && <SudokuPadImage
-                data={editedData}
-                style={{
-                    width: cellSize * 12,
-                    height: cellSize * 12,
-                }}
-            />}
-        </div>}
-
-        <div style={{display: "flex", gap: 16, justifyContent: "center", marginTop: 16}}>
-            <Button type={"button"} disabled={!isGridOk} onClick={submit}>Save</Button>
-            <Button type={"button"} onClick={onCancel}>Cancel</Button>
-        </div>
-    </Modal>;
-});
-
-const compileGrids = (grids: CaterpillarGrid[]) => {
-    const result: Scl = {
-        id: "caterdokupillarpoc",
-        cellSize: 50,
-        metadata: {} as any,
-        settings: {},
-        arrows: [],
-        cages: [],
-        lines: [],
-        cells: [],
-        regions: [],
-        overlays: [],
-        underlays: [],
-    };
-
-    let width = 0, height = 0;
-    const minLeft = Math.min(...grids.map((grid) => grid.offset.left)) - safetyMargin;
-    const minTop = Math.min(...grids.map((grid) => grid.offset.top)) - safetyMargin;
-
-    const solutionArray: string[][] = [];
-
-    for (const grid of grids) {
-        const offsetTop = grid.offset.top - minTop;
-        const offsetLeft = grid.offset.left - minLeft;
-        const translatePoint = ([y, x]: number[]) => [offsetTop + y, offsetLeft + x];
-
-        const data = puzzleIdToScl(grid.data);
-
-        const parseCageMetadata = (value?: unknown) => {
-            if (typeof value !== "string") {
-                return undefined;
-            }
-
-            const result = /^(source|title|author|rules|solution|msgcorrect): ([^\x00]*)$/.exec(value);
-            if (!result) {
-                return undefined;
-            }
-
-            return {
-                key: result[1],
-                value: result[2],
-            };
-        };
-
-        for (const cage of data.cages ?? []) {
-            const cageMetadata = parseCageMetadata(cage.value);
-            if (cageMetadata) {
-                data.metadata ??= {} as Scl["metadata"];
-                // @ts-ignore
-                data.metadata[cageMetadata.key] = cageMetadata.value;
-            }
-        }
-        data.cages = data.cages?.filter((cage) => !parseCageMetadata(cage.value));
-
-        const {
-            metadata: {solution} = {},
-            arrows = [],
-            cages = [],
-            lines = [],
-            cells,
-            regions = [],
-            overlays = [],
-            underlays = [],
-        } = data;
-
-        const gridHeight = cells.length;
-        const gridWidth = cells[0].length;
-        width = Math.max(width, offsetLeft + gridWidth + safetyMargin);
-        height = Math.max(height, offsetTop + gridHeight + safetyMargin);
-
-        for (const [top, row] of cells.entries()) {
-            for (const [left, cell] of row.entries()) {
-                result.cells[offsetTop + top] ??= [];
-                result.cells[offsetTop + top][offsetLeft + left] = cell;
-            }
-        }
-
-        if (solution) {
-            for (const index of indexes(solution.length)) {
-                const [y, x] = translatePoint([Math.floor(index / gridWidth), index % gridWidth]);
-
-                solutionArray[y] ??= [];
-                solutionArray[y][x] = solution[index];
-            }
-        }
-
-        result.regions!.push(...regions.map((region) => region.map(translatePoint)));
-        result.overlays!.push(...overlays.map((overlay) => ({
-            ...overlay,
-            center: translatePoint(overlay.center),
-        })));
-        result.underlays!.push(...underlays.map((underlay) => ({
-            ...underlay,
-            center: translatePoint(underlay.center),
-        })));
-        result.arrows!.push(...arrows.map((arrow) => ({
-            ...arrow,
-            wayPoints: arrow.wayPoints.map(translatePoint),
-        })));
-        result.lines!.push(...lines.map((line) => ({
-            ...line,
-            wayPoints: line.wayPoints.map(translatePoint),
-        })));
-        result.cages!.push(...cages.map((cage) => ({
-            ...cage,
-            cells: cage.cells?.map(translatePoint),
-        })));
-    }
-
-    for (const top of indexes(height)) {
-        result.cells[top] ??= [];
-        for (const left of indexes(width)) {
-            result.cells[top][left] ??= {} as any;
-        }
-    }
-
-    result.metadata!.source = "PuzzleTV";
-    result.metadata!.title = "Caterdokupillar POC";
-    result.metadata!.author = "A lot of people";
-    result.metadata!.rules = "Totally normal caterdokupillar rules apply.";
-
-    let solution = "";
-    for (const top of indexes(height)) {
-        for (const left of indexes(width)) {
-            solution += solutionArray[top]?.[left] ?? " ";
-        }
-    }
-    result.metadata!.solution = solution;
-
-    console.log(result);
-
-    return "https://sudokupad.app/" + sclToPuzzleId(result);
-};
