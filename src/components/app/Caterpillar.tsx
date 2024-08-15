@@ -185,16 +185,6 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
     const dataUsage = JSON.stringify(viewGrids).length / 65536;
 
-    console.log(
-        viewGrids
-            .filter((grid) => "parsedData" in grid)
-            .map((grid) => ({
-                grid,
-                usage: JSON.stringify(grid).length,
-            }))
-            .sort((a, b) => b.usage - a.usage)
-    );
-
     return <>
         <Absolute {...windowSize} pointerEvents={true} onClick={() => setSelectedGrids([])}>
             <div>
