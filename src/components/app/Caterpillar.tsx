@@ -5,7 +5,7 @@ import {Absolute} from "../layout/absolute/Absolute";
 import {useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
 import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
 import {emptyPosition} from "../../types/layout/Position";
-import {greenColor, lightGreyColor, lightRedColor} from "./globals";
+import {greenColor, lightGreyColor, lightOrangeColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
 import {useMemo, useState} from "react";
 import {useEventListener} from "../../hooks/useEventListener";
@@ -275,7 +275,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
             {hasUnsubmittedChanges && <>
                 <div>
-                    <Button type={"button"} onClick={submit}>Submit changes</Button>
+                    <Button type={"button"} onClick={submit} style={{background: lightOrangeColor}}>Submit changes</Button>
                 </div>
                 <div>
                     <Button type={"button"} onClick={cancel}>Cancel changes</Button>
