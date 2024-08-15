@@ -30,20 +30,18 @@ export const GridsCompilation = (
 ) => {
     const {transformRect} = getDimensions(grids, windowSize, readOnly);
 
-    const parsedGrids = useMemo(() => grids.map((grid): CaterpillarGrid & {parsedData?: Scl} => {
+    const parsedGrids = useMemo(() => grids.map((grid) => {
         try {
-            return {
-                ...grid,
-                parsedData: normalizeSclMetadata(puzzleIdToScl(grid.data)),
-            };
+            return normalizeSclMetadata(puzzleIdToScl(grid.data));
         } catch {
-            return grid;
+            return undefined;
         }
     }), [grids]);
 
     return <div>
-        {parsedGrids.map((grid) => {
-            const {guid, offset, size = 6, parsedData} = grid;
+        {grids.map((grid, index) => {
+            const {guid, offset, size = 6} = grid;
+            const parsedData = parsedGrids[index];
 
             return <Absolute
                 key={"background" + guid}

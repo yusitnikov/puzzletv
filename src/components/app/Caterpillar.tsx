@@ -69,6 +69,11 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
     const submit = () => {
         if (hasUnsubmittedChanges) {
+            // Earlier version of code inserted parsedData prop here - make sure it's not there
+            for (const grid of gridsEdit) {
+                delete (grid as any).parsedData;
+            }
+
             setGrids(gridsEdit);
             setGridsEdit(undefined);
         }
@@ -179,6 +184,16 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
     const modalCellSize = Math.min(windowSize.width, windowSize.height) * 0.05;
 
     const dataUsage = JSON.stringify(viewGrids).length / 65536;
+
+    console.log(
+        viewGrids
+            .filter((grid) => "parsedData" in grid)
+            .map((grid) => ({
+                grid,
+                usage: JSON.stringify(grid).length,
+            }))
+            .sort((a, b) => b.usage - a.usage)
+    );
 
     return <>
         <Absolute {...windowSize} pointerEvents={true} onClick={() => setSelectedGrids([])}>
