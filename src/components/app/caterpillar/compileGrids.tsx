@@ -1,5 +1,5 @@
 import {CaterpillarGrid} from "./types";
-import {puzzleIdToScl, Scl, sclToPuzzleId} from "../../../utils/sudokuPad";
+import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleId} from "../../../utils/sudokuPad";
 import {safetyMargin} from "./globals";
 import {indexes} from "../../../utils/indexes";
 
@@ -29,33 +29,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
         const offsetLeft = grid.offset.left - minLeft;
         const translatePoint = ([y, x]: number[]) => [offsetTop + y, offsetLeft + x];
 
-        const data = puzzleIdToScl(grid.data);
-
-        const parseCageMetadata = (value?: unknown) => {
-            if (typeof value !== "string") {
-                return undefined;
-            }
-
-            const result = /^(source|title|author|rules|solution|msgcorrect): ([^\x00]*)$/.exec(value);
-            if (!result) {
-                return undefined;
-            }
-
-            return {
-                key: result[1],
-                value: result[2],
-            };
-        };
-
-        for (const cage of data.cages ?? []) {
-            const cageMetadata = parseCageMetadata(cage.value);
-            if (cageMetadata) {
-                data.metadata ??= {} as Scl["metadata"];
-                // @ts-ignore
-                data.metadata[cageMetadata.key] = cageMetadata.value;
-            }
-        }
-        data.cages = data.cages?.filter((cage) => !parseCageMetadata(cage.value));
+        const data = normalizeSclMetadata(puzzleIdToScl(grid.data));
 
         const {
             metadata: {solution} = {},

@@ -1,7 +1,7 @@
 import {CaterpillarGrid} from "./types";
 import {observer} from "mobx-react-lite";
 import {useEffect, useMemo, useState} from "react";
-import {puzzleIdToScl, sclToPuzzleId} from "../../../utils/sudokuPad";
+import {normalizeSclMetadata, puzzleIdToScl, sclToPuzzleId} from "../../../utils/sudokuPad";
 import {Modal} from "../../layout/modal/Modal";
 import {JsonEditor} from "../../layout/json-editor/JsonEditor";
 import {SudokuPadImage} from "./SudokuPad";
@@ -19,7 +19,7 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
 
     const parsedGrid = useMemo(() => {
         try {
-            return puzzleIdToScl(data);
+            return normalizeSclMetadata(puzzleIdToScl(data));
         } catch {
             return undefined;
         }

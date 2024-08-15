@@ -151,3 +151,43 @@ export const puzzleIdToScl = (puzzleId: string) => {
 };
 
 export const sclToPuzzleId = (data: Scl) => `scl${loadFPuzzle.compressPuzzle(PuzzleZipper.zip(JSON.stringify(data)))}`;
+
+export const normalizeSclMetadata = (
+    {
+        cages = [],
+        metadata = {} as NonNullable<Scl["metadata"]>,
+        ...data
+    }: Scl
+): Scl => {
+    const parseCageMetadata = (value?: unknown) => {
+        if (typeof value !== "string") {
+            return undefined;
+        }
+
+        const result = /^(source|title|author|rules|solution|msgcorrect): ([^\x00]*)$/.exec(value);
+        if (!result) {
+            return undefined;
+        }
+
+        return {
+            key: result[1],
+            value: result[2],
+        };
+    };
+
+    // Clone the metadata object to keep the source object unmodified
+    metadata = {...metadata};
+    for (const cage of cages) {
+        const cageMetadata = parseCageMetadata(cage.value);
+        if (cageMetadata) {
+            // @ts-ignore
+            metadata[cageMetadata.key] = cageMetadata.value;
+        }
+    }
+
+    return {
+        ...data,
+        cages: cages.filter((cage) => !parseCageMetadata(cage.value)),
+        metadata,
+    };
+};

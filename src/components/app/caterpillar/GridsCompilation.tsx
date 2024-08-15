@@ -2,9 +2,12 @@ import {CaterpillarGrid} from "./types";
 import {WindowSize} from "../../../hooks/useWindowSize";
 import {getDimensions, getGridRect} from "./utils";
 import {Absolute} from "../../layout/absolute/Absolute";
-import {MouseEvent} from "react";
+import {MouseEvent, useMemo} from "react";
 import {CellSelectionColor} from "../../sudoku/cell/CellSelection";
 import {SudokuPad} from "./SudokuPad";
+import {normalizeSclMetadata, puzzleIdToScl, Scl} from "../../../utils/sudokuPad";
+import {lightOrangeColor, lightRedColor} from "../globals";
+import {lightenColorStr} from "../../../utils/color";
 
 interface GridsCompilationProps {
     grids: CaterpillarGrid[];
@@ -17,7 +20,7 @@ interface GridsCompilationProps {
 
 export const GridsCompilation = (
     {
-        grids: viewGrids,
+        grids,
         windowSize,
         readOnly,
         onClick,
@@ -25,17 +28,28 @@ export const GridsCompilation = (
         selectedGrids
     }: GridsCompilationProps
 ) => {
-    const {transformRect} = getDimensions(viewGrids, windowSize, readOnly);
+    const {transformRect} = getDimensions(grids, windowSize, readOnly);
+
+    const parsedGrids = useMemo(() => grids.map((grid): CaterpillarGrid & {parsedData?: Scl} => {
+        try {
+            return {
+                ...grid,
+                parsedData: normalizeSclMetadata(puzzleIdToScl(grid.data)),
+            };
+        } catch {
+            return grid;
+        }
+    }), [grids]);
 
     return <div>
-        {viewGrids.map((grid) => {
-            const {guid, offset, size = 6} = grid;
+        {parsedGrids.map((grid) => {
+            const {guid, offset, size = 6, parsedData} = grid;
 
             return <Absolute
                 key={"background" + guid}
                 {...transformRect({...offset, width: size, height: size})}
                 style={{
-                    background: "#fff",
+                    background: readOnly || parsedData?.metadata?.solution ? "#fff" : lightenColorStr(lightRedColor, 0.3),
                     pointerEvents: readOnly ? "none" : "all",
                     cursor: "pointer",
                 }}
@@ -54,14 +68,14 @@ export const GridsCompilation = (
             />;
         })}
 
-        {viewGrids.map(({guid, offset, size = 6}) => selectedGrids?.includes(guid) && <Absolute
+        {grids.map(({guid, offset, size = 6}) => selectedGrids?.includes(guid) && <Absolute
             key={"selection" + guid}
             {...transformRect({...offset, width: size, height: size})}
             borderColor={CellSelectionColor.mainCurrent}
             borderWidth={5}
         />)}
 
-        {viewGrids.map((grid) => <SudokuPad
+        {grids.map((grid) => <SudokuPad
             key={"SudokuPad" + grid.guid}
             data={grid.data}
             bounds={transformRect(getGridRect(grid))}
