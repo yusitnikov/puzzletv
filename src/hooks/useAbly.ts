@@ -66,9 +66,8 @@ export const useAblyChannelState = <T>(
             return;
         }
 
-        chain
-            .then(() => channel.publish("state", newState))
-            .then(() => setState(newState));
+        setState(newState);
+        chain.then(() => channel.publish("state", newState));
     }, [enabled, channel, chain, setState]);
     (window as any).updateState = updateState;
 
