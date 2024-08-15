@@ -186,8 +186,8 @@ export const normalizeSclMetadata = (
     }
 
     return {
+        metadata,
         ...data,
         cages: cages.filter((cage) => !parseCageMetadata(cage.value)),
-        metadata,
     };
 };
