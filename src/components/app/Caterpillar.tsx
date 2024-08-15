@@ -5,7 +5,7 @@ import {Absolute} from "../layout/absolute/Absolute";
 import {useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
 import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
 import {emptyPosition} from "../../types/layout/Position";
-import {greenColor, lightGreyColor, lightOrangeColor, lightRedColor} from "./globals";
+import {errorColor, greenColor, lightGreyColor, lightOrangeColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
 import {useMemo, useState} from "react";
 import {useEventListener} from "../../hooks/useEventListener";
@@ -178,6 +178,8 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
     const modalCellSize = Math.min(windowSize.width, windowSize.height) * 0.05;
 
+    const dataUsage = JSON.stringify(viewGrids).length / 65536;
+
     return <>
         <Absolute {...windowSize} pointerEvents={true} onClick={() => setSelectedGrids([])}>
             <div>
@@ -218,8 +220,16 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
         </Absolute>
 
         <Absolute
-            left={10}
+            left={0}
             top={0}
+            width={windowSize.width * Math.min(1, dataUsage)}
+            height={10}
+            style={{background: dataUsage < 1 ? lightOrangeColor : errorColor}}
+        />
+
+        <Absolute
+            left={10}
+            top={10}
             height={40}
             width={windowSize.width - 20}
             style={{
