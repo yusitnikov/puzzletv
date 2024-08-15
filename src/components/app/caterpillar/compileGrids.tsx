@@ -101,7 +101,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
     let solution = "";
     for (const top of indexes(height)) {
         for (const left of indexes(width)) {
-            solution += solutionArray[top]?.[left] ?? " ";
+            solution += solutionArray[top]?.[left] ?? result.cells[top][left].value ?? ".";
         }
     }
     result.metadata!.solution = solution;
