@@ -1,3 +1,4 @@
+import {ReactNode} from "react";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
 import {addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
@@ -7,6 +8,7 @@ import {Constraint} from "../../../types/sudoku/Constraint";
 import {isCageConstraint} from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import {isRuleBoxConstraint, RuleBoxConstraint} from "../components/RuleBox";
 import {RulesParagraph} from "../../../components/sudoku/rules/RulesParagraph";
+import {ParsedRulesHtml} from "../../../components/sudoku/rules/ParsedRulesHtml";
 
 const rulePrefix = "rule:";
 
@@ -28,12 +30,21 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
     postProcessPuzzle(puzzle) {
       puzzle = extendedTypeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 
-      const {items = []} = puzzle;
+      const {items = [], importOptions: {htmlRules} = {}} = puzzle;
+
+      const rulesMap: Record<string, ReactNode> = {};
 
       const processItems = (items: Constraint<ToRuleBoxPTM<T>, any>[]): Constraint<ToRuleBoxPTM<T>, any>[] => items.map(
-        (item) => isCageConstraint(item) && typeof item.props.sum === "string" && item.props.sum.startsWith(rulePrefix)
-          ? RuleBoxConstraint(item.cells, item.props.sum.substring(rulePrefix.length).trim())
-          : item
+        (item) => {
+            if (isCageConstraint(item) && typeof item.props.sum === "string" && item.props.sum.startsWith(rulePrefix)) {
+                const text = item.props.sum.substring(rulePrefix.length).trim();
+                const html = htmlRules ? <ParsedRulesHtml>{text}</ParsedRulesHtml> : text;
+                rulesMap[text] = html;
+                return RuleBoxConstraint(item.cells, text, html);
+            } else {
+                return item;
+            }
+        }
       );
 
       puzzle = {
@@ -50,7 +61,7 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
           {baseRules?.(translate, context)}
 
           {Object.entries((context.stateExtension as RuleBoxGameState).ruleBoxes ?? {}).map(([ruleText, wasClicked]) => wasClicked && <RulesParagraph key={ruleText}>
-            {ruleText}
+            {rulesMap[ruleText] ?? ruleText}
           </RulesParagraph>)}
         </>,
       };

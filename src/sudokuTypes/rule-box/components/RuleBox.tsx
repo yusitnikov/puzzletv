@@ -9,7 +9,7 @@ import {Gift} from "@emotion-icons/fluentui-system-filled";
 import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
 import styled from "@emotion/styled";
 import {Modal} from "../../../components/layout/modal/Modal";
-import {useState} from "react";
+import {ReactNode, useState} from "react";
 import {Button} from "../../../components/layout/button/Button";
 import {AnyRuleBoxPTM} from "../types/RuleBoxPTM";
 import {RuleBoxGameState} from "../types/RuleBoxGameState";
@@ -17,16 +17,17 @@ import {RuleBoxGameState} from "../types/RuleBoxGameState";
 const ruleBoxTag = "rule-box";
 
 export interface RuleBoxProps {
-    rules: string;
+    rulesText: string;
+    rulesNode: ReactNode;
 }
 
 export const RuleBox: ConstraintPropsGenericFcMap<RuleBoxProps, AnyRuleBoxPTM> = {
     [FieldLayer.regular]: observer(function RuleBoxUi<T extends AnyRuleBoxPTM>(
-        {cells, props: {rules}, color = lightRedColor, context}: ConstraintProps<T, RuleBoxProps>
+        {cells, props: {rulesText}, color = lightRedColor, context}: ConstraintProps<T, RuleBoxProps>
     ) {
         profiler.trace();
 
-        if ((context.stateExtension as RuleBoxGameState).ruleBoxes[rules]) {
+        if ((context.stateExtension as RuleBoxGameState).ruleBoxes[rulesText]) {
             return null;
         }
 
@@ -41,7 +42,7 @@ export const RuleBox: ConstraintPropsGenericFcMap<RuleBoxProps, AnyRuleBoxPTM> =
         </AutoSvg>;
     }),
     [FieldLayer.interactive]: observer(function RuleBoxClicker<T extends AnyRuleBoxPTM>(
-        {cells, props: {rules}, context}: ConstraintProps<T, RuleBoxProps>
+        {cells, props: {rulesText, rulesNode}, context}: ConstraintProps<T, RuleBoxProps>
     ) {
         profiler.trace();
 
@@ -54,14 +55,14 @@ export const RuleBox: ConstraintPropsGenericFcMap<RuleBoxProps, AnyRuleBoxPTM> =
         const closeModal = () => setShowModal(false);
 
         return <>
-            {!(context.stateExtension as RuleBoxGameState).ruleBoxes[rules] && <StyledClickArea
+            {!(context.stateExtension as RuleBoxGameState).ruleBoxes[rulesText] && <StyledClickArea
               onClick={() => {
                   setShowModal(true);
                   context.onStateChange({
                       extension: {
                           ruleBoxes: {
                               ...(context.stateExtension as RuleBoxGameState).ruleBoxes,
-                              [rules]: true,
+                              [rulesText]: true,
                           }
                       } as Partial<RuleBoxGameState>,
                   });
@@ -80,7 +81,7 @@ export const RuleBox: ConstraintPropsGenericFcMap<RuleBoxProps, AnyRuleBoxPTM> =
             </StyledClickArea>}
 
             {showModal && <Modal cellSize={cellSize} onClose={closeModal}>
-                <div>{rules}</div>
+                <div>{rulesNode}</div>
 
                 <Button
                   type={"button"}
@@ -104,12 +105,12 @@ const StyledClickArea = styled("g")({
     cursor: "pointer",
 });
 
-export const RuleBoxConstraint = <T extends AnyRuleBoxPTM>(cells: PositionLiteral[], rules: string): Constraint<T, RuleBoxProps> => ({
+export const RuleBoxConstraint = <T extends AnyRuleBoxPTM>(cells: PositionLiteral[], rulesText: string, rulesNode: ReactNode): Constraint<T, RuleBoxProps> => ({
     name: "rules box",
     tags: [ruleBoxTag],
     cells: parsePositionLiterals(cells),
     component: RuleBox,
-    props: {rules},
+    props: {rulesText, rulesNode},
 });
 
 export const isRuleBoxConstraint = <T extends AnyRuleBoxPTM>(constraint: Constraint<T, any>): constraint is Constraint<T, RuleBoxProps> =>
