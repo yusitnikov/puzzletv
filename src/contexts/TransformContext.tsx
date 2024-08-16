@@ -7,6 +7,7 @@ import {
 } from "../types/layout/Rect";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../utils/profiler";
+import {PuzzleContext} from "../types/sudoku/PuzzleContext";
 
 // region Scale
 const TransformScaleContext = createContext(1);
@@ -28,6 +29,12 @@ export const TransformScaleContextProvider = observer(function TransformScaleCon
 const TransformAngleContext = createContext(0);
 
 export const useTransformAngle = () => useContext(TransformAngleContext);
+
+export const useCompensationAngle = ({puzzle: {typeManager: {compensateConstraintDigitAngle}}}: PuzzleContext<any>) => {
+    const angle = useTransformAngle();
+
+    return compensateConstraintDigitAngle ? angle : 0;
+};
 
 export const TransformAngleContextProvider = observer(function TransformAngleContextProviderFc({angle, children}: PropsWithChildren<{angle: number}>) {
     profiler.trace();

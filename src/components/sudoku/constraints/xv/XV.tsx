@@ -6,51 +6,63 @@ import {ComponentType} from "react";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
+import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
+import {useCompensationAngle} from "../../../../contexts/TransformContext";
 
 const radius = 0.2;
 const lineWidth = 0.03;
 
-export const XMark: ConstraintPropsGenericFc = observer(function XMark<T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) {
+export const XMark: ConstraintPropsGenericFc = observer(function XMark<T extends AnyPTM>({cells: [cell1, cell2], context}: ConstraintProps<T>) {
     profiler.trace();
 
-    const left = (cell1.left + cell2.left) / 2 + 0.5;
-    const top = (cell1.top + cell2.top) / 2 + 0.5;
+    const angle = useCompensationAngle(context);
 
-    return <>
+    return <AutoSvg
+        left={(cell1.left + cell2.left) / 2 + 0.5}
+        top={(cell1.top + cell2.top) / 2 + 0.5}
+        angle={-angle}
+    >
         <line
-            x1={left - radius * 0.7}
-            y1={top - radius * 0.7}
-            x2={left + radius * 0.7}
-            y2={top + radius * 0.7}
+            x1={-radius * 0.7}
+            y1={-radius * 0.7}
+            x2={radius * 0.7}
+            y2={radius * 0.7}
             strokeWidth={lineWidth}
             stroke={blackColor}
         />
 
         <line
-            x1={left + radius * 0.7}
-            y1={top - radius * 0.7}
-            x2={left - radius * 0.7}
-            y2={top + radius * 0.7}
+            x1={radius * 0.7}
+            y1={-radius * 0.7}
+            x2={-radius * 0.7}
+            y2={radius * 0.7}
             strokeWidth={lineWidth}
             stroke={blackColor}
         />
-    </>;
+    </AutoSvg>;
 });
 
-export const VMark: ConstraintPropsGenericFc = observer(function VMark<T extends AnyPTM>({cells: [cell1, cell2]}: ConstraintProps<T>) {
-    const left = (cell1.left + cell2.left) / 2 + 0.5;
-    const top = (cell1.top + cell2.top) / 2 + 0.5;
+export const VMark: ConstraintPropsGenericFc = observer(function VMark<T extends AnyPTM>({cells: [cell1, cell2], context}: ConstraintProps<T>) {
+    profiler.trace();
 
-    return <polyline
-        points={formatSvgPointsArray([
-            {top: top - radius * 0.7, left: left - radius * 0.7},
-            {top: top + radius * 0.7, left},
-            {top: top - radius * 0.7, left: left + radius * 0.7},
-        ])}
-        strokeWidth={lineWidth}
-        stroke={blackColor}
-        fill={"none"}
-    />;
+    const angle = useCompensationAngle(context);
+
+    return <AutoSvg
+        left={(cell1.left + cell2.left) / 2 + 0.5}
+        top={(cell1.top + cell2.top) / 2 + 0.5}
+        angle={-angle}
+    >
+        <polyline
+            points={formatSvgPointsArray([
+                {top: -radius * 0.7, left: -radius * 0.7},
+                {top: radius * 0.7, left: 0},
+                {top: -radius * 0.7, left: radius * 0.7},
+            ])}
+            strokeWidth={lineWidth}
+            stroke={blackColor}
+            fill={"none"}
+        />
+    </AutoSvg>;
 });
 
 const XVConstraint = <T extends AnyPTM>(

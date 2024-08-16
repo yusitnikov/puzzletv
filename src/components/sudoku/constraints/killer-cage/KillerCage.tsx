@@ -16,7 +16,7 @@ import {CenteredText} from "../../../svg/centered-text/CenteredText";
 import {incrementArrayItemByIndex} from "../../../../utils/array";
 import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
-import {useTransformAngle} from "../../../../contexts/TransformContext";
+import {useCompensationAngle} from "../../../../contexts/TransformContext";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../../utils/profiler";
@@ -37,7 +37,7 @@ export interface KillerCageProps {
 export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
     [FieldLayer.regular]: observer(function KillerCage<T extends AnyPTM>(
         {
-            context: {puzzle},
+            context,
             cells,
             props: {
                 sum,
@@ -52,10 +52,8 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
     ) {
         profiler.trace();
 
-        const {
-            prioritizeSelection,
-            typeManager: {compensateConstraintDigitAngle},
-        } = puzzle;
+        const {puzzle} = context;
+        const {prioritizeSelection} = puzzle;
 
         const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
 
@@ -70,10 +68,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
         const sumPadding = prioritizeSelection ? 0.17 : largeSum ? 0.12 : borderPadding;
         const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.15;
 
-        let angle = useTransformAngle();
-        if (!compensateConstraintDigitAngle) {
-            angle = 0;
-        }
+        const angle = useCompensationAngle(context);
 
         return <>
             <polygon

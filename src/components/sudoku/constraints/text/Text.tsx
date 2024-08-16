@@ -11,6 +11,7 @@ import {ChessPieceType} from "../../../../sudokuTypes/chess/types/ChessPieceType
 import {ChessColor} from "../../../../sudokuTypes/chess/types/ChessColor";
 import {ChessPiece} from "../../../../sudokuTypes/chess/components/ChessPiece";
 import {cosmeticTag} from "../decorative-shape/DecorativeShape";
+import {useCompensationAngle} from "../../../../contexts/TransformContext";
 
 const chessPiecesMap: Record<string, { type: ChessPieceType; color: ChessColor; }> = {
     "♙": {
@@ -69,7 +70,7 @@ export interface TextProps {
 }
 
 export const TextComponent: ConstraintPropsGenericFc<TextProps> = observer(function TextFc<T extends AnyPTM>(
-    {cells, angle = 0, color = textColor, props: {text, size = 0.5}}: ConstraintProps<T, TextProps>
+    {cells, angle = 0, color = textColor, props: {text, size = 0.5}, context}: ConstraintProps<T, TextProps>
 ) {
     profiler.trace();
 
@@ -77,10 +78,12 @@ export const TextComponent: ConstraintPropsGenericFc<TextProps> = observer(funct
 
     const chessPiece = chessPiecesMap[text];
 
+    const compensationAngle = useCompensationAngle(context);
+
     return <AutoSvg
         top={top + 0.5}
         left={left + 0.5}
-        angle={angle}
+        angle={angle - compensationAngle}
     >
         {!chessPiece && <CenteredText
             size={size}

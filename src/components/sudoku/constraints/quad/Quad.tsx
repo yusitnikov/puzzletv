@@ -7,7 +7,7 @@ import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
 import {ReactElement} from "react";
 import {profiler} from "../../../../utils/profiler";
-import {useTransformAngle} from "../../../../contexts/TransformContext";
+import {useCompensationAngle} from "../../../../contexts/TransformContext";
 import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
 
 export interface QuadProps<CellType> {
@@ -38,7 +38,7 @@ export const Quad = {
 type QuadByDataProps<T extends AnyPTM> = Pick<ConstraintProps<T, QuadProps<T["cell"]>>, "context" | "cells" | "props">;
 export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
     {
-        context: {puzzle},
+        context,
         cells: [{top, left}],
         props: {
             expectedDigits = [],
@@ -50,10 +50,10 @@ export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
 ) {
     profiler.trace();
 
+    const {puzzle} = context;
     const {
         typeManager: {
             cellDataComponentType: {component: CellData},
-            compensateConstraintDigitAngle,
         },
     } = puzzle;
 
@@ -64,10 +64,7 @@ export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
 
     const digits = [d3, d1, d2, d4, ...others];
 
-    let compensationAngle = useTransformAngle();
-    if (!compensateConstraintDigitAngle) {
-        compensationAngle = 0;
-    }
+    const compensationAngle = useCompensationAngle(context);
 
     return <AutoSvg top={top} left={left} angle={-compensationAngle}>
         <circle

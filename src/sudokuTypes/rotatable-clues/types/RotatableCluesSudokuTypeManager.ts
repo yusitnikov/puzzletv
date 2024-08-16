@@ -277,13 +277,15 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             }
 
             const getCluePivot = ({cells}: Constraint<RotatableCluesPTM<T>>) => {
-                for (const {top, left} of cells) {
-                    for (const {cell, radius} of pivots) {
-                        const dx = cell.left - left;
-                        const dy = cell.top - top;
+                if (cells.length) {
+                    for (const {top, left} of [...cells, getAveragePosition(cells)]) {
+                        for (const {cell, radius} of pivots) {
+                            const dx = cell.left - left;
+                            const dy = cell.top - top;
 
-                        if (dx * dx + dy * dy <= radius * radius) {
-                            return cell;
+                            if (dx * dx + dy * dy <= radius * radius) {
+                                return cell;
+                            }
                         }
                     }
                 }
