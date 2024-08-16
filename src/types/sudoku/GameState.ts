@@ -459,20 +459,20 @@ export const gameStateRedo = <T extends AnyPTM>({fieldStateHistory}: PuzzleConte
 
 // region Selected cells
 export const gameStateAreAllSelectedCells = <T extends AnyPTM>(
-    {selectedCells, currentFieldState}: PuzzleContext<T>,
+    {allSelectedCells, currentFieldState}: PuzzleContext<T>,
     predicate: (cellState: CellState<T>, position: Position) => boolean
-) => areAllFieldStateCells(currentFieldState, selectedCells.items, predicate);
+) => areAllFieldStateCells(currentFieldState, allSelectedCells.items, predicate);
 
 export const gameStateIsAnySelectedCell = <T extends AnyPTM>(
-    {selectedCells, currentFieldState}: PuzzleContext<T>,
+    {allSelectedCells, currentFieldState}: PuzzleContext<T>,
     predicate: (cellState: CellState<T>, position: Position) => boolean
-) => isAnyFieldStateCell(currentFieldState, selectedCells.items, predicate);
+) => isAnyFieldStateCell(currentFieldState, allSelectedCells.items, predicate);
 
 export const gameStateAddSelectedCell = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     cellPosition: Position
 ): PartialGameStateEx<T> => context.cellWriteModeInfo.isNoSelectionMode ? {} : {
-    selectedCells: context.selectedCells.add(cellPosition),
+    selectedCells: context.allSelectedCells.add(cellPosition),
 };
 
 export const gameStateSetSelectedCells = <T extends AnyPTM>(
@@ -481,7 +481,7 @@ export const gameStateSetSelectedCells = <T extends AnyPTM>(
 ): PartialGameStateEx<T> => context.cellWriteModeInfo.isNoSelectionMode
     ? {}
     : {
-        selectedCells: context.selectedCells.set(cellPositions),
+        selectedCells: context.allSelectedCells.set(cellPositions),
     };
 
 export const gameStateToggleSelectedCells = <T extends AnyPTM>(
@@ -491,7 +491,7 @@ export const gameStateToggleSelectedCells = <T extends AnyPTM>(
 ): PartialGameStateEx<T> => context.cellWriteModeInfo.isNoSelectionMode
     ? {}
     : {
-        selectedCells: context.selectedCells.toggleAll(cellPositions, forcedEnable),
+        selectedCells: context.allSelectedCells.toggleAll(cellPositions, forcedEnable),
     };
 
 export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
@@ -563,7 +563,7 @@ export const gameStateSelectAllCells = <T extends AnyPTM>(context: PuzzleContext
 export const gameStateClearSelectedCells = <T extends AnyPTM>(context: PuzzleContext<T>): PartialGameStateEx<T> =>
     context.selectedCellsCount
         ? {
-            selectedCells: context.selectedCells.clear(),
+            selectedCells: context.allSelectedCells.clear(),
         }
         : {};
 
@@ -866,7 +866,7 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
                 lives: Math.max(0, newContext.lives - (decreaseOnlyOneLive ? 1 : failedDigits.length)),
             });
             if (!result.lives) {
-                result.selectedCells = newContext.selectedCells.clear();
+                result.selectedCells = newContext.allSelectedCells.clear();
             }
         }
     }
@@ -1218,10 +1218,10 @@ export const getAbsoluteScaleByLog = (scaleLog: number, step = defaultScaleStep)
 export const gameStateSetScaleLog = <T extends AnyPTM>(
     scaleLog: number,
     resetSelectedCells = true,
-): GameStateActionCallback<T> => ({puzzle: {typeManager: {scaleStep}}, selectedCells}) => ({
+): GameStateActionCallback<T> => ({puzzle: {typeManager: {scaleStep}}, allSelectedCells}) => ({
     scale: getAbsoluteScaleByLog(scaleLog, scaleStep),
     animating: true,
-    ...(resetSelectedCells && {selectedCells: selectedCells.clear()}),
+    ...(resetSelectedCells && {selectedCells: allSelectedCells.clear()}),
 });
 // endregion
 
@@ -1270,7 +1270,7 @@ export const gameStateApplyFieldDragGesture = <T extends AnyPTM>(
             },
             angle: rotation,
             scale: newScale,
-            ...(resetSelection && {selectedCells: context.selectedCells.clear()})
+            ...(resetSelection && {selectedCells: context.allSelectedCells.clear()})
         };
     });
 };

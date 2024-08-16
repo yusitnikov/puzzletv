@@ -9,6 +9,11 @@ import {FieldLayer} from "../../../types/sudoku/FieldLayer";
 import {lightGreyColor, veryDarkGreyColor} from "../../../components/app/globals";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
+import {gameStateSetSelectedCells, gameStateToggleSelectedCells} from "../../../types/sudoku/GameState";
+import {rgba} from "../../../utils/color";
+import {CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
+import {cancelOutsideClickProps} from "../../../utils/gestures";
+import {runInAction} from "mobx";
 
 const pivotRadius = 0.15;
 const pivotLineWidth = pivotRadius * 0.1;
@@ -92,6 +97,36 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                             fill={lightGreyColor}
                             stroke={veryDarkGreyColor}
                             strokeWidth={pivotLineWidth}
+                        />
+                    </AutoSvg>;
+                }),
+                [FieldLayer.interactive]: observer(function RotatableCluePivotSelection({cells: [cell], context}) {
+                    profiler.trace();
+
+                    const {top, left} = cell;
+
+                    if (top % 1 === 0 && left % 1 === 0) {
+                        return null;
+                    }
+
+                    const isSelected = context.isSelectedCell(top, left);
+
+                    return <AutoSvg top={top + 0.5} left={left + 0.5}>
+                        <circle
+                            r={0.5}
+                            stroke={"none"}
+                            strokeWidth={0}
+                            fill={isSelected ? rgba(CellSelectionColor.mainCurrent, 0.3) : "none"}
+                            style={{
+                                pointerEvents: "all",
+                                cursor: "pointer",
+                            }}
+                            {...cancelOutsideClickProps}
+                            onClick={(ev) => runInAction(() => context.onStateChange(
+                                (ev.ctrlKey || ev.metaKey || ev.shiftKey || (isSelected && context.selectedCellsCount === 1))
+                                    ? gameStateToggleSelectedCells(context, [cell])
+                                    : gameStateSetSelectedCells(context, [cell])
+                            ))}
                         />
                     </AutoSvg>;
                 }),

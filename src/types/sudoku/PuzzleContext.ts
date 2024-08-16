@@ -521,16 +521,20 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.state.isMultiSelection;
     }
 
-    get selectedCells() {
+    get allSelectedCells() {
         profiler.trace();
         return this.state.selectedCells;
     }
+    get selectedCells() {
+        profiler.trace();
+        return this.allSelectedCells.filter(({top, left}) => top % 1 === 0 && left % 1 === 0);
+    }
     readonly isSelectedCell = computedFn(function isSelectedCell(this: PuzzleContext<T>, top: number, left: number) {
-        return this.selectedCells.contains({top, left});
+        return this.allSelectedCells.contains({top, left});
     });
     get selectedCellsCount() {
         profiler.trace();
-        return this.selectedCells.size;
+        return this.allSelectedCells.size;
     }
     get firstSelectedCell() {
         profiler.trace();
