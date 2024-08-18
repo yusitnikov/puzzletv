@@ -47,8 +47,14 @@ export const GridsCompilation = (
             const solution = parsedData?.metadata?.solution;
             if (solution) {
                 for (const [gridTop, row] of parseSolutionString(solution, size).entries()) {
+                    if (!row) {
+                        continue;
+                    }
                     const top = gridTop + offset.top;
                     for (const [gridLeft, digit] of row.entries()) {
+                        if (digit === undefined) {
+                            continue;
+                        }
                         const left = gridLeft + offset.left;
                         map[top] ??= {};
                         map[top][left] ??= digit;
@@ -109,12 +115,12 @@ export const GridsCompilation = (
             const solution = parsedData?.metadata?.solution;
 
             return solution !== undefined && <Fragment key={"solution" + guid}>
-                {parseSolutionString(solution, size).map((row, gridTop) => <Fragment key={gridTop}>
+                {parseSolutionString(solution, size).map((row, gridTop) => row && <Fragment key={gridTop}>
                     {row.map((digit, gridLeft) => {
                         const top = gridTop + offset.top;
                         const left = gridLeft + offset.left;
 
-                        return <Absolute
+                        return digit !== undefined && <Absolute
                             key={gridLeft}
                             {...transformRect({top, left, width: 1, height: 1})}
                             style={{

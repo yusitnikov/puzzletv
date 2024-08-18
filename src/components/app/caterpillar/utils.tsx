@@ -52,6 +52,10 @@ export const parseSolutionStringIntoArray = (
     translatePoint = (point: number[]) => point,
 ) => {
     for (const index of indexes(solution.length)) {
+        if (Number.isNaN(Number(solution[index]))) {
+            continue;
+        }
+
         const [y, x] = translatePoint([Math.floor(index / gridWidth), index % gridWidth]);
 
         solutionArray[y] ??= [];
