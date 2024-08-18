@@ -2,6 +2,7 @@ import {CaterpillarGrid} from "./types";
 import {WindowSize} from "../../../hooks/useWindowSize";
 import {getRectsBoundingBox, Rect} from "../../../types/layout/Rect";
 import {safetyMargin} from "./globals";
+import {indexes} from "../../../utils/indexes";
 
 const regionBorderWidth = 0.07;
 
@@ -36,4 +37,24 @@ export const getDimensions = (grids: CaterpillarGrid[], windowSize: WindowSize, 
     });
 
     return {coeff, transformRect};
+};
+
+export const parseSolutionString = (solution: string, gridWidth: number) => {
+    const solutionArray: string[][] = [];
+    parseSolutionStringIntoArray(solutionArray, solution, gridWidth);
+    return solutionArray;
+};
+
+export const parseSolutionStringIntoArray = (
+    solutionArray: string[][],
+    solution: string,
+    gridWidth: number,
+    translatePoint = (point: number[]) => point,
+) => {
+    for (const index of indexes(solution.length)) {
+        const [y, x] = translatePoint([Math.floor(index / gridWidth), index % gridWidth]);
+
+        solutionArray[y] ??= [];
+        solutionArray[y][x] = solution[index];
+    }
 };

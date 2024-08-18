@@ -2,6 +2,7 @@ import {CaterpillarGrid} from "./types";
 import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleId} from "../../../utils/sudokuPad";
 import {safetyMargin} from "./globals";
 import {indexes} from "../../../utils/indexes";
+import {parseSolutionStringIntoArray} from "./utils";
 
 export const compileGrids = (grids: CaterpillarGrid[]) => {
     const result: Scl = {
@@ -55,12 +56,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
         }
 
         if (solution) {
-            for (const index of indexes(solution.length)) {
-                const [y, x] = translatePoint([Math.floor(index / gridWidth), index % gridWidth]);
-
-                solutionArray[y] ??= [];
-                solutionArray[y][x] = solution[index];
-            }
+            parseSolutionStringIntoArray(solutionArray, solution, gridWidth, translatePoint);
         }
 
         result.regions!.push(...regions.map((region) => region.map(translatePoint)));

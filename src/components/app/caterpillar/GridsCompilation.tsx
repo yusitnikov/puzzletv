@@ -1,13 +1,12 @@
 import {CaterpillarGrid} from "./types";
 import {WindowSize} from "../../../hooks/useWindowSize";
-import {getDimensions, getGridRect} from "./utils";
+import {getDimensions, getGridRect, parseSolutionString} from "./utils";
 import {Absolute} from "../../layout/absolute/Absolute";
-import {MouseEvent, useMemo} from "react";
+import {Fragment, MouseEvent, useMemo} from "react";
 import {CellSelectionColor} from "../../sudoku/cell/CellSelection";
 import {SudokuPad} from "./SudokuPad";
 import {normalizeSclMetadata, puzzleIdToScl} from "../../../utils/sudokuPad";
-import {lightRedColor} from "../globals";
-import {lightenColorStr} from "../../../utils/color";
+import {errorColor, mutedBlueColor} from "../globals";
 
 interface GridsCompilationProps {
     grids: CaterpillarGrid[];
@@ -16,6 +15,7 @@ interface GridsCompilationProps {
     onClick?: (grid: CaterpillarGrid, isCtrl: boolean) => void;
     onDoubleClick?: (grid: CaterpillarGrid) => void;
     selectedGrids?: number[];
+    showDigits?: boolean;
 }
 
 export const GridsCompilation = (
@@ -25,10 +25,11 @@ export const GridsCompilation = (
         readOnly,
         onClick,
         onDoubleClick,
-        selectedGrids
+        selectedGrids,
+        showDigits,
     }: GridsCompilationProps
 ) => {
-    const {transformRect} = getDimensions(grids, windowSize, readOnly);
+    const {coeff, transformRect} = getDimensions(grids, windowSize, readOnly);
 
     const parsedGrids = useMemo(() => grids.map((grid) => {
         try {
@@ -38,16 +39,39 @@ export const GridsCompilation = (
         }
     }), [grids]);
 
-    return <div>
-        {grids.map((grid, index) => {
-            const {guid, offset, size = 6} = grid;
+    const conflictsMap = useMemo(() => {
+        const map: Record<number, Record<number, string | false>> = {};
+
+        for (const [index, {offset, size = 6}] of grids.entries()) {
             const parsedData = parsedGrids[index];
+            const solution = parsedData?.metadata?.solution;
+            if (solution) {
+                for (const [gridTop, row] of parseSolutionString(solution, size).entries()) {
+                    const top = gridTop + offset.top;
+                    for (const [gridLeft, digit] of row.entries()) {
+                        const left = gridLeft + offset.left;
+                        map[top] ??= {};
+                        map[top][left] ??= digit;
+                        if (map[top][left] !== digit) {
+                            map[top][left] = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return map;
+    }, [grids, parsedGrids]);
+
+    return <div>
+        {grids.map((grid) => {
+            const {guid, offset, size = 6} = grid;
 
             return <Absolute
                 key={"background" + guid}
                 {...transformRect({...offset, width: size, height: size})}
                 style={{
-                    background: readOnly || parsedData?.metadata?.solution ? "#fff" : lightenColorStr(lightRedColor, 0.3),
+                    background: "#fff",
                     pointerEvents: readOnly ? "none" : "all",
                     cursor: "pointer",
                 }}
@@ -78,5 +102,35 @@ export const GridsCompilation = (
             data={grid.data}
             bounds={transformRect(getGridRect(grid))}
         />)}
+
+        {showDigits && grids.map((grid, index) => {
+            const {guid, offset, size = 6} = grid;
+            const parsedData = parsedGrids[index];
+            const solution = parsedData?.metadata?.solution;
+
+            return solution !== undefined && <Fragment key={"solution" + guid}>
+                {parseSolutionString(solution, size).map((row, gridTop) => <Fragment key={gridTop}>
+                    {row.map((digit, gridLeft) => {
+                        const top = gridTop + offset.top;
+                        const left = gridLeft + offset.left;
+
+                        return <Absolute
+                            key={gridLeft}
+                            {...transformRect({top, left, width: 1, height: 1})}
+                            style={{
+                                fontSize: coeff + "px",
+                                lineHeight: "1em",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                color: conflictsMap[top]?.[left] === false ? errorColor : mutedBlueColor,
+                            }}
+                        >
+                            {digit}
+                        </Absolute>;
+                    })}
+                </Fragment>)}
+            </Fragment>;
+        })}
     </div>;
 };

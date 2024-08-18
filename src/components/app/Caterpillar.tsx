@@ -46,6 +46,8 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
     const [editingGrid, setEditingGrid] = useState<CaterpillarGrid>();
 
+    const [showDigits, setShowDigits] = useState(false);
+
     const [showHelp, setShowHelp] = useState(false);
 
     const myNickname = settings.nickname.get();
@@ -221,6 +223,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
                     setEditingGrid(grid);
                 }}
                 selectedGrids={selectedGrids}
+                showDigits={showDigits}
             />
         </Absolute>
 
@@ -309,6 +312,13 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
 
             <div>
                 <Button type={"button"} onClick={() => setShowHelp(true)}>Show help</Button>
+            </div>
+
+            <div>
+                <label>
+                    <input type={"checkbox"} checked={showDigits} onChange={(ev) => setShowDigits(ev.target.checked)} />
+                    <span> Show digits</span>
+                </label>
             </div>
         </Absolute>
 
