@@ -3,6 +3,7 @@ import {WindowSize} from "../../../hooks/useWindowSize";
 import {getRectsBoundingBox, Rect} from "../../../types/layout/Rect";
 import {safetyMargin} from "./globals";
 import {indexes} from "../../../utils/indexes";
+import {stringifyCellCoords} from "../../../types/layout/Position";
 
 const regionBorderWidth = 0.07;
 
@@ -59,6 +60,9 @@ export const parseSolutionStringIntoArray = (
         const [y, x] = translatePoint([Math.floor(index / gridWidth), index % gridWidth]);
 
         solutionArray[y] ??= [];
-        solutionArray[y][x] = solution[index];
+        solutionArray[y][x] ??= solution[index];
+        if (solutionArray[y][x] !== solution[index]) {
+            console.warn("Solution digit mismatch at " + stringifyCellCoords({top: y, left: x}));
+        }
     }
 };
