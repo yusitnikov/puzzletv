@@ -233,6 +233,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
             width={windowSize.width * Math.min(1, dataUsage)}
             height={10}
             style={{background: dataUsage < 1 ? lightOrangeColor : errorColor}}
+            title={"Data usage percent (don't let this line reach the right wall!)"}
         />
 
         <Absolute
