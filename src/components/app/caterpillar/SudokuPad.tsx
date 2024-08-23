@@ -5,6 +5,7 @@ import {Rect} from "../../../types/layout/Rect";
 import {puzzleIdToScl, sclToPuzzleId} from "../../../utils/sudokuPad";
 import {safetyMargin} from "./globals";
 import {serializeToLocalStorage, unserializeFromLocalStorage} from "../../../utils/localStorage";
+import {utf8ToBase64} from "../../../utils/encoding";
 
 interface SudokuPadProps {
     data: string;
@@ -136,7 +137,7 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, cache = fa
     // noinspection JSDeprecatedSymbols
     return <img
         {...imgProps}
-        src={`data:image/svg+xml;base64,${btoa(svgText)}`}
+        src={`data:image/svg+xml;base64,${utf8ToBase64(svgText)}`}
         alt={"Grid"}
         onError={() => setIsError(true)}
     />;
