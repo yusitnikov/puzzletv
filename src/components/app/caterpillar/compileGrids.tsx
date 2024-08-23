@@ -3,6 +3,8 @@ import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleId} from "../../../
 import {safetyMargin} from "./globals";
 import {indexes} from "../../../utils/indexes";
 import {parseSolutionStringIntoArray} from "./utils";
+import {Position} from "../../../types/layout/Position";
+import {getRegionBorders} from "../../../utils/regions";
 
 export const compileGrids = (grids: CaterpillarGrid[]) => {
     const result: Scl = {
@@ -59,7 +61,40 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
             parseSolutionStringIntoArray(solutionArray, solution, gridWidth, translatePoint);
         }
 
-        result.regions!.push(...regions.map((region) => region.map(translatePoint)));
+        if (regions.length) {
+            if (grid.size === 6) {
+                for (let i = 1; i < 6; i++) {
+                    result.lines!.push(
+                        {
+                            target: "cell-grids",
+                            wayPoints: [[0, i], [6, i]].map(translatePoint),
+                            color: "#000000",
+                            thickness: 0.5,
+                        } as any,
+                        {
+                            target: "cell-grids",
+                            wayPoints: [[i, 0], [i, 6]].map(translatePoint),
+                            color: "#000000",
+                            thickness: 0.5,
+                        } as any,
+                    );
+                }
+            } else {
+                console.warn("Grid size is not 6 for", data);
+            }
+
+            for (const gridCells of regions) {
+                const cells = gridCells.map(translatePoint).map(([y, x]): Position => ({top: y, left: x}));
+                const points = getRegionBorders(cells, 1, true).map(({top, left}) => [top, left]);
+                result.lines!.push({
+                    target: "cell-grids",
+                    wayPoints: points,
+                    color: "#000000",
+                    thickness: 3,
+                } as any);
+            }
+        }
+
         result.overlays!.push(...overlays.map((overlay) => ({
             ...overlay,
             center: translatePoint(overlay.center),
