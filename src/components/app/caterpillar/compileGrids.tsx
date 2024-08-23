@@ -10,7 +10,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
     const result: Scl = {
         id: "caterdokupillarpoc",
         cellSize: 50,
-        metadata: {} as any,
+        metadata: {caterpillarGrids: []} as any,
         settings: {},
         arrows: [],
         cages: [],
@@ -35,7 +35,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
         const data = normalizeSclMetadata(puzzleIdToScl(grid.data));
 
         const {
-            metadata: {solution} = {},
+            metadata: {solution, ...otherMetadata} = {},
             arrows = [],
             cages = [],
             lines = [],
@@ -115,6 +115,14 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
             ...cage,
             cells: cage.cells?.map(translatePoint),
         })));
+
+        (result.metadata as any).caterpillarGrids.push({
+            ...otherMetadata,
+            top: offsetTop,
+            left: offsetLeft,
+            width: grid.size,
+            height: grid.size,
+        });
     }
 
     for (const top of indexes(height)) {
