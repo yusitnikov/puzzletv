@@ -363,8 +363,6 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
                 <div>
                     Click the "add grid" button to add a new grid.<br/>
                     In the grid editor modal, copy-paste the puzzle data from SudokuPad (use the bookmarklet that you see in the modal).<br/>
-                    If the puzzle has outside clues, update the "outside rows/columns" fields according to the number of outsides lines from each side.<br/>
-                    When all dimensions are configured properly, the white square in the preview should match the sudoku grid.<br/>
                     The new grid will be inserted at the place of the last grid, and can be moved with arrow keys later.
                 </div>
 
