@@ -10,7 +10,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
     const result: Scl = {
         id: "caterdokupillarpoc",
         cellSize: 50,
-        metadata: {caterpillarGrids: []} as any,
+        metadata: {grids: []} as any,
         settings: {},
         arrows: [],
         cages: [],
@@ -116,7 +116,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
             cells: cage.cells?.map(translatePoint),
         })));
 
-        (result.metadata as any).caterpillarGrids.push({
+        (result.metadata as any).grids.push({
             ...otherMetadata,
             top: offsetTop,
             left: offsetLeft,
