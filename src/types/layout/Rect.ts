@@ -92,3 +92,10 @@ export const isPointInRect = ({top, left, width, height}: Rect, point: Position)
 
 export const isCellInRect = ({top, left, width, height}: Rect, point: Position) =>
     point.left >= left && point.left < left + width && point.top >= top && point.top < top + height;
+
+const areSegmentsIntersecting = (start1: number, end1: number, start2: number, end2: number) =>
+    end1 > start2 && end2 > start1;
+
+export const areRectsIntersecting = (rect1: Rect, rect2: Rect) =>
+    areSegmentsIntersecting(rect1.left, rect1.left + rect1.width, rect2.left, rect2.left + rect2.width) &&
+    areSegmentsIntersecting(rect1.top, rect1.top + rect1.height, rect2.top, rect2.top + rect2.height);

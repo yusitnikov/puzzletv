@@ -5,6 +5,61 @@ import {indexes} from "../../../utils/indexes";
 import {parseSolutionStringIntoArray} from "./utils";
 import {Position} from "../../../types/layout/Position";
 import {getRegionBorders} from "../../../utils/regions";
+import {areRectsIntersecting, Rect} from "../../../types/layout/Rect";
+
+interface LinkedListItem {
+    grid: CaterpillarGrid;
+    rect: Rect;
+    links: LinkedListItem[];
+}
+
+const sortGrids = (grids: CaterpillarGrid[]) => {
+    const linkedListItems = grids.map((grid): LinkedListItem => ({
+        grid,
+        rect: {
+            ...grid.offset,
+            width: grid.size ?? 6,
+            height: grid.size ?? 6,
+        },
+        links: [],
+    }));
+
+    for (const item1 of linkedListItems) {
+        for (const item2 of linkedListItems) {
+            if (item1 !== item2 && areRectsIntersecting(item1.rect, item2.rect)) {
+                item1.links.push(item2);
+            }
+        }
+    }
+
+    const ends: LinkedListItem[] = [];
+    for (const item of linkedListItems) {
+        if (item.links.length === 1) {
+            ends.push(item);
+        } else if (item.links.length !== 2) {
+            console.log("Item:", item);
+            throw new Error("Wrong number of grid neighbors");
+        }
+    }
+    if (ends.length !== 2) {
+        console.log("Ends:", ends);
+        throw new Error("Wrong number of caterpillar ends");
+    }
+
+    const head = ends.sort((a, b) => a.rect.left - b.rect.left)[0];
+
+    const sortedItems: LinkedListItem[] = [];
+    for (let item = head; item; item = item.links.filter(link => !sortedItems.includes(link))[0]) {
+        sortedItems.push(item);
+    }
+
+    if (sortedItems.length !== grids.length) {
+        console.log("Sorted items:", sortedItems);
+        throw new Error("Wrong number of sorted grids");
+    }
+
+    return sortedItems.map(item => item.grid);
+};
 
 export const compileGrids = (grids: CaterpillarGrid[]) => {
     const result: Scl = {
@@ -24,6 +79,8 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
     let width = 0, height = 0;
     const minLeft = Math.min(...grids.map((grid) => grid.offset.left)) - safetyMargin;
     const minTop = Math.min(...grids.map((grid) => grid.offset.top)) - safetyMargin;
+
+    grids = sortGrids(grids);
 
     const solutionArray: string[][] = [];
 
