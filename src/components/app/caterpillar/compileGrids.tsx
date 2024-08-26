@@ -191,8 +191,8 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
 
     result.metadata!.source = "PuzzleTV";
     result.metadata!.title = "Caterdokupillar POC";
-    result.metadata!.author = "A lot of people";
-    result.metadata!.rules = "Totally normal caterdokupillar rules apply.";
+    result.metadata!.author = "Much of the setting community";
+    result.metadata!.rules = "This is a Caterdokupillar, you start solving in the top left grid and once you finish each puzzle grid, you use the digits that connect it to the next grid to solve that one and repeat until they are all full.\nMost grids use standard 6x6 Sudoku rules, that is put the digits 1-6 into each row, column, and box. The rules for each grid will update as you click through them.";
 
     let solution = "";
     for (const top of indexes(height)) {
