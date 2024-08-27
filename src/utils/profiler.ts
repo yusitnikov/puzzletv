@@ -6,7 +6,7 @@ class Profiler {
     data: Record<string, ProfilerItem> = {};
 
     constructor() {
-        this.enabled = process.env.NODE_ENV === "development" && localStorage.disableProfiler !== 'true';
+        this.enabled = localStorage.enableProfiler === "true";
     }
 
     flush() {
@@ -69,15 +69,19 @@ class Profiler {
     }
 }
 
-const nativeConsoleLog = console.log.bind(console);
-console.log = function(...args) {
-    const message = args[0];
-    if (typeof message === "string" && message.startsWith("[mobx.trace] ")) {
-        console.debug(...args);
-    } else {
-        nativeConsoleLog(...args);
-    }
-};
+export const profiler = new Profiler();
+
+if (profiler.enabled) {
+    const nativeConsoleLog = console.log.bind(console);
+    console.log = function(...args) {
+        const message = args[0];
+        if (typeof message === "string" && message.startsWith("[mobx.trace] ")) {
+            console.debug(...args);
+        } else {
+            nativeConsoleLog(...args);
+        }
+    };
+}
 
 interface ProfilerItem {
     count: number;
@@ -96,5 +100,3 @@ class Timer {
         this.onStop(diff);
     }
 }
-
-export const profiler = new Profiler();
