@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {ReactNode} from "react";
+import {HTMLAttributes, ReactNode, useState} from "react";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
 import {useRoute} from "../../../hooks/useRoute";
@@ -16,31 +16,46 @@ export interface Tab {
     contents: ReactNode;
 }
 
-export interface TabsProps {
+export interface TabsProps extends HTMLAttributes<HTMLDivElement> {
     tabs: Tab[];
     urlParam?: string;
 }
 
-export const Tabs = observer(function Tabs({tabs, urlParam = "tab"}: TabsProps) {
+export const Tabs = observer(function Tabs({tabs, urlParam, style, ...divProps}: TabsProps) {
     profiler.trace();
 
     const {slug, params} = useRoute();
     const language = useLanguageCode();
-    const selectedTabId = params[urlParam];
+    const [selectedTabIdState, setSelectedTabIdState] = useState(tabs[0].id);
+    const selectedTabId = urlParam ? params[urlParam] : selectedTabIdState;
     const selectedTab = tabs.find(({id}) => id === selectedTabId);
 
-    return <div>
+    return <div
+        {...divProps}
+        style={{
+            ...style,
+            display: "flex",
+            flexDirection: "column",
+            gap: padding,
+        }}
+    >
         <StyledTabsWrapper>
             {tabs.map(({id, title}) => <StyledButton
                 key={id}
                 type={"button"}
                 isSelected={selectedTabId === id}
-                onClick={() => window.location.replace(buildLink(slug, language, {...params, [urlParam]: id}, true))}
+                onClick={() => {
+                    if (urlParam) {
+                        window.location.replace(buildLink(slug, language, {...params, [urlParam]: id}, true));
+                    } else {
+                        setSelectedTabIdState(id);
+                    }
+                }}
             >
                 {title}
             </StyledButton>)}
         </StyledTabsWrapper>
-        {selectedTab && <div style={{marginTop: padding}}>{selectedTab.contents}</div>}
+        {selectedTab && <div style={{flex: 1}}>{selectedTab.contents}</div>}
     </div>;
 });
 

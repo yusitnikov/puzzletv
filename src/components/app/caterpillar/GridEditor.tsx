@@ -1,11 +1,13 @@
 import {CaterpillarGrid} from "./types";
 import {observer} from "mobx-react-lite";
 import {useEffect, useMemo, useState} from "react";
-import {normalizeSclMetadata, puzzleIdToScl, sclToPuzzleId} from "../../../utils/sudokuPad";
+import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleId} from "../../../utils/sudokuPad";
 import {Modal} from "../../layout/modal/Modal";
 import {JsonEditor} from "../../layout/json-editor/JsonEditor";
 import {SudokuPadImage} from "./SudokuPad";
 import {Button} from "../../layout/button/Button";
+import {Tabs} from "../../layout/tabs/Tabs";
+import {useThrottleData} from "../../../hooks/useThrottle";
 
 interface GridEditorProps {
     grid: CaterpillarGrid;
@@ -26,9 +28,18 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
     }, [data]);
 
     const [editedParsedGrid, setEditedParsedGrid] = useState(parsedGrid);
+    const [editedParsedGridVersion, setEditedParsedGridVersion] = useState(0);
     useEffect(() => {
         setEditedParsedGrid(parsedGrid);
+        setEditedParsedGridVersion(prev => prev + 1);
     }, [parsedGrid]);
+    const mergeEditedParsedMetadata = (data: Partial<Scl["metadata"]>) => setEditedParsedGrid((prev) => ({
+        ...prev!,
+        metadata: {
+            ...prev!.metadata!,
+            ...data,
+        },
+    }));
 
     const editedData = editedParsedGrid ? sclToPuzzleId(editedParsedGrid) : data;
 
@@ -42,6 +53,8 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
         size: parsedGridHeight,
     };
     const submit = () => onSubmit(newGrid);
+
+    const throttledEditedData = useThrottleData(500, editedData);
 
     return <Modal
         cellSize={cellSize * 2}
@@ -72,23 +85,77 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
 
         {!editedParsedGrid && <div>Error: failed to parse the grid data.</div>}
         {editedParsedGrid && !isGridOk && <div>Error: the grid should be a square.</div>}
-        {editedParsedGrid && <div style={{marginTop: 16, display: "flex", flexDirection: "row"}}>
-            <JsonEditor
-                key={data}
+        {editedParsedGrid && <div style={{marginTop: 16, display: "flex", flexDirection: "row", gap: "1em"}}>
+            <Tabs
                 style={{
                     width: cellSize * 12,
                     height: cellSize * 12,
                 }}
-                value={editedParsedGrid}
-                onChange={setEditedParsedGrid}
+                tabs={[
+                    {
+                        id: "metadata",
+                        title: "Puzzle metadata",
+                        contents: <div style={{
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            textAlign: "left",
+                            gap: "0.5em",
+                        }}>
+                            <input
+                                type={"text"}
+                                placeholder={"Title"}
+                                value={editedParsedGrid.metadata?.title ?? ""}
+                                onChange={(ev) => mergeEditedParsedMetadata({title: ev.currentTarget.value})}
+                                style={{font: "inherit"}}
+                            />
+                            <input
+                                type={"text"}
+                                placeholder={"Author"}
+                                value={editedParsedGrid.metadata?.author ?? ""}
+                                onChange={(ev) => mergeEditedParsedMetadata({author: ev.currentTarget.value})}
+                                style={{font: "inherit"}}
+                            />
+                            <textarea
+                                placeholder={"Rules"}
+                                value={editedParsedGrid.metadata?.rules ?? ""}
+                                onChange={(ev) => mergeEditedParsedMetadata({rules: ev.currentTarget.value})}
+                                style={{flex: 1, resize: "none", font: "inherit"}}
+                            />
+                            <input
+                                type={"text"}
+                                placeholder={"Solution"}
+                                value={editedParsedGrid.metadata?.solution ?? ""}
+                                onChange={(ev) => mergeEditedParsedMetadata({solution: ev.currentTarget.value})}
+                                style={{font: "inherit"}}
+                            />
+                        </div>,
+                    },
+                    {
+                        id: "json-editor",
+                        title: "JSON editor",
+                        contents: <JsonEditor
+                            key={editedParsedGridVersion}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                            }}
+                            value={editedParsedGrid}
+                            onChange={setEditedParsedGrid}
+                        />,
+                    },
+                ]}
             />
-            {isGridOk && <SudokuPadImage
-                data={editedData}
-                style={{
-                    width: cellSize * 12,
-                    height: cellSize * 12,
-                }}
-            />}
+            {isGridOk && <div style={{
+                position: "relative",
+                width: cellSize * 12,
+                height: cellSize * 12,
+            }}>
+                <SudokuPadImage
+                    data={throttledEditedData}
+                    style={{width: "100%", height: "100%"}}
+                />
+            </div>}
         </div>}
 
         <div style={{display: "flex", gap: 16, justifyContent: "center", marginTop: 16}}>
