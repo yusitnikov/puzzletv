@@ -435,7 +435,12 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const grids = chunks.flatMap(chunk => useGrids(chunk)[0] ?? []);
 
-    const sortedGrids = sortGrids(grids);
+    let sortedGrids = grids;
+    try {
+        sortedGrids = sortGrids(grids);
+    } catch (e: unknown) {
+        console.error(e);
+    }
 
     const windowSize = useWindowSize(false);
 

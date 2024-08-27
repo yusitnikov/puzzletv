@@ -80,8 +80,6 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
     const minLeft = Math.min(...grids.map((grid) => grid.offset.left)) - safetyMargin;
     const minTop = Math.min(...grids.map((grid) => grid.offset.top)) - safetyMargin;
 
-    grids = sortGrids(grids);
-
     const solutionArray: string[][] = [];
 
     for (const [index, grid] of grids.entries()) {
