@@ -20,13 +20,8 @@ export const getGridRect = ({offset, size = 6}: CaterpillarGrid): Rect => {
     };
 };
 
-export const getDimensions = (grids: CaterpillarGrid[], windowSize: WindowSize, readOnly: boolean) => {
-    const padding = readOnly ? 1 : 6;
-    const boundingRect = {...getRectsBoundingBox(...grids.map(getGridRect))};
-    boundingRect.top -= padding;
-    boundingRect.left -= padding;
-    boundingRect.width += padding * 2;
-    boundingRect.height += padding * 2;
+export const getDimensions = (grids: CaterpillarGrid[], windowSize: WindowSize) => {
+    const boundingRect = getRectsBoundingBox(...grids.map(getGridRect));
 
     const coeff = Math.min(windowSize.width / boundingRect.width, windowSize.height / boundingRect.height);
 

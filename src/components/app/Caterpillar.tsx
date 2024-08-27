@@ -68,7 +68,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
     const showAnyModal = showHelp || showNicknameModal || !!otherEditor;
 
     const windowSize = useWindowSize();
-    const {coeff} = getDimensions(viewGrids, windowSize, false);
+    const {coeff} = getDimensions(viewGrids, windowSize);
 
     const submit = () => {
         if (hasUnsubmittedChanges) {
@@ -262,6 +262,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
                 style={{
                     pointerEvents: "all",
                     cursor: "pointer",
+                    background: "#fff8",
                 }}
                 onClick={() => setShowNicknameModal(true)}
             >

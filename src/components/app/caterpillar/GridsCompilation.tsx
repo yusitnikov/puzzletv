@@ -29,7 +29,7 @@ export const GridsCompilation = (
         showDigits,
     }: GridsCompilationProps
 ) => {
-    const {coeff, transformRect} = getDimensions(grids, windowSize, readOnly);
+    const {coeff, transformRect} = getDimensions(grids, windowSize);
 
     const parsedGrids = useMemo(() => grids.map((grid) => {
         try {
