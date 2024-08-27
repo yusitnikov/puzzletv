@@ -16,10 +16,11 @@ import {SettingsTextBox} from "../sudoku/controls/settings/SettingsTextBox";
 import {SettingsItem} from "../sudoku/controls/settings/SettingsItem";
 import {Edit} from "@emotion-icons/material";
 import {CaterpillarGrid} from "./caterpillar/types";
-import {getDimensions} from "./caterpillar/utils";
+import {getDimensions, parseSolutionString} from "./caterpillar/utils";
 import {GridEditor} from "./caterpillar/GridEditor";
-import {compileGrids} from "./caterpillar/compileGrids";
+import {compileGrids, sortGrids} from "./caterpillar/compileGrids";
 import {GridsCompilation} from "./caterpillar/GridsCompilation";
+import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleUrl} from "../../utils/sudokuPad";
 
 interface PresenceData {
     nickname: string;
@@ -434,19 +435,76 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const grids = chunks.flatMap(chunk => useGrids(chunk)[0] ?? []);
 
+    const sortedGrids = sortGrids(grids);
+
     const windowSize = useWindowSize(false);
 
-    return <Absolute {...windowSize}>
-        <GridsCompilation grids={grids} windowSize={windowSize} readOnly={true}/>
+    let compiledGrids: Scl | undefined = undefined;
+    try {
+        compiledGrids = compileGrids(sortedGrids);
+    } catch (e: unknown) {
+        console.error(e);
+    }
 
-        {settings.nickname.get() === "Chameleon" && <div style={{
+    const gridsMetadata = sortedGrids.map((grid, index) => {
+        const parsedGrid = normalizeSclMetadata(puzzleIdToScl(grid.data));
+        const {
+            title = "Untitled",
+            author = "Unknown",
+            rules = "Undefined",
+            solution: solutionStr,
+        } = parsedGrid.metadata ?? {};
+
+        const result = {title, author, rules};
+
+        const next = sortedGrids[index + 1];
+        if (!next) {
+            return result;
+        }
+
+        const left = Math.max(0, next.offset.left - grid.offset.left);
+        const top = Math.max(0, next.offset.top - grid.offset.top);
+
+        if (!solutionStr) {
+            return result;
+        }
+        const solution = parseSolutionString(solutionStr, grid.size ?? 6);
+
+        return {
+            ...result,
+            digits: `${solution[top]?.[left]}${solution[top]?.[left + 1]}${solution[top + 1]?.[left]}${solution[top + 1]?.[left + 1]}`,
+        };
+    });
+
+    return <Absolute {...windowSize}>
+        <GridsCompilation grids={sortedGrids} windowSize={windowSize} readOnly={true}/>
+
+        {!!settings.nickname.get() && compiledGrids && <div style={{
             position: "absolute",
             left: 0,
             bottom: 0,
             padding: "1em",
+            display: "flex",
+            gap: "0.5em",
             pointerEvents: "all",
         }}>
-            <Button onClick={() => navigator.clipboard.writeText(compileGrids(grids)).then(() => alert("Copied!"))}>Copy SCL</Button>
+            <Button onClick={() => navigator.clipboard.writeText(sclToPuzzleUrl(compiledGrids!)).then(() => alert("Copied!"))}>Copy SCL</Button>
+
+            <Button
+                component={"a"}
+                href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(compiledGrids, null, 2))}
+                download={"caterpillar-puzzle.json"}
+            >
+                Download puzzle JSON
+            </Button>
+
+            <Button
+                component={"a"}
+                href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gridsMetadata, null, 2))}
+                download={"caterpillar-grids.json"}
+            >
+                Download grids metadata
+            </Button>
         </div>}
     </Absolute>;
 });

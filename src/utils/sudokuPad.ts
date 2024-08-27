@@ -152,6 +152,8 @@ export const puzzleIdToScl = (puzzleId: string) => {
 
 export const sclToPuzzleId = (data: Scl) => `scl${loadFPuzzle.compressPuzzle(PuzzleZipper.zip(JSON.stringify(data)))}`;
 
+export const sclToPuzzleUrl = (data: Scl) => "https://sudokupad.app/" + sclToPuzzleId(data);
+
 export const normalizeSclMetadata = (
     {
         cages = [],

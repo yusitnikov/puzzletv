@@ -1,5 +1,5 @@
 import {CaterpillarGrid} from "./types";
-import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleId} from "../../../utils/sudokuPad";
+import {normalizeSclMetadata, puzzleIdToScl, Scl} from "../../../utils/sudokuPad";
 import {safetyMargin} from "./globals";
 import {indexes} from "../../../utils/indexes";
 import {parseSolutionStringIntoArray} from "./utils";
@@ -13,7 +13,7 @@ interface LinkedListItem {
     links: LinkedListItem[];
 }
 
-const sortGrids = (grids: CaterpillarGrid[]) => {
+export const sortGrids = (grids: CaterpillarGrid[]) => {
     const linkedListItems = grids.map((grid): LinkedListItem => ({
         grid,
         rect: {
@@ -205,5 +205,5 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
 
     console.log(result);
 
-    return "https://sudokupad.app/" + sclToPuzzleId(result);
+    return result;
 };
