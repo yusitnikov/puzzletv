@@ -25,3 +25,21 @@ export const processTranslations = <T = string>(processor: (...items: T[]) => T,
                 processor(...items.map(item => translate(item, language)))
             ])
     ) as TranslationItem<T>;
+
+export const getRussianPluralForm = <T>(
+    count: number,
+    oneTranslation: T,
+    twoThreeFourTranslation: T,
+    otherTranslation: T,
+) => {
+    const ones = count % 10;
+    const tens = Math.floor(count / 10) % 10;
+
+    return tens === 1
+        ? otherTranslation
+        : ones === 1
+            ? oneTranslation
+            : [2, 3, 4].includes(ones)
+                ? twoThreeFourTranslation
+                : otherTranslation;
+};

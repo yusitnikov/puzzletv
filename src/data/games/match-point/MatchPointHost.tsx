@@ -33,7 +33,5 @@ export const MatchPointHost = observer(function MatchPointHost() {
         case MatchPointGameState.Answer: return <MatchPointHostGatherAnswers controller={controller}/>;
         case MatchPointGameState.Match: return <MatchPointHostPlay controller={controller}/>;
     }
-
-    return <div>It works!</div>;
 });
 

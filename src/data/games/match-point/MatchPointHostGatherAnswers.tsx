@@ -11,11 +11,17 @@ import {Button} from "../../../components/layout/button/Button";
 import {Check} from "@emotion-icons/material";
 import {Copy} from "@emotion-icons/boxicons-regular";
 import {QRCodeSVG} from "qrcode.react";
+import {useLanguageCode, useTranslate} from "../../../hooks/useTranslate";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
+import {getRussianPluralForm} from "../../../utils/translate";
 
 export const MatchPointHostGatherAnswers = observer(function MatchPointHostGatherAnswers({controller}: MatchPointGameControllerProps) {
+    const languageCode = useLanguageCode();
+    const translate = useTranslate();
+
     const [copy, copied] = useCopyToClipboard();
 
-    const {link} = controller;
+    const link = controller.getLink(languageCode, controller.gameId);
 
     const [playerMessages] = useAblyChannelPresence(
         ablyOptions,
@@ -25,13 +31,13 @@ export const MatchPointHostGatherAnswers = observer(function MatchPointHostGathe
 
     return <ResponsiveGrid>
         <div style={{gridArea: "link"}}>
-            <SubHeader>Link to the game:</SubHeader>
+            <SubHeader>{translate("Share the link to the game")}:</SubHeader>
 
             <div>
                 <a href={link} target={"_blank"} style={{wordBreak: "break-word"}}>{link}</a>
 
                 <Button onClick={() => copy(link)} style={{marginLeft: "0.5em"}}>
-                    Copy&nbsp;{copied ? <Check size={"1em"}/> : <Copy size={"1em"}/>}
+                    {translate("Copy")}&nbsp;{copied ? <Check size={"1em"}/> : <Copy size={"1em"}/>}
                 </Button>
             </div>
         </div>
@@ -41,7 +47,7 @@ export const MatchPointHostGatherAnswers = observer(function MatchPointHostGathe
         </div>
 
         <div style={{gridArea: "questions"}}>
-            <SubHeader>Questions:</SubHeader>
+            <SubHeader>{translate("Questions")}:</SubHeader>
 
             {controller.questionsForGame.map((question, index) => <div
                 key={index}
@@ -57,10 +63,14 @@ export const MatchPointHostGatherAnswers = observer(function MatchPointHostGathe
                 disabled={players.length < 2}
                 style={{marginRight: "1em"}}
             >
-                Play
+                {translate("Play")}
             </LargeButton>
 
-            {players.length} {players.length === 1 ? "player" : "players"} submitted answers
+            {players.length} {translate({
+                [LanguageCode.en]: `${players.length === 1 ? "player" : "players"} submitted answers`,
+                [LanguageCode.ru]: `${getRussianPluralForm(players.length, "игрок прислал", "игрока прислали", "игроков прислали")} ответы`,
+                [LanguageCode.de]: `Spieler ${players.length === 1 ? "hat" : "haben"} Antworten eingereicht`,
+            })}
         </div>
     </ResponsiveGrid>;
 });

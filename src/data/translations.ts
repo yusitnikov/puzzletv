@@ -71,6 +71,42 @@ export const translationsExactType = {
         [LanguageCode.ru]: "уменьшить",
         [LanguageCode.de]: "verkleinern",
     },
+    "Create new game": {
+        [LanguageCode.ru]: "Создать новую игру",
+        [LanguageCode.de]: "Neues Spiel erstellen",
+    },
+    "It's %1": {
+        [LanguageCode.ru]: "Это %1",
+        [LanguageCode.de]: "Das ist %1",
+    },
+    "Skip": {
+        [LanguageCode.ru]: "Пропустить",
+        [LanguageCode.de]: "Überspringen",
+    },
+    "Next": {
+        [LanguageCode.ru]: "Следующий",
+        [LanguageCode.de]: "Nächste",
+    },
+    "Questions": {
+        [LanguageCode.ru]: "Вопросы",
+        [LanguageCode.de]: "Fragen",
+    },
+    "Your name": {
+        [LanguageCode.ru]: "Ваше имя",
+        [LanguageCode.de]: "Ihr Name",
+    },
+    "What's your name?": {
+        [LanguageCode.ru]: "Как Вас зовут?",
+        [LanguageCode.de]: "Wie heißen Sie?",
+    },
+    "Hosted by %1": {
+        [LanguageCode.ru]: "Ведущий: %1",
+        [LanguageCode.de]: "Moderiert von %1",
+    },
+    "Submit": {
+        [LanguageCode.ru]: "Отправить",
+        [LanguageCode.de]: "Einreichen",
+    },
     // endregion
     // region App
     "Welcome to Puzzle TV!": {
@@ -142,7 +178,7 @@ export const translationsExactType = {
         [LanguageCode.de]: "Bitte lassen Sie nur einen aktiven Tab",
     },
     "The host of the game is not connected": {
-        [LanguageCode.ru]: "Хост не подключен",
+        [LanguageCode.ru]: "Ведущий не подключен",
         [LanguageCode.de]: "Der Host des Spiels ist nicht verbunden",
     },
     "Please wait for them to join": {
@@ -361,6 +397,10 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Подсвечивать клетки, видимые выделенными клетками",
         [LanguageCode.de]: "Markieren Sie die durch Auswahl sichtbaren Zellen",
     },
+    "Link to the game": {
+        [LanguageCode.ru]: "Ссылка на игру",
+        [LanguageCode.de]: "Link zum Spiel",
+    },
     "Share the link to the game": {
         [LanguageCode.ru]: "Поделиться ссылкой на эту игру",
         [LanguageCode.de]: "Teilen Sie den Link zum Spiel",
@@ -388,7 +428,7 @@ export const translationsExactType = {
     // endregion
     // region useMultiPlayer
     "host": {
-        [LanguageCode.ru]: "хост",
+        [LanguageCode.ru]: "ведущий",
         [LanguageCode.de]: "Host",
     },
     "guest": {

@@ -7,6 +7,8 @@ import {MatchPointGameState, MatchPointHostInfo, MatchPointPlayerInfo} from "./t
 import {LargeButton, Paragraph, SubHeader} from "./styled";
 import {settings} from "../../../types/layout/Settings";
 import {MatchPointPlayStep} from "./MatchPointPlayStep";
+import {useTranslate} from "../../../hooks/useTranslate";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 interface MatchPointPlayerProps {
     host: string;
@@ -15,6 +17,8 @@ interface MatchPointPlayerProps {
 
 const emptyObject = {};
 export const MatchPointPlayer = observer(function MatchPointPlayer({host, gameId}: MatchPointPlayerProps) {
+    const translate = useTranslate();
+
     const [hostInfoMessages, hostInfoLoaded] = useAblyChannelPresence(ablyOptions, getMatchPointHostChannelName(gameId));
 
     const [answers, setAnswers] = useState<string[]>([]);
@@ -32,21 +36,21 @@ export const MatchPointPlayer = observer(function MatchPointPlayer({host, gameId
     );
 
     if (!hostInfoLoaded) {
-        return <div>Loading...</div>;
+        return <div>{translate("Loading")}...</div>;
     }
 
     if (!hostInfo) {
-        return <div>The game host disconnected.</div>;
+        return <div>{translate("The host of the game is not connected")}.</div>;
     }
 
     const {name: hostName, state, questions} = hostInfo;
 
     return <div>
-        <Paragraph>Hosted by {hostName}</Paragraph>
+        <Paragraph>{translate("Hosted by %1").replace("%1", hostName)}</Paragraph>
 
         {state === MatchPointGameState.Answer && <div>
             <Paragraph>
-                <SubHeader>What's your name?</SubHeader>
+                <SubHeader>{translate("What's your name?")}</SubHeader>
 
                 <input
                     type={"text"}
@@ -87,14 +91,26 @@ export const MatchPointPlayer = observer(function MatchPointPlayer({host, gameId
                         (answers === submittedAnswers?.answers && name === submittedAnswers?.name)
                     }
                 >
-                    {submittedAnswers ? "Update submission" : "Submit"}
+                    {
+                        submittedAnswers
+                            ? translate({
+                                [LanguageCode.en]: "Update submission",
+                                [LanguageCode.ru]: "Обновить данные",
+                                [LanguageCode.de]: "Einreichung aktualisieren",
+                            })
+                            : translate("Submit")
+                    }
                 </LargeButton>
 
                 {submittedAnswers && <LargeButton
                     onClick={() => setSubmittedAnswers(undefined)}
                     style={{marginLeft: "0.5em"}}
                 >
-                    Cancel my submission
+                    {translate({
+                        [LanguageCode.en]: "Cancel my submission",
+                        [LanguageCode.ru]: "Отменить мою отправку",
+                        [LanguageCode.de]: "Meine Einreichung abbrechen",
+                    })}
                 </LargeButton>}
             </Paragraph>
         </div>}

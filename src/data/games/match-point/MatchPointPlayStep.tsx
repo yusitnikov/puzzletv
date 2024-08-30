@@ -2,6 +2,8 @@ import {MatchPointHostInfo} from "./types";
 import {observer} from "mobx-react-lite";
 import {LargeButton, Paragraph, SubHeader} from "./styled";
 import {useState} from "react";
+import {useTranslate} from "../../../hooks/useTranslate";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 interface MatchPointPlayStepProps extends Omit<MatchPointHostInfo, "name" | "state"> {
     onSelect?: (playerIndex?: number) => void;
@@ -10,6 +12,8 @@ interface MatchPointPlayStepProps extends Omit<MatchPointHostInfo, "name" | "sta
 export const MatchPointPlayStep = observer(function MatchPointPlayStep(
     {questions, answers, currentAnswerIndex, isShowingResults, onSelect}: MatchPointPlayStepProps
 ) {
+    const translate = useTranslate();
+
     const [playerIndexes, setPlayerIndexes] = useState<(number | undefined)[]>([]);
     const setPlayerIndex = (playerIndex?: number) => {
         const newIndexes = [...playerIndexes];
@@ -39,11 +43,15 @@ export const MatchPointPlayStep = observer(function MatchPointPlayStep(
         <Paragraph>
             <SubHeader>
                 {isShowingResults && <>
-                    {playerIndex === currentAnswerIndex && "Yes! "}
-                    {playerIndex !== currentAnswerIndex && playerIndex !== undefined && "No! "}
-                    It's {playerAnswer.name}!
+                    {playerIndex === currentAnswerIndex && `${translate("Yes")}! `}
+                    {playerIndex !== currentAnswerIndex && playerIndex !== undefined && `${translate("No")}! `}
+                    {translate("It's %1").replace("%1", playerAnswer.name)}!
                 </>}
-                {!isShowingResults && "Who would it be?"}
+                {!isShowingResults && translate({
+                    [LanguageCode.en]: "Who would it be?",
+                    [LanguageCode.ru]: "Кто бы это мог быть?",
+                    [LanguageCode.de]: "Wer wäre es?",
+                })}
             </SubHeader>
         </Paragraph>
 
@@ -62,7 +70,7 @@ export const MatchPointPlayStep = observer(function MatchPointPlayStep(
                     checked={selectedPlayer && playerIndex === undefined}
                     onClick={() => setPlayerIndex(undefined)}
                 >
-                    Skip
+                    {translate("Skip")}
                 </LargeButton>
             </div>
         </Paragraph>}

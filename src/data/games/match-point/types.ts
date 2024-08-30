@@ -63,15 +63,12 @@ export class MatchPointGameController {
         this.setQuestions(newQuestions);
     }
 
-    private getLink(gameId?: string) {
-        return buildLink("match-point", LanguageCode.en, {host: myClientId, game: gameId}, true);
+    getLink(languageCode: LanguageCode, gameId?: string) {
+        return buildLink("match-point", languageCode, {host: myClientId, game: gameId}, true);
     }
 
-    get linkPrefix() {
-        return this.getLink();
-    }
     get link() {
-        return this.getLink(this.gameId);
+        return this.getLink(LanguageCode.en, this.gameId);
     }
 
     startAnswering() {

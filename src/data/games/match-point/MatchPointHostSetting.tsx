@@ -3,11 +3,16 @@ import {MatchPointGameControllerProps} from "./types";
 import {DeleteButton, LargeButton, LinkText, Paragraph, SubHeader} from "./styled";
 import {darkGreyColor} from "../../../components/app/globals";
 import {settings} from "../../../types/layout/Settings";
+import {useLanguageCode, useTranslate} from "../../../hooks/useTranslate";
+import {LanguageCode} from "../../../types/translations/LanguageCode";
 
 export const MatchPointHostSetting = observer(function MatchPointHostSetting({controller}: MatchPointGameControllerProps) {
+    const languageCode = useLanguageCode();
+    const translate = useTranslate();
+
     return <div>
         <Paragraph>
-            <SubHeader>Link to the game:</SubHeader>
+            <SubHeader>{translate("Link to the game")}:</SubHeader>
 
             <div style={{
                 display: "flex",
@@ -21,12 +26,11 @@ export const MatchPointHostSetting = observer(function MatchPointHostSetting({co
                     // Ellipsis will get this color, everything else is styled
                     color: darkGreyColor,
                 }}>
-                    <LinkText>{controller.linkPrefix}</LinkText>
+                    <LinkText>{controller.getLink(languageCode)}</LinkText>
                 </span>
                 <LinkText>:game=</LinkText>
                 <input
                     type={"text"}
-                    placeholder={"Game handle"}
                     value={controller.gameId}
                     onInput={(ev) => controller.setGameId(ev.currentTarget.value)}
                     autoFocus={true}
@@ -36,7 +40,7 @@ export const MatchPointHostSetting = observer(function MatchPointHostSetting({co
         </Paragraph>
 
         <Paragraph>
-            <SubHeader>Questions:</SubHeader>
+            <SubHeader>{translate("Questions")}:</SubHeader>
             {controller.questionsForEditing.map((question, index) => <div
                 key={index}
                 style={{marginTop: "0.25em", display: "flex", alignItems: "center", gap: "0.5em"}}
@@ -68,7 +72,7 @@ export const MatchPointHostSetting = observer(function MatchPointHostSetting({co
         </Paragraph>
 
         <Paragraph>
-            <SubHeader>Your name:</SubHeader>
+            <SubHeader>{translate("Your name")}:</SubHeader>
             <div>
                 <input
                     type={"text"}
@@ -84,7 +88,11 @@ export const MatchPointHostSetting = observer(function MatchPointHostSetting({co
                 onClick={() => controller.startAnswering()}
                 disabled={settings.nickname.get().trim() === "" || controller.questionsForGame.length === 0}
             >
-                Gather answers
+                {translate({
+                    [LanguageCode.en]: "Gather answers",
+                    [LanguageCode.ru]: "Собрать ответы",
+                    [LanguageCode.de]: "Antworten sammeln",
+                })}
             </LargeButton>
         </Paragraph>
     </div>;
