@@ -7,6 +7,7 @@ import {GamesListItem} from "./GamesListItem";
 import {OpenInNew} from "@emotion-icons/material";
 import {profiler} from "../../utils/profiler";
 import {observer} from "mobx-react-lite";
+import {MatchPointExplanation} from "../../data/games/match-point/MatchPointExplanation";
 
 export const GamesList = observer(function GamesList() {
     profiler.trace();
@@ -15,6 +16,17 @@ export const GamesList = observer(function GamesList() {
     const translate = useTranslate();
 
     return <>
+        <GamesListItem
+            name={"Match Point!"}
+            imageUrl={"/images/MatchPoint.png"}
+            imageSize={{width: 300, height: 258}}
+            imageBorder={true}
+            author={translate(Chameleon)}
+            playLink={<a href={buildLink("match-point", language)}>Match Point!</a>}
+        >
+            <MatchPointExplanation/>
+        </GamesListItem>
+
         <GamesListItem
             name={"Quad Masters"}
             imageUrl={"/images/QuadMasters.png"}

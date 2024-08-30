@@ -2,17 +2,20 @@ import {ReactNode} from "react";
 import {useTranslate} from "../../hooks/useTranslate";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
+import {Size} from "../../types/layout/Size";
+import {textColor} from "./globals";
 
 export interface GamesListItemProps {
     name: string;
     imageUrl: string;
-    imageSize?: number;
+    imageSize?: number | Size;
+    imageBorder?: boolean;
     author?: string;
     playLink: ReactNode;
     children: ReactNode;
 }
 
-export const GamesListItem = observer(function GamesListItem({name, imageUrl, imageSize = 300, author, playLink, children}: GamesListItemProps) {
+export const GamesListItem = observer(function GamesListItem({name, imageUrl, imageSize = 300, imageBorder, author, playLink, children}: GamesListItemProps) {
     profiler.trace();
 
     const translate = useTranslate();
@@ -26,8 +29,9 @@ export const GamesListItem = observer(function GamesListItem({name, imageUrl, im
             style={{
                 display: "inline-block",
                 verticalAlign: "top",
-                width: imageSize,
-                height: imageSize,
+                width: typeof imageSize === "number" ? imageSize : imageSize.width,
+                height: typeof imageSize === "number" ? imageSize : imageSize.height,
+                border: imageBorder ? `1px ${textColor} solid` : "none",
                 marginRight: "1em",
                 marginBottom: "0.5em",
             }}
