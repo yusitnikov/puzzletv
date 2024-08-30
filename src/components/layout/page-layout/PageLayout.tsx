@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import React, {FC, ReactNode} from "react";
+import React, {CSSProperties, FC, ReactNode} from "react";
 import {headerHeight, headerPadding, lightGreyColor, textColor} from "../../app/globals";
 import {useLanguageCode, useTranslate} from "../../../hooks/useTranslate";
 import {buildLink} from "../../../utils/link";
@@ -18,11 +18,12 @@ export interface PageLayoutProps {
     title?: ReactNode;
     hideTitleHeader?: boolean;
     addTitleSuffix?: boolean;
+    textAlign?: CSSProperties["textAlign"];
     children: ReactNode;
 }
 
 export const PageLayout = observer(function PageLayout(
-    {addPadding = true, scrollable, title, hideTitleHeader, addTitleSuffix = true, children}: PageLayoutProps
+    {addPadding = true, scrollable, title, hideTitleHeader, addTitleSuffix = true, textAlign, children}: PageLayoutProps
 ) {
     profiler.trace();
 
@@ -61,7 +62,7 @@ export const PageLayout = observer(function PageLayout(
         },
     ];
 
-    return <StyledPageContainer>
+    return <StyledPageContainer textAlign={textAlign}>
         {title && <Title>{title}{addTitleSuffix && " – Puzzle TV"}</Title>}
 
         <StyledHeaderContainer>
@@ -123,12 +124,13 @@ export const PageTitle: FC = observer(function PageTitle({children}) {
 });
 
 
-const StyledPageContainer = styled("div")`
+const StyledPageContainer = styled("div")<{textAlign?: CSSProperties["textAlign"]}>`
   position: absolute;
   inset: 0;
   overflow: hidden;
   color: ${textColor};
   font-family: Lato, sans-serif;
+  text-align: ${({textAlign}) => textAlign};
 `;
 
 const StyledHeaderContainer = styled("div")({

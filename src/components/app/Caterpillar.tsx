@@ -21,6 +21,7 @@ import {GridEditor} from "./caterpillar/GridEditor";
 import {compileGrids, sortGrids} from "./caterpillar/compileGrids";
 import {GridsCompilation} from "./caterpillar/GridsCompilation";
 import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleUrl} from "../../utils/sudokuPad";
+import {copyToClipboard} from "../../utils/clipboard";
 
 interface PresenceData {
     nickname: string;
@@ -494,7 +495,7 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
             gap: "0.5em",
             pointerEvents: "all",
         }}>
-            <Button onClick={() => navigator.clipboard.writeText(sclToPuzzleUrl(compiledGrids!)).then(() => alert("Copied!"))}>Copy SCL</Button>
+            <Button onClick={() => copyToClipboard(sclToPuzzleUrl(compiledGrids!)).then(() => alert("Copied!"))}>Copy SCL</Button>
 
             <Button
                 component={"a"}

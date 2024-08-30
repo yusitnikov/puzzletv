@@ -20,6 +20,8 @@ import {LanguageCode} from "../../types/translations/LanguageCode";
 import {CaterpillarEditor, CaterpillarConsumer} from "./Caterpillar";
 import {SyncedLabel} from "./SyncedLabel";
 import {PuzzleImportSource} from "../../types/sudoku/PuzzleImportOptions";
+import {MatchPointHost} from "../../data/games/match-point/MatchPointHost";
+import {MatchPointPlayer} from "../../data/games/match-point/MatchPointPlayer";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -74,6 +76,14 @@ export const App = observer(({onPageLoaded}: AppProps) => {
                 title={translate("Games")}
             >
                 <GamesList/>
+            </PageLayout>;
+        case "match-point":
+            return <PageLayout
+                scrollable={true}
+                textAlign={"center"}
+                title={"Match Point!"}
+            >
+                {params.host ? <MatchPointPlayer host={params.host} gameId={params.game}/> : <MatchPointHost/>}
             </PageLayout>;
         case "for-setters":
             return <PageLayout

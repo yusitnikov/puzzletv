@@ -29,7 +29,9 @@ class SingletonManager<T> {
 const map: Record<string, SingletonManager<any>> = {};
 (window as any).map = map;
 
-export const useSingleton = <T>(key: string, creator: () => T, destructor?: (object: T) => void, enabled = true): T | undefined => {
+export function useSingleton<T>(key: string, creator: () => T, destructor?: (object: T) => void): T;
+export function useSingleton<T>(key: string, creator: () => T, destructor: ((object: T) => void) | undefined, enabled: boolean): T | undefined;
+export function useSingleton<T>(key: string, creator: () => T, destructor?: (object: T) => void, enabled = true): T | undefined {
     map[key] = map[key] || new SingletonManager(creator, destructor);
     const manager = map[key];
 

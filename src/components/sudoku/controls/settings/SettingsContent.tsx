@@ -19,6 +19,7 @@ import {AnimationSpeed} from "../../../../types/sudoku/AnimationSpeed";
 import {observer} from "mobx-react-lite";
 import {settings} from "../../../../types/layout/Settings";
 import {profiler} from "../../../../utils/profiler";
+import {useCopyToClipboard} from "../../../../hooks/useCopyToClipboard";
 
 // Temporarily disable collective solve while it's buggy
 const disableNetwork = true;
@@ -57,7 +58,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
 
     const textSize = cellSize * textHeightCoeff;
 
-    const [isCopied, setIsCopied] = useState(false);
+    const [copy, isCopied] = useCopyToClipboard();
 
     const fullUrl = window.location.href;
     const [shortenedUrl, setShortenedUrl] = useState(fullUrl);
@@ -136,11 +137,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                     <SettingsButton
                         type={"button"}
                         cellSize={cellSize}
-                        onClick={async () => {
-                            await window.navigator.clipboard.writeText(shortenedUrl);
-                            setIsCopied(true);
-                            window.setTimeout(() => setIsCopied(false), 1000);
-                        }}
+                        onClick={() => copy(shortenedUrl)}
                     >
                         {translate("Copy")}
                     </SettingsButton>
