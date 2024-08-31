@@ -53,7 +53,7 @@ export class GridLinesProcessor {
                     p1.top === p2.top ? Direction.right : Direction.bottom,
                     (prev) => ({
                         dashed: dashed || (prev?.dashed ?? false) || (prev !== undefined && !prev.bold),
-                        bold: prev ? prev.bold : true,
+                        bold: true,
                     }),
                 );
             }
