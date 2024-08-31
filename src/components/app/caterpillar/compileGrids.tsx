@@ -85,6 +85,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
     for (const [index, grid] of grids.entries()) {
         const offsetTop = grid.offset.top - minTop;
         const offsetLeft = grid.offset.left - minLeft;
+        const {size = 6} = grid;
         const translatePoint = ([y, x]: number[]) => [offsetTop + y, offsetLeft + x];
 
         const data = normalizeSclMetadata(puzzleIdToScl(grid.data));
@@ -117,7 +118,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
         }
 
         if (regions.length) {
-            if (grid.size === 6) {
+            if (size === 6) {
                 for (let i = 1; i < 6; i++) {
                     result.lines!.push(
                         {
@@ -174,10 +175,11 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
         (result.metadata as any).grids.push({
             ...otherMetadata,
             title: `${index + 1}. ${title || "Untitled"}`,
+            cells: `r${offsetTop + 1}c${offsetLeft + 1}-r${offsetTop + size}c${offsetLeft + size}`,
             top: offsetTop,
             left: offsetLeft,
-            width: grid.size,
-            height: grid.size,
+            width: size,
+            height: size,
         });
     }
 
