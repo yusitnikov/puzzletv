@@ -5,7 +5,7 @@ import {Absolute} from "../layout/absolute/Absolute";
 import {useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
 import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
 import {emptyPosition} from "../../types/layout/Position";
-import {errorColor, greenColor, lightGreyColor, lightOrangeColor, lightRedColor} from "./globals";
+import {errorColor, greenColor, lightOrangeColor, lightRedColor} from "./globals";
 import {indexes} from "../../utils/indexes";
 import {useMemo, useState} from "react";
 import {useEventListener} from "../../hooks/useEventListener";
@@ -192,22 +192,32 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
     return <>
         <Absolute {...windowSize} pointerEvents={true} onClick={() => setSelectedGrids([])}>
             <div>
-                {indexes(Math.ceil(windowSize.width / coeff), true).map((x) => <Absolute
-                    key={"column" + x}
-                    top={0}
-                    left={x * coeff}
-                    width={1}
-                    height={windowSize.height}
-                    style={{background: lightGreyColor}}
-                />)}
-                {indexes(Math.ceil(windowSize.height / coeff), true).map((y) => <Absolute
-                    key={"row" + y}
-                    left={0}
-                    top={y * coeff}
-                    height={1}
-                    width={windowSize.width}
-                    style={{background: lightGreyColor}}
-                />)}
+                {indexes(Math.ceil(windowSize.width / coeff), true).flatMap(
+                    (x) => indexes(Math.ceil(windowSize.height / coeff), true).map((y) => <Absolute
+                        key={`dot${x}-${y}`}
+                        top={y * coeff}
+                        left={x * coeff}
+                        width={1}
+                        height={1}
+                        style={{background: "#000"}}
+                    />)
+                )}
+                {/*{indexes(Math.ceil(windowSize.width / coeff), true).map((x) => <Absolute*/}
+                {/*    key={"column" + x}*/}
+                {/*    top={0}*/}
+                {/*    left={x * coeff}*/}
+                {/*    width={1}*/}
+                {/*    height={windowSize.height}*/}
+                {/*    style={{background: lightGreyColor}}*/}
+                {/*/>)}*/}
+                {/*{indexes(Math.ceil(windowSize.height / coeff), true).map((y) => <Absolute*/}
+                {/*    key={"row" + y}*/}
+                {/*    left={0}*/}
+                {/*    top={y * coeff}*/}
+                {/*    height={1}*/}
+                {/*    width={windowSize.width}*/}
+                {/*    style={{background: lightGreyColor}}*/}
+                {/*/>)}*/}
             </div>
 
             <GridsCompilation
