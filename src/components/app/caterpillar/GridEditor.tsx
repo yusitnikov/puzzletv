@@ -18,6 +18,7 @@ interface GridEditorProps {
 
 export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel, cellSize}: GridEditorProps) {
     const [data, setData] = useState(grid.data);
+    const [dashed, setDashed] = useState(grid.dashed ?? false);
 
     const parsedGrid = useMemo(() => {
         try {
@@ -51,6 +52,7 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
         ...grid,
         data: editedData,
         size: parsedGridHeight,
+        dashed,
     };
     const submit = () => onSubmit(newGrid);
 
@@ -129,6 +131,14 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
                                 onChange={(ev) => mergeEditedParsedMetadata({solution: ev.currentTarget.value})}
                                 style={{font: "inherit"}}
                             />
+                            <label style={{display: "flex", gap: "0.25em", alignItems: "center"}}>
+                                <input
+                                    type={"checkbox"}
+                                    checked={dashed}
+                                    onChange={(ev) => setDashed(ev.currentTarget.checked)}
+                                />
+                                <span>Dashed grid</span>
+                            </label>
                         </div>,
                     },
                     {
@@ -153,6 +163,7 @@ export const GridEditor = observer(function GridEditor({grid, onSubmit, onCancel
             }}>
                 <SudokuPadImage
                     data={throttledEditedData}
+                    dashed={dashed}
                     style={{width: "100%", height: "100%"}}
                 />
             </div>}

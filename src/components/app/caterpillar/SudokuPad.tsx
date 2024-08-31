@@ -2,17 +2,18 @@ import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
 import {HTMLAttributes, useEffect, useMemo, useState} from "react";
 import {Rect} from "../../../types/layout/Rect";
-import {puzzleIdToScl, Scl, sclToPuzzleId} from "../../../utils/sudokuPad";
+import {puzzleIdToScl, sclToPuzzleId} from "../../../utils/sudokuPad";
 import {safetyMargin} from "./globals";
 import {serializeToLocalStorage, unserializeFromLocalStorage} from "../../../utils/localStorage";
-import {utf8ToBase64} from "../../../utils/encoding";
+import {GridLinesProcessor} from "./GridLinesProcessor";
 
 interface SudokuPadProps {
     data: string;
     bounds: Rect;
+    dashed?: boolean;
 }
 
-export const SudokuPad = observer(function SudokuPad({data, bounds}: SudokuPadProps) {
+export const SudokuPad = observer(function SudokuPad({data, bounds, dashed}: SudokuPadProps) {
     profiler.trace();
 
     const fixedData = useMemo(() => {
@@ -46,6 +47,7 @@ export const SudokuPad = observer(function SudokuPad({data, bounds}: SudokuPadPr
 
     return <SudokuPadImage
         data={fixedData}
+        dashed={dashed}
         cache={true}
         style={{
             position: "absolute",
@@ -55,12 +57,13 @@ export const SudokuPad = observer(function SudokuPad({data, bounds}: SudokuPadPr
     />;
 });
 
-interface SudokuPadImageProps extends Omit<HTMLAttributes<HTMLImageElement>, "src" | "alt"> {
+interface SudokuPadImageProps extends HTMLAttributes<HTMLIFrameElement> {
     data: string;
+    dashed?: boolean;
     cache?: boolean;
 }
 
-export const SudokuPadImage = observer(function SudokuPadImage({data, cache = false, ...imgProps}: SudokuPadImageProps) {
+export const SudokuPadImage = observer(function SudokuPadImage({data, dashed = false, cache = false, ...props}: SudokuPadImageProps) {
     profiler.trace();
 
     const [svgText, setSvgText] = useState("");
@@ -69,29 +72,29 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, cache = fa
     // Replace all non-ascii characters by "?" to patch SudokuPad thumbnail API bug
     const fixedData = useMemo(() => {
         try {
-            const parsedData = puzzleIdToScl(data);
+            let parsedData = puzzleIdToScl(data);
 
-            const patchRecursive = (value: unknown): unknown => {
-                if (typeof value === "string") {
-                    return value.replaceAll(/[^\x00-\x7F]/g, "?");
-                }
-
-                if (Array.isArray(value)) {
-                    return value.map(patchRecursive);
-                }
-
-                if (typeof value === "object" && value) {
-                    return Object.fromEntries(Object.entries(value).map(([key, value]) => [key, patchRecursive(value)]));
-                }
-
-                return value;
+            const size = parsedData.cells.length;
+            const gridLinesProcessor = new GridLinesProcessor();
+            gridLinesProcessor.addGrid(
+                {top: 0, left: 0, width: size, height: size},
+                (parsedData.regions ?? []).map(region => region.map(([top, left]) => ({top, left}))),
+                dashed,
+            );
+            parsedData = {
+                ...parsedData,
+                regions: undefined,
+                lines: [
+                    ...gridLinesProcessor.getLines(),
+                    ...parsedData.lines ?? [],
+                ],
             };
 
-            return sclToPuzzleId(patchRecursive(parsedData) as Scl);
+            return sclToPuzzleId(parsedData);
         } catch {
             return undefined;
         }
-    }, [data]);
+    }, [data, dashed]);
 
     useEffect(() => {
         if (!fixedData) {
@@ -150,12 +153,12 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, cache = fa
 
     if (isError || !fixedData) {
         return <div style={{
-            ...imgProps.style,
+            ...props.style,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             color: "red",
-            fontSize: typeof imgProps.style?.height === "number" ? imgProps.style.height * 0.08 : undefined,
+            fontSize: typeof props.style?.height === "number" ? props.style.height * 0.08 : undefined,
         }}>
             ERROR
         </div>;
@@ -165,11 +168,28 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, cache = fa
         return null;
     }
 
-    // noinspection JSDeprecatedSymbols
-    return <img
-        {...imgProps}
-        src={`data:image/svg+xml;base64,${utf8ToBase64(svgText)}`}
-        alt={"Grid"}
-        onError={() => setIsError(true)}
+    return <iframe
+        {...props}
+        style={{
+            ...props.style,
+            border: "none",
+            outline: "none",
+            margin: 0,
+            padding: 0,
+        }}
+        srcDoc={`
+            <style>
+                svg {
+                    position: fixed;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+                #cell-grids .cell-grid {
+                    display: none;
+                }
+            </style>
+            ${svgText}
+        `}
     />;
 });

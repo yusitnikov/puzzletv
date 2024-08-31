@@ -106,6 +106,7 @@ export const GridsCompilation = (
         {grids.map((grid) => <SudokuPad
             key={"SudokuPad" + grid.guid}
             data={grid.data}
+            dashed={grid.dashed}
             bounds={transformRect(getGridRect(grid))}
         />)}
 

@@ -3,9 +3,8 @@ import {normalizeSclMetadata, puzzleIdToScl, Scl} from "../../../utils/sudokuPad
 import {safetyMargin} from "./globals";
 import {indexes} from "../../../utils/indexes";
 import {parseSolutionStringIntoArray} from "./utils";
-import {Position} from "../../../types/layout/Position";
-import {getRegionBorders} from "../../../utils/regions";
 import {areRectsIntersecting, Rect} from "../../../types/layout/Rect";
+import {GridLinesProcessor} from "./GridLinesProcessor";
 
 interface LinkedListItem {
     grid: CaterpillarGrid;
@@ -82,10 +81,12 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
 
     const solutionArray: string[][] = [];
 
+    const gridLinesProcessor = new GridLinesProcessor();
+
     for (const [index, grid] of grids.entries()) {
         const offsetTop = grid.offset.top - minTop;
         const offsetLeft = grid.offset.left - minLeft;
-        const {size = 6} = grid;
+        const {size = 6, dashed = false} = grid;
         const translatePoint = ([y, x]: number[]) => [offsetTop + y, offsetLeft + x];
 
         const data = normalizeSclMetadata(puzzleIdToScl(grid.data));
@@ -117,39 +118,16 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
             parseSolutionStringIntoArray(solutionArray, solution, gridWidth, translatePoint);
         }
 
-        if (regions.length) {
-            if (size === 6) {
-                for (let i = 1; i < 6; i++) {
-                    result.lines!.push(
-                        {
-                            target: "cell-grids",
-                            wayPoints: [[0, i], [6, i]].map(translatePoint),
-                            color: "#000000",
-                            thickness: 0.5,
-                        } as any,
-                        {
-                            target: "cell-grids",
-                            wayPoints: [[i, 0], [i, 6]].map(translatePoint),
-                            color: "#000000",
-                            thickness: 0.5,
-                        } as any,
-                    );
-                }
-            } else {
-                console.warn("Grid size is not 6 for", data);
-            }
-
-            for (const gridCells of regions) {
-                const cells = gridCells.map(translatePoint).map(([y, x]): Position => ({top: y, left: x}));
-                const points = getRegionBorders(cells, 1, true).map(({top, left}) => [top, left]);
-                result.lines!.push({
-                    target: "cell-grids",
-                    wayPoints: points,
-                    color: "#000000",
-                    thickness: 3,
-                } as any);
-            }
-        }
+        gridLinesProcessor.addGrid(
+            {
+                top: offsetTop,
+                left: offsetLeft,
+                width: size,
+                height: size,
+            },
+            regions.map(region => region.map(([top, left]) => ({top, left}))),
+            dashed,
+        );
 
         result.overlays!.push(...overlays.map((overlay) => ({
             ...overlay,
@@ -182,6 +160,11 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
             height: size,
         });
     }
+
+    result.lines = [
+        ...gridLinesProcessor.getLines(),
+        ...result.lines!
+    ];
 
     for (const top of indexes(height)) {
         result.cells[top] ??= [];

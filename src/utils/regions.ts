@@ -35,7 +35,7 @@ export const getRegionBoundingBox = (cells: Position[], cellWidth: number): Rect
     };
 };
 
-export const getRegionBorders = (cells: Position[], cellWidth: number, includeLoopedCell = false): Position[] => {
+export const getRegionBorders = (cells: Position[], cellWidth: number, includeLoopedCell = false, optimize = true): Position[] => {
     if (!cells.length) {
         return [];
     }
@@ -94,7 +94,7 @@ export const getRegionBorders = (cells: Position[], cellWidth: number, includeLo
         bordersGraph[cell2Str] = bordersGraph[cell2Str].filter(cell => !isSamePosition(cell, cell1));
 
         // Add the current border to the results (replace the previous point if the next point is the continuation)
-        if (borderPoints.length >= 2 && (borderPoints[borderPoints.length - 2].left === cell1.left) === (cell1.left === cell2.left)) {
+        if (optimize && borderPoints.length >= 2 && (borderPoints[borderPoints.length - 2].left === cell1.left) === (cell1.left === cell2.left)) {
             borderPoints[borderPoints.length - 1] = cell2;
         } else {
             borderPoints.push(cell2);

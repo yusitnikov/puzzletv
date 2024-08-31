@@ -5,4 +5,5 @@ export interface CaterpillarGrid {
     data: string;
     offset: Position;
     size?: number;
+    dashed?: boolean;
 }
