@@ -2,7 +2,7 @@ import {observer} from "mobx-react-lite";
 import {profiler} from "../../../utils/profiler";
 import {HTMLAttributes, useEffect, useMemo, useState} from "react";
 import {Rect} from "../../../types/layout/Rect";
-import {puzzleIdToScl, sclToPuzzleId} from "../../../utils/sudokuPad";
+import {puzzleIdToScl, Scl, sclToPuzzleId} from "../../../utils/sudokuPad";
 import {safetyMargin} from "./globals";
 import {serializeToLocalStorage, unserializeFromLocalStorage} from "../../../utils/localStorage";
 import {utf8ToBase64} from "../../../utils/encoding";
@@ -66,7 +66,38 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, cache = fa
     const [svgText, setSvgText] = useState("");
     const [isError, setIsError] = useState(false);
 
+    // Replace all non-ascii characters by "?" to patch SudokuPad thumbnail API bug
+    const fixedData = useMemo(() => {
+        try {
+            const parsedData = puzzleIdToScl(data);
+
+            const patchRecursive = (value: unknown): unknown => {
+                if (typeof value === "string") {
+                    return value.replaceAll(/[^\x00-\x7F]/g, "?");
+                }
+
+                if (Array.isArray(value)) {
+                    return value.map(patchRecursive);
+                }
+
+                if (typeof value === "object" && value) {
+                    return Object.fromEntries(Object.entries(value).map(([key, value]) => [key, patchRecursive(value)]));
+                }
+
+                return value;
+            };
+
+            return sclToPuzzleId(patchRecursive(parsedData) as Scl);
+        } catch {
+            return undefined;
+        }
+    }, [data]);
+
     useEffect(() => {
+        if (!fixedData) {
+            return;
+        }
+
         let aborted = false;
 
         // TODO: extract as a cache service or use a library
@@ -77,21 +108,21 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, cache = fa
         }
         if (cache) {
             const cacheStorage: Record<string, CacheItem> = unserializeFromLocalStorage(cacheKey) ?? {};
-            const cachedObject = cacheStorage[data];
+            const cachedObject = cacheStorage[fixedData];
             if (cachedObject) {
                 setSvgText(cachedObject.data);
                 return;
             }
         }
 
-        fetch(`https://api.sudokupad.com/thumbnail/${data}_512x512.svg`)
+        fetch(`https://api.sudokupad.com/thumbnail/${fixedData}_512x512.svg`)
             .then((res) => res.text())
             .then((res) => {
                 if (!aborted) {
                     setSvgText(res);
                     if (cache) {
                         const cacheStorage: Record<string, CacheItem> = unserializeFromLocalStorage(cacheKey) ?? {};
-                        cacheStorage[data] = {
+                        cacheStorage[fixedData] = {
                             data: res,
                             time: Date.now(),
                         };
@@ -115,9 +146,9 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, cache = fa
             setSvgText("");
             setIsError(false);
         };
-    }, [data, cache]);
+    }, [fixedData, cache]);
 
-    if (isError) {
+    if (isError || !fixedData) {
         return <div style={{
             ...imgProps.style,
             display: "flex",
