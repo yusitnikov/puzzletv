@@ -1,14 +1,11 @@
 import {useEffect, useMemo, useState} from "react";
-import {useWindowSize} from "../../hooks/useWindowSize";
-import {headerPadding} from "./globals";
 import {getAllPuzzlesForPreview} from "../../data/puzzles/AllPuzzles";
 import {PuzzlesListItem} from "./PuzzlesListItem";
 import {useRaf} from "../../hooks/useRaf";
 import {useLastValueRef} from "../../hooks/useLastValueRef";
 import {observer} from "mobx-react-lite";
 import {profiler} from "../../utils/profiler";
-
-const gridGap = headerPadding;
+import {Grid} from "../layout/grid/Grid";
 
 interface PuzzlesListProps {
     onLoaded?: () => void;
@@ -16,11 +13,6 @@ interface PuzzlesListProps {
 
 export const PuzzlesList = observer(({onLoaded}: PuzzlesListProps) => {
     profiler.trace();
-
-    const {width: windowWidth} = useWindowSize();
-    const innerWidth = windowWidth - headerPadding * 2;
-    const columnsCount = Math.max(Math.round(innerWidth / 400), 1);
-    const itemWidth = (innerWidth - (columnsCount - 1) * gridGap) / columnsCount;
 
     const puzzles = useMemo(getAllPuzzlesForPreview, []);
 
@@ -34,16 +26,12 @@ export const PuzzlesList = observer(({onLoaded}: PuzzlesListProps) => {
         }
     }, [loaded, onLoadedRef]);
 
-    return <div style={{
-        display: "grid",
-        gap: gridGap,
-        gridTemplateColumns: "minmax(0, 1fr) ".repeat(columnsCount),
-    }}>
-        {puzzles.map((puzzle, puzzleIndex) => <PuzzlesListItem
+    return <Grid defaultWidth={400}>
+        {(itemWidth) => puzzles.map((puzzle, puzzleIndex) => <PuzzlesListItem
             key={`item-${puzzle.slug}`}
             puzzle={puzzle}
             width={itemWidth}
             hide={puzzleIndex >= visiblePuzzlesCount}
         />)}
-    </div>;
+    </Grid>;
 });
