@@ -8,22 +8,19 @@ import {unzip, zip} from "../utils/zip";
 import {useLastValueRef} from "./useLastValueRef";
 import {useObjectFromLocalStorage} from "../utils/localStorage";
 
-export const useAbly = (options: Types.ClientOptions, enabled = true) => useSingleton(
+export const useAbly = (options: Types.ClientOptions) => useSingleton(
     "ably",
-    () => new Realtime({...options, autoConnect: true}),
-    undefined,
-    enabled
+    () => new Realtime({...options, autoConnect: true})
 );
 
 export const useAblyChannel = (options: Types.ClientOptions, name: string, enabled = true) => {
-    const ably = useAbly(options, enabled);
-    const ablyRef = useLastValueRef(ably);
+    const ably = useAbly(options);
 
     return useSingleton(
         `ably-channel-${name}`,
-        () => ablyRef.current!.channels.get("persist:" + name, {params: {rewind: "1"}}),
+        () => ably.channels.get("persist:" + name, {params: {rewind: "1"}}),
         undefined,
-        !!ably
+        enabled,
     );
 };
 
