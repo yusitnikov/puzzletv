@@ -60,9 +60,9 @@ export const sortGrids = (grids: CaterpillarGrid[]) => {
     return sortedItems.map(item => item.grid);
 };
 
-export const compileGrids = (grids: CaterpillarGrid[]) => {
+export const compileGrids = (grids: CaterpillarGrid[], idSuffix = "", gridOffset = 0, prevLink = "", nextLink = "") => {
     const result: Scl = {
-        id: "caterdokupillarpoc",
+        id: "caterdokupillar" + idSuffix,
         cellSize: 50,
         metadata: {grids: []} as any,
         settings: {},
@@ -152,7 +152,7 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
 
         (result.metadata as any).grids.push({
             ...otherMetadata,
-            title: `${index + 1}. ${title || "Untitled"}`,
+            title: `${index + gridOffset + 1}. ${title || "Untitled"}`,
             cells: `r${offsetTop + 1}c${offsetLeft + 1}-r${offsetTop + size}c${offsetLeft + size}`,
             top: offsetTop,
             left: offsetLeft,
@@ -177,6 +177,15 @@ export const compileGrids = (grids: CaterpillarGrid[]) => {
     result.metadata!.title = "Caterdokupillar";
     result.metadata!.author = "Much of the setting community";
     result.metadata!.rules = "Start in the top left, and as each 6x6 puzzle is completed, 4 digits will automatically carry over as givens for the next puzzle. Read the rules carefully for each puzzle, as many contain variants.";
+    if (prevLink || nextLink) {
+        result.metadata!.rules += "\n";
+        if (prevLink) {
+            result.metadata!.rules += `[Go to the previous segment](${prevLink}) `;
+        }
+        if (nextLink) {
+            result.metadata!.rules += `[Go to the next segment](${nextLink}) `;
+        }
+    }
 
     let solution = "";
     for (const top of indexes(height)) {

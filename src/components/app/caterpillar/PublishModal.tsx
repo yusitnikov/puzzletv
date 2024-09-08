@@ -13,10 +13,22 @@ import {Modal} from "../../layout/modal/Modal";
 import {SettingsItem} from "../../sudoku/controls/settings/SettingsItem";
 import {SettingsTextBox} from "../../sudoku/controls/settings/SettingsTextBox";
 import {apiKey, baseShortId} from "./globals";
-import {darkBlueColor, darkGreenColor, darkGreyColor, errorColor} from "../globals";
+import {
+    darkBlueColor,
+    darkGreenColor,
+    darkGreyColor,
+    errorColor,
+    greenColor,
+    lightGreyColor,
+    lightRedColor, textColor
+} from "../globals";
 import {LinkExternal} from "@emotion-icons/boxicons-regular";
 import {SettingsButton} from "../../sudoku/controls/settings/SettingsButton";
 import {CaterpillarGrid} from "./types";
+import {indexes} from "../../../utils/indexes";
+import {splitArrayIntoChunks} from "../../../utils/array";
+
+const chunkSize = 28;
 
 interface PublishModalProps {
     grids: CaterpillarGrid[];
@@ -29,8 +41,55 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
     const windowSize = useWindowSize(false);
     const modalCellSize = Math.min(windowSize.width, windowSize.height) * 0.125;
 
-    const [publishing, setPublishing] = useState(false);
-    const [publishSuccess, setPublishSuccess] = useState<boolean | undefined>();
+    const chunks = splitArrayIntoChunks(grids, chunkSize);
+
+    interface PublishStatus {
+        publishing?: boolean;
+        success?: boolean;
+    }
+    const [publishStatus, setPublishStatus] = useState<PublishStatus[]>(
+        () => indexes(chunks.length + 1).map(() => ({}))
+    );
+    const setPublishStatusItem = (index: number, item: PublishStatus) => setPublishStatus((prev) => {
+        const next = [...prev];
+        next[index] = item;
+        return next;
+    });
+
+    const getShortId = (index?: number) => baseShortId.get() + (index === undefined ? "" : index + 1);
+    const getPuzzleLink = (index?: number) =>
+        `${sudokuPadBaseUrl}${getShortId(index)}?setting-nogrid=1&setting-largepuzzle=1`;
+
+    const publish = async(index: number | undefined, grids: CaterpillarGrid[]) => {
+        const statusIndex = index ?? chunks.length;
+
+        let compiledGrids: Scl;
+        try {
+            compiledGrids = index === undefined
+                ? compileGrids(grids)
+                : compileGrids(
+                    grids,
+                    (index + 1).toString(),
+                    index * chunkSize,
+                    index > 0 ? getPuzzleLink(index - 1) : "",
+                    index < chunks.length - 1 ? getPuzzleLink(index + 1) : "",
+                );
+        } catch (e: unknown) {
+            console.error(e);
+            setPublishStatusItem(statusIndex, {});
+            return;
+        }
+
+        setPublishStatusItem(statusIndex, {publishing: true});
+
+        const success = await publishToSudokuPad(
+            getShortId(index),
+            sclToPuzzleId(compiledGrids!),
+            apiKey.get()
+        );
+
+        setPublishStatusItem(statusIndex, {success});
+    };
 
     return <Modal
         noHeader={true}
@@ -60,62 +119,32 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
         </SettingsItem>
 
         <SettingsItem>
-            <span style={{
-                color: publishing ? darkGreyColor : publishSuccess ? darkGreenColor : errorColor
-            }}>
-                {
-                    publishing
-                        ? "Publishing..."
-                        : publishSuccess === undefined
-                            ? <>&nbsp;</>
-                            : publishSuccess
-                                ? <a
-                                    href={`${sudokuPadBaseUrl}${baseShortId.get()}?setting-nogrid=1&setting-largepuzzle=1`}
-                                    target={"_blank"}
-                                    style={{
-                                        textDecoration: "none",
-                                        color: "inherit",
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        gap: "0.5em",
-                                    }}
-                                >
-                                    <span>Published</span>
-
-                                    <LinkExternal color={darkBlueColor} size={"1em"}/>
-                                </a>
-                                : "Failed to publish"
-                }
-            </span>
+            <div style={{display: "flex"}}>
+                {publishStatus.map(({publishing, success}, index) => <a
+                    key={index}
+                    href={getPuzzleLink(index === chunks.length ? undefined : index)}
+                    target={"_blank"}
+                    style={{
+                        padding: "1em",
+                        margin: 2,
+                        backgroundColor: publishing ? lightGreyColor : success === undefined ? "#fff" : success ? greenColor : lightRedColor,
+                    }}
+                >
+                    {index + 1}
+                </a>)}
+            </div>
         </SettingsItem>
 
         <div>
             <SettingsButton
                 type={"button"}
-                disabled={publishing || publishSuccess}
+                disabled={publishStatus.some(({publishing}) => publishing) || publishStatus.every(({success}) => success)}
                 cellSize={modalCellSize}
                 onClick={async () => {
-                    let compiledGrids: Scl;
-                    try {
-                        compiledGrids = compileGrids(grids);
-                    } catch (e: unknown) {
-                        console.error(e);
-                        setPublishSuccess(false);
-                        return;
+                    for (const [index, chunk] of chunks.entries()) {
+                        await publish(index, chunk);
                     }
-
-                    setPublishing(true);
-                    setPublishSuccess(undefined);
-
-                    const success = await publishToSudokuPad(
-                        baseShortId.get(),
-                        sclToPuzzleId(compiledGrids!),
-                        apiKey.get()
-                    );
-
-                    setPublishSuccess(success);
-                    setPublishing(false);
+                    await publish(undefined, grids);
                 }}
             >
                 Publish
