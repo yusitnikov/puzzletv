@@ -219,22 +219,6 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({chunk}: Ca
                         style={{background: "#000"}}
                     />)
                 )}
-                {/*{indexes(Math.ceil(windowSize.width / coeff), true).map((x) => <Absolute*/}
-                {/*    key={"column" + x}*/}
-                {/*    top={0}*/}
-                {/*    left={x * coeff}*/}
-                {/*    width={1}*/}
-                {/*    height={windowSize.height}*/}
-                {/*    style={{background: lightGreyColor}}*/}
-                {/*/>)}*/}
-                {/*{indexes(Math.ceil(windowSize.height / coeff), true).map((y) => <Absolute*/}
-                {/*    key={"row" + y}*/}
-                {/*    left={0}*/}
-                {/*    top={y * coeff}*/}
-                {/*    height={1}*/}
-                {/*    width={windowSize.width}*/}
-                {/*    style={{background: lightGreyColor}}*/}
-                {/*/>)}*/}
             </div>
 
             <GridsCompilation
