@@ -12,10 +12,11 @@ export interface ModalProps {
     onClose?: () => void;
     textAlign?: CSSProperties["textAlign"];
     borderless?: boolean;
+    noHeader?: boolean;
     children: ReactNode;
 }
 
-export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "center", borderless, children}: ModalProps) {
+export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "center", borderless, noHeader, children}: ModalProps) {
     profiler.trace();
 
     const padding = cellSize * globalPaddingCoeff;
@@ -34,7 +35,7 @@ export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "
                 zIndex: 1,
                 position: "absolute",
                 inset: 0,
-                top: headerHeight,
+                top: noHeader ? 0 : headerHeight,
                 background: "rgba(0, 0, 0, 0.5)",
                 fontFamily: "Lato, sans-serif",
             }}

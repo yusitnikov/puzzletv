@@ -5,7 +5,15 @@ import {Absolute} from "../layout/absolute/Absolute";
 import {useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence} from "../../hooks/useAbly";
 import {ablyOptions, myClientId} from "../../hooks/useMultiPlayer";
 import {emptyPosition} from "../../types/layout/Position";
-import {errorColor, greenColor, lightOrangeColor, lightRedColor} from "./globals";
+import {
+    darkBlueColor,
+    darkGreenColor,
+    darkGreyColor,
+    errorColor,
+    greenColor,
+    lightOrangeColor,
+    lightRedColor
+} from "./globals";
 import {indexes} from "../../utils/indexes";
 import {useMemo, useState} from "react";
 import {useEventListener} from "../../hooks/useEventListener";
@@ -20,8 +28,17 @@ import {getDimensions, parseSolutionString} from "./caterpillar/utils";
 import {GridEditor} from "./caterpillar/GridEditor";
 import {compileGrids, sortGrids} from "./caterpillar/compileGrids";
 import {GridsCompilation} from "./caterpillar/GridsCompilation";
-import {normalizeSclMetadata, puzzleIdToScl, Scl, sclToPuzzleUrl} from "../../utils/sudokuPad";
-import {copyToClipboard} from "../../utils/clipboard";
+import {
+    normalizeSclMetadata,
+    publishToSudokuPad,
+    puzzleIdToScl,
+    Scl,
+    sclToPuzzleId,
+    sudokuPadBaseUrl
+} from "../../utils/sudokuPad";
+import {apiKey, baseShortId} from "./caterpillar/globals";
+import {SettingsButton} from "../sudoku/controls/settings/SettingsButton";
+import {LinkExternal} from "@emotion-icons/boxicons-regular";
 
 interface PresenceData {
     nickname: string;
@@ -493,6 +510,11 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
         };
     });
 
+    const modalCellSize = Math.min(windowSize.width, windowSize.height) * 0.125;
+    const [showPublishDialog, setShowPublishDialog] = useState(false);
+    const [publishing, setPublishing] = useState(false);
+    const [publishSuccess, setPublishSuccess] = useState<boolean | undefined>();
+
     return <Absolute {...windowSize}>
         <GridsCompilation grids={sortedGrids} windowSize={windowSize} readOnly={true}/>
 
@@ -505,7 +527,103 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
             gap: "0.5em",
             pointerEvents: "all",
         }}>
-            <Button onClick={() => copyToClipboard(sclToPuzzleUrl(compiledGrids!)).then(() => alert("Copied!"))}>Copy SCL</Button>
+            <Button
+                onClick={() => {
+                    setShowPublishDialog(true);
+                    setPublishing(false);
+                    setPublishSuccess(undefined);
+                }}
+            >
+                Publish to SudokuPad
+            </Button>
+
+            {showPublishDialog && <Modal
+                noHeader={true}
+                cellSize={modalCellSize}
+                onClose={() => setShowPublishDialog(false)}
+            >
+                <SettingsItem>
+                    <span>Puzzle short ID:</span>
+
+                    <SettingsTextBox
+                        type={"text"}
+                        cellSize={modalCellSize}
+                        value={baseShortId.get()}
+                        onChange={(ev) => baseShortId.set(ev.target.value)}
+                    />
+                </SettingsItem>
+
+                <SettingsItem>
+                    <span>SudokuPad API key:</span>
+
+                    <SettingsTextBox
+                        type={"password"}
+                        cellSize={modalCellSize}
+                        value={apiKey.get()}
+                        onChange={(ev) => apiKey.set(ev.target.value)}
+                    />
+                </SettingsItem>
+
+                <SettingsItem>
+                    <span style={{
+                        color: publishing ? darkGreyColor : publishSuccess ? darkGreenColor : errorColor
+                    }}>
+                        {
+                            publishing
+                                ? "Publishing..."
+                                : publishSuccess === undefined
+                                    ? <>&nbsp;</>
+                                    : publishSuccess
+                                        ? <a
+                                            href={`${sudokuPadBaseUrl}${baseShortId.get()}?setting-nogrid=1&setting-largepuzzle=1`}
+                                            target={"_blank"}
+                                            style={{
+                                                textDecoration: "none",
+                                                color: "inherit",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                gap: "0.5em",
+                                            }}
+                                        >
+                                            <span>Published</span>
+
+                                            <LinkExternal color={darkBlueColor} size={"1em"}/>
+                                        </a>
+                                        : "Failed to publish"
+                        }
+                    </span>
+                </SettingsItem>
+
+                <div>
+                    <SettingsButton
+                        type={"button"}
+                        disabled={publishing || publishSuccess}
+                        cellSize={modalCellSize}
+                        onClick={async () => {
+                            setPublishing(true);
+                            setPublishSuccess(undefined);
+                            const success = await publishToSudokuPad(
+                                baseShortId.get(),
+                                sclToPuzzleId(compiledGrids!),
+                                apiKey.get()
+                            );
+                            setPublishSuccess(success);
+                            setPublishing(false);
+                        }}
+                    >
+                        Publish
+                    </SettingsButton>
+
+                    <SettingsButton
+                        type={"button"}
+                        cellSize={modalCellSize}
+                        onClick={() => setShowPublishDialog(false)}
+                    >
+                        Close
+                    </SettingsButton>
+                </div>
+            </Modal>}
 
             <Button
                 component={"a"}

@@ -150,9 +150,9 @@ export const puzzleIdToScl = (puzzleId: string) => {
     return data;
 };
 
-export const sclToPuzzleId = (data: Scl) => `scl${loadFPuzzle.compressPuzzle(PuzzleZipper.zip(JSON.stringify(data)))}`;
+export const sudokuPadBaseUrl = "https://sudokupad.app/";
 
-export const sclToPuzzleUrl = (data: Scl) => "https://sudokupad.app/" + sclToPuzzleId(data);
+export const sclToPuzzleId = (data: Scl) => `scl${loadFPuzzle.compressPuzzle(PuzzleZipper.zip(JSON.stringify(data)))}`;
 
 export const normalizeSclMetadata = (
     {
@@ -192,4 +192,29 @@ export const normalizeSclMetadata = (
         ...data,
         cages: cages.filter((cage) => !parseCageMetadata(cage.value)),
     };
+};
+
+const tryPublishToSudokuPad = async (shortId: string, scl: string, key: string | undefined, create: boolean) => {
+    const action = create ? "create" : "update";
+    try {
+        await fetch(`${sudokuPadBaseUrl}admin/${action}link`, {
+            method: "post",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({key, puzzle: scl, shortid: shortId}),
+        });
+        return true;
+    } catch (e) {
+        console[create ? "warn" : "error"](`Failed to ${action} SudokuPad puzzle`, e);
+        return false;
+    }
+};
+export const publishToSudokuPad = async (shortId: string, scl: string, key?: string) => {
+    const cacheKey = `createdSP:${shortId}`;
+
+    if (!localStorage[cacheKey]) {
+        await tryPublishToSudokuPad(shortId, scl, key, true);
+        localStorage[cacheKey] = 1;
+    }
+
+    return await tryPublishToSudokuPad(shortId, scl, key, false);
 };
