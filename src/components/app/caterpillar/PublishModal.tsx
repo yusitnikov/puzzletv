@@ -19,11 +19,11 @@ import {SettingsButton} from "../../sudoku/controls/settings/SettingsButton";
 import {CaterpillarGrid} from "./types";
 
 interface PublishModalProps {
-    sortedGrids: CaterpillarGrid[];
+    grids: CaterpillarGrid[];
     onClose: () => void;
 }
 
-export const PublishModal = observer(function PublishModal({sortedGrids, onClose}: PublishModalProps) {
+export const PublishModal = observer(function PublishModal({grids, onClose}: PublishModalProps) {
     profiler.trace();
 
     const windowSize = useWindowSize(false);
@@ -98,7 +98,7 @@ export const PublishModal = observer(function PublishModal({sortedGrids, onClose
                 onClick={async () => {
                     let compiledGrids: Scl;
                     try {
-                        compiledGrids = compileGrids(sortedGrids);
+                        compiledGrids = compileGrids(grids);
                     } catch (e: unknown) {
                         console.error(e);
                         setPublishSuccess(false);

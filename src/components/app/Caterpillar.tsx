@@ -501,7 +501,7 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({chunk 
             </Button>
 
             {showPublishDialog && <PublishModal
-                sortedGrids={sortedGrids}
+                grids={sortedGrids}
                 onClose={() => setShowPublishDialog(false)}
             />}
 
