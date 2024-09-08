@@ -1,12 +1,15 @@
 import {Realtime, Types} from "ably/promises";
 import {useSingleton} from "./useSingleton";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {usePureState} from "./usePureState";
 import {Chain} from "../utils/chain";
 import {useThrottleData} from "./useThrottle";
 import {unzip, zip} from "../utils/zip";
 import {useLastValueRef} from "./useLastValueRef";
 import {useObjectFromLocalStorage} from "../utils/localStorage";
+import {settings} from "../types/layout/Settings";
+import {myClientId} from "./useMultiPlayer";
+import {useTranslate} from "./useTranslate";
 
 export const useAbly = (options: Types.ClientOptions) => useSingleton(
     "ably",
@@ -131,6 +134,27 @@ export const useAblyChannelPresence = (
     return [presenceMessages || noMessages, presenceMessages !== undefined];
 };
 
+export const useAblyChannelPresenceMap = <T>(
+    options: Types.ClientOptions,
+    channelName: string,
+    preserve: boolean,
+    enabled = true
+): [Record<string, T>, boolean] => {
+    const [messages, loaded] = useAblyChannelPresence(options, channelName, enabled);
+
+    const mapRef = useRef<Record<string, T>>({});
+    if (!preserve) {
+        mapRef.current = {};
+    }
+    const map = mapRef.current;
+
+    for (const {clientId, data} of messages) {
+        map[clientId] = data;
+    }
+
+    return [map, loaded];
+}
+
 export const useSetMyAblyChannelPresence = (
     options: Types.ClientOptions,
     channelName: string,
@@ -164,4 +188,34 @@ export const useSetMyAblyChannelPresence = (
 
         chain.then(() => channel.presence.update(zip(JSON.stringify(myThrottledPresenceData))));
     }, [channel, enabled, chain, myThrottledPresenceData]);
+};
+
+const userNamesChannelName = "user-names";
+export interface UseUserNamesOptions {
+    showYouLabel?: boolean;
+}
+export type UserNameFunc = (clientId: string, options?: UseUserNamesOptions) => string;
+export const useUserNames = (
+    ablyOptions: Types.ClientOptions,
+    defaultOptions: UseUserNamesOptions = {},
+): UserNameFunc => {
+    const translate = useTranslate();
+
+    useSetMyAblyChannelPresence(ablyOptions, userNamesChannelName, settings.nickname.get());
+    const [namesMap] = useAblyChannelPresenceMap<string>(ablyOptions, userNamesChannelName, true);
+
+    return (
+        clientId: string,
+        {
+            showYouLabel = defaultOptions.showYouLabel ?? true,
+        }: UseUserNamesOptions = {}
+    ) => {
+        let result = namesMap[clientId]?.trim() || translate("guest");
+
+        if (showYouLabel && clientId === myClientId) {
+            result += ` (${translate("you")})`;
+        }
+
+        return result;
+    };
 };

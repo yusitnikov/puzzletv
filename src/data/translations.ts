@@ -39,6 +39,10 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Подключение",
         [LanguageCode.de]: "Wird geladen",
     },
+    "Back": {
+        [LanguageCode.ru]: "Назад",
+        [LanguageCode.de]: "Zurück",
+    },
     "Yes": {
         [LanguageCode.ru]: "Да",
         [LanguageCode.de]: "Ja",
@@ -50,6 +54,14 @@ export const translationsExactType = {
     "Cancel": {
         [LanguageCode.ru]: "Отмена",
         [LanguageCode.de]: "Stornieren",
+    },
+    "Leave": {
+        [LanguageCode.ru]: "Выйти",
+        [LanguageCode.de]: "Verlassen",
+    },
+    "Close": {
+        [LanguageCode.ru]: "Закрыть",
+        [LanguageCode.de]: "Schließen",
     },
     "Turn on": {
         [LanguageCode.ru]: "Включить",
@@ -102,6 +114,14 @@ export const translationsExactType = {
     "Hosted by %1": {
         [LanguageCode.ru]: "Ведущий: %1",
         [LanguageCode.de]: "Moderiert von %1",
+    },
+    "%1's game": {
+        [LanguageCode.ru]: "Игра %1",
+        [LanguageCode.de]: "Das Spiel von %1",
+    },
+    "Start the game": {
+        [LanguageCode.ru]: "Начать игру",
+        [LanguageCode.de]: "Starte das Spiel",
     },
     "Submit": {
         [LanguageCode.ru]: "Отправить",
@@ -184,6 +204,14 @@ export const translationsExactType = {
     "Please wait for them to join": {
         [LanguageCode.ru]: "Пожалуйста, подождите когда он присоединится",
         [LanguageCode.de]: "Warten Sie bitte, bis sie beitreten",
+    },
+    "Join": {
+        [LanguageCode.ru]: "Присоединиться",
+        [LanguageCode.de]: "Beitreten",
+    },
+    "Your move": {
+        [LanguageCode.ru]: "Ваш ход",
+        [LanguageCode.de]: "Ihr Umzug",
     },
     // endregion
     // region Controls

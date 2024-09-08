@@ -22,6 +22,7 @@ import {SyncedLabel} from "./SyncedLabel";
 import {PuzzleImportSource} from "../../types/sudoku/PuzzleImportOptions";
 import {MatchPointHost} from "../../data/games/match-point/MatchPointHost";
 import {MatchPointPlayer} from "../../data/games/match-point/MatchPointPlayer";
+import {WordSearch} from "../../data/games/word-search/WordSearch";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -84,6 +85,14 @@ export const App = observer(({onPageLoaded}: AppProps) => {
                 title={"Match Point!"}
             >
                 {params.host ? <MatchPointPlayer host={params.host} gameId={params.game}/> : <MatchPointHost/>}
+            </PageLayout>;
+        case "word-search":
+            return <PageLayout
+                scrollable={true}
+                title={"Word Search"}
+                hideTitleHeader={true}
+            >
+                <WordSearch/>
             </PageLayout>;
         case "for-setters":
             return <PageLayout

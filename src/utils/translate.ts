@@ -17,14 +17,14 @@ export const translate = <T = string>(phrase: PartiallyTranslatable<T>, language
 export const bindTranslate = (languageCode: LanguageCode) =>
     <T = string>(phrase: PartiallyTranslatable<T>) => translate(phrase, languageCode);
 
-export const processTranslations = <T = string>(processor: (...items: T[]) => T, ...items: PartiallyTranslatable<T>[]) =>
+export const processTranslations = <T = string, ResT = T>(processor: (...items: T[]) => ResT, ...items: PartiallyTranslatable<T>[]) =>
     Object.fromEntries(
         allLanguageCodes
             .map((language) => [
                 language,
                 processor(...items.map(item => translate(item, language)))
             ])
-    ) as TranslationItem<T>;
+    ) as TranslationItem<ResT>;
 
 export const getRussianPluralForm = <T>(
     count: number,
