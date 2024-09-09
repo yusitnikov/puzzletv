@@ -13,22 +13,21 @@ import {Modal} from "../../layout/modal/Modal";
 import {SettingsItem} from "../../sudoku/controls/settings/SettingsItem";
 import {SettingsTextBox} from "../../sudoku/controls/settings/SettingsTextBox";
 import {apiKey, baseShortId} from "./globals";
-import {
-    darkBlueColor,
-    darkGreenColor,
-    darkGreyColor,
-    errorColor,
-    greenColor,
-    lightGreyColor,
-    lightRedColor, textColor
-} from "../globals";
-import {LinkExternal} from "@emotion-icons/boxicons-regular";
+import {greenColor, lighterGreyColor, lightGreyColor, lightRedColor} from "../globals";
 import {SettingsButton} from "../../sudoku/controls/settings/SettingsButton";
 import {CaterpillarGrid} from "./types";
-import {indexes} from "../../../utils/indexes";
 import {splitArrayIntoChunks} from "../../../utils/array";
 
 const chunkSize = 28;
+
+const getShortId = (index?: number) => baseShortId.get() + (index === undefined ? "" : index + 1);
+const getPuzzleLink = (index?: number) =>
+    `${sudokuPadBaseUrl}${getShortId(index)}?setting-nogrid=1&setting-largepuzzle=1`;
+
+interface PublishStatus {
+    publishing?: boolean;
+    success?: boolean;
+}
 
 interface PublishModalProps {
     grids: CaterpillarGrid[];
@@ -43,26 +42,17 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
 
     const chunks = splitArrayIntoChunks(grids, chunkSize);
 
-    interface PublishStatus {
-        publishing?: boolean;
-        success?: boolean;
-    }
     const [publishStatus, setPublishStatus] = useState<PublishStatus[]>(
-        () => indexes(chunks.length + 1).map(() => ({}))
+        () => chunks.map(() => ({}))
     );
-    const setPublishStatusItem = (index: number, item: PublishStatus) => setPublishStatus((prev) => {
-        const next = [...prev];
-        next[index] = item;
-        return next;
-    });
 
-    const getShortId = (index?: number) => baseShortId.get() + (index === undefined ? "" : index + 1);
-    const getPuzzleLink = (index?: number) =>
-        `${sudokuPadBaseUrl}${getShortId(index)}?setting-nogrid=1&setting-largepuzzle=1`;
+    const [fullPublishStatus, setFullPublishStatus] = useState<PublishStatus>({});
 
-    const publish = async(index: number | undefined, grids: CaterpillarGrid[]) => {
-        const statusIndex = index ?? chunks.length;
-
+    const publish = async(
+        index: number | undefined,
+        grids: CaterpillarGrid[],
+        onUpdate: (status: PublishStatus) => void,
+    ) => {
         let compiledGrids: Scl;
         try {
             compiledGrids = index === undefined
@@ -76,11 +66,11 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
                 );
         } catch (e: unknown) {
             console.error(e);
-            setPublishStatusItem(statusIndex, {});
+            onUpdate({});
             return;
         }
 
-        setPublishStatusItem(statusIndex, {publishing: true});
+        onUpdate({publishing: true});
 
         const success = await publishToSudokuPad(
             getShortId(index),
@@ -88,7 +78,7 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
             apiKey.get()
         );
 
-        setPublishStatusItem(statusIndex, {success});
+        onUpdate({success});
     };
 
     return <Modal
@@ -119,32 +109,37 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
         </SettingsItem>
 
         <SettingsItem>
-            <div style={{display: "flex"}}>
-                {publishStatus.map(({publishing, success}, index) => <a
-                    key={index}
-                    href={getPuzzleLink(index === chunks.length ? undefined : index)}
-                    target={"_blank"}
-                    style={{
-                        padding: "1em",
-                        margin: 2,
-                        backgroundColor: publishing ? lightGreyColor : success === undefined ? "#fff" : success ? greenColor : lightRedColor,
-                    }}
-                >
-                    {index + 1}
-                </a>)}
+            <div style={{display: "flex", flexDirection: "column", gap: 5}}>
+                <div style={{display: "flex", gap: 5, justifyContent: "space-between"}}>
+                    {publishStatus.map((status, index) => <PublishStatusIndicator
+                        key={index}
+                        index={index}
+                        {...status}
+                    />)}
+                </div>
+
+                <PublishStatusIndicator
+                    index={undefined}
+                    {...fullPublishStatus}
+                />
             </div>
         </SettingsItem>
 
-        <div>
+        <div style={{marginTop: "1em"}}>
             <SettingsButton
                 type={"button"}
                 disabled={publishStatus.some(({publishing}) => publishing) || publishStatus.every(({success}) => success)}
                 cellSize={modalCellSize}
                 onClick={async () => {
                     for (const [index, chunk] of chunks.entries()) {
-                        await publish(index, chunk);
+                        await publish(index, chunk, (status) => setPublishStatus((prev) => {
+                            const next = [...prev];
+                            next[index] = status;
+                            return next;
+                        }));
                     }
-                    await publish(undefined, grids);
+
+                    await publish(undefined, grids, setFullPublishStatus);
                 }}
             >
                 Publish
@@ -159,4 +154,22 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
             </SettingsButton>
         </div>
     </Modal>;
+});
+
+
+interface PublishStatusIndicatorProps extends PublishStatus {
+    index?: number;
+}
+
+const PublishStatusIndicator = observer(function ({index, publishing, success}: PublishStatusIndicatorProps) {
+    return <a
+        href={getPuzzleLink(index)}
+        target={"_blank"}
+        style={{
+            padding: "0.5em 1em",
+            backgroundColor: publishing ? lightGreyColor : success === undefined ? lighterGreyColor : success ? greenColor : lightRedColor,
+        }}
+    >
+        {index === undefined ? "Full puzzle" : index + 1}
+    </a>;
 });
