@@ -194,7 +194,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                 {currentWord.map((letter, index) => <WordSearchLetter
                     key={index}
                     letter={letter.letter}
-                    myTurn={myTurn}
+                    active={myTurn}
                     clientIndex={playerIds.indexOf(currentPlayerId)}
                     cellSize={cellSize}
                     onToggle={() => toggleLetter(letter)}
@@ -213,7 +213,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                         return <WordSearchLetter
                             key={left}
                             letter={letter}
-                            myTurn={myTurn}
+                            active={myTurn}
                             inWord={isInWord(letterObj)}
                             clientIndex={playerIds.indexOf(letterOwners[top][left])}
                             cellSize={cellSize}

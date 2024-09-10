@@ -1,10 +1,17 @@
 import {Position} from "../../../types/layout/Position";
 
-export interface WordSearchLobbyState {
+export interface WordSearchLobbyDynamicState {
     roomHostId?: string;
     roomId?: string;
     playing?: boolean;
 }
+
+export interface WordSearchRoomSettings {
+    fieldWidth: number;
+    fieldHeight: number;
+}
+
+export type WordSearchLobbyState = WordSearchLobbyDynamicState & WordSearchRoomSettings;
 
 export interface WordSearchGameSettings {
     playerIds: string[];

@@ -4,7 +4,7 @@ import {clientColors} from "./constants";
 
 interface WordSearchLetterProps {
     letter: string;
-    myTurn?: boolean;
+    active?: boolean;
     inWord?: boolean;
     clientIndex?: number;
     cellSize: number;
@@ -12,7 +12,7 @@ interface WordSearchLetterProps {
 }
 
 export const WordSearchLetter = observer(function WordSearchLetter(
-    {letter, myTurn, inWord, clientIndex = -1, cellSize, onToggle}: WordSearchLetterProps
+    {letter, active, inWord, clientIndex = -1, cellSize, onToggle}: WordSearchLetterProps
 ) {
     return <div
         style={{
@@ -29,7 +29,7 @@ export const WordSearchLetter = observer(function WordSearchLetter(
                     ? clientColors[clientIndex]
                     : darkGreyColor,
             transition: "background-color 200ms linear",
-            cursor: myTurn ? "pointer" : "auto",
+            cursor: active ? "pointer" : "auto",
             margin: 2,
         }}
         onClick={onToggle}

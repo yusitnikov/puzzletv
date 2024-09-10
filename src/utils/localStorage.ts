@@ -3,10 +3,20 @@ import {useStateWithStorage} from "../hooks/useStateWithStorage";
 import {makeAutoObservable} from "mobx";
 import {computedFn} from "mobx-utils";
 
-interface ItemManager<T> {
+interface BasicItemManager<T> {
     get(): T;
     set(value: T): void;
 }
+
+interface ItemManager<T> {
+    get(): T;
+    set(value: T | ((prev: T) => T)): void;
+}
+
+const fromBasicItemManager = <T>({get, set}: BasicItemManager<T>): ItemManager<T> => ({
+    get,
+    set: (value) => set(typeof value === "function" ? (value as ((prev: T) => T))(get()) : value),
+});
 
 // noinspection JSUnusedLocalSymbols
 class LocalStorageManager {
@@ -35,30 +45,30 @@ class LocalStorageManager {
     }
 
     getStringManager<T extends string>(key: string, defaultValue = "" as T): ItemManager<T> {
-        return {
+        return fromBasicItemManager<T>({
             get: () => this.getString(key) ?? defaultValue,
             set: (value) => this.setString(key, value),
-        };
+        });
     }
 
     getBoolManager(key: string, defaultValue = false): ItemManager<boolean> {
-        return {
+        return fromBasicItemManager<boolean>({
             get: () => {
                 const value = this.getString(key);
                 return value !== undefined ? value === "1" : defaultValue;
             },
             set: (value) => this.setString(key, value ? "1" : "0"),
-        };
+        });
     }
 
     getNumberManager<T extends number = number>(key: string, defaultValue = 0 as T): ItemManager<T> {
-        return {
+        return fromBasicItemManager<T>({
             get: () => {
                 const value = this.getString(key);
                 return value !== undefined ? Number(value) as T : defaultValue;
             },
             set: (value) => this.setString(key, value.toString()),
-        };
+        });
     }
 }
 
