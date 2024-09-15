@@ -27,6 +27,7 @@ import {GivenDigitsMap} from "./GivenDigitsMap";
 import {ColorsImportMode, PuzzleImportOptions} from "./PuzzleImportOptions";
 import {PuzzleImporter} from "../../data/puzzles/PuzzleImporter";
 import {GridParser} from "../../data/puzzles/GridParser";
+import {FieldState} from "./FieldState";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -161,6 +162,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     gridBackgroundColor?: string;
     regionBackgroundColor?: string;
 
+    modifyInitialFieldState?(fieldState: FieldState<T>): FieldState<T>;
     keepStateOnRestart?(context: PuzzleContext<T>): PartialGameStateEx<T>;
 
     saveStateKeySuffix?: string;
@@ -201,6 +203,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     items?: Constraint<T, any>[]
         | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
 
+    cosmeticRegions?: boolean;
     getRegionsForRowsAndColumns?(context: PuzzleContext<T>): Constraint<T, any>[];
 
     getAdditionalNeighbors?(

@@ -29,7 +29,7 @@ import {controlKeysState} from "../../hooks/useControlKeysState";
 import {getAllowedCellWriteModeInfos} from "./CellWriteModeInfo";
 import {getFinalCellWriteMode} from "../../hooks/sudoku/useFinalCellWriteMode";
 import {CellWriteMode} from "./CellWriteMode";
-import {Constraint} from "./Constraint";
+import {Constraint, toDecorativeConstraint} from "./Constraint";
 import {FieldLayer} from "./FieldLayer";
 import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
 import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
@@ -705,14 +705,22 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get defaultPuzzleItems(): Constraint<T, any>[] {
         profiler.trace();
 
-        const {regions = []} = this.puzzle;
+        const {regions = [], typeManager: {cosmeticRegions}} = this.puzzle;
 
         return [
             FieldLinesConstraint(),
             ...regions.map(
-                (region) => Array.isArray(region)
-                    ? RegionConstraint<T>(region)
-                    : region
+                (region) => {
+                    if (Array.isArray(region)) {
+                        region = RegionConstraint<T>(region);
+                    }
+
+                    if (cosmeticRegions) {
+                        region = toDecorativeConstraint(region);
+                    }
+
+                    return region;
+                }
             ),
             UserLinesConstraint(),
         ];

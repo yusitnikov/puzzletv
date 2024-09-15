@@ -5,6 +5,7 @@ import {LanguageCode} from "../../types/translations/LanguageCode";
 import {PartiallyTranslatable} from "../../types/translations/Translatable";
 import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {ChessSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
+import {ChessGameSudokuTypeManager} from "../../sudokuTypes/chess/types/ChessGameSudokuTypeManager";
 import {createCubeFieldSize, createCubeRegions, CubeTypeManager} from "../../sudokuTypes/cube/types/CubeTypeManager";
 import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
 import {AutoRegionConstraint} from "../../components/sudoku/constraints/auto-region/AutoRegion";
@@ -87,6 +88,21 @@ export const EmptyChess: PuzzleDefinition<ChessPTM> = {
         ChessBoardCellsBackgroundConstraint(),
         ChessBoardIndexesConstraint(),
         ValidChessPositionConstraint,
+    ],
+    allowDrawing: allDrawingModes,
+};
+
+export const EmptyChessGame: PuzzleDefinition<ChessPTM> = {
+    noIndex: true,
+    title,
+    slug: "chess",
+    typeManager: ChessGameSudokuTypeManager,
+    fieldSize: FieldSize8,
+    regions: Regions8,
+    fieldMargin: chessBoardIndexesMargin,
+    items: [
+        ChessBoardCellsBackgroundConstraint(),
+        ChessBoardIndexesConstraint(),
     ],
     allowDrawing: allDrawingModes,
 };

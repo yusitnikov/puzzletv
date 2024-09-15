@@ -32,7 +32,7 @@ export const createEmptyFieldState = <T extends AnyPTM>(
 ): FieldState<T> => {
     const {typeManager: {initialFieldStateExtension}} = puzzle;
 
-    return {
+    const result: FieldState<T> = {
         cells: indexes(puzzle.fieldSize.rowsCount).map(() => indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle))),
         lines: new PuzzleLineSet(puzzle),
         marks: new CellMarkSet(puzzle).bulkAdd(puzzle.initialCellMarks ?? []),
@@ -42,6 +42,8 @@ export const createEmptyFieldState = <T extends AnyPTM>(
         clientId: myClientId,
         actionId: "",
     };
+
+    return puzzle.typeManager.modifyInitialFieldState?.(result) ?? result;
 };
 
 export const serializeFieldState = <T extends AnyPTM>(
