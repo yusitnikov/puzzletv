@@ -455,6 +455,10 @@ export const gameStateUndo = <T extends AnyPTM>({fieldStateHistory}: PuzzleConte
 export const gameStateRedo = <T extends AnyPTM>({fieldStateHistory}: PuzzleContext<T>): PartialGameStateEx<T> => ({
     fieldStateHistory: fieldStateHistory.redo(),
 });
+
+export const gameStateSeekHistory = <T extends AnyPTM>({fieldStateHistory}: PuzzleContext<T>, index: number): PartialGameStateEx<T> => ({
+    fieldStateHistory: fieldStateHistory.seek(index),
+});
 // endregion
 
 // region Selected cells

@@ -4,7 +4,7 @@ import {Redo} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
 import {ctrlKeyText} from "../../../utils/os";
-import {getNextActionId, redoAction} from "../../../types/sudoku/GameStateAction";
+import {getNextActionId, redoAction, seekHistoryAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {observer} from "mobx-react-lite";
@@ -17,6 +17,7 @@ export const RedoButton: ControlButtonItemPropsGenericFc = observer(function Red
     profiler.trace();
 
     const {
+        puzzle: {typeManager: {applyArrowsToHistory}},
         cellSizeForSidePanel: cellSize,
         isReady,
         multiPlayer: {isEnabled},
@@ -30,8 +31,21 @@ export const RedoButton: ControlButtonItemPropsGenericFc = observer(function Red
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 
-        if (!settings.isOpened && !isEnabled && ctrlKey && code === "KeyY") {
+        if (settings.isOpened || isEnabled) {
+            return;
+        }
+
+        if (ctrlKey && code === "KeyY") {
             handleRedo();
+            ev.preventDefault();
+        }
+
+        if (applyArrowsToHistory && code === "ArrowRight") {
+            if (ctrlKey && context.fieldStateHistory.statesCount) {
+                context.onStateChange(seekHistoryAction(context.fieldStateHistory.statesCount - 1, getNextActionId()));
+            } else {
+                handleRedo();
+            }
             ev.preventDefault();
         }
     });

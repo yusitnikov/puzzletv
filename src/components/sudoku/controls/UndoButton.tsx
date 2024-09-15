@@ -4,7 +4,7 @@ import {Undo} from "@emotion-icons/material";
 import {useTranslate} from "../../../hooks/useTranslate";
 import {useCallback} from "react";
 import {ctrlKeyText} from "../../../utils/os";
-import {getNextActionId, undoAction} from "../../../types/sudoku/GameStateAction";
+import {getNextActionId, seekHistoryAction, undoAction} from "../../../types/sudoku/GameStateAction";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {deleteHotkeys} from "./DeleteButton";
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
@@ -19,7 +19,7 @@ export const UndoButton: ControlButtonItemPropsGenericFc = observer(function Und
 
     const {
         cellSizeForSidePanel: cellSize,
-        puzzle: {hideDeleteButton},
+        puzzle: {hideDeleteButton, typeManager: {applyArrowsToHistory}},
         isReady,
         multiPlayer: {isEnabled},
     } = context;
@@ -32,8 +32,21 @@ export const UndoButton: ControlButtonItemPropsGenericFc = observer(function Und
         const {code, ctrlKey: winCtrlKey, metaKey: macCtrlKey} = ev;
         const ctrlKey = winCtrlKey || macCtrlKey;
 
-        if (!settings.isOpened && !isEnabled && ((ctrlKey && code === "KeyZ") || (hideDeleteButton && deleteHotkeys.includes(code)))) {
+        if (settings.isOpened || isEnabled) {
+            return;
+        }
+
+        if ((ctrlKey && code === "KeyZ") || (hideDeleteButton && deleteHotkeys.includes(code))) {
             handleUndo();
+            ev.preventDefault();
+        }
+
+        if (applyArrowsToHistory && code === "ArrowLeft") {
+            if (ctrlKey) {
+                context.onStateChange(seekHistoryAction(0, getNextActionId()));
+            } else {
+                handleUndo();
+            }
             ev.preventDefault();
         }
     });

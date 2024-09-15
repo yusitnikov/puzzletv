@@ -187,6 +187,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     // Apply processArrowDirection() changes even if there are no selected cells
     applyArrowProcessorToNoCell?: boolean;
 
+    applyArrowsToHistory?: boolean;
+
     transformCoords?(
         coords: Position,
         context: PuzzleContext<T>,

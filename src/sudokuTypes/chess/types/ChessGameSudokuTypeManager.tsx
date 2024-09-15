@@ -262,6 +262,8 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
             }
         };
     },
+
+    applyArrowsToHistory: true,
 };
 
 interface MoveProps {

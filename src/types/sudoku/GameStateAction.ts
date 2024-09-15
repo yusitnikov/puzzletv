@@ -6,6 +6,7 @@ import {
     gameStateHandleDigit,
     gameStateIncrementShading,
     gameStateRedo,
+    gameStateSeekHistory,
     gameStateSetCellMark,
     gameStateUndo,
     PartialGameStateEx,
@@ -59,6 +60,16 @@ export const redoActionType = <T extends AnyPTM>(): GameStateActionType<undefine
 export const redoAction = <T extends AnyPTM>(actionId: string): GameStateAction<undefined, T> => ({
     type: redoActionType(),
     params: undefined,
+    actionId,
+});
+
+export const seekHistoryActionType = <T extends AnyPTM>(): GameStateActionType<number, T> => ({
+    key: "seekHistory",
+    callback: (index) => (context) => gameStateSeekHistory(context, index),
+});
+export const seekHistoryAction = <T extends AnyPTM>(index: number, actionId: string): GameStateAction<number, T> => ({
+    type: seekHistoryActionType(),
+    params: index,
     actionId,
 });
 
@@ -163,6 +174,7 @@ export const shadingStartAction = <T extends AnyPTM>(
 export const coreGameStateActionTypes = <T extends AnyPTM>(): GameStateActionType<any, T>[] => [
     undoActionType(),
     redoActionType(),
+    seekHistoryActionType(),
     clearSelectionActionType(),
     enterDigitActionType(),
     applyCurrentMultiLineActionType(),
