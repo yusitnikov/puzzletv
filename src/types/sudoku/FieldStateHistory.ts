@@ -38,22 +38,18 @@ export class FieldStateHistory<T extends AnyPTM> {
 
     undo() {
         return this.canUndo
-            ? new FieldStateHistory(
-                this.puzzle,
-                this.states,
-                Math.max(0, this.currentIndex - 1),
-            )
+            ? this.seek(Math.max(0, this.currentIndex - 1))
             : this;
     }
 
     redo() {
         return this.canRedo
-            ? new FieldStateHistory(
-                this.puzzle,
-                this.states,
-                Math.min(this.statesCount - 1, this.currentIndex + 1),
-            )
+            ? this.seek(Math.min(this.statesCount - 1, this.currentIndex + 1))
             : this;
+    }
+
+    seek(index: number) {
+        return new FieldStateHistory(this.puzzle, this.states, index);
     }
 
     equals(other: FieldStateHistory<T>) {
