@@ -10,16 +10,14 @@ import {ChessPTM} from "../types/ChessPTM";
 import {observer} from "mobx-react-lite";
 import {settings} from "../../../types/layout/Settings";
 import {profiler} from "../../../utils/profiler";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 
 export const ChessMainControls = observer(function ChessMainControls(
     {context}: ControlButtonItemProps<ChessPTM>
 ) {
     profiler.trace();
 
-    const {
-        cellSizeForSidePanel: cellSize,
-        stateExtension: {selectedColor},
-    } = context;
+    const {cellSizeForSidePanel: cellSize} = context;
 
     const translate = useTranslate();
 
@@ -94,14 +92,27 @@ export const ChessMainControls = observer(function ChessMainControls(
             onClick={handleToggleColor}
             title={`${translate("Chess piece color")} (${translate("click to toggle")}, ${translate("shortcut")}: Shift+C)`}
         >
-            {(contentSize) => <Absolute
-                width={contentSize}
-                height={contentSize}
-                borderWidth={1}
-                style={{
-                    backgroundColor: selectedColor === ChessColor.white ? "#fff" : "#000"
-                }}
-            />}
+            {(contentSize) => <PieceColorButtonRect context={context} contentSize={contentSize} />}
         </ControlButton>
     </>;
+});
+
+interface PieceColorButtonRectProps {
+    context: PuzzleContext<ChessPTM>;
+    contentSize: number;
+}
+
+const PieceColorButtonRect = observer(function PieceColorButtonRect(
+    {context: {stateExtension: {selectedColor}}, contentSize}: PieceColorButtonRectProps
+) {
+    profiler.trace();
+
+    return <Absolute
+        width={contentSize}
+        height={contentSize}
+        borderWidth={1}
+        style={{
+            backgroundColor: selectedColor === ChessColor.white ? "#fff" : "#000"
+        }}
+    />;
 });
