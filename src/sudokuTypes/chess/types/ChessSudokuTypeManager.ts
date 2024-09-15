@@ -112,6 +112,6 @@ export const ChessSudokuTypeManager: SudokuTypeManager<ChessPTM> = addGameStateE
     },
 }, {
     initialGameStateExtension: {
-        selectedColor: ChessColor.black,
+        selectedColor: ChessColor.white,
     },
 });
