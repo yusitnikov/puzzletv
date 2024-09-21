@@ -36,6 +36,7 @@ const publish = async(
     grids: CaterpillarGrid[],
     onUpdate: (status: PublishStatus) => void,
     prevGrid?: CaterpillarGrid,
+    allowSafetyMarginOptimization = false,
 ) => {
     let compiledGrids: Scl;
     try {
@@ -43,14 +44,15 @@ const publish = async(
             ? compileGrids(grids)
             : compileGrids(
                 grids,
-                (index + 1).toString(),
+                base.split("/").reverse()[0] + (index + 1).toString(),
                 index * chunkSize,
                 index > 0 ? getPuzzleLink(base, index - 1) : "",
-                index < chunksCount ? getPuzzleLink(base, index + 1) : "",
+                index < chunksCount - 1 ? getPuzzleLink(base, index + 1) : "",
                 prevGrid ? {
                     top: Math.max(prevGrid.offset.top - grids[0].offset.top, 0),
                     left: Math.max(prevGrid.offset.left - grids[0].offset.left, 0),
-                } : undefined
+                } : undefined,
+                allowSafetyMarginOptimization && index > 0 && index < chunksCount - 1 ? 1 : 6,
             );
     } catch (e: unknown) {
         console.error(e);
@@ -69,7 +71,7 @@ const publish = async(
     onUpdate({success});
 };
 
-const useChunksPublish = (grids: CaterpillarGrid[], chunkSize: number, base: string) => {
+const useChunksPublish = (grids: CaterpillarGrid[], chunkSize: number, base: string, allowSafetyMarginOptimization: boolean) => {
     const chunks = splitArrayIntoChunks(grids, chunkSize);
 
     const [publishStatus, setPublishStatus] = useState<PublishStatus[]>(
@@ -91,6 +93,7 @@ const useChunksPublish = (grids: CaterpillarGrid[], chunkSize: number, base: str
                         return next;
                     }),
                     prevChunk ? prevChunk[prevChunk.length - 1] : undefined,
+                    allowSafetyMarginOptimization,
                 );
             }
         },
@@ -117,8 +120,8 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
     const windowSize = useWindowSize(false);
     const modalCellSize = Math.min(windowSize.width, windowSize.height) * 0.125;
 
-    const chunks1 = useChunksPublish(grids, 28, baseShortId.get());
-    const chunks2 = useChunksPublish(grids, 7, baseSmallShortId.get());
+    const chunks1 = useChunksPublish(grids, 28, baseShortId.get(), false);
+    const chunks2 = useChunksPublish(grids, 7, baseSmallShortId.get(), true);
 
     const [fullPublishStatus, setFullPublishStatus] = useState<PublishStatus>({});
 

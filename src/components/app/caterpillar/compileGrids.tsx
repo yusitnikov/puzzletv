@@ -1,6 +1,5 @@
 import {CaterpillarGrid} from "./types";
 import {normalizeSclMetadata, puzzleIdToScl, Scl} from "../../../utils/sudokuPad";
-import {safetyMargin} from "./globals";
 import {indexes} from "../../../utils/indexes";
 import {parseSolutionStringIntoArray} from "./utils";
 import {areRectsIntersecting, Rect} from "../../../types/layout/Rect";
@@ -63,14 +62,15 @@ export const sortGrids = (grids: CaterpillarGrid[]) => {
 
 export const compileGrids = (
     grids: CaterpillarGrid[],
-    idSuffix = "",
+    id = "caterdokupillar",
     gridOffset = 0,
     prevLink = "",
     nextLink = "",
-    givensOffset: Position | undefined = undefined
+    givensOffset: Position | undefined = undefined,
+    safetyMargin = 6,
 ) => {
     const result: Scl = {
-        id: "caterdokupillar" + idSuffix,
+        id,
         cellSize: 50,
         metadata: {grids: []} as any,
         settings: {},
