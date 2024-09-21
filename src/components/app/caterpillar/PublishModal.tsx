@@ -52,6 +52,7 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
         index: number | undefined,
         grids: CaterpillarGrid[],
         onUpdate: (status: PublishStatus) => void,
+        prevGrid?: CaterpillarGrid,
     ) => {
         let compiledGrids: Scl;
         try {
@@ -63,6 +64,10 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
                     index * chunkSize,
                     index > 0 ? getPuzzleLink(index - 1) : "",
                     index < chunks.length - 1 ? getPuzzleLink(index + 1) : "",
+                    prevGrid ? {
+                        top: Math.max(prevGrid.offset.top - grids[0].offset.top, 0),
+                        left: Math.max(prevGrid.offset.left - grids[0].offset.left, 0),
+                    } : undefined
                 );
         } catch (e: unknown) {
             console.error(e);
@@ -132,11 +137,17 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
                 cellSize={modalCellSize}
                 onClick={async () => {
                     for (const [index, chunk] of chunks.entries()) {
-                        await publish(index, chunk, (status) => setPublishStatus((prev) => {
-                            const next = [...prev];
-                            next[index] = status;
-                            return next;
-                        }));
+                        const prevChunk = chunks[index - 1];
+                        await publish(
+                            index,
+                            chunk,
+                            (status) => setPublishStatus((prev) => {
+                                const next = [...prev];
+                                next[index] = status;
+                                return next;
+                            }),
+                            prevChunk ? prevChunk[prevChunk.length - 1] : undefined,
+                        );
                     }
 
                     await publish(undefined, grids, setFullPublishStatus);

@@ -5,6 +5,7 @@ import {indexes} from "../../../utils/indexes";
 import {parseSolutionStringIntoArray} from "./utils";
 import {areRectsIntersecting, Rect} from "../../../types/layout/Rect";
 import {GridLinesProcessor} from "./GridLinesProcessor";
+import {Position} from "../../../types/layout/Position";
 
 interface LinkedListItem {
     grid: CaterpillarGrid;
@@ -60,7 +61,14 @@ export const sortGrids = (grids: CaterpillarGrid[]) => {
     return sortedItems.map(item => item.grid);
 };
 
-export const compileGrids = (grids: CaterpillarGrid[], idSuffix = "", gridOffset = 0, prevLink = "", nextLink = "") => {
+export const compileGrids = (
+    grids: CaterpillarGrid[],
+    idSuffix = "",
+    gridOffset = 0,
+    prevLink = "",
+    nextLink = "",
+    givensOffset: Position | undefined = undefined
+) => {
     const result: Scl = {
         id: "caterdokupillar" + idSuffix,
         cellSize: 50,
@@ -116,6 +124,17 @@ export const compileGrids = (grids: CaterpillarGrid[], idSuffix = "", gridOffset
 
         if (solution) {
             parseSolutionStringIntoArray(solutionArray, solution, gridWidth, translatePoint);
+
+            if (index === 0 && givensOffset) {
+                for (const dy of [0, 1]) {
+                    const top = offsetTop + givensOffset.top + dy;
+                    for (const dx of [0, 1]) {
+                        const left = offsetLeft + givensOffset.left + dx;
+                        result.cells[top][left].value = Number(solutionArray[top][left]);
+                        result.cells[top][left].given = true;
+                    }
+                }
+            }
         }
 
         gridLinesProcessor.addGrid(
