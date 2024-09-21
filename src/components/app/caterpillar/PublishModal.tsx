@@ -12,7 +12,7 @@ import {useState} from "react";
 import {Modal} from "../../layout/modal/Modal";
 import {SettingsItem} from "../../sudoku/controls/settings/SettingsItem";
 import {SettingsTextBox} from "../../sudoku/controls/settings/SettingsTextBox";
-import {apiKey, baseShortId} from "./globals";
+import {apiKey, baseShortId, baseSmallShortId} from "./globals";
 import {greenColor, lighterGreyColor, lightGreyColor, lightRedColor} from "../globals";
 import {SettingsButton} from "../../sudoku/controls/settings/SettingsButton";
 import {CaterpillarGrid} from "./types";
@@ -20,14 +20,91 @@ import {splitArrayIntoChunks} from "../../../utils/array";
 
 const chunkSize = 28;
 
-const getShortId = (index?: number) => baseShortId.get() + (index === undefined ? "" : index + 1);
-const getPuzzleLink = (index?: number) =>
-    `${sudokuPadBaseUrl}${getShortId(index)}?setting-nogrid=1&setting-largepuzzle=1`;
+const getShortId = (index?: number) => (index === undefined ? "" : index + 1);
+const getPuzzleLink = (base: string, index?: number) =>
+    `${sudokuPadBaseUrl}${base}${getShortId(index)}?setting-nogrid=1&setting-largepuzzle=1`;
 
 interface PublishStatus {
     publishing?: boolean;
     success?: boolean;
 }
+
+const publish = async(
+    base: string,
+    index: number | undefined,
+    chunksCount: number,
+    grids: CaterpillarGrid[],
+    onUpdate: (status: PublishStatus) => void,
+    prevGrid?: CaterpillarGrid,
+) => {
+    let compiledGrids: Scl;
+    try {
+        compiledGrids = index === undefined
+            ? compileGrids(grids)
+            : compileGrids(
+                grids,
+                (index + 1).toString(),
+                index * chunkSize,
+                index > 0 ? getPuzzleLink(base, index - 1) : "",
+                index < chunksCount ? getPuzzleLink(base, index + 1) : "",
+                prevGrid ? {
+                    top: Math.max(prevGrid.offset.top - grids[0].offset.top, 0),
+                    left: Math.max(prevGrid.offset.left - grids[0].offset.left, 0),
+                } : undefined
+            );
+    } catch (e: unknown) {
+        console.error(e);
+        onUpdate({});
+        return;
+    }
+
+    onUpdate({publishing: true});
+
+    const success = await publishToSudokuPad(
+        base + getShortId(index),
+        sclToPuzzleId(compiledGrids!),
+        apiKey.get()
+    );
+
+    onUpdate({success});
+};
+
+const useChunksPublish = (grids: CaterpillarGrid[], chunkSize: number, base: string) => {
+    const chunks = splitArrayIntoChunks(grids, chunkSize);
+
+    const [publishStatus, setPublishStatus] = useState<PublishStatus[]>(
+        () => chunks.map(() => ({}))
+    );
+
+    return {
+        publish: async() => {
+            for (const [index, chunk] of chunks.entries()) {
+                const prevChunk = chunks[index - 1];
+                await publish(
+                    base,
+                    index,
+                    chunks.length,
+                    chunk,
+                    (status) => setPublishStatus((prev) => {
+                        const next = [...prev];
+                        next[index] = status;
+                        return next;
+                    }),
+                    prevChunk ? prevChunk[prevChunk.length - 1] : undefined,
+                );
+            }
+        },
+        canRepublish: !publishStatus.some(({publishing}) => publishing) && !publishStatus.every(({success}) => success),
+        indicators: <div style={{display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 10}}>
+            {publishStatus.map((status, index) => <PublishStatusIndicator
+                key={index}
+                base={base}
+                index={index}
+                {...status}
+            />)}
+        </div>,
+    };
+};
 
 interface PublishModalProps {
     grids: CaterpillarGrid[];
@@ -40,56 +117,16 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
     const windowSize = useWindowSize(false);
     const modalCellSize = Math.min(windowSize.width, windowSize.height) * 0.125;
 
-    const chunks = splitArrayIntoChunks(grids, chunkSize);
-
-    const [publishStatus, setPublishStatus] = useState<PublishStatus[]>(
-        () => chunks.map(() => ({}))
-    );
+    const chunks1 = useChunksPublish(grids, 28, baseShortId.get());
+    const chunks2 = useChunksPublish(grids, 7, baseSmallShortId.get());
 
     const [fullPublishStatus, setFullPublishStatus] = useState<PublishStatus>({});
-
-    const publish = async(
-        index: number | undefined,
-        grids: CaterpillarGrid[],
-        onUpdate: (status: PublishStatus) => void,
-        prevGrid?: CaterpillarGrid,
-    ) => {
-        let compiledGrids: Scl;
-        try {
-            compiledGrids = index === undefined
-                ? compileGrids(grids)
-                : compileGrids(
-                    grids,
-                    (index + 1).toString(),
-                    index * chunkSize,
-                    index > 0 ? getPuzzleLink(index - 1) : "",
-                    index < chunks.length - 1 ? getPuzzleLink(index + 1) : "",
-                    prevGrid ? {
-                        top: Math.max(prevGrid.offset.top - grids[0].offset.top, 0),
-                        left: Math.max(prevGrid.offset.left - grids[0].offset.left, 0),
-                    } : undefined
-                );
-        } catch (e: unknown) {
-            console.error(e);
-            onUpdate({});
-            return;
-        }
-
-        onUpdate({publishing: true});
-
-        const success = await publishToSudokuPad(
-            getShortId(index),
-            sclToPuzzleId(compiledGrids!),
-            apiKey.get()
-        );
-
-        onUpdate({success});
-    };
 
     return <Modal
         noHeader={true}
         cellSize={modalCellSize}
         onClose={onClose}
+        style={{maxWidth: "70%"}}
     >
         <SettingsItem>
             <span>Puzzle short ID:</span>
@@ -99,6 +136,17 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
                 cellSize={modalCellSize}
                 value={baseShortId.get()}
                 onChange={(ev) => baseShortId.set(ev.target.value)}
+            />
+        </SettingsItem>
+
+        <SettingsItem>
+            <span>Small chunks short ID:</span>
+
+            <SettingsTextBox
+                type={"text"}
+                cellSize={modalCellSize}
+                value={baseSmallShortId.get()}
+                onChange={(ev) => baseSmallShortId.set(ev.target.value)}
             />
         </SettingsItem>
 
@@ -115,15 +163,12 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
 
         <SettingsItem>
             <div style={{display: "flex", flexDirection: "column", gap: 5}}>
-                <div style={{display: "flex", gap: 5, justifyContent: "space-between"}}>
-                    {publishStatus.map((status, index) => <PublishStatusIndicator
-                        key={index}
-                        index={index}
-                        {...status}
-                    />)}
-                </div>
+                {chunks1.indicators}
+
+                {chunks2.indicators}
 
                 <PublishStatusIndicator
+                    base={baseShortId.get()}
                     index={undefined}
                     {...fullPublishStatus}
                 />
@@ -133,24 +178,12 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
         <div style={{marginTop: "1em"}}>
             <SettingsButton
                 type={"button"}
-                disabled={publishStatus.some(({publishing}) => publishing) || publishStatus.every(({success}) => success)}
+                disabled={!chunks1.canRepublish || !chunks2.canRepublish}
                 cellSize={modalCellSize}
                 onClick={async () => {
-                    for (const [index, chunk] of chunks.entries()) {
-                        const prevChunk = chunks[index - 1];
-                        await publish(
-                            index,
-                            chunk,
-                            (status) => setPublishStatus((prev) => {
-                                const next = [...prev];
-                                next[index] = status;
-                                return next;
-                            }),
-                            prevChunk ? prevChunk[prevChunk.length - 1] : undefined,
-                        );
-                    }
-
-                    await publish(undefined, grids, setFullPublishStatus);
+                    await chunks1.publish();
+                    await chunks2.publish();
+                    await publish(baseShortId.get(), undefined, 1, grids, setFullPublishStatus);
                 }}
             >
                 Publish
@@ -169,12 +202,13 @@ export const PublishModal = observer(function PublishModal({grids, onClose}: Pub
 
 
 interface PublishStatusIndicatorProps extends PublishStatus {
+    base: string;
     index?: number;
 }
 
-const PublishStatusIndicator = observer(function ({index, publishing, success}: PublishStatusIndicatorProps) {
+const PublishStatusIndicator = observer(function ({base, index, publishing, success}: PublishStatusIndicatorProps) {
     return <a
-        href={getPuzzleLink(index)}
+        href={getPuzzleLink(base, index)}
         target={"_blank"}
         style={{
             padding: "0.5em 1em",

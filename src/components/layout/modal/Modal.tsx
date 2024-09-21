@@ -1,5 +1,5 @@
 import {createPortal} from "react-dom";
-import {CSSProperties, ReactNode} from "react";
+import {CSSProperties, HTMLAttributes, ReactNode} from "react";
 import {useEventListener} from "../../../hooks/useEventListener";
 import {globalPaddingCoeff, headerHeight, textColor, textHeightCoeff} from "../../app/globals";
 import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
@@ -7,7 +7,7 @@ import { runInAction } from "mobx";
 import {profiler} from "../../../utils/profiler";
 import {observer} from "mobx-react-lite";
 
-export interface ModalProps {
+export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
     cellSize: number;
     onClose?: () => void;
     textAlign?: CSSProperties["textAlign"];
@@ -16,7 +16,7 @@ export interface ModalProps {
     children: ReactNode;
 }
 
-export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "center", borderless, noHeader, children}: ModalProps) {
+export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "center", borderless, noHeader, children, ...divProps}: ModalProps) {
     profiler.trace();
 
     const padding = cellSize * globalPaddingCoeff;
@@ -59,6 +59,7 @@ export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "
                 }}
             >
                 <div
+                    {...divProps}
                     style={{
                         zIndex: 3,
                         border: borderless ? undefined : `3px solid ${textColor}`,
@@ -67,6 +68,7 @@ export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "
                         borderRadius: borderless ? 0 : padding / 3,
                         fontSize: cellSize * textHeightCoeff,
                         textAlign,
+                        ...divProps.style,
                     }}
                 >
                     {children}
