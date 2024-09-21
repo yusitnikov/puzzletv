@@ -5,6 +5,7 @@ import {parseSolutionStringIntoArray} from "./utils";
 import {areRectsIntersecting, Rect} from "../../../types/layout/Rect";
 import {GridLinesProcessor} from "./GridLinesProcessor";
 import {Position} from "../../../types/layout/Position";
+import deepmerge from "deepmerge";
 
 interface LinkedListItem {
     grid: CaterpillarGrid;
@@ -118,7 +119,10 @@ export const compileGrids = (
         for (const [top, row] of cells.entries()) {
             for (const [left, cell] of row.entries()) {
                 result.cells[offsetTop + top] ??= [];
-                result.cells[offsetTop + top][offsetLeft + left] = cell;
+                result.cells[offsetTop + top][offsetLeft + left] = deepmerge(
+                    result.cells[offsetTop + top][offsetLeft + left] ?? {},
+                    cell,
+                );
             }
         }
 
