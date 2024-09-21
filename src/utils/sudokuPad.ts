@@ -96,6 +96,7 @@ const parser = new ObjectParser({
         rules: optional(parseString("rules")),
         solution: optional(parseString("solution")),
         msgcorrect: optional(parseString("msgcorrect")),
+        norowcol: optional(parseBool("norowcol")),
     }))),
     settings: optional(parseObject("settings", new ObjectParser({
     }))),

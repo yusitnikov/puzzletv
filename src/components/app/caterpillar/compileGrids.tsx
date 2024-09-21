@@ -193,6 +193,7 @@ export const compileGrids = (
     }
 
     result.metadata!.source = "PuzzleTV";
+    result.metadata!.norowcol = true;
     result.metadata!.title = "Caterdokupillar";
     result.metadata!.author = "Much of the setting community";
     result.metadata!.rules = "Start in the top left, and as each 6x6 puzzle is completed, 4 digits will automatically carry over as givens for the next puzzle. Read the rules carefully for each puzzle, as many contain variants.";
