@@ -92,16 +92,21 @@ export const OutsideClue: ConstraintPropsGenericFcMap<OutsideClueProps> = {
     ) {
         profiler.trace();
 
-        const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent}}} = puzzle;
+        const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent, widthCoeff}}} = puzzle;
 
-        return <DigitSvgContent
-            puzzle={puzzle}
-            color={color}
-            digit={value}
-            size={0.5}
-            left={left + 0.5}
-            top={top + 0.5}
-        />;
+        const valueArr = value.toString().split("").map(Number);
+
+        return <>
+            {valueArr.map((num, index) => <DigitSvgContent
+                key={index}
+                puzzle={puzzle}
+                color={color}
+                digit={num}
+                size={0.5}
+                left={left + 0.5 + 0.5 * widthCoeff * (index - (valueArr.length - 1) / 2)}
+                top={top + 0.5}
+            />)}
+        </>;
     }),
 };
 
@@ -130,7 +135,7 @@ export const OutsideClueConstraint = <T extends AnyPTM>(
         color,
         props: {clueCell, value},
         component: OutsideClue,
-        isValidCell(cell, digits, cells, context, constraints, constraint, isFinalCheck = false) {
+        isValidCell(cell, digits, cells, context, _constraints, _constraint, isFinalCheck = false) {
             const {puzzle: {typeManager: {getDigitByCellData}}} = context;
 
             const currentDigit = getDigitByCellData(digits[cell.top][cell.left], context, cell);
