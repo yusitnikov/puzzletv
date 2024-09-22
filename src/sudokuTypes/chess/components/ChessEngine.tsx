@@ -1,15 +1,13 @@
 import {observer} from "mobx-react-lite";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {ChessPTM} from "../types/ChessPTM";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useChessHistory} from "./ChessHistory";
 import {ChessEngineResult} from "../types/ChessEngineResult";
 import {ChessBoardBase, FieldStateChessBoard, ReadOnlyChessBoard} from "../types/ChessBoard";
 import {parseChessCell} from "../types/utils";
 import {ChessMove, getChessMoveDescription} from "../types/ChessMove";
 import {ChessPieceTypeReverseMap} from "../types/ChessPieceType";
-
-let autoIncrementId = 0;
 
 interface ChessEngineProps {
     context: PuzzleContext<ChessPTM>;
@@ -25,21 +23,31 @@ export const ChessEngine = observer(function ChessEngine({context}: ChessEngineP
         [currentFieldState, halfMoves]
     );
 
-    const [socketState, setSocketState] = useState("initializing");
-    const messageIdRef = useRef(0);
     const [moves, setMoves] = useState<string[]>([]);
     const [variations, setVariations] = useState<string[]>([]);
-    const socket = useMemo(() => {
+    useEffect(() => {
+        setMoves([]);
+        setVariations([]);
+
+        let aborted = false;
+
         const socket = new WebSocket("ws://localhost:3002");
+
         socket.addEventListener("open", () => {
-            console.log("Open!");
-            setSocketState("ready");
-        });
-        socket.addEventListener("message", (ev) => {
-            const result: ChessEngineResult = JSON.parse(ev.data.toString());
-            if (result.mid !== messageIdRef.current) {
+            if (aborted) {
                 return;
             }
+
+            console.debug("Open!");
+            socket.send(JSON.stringify({variant: "sudoku", fen}));
+        });
+
+        socket.addEventListener("message", (ev) => {
+            if (aborted) {
+                return;
+            }
+
+            const result: ChessEngineResult = JSON.parse(ev.data.toString());
 
             const board = new FieldStateChessBoard(context.currentFieldState.cells);
 
@@ -56,7 +64,6 @@ export const ChessEngine = observer(function ChessEngine({context}: ChessEngineP
                         .join(" ");
 
                     const line = `[${depth}] [${unit}=${value}] ${multipv}. ${moves}`;
-                    console.log(line);
                     setVariations((prev) => {
                         if (multipv === 1) {
                             return [line];
@@ -69,29 +76,28 @@ export const ChessEngine = observer(function ChessEngine({context}: ChessEngineP
                 }
             }
         });
+
         socket.addEventListener("close", () => {
-            console.log("Closed!");
-            setSocketState("closed");
+            if (aborted) {
+                return;
+            }
+
+            console.debug("Closed!");
         });
+
         socket.addEventListener("error", () => {
-            console.log("Error!");
+            if (aborted) {
+                return;
+            }
+
+            console.debug("Error!");
         });
-        return socket;
-    }, [context]);
-    useEffect(() => {
-        messageIdRef.current = ++autoIncrementId;
-        setMoves([]);
-        setVariations([]);
-        if (socketState === "ready" && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({mid: messageIdRef.current, fen, variant: "sudoku"}));
-        }
-    }, [socket, socketState, fen]);
-    useEffect(() => {
+
         return () => {
-            setSocketState("disposed");
+            aborted = true;
             socket.close();
         };
-    }, [socket]);
+    }, [fen]);
 
     return <div style={{
         fontSize: context.cellSizeForSidePanel * 0.2,
