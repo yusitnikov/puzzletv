@@ -122,6 +122,7 @@ export const OutsideClueConstraint = <T extends AnyPTM>(
         context: PuzzleContext<T>,
         isFinalCheck: boolean,
         cellIndex: number,
+        value: number,
     ) => boolean,
 ): Constraint<T, OutsideClueProps> => {
     const clueCell = parsePositionLiteral(clueCellLiteral);
@@ -129,14 +130,14 @@ export const OutsideClueConstraint = <T extends AnyPTM>(
         ? parsePositionLiterals(cellLiteralsOrFieldSize)
         : getLineCellsByOutsideCell(clueCellLiteral, cellLiteralsOrFieldSize);
 
-    return {
+    const constraint: Constraint<T, OutsideClueProps> = {
         name,
         cells,
         color,
         props: {clueCell, value},
         component: OutsideClue,
         isValidCell(cell, digits, cells, context, _constraints, _constraint, isFinalCheck = false) {
-            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+            const {puzzle: {typeManager: {getDigitByCellData, transformNumber}}} = context;
 
             const currentDigit = getDigitByCellData(digits[cell.top][cell.left], context, cell);
             const cellDigits = cells.map((cell) => {
@@ -145,7 +146,11 @@ export const OutsideClueConstraint = <T extends AnyPTM>(
             });
             const cellIndex = cells.findIndex(position => isSamePosition(cell, position));
 
-            return isValidCell(currentDigit, cellDigits, context, isFinalCheck, cellIndex);
+            const expectedValue = transformNumber
+                ? transformNumber(value ?? 0, context, cells[0], constraint)
+                : value;
+
+            return isValidCell(currentDigit, cellDigits, context, isFinalCheck, cellIndex, expectedValue);
         },
         clone(constraint, {processCellCoords}): Constraint<T, OutsideClueProps> {
             return {
@@ -157,4 +162,6 @@ export const OutsideClueConstraint = <T extends AnyPTM>(
             };
         },
     };
+
+    return constraint;
 };

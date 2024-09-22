@@ -14,7 +14,7 @@ export const SandwichSumConstraint = <T extends AnyPTM>(
     cellLiteralsOrFieldSize,
     value,
     color,
-    (currentDigit, cellDigits, context, isFinalCheck) => {
+    (currentDigit, cellDigits, context, isFinalCheck, _cellIndex, value) => {
         const {digitsCount: maxDigit} = context;
 
         if (currentDigit !== 1 && currentDigit !== maxDigit) {

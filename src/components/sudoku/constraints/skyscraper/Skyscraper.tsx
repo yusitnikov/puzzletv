@@ -14,7 +14,7 @@ export const SkyscraperConstraint = <T extends AnyPTM>(
     cellLiteralsOrFieldSize,
     value,
     color,
-    (currentDigit, cellDigits, context, isFinalCheck, cellIndex) => {
+    (_currentDigit, cellDigits, _context, _isFinalCheck, cellIndex, value) => {
         let maxDigit = -1;
         let actualValue = 0;
         for (const [index, cellDigit] of cellDigits.entries()) {

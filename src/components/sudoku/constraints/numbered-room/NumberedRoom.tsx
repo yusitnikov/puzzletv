@@ -14,7 +14,7 @@ export const NumberedRoomConstraint = <T extends AnyPTM>(
     cellLiteralsOrFieldSize,
     value,
     color,
-    (currentDigit, cellDigits, context, isFinalCheck, cellIndex) => {
+    (currentDigit, cellDigits, _context, _isFinalCheck, cellIndex, value) => {
         const firstDigit = cellDigits[0];
 
         return firstDigit === undefined || cellIndex !== firstDigit - 1 || currentDigit === value;

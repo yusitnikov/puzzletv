@@ -15,7 +15,7 @@ export const XSumConstraint = <T extends AnyPTM>(
     cellLiteralsOrFieldSize,
     value,
     color,
-    (currentDigit, cellDigits, context, isFinalCheck, cellIndex) => {
+    (_currentDigit, cellDigits, _context, _isFinalCheck, cellIndex, value) => {
         const firstDigit = cellDigits[0];
         if (firstDigit === undefined) {
             return true;
