@@ -24,6 +24,7 @@ export const RotatableDigitCellData = observer(function RotatableDigitCellData<T
                 component: DigitComponent,
             } = digitComponentType,
         },
+        importOptions,
     } = puzzle;
 
     return <DigitComponent
@@ -31,7 +32,7 @@ export const RotatableDigitCellData = observer(function RotatableDigitCellData<T
         puzzle={puzzle}
         digit={data.digit}
         size={size}
-        color={getDefaultCellDataColor(props, data.sticky ? "#0c0" : userDigitColor)}
+        color={getDefaultCellDataColor(props, data.sticky && !importOptions?.stickyDigits ? "#0c0" : userDigitColor)}
     />;
 }) as <T extends AnyRotatablePTM>(props: CellDataProps<T>) => ReactElement;
 

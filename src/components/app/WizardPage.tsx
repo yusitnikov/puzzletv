@@ -247,7 +247,7 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
             height: rowsCount,
         } : undefined,
         noStickyRegionValidation: finalIsFirstGridSticky && !isShuffled && noStickyRegionValidation,
-        stickyDigits: !!finalAngleStep && stickyDigits,
+        stickyDigits: (!!finalAngleStep || type === PuzzleImportPuzzleType.Rotatable) && stickyDigits,
         stickyJigsawPiece: isJigsaw && finalAngleStep && hasStickyJigsawPiece ? stickyJigsawPiece : undefined,
         splitUnconnectedRegions,
         givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
@@ -311,6 +311,13 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
     // eslint-disable-next-line no-script-url
     const copyIdBookmarkletCode = "javascript:(()=>{const d=document,b=d.body,e=d.createElement('input');e.value=exportPuzzle();b.append(e);e.select();d.execCommand('copy');e.remove();})()";
 
+    const stickyDigitsControl = <Paragraph>
+        <label>
+            Digits should stay vertical:&nbsp;
+            <input type={"checkbox"} checked={stickyDigits} onChange={ev => setStickyDigits(ev.target.checked)}/>
+        </label>
+    </Paragraph>;
+
     return <div style={{
         display: "flex",
         flexDirection: width > height ? "row" : "column",
@@ -365,6 +372,8 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
                             </Select>
                         </label>
                     </Paragraph>
+
+                    {type === PuzzleImportPuzzleType.Rotatable && stickyDigitsControl}
                 </CollapsableFieldSet>
 
                 <CollapsableFieldSet legend={"Additional constraints"}>
@@ -558,12 +567,7 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
                     </Paragraph>}
 
                     {!!finalAngleStep && <>
-                        <Paragraph>
-                            <label>
-                                Digits should stay vertical:&nbsp;
-                                <input type={"checkbox"} checked={stickyDigits} onChange={ev => setStickyDigits(ev.target.checked)}/>
-                            </label>
-                        </Paragraph>
+                        {stickyDigitsControl}
 
                         {isJigsaw && <Paragraph>
                             <label>

@@ -350,7 +350,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     ) {
         this.addItems(QuadConstraint(
             gridParser.offsetCoords(cellLiteral),
-            values.map((digit) => this.typeManager.createCellDataByImportedDigit(digit)),
+            values.map((digit) => this.typeManager.createCellDataByImportedDigit(digit, this.importOptions)),
         ));
     }
 
@@ -938,7 +938,7 @@ export class PuzzleImporter<T extends AnyPTM> {
                         this.addSolutionDigit(gridParser, top, left, value);
                     }
                     this.initialDigits[offsetTop] = this.initialDigits[offsetTop] || {};
-                    this.initialDigits[offsetTop][offsetLeft] = this.typeManager.createCellDataByImportedDigit(value);
+                    this.initialDigits[offsetTop][offsetLeft] = this.typeManager.createCellDataByImportedDigit(value, this.importOptions);
                 }
                 break;
             case "string":

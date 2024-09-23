@@ -70,7 +70,7 @@ export const EmptyRotatable: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
     title,
     slug: "empty-rotatable",
-    typeManager: RotatableDigitSudokuTypeManager,
+    typeManager: RotatableDigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,

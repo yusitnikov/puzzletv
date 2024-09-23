@@ -62,7 +62,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
         </RulesUnorderedList>
         <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
     </>,
-    typeManager: RotatableDigitSudokuTypeManager,
+    typeManager: RotatableDigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
     initialDigits: {

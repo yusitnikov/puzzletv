@@ -85,7 +85,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         position?: Position
     ): T["cell"];
 
-    createCellDataByImportedDigit(digit: number): T["cell"];
+    createCellDataByImportedDigit(digit: number, importOptions: PuzzleImportOptions): T["cell"];
 
     getDigitByCellData(data: T["cell"], context: PuzzleContext<T>, cellPosition: Position): number;
 

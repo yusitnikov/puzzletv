@@ -121,7 +121,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         [PuzzleImportPuzzleType.Calculator]: regularTypeManager,
         [PuzzleImportPuzzleType.Cubedoku]: CubedokuTypeManager,
         [PuzzleImportPuzzleType.RotatableCube]: FullCubeTypeManager(),
-        [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager,
+        [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
             size: digitsCount,
             circleRegionsCount: Math.ceil((mainGridParser.size - 2) / 2),

@@ -16,6 +16,7 @@ import {isRotatableDigit, rotateDigit, rotateNumber} from "../../../components/s
 import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
 import {AddGameStateEx, addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import {RotatableGameState} from "./RotatableGameState";
+import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
 
 const isRotatableCellData = (puzzle: PuzzleDefinition<RotatableDigitPTM>, {digit, sticky}: RotatableDigit) =>
     !sticky && isRotatableDigit(puzzle, digit) && rotateDigit(puzzle, digit, 180) !== digit;
@@ -28,7 +29,8 @@ export const RotatableDigitSudokuTypeManagerBase = <T extends AnyPTM>(
     startAngle: number,
     angleDelta: number,
     showBackButton: boolean,
-    showStickyMode: boolean
+    showStickyMode: boolean,
+    compensateConstraintDigitAngle: boolean,
 ): SudokuTypeManager<AddGameStateEx<T, RotatableGameState, {}>> => ({
     ...addGameStateExToSudokuManager(baseTypeManager, {
         initialGameStateExtension: {
@@ -39,6 +41,7 @@ export const RotatableDigitSudokuTypeManagerBase = <T extends AnyPTM>(
     angleStep: angleDelta,
     allowRotation: true,
     isFreeRotation: false,
+    compensateConstraintDigitAngle,
 
     isReady({angle}): boolean {
         return startAngle === 0 || angle !== startAngle;
@@ -79,7 +82,7 @@ export const RotatableDigitSudokuTypeManagerBase = <T extends AnyPTM>(
     rotationallySymmetricDigits: true,
 });
 
-export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPTM> = RotatableDigitSudokuTypeManagerBase<RotatableDigitPTM>(
+export const RotatableDigitSudokuTypeManager = ({stickyDigits = false}: Partial<PuzzleImportOptions> = {}): SudokuTypeManager<RotatableDigitPTM> => RotatableDigitSudokuTypeManagerBase<RotatableDigitPTM>(
     {
         areSameCellData(
             data1,
@@ -123,17 +126,17 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
             return data as RotatableDigit;
         },
 
-        createCellDataByDisplayDigit(digit, {stateExtension: {isStickyMode}}): RotatableDigit {
+        createCellDataByDisplayDigit(digit, {stateExtension: {isStickyMode}, puzzle}): RotatableDigit {
             return {
                 digit,
-                sticky: isStickyMode,
+                sticky: isStickyMode || !!puzzle.importOptions?.stickyDigits,
             };
         },
 
         createCellDataByTypedDigit(digit, {puzzle, angle, stateExtension: {isStickyMode}}): RotatableDigit {
             const naiveResult: RotatableDigit = {
                 digit,
-                sticky: isStickyMode,
+                sticky: isStickyMode || !!puzzle.importOptions?.stickyDigits,
             };
 
             return {
@@ -142,8 +145,11 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
             };
         },
 
-        createCellDataByImportedDigit(digit): RotatableDigit {
-            return {digit};
+        createCellDataByImportedDigit(digit, importOptions): RotatableDigit {
+            return {
+                digit,
+                sticky: !!importOptions.stickyDigits,
+            };
         },
 
         getDigitByCellData(data, {puzzle, angle}) {
@@ -234,5 +240,6 @@ export const RotatableDigitSudokuTypeManager: SudokuTypeManager<RotatableDigitPT
     -90,
     180,
     false,
-    true
+    !stickyDigits,
+    stickyDigits,
 );
