@@ -237,7 +237,7 @@ export const RotatableDigitSudokuTypeManager = ({stickyDigits = false}: Partial<
             };
         },
     },
-    -90,
+    stickyDigits ? 0 : -90,
     180,
     false,
     !stickyDigits,
