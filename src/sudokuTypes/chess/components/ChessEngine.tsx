@@ -1,111 +1,194 @@
 import {observer} from "mobx-react-lite";
 import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {ChessPTM} from "../types/ChessPTM";
-import {useEffect, useMemo, useState} from "react";
-import {useChessHistory} from "./ChessHistory";
-import {ChessEngineResult} from "../types/ChessEngineResult";
+import {useEffect, useMemo} from "react";
+import {ChessHistoryManager} from "./ChessHistory";
+import {ChessEngineResult, VariationChessEngineResult} from "../types/ChessEngineResult";
 import {ChessBoardBase, FieldStateChessBoard, ReadOnlyChessBoard} from "../types/ChessBoard";
 import {parseChessCell} from "../types/utils";
 import {ChessMove, getChessMoveDescription} from "../types/ChessMove";
 import {ChessPieceTypeReverseMap} from "../types/ChessPieceType";
+import {profiler} from "../../../utils/profiler";
+import {makeAutoObservable, reaction, runInAction} from "mobx";
+import {isSamePosition} from "../../../types/layout/Position";
+import {computedFn} from "mobx-utils";
 
 interface ChessEngineProps {
     context: PuzzleContext<ChessPTM>;
 }
 
-export const ChessEngine = observer(function ChessEngine({context}: ChessEngineProps) {
-    const {currentFieldState} = context;
+export class ChessEngineManager {
+    private engineMoves: string[] | undefined = undefined;
+    private engineVariations: VariationChessEngineResult[] = [];
 
-    const halfMoves = useChessHistory(context, true).length;
+    static getInstance(context: PuzzleContext<ChessPTM>): ChessEngineManager {
+        return context.puzzleIndex.cache[ChessEngineManager.name] ??= new ChessEngineManager(context);
+    }
 
-    const fen = useMemo(
-        () => new FieldStateChessBoard(currentFieldState.cells).getFen(halfMoves),
-        [currentFieldState, halfMoves]
-    );
+    private constructor(private context: PuzzleContext<ChessPTM>) {
+        makeAutoObservable(this);
+    }
 
-    const [moves, setMoves] = useState<string[]>([]);
-    const [variations, setVariations] = useState<string[]>([]);
-    useEffect(() => {
-        setMoves([]);
-        setVariations([]);
+    get history() {
+        profiler.trace();
+        return ChessHistoryManager.getInstance(this.context).getChessHistory(true);
+    }
 
-        let aborted = false;
+    get halfMoves() {
+        profiler.trace();
+        return this.history.length;
+    }
 
-        const socket = new WebSocket("ws://localhost:3002");
+    get board() {
+        profiler.trace();
+        return new FieldStateChessBoard(this.context.currentFieldState.cells);
+    }
 
-        socket.addEventListener("open", () => {
-            if (aborted) {
-                return;
-            }
+    get fen() {
+        profiler.trace();
+        return this.board.getFen(this.halfMoves);
+    }
 
-            console.debug("Open!");
-            socket.send(JSON.stringify({variant: "sudoku", fen}));
+    get parsedMoves() {
+        profiler.trace();
+        return this.engineMoves
+            ?.map((moveStr) => parseEngineMoveOnBoard(this.board, moveStr, false))
+            ?.filter((move): move is ChessMove => move !== undefined);
+    }
+
+    readonly getMovesForCell = computedFn((top: number, left: number) => {
+        return this.parsedMoves
+            ?.filter(({start}) => isSamePosition(start, {top, left}))
+            ?.map(({end}) => end);
+    });
+
+    get movesForSelectedCell() {
+        if (this.context.selectedCellsCount !== 1) {
+            return [];
+        }
+
+        const {top, left} = this.context.firstSelectedCell!;
+        return this.getMovesForCell(top, left);
+    }
+
+    get formattedMoves() {
+        profiler.trace();
+        return this.engineMoves?.map((moveStr) => getEngineMoveDescription(this.board, moveStr, false));
+    }
+
+    get formattedVariations() {
+        profiler.trace();
+
+        return this.engineVariations.filter(Boolean).map(({depth, multipv, pv, score: {unit, value}}) => {
+            const board = new FieldStateChessBoard(this.context.currentFieldState.cells);
+
+            const moves = pv
+                .split(" ")
+                .map((moveStr) => getEngineMoveDescription(board, moveStr, true))
+                .join(" ");
+
+            return `[${depth}] [${unit}=${value}] ${multipv}. ${moves}`;
         });
+    }
 
-        socket.addEventListener("message", (ev) => {
-            if (aborted) {
-                return;
-            }
+    run() {
+        let disposeLastAction = () => {};
 
-            const result: ChessEngineResult = JSON.parse(ev.data.toString());
+        const disposeReaction = reaction(
+            () => this.fen,
+            (fen) => {
+                disposeLastAction();
 
-            const board = new FieldStateChessBoard(context.currentFieldState.cells);
+                runInAction(() => {
+                    this.engineMoves = undefined;
+                    this.engineVariations = [];
+                });
 
-            switch (result.type) {
-                case "moves":
-                    setMoves(result.moves.map((moveStr) => getEngineMoveDescription(board, moveStr, false)));
-                    break;
-                case "variation": {
-                    const {depth, multipv, pv, score: {unit, value}} = result;
+                let aborted = false;
 
-                    const moves = pv
-                        .split(" ")
-                        .map((moveStr) => getEngineMoveDescription(board, moveStr, true))
-                        .join(" ");
+                const socket = new WebSocket("ws://localhost:3002");
 
-                    const line = `[${depth}] [${unit}=${value}] ${multipv}. ${moves}`;
-                    setVariations((prev) => {
-                        if (multipv === 1) {
-                            return [line];
-                        }
-                        const next = [...prev];
-                        next[multipv - 1] = line;
-                        return next;
-                    });
-                    break;
-                }
-            }
-        });
+                socket.addEventListener("open", () => {
+                    if (aborted) {
+                        return;
+                    }
 
-        socket.addEventListener("close", () => {
-            if (aborted) {
-                return;
-            }
+                    console.debug("Open!");
+                    socket.send(JSON.stringify({variant: "sudoku", fen}));
+                });
 
-            console.debug("Closed!");
-        });
+                socket.addEventListener("message", (ev) => {
+                    if (aborted) {
+                        return;
+                    }
 
-        socket.addEventListener("error", () => {
-            if (aborted) {
-                return;
-            }
+                    const result: ChessEngineResult = JSON.parse(ev.data.toString());
 
-            console.debug("Error!");
-        });
+                    switch (result.type) {
+                        case "moves":
+                            runInAction(() => {
+                                this.engineMoves = result.moves;
+                            });
+                            break;
+                        case "variation":
+                            runInAction(() => {
+                                if (result.multipv === 1) {
+                                    this.engineVariations = [result];
+                                } else {
+                                    this.engineVariations[result.multipv - 1] = result;
+                                }
+                            });
+                            break;
+                    }
+                });
+
+                socket.addEventListener("close", () => {
+                    if (aborted) {
+                        return;
+                    }
+
+                    console.debug("Closed!");
+                });
+
+                socket.addEventListener("error", () => {
+                    if (aborted) {
+                        return;
+                    }
+
+                    console.debug("Error!");
+                });
+
+                disposeLastAction = () => {
+                    aborted = true;
+                    socket.close();
+                };
+            },
+            {
+                name: "runChessEngine",
+                fireImmediately: true,
+            },
+        );
 
         return () => {
-            aborted = true;
-            socket.close();
+            disposeLastAction();
+            disposeReaction();
         };
-    }, [fen]);
+    }
+}
+
+export const ChessEngine = observer(function ChessEngine({context}: ChessEngineProps) {
+    const manager = ChessEngineManager.getInstance(context);
+
+    const dispose = useMemo(() => manager.run(), [manager]);
+    useEffect(() => dispose, [dispose]);
 
     return <div style={{
         fontSize: context.cellSizeForSidePanel * 0.2,
         marginBottom: "0.5em",
     }}>
-        {/*<div>FEN: {fen}</div>*/}
+        {/*<div>FEN: {manager.fen}</div>*/}
 
-        {variations.map((line, index) => <div
+        {manager.formattedVariations.map((line, index) => <div
             key={index}
             title={line}
             style={{
@@ -117,7 +200,7 @@ export const ChessEngine = observer(function ChessEngine({context}: ChessEngineP
             {line}
         </div>)}
 
-        {moves.length > 0 && <div>Possible moves: {moves.join(", ")}</div>}
+        {manager.formattedMoves !== undefined && <div>Possible moves: {manager.formattedMoves.join(", ") || "none"}</div>}
     </div>;
 });
 
@@ -134,18 +217,24 @@ const parseEngineMove = (moveStr: string): Omit<ChessMove, "piece"> | undefined 
     };
 };
 
-const getEngineMoveDescription = (board: ChessBoardBase, moveStr: string, doTheMove: boolean): string => {
+const parseEngineMoveOnBoard = (board: ChessBoardBase, moveStr: string, doTheMove: boolean) => {
     const parsedMove = parseEngineMove(moveStr);
     if (!parsedMove) {
-        return moveStr;
+        return undefined;
     }
 
     const move = (doTheMove ? board : new ReadOnlyChessBoard(board))
         .move(parsedMove.start, parsedMove.end, parsedMove.promotionPiece);
     if (!move.piece) {
         console.warn("Got invalid move string from the engine", moveStr);
-        return moveStr;
+        return undefined;
     }
 
-    return getChessMoveDescription(move, true);
+    return move;
+};
+
+const getEngineMoveDescription = (board: ChessBoardBase, moveStr: string, doTheMove: boolean): string => {
+    const move = parseEngineMoveOnBoard(board, moveStr, doTheMove);
+
+    return move ? getChessMoveDescription(move, true) : moveStr;
 };

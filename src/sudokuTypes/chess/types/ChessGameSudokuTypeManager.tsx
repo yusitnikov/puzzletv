@@ -9,9 +9,11 @@ import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {ChessEngine} from "../components/ChessEngine";
+import {ChessEngine, ChessEngineManager} from "../components/ChessEngine";
 import {ChessHistory} from "../components/ChessHistory";
 import {FieldStateChessBoard} from "./ChessBoard";
+import {CellSelectionByDataProps, CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
+import {arrayContainsPosition} from "../../../types/layout/Position";
 
 const initialHeavyPieces = [
     ChessPieceType.rook,
@@ -67,11 +69,22 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         };
     },
 
+    getCellSelectionType(cell, context): Required<Pick<CellSelectionByDataProps<ChessPTM>, "color" | "strokeWidth">> | undefined {
+        const {movesForSelectedCell = []} = ChessEngineManager.getInstance(context);
+        if (arrayContainsPosition(movesForSelectedCell, cell)) {
+            return {
+                color: CellSelectionColor.secondary,
+                strokeWidth: 1,
+            };
+        }
+        return undefined;
+    },
+
     getReactions(context): IReactionDisposer[] {
         return [
             ...ChessSudokuTypeManager.getReactions?.(context) ?? [],
             reaction(
-                () => context.selectedCells.size === 1 ? context.selectedCells.first() : undefined,
+                () => context.selectedCellsCount === 1 ? context.firstSelectedCell : undefined,
                 (nextCell, cell) => {
                     if (!nextCell || !cell) {
                         return;
@@ -79,6 +92,11 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
 
                     const {top, left} = cell;
                     const {top: nextTop, left: nextLeft} = nextCell;
+
+                    const moves = ChessEngineManager.getInstance(context).getMovesForCell(top, left);
+                    if (moves && !arrayContainsPosition(moves, nextCell)) {
+                        return;
+                    }
 
                     const piece = context.getCellDigit(top, left);
                     if (!piece) {
