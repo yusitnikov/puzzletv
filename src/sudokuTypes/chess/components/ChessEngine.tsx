@@ -12,6 +12,9 @@ import {profiler} from "../../../utils/profiler";
 import {makeAutoObservable, reaction, runInAction} from "mobx";
 import {isSamePosition} from "../../../types/layout/Position";
 import {computedFn} from "mobx-utils";
+import {useEventListener} from "../../../hooks/useEventListener";
+import {settings} from "../../../types/layout/Settings";
+import {makeChessMove} from "../types/ChessGameSudokuTypeManager";
 
 interface ChessEngineProps {
     context: PuzzleContext<ChessPTM>;
@@ -89,6 +92,20 @@ export class ChessEngineManager {
 
             return `[${depth}] [${unit}=${value}] ${multipv}. ${moves}`;
         });
+    }
+
+    makeMove() {
+        const bestMoveStr = this.engineVariations[0]?.pv.split(" ")[0];
+        if (!bestMoveStr) {
+            return;
+        }
+
+        const bestMove = parseEngineMove(bestMoveStr);
+        if (!bestMove) {
+            return;
+        }
+
+        makeChessMove(this.context, bestMove.start, bestMove.end);
     }
 
     run() {
@@ -181,6 +198,12 @@ export const ChessEngine = observer(function ChessEngine({context}: ChessEngineP
 
     const dispose = useMemo(() => manager.run(), [manager]);
     useEffect(() => dispose, [dispose]);
+
+    useEventListener(window, "keydown", (ev) => {
+        if (!settings.isOpened && ev.code === "Space" && manager.formattedVariations.length) {
+            manager.makeMove();
+        }
+    });
 
     return <div style={{
         fontSize: context.cellSizeForSidePanel * 0.2,

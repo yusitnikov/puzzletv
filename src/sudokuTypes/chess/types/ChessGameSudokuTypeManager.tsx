@@ -9,11 +9,12 @@ import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory
 import {myClientId} from "../../../hooks/useMultiPlayer";
 import {getNextActionId} from "../../../types/sudoku/GameStateAction";
 import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
 import {ChessEngine, ChessEngineManager} from "../components/ChessEngine";
 import {ChessHistory} from "../components/ChessHistory";
 import {FieldStateChessBoard} from "./ChessBoard";
 import {CellSelectionByDataProps, CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
-import {arrayContainsPosition} from "../../../types/layout/Position";
+import {arrayContainsPosition, Position} from "../../../types/layout/Position";
 
 const initialHeavyPieces = [
     ChessPieceType.rook,
@@ -85,47 +86,17 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
             ...ChessSudokuTypeManager.getReactions?.(context) ?? [],
             reaction(
                 () => context.selectedCellsCount === 1 ? context.firstSelectedCell : undefined,
-                (nextCell, cell) => {
-                    if (!nextCell || !cell) {
+                (to, from) => {
+                    if (!to || !from) {
                         return;
                     }
 
-                    const {top, left} = cell;
-                    const {top: nextTop, left: nextLeft} = nextCell;
-
-                    const moves = ChessEngineManager.getInstance(context).getMovesForCell(top, left);
-                    if (moves && !arrayContainsPosition(moves, nextCell)) {
+                    const moves = ChessEngineManager.getInstance(context).getMovesForCell(from.top, from.left);
+                    if (moves && !arrayContainsPosition(moves, to)) {
                         return;
                     }
 
-                    const piece = context.getCellDigit(top, left);
-                    if (!piece) {
-                        return;
-                    }
-
-                    const capturedPiece = context.getCellDigit(nextTop, nextLeft);
-                    if (capturedPiece?.color === piece.color) {
-                        return;
-                    }
-
-                    context.onStateChange({
-                        fieldStateHistory: fieldStateHistoryAddState(
-                            context,
-                            myClientId,
-                            getNextActionId(),
-                            ({cells, ...state}) => {
-                                const board = new FieldStateChessBoard(cells);
-
-                                board.move(cell, nextCell);
-
-                                return {
-                                    ...state,
-                                    cells: board.cells,
-                                };
-                            }
-                        ),
-                        selectedCells: context.selectedCells.clear(),
-                    });
+                    makeChessMove(context, from, to);
                 },
                 {
                     name: "selected chess piece",
@@ -155,4 +126,35 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     },
 
     applyArrowsToHistory: true,
+};
+
+export const makeChessMove = (context: PuzzleContext<ChessPTM>, from: Position, to: Position) => {
+    const piece = context.getCellDigit(from.top, from.left);
+    if (!piece) {
+        return;
+    }
+
+    const capturedPiece = context.getCellDigit(to.top, to.left);
+    if (capturedPiece?.color === piece.color) {
+        return;
+    }
+
+    context.onStateChange({
+        fieldStateHistory: fieldStateHistoryAddState(
+            context,
+            myClientId,
+            getNextActionId(),
+            ({cells, ...state}) => {
+                const board = new FieldStateChessBoard(cells);
+
+                board.move(from, to);
+
+                return {
+                    ...state,
+                    cells: board.cells,
+                };
+            }
+        ),
+        selectedCells: context.selectedCells.clear(),
+    });
 };
