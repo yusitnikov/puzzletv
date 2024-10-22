@@ -111,6 +111,7 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
     const [splitUnconnectedRegions, setSplitUnconnectedRegions] = useBoolFromLocalStorage("fpwSplitUnconnectedRegions");
     const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
     const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
+    const [dashedGrid, setDashedGrid] = useBoolFromLocalStorage("fpwDashedGrid");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
     const [extraGridSource, setExtraGridSource] = useState(source);
     const [caterpillar, setCaterpillar] = useBoolFromLocalStorage("fpwCaterpillar");
@@ -251,6 +252,7 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
         stickyJigsawPiece: isJigsaw && finalAngleStep && hasStickyJigsawPiece ? stickyJigsawPiece : undefined,
         splitUnconnectedRegions,
         givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
+        dashedGrid,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
         offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
@@ -742,6 +744,13 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
                             If multiple cells marked as the same region in {typeLabel}, but not connected to each other,
                             treat them as different regions.
                         </Details>
+                    </Paragraph>
+
+                    <Paragraph>
+                        <label>
+                            Dashed grid:&nbsp;
+                            <input type={"checkbox"} checked={dashedGrid} onChange={ev => setDashedGrid(ev.target.checked)}/>
+                        </label>
                     </Paragraph>
 
                     {hasColors && !typeManagerPreview.colorsImportMode && <Paragraph>

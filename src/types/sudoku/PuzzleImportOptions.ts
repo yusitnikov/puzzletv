@@ -88,6 +88,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     givenDigitsBlockCars?: boolean;
     supportZero?: boolean;
     caterpillar?: boolean;
+    dashedGrid?: boolean;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -160,6 +161,7 @@ export const sanitizeImportOptions = (
         givenDigitsBlockCars,
         supportZero,
         caterpillar,
+        dashedGrid,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -228,6 +230,7 @@ export const sanitizeImportOptions = (
         givenDigitsBlockCars,
         supportZero,
         caterpillar,
+        dashedGrid,
     };
 
     return result;

@@ -18,10 +18,11 @@ interface FieldLinesByDataProps {
     borderWidth: number;
     customCellBorders: Position[][];
     regularBorders: Line[];
+    dashedGrid?: boolean;
 }
 
 const FieldLinesByData = observer((
-    {borderColor, borderWidth, customCellBorders, regularBorders}: FieldLinesByDataProps
+    {borderColor, borderWidth, customCellBorders, regularBorders, dashedGrid}: FieldLinesByDataProps
 ) => {
     profiler.trace();
 
@@ -42,6 +43,7 @@ const FieldLinesByData = observer((
             y2={end.top}
             stroke={borderColor}
             strokeWidth={borderWidth}
+            strokeDasharray={dashedGrid ? 0.125 : undefined}
         />)}
     </>;
 });
@@ -63,6 +65,7 @@ export const FieldLines: ConstraintPropsGenericFcMap = {
             fieldSize: {columnsCount, rowsCount},
             borderColor: puzzleBorderColor,
             customCellBounds,
+            dashedGrid,
         } = puzzle;
 
         const scale = useTransformScale();
@@ -130,6 +133,7 @@ export const FieldLines: ConstraintPropsGenericFcMap = {
             borderColor={borderColor}
             customCellBorders={customCellBorders}
             regularBorders={regularBorders}
+            dashedGrid={dashedGrid}
         />;
     }),
 };

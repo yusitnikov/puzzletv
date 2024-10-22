@@ -93,6 +93,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     ignoreEmptySolutionColors?: boolean;
     importOptions?: Partial<PuzzleImportOptions>;
     inactiveCells?: Position[];
+    dashedGrid?: boolean;
 }
 
 export const allDrawingModes: PuzzleDefinition<AnyPTM>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];

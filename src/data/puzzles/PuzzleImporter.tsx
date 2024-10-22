@@ -111,6 +111,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             loopY,
             allowOverrideColors = false,
             supportZero,
+            dashedGrid,
         } = importOptions;
 
         this.puzzle = {
@@ -132,6 +133,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             items: this.items,
             allowOverridingInitialColors: allowOverrideColors,
             supportZero,
+            dashedGrid,
             importOptions,
             resultChecker: noSpecialRules ? isValidFinishedPuzzleByConstraints : undefined,
         };
