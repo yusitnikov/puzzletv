@@ -93,6 +93,8 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
     const {playerIds, letters, turnIndex, words, letterOwners} = gameState;
 
     const currentPlayerId = playerIds[turnIndex % playerIds.length];
+    const myPlayerIndex = playerIds.indexOf(myClientId);
+    const normalizePlayerIndex = (index: number) => index < 0 ? index : index === myPlayerIndex ? 0 : index < myPlayerIndex ? index + 1 : index;
 
     let currentPlayerState = playerStateMap[currentPlayerId];
     if (currentPlayerState?.turnIndex !== turnIndex) {
@@ -144,7 +146,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                 {word.split("").map((letter, index) => <WordSearchLetter
                     key={index}
                     letter={letter}
-                    clientIndex={wordIndex % playerIds.length}
+                    clientIndex={normalizePlayerIndex(wordIndex % playerIds.length)}
                     cellSize={smallCellSize}
                 />)}
             </div>)}
@@ -159,11 +161,11 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                         borderRadius: "0.5em",
                         padding: "0.5em 1em",
                         color: "#fff",
-                        backgroundColor: clientColors[index],
+                        backgroundColor: clientColors[normalizePlayerIndex(index)],
                         transition: "outline-color 200ms linear",
                         outlineStyle: "solid",
                         outlineWidth: "0.4em",
-                        outlineColor: playerId === currentPlayerId ? rgba(clientColors[index], 0.3) : "transparent",
+                        outlineColor: playerId === currentPlayerId ? rgba(clientColors[normalizePlayerIndex(index)], 0.3) : "transparent",
                     }}
                 >
                     <div style={{
@@ -195,7 +197,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                     key={index}
                     letter={letter.letter}
                     active={myTurn}
-                    clientIndex={playerIds.indexOf(currentPlayerId)}
+                    clientIndex={normalizePlayerIndex(playerIds.indexOf(currentPlayerId))}
                     cellSize={cellSize}
                     onToggle={() => toggleLetter(letter)}
                 />)}
@@ -215,7 +217,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                             letter={letter}
                             active={myTurn}
                             inWord={isInWord(letterObj)}
-                            clientIndex={playerIds.indexOf(letterOwners[top][left])}
+                            clientIndex={normalizePlayerIndex(playerIds.indexOf(letterOwners[top][left]))}
                             cellSize={cellSize}
                             onToggle={() => toggleLetter(letterObj)}
                         >
