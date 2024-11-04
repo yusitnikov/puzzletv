@@ -92,6 +92,22 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
 
     const {playerIds, letters, turnIndex, words, letterOwners} = gameState;
 
+    const letterCountByOwner: Record<string, number> = {};
+    for (const playerId of letterOwners.flat()) {
+        letterCountByOwner[playerId] ??= 0;
+        letterCountByOwner[playerId]++;
+    }
+
+    const isGameFinished = !letterCountByOwner[""];
+
+    const playersSortedByLetterCount = Object.entries(letterCountByOwner)
+        .map(([playerId, count]) => ({playerId, count}))
+        .filter(({playerId}) => playerId !== '')
+        .sort((a, b) => b.count - a.count);
+    const winner = !isGameFinished || playersSortedByLetterCount[0]?.count === playersSortedByLetterCount[1]?.count
+        ? undefined
+        : playersSortedByLetterCount[0]?.playerId;
+
     const currentPlayerId = playerIds[turnIndex % playerIds.length];
     const myPlayerIndex = playerIds.indexOf(myClientId);
     const normalizePlayerIndex = (index: number) => index < 0 ? index : index === myPlayerIndex ? 0 : index < myPlayerIndex ? index + 1 : index;
@@ -101,7 +117,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
         currentPlayerState = {turnIndex: 0, word: []};
     }
 
-    const myTurn = currentPlayerId === myClientId && !currentPlayerState.commit;
+    const myTurn = currentPlayerId === myClientId && !currentPlayerState.commit && !isGameFinished;
 
     const currentWord = currentPlayerState.word;
     const currentWordStr = currentWord.map(({letter}) => letter).join("");
@@ -165,7 +181,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                         transition: "outline-color 200ms linear",
                         outlineStyle: "solid",
                         outlineWidth: "0.4em",
-                        outlineColor: playerId === currentPlayerId ? rgba(clientColors[normalizePlayerIndex(index)], 0.3) : "transparent",
+                        outlineColor: playerId === currentPlayerId && !isGameFinished ? rgba(clientColors[normalizePlayerIndex(index)], 0.3) : "transparent",
                     }}
                 >
                     <div style={{
@@ -188,7 +204,7 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
 
                     {getPlayerName(playerId)}
                     {" - "}
-                    {letterOwners.flat().filter((playerId2) => playerId2 === playerId).length}
+                    {letterCountByOwner[playerId] ?? 0}
                 </div>)}
             </div>
 
@@ -202,9 +218,12 @@ const WordSearchGameInner = observer(function WordSearchGameInner(
                     onToggle={() => toggleLetter(letter)}
                 />)}
 
-                {myTurn && !currentWord.length && <div style={{fontSize: cellSize * 0.7, lineHeight: `${cellSize}px`}}>
-                    {translate("Your move")}!
-                </div>}
+                <div style={{fontSize: cellSize * 0.7, lineHeight: `${cellSize}px`}}>
+                    {myTurn && !currentWord.length && `${translate("Your move")}!`}
+
+                    {isGameFinished && !winner && `${translate("It's a draw")}!`}
+                    {isGameFinished && winner && `${translate("%1 win").replace("%1", getPlayerName(winner))}!`}
+                </div>
             </div>
 
             <div>

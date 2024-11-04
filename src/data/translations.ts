@@ -287,6 +287,10 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Вы набрали %1 очков",
         [LanguageCode.de]: "Ihr Punktestand beträgt %1",
     },
+    "%1 win": {
+        [LanguageCode.ru]: "%1 выиграл(а)",
+        [LanguageCode.de]: "%1 gewinnt",
+    },
     "You win": {
         [LanguageCode.ru]: "Вы выиграли",
         [LanguageCode.de]: "Du gewinnst",
