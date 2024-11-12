@@ -269,7 +269,7 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 .filter(isPivot)
                 .map(({cells: [cell], props: {width: diameter}}) => ({
                     cell,
-                    radius: (keepCircles && !isWheels) ? diameter / 2 : 0.5,
+                    radius: Math.max((keepCircles && !isWheels) ? diameter / 2 : 0.5, 0.5),
                 }));
 
             if (!keepCircles) {
