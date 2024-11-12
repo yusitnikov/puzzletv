@@ -27,7 +27,7 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Wheels on the Bus",
     },
-    typeManager: RotatableCluesSudokuTypeManager(DigitSudokuTypeManager(), true),
+    typeManager: RotatableCluesSudokuTypeManager({baseTypeManager: DigitSudokuTypeManager(), isEquivalentLoop: true}),
     fieldSize: FieldSize9,
     regions: Regions9,
     extension: {

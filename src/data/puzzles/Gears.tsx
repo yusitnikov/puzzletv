@@ -19,7 +19,7 @@ export const Gears: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Gears test",
     },
-    typeManager: RotatableCluesSudokuTypeManager(DigitSudokuTypeManager(), false),
+    typeManager: RotatableCluesSudokuTypeManager({baseTypeManager: DigitSudokuTypeManager(), isEquivalentLoop: false}),
     fieldSize: FieldSize9,
     regions: Regions9,
     extension: {

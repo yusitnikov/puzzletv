@@ -65,7 +65,7 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Astronavigation",
     },
-    typeManager: ImportedRotatableCluesSudokuTypeManager(DigitSudokuTypeManager()),
+    typeManager: ImportedRotatableCluesSudokuTypeManager({baseTypeManager: DigitSudokuTypeManager()}),
     fieldSize: FieldSize9,
     regions: Regions9,
     rules: () => <>

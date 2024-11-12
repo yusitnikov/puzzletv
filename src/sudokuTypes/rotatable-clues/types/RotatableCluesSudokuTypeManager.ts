@@ -28,16 +28,27 @@ interface CluesImporterResult<T extends AnyPTM> {
     filteredItems?: PuzzleDefinition<RotatableCluesPTM<T>>["items"];
 }
 
+interface RotatableCluesOptions<T extends AnyPTM> {
+    baseTypeManager: SudokuTypeManager<T>;
+    // Do all clues remain the same when the pivot is turned 360 degrees?
+    isEquivalentLoop: boolean;
+    compensateConstraintDigitAngle?: boolean;
+    cluesImporter?: (puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => CluesImporterResult<T>;
+    angleStep?: number;
+}
+
 export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     {
-        postProcessPuzzle,
-        controlButtons = [],
-        ...baseTypeManager
-    }: SudokuTypeManager<T>,
-    // Do all clues remain the same when the pivot is turned 360 degrees?
-    isEquivalentLoop: boolean,
-    compensateConstraintDigitAngle = true,
-    cluesImporter: ((puzzle: PuzzleDefinition<RotatableCluesPTM<T>>) => CluesImporterResult<T>) | undefined = undefined,
+        baseTypeManager: {
+            postProcessPuzzle,
+            controlButtons = [],
+            ...baseTypeManager
+        },
+        isEquivalentLoop,
+        compensateConstraintDigitAngle = true,
+        cluesImporter,
+        angleStep = 90,
+    }: RotatableCluesOptions<T>
 ): SudokuTypeManager<RotatableCluesPTM<T>> => ({
     ...addGameStateExToSudokuManager(
         addFieldStateExToSudokuManager(
@@ -100,7 +111,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                             return manualAngle;
                         }
                         const digit = puzzle.typeManager.getDigitByCellData(data, context, {top, left});
-                        const forcedAngle = digit * 90;
+                        const forcedAngle = digit * angleStep;
                         // Find the closest angle to the manual angle, so that we don't have weird animation (but rotate only clockwise)
                         return isEquivalentLoop
                             ? manualAngle + loop(forcedAngle - manualAngle, 360)
@@ -209,12 +220,12 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
         {
             key: "rotate-clue-right",
             region: ControlButtonRegion.additional,
-            Component: RotateClueButton(90),
+            Component: RotateClueButton(angleStep),
         },
         {
             key: "rotate-clue-left",
             region: ControlButtonRegion.additional,
-            Component: RotateClueButton(-90),
+            Component: RotateClueButton(-angleStep),
         },
     ],
 
@@ -237,13 +248,11 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
 });
 
 export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
-    baseTypeManager: SudokuTypeManager<T>,
-    compensateConstraintDigitAngle = true,
-) => RotatableCluesSudokuTypeManager(
-    baseTypeManager,
-    true,
-    compensateConstraintDigitAngle,
-    (puzzle) => {
+    options: Omit<RotatableCluesOptions<T>, "isEquivalentLoop" | "cluesImporter">,
+) => RotatableCluesSudokuTypeManager({
+    ...options,
+    isEquivalentLoop: true,
+    cluesImporter: (puzzle) => {
         const isWheels = puzzle.importOptions?.wheels;
         const keepCircles = puzzle.importOptions?.keepCircles;
 
@@ -353,4 +362,4 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
 
         return {clues: []};
     },
-);
+});

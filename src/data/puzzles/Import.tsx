@@ -102,6 +102,8 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         startOffset = 0,
         jss,
         rotatableClues,
+        freeRotation,
+        angleStep,
         stickyConstraintDigitAngle,
         sokoban,
         eggs,
@@ -156,7 +158,11 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         typeManager = JssSudokuTypeManager(typeManager, hasZeroRegion);
     }
     if (rotatableClues) {
-        typeManager = ImportedRotatableCluesSudokuTypeManager(typeManager, !stickyConstraintDigitAngle);
+        typeManager = ImportedRotatableCluesSudokuTypeManager({
+            baseTypeManager: typeManager,
+            compensateConstraintDigitAngle: !stickyConstraintDigitAngle,
+            angleStep: freeRotation ? angleStep || 90 : 90,
+        });
     }
     if (screws) {
         typeManager = ImportedScrewsSudokuTypeManager(typeManager);

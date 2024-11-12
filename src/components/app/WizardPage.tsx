@@ -145,7 +145,11 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
     ].includes(type);
     const supportsJss = isRotatableGrid || (!isSpecialGrid && !loopX && !loopY);
 
-    const finalAngleStep = isTetris ? 90 : isJigsaw ? angleStep || undefined : undefined;
+    const finalAngleStep = isTetris
+        ? 90
+        : isJigsaw || (rotatableClues && freeRotation)
+            ? angleStep || undefined
+            : undefined;
 
     const filteredExtraGrids = useMemo(
         () => !supportsExtraGrids ? [] : extraGrids
@@ -416,6 +420,10 @@ export const WizardPage = observer(({load, slug, title, source}: WizardPageProps
                                     <input type={"checkbox"} checked={freeRotation} onChange={ev => setFreeRotation(ev.target.checked)}/>
                                 </label>
                             </Paragraph>
+                            {freeRotation && <Paragraph>
+                                Rotation step:&nbsp;
+                                <input type={"number"} value={angleStep} onChange={ev => setAngleStep(ev.target.valueAsNumber)} style={{width: 40}}/>
+                            </Paragraph>}
                             {!wheels && <>
                                 <Paragraph>
                                     <label>
