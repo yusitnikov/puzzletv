@@ -1,25 +1,23 @@
 # Puzzle TV
 
-A web application for creating and solving different types of sudoku.
+A web application for creating and solving different types of sudoku and pencil puzzles.
 
-## Available Scripts
+## Installation
 
-In the project directory, you can run:
+Clone the repository, install Node.js and npm, and run `npm install`.
 
-### `npm start`
+## Running the application
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Run `npm start` to start the application
+and open http://localhost:3000 in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The page will reload if you make edits,
+but sometimes refreshing the tab is still necessary.
 
-### `npm run build`
+## Understanding the codebase
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The project is a frontend-only JavaScript/TypeScript application
+based on [React](https://react.dev/) for web components,
+[MobX](https://mobx.js.org/) for global state management,
+[Emotion](https://emotion.sh/) for styles,
+and [ably](https://ably.com/) for web sockets.
