@@ -196,7 +196,10 @@ export enum ConstraintType {
     CosmeticSymbol = 2002,
 
     // Complex placeable constraints
-    SudokuRules
+    SudokuRules,
+
+    // Misc
+    Fog = 4000,
 }
 
 export interface LineConstraintConfigBase {
@@ -460,6 +463,12 @@ export interface BetweenLinesConstraintConfig extends LineWithEndPointsConfigBas
     type: ConstraintType.BetweenLines
 }
 
+export interface FogConfig {
+    type: ConstraintType.Fog
+    cells: CellId[]
+    triggers?: Record<CellId, CellId[]>
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type UserDefined = any
 
@@ -588,6 +597,7 @@ export type ConstraintConfigMap = {
     [ConstraintType.Whisper]: WhisperConstraintConfig
     [ConstraintType.XSums]: XSumsConstraintConfig
     [ConstraintType.XV]: XVConstraintConfig
+    [ConstraintType.Fog]: FogConfig
 }
 
 export type ConstraintConfig = ConstraintConfigMap[ConstraintType]

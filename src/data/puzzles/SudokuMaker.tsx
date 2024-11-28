@@ -36,6 +36,7 @@ import {
     EdgeId,
     EllipseSymbolParams,
     EvenConstraintConfig,
+    FogConfig,
     GivensConstraintConfig,
     GlobalEntropyConstraintConfig,
     KillerCagesConstraintConfig,
@@ -128,6 +129,8 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
     }
 
     addToImporter(importer: PuzzleImporter<T>) {
+        let fogCells: Position[] = [];
+
         new ObjectParser<CompressedPuzzle>({
             type: (type) => {
                 importer.toggleSudokuRules(type !== PuzzleType.Custom);
@@ -747,19 +750,23 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                 type: undefined,
                                 cages: (cages, {style: {cage: {color: cageColor}, text: {color: fontColor}}}) => {
                                     for (const cage of cages) {
-                                        if (isFowCage(cage)) {
-                                            continue;
-                                        }
+                                        const isFow = isFowCage(cage);
 
                                         new ObjectParser<Cage>({
                                             cells: (cells, {value}) => {
-                                                importer.addCosmeticCage(
-                                                    this,
-                                                    this.parseCellIds(cells),
-                                                    value,
-                                                    cageColor,
-                                                    fontColor,
-                                                );
+                                                const parsedCells = this.parseCellIds(cells);
+
+                                                if (isFow) {
+                                                    fogCells = [...fogCells, ...parsedCells];
+                                                } else {
+                                                    importer.addCosmeticCage(
+                                                        this,
+                                                        this.parseCellIds(cells),
+                                                        value,
+                                                        cageColor,
+                                                        fontColor,
+                                                    );
+                                                }
                                             },
                                             value: undefined,
                                         }).parse(cage, "cosmetic cage");
@@ -908,6 +915,17 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                             }).parse(constraint, "sudoku rules");
                             importer.toggleSudokuRules(true);
                             break;
+                        case ConstraintType.Fog:
+                            new ObjectParser<FogConfig>({
+                                type: undefined,
+                                cells: (cells) => {
+                                    fogCells = [...fogCells, ...this.parseCellIds(cells)];
+                                },
+                                // triggers: (triggers) => {
+                                //     // TODO
+                                // },
+                            }).parse(constraint, "fog");
+                            break;
                         default:
                             console.warn("Unrecognized SudokuMaker constraint type", (constraint as any).type);
                             break;
@@ -932,15 +950,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
         }, ["type"]).parse(this.puzzleJson, "SudokuMaker data");
 
         if (this.hasFog) {
-            importer.addFog(
-                this,
-                [],
-                this.puzzleJson.constraints
-                    .filter((item) => item.type === ConstraintType.CosmeticCage)
-                    .flatMap((item) => (item as CosmeticCageConstraintConfig).cages)
-                    .filter(isFowCage)
-                    .flatMap((cage) => this.parseCellIds(cage.cells))
-            );
+            importer.addFog(this, [], fogCells);
         }
     }
 
@@ -1048,7 +1058,10 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
         );
     }
     get hasFog() {
-        return this.puzzleJson.constraints.some((item) => item.type === ConstraintType.CosmeticCage && item.cages.some(isFowCage));
+        return this.puzzleJson.constraints.some(
+            (item) => item.type === ConstraintType.Fog
+                || (item.type === ConstraintType.CosmeticCage && item.cages.some(isFowCage))
+        );
     }
     get hasCosmeticElements() {
         return this.puzzleJson.constraints.some(
