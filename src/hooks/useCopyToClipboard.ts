@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {copyToClipboard} from "../utils/clipboard";
+import { useState } from "react";
+import { copyToClipboard } from "../utils/clipboard";
 
 export const useCopyToClipboard = (): [(text: string) => Promise<void>, boolean] => {
     const [isCopied, setIsCopied] = useState(false);

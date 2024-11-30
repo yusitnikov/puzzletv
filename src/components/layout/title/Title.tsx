@@ -1,13 +1,13 @@
-import {ReactNode, useEffect} from "react";
-import {createPortal} from "react-dom";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
+import { ReactNode, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
 
 export interface TitleProps {
     children: ReactNode;
 }
 
-export const Title = observer(function TitleFc({children}: TitleProps) {
+export const Title = observer(function TitleFc({ children }: TitleProps) {
     profiler.trace();
 
     useEffect(() => {

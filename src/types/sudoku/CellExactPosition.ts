@@ -1,5 +1,5 @@
-import {Position} from "../layout/Position";
-import {CellPart} from "./CellPart";
+import { Position } from "../layout/Position";
+import { CellPart } from "./CellPart";
 
 export interface CellExactPosition {
     center: Position;

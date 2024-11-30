@@ -1,33 +1,29 @@
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
+import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
 import {
     isSamePosition,
     parsePositionLiteral,
     parsePositionLiterals,
-    PositionLiteral
+    PositionLiteral,
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../../utils/profiler";
-import {blueColor, greenColor, lightRedColor} from "../../../app/globals";
-import {FieldSize} from "../../../../types/sudoku/FieldSize";
-import {indexes} from "../../../../utils/indexes";
-import {parseColorWithOpacity, rgba} from "../../../../utils/color";
+import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../../utils/profiler";
+import { blueColor, greenColor, lightRedColor } from "../../../app/globals";
+import { FieldSize } from "../../../../types/sudoku/FieldSize";
+import { indexes } from "../../../../utils/indexes";
+import { parseColorWithOpacity, rgba } from "../../../../utils/color";
 
 const Indexer: ConstraintPropsGenericFcMap = {
-    [FieldLayer.beforeSelection]: observer(function Indexer<T extends AnyPTM>({cells: [{left, top}], color}: ConstraintProps<T>) {
+    [FieldLayer.beforeSelection]: observer(function Indexer<T extends AnyPTM>({
+        cells: [{ left, top }],
+        color,
+    }: ConstraintProps<T>) {
         profiler.trace();
 
-        const {rgb, a} = parseColorWithOpacity(color!);
+        const { rgb, a } = parseColorWithOpacity(color!);
 
-        return <rect
-            x={left}
-            y={top}
-            width={1}
-            height={1}
-            fill={rgb}
-            opacity={a}
-        />;
+        return <rect x={left} y={top} width={1} height={1} fill={rgb} opacity={a} />;
     }),
 };
 
@@ -50,7 +46,11 @@ export const IndexerConstraint = <T extends AnyPTM>(
         props: undefined,
         isObvious: false,
         isValidCell(cell, digits, [indexingCell, ...indexedCells], context) {
-            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+            const {
+                puzzle: {
+                    typeManager: { getDigitByCellData },
+                },
+            } = context;
 
             const indexData = digits[indexingCell.top]?.[indexingCell.left];
             if (indexData === undefined) {
@@ -73,7 +73,7 @@ export const IndexerConstraint = <T extends AnyPTM>(
 
 export const RowIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    {columnsCount}: FieldSize,
+    { columnsCount }: FieldSize,
     color = rgba(greenColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
@@ -81,7 +81,7 @@ export const RowIndexerConstraint = <T extends AnyPTM>(
     return IndexerConstraint<T>(
         "row indexer",
         cell,
-        indexes(columnsCount).map((top) => ({...cell, top})),
+        indexes(columnsCount).map((top) => ({ ...cell, top })),
         cell.top + 1,
         color,
     );
@@ -89,7 +89,7 @@ export const RowIndexerConstraint = <T extends AnyPTM>(
 
 export const ColumnIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    {rowsCount}: FieldSize,
+    { rowsCount }: FieldSize,
     color = rgba(lightRedColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
@@ -97,7 +97,7 @@ export const ColumnIndexerConstraint = <T extends AnyPTM>(
     return IndexerConstraint<T>(
         "column indexer",
         cell,
-        indexes(rowsCount).map((left) => ({...cell, left})),
+        indexes(rowsCount).map((left) => ({ ...cell, left })),
         cell.left + 1,
         color,
     );
@@ -105,7 +105,7 @@ export const ColumnIndexerConstraint = <T extends AnyPTM>(
 
 export const BoxIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    {columnsCount, regionWidth = columnsCount, regionHeight = 1}: FieldSize,
+    { columnsCount, regionWidth = columnsCount, regionHeight = 1 }: FieldSize,
     color = rgba(blueColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
@@ -116,10 +116,12 @@ export const BoxIndexerConstraint = <T extends AnyPTM>(
     return IndexerConstraint<T>(
         "box indexer",
         cell,
-        indexes(regionHeight).flatMap((top) => indexes(regionWidth).map((left) => ({
-            top: boxTopIndex * regionHeight + top,
-            left: boxLeftIndex * regionWidth + left,
-        }))),
+        indexes(regionHeight).flatMap((top) =>
+            indexes(regionWidth).map((left) => ({
+                top: boxTopIndex * regionHeight + top,
+                left: boxLeftIndex * regionWidth + left,
+            })),
+        ),
         boxTopIndex * (columnsCount / regionWidth) + boxLeftIndex + 1,
         color,
     );

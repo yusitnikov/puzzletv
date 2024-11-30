@@ -1,6 +1,6 @@
-import {Constraint} from "../Constraint";
-import {normalizePuzzlePosition} from "../PuzzleDefinition";
-import {AnyPTM} from "../PuzzleTypeMap";
+import { Constraint } from "../Constraint";
+import { normalizePuzzlePosition } from "../PuzzleDefinition";
+import { AnyPTM } from "../PuzzleTypeMap";
 
 export const AntiKnightConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "anti-knight",
@@ -13,9 +13,15 @@ export const AntiKnightConstraint = <T extends AnyPTM>(): Constraint<T> => ({
         for (let dx = -2; dx <= 2; dx++) {
             for (let dy = -2; dy <= 2; dy++) {
                 if (Math.abs(dx * dy) === 2) {
-                    const otherCell = normalizePuzzlePosition({top: cell.top + dy, left: cell.left + dx}, context.puzzle);
+                    const otherCell = normalizePuzzlePosition(
+                        { top: cell.top + dy, left: cell.left + dx },
+                        context.puzzle,
+                    );
                     const digit2 = digits[otherCell.top]?.[otherCell.left];
-                    if (digit2 !== undefined && context.puzzle.typeManager.areSameCellData(digit2, digit, context, otherCell, cell)) {
+                    if (
+                        digit2 !== undefined &&
+                        context.puzzle.typeManager.areSameCellData(digit2, digit, context, otherCell, cell)
+                    ) {
                         return false;
                     }
                 }

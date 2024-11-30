@@ -1,16 +1,18 @@
-import {GivenDigitsMap} from "../types/sudoku/GivenDigitsMap";
-import {indexes, indexesFromTo} from "./indexes";
-import {Position} from "../types/layout/Position";
+import { GivenDigitsMap } from "../types/sudoku/GivenDigitsMap";
+import { indexes, indexesFromTo } from "./indexes";
+import { Position } from "../types/layout/Position";
 
 export type RandomGenerator = () => number;
 
 // "mulberry32" - see https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
-export const createRandomGenerator = (seed: number): RandomGenerator => () => {
-    let t = seed += 0x6D2B79F5;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-};
+export const createRandomGenerator =
+    (seed: number): RandomGenerator =>
+    () => {
+        let t = (seed += 0x6d2b79f5);
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
 
 export const getDailyRandomGeneratorSeed = (typeSeed: number) => {
     const date = new Date();
@@ -18,7 +20,11 @@ export const getDailyRandomGeneratorSeed = (typeSeed: number) => {
     return typeSeed * 1000000 + date.getUTCFullYear() * 10000 + date.getUTCMonth() * 100 + date.getUTCDate();
 };
 
-export const generateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, randomOrSeed: number): GivenDigitsMap<number> => {
+export const generateRandomPuzzleDigits = (
+    fieldSize: number,
+    regionWidth: number,
+    randomOrSeed: number,
+): GivenDigitsMap<number> => {
     const random = createRandomGenerator(randomOrSeed);
 
     while (true) {
@@ -47,7 +53,11 @@ export const shuffleArray = <T>(array: T[], random: RandomGenerator): T[] => {
     return shuffled;
 };
 
-const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, random: RandomGenerator): GivenDigitsMap<number> | undefined => {
+const tryGenerateRandomPuzzleDigits = (
+    fieldSize: number,
+    regionWidth: number,
+    random: RandomGenerator,
+): GivenDigitsMap<number> | undefined => {
     const regionHeight = fieldSize / regionWidth;
 
     const initialDigits: GivenDigitsMap<number> = {};
@@ -57,9 +67,7 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
         digitOptions[rowIndex] = {};
 
         for (const columnIndex of indexes(fieldSize)) {
-            digitOptions[rowIndex][columnIndex] = new Set(
-                shuffleArray(indexesFromTo(1, fieldSize, true), random)
-            );
+            digitOptions[rowIndex][columnIndex] = new Set(shuffleArray(indexesFromTo(1, fieldSize, true), random));
         }
     }
 
@@ -75,10 +83,10 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
 
         initialDigits[rowIndex][columnIndex] = digit;
 
-        const boxRowIndex = rowIndex - rowIndex % regionHeight;
-        const boxColumnIndex = columnIndex - columnIndex % regionWidth;
+        const boxRowIndex = rowIndex - (rowIndex % regionHeight);
+        const boxColumnIndex = columnIndex - (columnIndex % regionWidth);
 
-        const candidatesToRemove: Position[] = indexes(fieldSize).flatMap(index => [
+        const candidatesToRemove: Position[] = indexes(fieldSize).flatMap((index) => [
             {
                 top: rowIndex,
                 left: index,
@@ -88,16 +96,16 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
                 left: columnIndex,
             },
             {
-                top: boxRowIndex + index % regionHeight,
+                top: boxRowIndex + (index % regionHeight),
                 left: boxColumnIndex + Math.floor(index / regionHeight),
             },
         ]);
 
-        for (const {top, left} of candidatesToRemove) {
+        for (const { top, left } of candidatesToRemove) {
             digitOptions[top][left].delete(digit);
         }
 
-        for (const {top, left} of candidatesToRemove) {
+        for (const { top, left } of candidatesToRemove) {
             if (digitOptions[top][left].size <= 1) {
                 return putRandomDigit(top, left);
             }
@@ -110,13 +118,15 @@ const tryGenerateRandomPuzzleDigits = (fieldSize: number, regionWidth: number, r
         const boxRowOffset = boxLeft * regionHeight;
 
         for (const boxTop of indexes(fieldSize / regionWidth)) {
-            const boxColumnOffset = (boxTop + boxLeft) * regionWidth % fieldSize;
+            const boxColumnOffset = ((boxTop + boxLeft) * regionWidth) % fieldSize;
 
             for (const index of indexes(fieldSize)) {
-                if (!putRandomDigit(
-                    boxRowOffset + index % regionHeight,
-                    boxColumnOffset + Math.floor(index / regionHeight)
-                )) {
+                if (
+                    !putRandomDigit(
+                        boxRowOffset + (index % regionHeight),
+                        boxColumnOffset + Math.floor(index / regionHeight),
+                    )
+                ) {
                     return undefined;
                 }
             }

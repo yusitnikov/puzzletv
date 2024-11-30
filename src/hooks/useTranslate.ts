@@ -1,6 +1,6 @@
-import {useRoute} from "./useRoute";
-import {LanguageCode} from "../types/translations/LanguageCode";
-import {bindTranslate} from "../utils/translate";
+import { useRoute } from "./useRoute";
+import { LanguageCode } from "../types/translations/LanguageCode";
+import { bindTranslate } from "../utils/translate";
 
 export const useLanguageCode = () => useRoute().params.lang as LanguageCode;
 

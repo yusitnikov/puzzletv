@@ -1,7 +1,7 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import {
     arrowsExplained,
     arrowsTitle,
@@ -16,25 +16,25 @@ import {
     normalSudokuRulesApply,
     renbanExplained,
     renbanTitle,
-    ruleWithTitle
+    ruleWithTitle,
 } from "../ruleSnippets";
-import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
-import {BetweenLineConstraint} from "../../components/sudoku/constraints/between-line/BetweenLine";
-import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
-import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
-import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
+import { KillerCageConstraintByRect } from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
+import { BetweenLineConstraint } from "../../components/sudoku/constraints/between-line/BetweenLine";
+import { EvenConstraint } from "../../components/sudoku/constraints/even/Even";
+import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
+import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
 import React from "react";
-import {CellSelectionColor, CellSelectionByDataProps} from "../../components/sudoku/cell/CellSelection";
-import {Raumplaner} from "../authors";
+import { CellSelectionColor, CellSelectionByDataProps } from "../../components/sudoku/cell/CellSelection";
+import { Raumplaner } from "../authors";
 import {
     isValidFinishedPuzzleByStageConstraints,
-    MultiStageSudokuTypeManager
+    MultiStageSudokuTypeManager,
 } from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
-import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
-import {Constraint} from "../../types/sudoku/Constraint";
-import {MultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
+import { PuzzleContext } from "../../types/sudoku/PuzzleContext";
+import { Constraint } from "../../types/sudoku/Constraint";
+import { MultiStagePTM } from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
 
 const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     switch (stage) {
@@ -155,50 +155,75 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
     slug: "hidden-setup",
     saveStateKey: "hidden-setup-v2",
     typeManager: {
-        ...MultiStageSudokuTypeManager({getStage}),
+        ...MultiStageSudokuTypeManager({ getStage }),
         getCellSelectionType(
-            {top, left},
-            {stateExtension: {stage}}
+            { top, left },
+            { stateExtension: { stage } },
         ): Required<Pick<CellSelectionByDataProps<MultiStagePTM>, "color" | "strokeWidth">> | undefined {
             const colors = getStageCellsMap(stage);
 
-            return colors[top]?.[left] === undefined ? undefined : {
-                color: CellSelectionColor.secondary,
-                strokeWidth: 1,
-            };
+            return colors[top]?.[left] === undefined
+                ? undefined
+                : {
+                      color: CellSelectionColor.secondary,
+                      strokeWidth: 1,
+                  };
         },
     },
     fieldSize: FieldSize9,
     regions: Regions9,
-    rules: (translate, {stateExtension: {stage}}) => {
-        return <>
-            <RulesParagraph>{translate({
-                [LanguageCode.en]: "This puzzle does reveal its clues in stages",
-                [LanguageCode.ru]: "Этот судоку раскрывает свои подсказки поэтапно",
-                [LanguageCode.de]: "Dieses Rätsel enthüllt seine Hinweise schrittweise",
-            })}.</RulesParagraph>
-            <RulesParagraph>{translate({
-                [LanguageCode.en]: "Enter the correct digits into the highlighted cells to proceed to the next stage of the puzzle",
-                [LanguageCode.ru]: "Введите правильные цифры в выделенные ячейки, чтобы перейти к следующему этапу",
-                [LanguageCode.de]: "Geben Sie die richtigen Ziffern in die hervorgehobenen Zellen ein, um mit der nächsten Stufe des Rätsels fortzufahren",
-            })}.</RulesParagraph>
-            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-            <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
-            <RulesUnorderedList>
-                <li>{ruleWithTitle(translate(evenTitle), translate(evenExplained))}.</li>
-                <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</li>
-                <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
-                <li>{ruleWithTitle(translate(inBetweenLineTitle), translate(inBetweenLineExplained))}.</li>
-                {stage >= 2 && <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>}
-            </RulesUnorderedList>
-            {stage < 2 && <RulesParagraph>{translate({
-                [LanguageCode.en]: "In later stages there will be additional clues",
-                [LanguageCode.ru]: "На более поздних этапах будут дополнительные подсказки",
-                [LanguageCode.de]: "In späteren Phasen wird es zusätzliche Hinweise geben",
-            })}.</RulesParagraph>}
-        </>;
+    rules: (translate, { stateExtension: { stage } }) => {
+        return (
+            <>
+                <RulesParagraph>
+                    {translate({
+                        [LanguageCode.en]: "This puzzle does reveal its clues in stages",
+                        [LanguageCode.ru]: "Этот судоку раскрывает свои подсказки поэтапно",
+                        [LanguageCode.de]: "Dieses Rätsel enthüllt seine Hinweise schrittweise",
+                    })}
+                    .
+                </RulesParagraph>
+                <RulesParagraph>
+                    {translate({
+                        [LanguageCode.en]:
+                            "Enter the correct digits into the highlighted cells to proceed to the next stage of the puzzle",
+                        [LanguageCode.ru]:
+                            "Введите правильные цифры в выделенные ячейки, чтобы перейти к следующему этапу",
+                        [LanguageCode.de]:
+                            "Geben Sie die richtigen Ziffern in die hervorgehobenen Zellen ein, um mit der nächsten Stufe des Rätsels fortzufahren",
+                    })}
+                    .
+                </RulesParagraph>
+                <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+                <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+                <RulesUnorderedList>
+                    <li>{ruleWithTitle(translate(evenTitle), translate(evenExplained))}.</li>
+                    <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</li>
+                    <li>
+                        {ruleWithTitle(
+                            translate(killerCagesTitle),
+                            translate(killerCagesExplained),
+                            translate(cannotRepeatInCage),
+                        )}
+                        .
+                    </li>
+                    <li>{ruleWithTitle(translate(inBetweenLineTitle), translate(inBetweenLineExplained))}.</li>
+                    {stage >= 2 && <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>}
+                </RulesUnorderedList>
+                {stage < 2 && (
+                    <RulesParagraph>
+                        {translate({
+                            [LanguageCode.en]: "In later stages there will be additional clues",
+                            [LanguageCode.ru]: "На более поздних этапах будут дополнительные подсказки",
+                            [LanguageCode.de]: "In späteren Phasen wird es zusätzliche Hinweise geben",
+                        })}
+                        .
+                    </RulesParagraph>
+                )}
+            </>
+        );
     },
-    items: ({stateExtension: {stage}}) => {
+    items: ({ stateExtension: { stage } }) => {
         const result: Constraint<MultiStagePTM, any>[] = [
             KillerCageConstraintByRect("R4C1", 4, 1, 28),
             KillerCageConstraintByRect("R6C6", 4, 1, 12),

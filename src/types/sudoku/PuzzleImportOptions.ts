@@ -1,4 +1,4 @@
-import {Rect} from "../layout/Rect";
+import { Rect } from "../layout/Rect";
 
 export enum PuzzleImportPuzzleType {
     Regular = "regular",
@@ -92,15 +92,14 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
-const sanitizeGridImportOptions = (
-    {
-        source,
-        load,
-        offsetX = 0,
-        offsetY = 0,
-        overrides = {},
-    }: Omit<PuzzleGridImportOptions, "source"> & Required<Pick<PuzzleGridImportOptions, "source">>
-): Required<PuzzleGridImportOptions> => ({
+const sanitizeGridImportOptions = ({
+    source,
+    load,
+    offsetX = 0,
+    offsetY = 0,
+    overrides = {},
+}: Omit<PuzzleGridImportOptions, "source"> &
+    Required<Pick<PuzzleGridImportOptions, "source">>): Required<PuzzleGridImportOptions> => ({
     source,
     load,
     offsetX: Number(offsetX),
@@ -166,10 +165,12 @@ export const sanitizeImportOptions = (
 
     // noinspection UnnecessaryLocalVariableJS
     const result: Required<PuzzleImportOptions> = {
-        ...sanitizeGridImportOptions({source, ...importOptions}),
+        ...sanitizeGridImportOptions({ source, ...importOptions }),
         extraGrids: Object.fromEntries(
-            [...(Array.isArray(extraGrids) ? extraGrids.entries() : Object.entries(extraGrids))]
-                .map(([key, grid]) => [key, sanitizeGridImportOptions({source, ...grid})]),
+            [...(Array.isArray(extraGrids) ? extraGrids.entries() : Object.entries(extraGrids))].map(([key, grid]) => [
+                key,
+                sanitizeGridImportOptions({ source, ...grid }),
+            ]),
         ),
         title,
         author,
@@ -199,20 +200,15 @@ export const sanitizeImportOptions = (
         yajilinFog,
         fogStars,
         cosmeticsBehindFog,
-        safeCrackerCodeLength: safeCrackerCodeLength === undefined
-            ? undefined as unknown as number
-            : Number(safeCrackerCodeLength),
-        visibleRingsCount: visibleRingsCount === undefined
-            ? undefined as unknown as number
-            : Number(visibleRingsCount),
+        safeCrackerCodeLength:
+            safeCrackerCodeLength === undefined ? (undefined as unknown as number) : Number(safeCrackerCodeLength),
+        visibleRingsCount:
+            visibleRingsCount === undefined ? (undefined as unknown as number) : Number(visibleRingsCount),
         startOffset: Number(startOffset),
         allowOverrideColors,
-        colorsImportMode: colorsImportMode === ColorsImportMode.Auto
-            ? undefined as unknown as ColorsImportMode
-            : colorsImportMode,
-        digitsCount: digitsCount === undefined
-            ? undefined as unknown as number
-            : Number(digitsCount),
+        colorsImportMode:
+            colorsImportMode === ColorsImportMode.Auto ? (undefined as unknown as ColorsImportMode) : colorsImportMode,
+        digitsCount: digitsCount === undefined ? (undefined as unknown as number) : Number(digitsCount),
         angleStep: Number(angleStep),
         shuffle,
         noPieceRegions,

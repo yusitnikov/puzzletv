@@ -1,5 +1,5 @@
-import {LanguageCode} from "../../../types/translations/LanguageCode";
-import {PartiallyTranslatable} from "../../../types/translations/Translatable";
+import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { PartiallyTranslatable } from "../../../types/translations/Translatable";
 
 export const seeIllustration: PartiallyTranslatable = {
     [LanguageCode.en]: "See the illustration",

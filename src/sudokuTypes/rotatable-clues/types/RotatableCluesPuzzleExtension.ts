@@ -1,19 +1,14 @@
-import {
-    getAveragePosition,
-    parsePositionLiterals,
-    Position,
-    PositionLiteral
-} from "../../../types/layout/Position";
-import {Constraint} from "../../../types/sudoku/Constraint";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {CellColorValue, resolveCellColorValue} from "../../../types/sudoku/CellColor";
-import {EllipseConstraint} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {blackColor} from "../../../components/app/globals";
-import {FieldLayer} from "../../../types/sudoku/FieldLayer";
+import { getAveragePosition, parsePositionLiterals, Position, PositionLiteral } from "../../../types/layout/Position";
+import { Constraint } from "../../../types/sudoku/Constraint";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { CellColorValue, resolveCellColorValue } from "../../../types/sudoku/CellColor";
+import { EllipseConstraint } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import { blackColor } from "../../../components/app/globals";
+import { FieldLayer } from "../../../types/sudoku/FieldLayer";
 
 export interface RotatableClue {
     pivot: Position;
-    clues: Constraint<AnyPTM, any>[],
+    clues: Constraint<AnyPTM, any>[];
     coeff?: number;
     dependentClues?: RotatableClue[];
 }

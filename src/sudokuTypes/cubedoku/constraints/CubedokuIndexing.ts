@@ -1,19 +1,24 @@
-import {Constraint} from "../../../types/sudoku/Constraint";
-import {isSamePosition, Position} from "../../../types/layout/Position";
-import {Position3D} from "../../../types/layout/Position3D";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import { Constraint } from "../../../types/sudoku/Constraint";
+import { isSamePosition, Position } from "../../../types/layout/Position";
+import { Position3D } from "../../../types/layout/Position3D";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 
 export const CubedokuIndexingConstraint = <T extends AnyPTM>(): Constraint<T> => ({
     name: "cubedoku indexing",
     cells: [],
     props: undefined,
     isValidCell(cell, digits, _, context): boolean {
-        const {puzzle: {fieldSize: {fieldSize}, typeManager: {getDigitByCellData}}} = context;
+        const {
+            puzzle: {
+                fieldSize: { fieldSize },
+                typeManager: { getDigitByCellData },
+            },
+        } = context;
         const realFieldSize = fieldSize / 2;
 
         // x and y are like in the left face of the cube
-        const getIndexedCell = ({left, top}: Position, data: T["cell"]): Position3D => {
-            const digit = getDigitByCellData(data, context, {top, left});
+        const getIndexedCell = ({ left, top }: Position, data: T["cell"]): Position3D => {
+            const digit = getDigitByCellData(data, context, { top, left });
 
             if (top < realFieldSize) {
                 return {
@@ -36,7 +41,7 @@ export const CubedokuIndexingConstraint = <T extends AnyPTM>(): Constraint<T> =>
             }
         };
 
-        const {x, y, z} = getIndexedCell(cell, digits[cell.top][cell.left]!);
+        const { x, y, z } = getIndexedCell(cell, digits[cell.top][cell.left]!);
 
         for (const [topStr, row] of Object.entries(digits)) {
             for (const [leftStr, data] of Object.entries(row)) {

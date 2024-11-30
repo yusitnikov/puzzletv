@@ -7,7 +7,7 @@ export class Deferred<T = void> {
         this.promise = new Promise<T>((resolve, reject) => {
             this._resolve = resolve;
             this._reject = reject;
-        })
+        });
     }
 
     public resolve(value: T) {

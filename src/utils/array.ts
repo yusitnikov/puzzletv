@@ -1,4 +1,4 @@
-import {loop} from "./math";
+import { loop } from "./math";
 
 export const splitArrayIntoChunks = <T>(array: T[], chunkSize: number): T[][] => {
     const result: T[][] = [];
@@ -30,7 +30,7 @@ export const incrementArrayItem = <T>(array: T[], currentItem: T | ((item: T) =>
         typeof currentItem === "function"
             ? array.findIndex(currentItem as (item: T) => boolean)
             : array.indexOf(currentItem),
-        increment
+        increment,
     );
 
 export const getReverseIndexMap = (indexes: number[]) => {

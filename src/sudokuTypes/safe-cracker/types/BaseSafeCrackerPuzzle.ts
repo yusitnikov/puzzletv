@@ -1,24 +1,32 @@
-import {SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {Position} from "../../../types/layout/Position";
-import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
-import {indexes} from "../../../utils/indexes";
-import {createGivenDigitsMapFromArray} from "../../../types/sudoku/GivenDigitsMap";
-import {CustomCellBounds} from "../../../types/sudoku/CustomCellBounds";
-import {SafeCrackerSudokuTypeManager} from "./SafeCrackerSudokuTypeManager";
-import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {roundToStep} from "../../../utils/math";
+import { SafeCrackerPuzzleParams } from "./SafeCrackerPuzzleParams";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { Position } from "../../../types/layout/Position";
+import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
+import { indexes } from "../../../utils/indexes";
+import { createGivenDigitsMapFromArray } from "../../../types/sudoku/GivenDigitsMap";
+import { CustomCellBounds } from "../../../types/sudoku/CustomCellBounds";
+import { SafeCrackerSudokuTypeManager } from "./SafeCrackerSudokuTypeManager";
+import { AnyNumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { roundToStep } from "../../../utils/math";
 
-export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCrackerPuzzleParams): Pick<
+export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(
+    params: SafeCrackerPuzzleParams,
+): Pick<
     PuzzleDefinition<T>,
-    "fieldSize" | "regions" | "digitsCount" | "customCellBounds" | "ignoreRowsColumnCountInTheWrapper" | "typeManager" | "allowDrawing"
+    | "fieldSize"
+    | "regions"
+    | "digitsCount"
+    | "customCellBounds"
+    | "ignoreRowsColumnCountInTheWrapper"
+    | "typeManager"
+    | "allowDrawing"
 > => {
-    const {size, circleRegionsCount, codeCellsCount} = params;
+    const { size, circleRegionsCount, codeCellsCount } = params;
 
     const round = (value: number) => roundToStep(value, 0.001);
 
     const circleCellsCount = circleRegionsCount * size;
-    const cellAngle = 2 * Math.PI / circleCellsCount;
+    const cellAngle = (2 * Math.PI) / circleCellsCount;
     const circleCellSize = size * 0.9 * cellAngle;
     const circleUserAreaSize = circleCellSize * 0.8;
     const getCircleCellPosition = (cellIndex: number, top: number): Position => {
@@ -31,7 +39,7 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCracke
         };
     };
 
-    const centerCellSize = 2 - 5 * circleCellSize / size;
+    const centerCellSize = 2 - (5 * circleCellSize) / size;
     const getCenterCellPosition = (totalCellsCount: number, cellIndex: number, top: number): Position => ({
         top: round(size + centerCellSize * (top - 1.5)),
         left: round(size + centerCellSize * (cellIndex - totalCellsCount / 2)),
@@ -43,21 +51,28 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCracke
             columnsCount: size,
             rowsCount: circleRegionsCount * 2 + 2,
         },
-        regions: [RegionConstraint(indexes(size).map(index => ({top: circleRegionsCount * 2, left: index})), false)],
+        regions: [
+            RegionConstraint(
+                indexes(size).map((index) => ({ top: circleRegionsCount * 2, left: index })),
+                false,
+            ),
+        ],
         digitsCount: size,
         customCellBounds: createGivenDigitsMapFromArray<CustomCellBounds>([
-            ...indexes(circleRegionsCount).flatMap(regionIndex => [
+            ...indexes(circleRegionsCount).flatMap((regionIndex) => [
                 indexes(size).map((cellIndexInRegion) => {
                     const cellIndex = regionIndex * size + cellIndexInRegion;
                     const center = getCircleCellPosition(cellIndex, 0.75);
 
                     return {
-                        borders: [[
-                            getCircleCellPosition(cellIndex - 0.5, 0.5),
-                            getCircleCellPosition(cellIndex - 0.5, 1),
-                            getCircleCellPosition(cellIndex + 0.5, 1),
-                            getCircleCellPosition(cellIndex + 0.5, 0.5),
-                        ]],
+                        borders: [
+                            [
+                                getCircleCellPosition(cellIndex - 0.5, 0.5),
+                                getCircleCellPosition(cellIndex - 0.5, 1),
+                                getCircleCellPosition(cellIndex + 0.5, 1),
+                                getCircleCellPosition(cellIndex + 0.5, 0.5),
+                            ],
+                        ],
                         userArea: {
                             top: center.top - circleUserAreaSize / 4,
                             left: center.left - circleUserAreaSize / 4,
@@ -71,12 +86,14 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCracke
                     const center = getCircleCellPosition(cellIndex, 0);
 
                     return {
-                        borders: [[
-                            getCircleCellPosition(cellIndex - 0.5, -0.5),
-                            getCircleCellPosition(cellIndex - 0.5, 0.5),
-                            getCircleCellPosition(cellIndex + 0.5, 0.5),
-                            getCircleCellPosition(cellIndex + 0.5, -0.5),
-                        ]],
+                        borders: [
+                            [
+                                getCircleCellPosition(cellIndex - 0.5, -0.5),
+                                getCircleCellPosition(cellIndex - 0.5, 0.5),
+                                getCircleCellPosition(cellIndex + 0.5, 0.5),
+                                getCircleCellPosition(cellIndex + 0.5, -0.5),
+                            ],
+                        ],
                         userArea: {
                             top: center.top - circleUserAreaSize / 2,
                             left: center.left - circleUserAreaSize / 2,
@@ -86,31 +103,38 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(params: SafeCracke
                     };
                 }),
             ]),
-            indexes(size).map(index => ({
-                borders: [[
-                    getCenterCellPosition(9, index, 1),
-                    getCenterCellPosition(9, index, 0),
-                    getCenterCellPosition(9, index + 1, 0),
-                    getCenterCellPosition(9, index + 1, 1),
-                ]],
+            indexes(size).map((index) => ({
+                borders: [
+                    [
+                        getCenterCellPosition(9, index, 1),
+                        getCenterCellPosition(9, index, 0),
+                        getCenterCellPosition(9, index + 1, 0),
+                        getCenterCellPosition(9, index + 1, 1),
+                    ],
+                ],
                 userArea: {
                     ...getCenterCellPosition(9, index, 0),
                     width: centerCellSize,
                     height: centerCellSize,
-                }
+                },
             })),
-            indexes(size).map(index => ({
-                borders: index >= codeCellsCount ? [] : [[
-                    getCenterCellPosition(codeCellsCount, index, 3),
-                    getCenterCellPosition(codeCellsCount, index, 2),
-                    getCenterCellPosition(codeCellsCount, index + 1, 2),
-                    getCenterCellPosition(codeCellsCount, index + 1, 3),
-                ]],
+            indexes(size).map((index) => ({
+                borders:
+                    index >= codeCellsCount
+                        ? []
+                        : [
+                              [
+                                  getCenterCellPosition(codeCellsCount, index, 3),
+                                  getCenterCellPosition(codeCellsCount, index, 2),
+                                  getCenterCellPosition(codeCellsCount, index + 1, 2),
+                                  getCenterCellPosition(codeCellsCount, index + 1, 3),
+                              ],
+                          ],
                 userArea: {
                     ...getCenterCellPosition(codeCellsCount, index, 2),
                     width: centerCellSize,
                     height: centerCellSize,
-                }
+                },
             })),
         ]),
         ignoreRowsColumnCountInTheWrapper: true,

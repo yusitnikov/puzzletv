@@ -1,9 +1,9 @@
-import {Position} from "../layout/Position";
-import {CellExactPosition} from "./CellExactPosition";
-import {CellWriteModeInfo} from "./CellWriteModeInfo";
-import {BasePointerStateExtraData} from "../../utils/gestures";
-import {PuzzleContext} from "./PuzzleContext";
-import {AnyPTM} from "./PuzzleTypeMap";
+import { Position } from "../layout/Position";
+import { CellExactPosition } from "./CellExactPosition";
+import { CellWriteModeInfo } from "./CellWriteModeInfo";
+import { BasePointerStateExtraData } from "../../utils/gestures";
+import { PuzzleContext } from "./PuzzleContext";
+import { AnyPTM } from "./PuzzleTypeMap";
 
 export const cellGestureExtraDataTag = "cell";
 
@@ -15,7 +15,7 @@ export interface CellGestureExtraData extends BasePointerStateExtraData {
 }
 
 export const isCellGestureExtraData = (
-    extraData: BasePointerStateExtraData | undefined
+    extraData: BasePointerStateExtraData | undefined,
 ): extraData is CellGestureExtraData => extraData?.tags.includes(cellGestureExtraDataTag) ?? false;
 
 export const getCurrentCellWriteModeInfoByGestureExtraData = <T extends AnyPTM>(

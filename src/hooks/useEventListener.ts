@@ -1,6 +1,6 @@
-import {useEffect} from "react";
-import {useLastValueRef} from "./useLastValueRef";
-import {runInAction} from "mobx";
+import { useEffect } from "react";
+import { useLastValueRef } from "./useLastValueRef";
+import { runInAction } from "mobx";
 
 export function useEventListener<K extends keyof WindowEventMap>(
     target: Window,
@@ -12,16 +12,8 @@ export function useEventListener<K extends keyof ElementEventMap>(
     eventName: K,
     handler: (ev: ElementEventMap[K]) => void,
 ): void;
-export function useEventListener(
-    target: EventTarget,
-    eventName: string,
-    handler: (ev: CustomEvent) => void,
-): void;
-export function useEventListener<E extends Event>(
-    target: EventTarget,
-    eventName: string,
-    handler: (ev: E) => void,
-) {
+export function useEventListener(target: EventTarget, eventName: string, handler: (ev: CustomEvent) => void): void;
+export function useEventListener<E extends Event>(target: EventTarget, eventName: string, handler: (ev: E) => void) {
     // Use reference to get rid of unnecessary dependencies
     const handlerRef = useLastValueRef(handler);
 

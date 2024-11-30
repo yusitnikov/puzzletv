@@ -1,10 +1,10 @@
-import {JigsawSudokuTypeManager} from "../../jigsaw/types/JigsawSudokuTypeManager";
-import {PuzzleImportOptions} from "../../../types/sudoku/PuzzleImportOptions";
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {JigsawPTM} from "../../jigsaw/types/JigsawPTM";
-import {LanguageCode} from "../../../types/translations/LanguageCode";
-import {getRectCenter} from "../../../types/layout/Rect";
-import {getAveragePosition} from "../../../types/layout/Position";
+import { JigsawSudokuTypeManager } from "../../jigsaw/types/JigsawSudokuTypeManager";
+import { PuzzleImportOptions } from "../../../types/sudoku/PuzzleImportOptions";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { JigsawPTM } from "../../jigsaw/types/JigsawPTM";
+import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { getRectCenter } from "../../../types/layout/Rect";
+import { getAveragePosition } from "../../../types/layout/Position";
 
 export const TetrisSudokuTypeManager = (options: PuzzleImportOptions): SudokuTypeManager<JigsawPTM> => ({
     ...JigsawSudokuTypeManager(options, {
@@ -16,9 +16,15 @@ export const TetrisSudokuTypeManager = (options: PuzzleImportOptions): SudokuTyp
                 [LanguageCode.de]: "Für aktives Tetris-Figur",
             },
             dragPieceToMove: (rotatable) => ({
-                [LanguageCode.en]: "Drag the tetris figure to move it, click it to focus" + (rotatable ? ", click again to rotate" : ""),
-                [LanguageCode.ru]: "Перетащите тетрисную фигуру, чтобы двигать её. Щелкните по ней, чтобы выделить" + (rotatable ? ". Щелкните еще раз, чтобы повернуть" : ""),
-                [LanguageCode.de]: "Ziehen Sie das Tetris-Figur, um es zu verschieben, klicken Sie darauf, um es zu fokussieren" + (rotatable ? ", und klicken Sie erneut, um es zu drehen" : ""),
+                [LanguageCode.en]:
+                    "Drag the tetris figure to move it, click it to focus" +
+                    (rotatable ? ", click again to rotate" : ""),
+                [LanguageCode.ru]:
+                    "Перетащите тетрисную фигуру, чтобы двигать её. Щелкните по ней, чтобы выделить" +
+                    (rotatable ? ". Щелкните еще раз, чтобы повернуть" : ""),
+                [LanguageCode.de]:
+                    "Ziehen Sie das Tetris-Figur, um es zu verschieben, klicken Sie darauf, um es zu fokussieren" +
+                    (rotatable ? ", und klicken Sie erneut, um es zu drehen" : ""),
             }),
             dragModeTitle: {
                 [LanguageCode.en]: "Move the grid and the tetris figures",
@@ -26,13 +32,13 @@ export const TetrisSudokuTypeManager = (options: PuzzleImportOptions): SudokuTyp
                 [LanguageCode.de]: "Bewegen Sie das Gitter und die Tetris-Figuren",
             },
         },
-        getPieceCenter: ({cells, boundingRect}) => {
+        getPieceCenter: ({ cells, boundingRect }) => {
             // 2x2 quad rotates around the natural center
             if (boundingRect.width === 2 && boundingRect.height === 2) {
                 return getRectCenter(boundingRect);
             }
 
-            const {top, left} = getAveragePosition(cells);
+            const { top, left } = getAveragePosition(cells);
             return {
                 // subtracting 0.001 from the value is to ensure that 0.5 will be rounded down
                 top: Math.round(top - 0.001) + 0.5,

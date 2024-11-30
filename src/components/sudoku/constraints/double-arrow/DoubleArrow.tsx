@@ -1,11 +1,8 @@
-import {
-    parsePositionLiterals,
-    PositionLiteral
-} from "../../../../types/layout/Position";
-import {Constraint} from "../../../../types/sudoku/Constraint";
-import {splitMultiLine} from "../../../../utils/lines";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {BetweenLine, BetweenLineProps} from "../between-line/BetweenLine";
+import { parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
+import { Constraint } from "../../../../types/sudoku/Constraint";
+import { splitMultiLine } from "../../../../utils/lines";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { BetweenLine, BetweenLineProps } from "../between-line/BetweenLine";
 
 export const DoubleArrowConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],

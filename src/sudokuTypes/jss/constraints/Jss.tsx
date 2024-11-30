@@ -1,14 +1,14 @@
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../types/sudoku/Constraint";
-import {JssCell} from "../types/JssCell";
-import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
-import {emptyPosition} from "../../../types/layout/Position";
-import {SingleCellFieldItemPositionFix} from "../../../components/sudoku/field/SingleCellFieldItemPositionFix";
-import {CenteredText} from "../../../components/svg/centered-text/CenteredText";
-import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../types/sudoku/Constraint";
+import { JssCell } from "../types/JssCell";
+import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
+import { emptyPosition } from "../../../types/layout/Position";
+import { SingleCellFieldItemPositionFix } from "../../../components/sudoku/field/SingleCellFieldItemPositionFix";
+import { CenteredText } from "../../../components/svg/centered-text/CenteredText";
+import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
 
 export const jssTag = "jss";
 
@@ -16,7 +16,11 @@ export interface JssProps {
     cells: JssCell[];
 }
 
-export const Jss: ConstraintPropsGenericFc<JssProps> = observer(function Jss<T extends AnyPTM>({context, props: {cells}, region}: ConstraintProps<T, JssProps>) {
+export const Jss: ConstraintPropsGenericFc<JssProps> = observer(function Jss<T extends AnyPTM>({
+    context,
+    props: { cells },
+    region,
+}: ConstraintProps<T, JssProps>) {
     profiler.trace();
 
     if (region) {
@@ -44,49 +48,35 @@ export const Jss: ConstraintPropsGenericFc<JssProps> = observer(function Jss<T e
         }
     }
 
-    return <>
-        {cells.map(({top, left, backgroundColor, text, textColor, textSize = 0.7}) => {
-            return <AutoSvg
-                key={`${top}-${left}`}
-                top={top}
-                left={left}
-                width={1}
-                height={1}
-            >
-                {backgroundColor && <rect
-                    width={1}
-                    height={1}
-                    fill={backgroundColor}
-                    stroke={"none"}
-                    strokeWidth={0}
-                />}
+    return (
+        <>
+            {cells.map(({ top, left, backgroundColor, text, textColor, textSize = 0.7 }) => {
+                return (
+                    <AutoSvg key={`${top}-${left}`} top={top} left={left} width={1} height={1}>
+                        {backgroundColor && (
+                            <rect width={1} height={1} fill={backgroundColor} stroke={"none"} strokeWidth={0} />
+                        )}
 
-                {text !== undefined && <SingleCellFieldItemPositionFix
-                    context={context}
-                    position={emptyPosition}
-                    region={region}
-                >
-                    <AutoSvg
-                        top={0.5}
-                        left={0.5}
-                    >
-                        <CenteredText
-                            size={textSize}
-                            fill={textColor}
-                        >
-                            {text}
-                        </CenteredText>
+                        {text !== undefined && (
+                            <SingleCellFieldItemPositionFix context={context} position={emptyPosition} region={region}>
+                                <AutoSvg top={0.5} left={0.5}>
+                                    <CenteredText size={textSize} fill={textColor}>
+                                        {text}
+                                    </CenteredText>
+                                </AutoSvg>
+                            </SingleCellFieldItemPositionFix>
+                        )}
                     </AutoSvg>
-                </SingleCellFieldItemPositionFix>}
-            </AutoSvg>;
-        })}
-    </>;
+                );
+            })}
+        </>
+    );
 });
 
 export const JssConstraint = <T extends AnyPTM>(cells: JssCell[]): Constraint<T, JssProps> => ({
     name: "JSS",
     tags: [jssTag],
-    cells: cells.map(({top, left}) => ({top, left})),
-    props: {cells},
-    component: {[FieldLayer.noClip]: Jss},
+    cells: cells.map(({ top, left }) => ({ top, left })),
+    props: { cells },
+    component: { [FieldLayer.noClip]: Jss },
 });

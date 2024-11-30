@@ -1,19 +1,19 @@
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {CaterpillarPTM} from "./CaterpillarPTM";
-import {ZoomInButtonItem, ZoomOutButtonItem} from "../../../components/sudoku/controls/ZoomButton";
-import {CaterpillarPuzzleExtension} from "./CaterpillarPuzzleExtension";
-import {CaterpillarGrid} from "./CaterpillarGrid";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {isCellInRect} from "../../../types/layout/Rect";
-import {RulesParagraph} from "../../../components/sudoku/rules/RulesParagraph";
-import {LanguageCode} from "../../../types/translations/LanguageCode";
-import {CaterpillarGridFocusConstraint} from "../constraints/CaterpillarGridFocus";
-import {lightGreyColor} from "../../../components/app/globals";
-import {FocusButtonItem, FocusButtonRule} from "../components/FocusButton";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { CaterpillarPTM } from "./CaterpillarPTM";
+import { ZoomInButtonItem, ZoomOutButtonItem } from "../../../components/sudoku/controls/ZoomButton";
+import { CaterpillarPuzzleExtension } from "./CaterpillarPuzzleExtension";
+import { CaterpillarGrid } from "./CaterpillarGrid";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { isCellInRect } from "../../../types/layout/Rect";
+import { RulesParagraph } from "../../../components/sudoku/rules/RulesParagraph";
+import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { CaterpillarGridFocusConstraint } from "../constraints/CaterpillarGridFocus";
+import { lightGreyColor } from "../../../components/app/globals";
+import { FocusButtonItem, FocusButtonRule } from "../components/FocusButton";
 
 export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
-    baseTypeManager: SudokuTypeManager<T>
+    baseTypeManager: SudokuTypeManager<T>,
 ): SudokuTypeManager<CaterpillarPTM<T>> => {
     const typedBaseTypeManager = baseTypeManager as unknown as SudokuTypeManager<CaterpillarPTM<T>>;
 
@@ -43,16 +43,13 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
             };
             puzzle.extension = {
                 ...puzzle.extension,
-                caterpillarGrids: [
-                    ...puzzle.extension?.caterpillarGrids ?? [],
-                    newGrid,
-                ],
+                caterpillarGrids: [...(puzzle.extension?.caterpillarGrids ?? []), newGrid],
             };
         },
         postProcessImportGrid(puzzle, importer, gridParser) {
             typedBaseTypeManager.postProcessImportGrid?.(puzzle, importer, gridParser);
 
-            const {caterpillarGrids} = puzzle.extension as CaterpillarPuzzleExtension;
+            const { caterpillarGrids } = puzzle.extension as CaterpillarPuzzleExtension;
             caterpillarGrids[caterpillarGrids.length - 1].outsideBounds = gridParser.outsideBounds;
         },
 
@@ -76,34 +73,40 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
         postProcessPuzzle(puzzle): PuzzleDefinition<CaterpillarPTM<T>> {
             const grids = (puzzle.extension as CaterpillarPuzzleExtension)?.caterpillarGrids ?? [];
 
-            const {items = []} = puzzle;
+            const { items = [] } = puzzle;
             const extraItems = grids.map((grid) => CaterpillarGridFocusConstraint<CaterpillarPTM<T>>(grid.bounds));
 
             return {
                 ...puzzle,
-                items: typeof items === "function"
-                    ? (context) => [
-                        ...extraItems,
-                        ...items(context),
-                    ]
-                    : [
-                        ...extraItems,
-                        ...items,
-                    ],
+                items:
+                    typeof items === "function"
+                        ? (context) => [...extraItems, ...items(context)]
+                        : [...extraItems, ...items],
                 rules: (translate, context) => {
                     const selectedCells = context.selectedCells.items;
 
                     const gridRules = grids
-                        .map(({bounds, props}, index) => {
-                            if ((props.title || props.author || props.rules) && selectedCells.some((cell) => isCellInRect(bounds, cell))) {
-                                return <div key={index}>
-                                    {!!(props.title || props.author) && <RulesParagraph>
-                                        {!!props.title && <strong>{translate(props.title)} </strong>}
-                                        {!!props.author && <em>{translate("by")} {translate(props.author)}</em>}
-                                    </RulesParagraph>}
+                        .map(({ bounds, props }, index) => {
+                            if (
+                                (props.title || props.author || props.rules) &&
+                                selectedCells.some((cell) => isCellInRect(bounds, cell))
+                            ) {
+                                return (
+                                    <div key={index}>
+                                        {!!(props.title || props.author) && (
+                                            <RulesParagraph>
+                                                {!!props.title && <strong>{translate(props.title)} </strong>}
+                                                {!!props.author && (
+                                                    <em>
+                                                        {translate("by")} {translate(props.author)}
+                                                    </em>
+                                                )}
+                                            </RulesParagraph>
+                                        )}
 
-                                    {!!props.rules && props.rules(translate, context)}
-                                </div>;
+                                        {!!props.rules && props.rules(translate, context)}
+                                    </div>
+                                );
                             }
 
                             return undefined;
@@ -111,20 +114,25 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
                         .filter(Boolean);
 
                     if (gridRules.length === 0) {
-                        return <>
-                            <RulesParagraph>{translate({
-                                [LanguageCode.en]: "Click on a grid to see its rules",
-                                [LanguageCode.ru]: "Нажмите на поле, чтобы увидеть его правила",
-                                [LanguageCode.de]: "Klicken Sie auf ein Raster, um dessen Regeln anzuzeigen",
-                            })}.</RulesParagraph>
+                        return (
+                            <>
+                                <RulesParagraph>
+                                    {translate({
+                                        [LanguageCode.en]: "Click on a grid to see its rules",
+                                        [LanguageCode.ru]: "Нажмите на поле, чтобы увидеть его правила",
+                                        [LanguageCode.de]: "Klicken Sie auf ein Raster, um dessen Regeln anzuzeigen",
+                                    })}
+                                    .
+                                </RulesParagraph>
 
-                            <RulesParagraph><FocusButtonRule context={context}/></RulesParagraph>
-                        </>;
+                                <RulesParagraph>
+                                    <FocusButtonRule context={context} />
+                                </RulesParagraph>
+                            </>
+                        );
                     }
 
-                    return <div style={{display: "flex", flexDirection: "column", gap: "1em"}}>
-                        {gridRules}
-                    </div>;
+                    return <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>{gridRules}</div>;
                 },
             };
         },
@@ -135,9 +143,9 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
             const grids = (context.puzzle.extension as CaterpillarPuzzleExtension)?.caterpillarGrids ?? [];
             const selectedCells = context.selectedCells.items;
 
-            for (const {bounds, overrides} of grids) {
+            for (const { bounds, overrides } of grids) {
                 if (selectedCells.some((cell) => isCellInRect(bounds, cell))) {
-                    result = {...result, ...overrides};
+                    result = { ...result, ...overrides };
                 }
             }
 

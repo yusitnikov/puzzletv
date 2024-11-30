@@ -1,10 +1,10 @@
-import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {lightRedColor, peachColor} from "../../../app/globals";
-import {LineComponent, LineProps} from "../line/Line";
-import {splitMultiLine} from "../../../../utils/lines";
-import {Constraint} from "../../../../types/sudoku/Constraint";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import { isSamePosition, parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
+import { lightRedColor, peachColor } from "../../../app/globals";
+import { LineComponent, LineProps } from "../line/Line";
+import { splitMultiLine } from "../../../../utils/lines";
+import { Constraint } from "../../../../types/sudoku/Constraint";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
 
 export const BaseEntropicLineConstraint = <T extends AnyPTM>(
     name: string,
@@ -23,17 +23,20 @@ export const BaseEntropicLineConstraint = <T extends AnyPTM>(
         name,
         cells,
         color,
-        props: {width},
+        props: { width },
         component: LineComponent,
         isObvious: true,
         isValidCell(cell, digits, cells, context) {
-            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+            const {
+                puzzle: {
+                    typeManager: { getDigitByCellData },
+                },
+            } = context;
 
-            const getGroupIndex = (digit: number) => digitGroups.findIndex(
-                (group) => Array.isArray(group)
-                    ? group.includes(digit)
-                    : group(digit, context)
-            );
+            const getGroupIndex = (digit: number) =>
+                digitGroups.findIndex((group) =>
+                    Array.isArray(group) ? group.includes(digit) : group(digit, context),
+                );
 
             const digit = getDigitByCellData(digits[cell.top][cell.left]!, context, cell);
             const group = getGroupIndex(digit);
@@ -74,50 +77,46 @@ export const EntropicLineConstraint = <T extends AnyPTM>(
     split = true,
     color = peachColor,
     width: number | undefined = undefined,
-) => BaseEntropicLineConstraint<T>(
-    "entropic line",
-    cellLiterals,
-    [
-        (digit, {digitsCount}) => digit * 3 <= digitsCount,
-        (digit, {digitsCount}) => digit * 3 > digitsCount && digit * 3 <= digitsCount * 2,
-        (digit, {digitsCount}) => digit * 3 > digitsCount * 2,
-    ],
-    split,
-    color,
-    width,
-);
+) =>
+    BaseEntropicLineConstraint<T>(
+        "entropic line",
+        cellLiterals,
+        [
+            (digit, { digitsCount }) => digit * 3 <= digitsCount,
+            (digit, { digitsCount }) => digit * 3 > digitsCount && digit * 3 <= digitsCount * 2,
+            (digit, { digitsCount }) => digit * 3 > digitsCount * 2,
+        ],
+        split,
+        color,
+        width,
+    );
 
 export const ModularLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
     color = "#33bbbb",
     width: number | undefined = undefined,
-) => BaseEntropicLineConstraint<T>(
-    "modular line",
-    cellLiterals,
-    [
-        (digit) => digit % 3 === 0,
-        (digit) => digit % 3 === 1,
-        (digit) => digit % 3 === 2,
-    ],
-    split,
-    color,
-    width,
-);
+) =>
+    BaseEntropicLineConstraint<T>(
+        "modular line",
+        cellLiterals,
+        [(digit) => digit % 3 === 0, (digit) => digit % 3 === 1, (digit) => digit % 3 === 2],
+        split,
+        color,
+        width,
+    );
 
 export const ParityLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     split = true,
     color = lightRedColor,
     width: number | undefined = undefined,
-) => BaseEntropicLineConstraint<T>(
-    "parity line",
-    cellLiterals,
-    [
-        (digit) => digit % 2 === 0,
-        (digit) => digit % 2 === 1,
-    ],
-    split,
-    color,
-    width,
-);
+) =>
+    BaseEntropicLineConstraint<T>(
+        "parity line",
+        cellLiterals,
+        [(digit) => digit % 2 === 0, (digit) => digit % 2 === 1],
+        split,
+        color,
+        width,
+    );

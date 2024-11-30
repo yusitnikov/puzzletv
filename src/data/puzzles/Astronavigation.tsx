@@ -1,38 +1,36 @@
 import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
-    PuzzleDefinition
+    PuzzleDefinition,
 } from "../../types/sudoku/PuzzleDefinition";
-import {RotatableCluesPTM} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {
-    ImportedRotatableCluesSudokuTypeManager
-} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { ImportedRotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {
     DecorativeShapeComponent,
-    DecorativeShapeConstraint, EllipseConstraint
+    DecorativeShapeConstraint,
+    EllipseConstraint,
 } from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../utils/profiler";
-import {PositionLiteral} from "../../types/layout/Position";
-import {FieldLayer} from "../../types/sudoku/FieldLayer";
-import {textColor} from "../../components/app/globals";
-import {Constraint} from "../../types/sudoku/Constraint";
-import {createGivenDigitsMapFromArray} from "../../types/sudoku/GivenDigitsMap";
-import {CellColor} from "../../types/sudoku/CellColor";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../utils/profiler";
+import { PositionLiteral } from "../../types/layout/Position";
+import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { textColor } from "../../components/app/globals";
+import { Constraint } from "../../types/sudoku/Constraint";
+import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
+import { CellColor } from "../../types/sudoku/CellColor";
 
-const ArrowComponent = DecorativeShapeComponent(observer(function ArrowFc(props) {
-    profiler.trace();
+const ArrowComponent = DecorativeShapeComponent(
+    observer(function ArrowFc(props) {
+        profiler.trace();
 
-    return <path
-        d={"M -0.2 0.4 L -0.2 0 L -0.4 0 L 0 -0.4 L 0.4 0 L 0.2 0 L 0.2 0.4 z"}
-        {...props}
-    />;
-}));
+        return <path d={"M -0.2 0.4 L -0.2 0 L -0.4 0 L 0 -0.4 L 0.4 0 L 0.2 0 L 0.2 0.4 z"} {...props} />;
+    }),
+);
 
 const DecorativeArrowConstraint = (
     cellLiteral: PositionLiteral,
@@ -49,7 +47,7 @@ const DecorativeArrowConstraint = (
         undefined,
         undefined,
         undefined,
-        angle
+        angle,
     ),
     EllipseConstraint([cellLiteral], 1),
 ];
@@ -65,21 +63,31 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Astronavigation",
     },
-    typeManager: ImportedRotatableCluesSudokuTypeManager({baseTypeManager: DigitSudokuTypeManager()}),
+    typeManager: ImportedRotatableCluesSudokuTypeManager({ baseTypeManager: DigitSudokuTypeManager() }),
     fieldSize: FieldSize9,
     regions: Regions9,
-    rules: () => <>
-        <RulesParagraph>Normal Sudoku rules apply.</RulesParagraph>
-        <RulesParagraph>
-            Guide Arrow: Shade some empty cells so that no two shaded cells are orthogonally adjacent
-            and the remaining unshaded cells form one orthogonally connected area.
-            No complete loop of cells may be unshaded (including 2×2s).
-            An arrow indicates the only direction in which one could begin a path to the star without going through a shaded cell or backtracking.
-        </RulesParagraph>
-        <RulesParagraph>Each arrow must be rotated clockwise by D×90°, where D is the digit in that arrow's cell.</RulesParagraph>
-        <RulesParagraph>For each arrow, the sum of the next two digits along the path to the star must equal the digit in that arrow's cell.</RulesParagraph>
-        <RulesParagraph>The location of the star is to be discovered, but it must not be in a cell that is part of an arrow's sum.</RulesParagraph>
-    </>,
+    rules: () => (
+        <>
+            <RulesParagraph>Normal Sudoku rules apply.</RulesParagraph>
+            <RulesParagraph>
+                Guide Arrow: Shade some empty cells so that no two shaded cells are orthogonally adjacent and the
+                remaining unshaded cells form one orthogonally connected area. No complete loop of cells may be unshaded
+                (including 2×2s). An arrow indicates the only direction in which one could begin a path to the star
+                without going through a shaded cell or backtracking.
+            </RulesParagraph>
+            <RulesParagraph>
+                Each arrow must be rotated clockwise by D×90°, where D is the digit in that arrow's cell.
+            </RulesParagraph>
+            <RulesParagraph>
+                For each arrow, the sum of the next two digits along the path to the star must equal the digit in that
+                arrow's cell.
+            </RulesParagraph>
+            <RulesParagraph>
+                The location of the star is to be discovered, but it must not be in a cell that is part of an arrow's
+                sum.
+            </RulesParagraph>
+        </>
+    ),
     items: [
         ...DecorativeArrowConstraint("R1C2", 0),
         ...DecorativeArrowConstraint("R1C4", 90),
@@ -123,7 +131,5 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     allowMappingSolutionColors: true,
     ignoreEmptySolutionColors: true,
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
-    successMessage: "Congratulations!\n" +
-        "You found your way to the star!\n" +
-        "The solution is correct."
+    successMessage: "Congratulations!\n" + "You found your way to the star!\n" + "The solution is correct.",
 };

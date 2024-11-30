@@ -1,10 +1,10 @@
-import {makeAutoObservable} from "mobx";
-import {GridRegion} from "../../../types/sudoku/GridRegion";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {JigsawPTM} from "./JigsawPTM";
-import {getActiveJigsawPieceZIndex} from "./helpers";
-import {Position, rotateVectorClockwise} from "../../../types/layout/Position";
-import {profiler} from "../../../utils/profiler";
+import { makeAutoObservable } from "mobx";
+import { GridRegion } from "../../../types/sudoku/GridRegion";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { JigsawPTM } from "./JigsawPTM";
+import { getActiveJigsawPieceZIndex } from "./helpers";
+import { Position, rotateVectorClockwise } from "../../../types/layout/Position";
+import { profiler } from "../../../utils/profiler";
 
 export class JigsawPieceRegion implements GridRegion {
     private readonly center: Position;
@@ -36,7 +36,7 @@ export class JigsawPieceRegion implements GridRegion {
     ) {
         makeAutoObservable(this);
 
-        const {cells, boundingRect, center} = context.puzzle.extension!.pieces[index];
+        const { cells, boundingRect, center } = context.puzzle.extension!.pieces[index];
 
         this.top = boundingRect.top;
         this.left = boundingRect.left;

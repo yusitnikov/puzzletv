@@ -1,89 +1,85 @@
-import {Position, PositionLiteral, PositionSet} from "../../types/layout/Position";
-import {GivenDigitsMap} from "../../types/sudoku/GivenDigitsMap";
-import {CellColorValue} from "../../types/sudoku/CellColor";
-import {Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint} from "../../types/sudoku/Constraint";
+import { Position, PositionLiteral, PositionSet } from "../../types/layout/Position";
+import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
+import { CellColorValue } from "../../types/sudoku/CellColor";
+import { Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/sudoku/Constraint";
 import {
     allDrawingModes,
     importGivenColorsAsSolution,
     isValidFinishedPuzzleByEmbeddedSolution,
-    PuzzleDefinition
+    PuzzleDefinition,
 } from "../../types/sudoku/PuzzleDefinition";
-import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {ColorsImportMode, PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
-import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
-import {FieldSize} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {indexes} from "../../utils/indexes";
-import {SudokuCellsIndex} from "../../types/sudoku/SudokuCellsIndex";
-import {isVisibleCell} from "../../types/sudoku/CellTypeProps";
-import {createEmptyContextForPuzzle, PuzzleContext} from "../../types/sudoku/PuzzleContext";
-import {doesGridRegionContainCell} from "../../types/sudoku/GridRegion";
-import {
-    FillableCalculatorDigitConstraint
-} from "../../components/sudoku/constraints/fillable-calculator-digit/FillableCalculatorDigit";
-import {ReactNode} from "react";
-import {ParsedRulesHtml} from "../../components/sudoku/rules/ParsedRulesHtml";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {GridParser} from "./GridParser";
-import {LittleKillerConstraintByCells} from "../../components/sudoku/constraints/little-killer/LittleKiller";
+import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { ColorsImportMode, PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
+import { SudokuTypeManager } from "../../types/sudoku/SudokuTypeManager";
+import { FieldSize } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { indexes } from "../../utils/indexes";
+import { SudokuCellsIndex } from "../../types/sudoku/SudokuCellsIndex";
+import { isVisibleCell } from "../../types/sudoku/CellTypeProps";
+import { createEmptyContextForPuzzle, PuzzleContext } from "../../types/sudoku/PuzzleContext";
+import { doesGridRegionContainCell } from "../../types/sudoku/GridRegion";
+import { FillableCalculatorDigitConstraint } from "../../components/sudoku/constraints/fillable-calculator-digit/FillableCalculatorDigit";
+import { ReactNode } from "react";
+import { ParsedRulesHtml } from "../../components/sudoku/rules/ParsedRulesHtml";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { GridParser } from "./GridParser";
+import { LittleKillerConstraintByCells } from "../../components/sudoku/constraints/little-killer/LittleKiller";
 import {
     detectOutsideClueDirection,
     getLineCellsByOutsideCell,
     OutsideClueLineDirectionLiteral,
-    OutsideClueLineDirectionType
+    OutsideClueLineDirectionType,
 } from "../../components/sudoku/constraints/outside-clue/OutsideClue";
-import {XSumConstraint} from "../../components/sudoku/constraints/x-sum/XSum";
-import {SkyscraperConstraint} from "../../components/sudoku/constraints/skyscraper/Skyscraper";
-import {SandwichSumConstraint} from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
-import {NumberedRoomConstraint} from "../../components/sudoku/constraints/numbered-room/NumberedRoom";
+import { XSumConstraint } from "../../components/sudoku/constraints/x-sum/XSum";
+import { SkyscraperConstraint } from "../../components/sudoku/constraints/skyscraper/Skyscraper";
+import { SandwichSumConstraint } from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
+import { NumberedRoomConstraint } from "../../components/sudoku/constraints/numbered-room/NumberedRoom";
 import {
     NegativeDiagonalConstraint,
-    PositiveDiagonalConstraint
+    PositiveDiagonalConstraint,
 } from "../../components/sudoku/constraints/main-diagonal/MainDiagonal";
-import {RegionSumLineConstraint} from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
-import {PalindromeConstraint} from "../../components/sudoku/constraints/palindrome/Palindrome";
-import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
-import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
-import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {FieldLayer} from "../../types/sudoku/FieldLayer";
+import { RegionSumLineConstraint } from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
+import { PalindromeConstraint } from "../../components/sudoku/constraints/palindrome/Palindrome";
+import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
+import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
+import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+import { FieldLayer } from "../../types/sudoku/FieldLayer";
 import {
     DecorativeCageConstraint,
-    KillerCageConstraint
+    KillerCageConstraint,
 } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
-import {AntiKingConstraint} from "../../types/sudoku/constraints/AntiKing";
-import {
-    NonConsecutiveNeighborsConstraint
-} from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
-import {DisjointGroupsConstraint} from "../../types/sudoku/constraints/DisjointGroups";
-import {QuadConstraint} from "../../components/sudoku/constraints/quad/Quad";
-import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import {VMarkConstraint, XMarkConstraint} from "../../components/sudoku/constraints/xv/XV";
-import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
-import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
-import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
-import {MaxConstraint, MinConstraint} from "../../components/sudoku/constraints/min-max/MinMax";
+import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
+import { AntiKingConstraint } from "../../types/sudoku/constraints/AntiKing";
+import { NonConsecutiveNeighborsConstraint } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
+import { DisjointGroupsConstraint } from "../../types/sudoku/constraints/DisjointGroups";
+import { QuadConstraint } from "../../components/sudoku/constraints/quad/Quad";
+import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import { VMarkConstraint, XMarkConstraint } from "../../components/sudoku/constraints/xv/XV";
+import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
+import { EvenConstraint } from "../../components/sudoku/constraints/even/Even";
+import { OddConstraint } from "../../components/sudoku/constraints/odd/Odd";
+import { MaxConstraint, MinConstraint } from "../../components/sudoku/constraints/min-max/MinMax";
 import {
     BoxIndexerConstraint,
     ColumnIndexerConstraint,
-    RowIndexerConstraint
+    RowIndexerConstraint,
 } from "../../components/sudoku/constraints/indexer/Indexer";
-import {CloneConstraint} from "../../components/sudoku/constraints/clone/Clone";
-import {BetweenLineConstraint} from "../../components/sudoku/constraints/between-line/BetweenLine";
-import {LockoutLineConstraint} from "../../components/sudoku/constraints/lockout-line/LockoutLine";
-import {LineConstraint} from "../../components/sudoku/constraints/line/Line";
+import { CloneConstraint } from "../../components/sudoku/constraints/clone/Clone";
+import { BetweenLineConstraint } from "../../components/sudoku/constraints/between-line/BetweenLine";
+import { LockoutLineConstraint } from "../../components/sudoku/constraints/lockout-line/LockoutLine";
+import { LineConstraint } from "../../components/sudoku/constraints/line/Line";
 import {
     CosmeticArrowConstraint,
     EllipseConstraint,
-    RectConstraint
+    RectConstraint,
 } from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {TextConstraint} from "../../components/sudoku/constraints/text/Text";
-import {FogConstraint} from "../../components/sudoku/constraints/fog/Fog";
-import {DoubleArrowConstraint} from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
+import { TextConstraint } from "../../components/sudoku/constraints/text/Text";
+import { FogConstraint } from "../../components/sudoku/constraints/fog/Fog";
+import { DoubleArrowConstraint } from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
 import {
     EntropicLineConstraint,
     ModularLineConstraint,
-    ParityLineConstraint
+    ParityLineConstraint,
 } from "../../components/sudoku/constraints/entropy-line/EntropicLine";
 
 export class PuzzleImporter<T extends AnyPTM> {
@@ -117,7 +113,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.puzzle = {
             noIndex: true,
             slug,
-            title: {[LanguageCode.en]: "Untitled"},
+            title: { [LanguageCode.en]: "Untitled" },
             typeManager,
             fieldSize,
             regions: this.regions,
@@ -138,38 +134,38 @@ export class PuzzleImporter<T extends AnyPTM> {
             resultChecker: noSpecialRules ? isValidFinishedPuzzleByConstraints : undefined,
         };
 
-        this.inactiveCells = new PositionSet(indexes(fieldSize.rowsCount).flatMap(
-            (top) => indexes(fieldSize.columnsCount).map((left) => ({top, left}))
-        ));
+        this.inactiveCells = new PositionSet(
+            indexes(fieldSize.rowsCount).flatMap((top) =>
+                indexes(fieldSize.columnsCount).map((left) => ({ top, left })),
+            ),
+        );
 
         this.setTitle(importOptions.title);
         this.setAuthor(importOptions.author);
     }
 
     private finalImportOptions(gridParser: GridParser<T, any>): PuzzleImportOptions {
-        return {...this.importOptions, ...gridParser.importOptionOverrides};
+        return { ...this.importOptions, ...gridParser.importOptionOverrides };
     }
 
     private cosmeticsLayer(gridParser: GridParser<T, any>, beforeLines = false) {
-        const {
-            rotatableClues,
-            keepCircles,
-            cosmeticsBehindFog,
-        } = this.finalImportOptions(gridParser);
+        const { rotatableClues, keepCircles, cosmeticsBehindFog } = this.finalImportOptions(gridParser);
 
         return rotatableClues && keepCircles
             ? FieldLayer.beforeSelection
             : beforeLines || cosmeticsBehindFog
-                ? FieldLayer.regular
-                : FieldLayer.afterLines;
+              ? FieldLayer.regular
+              : FieldLayer.afterLines;
     }
 
     addGrid<JsonT>(gridParser: GridParser<T, JsonT>) {
-        const {columnsCount, rowsCount, minDigit, maxDigit} = gridParser;
+        const { columnsCount, rowsCount, minDigit, maxDigit } = gridParser;
 
-        this.inactiveCells = this.inactiveCells.bulkRemove(gridParser.offsetCoordsArray(indexes(rowsCount).flatMap(
-            (top) => indexes(columnsCount).map((left) => ({top, left}))
-        )));
+        this.inactiveCells = this.inactiveCells.bulkRemove(
+            gridParser.offsetCoordsArray(
+                indexes(rowsCount).flatMap((top) => indexes(columnsCount).map((left) => ({ top, left }))),
+            ),
+        );
 
         if (minDigit === 0) {
             this.puzzle.supportZero = true;
@@ -185,7 +181,7 @@ export class PuzzleImporter<T extends AnyPTM> {
 
     setTitle(title = "") {
         if (title) {
-            const translatedTitle = {[LanguageCode.en]: title};
+            const translatedTitle = { [LanguageCode.en]: title };
 
             const appliedHook = this.puzzle.typeManager.onImportPuzzleProp?.(this.puzzle, "title", translatedTitle);
 
@@ -197,7 +193,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
     setAuthor(author = "") {
         if (author) {
-            const translatedAuthor = {[LanguageCode.en]: author};
+            const translatedAuthor = { [LanguageCode.en]: author };
             if (!this.puzzle.typeManager.onImportPuzzleProp?.(this.puzzle, "author", translatedAuthor)) {
                 this.puzzle.author ??= translatedAuthor;
             }
@@ -209,9 +205,13 @@ export class PuzzleImporter<T extends AnyPTM> {
             if (this.finalImportOptions(gridParser).htmlRules) {
                 parsedRules = <ParsedRulesHtml>{ruleset}</ParsedRulesHtml>;
             } else {
-                parsedRules = <>{ruleset.split("\n").map(
-                    (line, index) => <RulesParagraph key={index}>{line || <span>&nbsp;</span>}</RulesParagraph>
-                )}</>;
+                parsedRules = (
+                    <>
+                        {ruleset.split("\n").map((line, index) => (
+                            <RulesParagraph key={index}>{line || <span>&nbsp;</span>}</RulesParagraph>
+                        ))}
+                    </>
+                );
             }
             const rulesCallback = () => parsedRules;
 
@@ -224,14 +224,16 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.puzzle.successMessage = message;
     }
 
-    isVisibleGridCell({top, left}: Position) {
-        return isVisibleCell(this.typeManager.getCellTypeProps?.(
-            {
-                top: Math.floor(top),
-                left: Math.floor(left),
-            },
-            this.puzzle
-        ));
+    isVisibleGridCell({ top, left }: Position) {
+        return isVisibleCell(
+            this.typeManager.getCellTypeProps?.(
+                {
+                    top: Math.floor(top),
+                    left: Math.floor(left),
+                },
+                this.puzzle,
+            ),
+        );
     }
 
     fixCellPosition(cell: Position) {
@@ -241,40 +243,31 @@ export class PuzzleImporter<T extends AnyPTM> {
         return cells.map((cell) => this.fixCellPosition(cell));
     }
 
-    addRegions<JsonT>(gridParser: GridParser<T, JsonT>, cellRegions: (number|null|undefined)[][]) {
-        const {
-            size,
-            columnsCount,
-            rowsCount,
-            regionWidth,
-            regionHeight,
-            offsetX,
-            offsetY,
-        } = gridParser;
+    addRegions<JsonT>(gridParser: GridParser<T, JsonT>, cellRegions: (number | null | undefined)[][]) {
+        const { size, columnsCount, rowsCount, regionWidth, regionHeight, offsetX, offsetY } = gridParser;
 
         let maxRegion = Math.max(size - 1, ...(cellRegions.flat().filter(Boolean) as number[]));
 
-        const allGridCells: (Position & {region: number|null|undefined})[] = cellRegions
-            .flatMap(
-                (row, top) => row.map(
-                    (region, left) => ({...gridParser.offsetCoords({top, left}), region})
-                )
-            );
+        const allGridCells: (Position & { region: number | null | undefined })[] = cellRegions.flatMap((row, top) =>
+            row.map((region, left) => ({ ...gridParser.offsetCoords({ top, left }), region })),
+        );
         const validGridCells = allGridCells.filter((cell) => this.isVisibleGridCell(cell));
 
         this.emptyContextCache ??= createEmptyContextForPuzzle(this.puzzle);
-        const faces = this.typeManager.getRegionsWithSameCoordsTransformation?.(this.emptyContextCache, true) ?? [{
-            top: offsetY,
-            left: offsetX,
-            width: columnsCount,
-            height: rowsCount,
-        }];
-        const regions = faces.flatMap(face => {
+        const faces = this.typeManager.getRegionsWithSameCoordsTransformation?.(this.emptyContextCache, true) ?? [
+            {
+                top: offsetY,
+                left: offsetX,
+                width: columnsCount,
+                height: rowsCount,
+            },
+        ];
+        const regions = faces.flatMap((face) => {
             const validFaceCells = validGridCells.filter((cell) => doesGridRegionContainCell(face, cell));
 
             return indexes(maxRegion + 1)
-                .map(regionIndex => validFaceCells.filter(
-                    ({top, left, region}) => {
+                .map((regionIndex) =>
+                    validFaceCells.filter(({ top, left, region }) => {
                         if (region === undefined) {
                             const topIndex = Math.floor((top - offsetY) / regionHeight);
                             const leftIndex = Math.floor((left - offsetX) / regionWidth);
@@ -282,9 +275,9 @@ export class PuzzleImporter<T extends AnyPTM> {
                         }
 
                         return region === regionIndex;
-                    }
-                ))
-                .filter(({length}) => length);
+                    }),
+                )
+                .filter(({ length }) => length);
         });
         if (regions.length > 1) {
             this.regions.push(...regions);
@@ -325,73 +318,88 @@ export class PuzzleImporter<T extends AnyPTM> {
     ) {
         this.puzzle.prioritizeSelection = true;
 
-        this.addItems(FogConstraint(
-            gridParser.offsetCoordsArray(startCell3x3Literals),
-            gridParser.offsetCoordsArray(startCellLiterals),
-            gridParser.offsetCoordsArray(bulbCellLiterals),
-        ));
+        this.addItems(
+            FogConstraint(
+                gridParser.offsetCoordsArray(startCell3x3Literals),
+                gridParser.offsetCoordsArray(startCellLiterals),
+                gridParser.offsetCoordsArray(bulbCellLiterals),
+            ),
+        );
     }
 
-    addClones(
-        gridParser: GridParser<T, any>,
-        cells: PositionLiteral[],
-        color?: string,
-    ) {
-        const visibleCells = gridParser.offsetCoordsArray(cells)
-            .filter((cell) => this.isVisibleGridCell(cell));
+    addClones(gridParser: GridParser<T, any>, cells: PositionLiteral[], color?: string) {
+        const visibleCells = gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell));
 
         if (visibleCells.length > 1) {
             this.addItems(CloneConstraint(visibleCells, color));
         }
     }
 
-    addQuadruple(
-        gridParser: GridParser<T, any>,
-        cellLiteral: PositionLiteral,
-        values: number[],
-    ) {
-        this.addItems(QuadConstraint(
-            gridParser.offsetCoords(cellLiteral),
-            values.map((digit) => this.typeManager.createCellDataByImportedDigit(digit, this.importOptions)),
-        ));
+    addQuadruple(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, values: number[]) {
+        this.addItems(
+            QuadConstraint(
+                gridParser.offsetCoords(cellLiteral),
+                values.map((digit) => this.typeManager.createCellDataByImportedDigit(digit, this.importOptions)),
+            ),
+        );
     }
 
     // region Domino
-    addWhiteKropki(gridParser: GridParser<T, any>, cell1: PositionLiteral, cell2: PositionLiteral, value?: number, autoShowValue = true) {
-        this.addItems(KropkiDotConstraint(
-            this.fixCellPosition(gridParser.offsetCoords(cell1)),
-            this.fixCellPosition(gridParser.offsetCoords(cell2)),
-            false,
-            value,
-            undefined,
-            autoShowValue || value !== 1,
-            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
-        ));
+    addWhiteKropki(
+        gridParser: GridParser<T, any>,
+        cell1: PositionLiteral,
+        cell2: PositionLiteral,
+        value?: number,
+        autoShowValue = true,
+    ) {
+        this.addItems(
+            KropkiDotConstraint(
+                this.fixCellPosition(gridParser.offsetCoords(cell1)),
+                this.fixCellPosition(gridParser.offsetCoords(cell2)),
+                false,
+                value,
+                undefined,
+                autoShowValue || value !== 1,
+                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+            ),
+        );
     }
-    addBlackKropki(gridParser: GridParser<T, any>, cell1: PositionLiteral, cell2: PositionLiteral, value?: number, autoShowValue = true) {
-        this.addItems(KropkiDotConstraint(
-            this.fixCellPosition(gridParser.offsetCoords(cell1)),
-            this.fixCellPosition(gridParser.offsetCoords(cell2)),
-            true,
-            value,
-            undefined,
-            autoShowValue || value !== 2,
-            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
-        ));
+    addBlackKropki(
+        gridParser: GridParser<T, any>,
+        cell1: PositionLiteral,
+        cell2: PositionLiteral,
+        value?: number,
+        autoShowValue = true,
+    ) {
+        this.addItems(
+            KropkiDotConstraint(
+                this.fixCellPosition(gridParser.offsetCoords(cell1)),
+                this.fixCellPosition(gridParser.offsetCoords(cell2)),
+                true,
+                value,
+                undefined,
+                autoShowValue || value !== 2,
+                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+            ),
+        );
     }
     addX(gridParser: GridParser<T, any>, cell1: PositionLiteral, cell2: PositionLiteral) {
-        this.addItems(XMarkConstraint(
-            this.fixCellPosition(gridParser.offsetCoords(cell1)),
-            this.fixCellPosition(gridParser.offsetCoords(cell2)),
-            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
-        ));
+        this.addItems(
+            XMarkConstraint(
+                this.fixCellPosition(gridParser.offsetCoords(cell1)),
+                this.fixCellPosition(gridParser.offsetCoords(cell2)),
+                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+            ),
+        );
     }
     addV(gridParser: GridParser<T, any>, cell1: PositionLiteral, cell2: PositionLiteral) {
-        this.addItems(VMarkConstraint(
-            this.fixCellPosition(gridParser.offsetCoords(cell1)),
-            this.fixCellPosition(gridParser.offsetCoords(cell2)),
-            gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
-        ));
+        this.addItems(
+            VMarkConstraint(
+                this.fixCellPosition(gridParser.offsetCoords(cell1)),
+                this.fixCellPosition(gridParser.offsetCoords(cell2)),
+                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+            ),
+        );
     }
     // endregion
 
@@ -403,23 +411,22 @@ export class PuzzleImporter<T extends AnyPTM> {
         lineColor?: string,
         fontColor?: string,
     ) {
-        this.addItems(KillerCageConstraint(
-            gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
-            value,
-            false,
-            undefined,
-            lineColor,
-            fontColor,
-        ));
+        this.addItems(
+            KillerCageConstraint(
+                gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
+                value,
+                false,
+                undefined,
+                lineColor,
+                fontColor,
+            ),
+        );
     }
-    addExtraRegion(
-        gridParser: GridParser<T, any>,
-        cells: PositionLiteral[],
-    ) {
+    addExtraRegion(gridParser: GridParser<T, any>, cells: PositionLiteral[]) {
         // TODO: implement visuals
-        this.addItems(KillerCageConstraint(
-            gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
-        ));
+        this.addItems(
+            KillerCageConstraint(gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell))),
+        );
     }
     // endregion
 
@@ -429,27 +436,20 @@ export class PuzzleImporter<T extends AnyPTM> {
         circleCellLiterals: PositionLiteral[],
         [lineStartLiteral, ...lineLiterals]: PositionLiteral[],
     ) {
-        const {
-            transparentArrowCircle,
-            "product-arrow": productArrow,
-        } = this.finalImportOptions(gridParser);
+        const { transparentArrowCircle, "product-arrow": productArrow } = this.finalImportOptions(gridParser);
 
-        this.addItems(ArrowConstraint(
-            gridParser.offsetCoordsArray(circleCellLiterals)
-                .filter((cell) => this.isVisibleGridCell(cell)),
-            gridParser.offsetCoordsArray(lineLiterals)
-                .filter((cell) => this.isVisibleGridCell(cell)),
-            transparentArrowCircle,
-            lineStartLiteral && gridParser.offsetCoords(lineStartLiteral),
-            productArrow,
-            false,
-        ));
+        this.addItems(
+            ArrowConstraint(
+                gridParser.offsetCoordsArray(circleCellLiterals).filter((cell) => this.isVisibleGridCell(cell)),
+                gridParser.offsetCoordsArray(lineLiterals).filter((cell) => this.isVisibleGridCell(cell)),
+                transparentArrowCircle,
+                lineStartLiteral && gridParser.offsetCoords(lineStartLiteral),
+                productArrow,
+                false,
+            ),
+        );
     }
-    addArrows(
-        gridParser: GridParser<T, any>,
-        circleCellLiterals: PositionLiteral[],
-        lines: PositionLiteral[][],
-    ) {
+    addArrows(gridParser: GridParser<T, any>, circleCellLiterals: PositionLiteral[], lines: PositionLiteral[][]) {
         for (const line of lines) {
             this.addArrow(gridParser, circleCellLiterals, line);
         }
@@ -503,13 +503,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             gridParser,
             cells,
             display,
-            (cells, split, lineColor, lineWidth) => WhispersConstraint<T>(
-                cells,
-                split,
-                value,
-                lineColor,
-                lineWidth,
-            ),
+            (cells, split, lineColor, lineWidth) => WhispersConstraint<T>(cells, split, value, lineColor, lineWidth),
             lineColor,
             lineWidth,
         );
@@ -563,14 +557,8 @@ export class PuzzleImporter<T extends AnyPTM> {
             gridParser,
             cells,
             true,
-            (cells, split, lineColor, lineWidth) => ThermometerConstraint(
-                cells,
-                split,
-                slow,
-                lineColor,
-                lineWidth,
-                bulbRadius,
-            ),
+            (cells, split, lineColor, lineWidth) =>
+                ThermometerConstraint(cells, split, slow, lineColor, lineWidth, bulbRadius),
             lineColor,
             lineWidth,
         );
@@ -585,16 +573,18 @@ export class PuzzleImporter<T extends AnyPTM> {
         bulbLineColor?: string,
         bulbLineWidth?: number,
     ) {
-        this.addItems(BetweenLineConstraint(
-            gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
-            false,
-            lineColor,
-            lineWidth,
-            bulbRadius,
-            bulbBackgroundColor,
-            bulbLineColor,
-            bulbLineWidth
-        ));
+        this.addItems(
+            BetweenLineConstraint(
+                gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell)),
+                false,
+                lineColor,
+                lineWidth,
+                bulbRadius,
+                bulbBackgroundColor,
+                bulbLineColor,
+                bulbLineWidth,
+            ),
+        );
     }
     addDoubleArrowLine(
         gridParser: GridParser<T, any>,
@@ -615,7 +605,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             bulbRadius,
             bulbBackgroundColor,
             bulbLineColor,
-            bulbLineWidth
+            bulbLineWidth,
         );
         this.addItems(display ? constraint : toInvisibleConstraint(constraint));
     }
@@ -688,7 +678,9 @@ export class PuzzleImporter<T extends AnyPTM> {
         arrowColor?: string,
     ) {
         const direction = detectOutsideClueDirection(startCell, gridParser.fieldSize, directionLiteral);
-        const offsetLineCells = gridParser.offsetCoordsArray(getLineCellsByOutsideCell(startCell, gridParser.fieldSize, direction));
+        const offsetLineCells = gridParser.offsetCoordsArray(
+            getLineCellsByOutsideCell(startCell, gridParser.fieldSize, direction),
+        );
 
         this.checkForOutsideCells(gridParser, [
             {
@@ -697,13 +689,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             },
         ]);
 
-        this.addItems(LittleKillerConstraintByCells<T>(
-            offsetLineCells,
-            direction,
-            value,
-            textColor,
-            arrowColor,
-        ));
+        this.addItems(LittleKillerConstraintByCells<T>(offsetLineCells, direction, value, textColor, arrowColor));
     }
 
     addSimpleOutsideClue(
@@ -717,12 +703,16 @@ export class PuzzleImporter<T extends AnyPTM> {
         const offsetClueCell = gridParser.offsetCoords(cellLiteral);
         this.checkForOutsideCells(gridParser, [offsetClueCell]);
 
-        this.addItems(factory(
-            offsetClueCell,
-            gridParser.offsetCoordsArray(getLineCellsByOutsideCell(cellLiteral, gridParser.fieldSize, directionLiteral)),
-            value,
-            color,
-        ));
+        this.addItems(
+            factory(
+                offsetClueCell,
+                gridParser.offsetCoordsArray(
+                    getLineCellsByOutsideCell(cellLiteral, gridParser.fieldSize, directionLiteral),
+                ),
+                value,
+                color,
+            ),
+        );
     }
     addSkyscraper(
         gridParser: GridParser<T, any>,
@@ -775,13 +765,8 @@ export class PuzzleImporter<T extends AnyPTM> {
             gridParser,
             cells,
             true,
-            (cells, split, lineColor, lineWidth) => LineConstraint(
-                cells,
-                lineColor,
-                lineWidth,
-                split,
-                this.cosmeticsLayer(gridParser, beforeGridLines),
-            ),
+            (cells, split, lineColor, lineWidth) =>
+                LineConstraint(cells, lineColor, lineWidth, split, this.cosmeticsLayer(gridParser, beforeGridLines)),
             lineColor,
             lineWidth,
         );
@@ -801,17 +786,19 @@ export class PuzzleImporter<T extends AnyPTM> {
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
-        this.addItems(RectConstraint(
-            this.fixCellPositions(cells),
-            {width, height},
-            backgroundColor,
-            borderColor,
-            borderWidth,
-            text,
-            textColor,
-            angle,
-            this.cosmeticsLayer(gridParser, beforeLines),
-        ));
+        this.addItems(
+            RectConstraint(
+                this.fixCellPositions(cells),
+                { width, height },
+                backgroundColor,
+                borderColor,
+                borderWidth,
+                text,
+                textColor,
+                angle,
+                this.cosmeticsLayer(gridParser, beforeLines),
+            ),
+        );
     }
     addCosmeticCircle(
         gridParser: GridParser<T, any>,
@@ -828,17 +815,19 @@ export class PuzzleImporter<T extends AnyPTM> {
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
-        this.addItems(EllipseConstraint(
-            this.fixCellPositions(cells),
-            {width, height},
-            backgroundColor,
-            borderColor,
-            borderWidth,
-            text,
-            textColor,
-            angle,
-            this.cosmeticsLayer(gridParser, beforeLines),
-        ));
+        this.addItems(
+            EllipseConstraint(
+                this.fixCellPositions(cells),
+                { width, height },
+                backgroundColor,
+                borderColor,
+                borderWidth,
+                text,
+                textColor,
+                angle,
+                this.cosmeticsLayer(gridParser, beforeLines),
+            ),
+        );
     }
     addCosmeticArrow(
         gridParser: GridParser<T, any>,
@@ -854,17 +843,19 @@ export class PuzzleImporter<T extends AnyPTM> {
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
-        this.addItems(CosmeticArrowConstraint(
-            this.fixCellPositions(cells),
-            length,
-            headSize,
-            borderColor,
-            borderWidth,
-            text,
-            textColor,
-            angle,
-            this.cosmeticsLayer(gridParser, beforeLines),
-        ));
+        this.addItems(
+            CosmeticArrowConstraint(
+                this.fixCellPositions(cells),
+                length,
+                headSize,
+                borderColor,
+                borderWidth,
+                text,
+                textColor,
+                angle,
+                this.cosmeticsLayer(gridParser, beforeLines),
+            ),
+        );
     }
     addCosmeticText(
         gridParser: GridParser<T, any>,
@@ -877,14 +868,16 @@ export class PuzzleImporter<T extends AnyPTM> {
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
-        this.addItems(TextConstraint(
-            this.fixCellPositions(cells),
-            text,
-            color,
-            size,
-            angle,
-            this.cosmeticsLayer(gridParser, beforeLines),
-        ));
+        this.addItems(
+            TextConstraint(
+                this.fixCellPositions(cells),
+                text,
+                color,
+                size,
+                angle,
+                this.cosmeticsLayer(gridParser, beforeLines),
+            ),
+        );
     }
     addCosmeticCage(
         gridParser: GridParser<T, any>,
@@ -893,17 +886,9 @@ export class PuzzleImporter<T extends AnyPTM> {
         lineColor?: string,
         fontColor?: string,
     ) {
-        const visibleCells = gridParser.offsetCoordsArray(cells)
-            .filter((cell) => this.isVisibleGridCell(cell));
+        const visibleCells = gridParser.offsetCoordsArray(cells).filter((cell) => this.isVisibleGridCell(cell));
         this.checkForOutsideCells(gridParser, visibleCells);
-        this.addItems(DecorativeCageConstraint(
-            visibleCells,
-            text,
-            false,
-            undefined,
-            lineColor,
-            fontColor,
-        ));
+        this.addItems(DecorativeCageConstraint(visibleCells, text, false, undefined, lineColor, fontColor));
     }
     // endregion
     // endregion
@@ -914,33 +899,38 @@ export class PuzzleImporter<T extends AnyPTM> {
     checkForOutsideCells(gridParser: GridParser<T, any>, cells: Position[]) {
         gridParser.extendOutsideBoundsByCells(cells);
 
-        const margin = Math.max(0, ...cells.flatMap(({top, left}) => [
-            -top,
-            -left,
-            top + 1 - this.puzzle.fieldSize.rowsCount,
-            left + 1 - this.puzzle.fieldSize.columnsCount,
-        ]));
+        const margin = Math.max(
+            0,
+            ...cells.flatMap(({ top, left }) => [
+                -top,
+                -left,
+                top + 1 - this.puzzle.fieldSize.rowsCount,
+                left + 1 - this.puzzle.fieldSize.columnsCount,
+            ]),
+        );
 
         if (margin > 0) {
             this.addMargin(margin);
         }
-    };
-
+    }
 
     addGiven(gridParser: GridParser<T, any>, top: number, left: number, value: number | string) {
-        const {top: offsetTop, left: offsetLeft} = gridParser.offsetCoords({top, left});
+        const { top: offsetTop, left: offsetLeft } = gridParser.offsetCoords({ top, left });
 
         switch (typeof value) {
             case "number":
                 if (this.finalImportOptions(gridParser).fillableDigitalDisplay) {
                     // TODO: extract to a type manager
-                    this.items.push(FillableCalculatorDigitConstraint({top: offsetTop, left: offsetLeft}, value));
+                    this.items.push(FillableCalculatorDigitConstraint({ top: offsetTop, left: offsetLeft }, value));
                 } else {
                     if (gridParser.hasSolution) {
                         this.addSolutionDigit(gridParser, top, left, value);
                     }
                     this.initialDigits[offsetTop] = this.initialDigits[offsetTop] || {};
-                    this.initialDigits[offsetTop][offsetLeft] = this.typeManager.createCellDataByImportedDigit(value, this.importOptions);
+                    this.initialDigits[offsetTop][offsetLeft] = this.typeManager.createCellDataByImportedDigit(
+                        value,
+                        this.importOptions,
+                    );
                 }
                 break;
             case "string":
@@ -951,7 +941,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     addSolutionDigit(gridParser: GridParser<T, any>, top: number, left: number, value: number | string) {
-        const offsetCoords = gridParser.offsetCoords({top, left});
+        const offsetCoords = gridParser.offsetCoords({ top, left });
         top = offsetCoords.top;
         left = offsetCoords.left;
 
@@ -970,7 +960,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             return;
         }
 
-        const offsetCoords = gridParser.offsetCoords({top, left});
+        const offsetCoords = gridParser.offsetCoords({ top, left });
         top = offsetCoords.top;
         left = offsetCoords.left;
 
@@ -987,7 +977,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             return;
         }
 
-        const offsetCoords = gridParser.offsetCoords({top, left});
+        const offsetCoords = gridParser.offsetCoords({ top, left });
         top = offsetCoords.top;
         left = offsetCoords.left;
 
@@ -1000,7 +990,7 @@ export class PuzzleImporter<T extends AnyPTM> {
 
     processColor(gridParser: GridParser<T, any>, color: CellColorValue, forceMapping: boolean): CellColorValue {
         return forceMapping || this.typeManager.mapImportedColors
-            ? gridParser.colorsMap[color as string] ?? color
+            ? (gridParser.colorsMap[color as string] ?? color)
             : color;
     }
     processColors(gridParser: GridParser<T, any>, colors: CellColorValue[], forceMapping: boolean) {
@@ -1026,7 +1016,9 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     private splitUnconnectedRegions() {
-        const cellsIndex = new SudokuCellsIndex(this.puzzle.typeManager.postProcessPuzzle?.(this.puzzle) ?? this.puzzle);
+        const cellsIndex = new SudokuCellsIndex(
+            this.puzzle.typeManager.postProcessPuzzle?.(this.puzzle) ?? this.puzzle,
+        );
 
         this.puzzle.regions = cellsIndex.splitUnconnectedRegions(this.regions);
     }

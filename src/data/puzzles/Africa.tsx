@@ -1,23 +1,19 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {Chameleon} from "../authors";
-import {GoogleMapsFieldWrapper} from "../../sudokuTypes/google-maps/components/GoogleMapsFieldWrapper";
-import {
-    AfricaCountriesAreas,
-    AfricaCountriesBounds,
-    AfricaCountriesEnum
-} from "./africa-data/AfricaCountries";
-import {isValidFinishedPuzzleByConstraints, toInvisibleConstraint} from "../../types/sudoku/Constraint";
-import {processGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
-import {latLngLiteralToPosition} from "../../sudokuTypes/google-maps/utils/googleMapsCoords";
-import {CustomCellBounds} from "../../types/sudoku/CustomCellBounds";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
-import {GoogleMapsTypeManager} from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
-import {GoogleMapsPTM} from "../../sudokuTypes/google-maps/types/GoogleMapsPTM";
-import {indexes} from "../../utils/indexes";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { Chameleon } from "../authors";
+import { GoogleMapsFieldWrapper } from "../../sudokuTypes/google-maps/components/GoogleMapsFieldWrapper";
+import { AfricaCountriesAreas, AfricaCountriesBounds, AfricaCountriesEnum } from "./africa-data/AfricaCountries";
+import { isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/sudoku/Constraint";
+import { processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
+import { latLngLiteralToPosition } from "../../sudokuTypes/google-maps/utils/googleMapsCoords";
+import { CustomCellBounds } from "../../types/sudoku/CustomCellBounds";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { OddConstraint } from "../../components/sudoku/constraints/odd/Odd";
+import { GoogleMapsTypeManager } from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
+import { GoogleMapsPTM } from "../../sudokuTypes/google-maps/types/GoogleMapsPTM";
+import { indexes } from "../../utils/indexes";
 
 export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
     noIndex: true,
@@ -26,20 +22,33 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         [LanguageCode.en]: "Africa",
     },
     author: Chameleon,
-    rules: () => <>
-        <RulesParagraph>Put digits from 1 to 5 to each country of Africa, except for the islands.</RulesParagraph>
-        <RulesParagraph>Neighbors (2 countries that share a border) can't contain the same digit.</RulesParagraph>
-        <RulesParagraph>There are exactly 9 pairs of neighbors that have either consecutive digits or digits in a 1:2 ratio (or both).</RulesParagraph>
-        <RulesParagraph>The product of all digits on the map (i.e. all digits multiplied together) ends with nine zeros.</RulesParagraph>
-        <RulesParagraph>Countries that end with a consonant letter have an odd digit.</RulesParagraph>
-        <RulesParagraph>Clarifications about neighborhood:</RulesParagraph>
-        <RulesUnorderedList>
-            <li>Zambia and Botswana <u>are</u> neighbors.</li>
-            <li>Namibia and Zimbabwe <u>are not</u> neighbors.</li>
-            <li>Republic of the Congo and Angola <u>are</u> neighbors (Angola has one small "extra piece").</li>
-            <li>Enlarge the map if in doubt of any other neighborhood.</li>
-        </RulesUnorderedList>
-    </>,
+    rules: () => (
+        <>
+            <RulesParagraph>Put digits from 1 to 5 to each country of Africa, except for the islands.</RulesParagraph>
+            <RulesParagraph>Neighbors (2 countries that share a border) can't contain the same digit.</RulesParagraph>
+            <RulesParagraph>
+                There are exactly 9 pairs of neighbors that have either consecutive digits or digits in a 1:2 ratio (or
+                both).
+            </RulesParagraph>
+            <RulesParagraph>
+                The product of all digits on the map (i.e. all digits multiplied together) ends with nine zeros.
+            </RulesParagraph>
+            <RulesParagraph>Countries that end with a consonant letter have an odd digit.</RulesParagraph>
+            <RulesParagraph>Clarifications about neighborhood:</RulesParagraph>
+            <RulesUnorderedList>
+                <li>
+                    Zambia and Botswana <u>are</u> neighbors.
+                </li>
+                <li>
+                    Namibia and Zimbabwe <u>are not</u> neighbors.
+                </li>
+                <li>
+                    Republic of the Congo and Angola <u>are</u> neighbors (Angola has one small "extra piece").
+                </li>
+                <li>Enlarge the map if in doubt of any other neighborhood.</li>
+            </RulesUnorderedList>
+        </>
+    ),
     typeManager: GoogleMapsTypeManager(DigitSudokuTypeManager()),
     fieldWrapperComponent: GoogleMapsFieldWrapper({
         west: -7.5,
@@ -55,11 +64,11 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
     },
     digitsCount: 5,
     customCellBounds: processGivenDigitsMaps(
-        ([bordersLatLng], {left: index}): CustomCellBounds => ({
+        ([bordersLatLng], { left: index }): CustomCellBounds => ({
             borders: bordersLatLng.map((border) => border.map(latLngLiteralToPosition)),
             userArea: AfricaCountriesAreas[index as AfricaCountriesEnum],
         }),
-        [{0: AfricaCountriesBounds}]
+        [{ 0: AfricaCountriesBounds }],
     ),
     items: [
         {
@@ -69,14 +78,17 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             isValidCell(cell, digits, regionCells, context): boolean {
                 const digit = digits[cell.top][cell.left]!;
 
-                const {puzzle, puzzleIndex} = context;
+                const { puzzle, puzzleIndex } = context;
 
-                const {neighbors} = puzzleIndex.allCells[cell.top][cell.left];
+                const { neighbors } = puzzleIndex.allCells[cell.top][cell.left];
 
                 for (const neighbor of neighbors.items) {
                     const digit2 = digits[neighbor.top]?.[neighbor.left];
 
-                    if (digit2 !== undefined && puzzle.typeManager.areSameCellData(digit, digit2, context, cell, neighbor)) {
+                    if (
+                        digit2 !== undefined &&
+                        puzzle.typeManager.areSameCellData(digit, digit2, context, cell, neighbor)
+                    ) {
                         return false;
                     }
                 }
@@ -95,7 +107,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             AfricaCountriesEnum.CentAfrRep,
             AfricaCountriesEnum.SouthSudan,
             AfricaCountriesEnum.Gabon,
-        ].map((left: number) => toInvisibleConstraint(OddConstraint({top: 0, left}))),
+        ].map((left: number) => toInvisibleConstraint(OddConstraint({ top: 0, left }))),
     ],
     resultChecker: (context) => {
         if (!isValidFinishedPuzzleByConstraints(context)) {

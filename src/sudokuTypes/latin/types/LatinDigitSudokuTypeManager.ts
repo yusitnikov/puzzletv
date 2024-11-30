@@ -1,7 +1,7 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {LatinDigitComponentType} from "../../../components/sudoku/digit/LatinDigit";
-import {areSameArrays} from "../../../utils/array";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { LatinDigitComponentType } from "../../../components/sudoku/digit/LatinDigit";
+import { areSameArrays } from "../../../utils/array";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 
 const map: Record<number, number> = {
     1: 1,
@@ -15,23 +15,15 @@ const map: Record<number, number> = {
     9: 1000,
 };
 
-export const LatinDigitSudokuTypeManager = <T extends AnyPTM>(baseTypeManager: SudokuTypeManager<T>): SudokuTypeManager<T> => ({
+export const LatinDigitSudokuTypeManager = <T extends AnyPTM>(
+    baseTypeManager: SudokuTypeManager<T>,
+): SudokuTypeManager<T> => ({
     ...baseTypeManager,
 
     disableCellModeLetterShortcuts: true,
     disableArrowLetterShortcuts: true,
     disableDigitShortcuts: true,
-    digitShortcuts: [
-        ["1", "I"],
-        ["2"],
-        ["3"],
-        ["5", "V"],
-        ["0", "X"],
-        ["L"],
-        ["C"],
-        ["D"],
-        ["M"],
-    ],
+    digitShortcuts: [["1", "I"], ["2"], ["3"], ["5", "V"], ["0", "X"], ["L"], ["C"], ["D"], ["M"]],
 
     cellDataDigitComponentType: LatinDigitComponentType(),
 
@@ -46,19 +38,21 @@ export const LatinDigitSudokuTypeManager = <T extends AnyPTM>(baseTypeManager: S
         const num = naiveLatinDigitsToNumber(digits);
         const correctDigits = numberToLatinDigits(num);
 
-        return (correctDigits !== undefined && areSameArrays(digits, correctDigits))
-            ? num
-            : undefined;
+        return correctDigits !== undefined && areSameArrays(digits, correctDigits) ? num : undefined;
     },
 });
 
-const normalizeLatinDigits = (digits: number[]) => digits.flatMap(digit => {
-    switch (digit) {
-        case 3: return [1, 1, 1];
-        case 2: return [1, 1];
-        default: return [digit];
-    }
-});
+const normalizeLatinDigits = (digits: number[]) =>
+    digits.flatMap((digit) => {
+        switch (digit) {
+            case 3:
+                return [1, 1, 1];
+            case 2:
+                return [1, 1];
+            default:
+                return [digit];
+        }
+    });
 
 const naiveLatinDigitsToNumber = (digits: number[]) => {
     let num = 0;
@@ -73,33 +67,28 @@ const naiveLatinDigitsToNumber = (digits: number[]) => {
     return num;
 };
 
-const regularDigitToLatinDigit = (digit: number, coeff: number): number[] => [
-    [],
-    [coeff],
-    [coeff, coeff],
-    [coeff, coeff, coeff],
-    [coeff, coeff * 5],
-    [coeff * 5],
-    [coeff * 5, coeff],
-    [coeff * 5, coeff, coeff],
-    [coeff * 5, coeff, coeff, coeff],
-    [coeff, coeff * 10],
-][digit];
+const regularDigitToLatinDigit = (digit: number, coeff: number): number[] =>
+    [
+        [],
+        [coeff],
+        [coeff, coeff],
+        [coeff, coeff, coeff],
+        [coeff, coeff * 5],
+        [coeff * 5],
+        [coeff * 5, coeff],
+        [coeff * 5, coeff, coeff],
+        [coeff * 5, coeff, coeff, coeff],
+        [coeff, coeff * 10],
+    ][digit];
 
 const numberToLatinDigits = (num: number): number[] | undefined => {
     if (num <= 0 || num >= 4000) {
         return undefined;
     }
 
-    const regularDigits = num
-        .toString()
-        .split("")
-        .map(Number);
+    const regularDigits = num.toString().split("").map(Number);
 
-    return regularDigits.flatMap(
-        (digit, index) => regularDigitToLatinDigit(
-            digit,
-            Math.pow(10, regularDigits.length - 1 - index)
-        )
+    return regularDigits.flatMap((digit, index) =>
+        regularDigitToLatinDigit(digit, Math.pow(10, regularDigits.length - 1 - index)),
     );
 };

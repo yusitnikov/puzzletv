@@ -1,9 +1,9 @@
-import {ComponentType} from "react";
-import {DigitProps} from "./DigitProps";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {DigitRotationInfo} from "./DigitRotationInfo";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {loop} from "../../../utils/math";
+import { ComponentType } from "react";
+import { DigitProps } from "./DigitProps";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { DigitRotationInfo } from "./DigitRotationInfo";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { loop } from "../../../utils/math";
 
 export interface DigitComponentType<T extends AnyPTM> {
     component: ComponentType<DigitProps<T>>;
@@ -13,12 +13,7 @@ export interface DigitComponentType<T extends AnyPTM> {
 }
 
 export const getDigitRotationInfo = <T extends AnyPTM>(
-    {
-        typeManager: {
-            digitComponentType,
-            cellDataDigitComponentType = digitComponentType,
-        },
-    }: PuzzleDefinition<T>,
+    { typeManager: { digitComponentType, cellDataDigitComponentType = digitComponentType } }: PuzzleDefinition<T>,
     digit: number,
 ): DigitRotationInfo => cellDataDigitComponentType.getDigitRotationInfo?.(digit) ?? {};
 
@@ -26,12 +21,8 @@ export const isRotatableDigit = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, 
     getDigitRotationInfo(puzzle, digit).isRotatable ?? false;
 
 export const rotateDigit = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, digit: number, angle: number): number => {
-    const {rotatesInto = digit} = getDigitRotationInfo(puzzle, digit);
-    return typeof rotatesInto === "function"
-        ? rotatesInto(angle)
-        : loop(angle, 360) === 0
-            ? digit
-            : rotatesInto;
+    const { rotatesInto = digit } = getDigitRotationInfo(puzzle, digit);
+    return typeof rotatesInto === "function" ? rotatesInto(angle) : loop(angle, 360) === 0 ? digit : rotatesInto;
 };
 
 export const rotateNumber = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, num: number) =>
@@ -39,7 +30,7 @@ export const rotateNumber = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, num:
         num
             .toString()
             .split("")
-            .map(c => rotateDigit(puzzle, Number(c), 180))
+            .map((c) => rotateDigit(puzzle, Number(c), 180))
             .reverse()
-            .join("")
+            .join(""),
     );

@@ -1,20 +1,19 @@
-import {ConstraintProps} from "../../../types/sudoku/Constraint";
-import {JigsawPTM} from "../types/JigsawPTM";
-import {Jss, JssProps} from "../../jss/constraints/Jss";
-import {JigsawJssCluesVisibility} from "../types/JigsawGameState";
-import {observer} from "mobx-react-lite";
-import {useComputedValue} from "../../../hooks/useComputed";
-import {profiler} from "../../../utils/profiler";
+import { ConstraintProps } from "../../../types/sudoku/Constraint";
+import { JigsawPTM } from "../types/JigsawPTM";
+import { Jss, JssProps } from "../../jss/constraints/Jss";
+import { JigsawJssCluesVisibility } from "../types/JigsawGameState";
+import { observer } from "mobx-react-lite";
+import { useComputedValue } from "../../../hooks/useComputed";
+import { profiler } from "../../../utils/profiler";
 
 export const JigsawJss = observer(function JigsawJssFc(props: ConstraintProps<JigsawPTM, JssProps>) {
     profiler.trace();
 
-    const {context, region} = props;
+    const { context, region } = props;
 
-    const jssCluesVisibility = useComputedValue(
-        () => context.stateExtension.jssCluesVisibility,
-        {name: "JigsawJss:jssCluesVisibility"}
-    );
+    const jssCluesVisibility = useComputedValue(() => context.stateExtension.jssCluesVisibility, {
+        name: "JigsawJss:jssCluesVisibility",
+    });
 
     switch (jssCluesVisibility) {
         case JigsawJssCluesVisibility.None:
@@ -26,5 +25,5 @@ export const JigsawJss = observer(function JigsawJssFc(props: ConstraintProps<Ji
             break;
     }
 
-    return <Jss {...props}/>
+    return <Jss {...props} />;
 });

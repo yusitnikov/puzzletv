@@ -1,4 +1,4 @@
-import {Position} from "../../../types/layout/Position";
+import { Position } from "../../../types/layout/Position";
 
 export interface GoogleMapsState {
     map: google.maps.Map;

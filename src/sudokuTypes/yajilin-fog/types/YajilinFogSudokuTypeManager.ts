@@ -1,15 +1,15 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {CellColor} from "../../../types/sudoku/CellColor";
-import {lineTag} from "../../../components/sudoku/constraints/line/Line";
-import {PuzzleLineSet} from "../../../types/sudoku/PuzzleLineSet";
-import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
-import {indexes} from "../../../utils/indexes";
-import {FogConstraint, FogProps, fogTag} from "../../../components/sudoku/constraints/fog/Fog";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { CellColor } from "../../../types/sudoku/CellColor";
+import { lineTag } from "../../../components/sudoku/constraints/line/Line";
+import { PuzzleLineSet } from "../../../types/sudoku/PuzzleLineSet";
+import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/sudoku/GivenDigitsMap";
+import { indexes } from "../../../utils/indexes";
+import { FogConstraint, FogProps, fogTag } from "../../../components/sudoku/constraints/fog/Fog";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 
 export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
-    baseTypeManager: SudokuTypeManager<T>
+    baseTypeManager: SudokuTypeManager<T>,
 ): SudokuTypeManager<T> => {
     return {
         ...baseTypeManager,
@@ -31,15 +31,15 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
 
             if (puzzle.solution) {
                 puzzle.solution = processGivenDigitsMaps(
-                    ([value]) => value === 0 ? undefined : value,
-                    [puzzle.solution]
+                    ([value]) => (value === 0 ? undefined : value),
+                    [puzzle.solution],
                 );
             }
 
             let yajilinFogLineSolution = new PuzzleLineSet(puzzle);
             const yajilinFogShadeSolution: GivenDigitsMap<CellColor> = {};
 
-            const {initialColors} = puzzle;
+            const { initialColors } = puzzle;
             if (typeof initialColors === "object") {
                 for (const [topStr, row] of Object.entries(initialColors)) {
                     const top = Number(topStr);
@@ -63,31 +63,33 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                 const items: typeof originalItems = [];
 
                 for (const item of originalItems) {
-                    const {tags, color, cells, props} = item;
+                    const { tags, color, cells, props } = item;
 
                     if (tags?.includes(lineTag) && color === "#000000") {
-                        yajilinFogLineSolution = yajilinFogLineSolution.bulkAdd(indexes(cells.length - 1).map(i => ({
-                            start: cells[i],
-                            end: cells[i + 1],
-                        })));
+                        yajilinFogLineSolution = yajilinFogLineSolution.bulkAdd(
+                            indexes(cells.length - 1).map((i) => ({
+                                start: cells[i],
+                                end: cells[i + 1],
+                            })),
+                        );
 
                         continue;
                     }
 
                     if (tags?.includes(fogTag)) {
-                        const {
-                            startCells3x3,
-                            startCells,
-                            bulbCells,
-                        } = props as FogProps<T>;
+                        const { startCells3x3, startCells, bulbCells } = props as FogProps<T>;
 
-                        items.push(FogConstraint(
-                            startCells3x3,
-                            startCells,
-                            bulbCells,
-                            yajilinFogLineSolution.size ? yajilinFogLineSolution : true,
-                            Object.keys(yajilinFogShadeSolution).length ? yajilinFogShadeSolution : [CellColor.black],
-                        ));
+                        items.push(
+                            FogConstraint(
+                                startCells3x3,
+                                startCells,
+                                bulbCells,
+                                yajilinFogLineSolution.size ? yajilinFogLineSolution : true,
+                                Object.keys(yajilinFogShadeSolution).length
+                                    ? yajilinFogShadeSolution
+                                    : [CellColor.black],
+                            ),
+                        );
 
                         continue;
                     }
@@ -104,29 +106,33 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
             const originalResultChecker = puzzle.resultChecker;
             if (originalResultChecker && typeof initialColors === "object") {
                 puzzle.resultChecker = (context) => {
-                    const {puzzleIndex, currentFieldStateWithFogDemo: {cells, lines}} = context;
+                    const {
+                        puzzleIndex,
+                        currentFieldStateWithFogDemo: { cells, lines },
+                    } = context;
 
                     if (
                         Object.keys(yajilinFogShadeSolution).length &&
-                        !cells.every((row, top) => row.every(({colors}, left) => {
-                            if (initialColors[top]?.[left]?.length) {
-                                return true;
-                            }
+                        !cells.every((row, top) =>
+                            row.every(({ colors }, left) => {
+                                if (initialColors[top]?.[left]?.length) {
+                                    return true;
+                                }
 
-                            const isActualBlack = colors.size === 1 && colors.first() === CellColor.black;
-                            const isExpectedBlack = !!yajilinFogShadeSolution[top]?.[left];
-                            return isActualBlack === isExpectedBlack;
-                        }))
+                                const isActualBlack = colors.size === 1 && colors.first() === CellColor.black;
+                                const isExpectedBlack = !!yajilinFogShadeSolution[top]?.[left];
+                                return isActualBlack === isExpectedBlack;
+                            }),
+                        )
                     ) {
                         return false;
                     }
 
                     if (
                         yajilinFogLineSolution.size &&
-                        !new PuzzleLineSet(
-                            puzzle,
-                            puzzleIndex.getCenterLines(lines.items, true)
-                        ).equals(yajilinFogLineSolution)
+                        !new PuzzleLineSet(puzzle, puzzleIndex.getCenterLines(lines.items, true)).equals(
+                            yajilinFogLineSolution,
+                        )
                     ) {
                         return false;
                     }

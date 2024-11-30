@@ -1,4 +1,4 @@
-import {ScrewsGameClueState} from "./ScrewsGameClueState";
+import { ScrewsGameClueState } from "./ScrewsGameClueState";
 
 export interface ScrewsGameState {
     screws: ScrewsGameClueState[];

@@ -1,5 +1,5 @@
-import {CaterpillarGrid} from "./CaterpillarGrid";
+import { CaterpillarGrid } from "./CaterpillarGrid";
 
 export interface CaterpillarPuzzleExtension {
-  caterpillarGrids: CaterpillarGrid[];
+    caterpillarGrids: CaterpillarGrid[];
 }

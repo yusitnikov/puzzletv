@@ -1,20 +1,20 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {ChessColor} from "./ChessColor";
-import {ChessPTM} from "./ChessPTM";
-import {ChessSudokuTypeManager} from "./ChessSudokuTypeManager";
-import {FieldState} from "../../../types/sudoku/FieldState";
-import {ChessPieceType} from "./ChessPieceType";
-import {comparer, IReactionDisposer, reaction} from "mobx";
-import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
-import {myClientId} from "../../../hooks/useMultiPlayer";
-import {getNextActionId} from "../../../types/sudoku/GameStateAction";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {ChessEngine, ChessEngineManager} from "../components/ChessEngine";
-import {ChessHistory} from "../components/ChessHistory";
-import {FieldStateChessBoard} from "./ChessBoard";
-import {CellSelectionByDataProps, CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
-import {arrayContainsPosition, Position} from "../../../types/layout/Position";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { ChessColor } from "./ChessColor";
+import { ChessPTM } from "./ChessPTM";
+import { ChessSudokuTypeManager } from "./ChessSudokuTypeManager";
+import { FieldState } from "../../../types/sudoku/FieldState";
+import { ChessPieceType } from "./ChessPieceType";
+import { comparer, IReactionDisposer, reaction } from "mobx";
+import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { myClientId } from "../../../hooks/useMultiPlayer";
+import { getNextActionId } from "../../../types/sudoku/GameStateAction";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { ChessEngine, ChessEngineManager } from "../components/ChessEngine";
+import { ChessHistory } from "../components/ChessHistory";
+import { FieldStateChessBoard } from "./ChessBoard";
+import { CellSelectionByDataProps, CellSelectionColor } from "../../../components/sudoku/cell/CellSelection";
+import { arrayContainsPosition, Position } from "../../../types/layout/Position";
 
 const initialHeavyPieces = [
     ChessPieceType.rook,
@@ -26,7 +26,7 @@ const initialHeavyPieces = [
     ChessPieceType.knight,
     ChessPieceType.rook,
 ];
-const initialPieces: Record<number, { color: ChessColor, pieces: ChessPieceType[] }> = {
+const initialPieces: Record<number, { color: ChessColor; pieces: ChessPieceType[] }> = {
     0: {
         color: ChessColor.black,
         pieces: initialHeavyPieces,
@@ -43,7 +43,7 @@ const initialPieces: Record<number, { color: ChessColor, pieces: ChessPieceType[
         color: ChessColor.white,
         pieces: initialHeavyPieces,
     },
-}
+};
 
 export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
     ...ChessSudokuTypeManager,
@@ -53,25 +53,30 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         return [];
     },
 
-    modifyInitialFieldState({cells, ...state}: FieldState<ChessPTM>): FieldState<ChessPTM> {
+    modifyInitialFieldState({ cells, ...state }: FieldState<ChessPTM>): FieldState<ChessPTM> {
         return {
             ...state,
-            cells: cells.map((row, top) => row.map((cell, left) => {
-                const rowPieces = initialPieces[top];
+            cells: cells.map((row, top) =>
+                row.map((cell, left) => {
+                    const rowPieces = initialPieces[top];
 
-                return {
-                    ...cell,
-                    usersDigit: rowPieces && {
-                        type: rowPieces.pieces[left],
-                        color: rowPieces.color,
-                    },
-                };
-            })),
+                    return {
+                        ...cell,
+                        usersDigit: rowPieces && {
+                            type: rowPieces.pieces[left],
+                            color: rowPieces.color,
+                        },
+                    };
+                }),
+            ),
         };
     },
 
-    getCellSelectionType(cell, context): Required<Pick<CellSelectionByDataProps<ChessPTM>, "color" | "strokeWidth">> | undefined {
-        const {movesForSelectedCell = []} = ChessEngineManager.getInstance(context);
+    getCellSelectionType(
+        cell,
+        context,
+    ): Required<Pick<CellSelectionByDataProps<ChessPTM>, "color" | "strokeWidth">> | undefined {
+        const { movesForSelectedCell = [] } = ChessEngineManager.getInstance(context);
         if (arrayContainsPosition(movesForSelectedCell, cell)) {
             return {
                 color: CellSelectionColor.secondary,
@@ -83,9 +88,9 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
 
     getReactions(context): IReactionDisposer[] {
         return [
-            ...ChessSudokuTypeManager.getReactions?.(context) ?? [],
+            ...(ChessSudokuTypeManager.getReactions?.(context) ?? []),
             reaction(
-                () => context.selectedCellsCount === 1 ? context.firstSelectedCell : undefined,
+                () => (context.selectedCellsCount === 1 ? context.firstSelectedCell : undefined),
                 (to, from) => {
                     if (!to || !from) {
                         return;
@@ -101,13 +106,13 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
                 {
                     name: "selected chess piece",
                     equals: comparer.structural,
-                }
+                },
             ),
         ];
     },
 
     getAboveRules(_translate, context) {
-        return <ChessEngine context={context}/>;
+        return <ChessEngine context={context} />;
     },
 
     postProcessPuzzle(puzzle): PuzzleDefinition<ChessPTM> {
@@ -116,12 +121,14 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         return {
             ...puzzle,
             rules(translate, context) {
-                return <>
-                    {puzzle.rules?.(translate, context)}
+                return (
+                    <>
+                        {puzzle.rules?.(translate, context)}
 
-                    <ChessHistory context={context}/>
-                </>;
-            }
+                        <ChessHistory context={context} />
+                    </>
+                );
+            },
         };
     },
 
@@ -140,21 +147,16 @@ export const makeChessMove = (context: PuzzleContext<ChessPTM>, from: Position, 
     }
 
     context.onStateChange({
-        fieldStateHistory: fieldStateHistoryAddState(
-            context,
-            myClientId,
-            getNextActionId(),
-            ({cells, ...state}) => {
-                const board = new FieldStateChessBoard(cells);
+        fieldStateHistory: fieldStateHistoryAddState(context, myClientId, getNextActionId(), ({ cells, ...state }) => {
+            const board = new FieldStateChessBoard(cells);
 
-                board.move(from, to);
+            board.move(from, to);
 
-                return {
-                    ...state,
-                    cells: board.cells,
-                };
-            }
-        ),
+            return {
+                ...state,
+                cells: board.cells,
+            };
+        }),
         selectedCells: context.selectedCells.clear(),
     });
 };

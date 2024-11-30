@@ -1,12 +1,12 @@
-import {translations} from "../data/translations";
-import {allLanguageCodes, LanguageCode} from "../types/translations/LanguageCode";
-import {PartiallyTranslatable} from "../types/translations/Translatable";
-import {TranslationItem} from "../types/translations/TranslationItem";
+import { translations } from "../data/translations";
+import { allLanguageCodes, LanguageCode } from "../types/translations/LanguageCode";
+import { PartiallyTranslatable } from "../types/translations/Translatable";
+import { TranslationItem } from "../types/translations/TranslationItem";
 
 export const translate = <T = string>(phrase: PartiallyTranslatable<T>, languageCode: LanguageCode): T => {
     if (typeof phrase === "string") {
         // phrase is a key of the dictionary item, T is string
-        const result: string = (translations[phrase][languageCode] || phrase);
+        const result: string = translations[phrase][languageCode] || phrase;
         return result as any as T;
     } else {
         // phrase is a map of translations, T is any
@@ -14,16 +14,17 @@ export const translate = <T = string>(phrase: PartiallyTranslatable<T>, language
     }
 };
 
-export const bindTranslate = (languageCode: LanguageCode) =>
-    <T = string>(phrase: PartiallyTranslatable<T>) => translate(phrase, languageCode);
+export const bindTranslate =
+    (languageCode: LanguageCode) =>
+    <T = string>(phrase: PartiallyTranslatable<T>) =>
+        translate(phrase, languageCode);
 
-export const processTranslations = <T = string, ResT = T>(processor: (...items: T[]) => ResT, ...items: PartiallyTranslatable<T>[]) =>
+export const processTranslations = <T = string, ResT = T>(
+    processor: (...items: T[]) => ResT,
+    ...items: PartiallyTranslatable<T>[]
+) =>
     Object.fromEntries(
-        allLanguageCodes
-            .map((language) => [
-                language,
-                processor(...items.map(item => translate(item, language)))
-            ])
+        allLanguageCodes.map((language) => [language, processor(...items.map((item) => translate(item, language)))]),
     ) as TranslationItem<ResT>;
 
 export const getRussianPluralForm = <T>(
@@ -38,8 +39,8 @@ export const getRussianPluralForm = <T>(
     return tens === 1
         ? otherTranslation
         : ones === 1
-            ? oneTranslation
-            : [2, 3, 4].includes(ones)
-                ? twoThreeFourTranslation
-                : otherTranslation;
+          ? oneTranslation
+          : [2, 3, 4].includes(ones)
+            ? twoThreeFourTranslation
+            : otherTranslation;
 };

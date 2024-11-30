@@ -1,4 +1,4 @@
-import {LanguageCode} from "./LanguageCode";
+import { LanguageCode } from "./LanguageCode";
 
 export type TranslationItem<T = string> = Record<LanguageCode, T>;
 

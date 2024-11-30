@@ -1,19 +1,19 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {CubedokuTypeManager} from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { CubedokuTypeManager } from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import {
     cubedokuIndexingDetails,
     cubedokuIndexingRules,
-    cubedokuNormalSudokuRules
+    cubedokuNormalSudokuRules,
 } from "../../sudokuTypes/cubedoku/data/ruleSnippets";
-import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
-import {thermometersExplained} from "../ruleSnippets";
-import {parsePositionLiterals2} from "../../types/layout/Position";
-import {CubedokuIndexingConstraint} from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {createCubeFieldSize, createCubeRegions} from "../../sudokuTypes/cube/types/CubeTypeManager";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
+import { thermometersExplained } from "../ruleSnippets";
+import { parsePositionLiterals2 } from "../../types/layout/Position";
+import { CubedokuIndexingConstraint } from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
+import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { createCubeFieldSize, createCubeRegions } from "../../sudokuTypes/cube/types/CubeTypeManager";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 
 const Andrewsarchus = {
     [LanguageCode.en]: "Andrewsarchus",
@@ -43,11 +43,13 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
     ],
     digitsCount: 4,
     fieldMargin: 1,
-    rules: translate => <>
-        <RulesParagraph>{translate(cubedokuNormalSudokuRules(4))}.</RulesParagraph>
-        <RulesParagraph>{translate(cubedokuIndexingRules)}.</RulesParagraph>
-        <RulesParagraph>{translate(cubedokuIndexingDetails)}.</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(cubedokuNormalSudokuRules(4))}.</RulesParagraph>
+            <RulesParagraph>{translate(cubedokuIndexingRules)}.</RulesParagraph>
+            <RulesParagraph>{translate(cubedokuIndexingDetails)}.</RulesParagraph>
+        </>
+    ),
     initialDigits: {
         3: {
             3: 3,
@@ -61,9 +63,7 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
             7: 2,
         },
     },
-    items: [
-        CubedokuIndexingConstraint(),
-    ],
+    items: [CubedokuIndexingConstraint()],
     resultChecker: isValidFinishedPuzzleByConstraints,
 };
 
@@ -95,12 +95,14 @@ export const CubeIt: PuzzleDefinition<NumberPTM> = {
         ["R9C9", "R10C6", "R10C7", "R10C8", "R10C9"],
     ]),
     digitsCount: 5,
-    rules: translate => <>
-        <RulesParagraph>{translate(cubedokuNormalSudokuRules(5))}.</RulesParagraph>
-        <RulesParagraph>{translate(cubedokuIndexingRules)}.</RulesParagraph>
-        <RulesParagraph>{translate(cubedokuIndexingDetails)}.</RulesParagraph>
-        <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(cubedokuNormalSudokuRules(5))}.</RulesParagraph>
+            <RulesParagraph>{translate(cubedokuIndexingRules)}.</RulesParagraph>
+            <RulesParagraph>{translate(cubedokuIndexingDetails)}.</RulesParagraph>
+            <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
+        </>
+    ),
     items: [
         ThermometerConstraint(["R5C1", "R3C1"]),
         ThermometerConstraint(["R4C2", "R4C4"]),

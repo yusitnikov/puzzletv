@@ -1,10 +1,10 @@
-import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {darkGreyColor} from "../../../app/globals";
-import {LineComponent, LineProps} from "../line/Line";
-import {splitMultiLine} from "../../../../utils/lines";
-import {Constraint} from "../../../../types/sudoku/Constraint";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {indexes} from "../../../../utils/indexes";
+import { isSamePosition, parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
+import { darkGreyColor } from "../../../app/globals";
+import { LineComponent, LineProps } from "../line/Line";
+import { splitMultiLine } from "../../../../utils/lines";
+import { Constraint } from "../../../../types/sudoku/Constraint";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { indexes } from "../../../../utils/indexes";
 
 export const SequenceLineConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
@@ -21,11 +21,15 @@ export const SequenceLineConstraint = <T extends AnyPTM>(
         name: "sequence line",
         cells,
         color,
-        props: {width},
+        props: { width },
         component: LineComponent,
         isObvious: true,
         isValidCell(cell, digits, cells, context) {
-            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+            const {
+                puzzle: {
+                    typeManager: { getDigitByCellData },
+                },
+            } = context;
 
             const index = cells.findIndex((position) => isSamePosition(cell, position));
             for (let index2 = index - 2; index2 <= index; index2++) {
@@ -43,7 +47,12 @@ export const SequenceLineConstraint = <T extends AnyPTM>(
                     return getDigitByCellData(data2, context, cell2);
                 });
 
-                if (digit1 !== undefined && digit2 !== undefined && digit3 !== undefined && digit2 * 2 !== digit1 + digit3) {
+                if (
+                    digit1 !== undefined &&
+                    digit2 !== undefined &&
+                    digit3 !== undefined &&
+                    digit2 * 2 !== digit1 + digit3
+                ) {
                     return false;
                 }
             }

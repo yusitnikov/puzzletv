@@ -1,4 +1,4 @@
-import {RotatableCluesGameClueState} from "./RotatableCluesGameClueState";
+import { RotatableCluesGameClueState } from "./RotatableCluesGameClueState";
 
 export interface RotatableCluesGameState {
     clues: RotatableCluesGameClueState[];

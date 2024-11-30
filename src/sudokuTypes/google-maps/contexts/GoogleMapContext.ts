@@ -1,4 +1,4 @@
-import {createContext, useContext} from "react";
+import { createContext, useContext } from "react";
 
 export interface GoogleMapContextData {
     map: google.maps.Map;
@@ -9,7 +9,7 @@ export interface GoogleMapContextData {
 export const GoogleMapContext = createContext<GoogleMapContextData>({
     map: undefined as any,
     overlay: undefined as any,
-    renderVersion: 0
+    renderVersion: 0,
 });
 
 export const useGoogleMapContext = () => useContext(GoogleMapContext);

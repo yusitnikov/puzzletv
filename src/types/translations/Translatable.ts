@@ -1,5 +1,5 @@
-import {translationsExactType} from "../../data/translations";
-import {TranslationItem, TranslationItemWithEn} from "./TranslationItem";
+import { translationsExactType } from "../../data/translations";
+import { TranslationItem, TranslationItemWithEn } from "./TranslationItem";
 
 export type TranslatableFromDictionary<T = string> = T extends string ? keyof typeof translationsExactType : never;
 

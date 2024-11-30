@@ -1,18 +1,18 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import {
     getRegionCells,
     importGivenColorsAsSolution,
     importSolutionColorsAsGiven,
-    PuzzleDefinition
+    PuzzleDefinition,
 } from "../../../types/sudoku/PuzzleDefinition";
-import {PositionSet} from "../../../types/layout/Position";
-import {Constraint} from "../../../types/sudoku/Constraint";
-import {JssCell} from "./JssCell";
-import {GivenDigitsMap, processGivenDigitsMaps} from "../../../types/sudoku/GivenDigitsMap";
-import {CellColorValue, resolveCellColorValue} from "../../../types/sudoku/CellColor";
-import {JssConstraint} from "../constraints/Jss";
-import {isTextConstraint, TextProps} from "../../../components/sudoku/constraints/text/Text";
+import { PositionSet } from "../../../types/layout/Position";
+import { Constraint } from "../../../types/sudoku/Constraint";
+import { JssCell } from "./JssCell";
+import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/sudoku/GivenDigitsMap";
+import { CellColorValue, resolveCellColorValue } from "../../../types/sudoku/CellColor";
+import { JssConstraint } from "../constraints/Jss";
+import { isTextConstraint, TextProps } from "../../../components/sudoku/constraints/text/Text";
 
 export const JssSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager: SudokuTypeManager<T>,
@@ -33,8 +33,8 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
 
                 if (puzzleHasZeroRegion) {
                     // Get the largest region
-                    const inactiveRegion = activeRegions.reduce(
-                        (a, b) => getRegionCells(a).length > getRegionCells(b).length ? a : b
+                    const inactiveRegion = activeRegions.reduce((a, b) =>
+                        getRegionCells(a).length > getRegionCells(b).length ? a : b,
                     );
                     activeRegions = activeRegions.filter((region) => region !== inactiveRegion);
                     inactiveCells.push(...getRegionCells(inactiveRegion));
@@ -59,11 +59,11 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
                 ([[color]], position): JssCell | undefined =>
                     color && !allRegionCells.contains(position)
                         ? {
-                            ...position,
-                            backgroundColor: resolveCellColorValue(color)
-                        }
+                              ...position,
+                              backgroundColor: resolveCellColorValue(color),
+                          }
                         : undefined,
-                [puzzle.initialColors as GivenDigitsMap<CellColorValue[]>]
+                [puzzle.initialColors as GivenDigitsMap<CellColorValue[]>],
             );
             puzzle.initialColors = undefined;
 
@@ -72,14 +72,26 @@ export const JssSudokuTypeManager = <T extends AnyPTM>(
                 throw new Error(`puzzle.items is expected to be an array for ${JssSudokuTypeManager.name}`);
             }
             const isJssTextClue = (constraint: Constraint<T, any>): constraint is Constraint<T, TextProps> => {
-                const {cells: {length, 0: cell}} = constraint;
-                return isTextConstraint(constraint) && length === 1 && cell.top % 1 === 0 && cell.left % 1 === 0 && constraint.props.text !== "";
+                const {
+                    cells: { length, 0: cell },
+                } = constraint;
+                return (
+                    isTextConstraint(constraint) &&
+                    length === 1 &&
+                    cell.top % 1 === 0 &&
+                    cell.left % 1 === 0 &&
+                    constraint.props.text !== ""
+                );
             };
             for (const constraint of puzzle.items) {
                 if (isJssTextClue(constraint)) {
-                    const {cells: [{top, left}], props: {text, size}, color} = constraint;
+                    const {
+                        cells: [{ top, left }],
+                        props: { text, size },
+                        color,
+                    } = constraint;
                     jssCellsMap[top] = jssCellsMap[top] ?? {};
-                    jssCellsMap[top][left] = jssCellsMap[top][left] ?? {top, left};
+                    jssCellsMap[top][left] = jssCellsMap[top][left] ?? { top, left };
                     jssCellsMap[top][left].text = text;
                     jssCellsMap[top][left].textColor = color;
                     jssCellsMap[top][left].textSize = size;

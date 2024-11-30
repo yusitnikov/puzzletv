@@ -1,5 +1,5 @@
-import {HashSet} from "../struct/Set";
-import {average} from "../../utils/math";
+import { HashSet } from "../struct/Set";
+import { average } from "../../utils/math";
 
 export interface Position {
     left: number;
@@ -28,17 +28,17 @@ export const emptyPositionWithAngle: PositionWithAngle = {
 // Position object or "x,y" or "RyCx"
 export type PositionLiteral = Position | string;
 
-export const stringifyPosition = ({left, top}: Position) => `${left},${top}`;
+export const stringifyPosition = ({ left, top }: Position) => `${left},${top}`;
 export const formatSvgPointsArray = (points: Position[]) => points.map(stringifyPosition).join(" ");
-export const positionToArray = ({left, top}: Position): [number, number] => [left, top];
+export const positionToArray = ({ left, top }: Position): [number, number] => [left, top];
 
-export const stringifyCellCoords = ({left, top}: Position) => `R${top + 1}C${left + 1}`;
+export const stringifyCellCoords = ({ left, top }: Position) => `R${top + 1}C${left + 1}`;
 export const parsePositionLiteral = (position: PositionLiteral): Position => {
     if (typeof position !== "string") {
         return position;
     } else if (/^[UDLR]+$/.test(position)) {
         // Direction string, compatible with FPuzzlesLittleKillerSumDirection
-        const result: Position = {top: 0, left: 0};
+        const result: Position = { top: 0, left: 0 };
 
         for (const direction of position.split("")) {
             switch (direction) {
@@ -76,7 +76,8 @@ export const parsePositionLiteral = (position: PositionLiteral): Position => {
 };
 
 export const parsePositionLiterals = (positions: PositionLiteral[]): Position[] => positions.map(parsePositionLiteral);
-export const parsePositionLiterals2 = (positions: PositionLiteral[][]): Position[][] => positions.map(parsePositionLiterals);
+export const parsePositionLiterals2 = (positions: PositionLiteral[][]): Position[][] =>
+    positions.map(parsePositionLiterals);
 
 export const isSamePosition = (p1: Position, p2: Position) => p1.left === p2.left && p1.top === p2.top;
 export const arrayContainsPosition = (positions: Position[], position: Position) =>
@@ -86,7 +87,7 @@ export const isSameLine = (line1: Line, line2: Line) =>
     (isSamePosition(line1.start, line2.start) && isSamePosition(line1.end, line2.end)) ||
     (isSamePosition(line1.start, line2.end) && isSamePosition(line1.end, line2.start));
 
-export const invertPosition = ({left, top}: Position): Position => ({
+export const invertPosition = ({ left, top }: Position): Position => ({
     left: -left,
     top: -top,
 });
@@ -97,12 +98,12 @@ export const invertLine = <LineT extends Line = Line>(line: LineT): LineT => ({
     end: line.start,
 });
 
-export const getLineVector = ({start, end}: Line): Position => ({
+export const getLineVector = ({ start, end }: Line): Position => ({
     left: end.left - start.left,
     top: end.top - start.top,
 });
 
-export const getVectorLength = ({left, top}: Position) => Math.hypot(left, top);
+export const getVectorLength = ({ left, top }: Position) => Math.hypot(left, top);
 
 export const scaleVector = (vector: Position, coeff: number): Position => ({
     left: vector.left * coeff,
@@ -111,7 +112,11 @@ export const scaleVector = (vector: Position, coeff: number): Position => ({
 
 export const normalizeVector = (vector: Position): Position => scaleVector(vector, 1 / (getVectorLength(vector) || 1));
 
-export const getCircleConnectionPoint = <T extends Position>({left: x1, top: y1, ...other}: T, {left: x2, top: y2}: T, circleRadius: number): T => {
+export const getCircleConnectionPoint = <T extends Position>(
+    { left: x1, top: y1, ...other }: T,
+    { left: x2, top: y2 }: T,
+    circleRadius: number,
+): T => {
     let dx = x2 - x1;
     let dy = y2 - y1;
     const dLength = Math.hypot(dx, dy);
@@ -124,7 +129,7 @@ export const getCircleConnectionPoint = <T extends Position>({left: x1, top: y1,
     } as T;
 };
 
-export const stringifyLine = ({start, end}: Line) => `${stringifyPosition(start)}>${stringifyPosition(end)}`;
+export const stringifyLine = ({ start, end }: Line) => `${stringifyPosition(start)}>${stringifyPosition(end)}`;
 
 export const getAveragePosition = (positions: Position[]): Position => {
     if (!positions.length) {
@@ -132,8 +137,8 @@ export const getAveragePosition = (positions: Position[]): Position => {
     }
 
     return {
-        top: average(positions.map(({top}) => top)),
-        left: average(positions.map(({left}) => left)),
+        top: average(positions.map(({ top }) => top)),
+        left: average(positions.map(({ left }) => left)),
     };
 };
 
@@ -154,7 +159,7 @@ export const rotateVectorClockwise = <T extends Position>(vector: T, angle: numb
 
 export class PositionSet extends HashSet<Position> {
     constructor(items: Position[] = []) {
-        super(items, {hasher: stringifyPosition});
+        super(items, { hasher: stringifyPosition });
     }
 
     static unserialize(items: any) {

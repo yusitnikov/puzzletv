@@ -1,69 +1,76 @@
-import {CellWriteModeInfo} from "../../../types/sudoku/CellWriteModeInfo";
-import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
-import {GestureInfo} from "../../../utils/gestures";
-import {isCellGestureExtraData} from "../../../types/sudoku/CellGestureExtraData";
-import {LanguageCode} from "../../../types/translations/LanguageCode";
-import {myClientId} from "../../../hooks/useMultiPlayer";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {isPointInRect} from "../../../types/layout/Rect";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {ScrewsPTM} from "./ScrewsPTM";
-import {Screw} from "./ScrewsPuzzleExtension";
-import {GameStateActionCallback} from "../../../types/sudoku/GameStateAction";
-import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
+import { CellWriteModeInfo } from "../../../types/sudoku/CellWriteModeInfo";
+import { MoveCellWriteModeInfo } from "../../../types/sudoku/cellWriteModes/move";
+import { GestureInfo } from "../../../utils/gestures";
+import { isCellGestureExtraData } from "../../../types/sudoku/CellGestureExtraData";
+import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { myClientId } from "../../../hooks/useMultiPlayer";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
+import { isPointInRect } from "../../../types/layout/Rect";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { ScrewsPTM } from "./ScrewsPTM";
+import { Screw } from "./ScrewsPuzzleExtension";
+import { GameStateActionCallback } from "../../../types/sudoku/GameStateAction";
+import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
 import {
     ControlButtonItemProps,
-    ControlButtonItemPropsGenericFc
+    ControlButtonItemPropsGenericFc,
 } from "../../../components/sudoku/controls/ControlButtonsManager";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
-import {useTranslate} from "../../../hooks/useTranslate";
-import {CellWriteModeButton} from "../../../components/sudoku/controls/CellWriteModeButton";
-import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
-import {textColor} from "../../../components/app/globals";
-import {ScrewByData} from "../constraints/Screw";
-import {ScrewsGameState} from "./ScrewsGameState";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
+import { useTranslate } from "../../../hooks/useTranslate";
+import { CellWriteModeButton } from "../../../components/sudoku/controls/CellWriteModeButton";
+import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
+import { textColor } from "../../../components/app/globals";
+import { ScrewByData } from "../constraints/Screw";
+import { ScrewsGameState } from "./ScrewsGameState";
 
-const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function ScrewsMoveButton<T extends AnyPTM>(
-    {context, top, left, info}: ControlButtonItemProps<T>
-) {
+const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function ScrewsMoveButton<T extends AnyPTM>({
+    context,
+    top,
+    left,
+    info,
+}: ControlButtonItemProps<T>) {
     profiler.trace();
 
     const translate = useTranslate();
 
-    return <>
-        <CellWriteModeButton
-            top={top}
-            left={left}
-            cellWriteMode={CellWriteMode.move}
-            data={(size) => <AutoSvg
-                width={size}
-                height={size}
-                viewBox={{
-                    top: -1.1,
-                    left: -1.1,
-                    width: 2.2,
-                    height: 2.2,
-                }}
-            >
-                <line x1={-0.6} y1={-1} x2={-0.6} y2={1} stroke={textColor} strokeWidth={0.15}/>
-                <polyline points={"-0.3,-0.7 -0.6,-1 -0.9,-0.7"} stroke={textColor} strokeWidth={0.15}/>
-                <polyline points={"-0.3,0.7 -0.6,1 -0.9,0.7"} stroke={textColor} strokeWidth={0.15}/>
-                <g transform={"scale(0.55)"}>
-                    <ScrewByData
-                        context={context}
-                        position={{top: -2, left: -0.2, width: 2, height: 4}}
-                        digits={[]}
-                        offset={0}
-                    />
-                </g>
-            </AutoSvg>}
-            noBorders={true}
-            title={`${translate(info?.title!)} (${translate("shortcut")}: ${info!.hotKeyStr})`}
-            context={context}
-        />
-    </>;
+    return (
+        <>
+            <CellWriteModeButton
+                top={top}
+                left={left}
+                cellWriteMode={CellWriteMode.move}
+                data={(size) => (
+                    <AutoSvg
+                        width={size}
+                        height={size}
+                        viewBox={{
+                            top: -1.1,
+                            left: -1.1,
+                            width: 2.2,
+                            height: 2.2,
+                        }}
+                    >
+                        <line x1={-0.6} y1={-1} x2={-0.6} y2={1} stroke={textColor} strokeWidth={0.15} />
+                        <polyline points={"-0.3,-0.7 -0.6,-1 -0.9,-0.7"} stroke={textColor} strokeWidth={0.15} />
+                        <polyline points={"-0.3,0.7 -0.6,1 -0.9,0.7"} stroke={textColor} strokeWidth={0.15} />
+                        <g transform={"scale(0.55)"}>
+                            <ScrewByData
+                                context={context}
+                                position={{ top: -2, left: -0.2, width: 2, height: 4 }}
+                                digits={[]}
+                                offset={0}
+                            />
+                        </g>
+                    </AutoSvg>
+                )}
+                noBorders={true}
+                title={`${translate(info?.title!)} (${translate("shortcut")}: ${info!.hotKeyStr})`}
+                context={context}
+            />
+        </>
+    );
 });
 
 export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<ScrewsPTM<T>> => {
@@ -81,10 +88,12 @@ export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeIn
         hotKeyStr: base.hotKeyStr,
         isValidGesture: base.isValidGesture,
         onMove(props, context) {
-            const {gesture, startMetrics, currentMetrics} = props;
-            const {id, state: startContext} = gesture;
-            const {puzzle, cellSize} = context;
-            const {fieldSize: {rowsCount}} = puzzle;
+            const { gesture, startMetrics, currentMetrics } = props;
+            const { id, state: startContext } = gesture;
+            const { puzzle, cellSize } = context;
+            const {
+                fieldSize: { rowsCount },
+            } = puzzle;
 
             if (!puzzle.extension) {
                 return;
@@ -96,96 +105,98 @@ export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeIn
             }
             const screwRect = (puzzle.extension.screws as Screw<T["cell"]>[])[screwIndex].initialPosition;
 
-            context.onStateChange(screwStateChangeAction(
-                startContext,
-                myClientId,
-                `gesture-${id}`,
-                screwIndex,
-                (offset) => {
-                    let newTop = screwRect.top + offset + (currentMetrics.y - startMetrics.y) / cellSize;
-                    newTop = Math.max(0, newTop);
-                    newTop = Math.min(rowsCount - screwRect.height, newTop);
+            context.onStateChange(
+                screwStateChangeAction(
+                    startContext,
+                    myClientId,
+                    `gesture-${id}`,
+                    screwIndex,
+                    (offset) => {
+                        let newTop = screwRect.top + offset + (currentMetrics.y - startMetrics.y) / cellSize;
+                        newTop = Math.max(0, newTop);
+                        newTop = Math.min(rowsCount - screwRect.height, newTop);
 
-                    return newTop - screwRect.top;
-                },
-                false,
-            ));
+                        return newTop - screwRect.top;
+                    },
+                    false,
+                ),
+            );
         },
         onGestureEnd(props, context) {
-            const {gesture} = props;
+            const { gesture } = props;
 
             const carIndex = getScrewIndexByGesture(context, gesture);
             if (carIndex === undefined) {
                 return;
             }
 
-            context.onStateChange(screwStateChangeAction(
-                undefined,
-                myClientId,
-                `gesture-${gesture.id}`,
-                carIndex,
-                Math.round,
-                true,
-            ));
+            context.onStateChange(
+                screwStateChangeAction(undefined, myClientId, `gesture-${gesture.id}`, carIndex, Math.round, true),
+            );
         },
     };
 };
 
 const getScrewIndexByGesture = <T extends AnyPTM>(
     context: PuzzleContext<ScrewsPTM<T>>,
-    {pointers, state: startContext = context}: GestureInfo<PuzzleContext<ScrewsPTM<T>>>,
+    { pointers, state: startContext = context }: GestureInfo<PuzzleContext<ScrewsPTM<T>>>,
 ) => {
     const index = ((startContext.puzzle.extension?.screws ?? []) as Screw<T["cell"]>[])
-        .map(({initialPosition}) => initialPosition)
-        .findIndex((rect, index) => pointers.every(({start: {extraData}}) => {
-            if (!isCellGestureExtraData(extraData)) {
-                return false;
-            }
-            const {top, left} = extraData.cell;
-            const offset = (startContext.stateExtension as ScrewsGameState).screws[index].animationManager.animatedValue;
-            const offsetCell = {top: top + 0.5 - offset, left: left + 0.5};
-            return isPointInRect(rect, offsetCell);
-        }));
+        .map(({ initialPosition }) => initialPosition)
+        .findIndex((rect, index) =>
+            pointers.every(({ start: { extraData } }) => {
+                if (!isCellGestureExtraData(extraData)) {
+                    return false;
+                }
+                const { top, left } = extraData.cell;
+                const offset = (startContext.stateExtension as ScrewsGameState).screws[index].animationManager
+                    .animatedValue;
+                const offsetCell = { top: top + 0.5 - offset, left: left + 0.5 };
+                return isPointInRect(rect, offsetCell);
+            }),
+        );
     return index < 0 ? undefined : index;
 };
 
-export const screwStateChangeAction = <T extends AnyPTM>(
-    startContext: PuzzleContext<ScrewsPTM<T>> | undefined,
-    clientId: string,
-    actionId: string,
-    screwIndex: number,
-    calculatePosition: (prevOffset: number, allOffsets: number[]) => number,
-    animate: boolean,
-): GameStateActionCallback<ScrewsPTM<T>> => (context) => {
-    const {
-        stateExtension: {screws: screwStates},
-    } = context;
+export const screwStateChangeAction =
+    <T extends AnyPTM>(
+        startContext: PuzzleContext<ScrewsPTM<T>> | undefined,
+        clientId: string,
+        actionId: string,
+        screwIndex: number,
+        calculatePosition: (prevOffset: number, allOffsets: number[]) => number,
+        animate: boolean,
+    ): GameStateActionCallback<ScrewsPTM<T>> =>
+    (context) => {
+        const {
+            stateExtension: { screws: screwStates },
+        } = context;
 
-    const startScrewOffset = startContext?.fieldExtension.screwOffsets;
+        const startScrewOffset = startContext?.fieldExtension.screwOffsets;
 
-    return {
-        fieldStateHistory: fieldStateHistoryAddState(
-            context,
-            clientId,
-            actionId,
-            ({extension: {screwOffsets, ...fieldExtension}, ...fieldState}) => ({
-                ...fieldState,
-                extension: {
-                    ...fieldExtension,
-                    screwOffsets: [
-                        ...screwOffsets.slice(0, screwIndex),
-                        calculatePosition((startScrewOffset ?? screwOffsets)[screwIndex], screwOffsets),
-                        ...screwOffsets.slice(screwIndex + 1),
-                    ],
-                },
-            })
-        ),
-        extension: {
-            screws: [
-                ...screwStates.slice(0, screwIndex),
-                {...screwStates[screwIndex], animating: animate},
-                ...screwStates.slice(screwIndex + 1),
-            ],
-        },
+        return {
+            fieldStateHistory: fieldStateHistoryAddState(
+                context,
+                clientId,
+                actionId,
+                ({ extension: { screwOffsets, ...fieldExtension }, ...fieldState }) => ({
+                    ...fieldState,
+                    extension: {
+                        ...fieldExtension,
+                        screwOffsets: [
+                            ...screwOffsets.slice(0, screwIndex),
+                            calculatePosition((startScrewOffset ?? screwOffsets)[screwIndex], screwOffsets),
+                            ...screwOffsets.slice(screwIndex + 1),
+                        ],
+                    },
+                }),
+            ),
+            extension: {
+                screws: [
+                    ...screwStates.slice(0, screwIndex),
+                    { ...screwStates[screwIndex], animating: animate },
+                    ...screwStates.slice(screwIndex + 1),
+                ],
+            },
+        };
     };
-};

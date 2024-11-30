@@ -1,20 +1,20 @@
-import {observer} from "mobx-react-lite";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {ChessPTM} from "../types/ChessPTM";
-import {useEffect, useMemo} from "react";
-import {ChessHistoryManager} from "./ChessHistory";
-import {ChessEngineResult, VariationChessEngineResult} from "../types/ChessEngineResult";
-import {ChessBoardBase, FieldStateChessBoard, ReadOnlyChessBoard} from "../types/ChessBoard";
-import {parseChessCell} from "../types/utils";
-import {ChessMove, getChessMoveDescription} from "../types/ChessMove";
-import {ChessPieceTypeReverseMap} from "../types/ChessPieceType";
-import {profiler} from "../../../utils/profiler";
-import {makeAutoObservable, reaction, runInAction} from "mobx";
-import {isSamePosition} from "../../../types/layout/Position";
-import {computedFn} from "mobx-utils";
-import {useEventListener} from "../../../hooks/useEventListener";
-import {settings} from "../../../types/layout/Settings";
-import {makeChessMove} from "../types/ChessGameSudokuTypeManager";
+import { observer } from "mobx-react-lite";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { ChessPTM } from "../types/ChessPTM";
+import { useEffect, useMemo } from "react";
+import { ChessHistoryManager } from "./ChessHistory";
+import { ChessEngineResult, VariationChessEngineResult } from "../types/ChessEngineResult";
+import { ChessBoardBase, FieldStateChessBoard, ReadOnlyChessBoard } from "../types/ChessBoard";
+import { parseChessCell } from "../types/utils";
+import { ChessMove, getChessMoveDescription } from "../types/ChessMove";
+import { ChessPieceTypeReverseMap } from "../types/ChessPieceType";
+import { profiler } from "../../../utils/profiler";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
+import { isSamePosition } from "../../../types/layout/Position";
+import { computedFn } from "mobx-utils";
+import { useEventListener } from "../../../hooks/useEventListener";
+import { settings } from "../../../types/layout/Settings";
+import { makeChessMove } from "../types/ChessGameSudokuTypeManager";
 
 interface ChessEngineProps {
     context: PuzzleContext<ChessPTM>;
@@ -25,7 +25,7 @@ export class ChessEngineManager {
     private engineVariations: VariationChessEngineResult[] = [];
 
     static getInstance(context: PuzzleContext<ChessPTM>): ChessEngineManager {
-        return context.puzzleIndex.cache[ChessEngineManager.name] ??= new ChessEngineManager(context);
+        return (context.puzzleIndex.cache[ChessEngineManager.name] ??= new ChessEngineManager(context));
     }
 
     private constructor(private context: PuzzleContext<ChessPTM>) {
@@ -60,9 +60,7 @@ export class ChessEngineManager {
     }
 
     readonly getMovesForCell = computedFn((top: number, left: number) => {
-        return this.parsedMoves
-            ?.filter(({start}) => isSamePosition(start, {top, left}))
-            ?.map(({end}) => end);
+        return this.parsedMoves?.filter(({ start }) => isSamePosition(start, { top, left }))?.map(({ end }) => end);
     });
 
     get movesForSelectedCell() {
@@ -70,7 +68,7 @@ export class ChessEngineManager {
             return [];
         }
 
-        const {top, left} = this.context.firstSelectedCell!;
+        const { top, left } = this.context.firstSelectedCell!;
         return this.getMovesForCell(top, left);
     }
 
@@ -82,7 +80,7 @@ export class ChessEngineManager {
     get formattedVariations() {
         profiler.trace();
 
-        return this.engineVariations.filter(Boolean).map(({depth, multipv, pv, score: {unit, value}}) => {
+        return this.engineVariations.filter(Boolean).map(({ depth, multipv, pv, score: { unit, value } }) => {
             const board = new FieldStateChessBoard(this.context.currentFieldState.cells);
 
             const moves = pv
@@ -131,7 +129,7 @@ export class ChessEngineManager {
                     }
 
                     console.debug("Open!");
-                    socket.send(JSON.stringify({variant: "sudoku", fen}));
+                    socket.send(JSON.stringify({ variant: "sudoku", fen }));
                 });
 
                 socket.addEventListener("message", (ev) => {
@@ -193,7 +191,7 @@ export class ChessEngineManager {
     }
 }
 
-export const ChessEngine = observer(function ChessEngine({context}: ChessEngineProps) {
+export const ChessEngine = observer(function ChessEngine({ context }: ChessEngineProps) {
     const manager = ChessEngineManager.getInstance(context);
 
     const dispose = useMemo(() => manager.run(), [manager]);
@@ -205,26 +203,34 @@ export const ChessEngine = observer(function ChessEngine({context}: ChessEngineP
         }
     });
 
-    return <div style={{
-        fontSize: context.cellSizeForSidePanel * 0.2,
-        marginBottom: "0.5em",
-    }}>
-        {/*<div>FEN: {manager.fen}</div>*/}
-
-        {manager.formattedVariations.map((line, index) => <div
-            key={index}
-            title={line}
+    return (
+        <div
             style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
+                fontSize: context.cellSizeForSidePanel * 0.2,
+                marginBottom: "0.5em",
             }}
         >
-            {line}
-        </div>)}
+            {/*<div>FEN: {manager.fen}</div>*/}
 
-        {manager.formattedMoves !== undefined && <div>Possible moves: {manager.formattedMoves.join(", ") || "none"}</div>}
-    </div>;
+            {manager.formattedVariations.map((line, index) => (
+                <div
+                    key={index}
+                    title={line}
+                    style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                    }}
+                >
+                    {line}
+                </div>
+            ))}
+
+            {manager.formattedMoves !== undefined && (
+                <div>Possible moves: {manager.formattedMoves.join(", ") || "none"}</div>
+            )}
+        </div>
+    );
 });
 
 const parseEngineMove = (moveStr: string): Omit<ChessMove, "piece"> | undefined => {
@@ -246,8 +252,11 @@ const parseEngineMoveOnBoard = (board: ChessBoardBase, moveStr: string, doTheMov
         return undefined;
     }
 
-    const move = (doTheMove ? board : new ReadOnlyChessBoard(board))
-        .move(parsedMove.start, parsedMove.end, parsedMove.promotionPiece);
+    const move = (doTheMove ? board : new ReadOnlyChessBoard(board)).move(
+        parsedMove.start,
+        parsedMove.end,
+        parsedMove.promotionPiece,
+    );
     if (!move.piece) {
         console.warn("Got invalid move string from the engine", moveStr);
         return undefined;

@@ -1,10 +1,10 @@
-import {CaterpillarGrid} from "./types";
-import {normalizeSclMetadata, puzzleIdToScl, Scl} from "../../../utils/sudokuPad";
-import {indexes} from "../../../utils/indexes";
-import {parseSolutionStringIntoArray} from "./utils";
-import {areRectsIntersecting, Rect} from "../../../types/layout/Rect";
-import {GridLinesProcessor} from "./GridLinesProcessor";
-import {Position} from "../../../types/layout/Position";
+import { CaterpillarGrid } from "./types";
+import { normalizeSclMetadata, puzzleIdToScl, Scl } from "../../../utils/sudokuPad";
+import { indexes } from "../../../utils/indexes";
+import { parseSolutionStringIntoArray } from "./utils";
+import { areRectsIntersecting, Rect } from "../../../types/layout/Rect";
+import { GridLinesProcessor } from "./GridLinesProcessor";
+import { Position } from "../../../types/layout/Position";
 import deepmerge from "deepmerge";
 
 interface LinkedListItem {
@@ -14,15 +14,17 @@ interface LinkedListItem {
 }
 
 export const sortGrids = (grids: CaterpillarGrid[]) => {
-    const linkedListItems = grids.map((grid): LinkedListItem => ({
-        grid,
-        rect: {
-            ...grid.offset,
-            width: grid.size ?? 6,
-            height: grid.size ?? 6,
-        },
-        links: [],
-    }));
+    const linkedListItems = grids.map(
+        (grid): LinkedListItem => ({
+            grid,
+            rect: {
+                ...grid.offset,
+                width: grid.size ?? 6,
+                height: grid.size ?? 6,
+            },
+            links: [],
+        }),
+    );
 
     for (const item1 of linkedListItems) {
         for (const item2 of linkedListItems) {
@@ -49,7 +51,7 @@ export const sortGrids = (grids: CaterpillarGrid[]) => {
     const head = ends.sort((a, b) => a.rect.left - b.rect.left)[0];
 
     const sortedItems: LinkedListItem[] = [];
-    for (let item = head; item; item = item.links.filter(link => !sortedItems.includes(link))[0]) {
+    for (let item = head; item; item = item.links.filter((link) => !sortedItems.includes(link))[0]) {
         sortedItems.push(item);
     }
 
@@ -58,7 +60,7 @@ export const sortGrids = (grids: CaterpillarGrid[]) => {
         throw new Error("Wrong number of sorted grids");
     }
 
-    return sortedItems.map(item => item.grid);
+    return sortedItems.map((item) => item.grid);
 };
 
 export const compileGrids = (
@@ -73,7 +75,7 @@ export const compileGrids = (
     const result: Scl = {
         id,
         cellSize: 50,
-        metadata: {grids: []} as any,
+        metadata: { grids: [] } as any,
         settings: {},
         arrows: [],
         cages: [],
@@ -84,7 +86,8 @@ export const compileGrids = (
         underlays: [],
     };
 
-    let width = 0, height = 0;
+    let width = 0,
+        height = 0;
     const minLeft = Math.min(...grids.map((grid) => grid.offset.left)) - safetyMargin;
     const minTop = Math.min(...grids.map((grid) => grid.offset.top)) - safetyMargin;
 
@@ -95,13 +98,13 @@ export const compileGrids = (
     for (const [index, grid] of grids.entries()) {
         const offsetTop = grid.offset.top - minTop;
         const offsetLeft = grid.offset.left - minLeft;
-        const {size = 6, dashed = false} = grid;
+        const { size = 6, dashed = false } = grid;
         const translatePoint = ([y, x]: number[]) => [offsetTop + y, offsetLeft + x];
 
         const data = normalizeSclMetadata(puzzleIdToScl(grid.data));
 
         const {
-            metadata: {solution, title, ...otherMetadata} = {},
+            metadata: { solution, title, ...otherMetadata } = {},
             arrows = [],
             cages = [],
             lines = [],
@@ -148,30 +151,40 @@ export const compileGrids = (
                 width: size,
                 height: size,
             },
-            regions.map(region => region.map(([top, left]) => ({top, left}))),
+            regions.map((region) => region.map(([top, left]) => ({ top, left }))),
             dashed,
         );
 
-        result.overlays!.push(...overlays.map((overlay) => ({
-            ...overlay,
-            center: translatePoint(overlay.center),
-        })));
-        result.underlays!.push(...underlays.map((underlay) => ({
-            ...underlay,
-            center: translatePoint(underlay.center),
-        })));
-        result.arrows!.push(...arrows.map((arrow) => ({
-            ...arrow,
-            wayPoints: arrow.wayPoints.map(translatePoint),
-        })));
-        result.lines!.push(...lines.map((line) => ({
-            ...line,
-            wayPoints: line.wayPoints.map(translatePoint),
-        })));
-        result.cages!.push(...cages.map((cage) => ({
-            ...cage,
-            cells: cage.cells?.map(translatePoint),
-        })));
+        result.overlays!.push(
+            ...overlays.map((overlay) => ({
+                ...overlay,
+                center: translatePoint(overlay.center),
+            })),
+        );
+        result.underlays!.push(
+            ...underlays.map((underlay) => ({
+                ...underlay,
+                center: translatePoint(underlay.center),
+            })),
+        );
+        result.arrows!.push(
+            ...arrows.map((arrow) => ({
+                ...arrow,
+                wayPoints: arrow.wayPoints.map(translatePoint),
+            })),
+        );
+        result.lines!.push(
+            ...lines.map((line) => ({
+                ...line,
+                wayPoints: line.wayPoints.map(translatePoint),
+            })),
+        );
+        result.cages!.push(
+            ...cages.map((cage) => ({
+                ...cage,
+                cells: cage.cells?.map(translatePoint),
+            })),
+        );
 
         (result.metadata as any).grids.push({
             ...otherMetadata,
@@ -184,10 +197,7 @@ export const compileGrids = (
         });
     }
 
-    result.lines = [
-        ...gridLinesProcessor.getLines(),
-        ...result.lines!
-    ];
+    result.lines = [...gridLinesProcessor.getLines(), ...result.lines!];
 
     for (const top of indexes(height)) {
         result.cells[top] ??= [];
@@ -200,7 +210,8 @@ export const compileGrids = (
     result.metadata!.norowcol = true;
     result.metadata!.title = "Caterdokupillar";
     result.metadata!.author = "Much of the setting community";
-    result.metadata!.rules = "Start in the top left, and as each 6x6 puzzle is completed, 4 digits will automatically carry over as givens for the next puzzle. Read the rules carefully for each puzzle, as many contain variants.";
+    result.metadata!.rules =
+        "Start in the top left, and as each 6x6 puzzle is completed, 4 digits will automatically carry over as givens for the next puzzle. Read the rules carefully for each puzzle, as many contain variants.";
     if (prevLink || nextLink) {
         result.metadata!.rules += "\n";
         if (prevLink) {

@@ -1,18 +1,17 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {PartiallyTranslatable} from "../../types/translations/Translatable";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { PartiallyTranslatable } from "../../types/translations/Translatable";
+import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import {
-    createMonumentValleyFieldSize, createMonumentValleyRegions,
+    createMonumentValleyFieldSize,
+    createMonumentValleyRegions,
     MonumentValleyTypeManager,
-    parseMonumentValleyDigitsMap
+    parseMonumentValleyDigitsMap,
 } from "../../sudokuTypes/monument-valley/types/MonumentValleyTypeManager";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import React from "react";
-import {
-    MonumentValleyGridBordersConstraint
-} from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
-import {MonumentValleyPTM} from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
+import { MonumentValleyGridBordersConstraint } from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
+import { MonumentValleyPTM } from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
 
 const author: PartiallyTranslatable = {
     [LanguageCode.en]: "TrevorTao",
@@ -37,9 +36,7 @@ export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     regions: createMonumentValleyRegions(9, 3),
     digitsCount: 9,
     rules: (translate) => <RulesParagraph>{translate(rules("0 1 6 8 9"))}</RulesParagraph>,
-    items: [
-        MonumentValleyGridBordersConstraint(),
-    ],
+    items: [MonumentValleyGridBordersConstraint()],
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             4: 8.5,
@@ -144,9 +141,7 @@ export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     fieldSize: createMonumentValleyFieldSize(5, 1, 2),
     digitsCount: 5,
     rules: (translate) => <RulesParagraph>{translate(rules("0 1 8"))}</RulesParagraph>,
-    items: [
-        MonumentValleyGridBordersConstraint(),
-    ],
+    items: [MonumentValleyGridBordersConstraint()],
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
             2: 1,
@@ -166,7 +161,7 @@ export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
         },
         4: {
             2: 0,
-            8: 8.5
+            8: 8.5,
         },
         5: {
             3: 1.5,

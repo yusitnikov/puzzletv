@@ -1,7 +1,7 @@
-import {makeAutoObservable, runInAction} from "mobx";
-import {buildLink} from "../../../utils/link";
-import {LanguageCode} from "../../../types/translations/LanguageCode";
-import {myClientId} from "../../../hooks/useMultiPlayer";
+import { makeAutoObservable, runInAction } from "mobx";
+import { buildLink } from "../../../utils/link";
+import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { myClientId } from "../../../hooks/useMultiPlayer";
 
 export enum MatchPointGameState {
     HomePage,
@@ -19,14 +19,12 @@ export class MatchPointGameController {
     isShowingResults = false;
 
     get questionsForEditing() {
-        const {questions} = this;
+        const { questions } = this;
 
         return questions[questions.length - 1] === "" ? questions : [...questions, ""];
     }
     get questionsForGame() {
-        return this.questions
-            .map((question) => question.trim())
-            .filter((question) => question !== "");
+        return this.questions.map((question) => question.trim()).filter((question) => question !== "");
     }
 
     constructor() {
@@ -64,7 +62,7 @@ export class MatchPointGameController {
     }
 
     getLink(languageCode: LanguageCode, gameId?: string) {
-        return buildLink("match-point", languageCode, {host: myClientId, game: gameId}, true);
+        return buildLink("match-point", languageCode, { host: myClientId, game: gameId }, true);
     }
 
     get link() {
@@ -79,7 +77,7 @@ export class MatchPointGameController {
 
     startMatching(answers: MatchPointPlayerInfo[]) {
         runInAction(() => {
-            this.answers = [...answers].sort(() => Math.random() < 0.5 ? 1 : -1);
+            this.answers = [...answers].sort(() => (Math.random() < 0.5 ? 1 : -1));
             this.currentAnswerIndex = 0;
             this.isShowingResults = false;
             this.state = MatchPointGameState.Match;

@@ -1,24 +1,28 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
-import {Position, PositionWithAngle} from "../../../types/layout/Position";
-import {Rect} from "../../../types/layout/Rect";
-import {darkGreyColor} from "../../../components/app/globals";
-import {indexes} from "../../../utils/indexes";
-import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
-import {Constraint} from "../../../types/sudoku/Constraint";
-import {NumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
+import { createRegularRegions, FieldSize } from "../../../types/sudoku/FieldSize";
+import { Position, PositionWithAngle } from "../../../types/layout/Position";
+import { Rect } from "../../../types/layout/Rect";
+import { darkGreyColor } from "../../../components/app/globals";
+import { indexes } from "../../../utils/indexes";
+import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
+import { Constraint } from "../../../types/sudoku/Constraint";
+import { NumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
 
 export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuTypeManager<NumberPTM> => ({
     ...DigitSudokuTypeManager(),
 
-    getCellTypeProps({top, left}, {fieldSize: {rowsCount, columnsCount}}): CellTypeProps<NumberPTM> {
-        return {isVisible: left * 2 < columnsCount || top * 2 >= rowsCount};
+    getCellTypeProps({ top, left }, { fieldSize: { rowsCount, columnsCount } }): CellTypeProps<NumberPTM> {
+        return { isVisible: left * 2 < columnsCount || top * 2 >= rowsCount };
     },
 
     processCellDataPosition(
-        {puzzle: {fieldSize: {fieldSize}}},
+        {
+            puzzle: {
+                fieldSize: { fieldSize },
+            },
+        },
         basePosition,
         dataSet,
         dataIndex,
@@ -37,7 +41,14 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         };
     },
 
-    transformCoords({top, left}, {puzzle: {fieldSize: {fieldSize}}}) {
+    transformCoords(
+        { top, left },
+        {
+            puzzle: {
+                fieldSize: { fieldSize },
+            },
+        },
+    ) {
         const realFieldSize = fieldSize / 2;
 
         if (top < realFieldSize) {
@@ -53,7 +64,12 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         };
     },
 
-    getRegionsWithSameCoordsTransformation({puzzle: {fieldSize: {fieldSize}, fieldMargin = 0}}): Rect[] {
+    getRegionsWithSameCoordsTransformation({
+        puzzle: {
+            fieldSize: { fieldSize },
+            fieldMargin = 0,
+        },
+    }): Rect[] {
         const realFieldSize = fieldSize / 2;
         const fullMargin = fieldMargin + fieldSize;
 
@@ -79,60 +95,78 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): SudokuType
         ];
     },
 
-    getRegionsForRowsAndColumns({puzzle: {fieldSize: {fieldSize}}}): Constraint<NumberPTM, any>[] {
+    getRegionsForRowsAndColumns({
+        puzzle: {
+            fieldSize: { fieldSize },
+        },
+    }): Constraint<NumberPTM, any>[] {
         const realFieldSize = fieldSize / 2;
 
         if (continuousRowColumnRegions) {
-            return indexes(realFieldSize).flatMap(i => [
+            return indexes(realFieldSize).flatMap((i) => [
                 RegionConstraint(
-                    indexes(fieldSize).map(j => ({left: i, top: j})),
+                    indexes(fieldSize).map((j) => ({ left: i, top: j })),
                     false,
-                    "column"
+                    "column",
                 ),
                 RegionConstraint(
-                    indexes(realFieldSize).flatMap(j => [
-                        {left: j, top: i},
-                        {left: fieldSize - 1 - i, top: j + realFieldSize},
+                    indexes(realFieldSize).flatMap((j) => [
+                        { left: j, top: i },
+                        { left: fieldSize - 1 - i, top: j + realFieldSize },
                     ]),
                     false,
-                    "row"
+                    "row",
                 ),
                 RegionConstraint(
-                    indexes(fieldSize).map(j => ({left: j, top: i + realFieldSize})),
+                    indexes(fieldSize).map((j) => ({ left: j, top: i + realFieldSize })),
                     false,
-                    "row"
+                    "row",
                 ),
             ]);
         } else {
             const cubeFaces: Position[] = [
-                {left: 0, top: 0},
-                {left: 0, top: realFieldSize},
-                {left: realFieldSize, top: realFieldSize},
+                { left: 0, top: 0 },
+                { left: 0, top: realFieldSize },
+                { left: realFieldSize, top: realFieldSize },
             ];
 
-            return cubeFaces.flatMap(({left, top}) => indexes(realFieldSize).flatMap(i => [
-                RegionConstraint(indexes(realFieldSize).map(j => ({left: left + i, top: top + j})), false, "column"),
-                RegionConstraint(indexes(realFieldSize).map(j => ({left: left + j, top: top + i})), false, "row"),
-            ]));
+            return cubeFaces.flatMap(({ left, top }) =>
+                indexes(realFieldSize).flatMap((i) => [
+                    RegionConstraint(
+                        indexes(realFieldSize).map((j) => ({ left: left + i, top: top + j })),
+                        false,
+                        "column",
+                    ),
+                    RegionConstraint(
+                        indexes(realFieldSize).map((j) => ({ left: left + j, top: top + i })),
+                        false,
+                        "row",
+                    ),
+                ]),
+            );
         }
     },
 
-    getAdditionalNeighbors({top, left}, {fieldSize: {fieldSize}}) {
+    getAdditionalNeighbors({ top, left }, { fieldSize: { fieldSize } }) {
         const realFieldSize = fieldSize / 2;
 
         if (continuousRowColumnRegions) {
             if (left === realFieldSize - 1 && top < realFieldSize) {
-                return [{
-                    top: realFieldSize,
-                    left: fieldSize - 1 - top,
-                }];
+                return [
+                    {
+                        top: realFieldSize,
+                        left: fieldSize - 1 - top,
+                    },
+                ];
             }
 
             if (top === realFieldSize && left >= realFieldSize) {
-                return [{
-                    top: fieldSize - 1 - left,
-                    left: realFieldSize - 1,
-                }];
+                return [
+                    {
+                        top: fieldSize - 1 - left,
+                        left: realFieldSize - 1,
+                    },
+                ];
             }
         }
 
@@ -149,5 +183,6 @@ export const createCubeFieldSize = (fieldSize: number): FieldSize => ({
 });
 
 export const createCubeRegions = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth) =>
-    createRegularRegions(fieldSize * 2, fieldSize * 2, regionWidth, regionHeight)
-        .filter(([{left, top}]) => left < fieldSize || top >= fieldSize);
+    createRegularRegions(fieldSize * 2, fieldSize * 2, regionWidth, regionHeight).filter(
+        ([{ left, top }]) => left < fieldSize || top >= fieldSize,
+    );

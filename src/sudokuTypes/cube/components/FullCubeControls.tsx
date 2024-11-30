@@ -1,16 +1,16 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {PuzzleContextProps} from "../../../types/sudoku/PuzzleContext";
-import {textColor} from "../../../components/app/globals";
-import {controlButtonOptions, controlButtonStyles} from "../../../components/sudoku/controls/ControlButton";
-import {useTranslate} from "../../../hooks/useTranslate";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
-import {FullCubePTM} from "../types/FullCubePTM";
-import {gameStateHandleRotateFullCube} from "../types/FullCubeGameState";
-import {vectorOx, vectorOy, vectorOz} from "../../../types/layout/Position3D";
-import {KeyboardArrowUp, KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowLeft} from "@emotion-icons/material";
-import {useEventListener} from "../../../hooks/useEventListener";
+import { PuzzleContextProps } from "../../../types/sudoku/PuzzleContext";
+import { textColor } from "../../../components/app/globals";
+import { controlButtonOptions, controlButtonStyles } from "../../../components/sudoku/controls/ControlButton";
+import { useTranslate } from "../../../hooks/useTranslate";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
+import { FullCubePTM } from "../types/FullCubePTM";
+import { gameStateHandleRotateFullCube } from "../types/FullCubeGameState";
+import { vectorOx, vectorOy, vectorOz } from "../../../types/layout/Position3D";
+import { KeyboardArrowUp, KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowLeft } from "@emotion-icons/material";
+import { useEventListener } from "../../../hooks/useEventListener";
 
 const StyledButton = styled("button", {
     ...controlButtonOptions,
@@ -19,7 +19,7 @@ const StyledButton = styled("button", {
     },
 })([
     controlButtonStyles,
-    ({style}) => ({
+    ({ style }) => ({
         ...style,
         position: "absolute",
         pointerEvents: "all",
@@ -33,13 +33,13 @@ const StyledButton = styled("button", {
     }),
 ]);
 
-export const FullCubeControls = observer(function FullCubeControlsFc(
-    {context}: PuzzleContextProps<FullCubePTM>
-) {
+export const FullCubeControls = observer(function FullCubeControlsFc({ context }: PuzzleContextProps<FullCubePTM>) {
     profiler.trace();
 
     const {
-        puzzle: {fieldSize: {fieldSize}},
+        puzzle: {
+            fieldSize: { fieldSize },
+        },
         cellSize,
         isReadonlyContext,
     } = context;
@@ -91,78 +91,82 @@ export const FullCubeControls = observer(function FullCubeControlsFc(
         return null;
     }
 
-    return <div style={{
-        fontSize: cellSize / 2,
-    }}>
-        <StyledButton
+    return (
+        <div
             style={{
-                left: cellSize * (fieldSize / 4 - 0.55),
-                top: cellSize * (fieldSize * 7 / 8 + 0.6),
-                transform: `skewY(${skewAngle}deg)`,
+                fontSize: cellSize / 2,
             }}
-            onClick={leftUp}
-            title={buttonTitle("Q")}
         >
-            <KeyboardArrowUp/>
-        </StyledButton>
-        <StyledButton
-            style={{
-                left: cellSize * (fieldSize / 4 + 0.55),
-                top: cellSize * (fieldSize * 7 / 8 + 1.15),
-                transform: `skewY(${skewAngle}deg)`,
-            }}
-            onClick={leftDown}
-            title={buttonTitle("A")}
-        >
-            <KeyboardArrowDown/>
-        </StyledButton>
+            <StyledButton
+                style={{
+                    left: cellSize * (fieldSize / 4 - 0.55),
+                    top: cellSize * ((fieldSize * 7) / 8 + 0.6),
+                    transform: `skewY(${skewAngle}deg)`,
+                }}
+                onClick={leftUp}
+                title={buttonTitle("Q")}
+            >
+                <KeyboardArrowUp />
+            </StyledButton>
+            <StyledButton
+                style={{
+                    left: cellSize * (fieldSize / 4 + 0.55),
+                    top: cellSize * ((fieldSize * 7) / 8 + 1.15),
+                    transform: `skewY(${skewAngle}deg)`,
+                }}
+                onClick={leftDown}
+                title={buttonTitle("A")}
+            >
+                <KeyboardArrowDown />
+            </StyledButton>
 
-        <StyledButton
-            style={{
-                left: cellSize * (fieldSize * 3 / 4 - 0.55),
-                top: cellSize * (fieldSize * 7 / 8 + 1.15),
-                transform: `skewY(-${skewAngle}deg)`,
-            }}
-            onClick={rightUp}
-            title={buttonTitle("R")}
-        >
-            <KeyboardArrowUp/>
-        </StyledButton>
-        <StyledButton
-            style={{
-                left: cellSize * (fieldSize * 3 / 4 + 0.55),
-                top: cellSize * (fieldSize * 7 / 8 + 0.6),
-                transform: `skewY(-${skewAngle}deg)`,
-            }}
-            onClick={rightDown}
-            title={buttonTitle("F")}
-        >
-            <KeyboardArrowDown/>
-        </StyledButton>
+            <StyledButton
+                style={{
+                    left: cellSize * ((fieldSize * 3) / 4 - 0.55),
+                    top: cellSize * ((fieldSize * 7) / 8 + 1.15),
+                    transform: `skewY(-${skewAngle}deg)`,
+                }}
+                onClick={rightUp}
+                title={buttonTitle("R")}
+            >
+                <KeyboardArrowUp />
+            </StyledButton>
+            <StyledButton
+                style={{
+                    left: cellSize * ((fieldSize * 3) / 4 + 0.55),
+                    top: cellSize * ((fieldSize * 7) / 8 + 0.6),
+                    transform: `skewY(-${skewAngle}deg)`,
+                }}
+                onClick={rightDown}
+                title={buttonTitle("F")}
+            >
+                <KeyboardArrowDown />
+            </StyledButton>
 
-        <StyledButton
-            style={{
-                left: cellSize * (fieldSize + 0.8),
-                top: cellSize * (fieldSize / 2 - 0.95),
-                transform: `skewY(-${skewAngle}deg)`,
-            }}
-            onClick={right}
-            title={buttonTitle("D")}
-        >
-            <KeyboardArrowRight/>
-        </StyledButton>
-        <StyledButton
-            style={{
-                left: cellSize * (fieldSize + 0.8),
-                top: cellSize * (fieldSize / 2 + 0.15),
-                transform: `skewY(-${skewAngle}deg)`,
-            }}
-            onClick={left}
-            title={buttonTitle("S")}
-        >
-            <KeyboardArrowLeft/>
-        </StyledButton>
-    </div>;
+            <StyledButton
+                style={{
+                    left: cellSize * (fieldSize + 0.8),
+                    top: cellSize * (fieldSize / 2 - 0.95),
+                    transform: `skewY(-${skewAngle}deg)`,
+                }}
+                onClick={right}
+                title={buttonTitle("D")}
+            >
+                <KeyboardArrowRight />
+            </StyledButton>
+            <StyledButton
+                style={{
+                    left: cellSize * (fieldSize + 0.8),
+                    top: cellSize * (fieldSize / 2 + 0.15),
+                    transform: `skewY(-${skewAngle}deg)`,
+                }}
+                onClick={left}
+                title={buttonTitle("S")}
+            >
+                <KeyboardArrowLeft />
+            </StyledButton>
+        </div>
+    );
 });
 
-const skewAngle = Math.atan(0.5) * 180 / Math.PI;
+const skewAngle = (Math.atan(0.5) * 180) / Math.PI;

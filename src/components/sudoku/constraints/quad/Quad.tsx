@@ -1,14 +1,14 @@
-import {recentInfoColor, textColor} from "../../../app/globals";
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {parsePositionLiteral, Position, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps} from "../../../../types/sudoku/Constraint";
-import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {observer} from "mobx-react-lite";
-import {ReactElement} from "react";
-import {profiler} from "../../../../utils/profiler";
-import {useCompensationAngle} from "../../../../contexts/TransformContext";
-import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
+import { recentInfoColor, textColor } from "../../../app/globals";
+import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { parsePositionLiteral, Position, PositionLiteral } from "../../../../types/layout/Position";
+import { Constraint, ConstraintProps } from "../../../../types/sudoku/Constraint";
+import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { observer } from "mobx-react-lite";
+import { ReactElement } from "react";
+import { profiler } from "../../../../utils/profiler";
+import { useCompensationAngle } from "../../../../contexts/TransformContext";
+import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
 
 export interface QuadProps<CellType> {
     expectedDigits?: CellType[];
@@ -18,93 +18,84 @@ export interface QuadProps<CellType> {
 }
 
 export const Quad = {
-    [FieldLayer.afterLines]: observer(function Quad<T extends AnyPTM>(
-        {
-            context,
-            cells,
-            props,
-        }: ConstraintProps<T, QuadProps<T["cell"]>>
-    ) {
+    [FieldLayer.afterLines]: observer(function Quad<T extends AnyPTM>({
+        context,
+        cells,
+        props,
+    }: ConstraintProps<T, QuadProps<T["cell"]>>) {
         profiler.trace();
 
-        return <QuadByData
-            context={context}
-            cells={cells}
-            props={props}
-        />;
+        return <QuadByData context={context} cells={cells} props={props} />;
     }) as <T extends AnyPTM>(props: ConstraintProps<T, QuadProps<T["cell"]>>) => ReactElement,
 };
 
 type QuadByDataProps<T extends AnyPTM> = Pick<ConstraintProps<T, QuadProps<T["cell"]>>, "context" | "cells" | "props">;
-export const QuadByData = observer(function QuadByData<T extends AnyPTM>(
-    {
-        context,
-        cells: [{top, left}],
-        props: {
-            expectedDigits = [],
-            forbiddenDigits = [],
-            isRecent,
-            radius = 0.3,
-        },
-    }: QuadByDataProps<T>
-) {
+export const QuadByData = observer(function QuadByData<T extends AnyPTM>({
+    context,
+    cells: [{ top, left }],
+    props: { expectedDigits = [], forbiddenDigits = [], isRecent, radius = 0.3 },
+}: QuadByDataProps<T>) {
     profiler.trace();
 
-    const {puzzle} = context;
+    const { puzzle } = context;
     const {
         typeManager: {
-            cellDataComponentType: {component: CellData},
+            cellDataComponentType: { component: CellData },
         },
     } = puzzle;
 
-    const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: {digit?: T["cell"], valid?: boolean}[] = [
-        ...expectedDigits.map(digit => ({digit, valid: true})),
-        ...forbiddenDigits.map(digit => ({digit})),
+    const [d1 = {}, d2 = {}, d3 = {}, d4 = {}, ...others]: { digit?: T["cell"]; valid?: boolean }[] = [
+        ...expectedDigits.map((digit) => ({ digit, valid: true })),
+        ...forbiddenDigits.map((digit) => ({ digit })),
     ];
 
     const digits = [d3, d1, d2, d4, ...others];
 
     const compensationAngle = useCompensationAngle(context);
 
-    return <AutoSvg top={top} left={left} angle={-compensationAngle}>
-        <circle
-            key={"circle"}
-            cx={0}
-            cy={0}
-            r={radius}
-            strokeWidth={0.02}
-            stroke={isRecent ? recentInfoColor : textColor}
-            fill={"white"}
-        />
+    return (
+        <AutoSvg top={top} left={left} angle={-compensationAngle}>
+            <circle
+                key={"circle"}
+                cx={0}
+                cy={0}
+                r={radius}
+                strokeWidth={0.02}
+                stroke={isRecent ? recentInfoColor : textColor}
+                fill={"white"}
+            />
 
-        {digits.map(({digit, valid = false}, index) => {
-            if (!digit) {
-                return undefined;
-            }
+            {digits.map(({ digit, valid = false }, index) => {
+                if (!digit) {
+                    return undefined;
+                }
 
-            const angle = 2 * Math.PI * (index + 0.5) / digits.length;
-            const fontSize = radius * 1.75 / Math.sqrt(digits.length);
-            const offset = radius - fontSize / 2;
+                const angle = (2 * Math.PI * (index + 0.5)) / digits.length;
+                const fontSize = (radius * 1.75) / Math.sqrt(digits.length);
+                const offset = radius - fontSize / 2;
 
-            return <CellData
-                key={`digit-${index}`}
-                puzzle={puzzle}
-                data={digit}
-                size={fontSize}
-                top={offset * Math.cos(angle)}
-                left={-offset * Math.sin(angle)}
-                isInitial={valid}
-                isValid={valid}
-            />;
-        })}
-    </AutoSvg>;
+                return (
+                    <CellData
+                        key={`digit-${index}`}
+                        puzzle={puzzle}
+                        data={digit}
+                        size={fontSize}
+                        top={offset * Math.cos(angle)}
+                        left={-offset * Math.sin(angle)}
+                        isInitial={valid}
+                        isValid={valid}
+                    />
+                );
+            })}
+        </AutoSvg>
+    );
 }) as <T extends AnyPTM>(props: QuadByDataProps<T>) => ReactElement;
 
-const getQuadCells = ({top, left}: Position): Position[] => [
-    {top, left},
-    {top: top - 1, left},
-    {top, left: left - 1},
-    {top: top - 1, left: left - 1},
+const getQuadCells = ({ top, left }: Position): Position[] => [
+    { top, left },
+    { top: top - 1, left },
+    { top, left: left - 1 },
+    { top: top - 1, left: left - 1 },
 ];
 
 export const QuadConstraint = <T extends AnyPTM>(
@@ -112,9 +103,9 @@ export const QuadConstraint = <T extends AnyPTM>(
     expectedDigits: T["cell"][],
     forbiddenDigits: T["cell"][] = [],
     isRecent = false,
-    radius = 0.3
+    radius = 0.3,
 ): Constraint<T, QuadProps<T["cell"]>> => {
-    return ({
+    return {
         name: "quad",
         cells: getQuadCells(parsePositionLiteral(cellLiteral)),
         props: {
@@ -126,12 +117,14 @@ export const QuadConstraint = <T extends AnyPTM>(
         component: Quad,
         isObvious: true,
         isValidCell(cell, digitsMap, cells, context) {
-            const {puzzle} = context;
-            const {typeManager: {areSameCellData}} = puzzle;
+            const { puzzle } = context;
+            const {
+                typeManager: { areSameCellData },
+            } = puzzle;
 
             const data = digitsMap[cell.top][cell.left];
 
-            if (forbiddenDigits.some(forbiddenData => areSameCellData(data, forbiddenData, context, cell, cell))) {
+            if (forbiddenDigits.some((forbiddenData) => areSameCellData(data, forbiddenData, context, cell, cell))) {
                 return false;
             }
 
@@ -144,7 +137,9 @@ export const QuadConstraint = <T extends AnyPTM>(
                         continue;
                     }
 
-                    const matchingIndex = remainingExpectedDigits.findIndex(expectedDigit => areSameCellData(cellData, expectedDigit, context, cell2, cell2));
+                    const matchingIndex = remainingExpectedDigits.findIndex((expectedDigit) =>
+                        areSameCellData(cellData, expectedDigit, context, cell2, cell2),
+                    );
                     if (matchingIndex < 0) {
                         return false;
                     }
@@ -153,12 +148,16 @@ export const QuadConstraint = <T extends AnyPTM>(
                 }
             }
 
-            return cells.some(({top, left}) => digitsMap[top]?.[left] === undefined)
-                || expectedDigits.every(expectedData => cells.some(
-                    (cell2) => areSameCellData(digitsMap[cell2.top][cell2.left]!, expectedData, context, cell2, cell2)
-                ));
+            return (
+                cells.some(({ top, left }) => digitsMap[top]?.[left] === undefined) ||
+                expectedDigits.every((expectedData) =>
+                    cells.some((cell2) =>
+                        areSameCellData(digitsMap[cell2.top][cell2.left]!, expectedData, context, cell2, cell2),
+                    ),
+                )
+            );
         },
-    });
+    };
 };
 
 export const QuadConstraintBySolution = <T extends AnyPTM>(
@@ -166,22 +165,25 @@ export const QuadConstraintBySolution = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
     digits: T["cell"][],
     isRecent = false,
-    radius = 0.3
+    radius = 0.3,
 ): Constraint<T, QuadProps<T["cell"]>> => {
     const cell = parsePositionLiteral(cellLiteral);
 
     const actualDigits = getQuadCells(cell)
-        .map(({top, left}) => context.puzzle.solution?.[top]?.[left])
-        .filter(value => value !== undefined)
-        .map(value => value!);
+        .map(({ top, left }) => context.puzzle.solution?.[top]?.[left])
+        .filter((value) => value !== undefined)
+        .map((value) => value!);
 
-    const isGoodDigit = (digit: T["cell"]) => actualDigits.some(actualDigit => context.puzzle.typeManager.areSameCellData(digit, actualDigit, context, cell, cell))
+    const isGoodDigit = (digit: T["cell"]) =>
+        actualDigits.some((actualDigit) =>
+            context.puzzle.typeManager.areSameCellData(digit, actualDigit, context, cell, cell),
+        );
 
     return QuadConstraint(
         cellLiteral,
         digits.filter(isGoodDigit),
-        digits.filter(digit => !isGoodDigit(digit)),
+        digits.filter((digit) => !isGoodDigit(digit)),
         isRecent,
-        radius
+        radius,
     );
 };

@@ -1,4 +1,4 @@
-import {PartiallyTranslatable} from "../../../types/translations/Translatable";
+import { PartiallyTranslatable } from "../../../types/translations/Translatable";
 
 export interface JigsawSudokuPhrases {
     forActivePiece: PartiallyTranslatable;

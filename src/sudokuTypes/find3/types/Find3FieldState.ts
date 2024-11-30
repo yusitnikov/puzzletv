@@ -1,4 +1,4 @@
-import {Position} from "../../../types/layout/Position";
+import { Position } from "../../../types/layout/Position";
 
 export interface Find3FieldState {
     giftsCount: number;

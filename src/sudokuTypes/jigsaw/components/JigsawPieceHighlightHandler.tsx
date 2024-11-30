@@ -1,31 +1,31 @@
 import {
     ControlButtonItem,
     ControlButtonItemProps,
-    ControlButtonRegion
+    ControlButtonRegion,
 } from "../../../components/sudoku/controls/ControlButtonsManager";
-import {JigsawPTM} from "../types/JigsawPTM";
-import {useEventListener} from "../../../hooks/useEventListener";
-import {useEffect} from "react";
+import { JigsawPTM } from "../types/JigsawPTM";
+import { useEventListener } from "../../../hooks/useEventListener";
+import { useEffect } from "react";
 import {
     getActiveJigsawPieceZIndex,
     getJigsawPieceIndexesByCell,
     groupJigsawPiecesByZIndex,
     moveJigsawPieceByGroupGesture,
 } from "../types/helpers";
-import {jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction} from "../types/JigsawGamePieceState";
-import {incrementArrayItem} from "../../../utils/array";
-import {myClientId} from "../../../hooks/useMultiPlayer";
-import {getNextActionId} from "../../../types/sudoku/GameStateAction";
-import {emptyGestureMetrics, GestureMetrics} from "../../../utils/gestures";
-import {comparer} from "mobx";
-import {observer} from "mobx-react-lite";
-import {useComputedValue} from "../../../hooks/useComputed";
-import {profiler} from "../../../utils/profiler";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
+import { jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction } from "../types/JigsawGamePieceState";
+import { incrementArrayItem } from "../../../utils/array";
+import { myClientId } from "../../../hooks/useMultiPlayer";
+import { getNextActionId } from "../../../types/sudoku/GameStateAction";
+import { emptyGestureMetrics, GestureMetrics } from "../../../utils/gestures";
+import { comparer } from "mobx";
+import { observer } from "mobx-react-lite";
+import { useComputedValue } from "../../../hooks/useComputed";
+import { profiler } from "../../../utils/profiler";
+import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 
-const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandler(
-    {context}: ControlButtonItemProps<JigsawPTM>
-) {
+const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandler({
+    context,
+}: ControlButtonItemProps<JigsawPTM>) {
     profiler.trace();
 
     // TODO: make sure that the last selected cell with Ctrl+A is the bottom-right-most cell according to the pieces' state
@@ -33,28 +33,27 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
         function getHasSelectedCell() {
             return !!context.lastSelectedCell;
         },
-        {equals: comparer.structural}
+        { equals: comparer.structural },
     );
     const selectedRegionIndexes = useComputedValue(
         function getSelectedRegionIndexes() {
-            return context.lastSelectedCell && getJigsawPieceIndexesByCell(
-                context.puzzle,
-                context.fieldExtension.pieces,
-                context.lastSelectedCell
+            return (
+                context.lastSelectedCell &&
+                getJigsawPieceIndexesByCell(context.puzzle, context.fieldExtension.pieces, context.lastSelectedCell)
             );
         },
-        {equals: comparer.structural}
+        { equals: comparer.structural },
     );
     useEffect(() => {
         if (selectedRegionIndexes?.length) {
             context.onStateChange(jigsawPieceBringOnTopAction(selectedRegionIndexes, false));
         } else if (hasSelectedCell) {
-            context.onStateChange({extension: {highlightCurrentPiece: false}});
+            context.onStateChange({ extension: { highlightCurrentPiece: false } });
         }
     }, [context, selectedRegionIndexes, hasSelectedCell]);
 
     useEventListener(window, "keydown", (ev) => {
-        const {code, ctrlKey, metaKey, altKey, shiftKey} = ev;
+        const { code, ctrlKey, metaKey, altKey, shiftKey } = ev;
 
         if (ctrlKey || metaKey || altKey) {
             return;
@@ -62,32 +61,34 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
 
         const {
             puzzle,
-            stateExtension: {highlightCurrentPiece},
-            fieldExtension: {pieces: piecePositions},
+            stateExtension: { highlightCurrentPiece },
+            fieldExtension: { pieces: piecePositions },
         } = context;
 
-        const {importOptions: {angleStep} = {}} = puzzle;
+        const { importOptions: { angleStep } = {} } = puzzle;
         const activeZIndex = getActiveJigsawPieceZIndex(piecePositions);
         const groups = groupJigsawPiecesByZIndex(context);
 
         const movePiece = (dx: number, dy: number) => {
             if (highlightCurrentPiece && context.cellWriteMode === CellWriteMode.move) {
-                const activeGroup = groups.find(({zIndex}) => zIndex === activeZIndex);
+                const activeGroup = groups.find(({ zIndex }) => zIndex === activeZIndex);
                 if (activeGroup) {
-                    context.onStateChange(jigsawPieceStateChangeAction(
-                        undefined,
-                        myClientId,
-                        getNextActionId(),
-                        activeGroup.indexes,
-                        ({position: {top, left}}) => ({
-                            position: {
-                                top: top + dy,
-                                left: left + dx,
-                            },
-                            state: {animating: true},
-                        }),
-                        false
-                    ));
+                    context.onStateChange(
+                        jigsawPieceStateChangeAction(
+                            undefined,
+                            myClientId,
+                            getNextActionId(),
+                            activeGroup.indexes,
+                            ({ position: { top, left } }) => ({
+                                position: {
+                                    top: top + dy,
+                                    left: left + dx,
+                                },
+                                state: { animating: true },
+                            }),
+                            false,
+                        ),
+                    );
                     ev.preventDefault();
                 }
             }
@@ -96,22 +97,21 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
         switch (code) {
             case "Tab":
                 const sortedPieceGroups = [...groups].sort(
-                    ({center: a}, {center: b}) =>
-                        Math.sign(a.top - b.top) || Math.sign(a.left - b.left)
+                    ({ center: a }, { center: b }) => Math.sign(a.top - b.top) || Math.sign(a.left - b.left),
                 );
                 const newActivePieces = incrementArrayItem(
                     sortedPieceGroups,
-                    ({zIndex}) => zIndex === activeZIndex,
-                    shiftKey ? -1 : 1
+                    ({ zIndex }) => zIndex === activeZIndex,
+                    shiftKey ? -1 : 1,
                 );
                 // TODO: scroll the active piece into view
                 context.onStateChange([
                     jigsawPieceBringOnTopAction(newActivePieces.indexes),
                     context.selectedCellsCount !== 0
                         ? {
-                            // TODO: select the top-left-most cell according to the current angle
-                            selectedCells: context.selectedCells.set(newActivePieces.cells.slice(0, 1)),
-                        }
+                              // TODO: select the top-left-most cell according to the current angle
+                              selectedCells: context.selectedCells.set(newActivePieces.cells.slice(0, 1)),
+                          }
                         : {},
                 ]);
 
@@ -120,28 +120,30 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
             case "KeyR":
             case "Space":
                 if (highlightCurrentPiece && angleStep) {
-                    const activeGroup = groups.find(({zIndex}) => zIndex === activeZIndex);
+                    const activeGroup = groups.find(({ zIndex }) => zIndex === activeZIndex);
                     if (activeGroup) {
                         const groupGesture: GestureMetrics = {
                             ...emptyGestureMetrics,
-                            rotation: angleStep * (shiftKey ? -1 : 1)
+                            rotation: angleStep * (shiftKey ? -1 : 1),
                         };
-                        context.onStateChange(jigsawPieceStateChangeAction(
-                            undefined,
-                            myClientId,
-                            getNextActionId(),
-                            activeGroup.indexes,
-                            ({position}, pieceIndex) => ({
-                                position: moveJigsawPieceByGroupGesture(
-                                    activeGroup,
-                                    groupGesture,
-                                    puzzle.extension!.pieces[pieceIndex],
-                                    position
-                                ),
-                                state: {animating: true},
-                            }),
-                            false
-                        ));
+                        context.onStateChange(
+                            jigsawPieceStateChangeAction(
+                                undefined,
+                                myClientId,
+                                getNextActionId(),
+                                activeGroup.indexes,
+                                ({ position }, pieceIndex) => ({
+                                    position: moveJigsawPieceByGroupGesture(
+                                        activeGroup,
+                                        groupGesture,
+                                        puzzle.extension!.pieces[pieceIndex],
+                                        position,
+                                    ),
+                                    state: { animating: true },
+                                }),
+                                false,
+                            ),
+                        );
                     }
                 }
                 ev.preventDefault();

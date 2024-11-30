@@ -1,6 +1,6 @@
-import {useState} from "react";
-import {useEventListener} from "./useEventListener";
-import {isFullScreen} from "../utils/fullScreen";
+import { useState } from "react";
+import { useEventListener } from "./useEventListener";
+import { isFullScreen } from "../utils/fullScreen";
 
 export const useIsFullScreen = () => {
     const [isFullScreenState, setIsFullScreenState] = useState(isFullScreen);

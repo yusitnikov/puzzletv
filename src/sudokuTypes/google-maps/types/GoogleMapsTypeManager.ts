@@ -1,16 +1,16 @@
-import {defaultProcessArrowDirection, SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {emptyPosition, Position} from "../../../types/layout/Position";
-import {mergeGameStateUpdates, PartialGameStateEx} from "../../../types/sudoku/GameState";
-import {positionToLatLngLiteral} from "../utils/googleMapsCoords";
-import {MoveCellWriteModeInfo} from "../../../types/sudoku/cellWriteModes/move";
-import {AnyGoogleMapsPTM} from "./GoogleMapsPTM";
+import { defaultProcessArrowDirection, SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { emptyPosition, Position } from "../../../types/layout/Position";
+import { mergeGameStateUpdates, PartialGameStateEx } from "../../../types/sudoku/GameState";
+import { positionToLatLngLiteral } from "../utils/googleMapsCoords";
+import { MoveCellWriteModeInfo } from "../../../types/sudoku/cellWriteModes/move";
+import { AnyGoogleMapsPTM } from "./GoogleMapsPTM";
 
 export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
-    baseTypeManager: SudokuTypeManager<T>
+    baseTypeManager: SudokuTypeManager<T>,
 ): SudokuTypeManager<T> => ({
     ...baseTypeManager,
     extraCellWriteModes: [
-        ...baseTypeManager.extraCellWriteModes ?? [],
+        ...(baseTypeManager.extraCellWriteModes ?? []),
         {
             ...MoveCellWriteModeInfo(),
             disableCellHandlers: true,
@@ -24,12 +24,13 @@ export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
         renderVersion: 0,
     } as T["stateEx"],
     keepStateOnRestart(context): PartialGameStateEx<T> {
-        const {stateExtension: {zoom, center, map, overlay, renderVersion}} = context;
+        const {
+            stateExtension: { zoom, center, map, overlay, renderVersion },
+        } = context;
 
-        return mergeGameStateUpdates(
-            baseTypeManager.keepStateOnRestart?.(context) ?? {},
-            {extension: {zoom, center, map, overlay, renderVersion}},
-        );
+        return mergeGameStateUpdates(baseTypeManager.keepStateOnRestart?.(context) ?? {}, {
+            extension: { zoom, center, map, overlay, renderVersion },
+        });
     },
     transformCoords(coords, context): Position {
         coords = baseTypeManager.transformCoords?.(coords, context) || coords;
@@ -39,7 +40,7 @@ export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
             return coords;
         }
 
-        const {x, y} = projection.fromLatLngToContainerPixel(new google.maps.LatLng(positionToLatLngLiteral(coords)));
+        const { x, y } = projection.fromLatLngToContainerPixel(new google.maps.LatLng(positionToLatLngLiteral(coords)));
         return {
             left: x,
             top: y,
@@ -47,6 +48,12 @@ export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
     },
     isOddTransformCoords: true,
     processArrowDirection(cell, xDirection, yDirection, context, isMainKeyboard) {
-        return (baseTypeManager.processArrowDirection || defaultProcessArrowDirection)(cell, xDirection, -yDirection, context, isMainKeyboard);
+        return (baseTypeManager.processArrowDirection || defaultProcessArrowDirection)(
+            cell,
+            xDirection,
+            -yDirection,
+            context,
+            isMainKeyboard,
+        );
     },
 });

@@ -1,16 +1,17 @@
-import {Types} from "ably/promises";
-import {useAblyChannelPresence, useSetMyAblyChannelPresence} from "./useAbly";
-import {useEffect} from "react";
-import {autorun, comparer, makeAutoObservable, runInAction} from "mobx";
-import {PuzzleContext} from "../types/sudoku/PuzzleContext";
-import {AnyPTM} from "../types/sudoku/PuzzleTypeMap";
-import {getAllShareState} from "../types/sudoku/GameState";
-import {settings} from "../types/layout/Settings";
-import {profiler} from "../utils/profiler";
+import { Types } from "ably/promises";
+import { useAblyChannelPresence, useSetMyAblyChannelPresence } from "./useAbly";
+import { useEffect } from "react";
+import { autorun, comparer, makeAutoObservable, runInAction } from "mobx";
+import { PuzzleContext } from "../types/sudoku/PuzzleContext";
+import { AnyPTM } from "../types/sudoku/PuzzleTypeMap";
+import { getAllShareState } from "../types/sudoku/GameState";
+import { settings } from "../types/layout/Settings";
+import { profiler } from "../utils/profiler";
 
 const emptyObject = {};
 
-export const myClientId: string = (window.localStorage.clientId = window.localStorage.clientId || Math.random().toString().substring(2));
+export const myClientId: string = (window.localStorage.clientId =
+    window.localStorage.clientId || Math.random().toString().substring(2));
 
 export const ablyOptions: Types.ClientOptions = {
     key: "fzkxHw.SEUR7g:J1rgfUWwc397XqQ34wjLftylIcQlAWZeJHxV-bFpPuM",
@@ -73,12 +74,12 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
 
         const map: Record<string, PlayerPresenceData> = {};
 
-        for (const {clientId, data} of this.presenceData) {
-            map[clientId] = map[clientId] || {clientId, data, connectionsCount: 0};
+        for (const { clientId, data } of this.presenceData) {
+            map[clientId] = map[clientId] || { clientId, data, connectionsCount: 0 };
             ++map[clientId].connectionsCount;
         }
 
-        map[myClientId] = map[myClientId] || {clientId: myClientId, data: undefined, connectionsCount: 1};
+        map[myClientId] = map[myClientId] || { clientId: myClientId, data: undefined, connectionsCount: 1 };
 
         return map;
     }
@@ -88,8 +89,8 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
         const allIds = Object.keys(this.playersDataMap);
 
         return [
-            ...allIds.filter(id => comparePlayerIds(id, this.hostId) >= 0).sort(comparePlayerIds),
-            ...allIds.filter(id => comparePlayerIds(id, this.hostId) < 0).sort(comparePlayerIds),
+            ...allIds.filter((id) => comparePlayerIds(id, this.hostId) >= 0).sort(comparePlayerIds),
+            ...allIds.filter((id) => comparePlayerIds(id, this.hostId) < 0).sort(comparePlayerIds),
         ];
     }
 
@@ -97,15 +98,15 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
         profiler.trace();
 
         return this.allPlayerIds
-            .map(clientId => ({
+            .map((clientId) => ({
                 clientId,
                 score: this.context.puzzle.typeManager.getPlayerScore?.(this.context, clientId) || 0,
             }))
-            .sort((a, b) => a.score < b.score ? 1 : -1);
+            .sort((a, b) => (a.score < b.score ? 1 : -1));
     }
 
     get myScore() {
-        return this.playerScores.find(({clientId}) => clientId === myClientId)!.score;
+        return this.playerScores.find(({ clientId }) => clientId === myClientId)!.score;
     }
 
     get playerNicknames(): Record<string, string> {
@@ -114,10 +115,13 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
         const hostStr = this.context.translate("host");
         const guestStr = this.context.translate("guest");
 
-        return Object.fromEntries(Object.values(this.playersDataMap).map(({clientId, data}) => [
-            clientId,
-            (clientId === myClientId ? settings.nickname.get() : data?.nickname || "") || (clientId === this.hostId ? hostStr : `${guestStr}#${clientId.substring(0, 4)}`),
-        ]));
+        return Object.fromEntries(
+            Object.values(this.playersDataMap).map(({ clientId, data }) => [
+                clientId,
+                (clientId === myClientId ? settings.nickname.get() : data?.nickname || "") ||
+                    (clientId === this.hostId ? hostStr : `${guestStr}#${clientId.substring(0, 4)}`),
+            ]),
+        );
     }
 
     private get hostPlayerData() {
@@ -145,7 +149,7 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
     get myPendingMessages() {
         profiler.trace();
 
-        return this.myMessages.filter(({id}) => id > this.myProcessedMessageId);
+        return this.myMessages.filter(({ id }) => id > this.myProcessedMessageId);
     }
 
     /**
@@ -156,16 +160,15 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
 
         const {
             isHost,
-            context: {puzzle, myGameState},
+            context: { puzzle, myGameState },
         } = this;
-        const {currentPlayer, playerObjects} = myGameState;
+        const { currentPlayer, playerObjects } = myGameState;
 
         return {
-            ...(isHost && (
-                puzzle.params?.share
+            ...(isHost &&
+                (puzzle.params?.share
                     ? getAllShareState(this.context)
-                    : puzzle.typeManager.getSharedState?.(puzzle, myGameState)
-            )),
+                    : puzzle.typeManager.getSharedState?.(puzzle, myGameState))),
             currentPlayer,
             playerObjects,
         };
@@ -180,49 +183,51 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
 
         return this.isHost
             ? {
-                ...sharedData,
-                data: this.myHostData,
-                processed: this.processedMessageIds,
-            }
+                  ...sharedData,
+                  data: this.myHostData,
+                  processed: this.processedMessageIds,
+              }
             : {
-                ...sharedData,
-                messages: this.myPendingMessages.slice(0, 50),
-            };
+                  ...sharedData,
+                  messages: this.myPendingMessages.slice(0, 50),
+              };
     }
 
     constructor(context: PuzzleContext<T>) {
-        makeAutoObservable(this, {}, {equals: comparer.structural});
+        makeAutoObservable(this, {}, { equals: comparer.structural });
 
         this.context = context;
     }
 
     sendMessage(data: any) {
-        setTimeout(() => runInAction(() => {
-            this.myMessages.push({id: Date.now(), data});
-        }));
-    };
+        setTimeout(() =>
+            runInAction(() => {
+                this.myMessages.push({ id: Date.now(), data });
+            }),
+        );
+    }
 
     processPendingMessages(onMessages: (messages: MessageWithClientId[]) => void) {
         if (!this.isHost) {
             return;
         }
 
-        const newProcessedMessageIds = {...this.processedMessageIds};
+        const newProcessedMessageIds = { ...this.processedMessageIds };
         const messagesToProcess: MessageWithClientId[] = [];
 
-        for (const {clientId, data: presenceData} of Object.values(this.playersDataMap)) {
+        for (const { clientId, data: presenceData } of Object.values(this.playersDataMap)) {
             if (clientId === myClientId) {
                 continue;
             }
 
             const processedMessageId = this.processedMessageIds[clientId] || 0;
 
-            for (const {id, data} of presenceData?.messages || [] as Message[]) {
+            for (const { id, data } of presenceData?.messages || ([] as Message[])) {
                 if (id <= processedMessageId) {
                     continue;
                 }
 
-                messagesToProcess.push({data, clientId});
+                messagesToProcess.push({ data, clientId });
                 newProcessedMessageIds[clientId] = id;
             }
         }
@@ -247,27 +252,36 @@ export const useMultiPlayer = <T extends AnyPTM>(multiPlayer: UseMultiPlayerResu
     runInAction(() => {
         multiPlayer.isLoaded = isLoaded;
     });
-    useEffect(() => runInAction(function updatePresenceData() {
-        multiPlayer.presenceData = presenceData;
-    }), [multiPlayer, presenceData]);
-
-    useEffect(() => autorun(function mergeHostDataToStateAutorun() {
-        profiler.trace();
-
-        multiPlayer.context.mergeHostDataToState();
-    }), [multiPlayer]);
+    useEffect(
+        () =>
+            runInAction(function updatePresenceData() {
+                multiPlayer.presenceData = presenceData;
+            }),
+        [multiPlayer, presenceData],
+    );
 
     useEffect(
-        () => autorun(function processPendingMessagesAutorun() {
-            profiler.trace();
+        () =>
+            autorun(function mergeHostDataToStateAutorun() {
+                profiler.trace();
 
-            multiPlayer.processPendingMessages(
-                (messages) => multiPlayer.context.update({
-                    myGameState: multiPlayer.context.processMessages(messages),
-                })
-            );
-        }),
-        [multiPlayer]
+                multiPlayer.context.mergeHostDataToState();
+            }),
+        [multiPlayer],
+    );
+
+    useEffect(
+        () =>
+            autorun(function processPendingMessagesAutorun() {
+                profiler.trace();
+
+                multiPlayer.processPendingMessages((messages) =>
+                    multiPlayer.context.update({
+                        myGameState: multiPlayer.context.processMessages(messages),
+                    }),
+                );
+            }),
+        [multiPlayer],
     );
 
     useSetMyAblyChannelPresence(ablyOptions, channelName, multiPlayer.dataToSend, multiPlayer.isEnabled);
@@ -278,5 +292,5 @@ export const comparePlayerIds = (a: string, b: string) => a.localeCompare(b);
 export const getNextPlayerId = (currentPlayerId: string, allPlayerIds: string[]) => {
     const sortedPlayerIds = allPlayerIds.sort(comparePlayerIds);
 
-    return sortedPlayerIds.find(id => comparePlayerIds(id, currentPlayerId) > 0) ?? sortedPlayerIds[0];
+    return sortedPlayerIds.find((id) => comparePlayerIds(id, currentPlayerId) > 0) ?? sortedPlayerIds[0];
 };

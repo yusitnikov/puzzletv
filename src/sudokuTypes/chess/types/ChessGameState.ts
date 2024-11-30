@@ -1,4 +1,4 @@
-import {ChessColor} from "./ChessColor";
+import { ChessColor } from "./ChessColor";
 
 export interface ChessGameState {
     selectedColor: ChessColor;

@@ -1,5 +1,5 @@
-import {createContext, JSXElementConstructor, useContext, useState} from "react";
-import {useEventListener} from "./useEventListener";
+import { createContext, JSXElementConstructor, useContext, useState } from "react";
+import { useEventListener } from "./useEventListener";
 
 const HashContext = createContext<string | undefined>(undefined);
 
@@ -19,7 +19,10 @@ interface HashProps {
     _hash?: string;
 }
 
-export const WithHashContext = <PropsT,>(Component: JSXElementConstructor<PropsT>) =>
-    ({_hash = "", ...props}: PropsT & HashProps) => <HashContext.Provider value={_hash}>
-        <Component {...props as PropsT}/>
-    </HashContext.Provider>;
+export const WithHashContext =
+    <PropsT,>(Component: JSXElementConstructor<PropsT>) =>
+    ({ _hash = "", ...props }: PropsT & HashProps) => (
+        <HashContext.Provider value={_hash}>
+            <Component {...(props as PropsT)} />
+        </HashContext.Provider>
+    );

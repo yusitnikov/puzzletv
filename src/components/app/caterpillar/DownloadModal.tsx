@@ -1,20 +1,20 @@
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
-import {compileGrids} from "./compileGrids";
-import {useWindowSize} from "../../../hooks/useWindowSize";
-import {normalizeSclMetadata, puzzleIdToScl, Scl} from "../../../utils/sudokuPad";
-import {Modal} from "../../layout/modal/Modal";
-import {SettingsItem} from "../../sudoku/controls/settings/SettingsItem";
-import {SettingsButton} from "../../sudoku/controls/settings/SettingsButton";
-import {CaterpillarGrid} from "./types";
-import {parseSolutionString} from "./utils";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
+import { compileGrids } from "./compileGrids";
+import { useWindowSize } from "../../../hooks/useWindowSize";
+import { normalizeSclMetadata, puzzleIdToScl, Scl } from "../../../utils/sudokuPad";
+import { Modal } from "../../layout/modal/Modal";
+import { SettingsItem } from "../../sudoku/controls/settings/SettingsItem";
+import { SettingsButton } from "../../sudoku/controls/settings/SettingsButton";
+import { CaterpillarGrid } from "./types";
+import { parseSolutionString } from "./utils";
 
 interface DownloadModalProps {
     grids: CaterpillarGrid[];
     onClose: () => void;
 }
 
-export const DownloadModal = observer(function DownloadModal({grids, onClose}: DownloadModalProps) {
+export const DownloadModal = observer(function DownloadModal({ grids, onClose }: DownloadModalProps) {
     profiler.trace();
 
     const windowSize = useWindowSize(false);
@@ -36,7 +36,7 @@ export const DownloadModal = observer(function DownloadModal({grids, onClose}: D
             solution: solutionStr,
         } = parsedGrid.metadata ?? {};
 
-        const result = {title, author, rules};
+        const result = { title, author, rules };
 
         const next = grids[index + 1];
         if (!next) {
@@ -57,45 +57,43 @@ export const DownloadModal = observer(function DownloadModal({grids, onClose}: D
         };
     });
 
-    return <Modal
-        noHeader={true}
-        cellSize={modalCellSize}
-        onClose={onClose}
-    >
-        {compiledGrids && <SettingsItem>
-            <span>Puzzle JSON:</span>
+    return (
+        <Modal noHeader={true} cellSize={modalCellSize} onClose={onClose}>
+            {compiledGrids && (
+                <SettingsItem>
+                    <span>Puzzle JSON:</span>
 
-            <SettingsButton
-                component={"a"}
-                href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(compiledGrids, null, 2))}
-                download={"caterpillar-puzzle.json"}
-                cellSize={modalCellSize}
-            >
-                Download
-            </SettingsButton>
-        </SettingsItem>}
+                    <SettingsButton
+                        component={"a"}
+                        href={
+                            "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(compiledGrids, null, 2))
+                        }
+                        download={"caterpillar-puzzle.json"}
+                        cellSize={modalCellSize}
+                    >
+                        Download
+                    </SettingsButton>
+                </SettingsItem>
+            )}
 
-        <SettingsItem>
-            <span>Grids metadata:</span>
+            <SettingsItem>
+                <span>Grids metadata:</span>
 
-            <SettingsButton
-                component={"a"}
-                href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gridsMetadata, null, 2))}
-                download={"caterpillar-grids.json"}
-                cellSize={modalCellSize}
-            >
-                Download
-            </SettingsButton>
-        </SettingsItem>
+                <SettingsButton
+                    component={"a"}
+                    href={"data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gridsMetadata, null, 2))}
+                    download={"caterpillar-grids.json"}
+                    cellSize={modalCellSize}
+                >
+                    Download
+                </SettingsButton>
+            </SettingsItem>
 
-        <div>
-            <SettingsButton
-                type={"button"}
-                cellSize={modalCellSize}
-                onClick={onClose}
-            >
-                Close
-            </SettingsButton>
-        </div>
-    </Modal>;
+            <div>
+                <SettingsButton type={"button"} cellSize={modalCellSize} onClick={onClose}>
+                    Close
+                </SettingsButton>
+            </div>
+        </Modal>
+    );
 });

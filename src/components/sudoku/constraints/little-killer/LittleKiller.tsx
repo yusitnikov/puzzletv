@@ -1,19 +1,19 @@
-import {textColor} from "../../../app/globals";
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
+import { textColor } from "../../../app/globals";
+import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
 import {
     Line,
     parsePositionLiteral,
     parsePositionLiterals,
     Position,
-    PositionLiteral
+    PositionLiteral,
 } from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
-import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
-import {FieldSize} from "../../../../types/sudoku/FieldSize";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../../utils/profiler";
-import {getLineCellsByOutsideCell} from "../outside-clue/OutsideClue";
+import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
+import { ArrowEnd } from "../../../svg/arrow-end/ArrowEnd";
+import { FieldSize } from "../../../../types/sudoku/FieldSize";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../../utils/profiler";
+import { getLineCellsByOutsideCell } from "../outside-clue/OutsideClue";
 
 const lineWidth = 0.03;
 
@@ -24,12 +24,19 @@ export interface LittleKillerProps {
 }
 
 export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
-    [FieldLayer.regular]: observer(function LittleKiller<T extends AnyPTM>(
-        {context: {puzzle}, cells: [{top, left}], color: fontColor = textColor, props: {direction, sum, lineColor = textColor}}: ConstraintProps<T, LittleKillerProps>
-    ) {
+    [FieldLayer.regular]: observer(function LittleKiller<T extends AnyPTM>({
+        context: { puzzle },
+        cells: [{ top, left }],
+        color: fontColor = textColor,
+        props: { direction, sum, lineColor = textColor },
+    }: ConstraintProps<T, LittleKillerProps>) {
         profiler.trace();
 
-        const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent}}} = puzzle;
+        const {
+            typeManager: {
+                digitComponentType: { svgContentComponent: DigitSvgContent },
+            },
+        } = puzzle;
 
         top += 0.5;
         left += 0.5;
@@ -47,33 +54,37 @@ export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
             },
         };
 
-        return <>
-            <line
-                x1={line.start.left}
-                y1={line.start.top}
-                x2={line.end.left}
-                y2={line.end.top}
-                strokeWidth={lineWidth}
-                stroke={lineColor}
-            />
+        return (
+            <>
+                <line
+                    x1={line.start.left}
+                    y1={line.start.top}
+                    x2={line.end.left}
+                    y2={line.end.top}
+                    strokeWidth={lineWidth}
+                    stroke={lineColor}
+                />
 
-            <ArrowEnd
-                position={line.end}
-                direction={direction}
-                arrowSize={0.1}
-                lineWidth={lineWidth}
-                color={lineColor}
-            />
+                <ArrowEnd
+                    position={line.end}
+                    direction={direction}
+                    arrowSize={0.1}
+                    lineWidth={lineWidth}
+                    color={lineColor}
+                />
 
-            {sum !== undefined && <DigitSvgContent
-                puzzle={puzzle}
-                color={fontColor}
-                digit={sum}
-                size={0.5}
-                left={left - 0.5 * direction.left}
-                top={top - 0.5 * direction.top}
-            />}
-        </>;
+                {sum !== undefined && (
+                    <DigitSvgContent
+                        puzzle={puzzle}
+                        color={fontColor}
+                        digit={sum}
+                        size={0.5}
+                        left={left - 0.5 * direction.left}
+                        top={top - 0.5 * direction.top}
+                    />
+                )}
+            </>
+        );
     }),
 };
 
@@ -84,13 +95,14 @@ export const LittleKillerConstraint = <T extends AnyPTM>(
     sum?: number,
     color?: string,
     lineColor = color,
-) => LittleKillerConstraintByCells<T>(
-    getLineCellsByOutsideCell(startCell, fieldSize, direction),
-    direction,
-    sum,
-    color,
-    lineColor,
-);
+) =>
+    LittleKillerConstraintByCells<T>(
+        getLineCellsByOutsideCell(startCell, fieldSize, direction),
+        direction,
+        sum,
+        color,
+        lineColor,
+    );
 
 export const LittleKillerConstraintByCells = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
@@ -113,7 +125,11 @@ export const LittleKillerConstraintByCells = <T extends AnyPTM>(
             return true;
         }
 
-        const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+        const {
+            puzzle: {
+                typeManager: { getDigitByCellData },
+            },
+        } = context;
 
         let actualSum = 0;
 

@@ -1,12 +1,12 @@
-import {PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
-import {createRegularFieldSize, createRegularRegions} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {generateRandomPuzzleDigits, getDailyRandomGeneratorSeed} from "../../utils/random";
-import {QuadMastersSudokuTypeManager} from "../../sudokuTypes/quad-masters/types/QuadMastersSudokuTypeManager";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {getAutoRegionWidth} from "../../utils/regions";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {normalSudokuRulesApply} from "../ruleSnippets";
+import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
+import { createRegularFieldSize, createRegularRegions } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { generateRandomPuzzleDigits, getDailyRandomGeneratorSeed } from "../../utils/random";
+import { QuadMastersSudokuTypeManager } from "../../sudokuTypes/quad-masters/types/QuadMastersSudokuTypeManager";
+import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { getAutoRegionWidth } from "../../utils/regions";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { normalSudokuRulesApply } from "../ruleSnippets";
 import {
     correctGuessRules,
     incorrectGuessMultiPlayerRules,
@@ -15,39 +15,47 @@ import {
     multiPlayerTurnsRules,
     phase,
     placeDigitRules,
-    placeQuadRules, privatePencilmarksNote,
-    quadBlackDigits, quadGreenDigits, quadGreyDigits,
-    quadRedDigits, quadYellowDigits,
+    placeQuadRules,
+    privatePencilmarksNote,
+    quadBlackDigits,
+    quadGreenDigits,
+    quadGreyDigits,
+    quadRedDigits,
+    quadYellowDigits,
     singlePlayerScoreRules,
-    twoPhasesGame
+    twoPhasesGame,
 } from "../../sudokuTypes/quad-masters/data/ruleSnippets";
-import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import {PartiallyTranslatable} from "../../types/translations/Translatable";
-import {QuadMastersPTM} from "../../sudokuTypes/quad-masters/types/QuadMastersPTM";
+import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { PartiallyTranslatable } from "../../types/translations/Translatable";
+import { QuadMastersPTM } from "../../sudokuTypes/quad-masters/types/QuadMastersPTM";
 
-export const getQuadMastersTitle = (daily: boolean, isQuadle: boolean, includeRandomWord?: boolean): PartiallyTranslatable => ({
-    [LanguageCode.en]: (daily ? "Daily " : (includeRandomWord ? "Random " : "")) + (isQuadle ? "Quadle" : "Quad Masters"),
-    [LanguageCode.ru]: (!daily && includeRandomWord ? "Случайный " : "") + (isQuadle ? "Quadle" : "Quad Masters") + (daily ? " дня" : ""),
+export const getQuadMastersTitle = (
+    daily: boolean,
+    isQuadle: boolean,
+    includeRandomWord?: boolean,
+): PartiallyTranslatable => ({
+    [LanguageCode.en]: (daily ? "Daily " : includeRandomWord ? "Random " : "") + (isQuadle ? "Quadle" : "Quad Masters"),
+    [LanguageCode.ru]:
+        (!daily && includeRandomWord ? "Случайный " : "") +
+        (isQuadle ? "Quadle" : "Quad Masters") +
+        (daily ? " дня" : ""),
 });
 
-export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: boolean): PuzzleDefinitionLoader<QuadMastersPTM> => ({
+export const generateQuadMasters = (
+    slug: string,
+    daily: boolean,
+    isQuadle: boolean,
+): PuzzleDefinitionLoader<QuadMastersPTM> => ({
     slug,
     noIndex: true,
-    fulfillParams: (
-        {
-            size = 9,
-            regionWidth = getAutoRegionWidth(size),
-            seed,
-            ...other
-        }
-    ) => ({
+    fulfillParams: ({ size = 9, regionWidth = getAutoRegionWidth(size), seed, ...other }) => ({
         size,
         regionWidth,
         seed: daily ? "daily" : (seed ?? Math.round(Math.random() * 1000000)),
         isRandom: !seed && !daily,
-        ...other
+        ...other,
     }),
-    loadPuzzle: ({size: sizeStr, regionWidth: regionWidthStr, seed: seedStr, isRandom, host, ...otherParams}) => {
+    loadPuzzle: ({ size: sizeStr, regionWidth: regionWidthStr, seed: seedStr, isRandom, host, ...otherParams }) => {
         const fieldSize = Number(sizeStr);
         const regionWidth = Number(regionWidthStr);
         const randomSeed = daily ? getDailyRandomGeneratorSeed(isQuadle ? 1 : 0) : Number(seedStr);
@@ -74,31 +82,37 @@ export const generateQuadMasters = (slug: string, daily: boolean, isQuadle: bool
             resultChecker: isValidFinishedPuzzleByConstraints,
             forceAutoCheckOnFinish: true,
             fieldMargin: Math.max(0, (7 - fieldSize) / 2),
-            rules: translate => <>
-                <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-                <RulesParagraph>{translate(host ? multiPlayerTurnsRules : twoPhasesGame)}.</RulesParagraph>
-                <RulesParagraph>{translate(phase)} 1:</RulesParagraph>
-                <RulesUnorderedList>
-                    <li>{translate(placeQuadRules)}.</li>
-                    {isQuadle && <>
-                        <li>{translate(quadGreenDigits)}.</li>
-                        <li>{translate(quadYellowDigits)}.</li>
-                        <li>{translate(quadGreyDigits)}.</li>
-                    </>}
-                    {!isQuadle && <>
-                        <li>{translate(quadBlackDigits)}.</li>
-                        <li>{translate(quadRedDigits)}.</li>
-                    </>}
-                </RulesUnorderedList>
-                <RulesParagraph>{translate(phase)} 2:</RulesParagraph>
-                <RulesUnorderedList>
-                    <li>{translate(placeDigitRules)}.</li>
-                    <li>{translate(correctGuessRules)}.</li>
-                    <li>{translate(host ? incorrectGuessMultiPlayerRules : incorrectGuessSinglePlayerRules)}.</li>
-                </RulesUnorderedList>
-                <RulesParagraph>{translate(host ? multiPlayerScoreRules : singlePlayerScoreRules)}.</RulesParagraph>
-                {!!host && <RulesParagraph>{translate(privatePencilmarksNote)}.</RulesParagraph>}
-            </>,
+            rules: (translate) => (
+                <>
+                    <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+                    <RulesParagraph>{translate(host ? multiPlayerTurnsRules : twoPhasesGame)}.</RulesParagraph>
+                    <RulesParagraph>{translate(phase)} 1:</RulesParagraph>
+                    <RulesUnorderedList>
+                        <li>{translate(placeQuadRules)}.</li>
+                        {isQuadle && (
+                            <>
+                                <li>{translate(quadGreenDigits)}.</li>
+                                <li>{translate(quadYellowDigits)}.</li>
+                                <li>{translate(quadGreyDigits)}.</li>
+                            </>
+                        )}
+                        {!isQuadle && (
+                            <>
+                                <li>{translate(quadBlackDigits)}.</li>
+                                <li>{translate(quadRedDigits)}.</li>
+                            </>
+                        )}
+                    </RulesUnorderedList>
+                    <RulesParagraph>{translate(phase)} 2:</RulesParagraph>
+                    <RulesUnorderedList>
+                        <li>{translate(placeDigitRules)}.</li>
+                        <li>{translate(correctGuessRules)}.</li>
+                        <li>{translate(host ? incorrectGuessMultiPlayerRules : incorrectGuessSinglePlayerRules)}.</li>
+                    </RulesUnorderedList>
+                    <RulesParagraph>{translate(host ? multiPlayerScoreRules : singlePlayerScoreRules)}.</RulesParagraph>
+                    {!!host && <RulesParagraph>{translate(privatePencilmarksNote)}.</RulesParagraph>}
+                </>
+            ),
         };
     },
 });

@@ -1,15 +1,11 @@
-import {blackColor, textColor} from "../../../app/globals";
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {parsePositionLiteral, PositionLiteral} from "../../../../types/layout/Position";
-import {
-    Constraint,
-    ConstraintProps,
-    ConstraintPropsGenericFc
-} from "../../../../types/sudoku/Constraint";
-import {CenteredText} from "../../../svg/centered-text/CenteredText";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../../utils/profiler";
+import { blackColor, textColor } from "../../../app/globals";
+import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
+import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../../types/sudoku/Constraint";
+import { CenteredText } from "../../../svg/centered-text/CenteredText";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../../utils/profiler";
 
 export const KropkiDotTag = "kropki-dot";
 
@@ -20,40 +16,32 @@ export interface KropkiDotProps {
     showValue?: boolean;
 }
 
-export const KropkiDot: ConstraintPropsGenericFc<KropkiDotProps> = observer(function KropkiDot<T extends AnyPTM>(
-    {
-        cells: [cell1, cell2],
-        color = blackColor,
-        props: {
-            value,
-            showValue = true
-        },
-    }: ConstraintProps<T, KropkiDotProps>
-) {
+export const KropkiDot: ConstraintPropsGenericFc<KropkiDotProps> = observer(function KropkiDot<T extends AnyPTM>({
+    cells: [cell1, cell2],
+    color = blackColor,
+    props: { value, showValue = true },
+}: ConstraintProps<T, KropkiDotProps>) {
     profiler.trace();
 
     const top = (cell1.top + cell2.top) / 2 + 0.5;
     const left = (cell1.left + cell2.left) / 2 + 0.5;
 
-    return <>
-        <circle
-            cx={left}
-            cy={top}
-            r={radius}
-            strokeWidth={0.02}
-            stroke={blackColor}
-            fill={color}
-        />
+    return (
+        <>
+            <circle cx={left} cy={top} r={radius} strokeWidth={0.02} stroke={blackColor} fill={color} />
 
-        {value && showValue && <CenteredText
-            top={top}
-            left={left}
-            size={radius * (typeof value === "number" ? 1.75 : 1.25)}
-            fill={[blackColor, textColor, "black", "#000", "#000000"].includes(color) ? "white" : blackColor}
-        >
-            {typeof value === "number" ? value : value.join(":")}
-        </CenteredText>}
-    </>;
+            {value && showValue && (
+                <CenteredText
+                    top={top}
+                    left={left}
+                    size={radius * (typeof value === "number" ? 1.75 : 1.25)}
+                    fill={[blackColor, textColor, "black", "#000", "#000000"].includes(color) ? "white" : blackColor}
+                >
+                    {typeof value === "number" ? value : value.join(":")}
+                </CenteredText>
+            )}
+        </>
+    );
 });
 
 export const KropkiDotConstraint = <T extends AnyPTM>(
@@ -77,10 +65,14 @@ export const KropkiDotConstraint = <T extends AnyPTM>(
             value,
             showValue,
         },
-        component: {[layer]: KropkiDot},
+        component: { [layer]: KropkiDot },
         isObvious: true,
         isValidCell(cell, digits, [cell1, cell2], context) {
-            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+            const {
+                puzzle: {
+                    typeManager: { getDigitByCellData },
+                },
+            } = context;
 
             const data1 = digits[cell1.top]?.[cell1.left];
             const data2 = digits[cell2.top]?.[cell2.left];
@@ -103,5 +95,8 @@ export const KropkiDotConstraint = <T extends AnyPTM>(
     };
 };
 
-export const HeartConstraint = <T extends AnyPTM>(cellLiteral1: PositionLiteral, cellLiteral2: PositionLiteral, showValue = false) =>
-    KropkiDotConstraint<T>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", showValue);
+export const HeartConstraint = <T extends AnyPTM>(
+    cellLiteral1: PositionLiteral,
+    cellLiteral2: PositionLiteral,
+    showValue = false,
+) => KropkiDotConstraint<T>(cellLiteral1, cellLiteral2, true, [2, 3], "#f00", showValue);

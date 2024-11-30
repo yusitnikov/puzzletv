@@ -1,4 +1,4 @@
-import {DOMAttributes} from "react";
+import { DOMAttributes } from "react";
 
 export type EventHandlerPropNames = Exclude<keyof DOMAttributes<any>, "children" | "dangerouslySetInnerHTML">;
 

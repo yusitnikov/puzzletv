@@ -1,4 +1,4 @@
-import {QuadInputState} from "./QuadInputState";
+import { QuadInputState } from "./QuadInputState";
 
 export interface QuadInputGameState<CellType> {
     currentQuad?: QuadInputState<CellType>;

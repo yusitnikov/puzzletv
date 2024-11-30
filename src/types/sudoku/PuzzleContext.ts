@@ -1,4 +1,4 @@
-import {getDefaultDigitsCount, getRegionCells, PuzzleDefinition} from "./PuzzleDefinition";
+import { getDefaultDigitsCount, getRegionCells, PuzzleDefinition } from "./PuzzleDefinition";
 import {
     GameStateEx,
     gameStateGetCurrentGivenDigitsByCells,
@@ -8,46 +8,46 @@ import {
     mergeGameStateWithUpdates,
     PartialGameStateEx,
     ProcessedGameStateAnimatedValues,
-    setAllShareState
+    setAllShareState,
 } from "./GameState";
-import {MessageWithClientId, myClientId, UseMultiPlayerResult} from "../../hooks/useMultiPlayer";
-import {Dispatch, ReactNode} from "react";
+import { MessageWithClientId, myClientId, UseMultiPlayerResult } from "../../hooks/useMultiPlayer";
+import { Dispatch, ReactNode } from "react";
 import {
     coreGameStateActionTypes,
     GameStateAction,
     GameStateActionCallback,
-    GameStateActionOrCallback
+    GameStateActionOrCallback,
 } from "./GameStateAction";
-import {SudokuCellsIndex} from "./SudokuCellsIndex";
-import {AnyPTM} from "./PuzzleTypeMap";
-import {comparer, computed, makeAutoObservable, runInAction} from "mobx";
-import {computedFn, createViewModel} from "mobx-utils";
-import {Position, PositionSet} from "../layout/Position";
-import {isSelectableCell} from "./CellTypeProps";
-import {TransformedCustomCellBounds} from "./CustomCellBounds";
-import {controlKeysState} from "../../hooks/useControlKeysState";
-import {getAllowedCellWriteModeInfos} from "./CellWriteModeInfo";
-import {getFinalCellWriteMode} from "../../hooks/sudoku/useFinalCellWriteMode";
-import {CellWriteMode} from "./CellWriteMode";
-import {Constraint, toDecorativeConstraint} from "./Constraint";
-import {FieldLayer} from "./FieldLayer";
-import {getDefaultRegionsForRowsAndColumns} from "./FieldSize";
-import {FieldLinesConstraint} from "../../components/sudoku/field/FieldLines";
-import {RegionConstraint} from "../../components/sudoku/constraints/region/Region";
-import {UserLinesConstraint} from "../../components/sudoku/constraints/user-lines/UserLines";
-import {GivenDigitsMap, mergeGivenDigitsMaps} from "./GivenDigitsMap";
-import {getFogPropsByContext, getFogVisibleCells} from "../../components/sudoku/constraints/fog/Fog";
-import {setComparer, SetInterface} from "../struct/Set";
-import {PuzzleLine} from "./PuzzleLine";
-import {CellMark} from "./CellMark";
-import {areCellStatesEqual, CellState} from "./CellState";
-import {LanguageCode} from "../translations/LanguageCode";
-import {translate} from "../../utils/translate";
-import {PartiallyTranslatable} from "../translations/Translatable";
-import {PuzzleResultCheck} from "./PuzzleResultCheck";
-import {profiler} from "../../utils/profiler";
-import {getGridRegionCells, GridRegion} from "./GridRegion";
-import {PuzzleImportOptions} from "./PuzzleImportOptions";
+import { SudokuCellsIndex } from "./SudokuCellsIndex";
+import { AnyPTM } from "./PuzzleTypeMap";
+import { comparer, computed, makeAutoObservable, runInAction } from "mobx";
+import { computedFn, createViewModel } from "mobx-utils";
+import { Position, PositionSet } from "../layout/Position";
+import { isSelectableCell } from "./CellTypeProps";
+import { TransformedCustomCellBounds } from "./CustomCellBounds";
+import { controlKeysState } from "../../hooks/useControlKeysState";
+import { getAllowedCellWriteModeInfos } from "./CellWriteModeInfo";
+import { getFinalCellWriteMode } from "../../hooks/sudoku/useFinalCellWriteMode";
+import { CellWriteMode } from "./CellWriteMode";
+import { Constraint, toDecorativeConstraint } from "./Constraint";
+import { FieldLayer } from "./FieldLayer";
+import { getDefaultRegionsForRowsAndColumns } from "./FieldSize";
+import { FieldLinesConstraint } from "../../components/sudoku/field/FieldLines";
+import { RegionConstraint } from "../../components/sudoku/constraints/region/Region";
+import { UserLinesConstraint } from "../../components/sudoku/constraints/user-lines/UserLines";
+import { GivenDigitsMap, mergeGivenDigitsMaps } from "./GivenDigitsMap";
+import { getFogPropsByContext, getFogVisibleCells } from "../../components/sudoku/constraints/fog/Fog";
+import { setComparer, SetInterface } from "../struct/Set";
+import { PuzzleLine } from "./PuzzleLine";
+import { CellMark } from "./CellMark";
+import { areCellStatesEqual, CellState } from "./CellState";
+import { LanguageCode } from "../translations/LanguageCode";
+import { translate } from "../../utils/translate";
+import { PartiallyTranslatable } from "../translations/Translatable";
+import { PuzzleResultCheck } from "./PuzzleResultCheck";
+import { profiler } from "../../utils/profiler";
+import { getGridRegionCells, GridRegion } from "./GridRegion";
+import { PuzzleImportOptions } from "./PuzzleImportOptions";
 
 const emptyObject = {};
 
@@ -57,10 +57,7 @@ export interface PuzzleContextOptions<T extends AnyPTM> {
     processedGameStateExtension?: T["processedStateEx"];
     animated?: ProcessedGameStateAnimatedValues;
     myGameState: GameStateEx<T>;
-    onStateChange?: Dispatch<
-        GameStateActionOrCallback<any, T> |
-        GameStateActionOrCallback<any, T>[]
-    >;
+    onStateChange?: Dispatch<GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[]>;
     cellSize: number;
     cellSizeForSidePanel: number;
     isReadonlyContext: boolean;
@@ -87,9 +84,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get processedGameStateExtension() {
         profiler.trace();
 
-        return this._processedGameStateExtension
-            ?? this.puzzle.typeManager.getProcessedGameStateExtension?.(this)
-            ?? (emptyObject as T["processedStateEx"]);
+        return (
+            this._processedGameStateExtension ??
+            this.puzzle.typeManager.getProcessedGameStateExtension?.(this) ??
+            (emptyObject as T["processedStateEx"])
+        );
     }
 
     get regions() {
@@ -102,7 +101,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
         const result: GivenDigitsMap<GridRegion> = {};
         for (const region of this.regions ?? []) {
-            for (const {top, left} of getGridRegionCells(region)) {
+            for (const { top, left } of getGridRegionCells(region)) {
                 result[top] ??= {};
                 result[top][left] = region;
             }
@@ -111,11 +110,13 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return result;
     }
 
-    readonly getCellRegion = computedFn(
-        function getCellRegion(this: PuzzleContext<T>, top: number, left: number): GridRegion | undefined {
-            return this.regionsByCellsMap[top]?.[left];
-        }
-    );
+    readonly getCellRegion = computedFn(function getCellRegion(
+        this: PuzzleContext<T>,
+        top: number,
+        left: number,
+    ): GridRegion | undefined {
+        return this.regionsByCellsMap[top]?.[left];
+    });
 
     private _animated?: ProcessedGameStateAnimatedValues;
     get animated(): ProcessedGameStateAnimatedValues {
@@ -153,48 +154,46 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.animated.scale;
     }
 
-    private _onStateChange?: Dispatch<
-        GameStateActionOrCallback<any, T> |
-        GameStateActionOrCallback<any, T>[]
-    >;
+    private _onStateChange?: Dispatch<GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[]>;
 
-    constructor(
-        {
-            puzzle,
-            puzzleIndex,
-            processedGameStateExtension,
-            animated,
-            myGameState,
-            onStateChange,
-            cellSize,
-            cellSizeForSidePanel,
-            isReadonlyContext,
-            applyKeys,
-            applyPendingMessages,
-        }: PuzzleContextOptions<T>
-    ) {
-        makeAutoObservable(this, {
-            userDigits: computed({equals: comparer.structural}),
-            cells: computed<CellState<T>[][]>({
-                equals: (as, bs) => as.every(
-                    (row, top) => row.every(
-                        (a, left) => areCellStatesEqual(this, a, bs[top][left])
-                    )
-                ),
-            }),
-            lines: computed<SetInterface<PuzzleLine>>({equals: setComparer}),
-            marks: computed<SetInterface<CellMark>>({equals: setComparer}),
-            fieldExtension: computed<T["fieldStateEx"]>({equals: (a, b) => {
-                const {
-                    typeManager: {
-                        areFieldStateExtensionsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b),
+    constructor({
+        puzzle,
+        puzzleIndex,
+        processedGameStateExtension,
+        animated,
+        myGameState,
+        onStateChange,
+        cellSize,
+        cellSizeForSidePanel,
+        isReadonlyContext,
+        applyKeys,
+        applyPendingMessages,
+    }: PuzzleContextOptions<T>) {
+        makeAutoObservable(
+            this,
+            {
+                userDigits: computed({ equals: comparer.structural }),
+                cells: computed<CellState<T>[][]>({
+                    equals: (as, bs) =>
+                        as.every((row, top) => row.every((a, left) => areCellStatesEqual(this, a, bs[top][left]))),
+                }),
+                lines: computed<SetInterface<PuzzleLine>>({ equals: setComparer }),
+                marks: computed<SetInterface<CellMark>>({ equals: setComparer }),
+                fieldExtension: computed<T["fieldStateEx"]>({
+                    equals: (a, b) => {
+                        const {
+                            typeManager: {
+                                areFieldStateExtensionsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b),
+                            },
+                        } = this.puzzle;
+                        return areFieldStateExtensionsEqual(a, b);
                     },
-                } = this.puzzle;
-                return areFieldStateExtensionsEqual(a, b);
-            }}),
-            resultCheck: computed({equals: comparer.structural}),
-            importOptionOverrides: computed({equals: comparer.structural}),
-        }, {});
+                }),
+                resultCheck: computed({ equals: comparer.structural }),
+                importOptionOverrides: computed({ equals: comparer.structural }),
+            },
+            {},
+        );
 
         this.puzzle = puzzle;
         this.puzzleIndex = puzzleIndex ?? new SudokuCellsIndex(this.puzzle);
@@ -239,7 +238,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             if ("animated" in updates) {
                 this._animated = animated;
             }
-            if (myGameState !== undefined/* && !areSameGameStates(this, myGameState, this.myGameState)*/) {
+            if (myGameState !== undefined /* && !areSameGameStates(this, myGameState, this.myGameState)*/) {
                 this.myGameState = myGameState;
             }
             if ("onStateChange" in updates) {
@@ -284,9 +283,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get readOnlySafeContext(): PuzzleContext<T> {
         profiler.trace();
 
-        return this.shouldApplyReadOnlySafeContext
-            ? this.cloneWith({onStateChange: () => {}})
-            : this;
+        return this.shouldApplyReadOnlySafeContext ? this.cloneWith({ onStateChange: () => {} }) : this;
     }
 
     mergeHostDataToState() {
@@ -294,7 +291,13 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             ? setAllShareState
             : this.puzzle.typeManager.setSharedState;
 
-        if (!finalSetSharedState || this.multiPlayer.isHost || !this.multiPlayer.isEnabled || !this.multiPlayer.isLoaded || !this.multiPlayer.hostData) {
+        if (
+            !finalSetSharedState ||
+            this.multiPlayer.isHost ||
+            !this.multiPlayer.isEnabled ||
+            !this.multiPlayer.isLoaded ||
+            !this.multiPlayer.hostData
+        ) {
             return;
         }
 
@@ -305,7 +308,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 {
                     currentPlayer: this.multiPlayer.hostData.currentPlayer,
                     playerObjects: this.multiPlayer.hostData.playerObjects,
-                }
+                },
             ),
         });
     }
@@ -328,7 +331,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 onStateChange: () => console.error("Unexpected state change inside of the messages loop!"),
             });
 
-            for (const {data: message, clientId} of messages) {
+            for (const { data: message, clientId } of messages) {
                 const {
                     type,
                     actionId,
@@ -349,7 +352,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                     },
                 } = message;
 
-                const actionType = allActionTypes.find(({key}) => key === type)!;
+                const actionType = allActionTypes.find(({ key }) => key === type)!;
 
                 // Execute the action in player's context
                 processedContext.update({
@@ -369,15 +372,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                             angle,
                             scale,
                         },
-                        this.puzzle.typeManager.unserializeInternalState?.(this.puzzle, otherState) ?? {}
+                        this.puzzle.typeManager.unserializeInternalState?.(this.puzzle, otherState) ?? {},
                     ),
                 });
 
-                const callback = actionType.callback(
-                    params,
-                    clientId,
-                    actionId,
-                );
+                const callback = actionType.callback(params, clientId, actionId);
 
                 myGameState = mergeGameStateWithUpdates(
                     myGameState,
@@ -394,11 +393,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
         return this.applyPendingMessages
             ? this.processMessages(
-                this.multiPlayer.myPendingMessages.map(({data}) => ({
-                    data,
-                    clientId: myClientId,
-                }))
-            )
+                  this.multiPlayer.myPendingMessages.map(({ data }) => ({
+                      data,
+                      clientId: myClientId,
+                  })),
+              )
             : this.myGameState;
     }
 
@@ -422,33 +421,33 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         function getCell(this: PuzzleContext<T>, top: number, left: number) {
             return this.cells[top]?.[left];
         },
-        {equals: (a, b) => areCellStatesEqual(this, a, b)}
+        { equals: (a, b) => areCellStatesEqual(this, a, b) },
     );
     readonly getCellDigit = computedFn(
         function getCellDigit(this: PuzzleContext<T>, top: number, left: number) {
             return this.getCell(top, left)?.usersDigit;
         },
-        {equals: comparer.structural}
+        { equals: comparer.structural },
     );
     // noinspection JSUnusedGlobalSymbols
     readonly getCellCenterDigits = computedFn(
         function getCellCenterDigits(this: PuzzleContext<T>, top: number, left: number) {
             return this.getCell(top, left)?.centerDigits.sorted();
         },
-        {equals: setComparer}
+        { equals: setComparer },
     );
     // noinspection JSUnusedGlobalSymbols
     readonly getCellCornerDigits = computedFn(
         function getCellCornerDigits(this: PuzzleContext<T>, top: number, left: number) {
             return this.getCell(top, left)?.cornerDigits.sorted();
         },
-        {equals: setComparer}
+        { equals: setComparer },
     );
     readonly getCellColors = computedFn(
         function getCellColors(this: PuzzleContext<T>, top: number, left: number) {
             return this.getCell(top, left)?.colors.sorted();
         },
-        {equals: setComparer}
+        { equals: setComparer },
     );
 
     get lines() {
@@ -469,16 +468,13 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get userDigits(): GivenDigitsMap<T["cell"]> {
         profiler.trace();
 
-        return mergeGivenDigitsMaps(
-            this.allInitialDigits,
-            gameStateGetCurrentGivenDigitsByCells(this.cells),
-        );
+        return mergeGivenDigitsMaps(this.allInitialDigits, gameStateGetCurrentGivenDigitsByCells(this.cells));
     }
     readonly getUserDigit = computedFn(
         function getUserDigit(this: PuzzleContext<T>, top: number, left: number): T["cell"] | undefined {
             return this.userDigits[top]?.[left];
         },
-        {equals: comparer.structural}
+        { equals: comparer.structural },
     );
     // endregion
 
@@ -527,10 +523,10 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     }
     get selectedCells() {
         profiler.trace();
-        return this.allSelectedCells.filter(({top, left}) => top % 1 === 0 && left % 1 === 0);
+        return this.allSelectedCells.filter(({ top, left }) => top % 1 === 0 && left % 1 === 0);
     }
     readonly isSelectedCell = computedFn(function isSelectedCell(this: PuzzleContext<T>, top: number, left: number) {
-        return this.allSelectedCells.contains({top, left});
+        return this.allSelectedCells.contains({ top, left });
     });
     get selectedCellsCount() {
         profiler.trace();
@@ -544,8 +540,12 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         profiler.trace();
         return this.selectedCells.last();
     }
-    readonly isLastSelectedCell = computedFn(function isLastSelectedCell(this: PuzzleContext<T>, top: number, left: number) {
-        const {lastSelectedCell} = this;
+    readonly isLastSelectedCell = computedFn(function isLastSelectedCell(
+        this: PuzzleContext<T>,
+        top: number,
+        left: number,
+    ) {
+        const { lastSelectedCell } = this;
         return lastSelectedCell?.top === top && lastSelectedCell?.left === left;
     });
 
@@ -643,18 +643,22 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         const result = this.puzzle.resultChecker?.(this) ?? false;
         return typeof result === "boolean"
             ? {
-                isCorrectResult: result,
-                resultPhrase: result
-                    ? (this.puzzle.successMessage ?? `${this.translate("Absolutely right")}!`)
-                    : `${this.translate("Something's wrong here")}...`
-            }
+                  isCorrectResult: result,
+                  resultPhrase: result
+                      ? (this.puzzle.successMessage ?? `${this.translate("Absolutely right")}!`)
+                      : `${this.translate("Something's wrong here")}...`,
+              }
             : {
-                isCorrectResult: result.isCorrectResult,
-                resultPhrase: typeof result.resultPhrase === "string" || (result.resultPhrase && typeof result.resultPhrase === "object" && LanguageCode.en in result.resultPhrase)
-                    ? this.translate(result.resultPhrase as PartiallyTranslatable<ReactNode>)
-                    : result.resultPhrase,
-                forceShowResult: result.forceShowResult,
-            };
+                  isCorrectResult: result.isCorrectResult,
+                  resultPhrase:
+                      typeof result.resultPhrase === "string" ||
+                      (result.resultPhrase &&
+                          typeof result.resultPhrase === "object" &&
+                          LanguageCode.en in result.resultPhrase)
+                          ? this.translate(result.resultPhrase as PartiallyTranslatable<ReactNode>)
+                          : result.resultPhrase,
+                  forceShowResult: result.forceShowResult,
+              };
     }
 
     get regionsForRowsAndColumns(): Constraint<T, any>[] {
@@ -663,9 +667,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         const {
             disableSudokuRules,
             typeManager: {
-                getRegionsForRowsAndColumns = disableSudokuRules
-                    ? (() => [])
-                    : getDefaultRegionsForRowsAndColumns,
+                getRegionsForRowsAndColumns = disableSudokuRules ? () => [] : getDefaultRegionsForRowsAndColumns,
             },
         } = this.puzzle;
 
@@ -675,53 +677,50 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get puzzleInitialColors() {
         profiler.trace();
 
-        const {puzzle: {initialColors = {}}} = this;
+        const {
+            puzzle: { initialColors = {} },
+        } = this;
 
-        return typeof initialColors === "function"
-            ? initialColors(this)
-            : initialColors;
+        return typeof initialColors === "function" ? initialColors(this) : initialColors;
     }
 
     get resolvedPuzzleItems(): Constraint<T, any>[] {
         profiler.trace();
 
-        const {items = []} = this.puzzle;
+        const { items = [] } = this.puzzle;
 
-        return typeof items === "function"
-            ? items(this)
-            : items;
+        return typeof items === "function" ? items(this) : items;
     }
 
     get resolvedStateItems(): Constraint<T, any>[] {
         profiler.trace();
 
-        const {items = []} = this.puzzle.typeManager;
+        const { items = [] } = this.puzzle.typeManager;
 
-        return typeof items === "function"
-            ? items(this)
-            : items;
+        return typeof items === "function" ? items(this) : items;
     }
 
     get defaultPuzzleItems(): Constraint<T, any>[] {
         profiler.trace();
 
-        const {regions = [], typeManager: {cosmeticRegions}} = this.puzzle;
+        const {
+            regions = [],
+            typeManager: { cosmeticRegions },
+        } = this.puzzle;
 
         return [
             FieldLinesConstraint(),
-            ...regions.map(
-                (region) => {
-                    if (Array.isArray(region)) {
-                        region = RegionConstraint<T>(region);
-                    }
-
-                    if (cosmeticRegions) {
-                        region = toDecorativeConstraint(region);
-                    }
-
-                    return region;
+            ...regions.map((region) => {
+                if (Array.isArray(region)) {
+                    region = RegionConstraint<T>(region);
                 }
-            ),
+
+                if (cosmeticRegions) {
+                    region = toDecorativeConstraint(region);
+                }
+
+                return region;
+            }),
             UserLinesConstraint(),
         ];
     }
@@ -729,12 +728,12 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     private get regionCellsIndex() {
         profiler.trace();
 
-        const map: GivenDigitsMap<{ index: number, cells: Position[] }> = {};
+        const map: GivenDigitsMap<{ index: number; cells: Position[] }> = {};
         for (const [index, region] of (this.puzzle.regions ?? []).entries()) {
             const cells = getRegionCells(region);
-            for (const {top, left} of cells) {
+            for (const { top, left } of cells) {
                 map[top] = map[top] ?? {};
-                map[top][left] = {index, cells};
+                map[top][left] = { index, cells };
             }
         }
 
@@ -757,21 +756,25 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     readonly getVisibleItemsForLayer = computedFn(
         function getVisibleItemsForLayer(this: PuzzleContext<T>, layer: FieldLayer) {
-            return this.allItems.filter(({component}) => component?.[layer]);
+            return this.allItems.filter(({ component }) => component?.[layer]);
         },
-        {equals: comparer.shallow}
+        { equals: comparer.shallow },
     );
 
     readonly getCellTransformedBounds = computedFn(function getCellTransformedBounds(
-        this: PuzzleContext<T>, top: number, left: number
+        this: PuzzleContext<T>,
+        top: number,
+        left: number,
     ): TransformedCustomCellBounds {
         return this.puzzleIndex.allCells[top][left].getTransformedBounds(this);
     });
 
     readonly isVisibleCellForState = computedFn(function isVisibleCellForState(
-        this: PuzzleContext<T>, top: number, left: number
+        this: PuzzleContext<T>,
+        top: number,
+        left: number,
     ) {
-        return this.puzzleIndex.getCellTypeProps({top, left}).isVisibleForState?.(this) !== false;
+        return this.puzzleIndex.getCellTypeProps({ top, left }).isVisibleForState?.(this) !== false;
     });
 
     get centerLineSegments() {
@@ -782,35 +785,34 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get isReady() {
         profiler.trace();
 
-        return !this.isReadonlyContext
-            && !this.multiPlayer.isDoubledConnected
-            && !(this.multiPlayer.isEnabled && (!this.multiPlayer.isLoaded || !this.multiPlayer.hostData))
-            && (this.puzzle.typeManager.isReady?.(this) ?? true);
+        return (
+            !this.isReadonlyContext &&
+            !this.multiPlayer.isDoubledConnected &&
+            !(this.multiPlayer.isEnabled && (!this.multiPlayer.isLoaded || !this.multiPlayer.hostData)) &&
+            (this.puzzle.typeManager.isReady?.(this) ?? true)
+        );
     }
 
     get isMyTurn() {
         profiler.trace();
 
-        return !this.multiPlayer.isEnabled
-            || this.currentPlayer === myClientId
-            || !!this.puzzle.params?.share;
+        return !this.multiPlayer.isEnabled || this.currentPlayer === myClientId || !!this.puzzle.params?.share;
     }
 
     get lastPlayerObjects(): Record<string, boolean> {
         profiler.trace();
 
         if (this.multiPlayer.isEnabled) {
-            let sortedPlayerObjects = Object.entries(this.playerObjects)
-                .sort(([, a], [, b]) => b.index - a.index);
+            let sortedPlayerObjects = Object.entries(this.playerObjects).sort(([, a], [, b]) => b.index - a.index);
             if (sortedPlayerObjects.length) {
-                const [, {clientId: lastClientId}] = sortedPlayerObjects[0];
-                const lastPrevClientIdIndex = sortedPlayerObjects.findIndex(([, {clientId}]) => clientId !== lastClientId);
+                const [, { clientId: lastClientId }] = sortedPlayerObjects[0];
+                const lastPrevClientIdIndex = sortedPlayerObjects.findIndex(
+                    ([, { clientId }]) => clientId !== lastClientId,
+                );
                 if (lastPrevClientIdIndex >= 0) {
                     sortedPlayerObjects = sortedPlayerObjects.slice(0, lastPrevClientIdIndex);
                 }
-                return Object.fromEntries(
-                    sortedPlayerObjects.map(([key]) => [key, true])
-                )
+                return Object.fromEntries(sortedPlayerObjects.map(([key]) => [key, true]));
             }
         }
 
@@ -820,19 +822,13 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     get scaleLog() {
         profiler.trace();
 
-        return getScaleLog(
-            this.scale,
-            this.puzzle.typeManager.scaleStep
-        );
+        return getScaleLog(this.scale, this.puzzle.typeManager.scaleStep);
     }
 
     get animatedScaleLog() {
         profiler.trace();
 
-        return getScaleLog(
-            this.animatedScale,
-            this.puzzle.typeManager.scaleStep
-        );
+        return getScaleLog(this.animatedScale, this.puzzle.typeManager.scaleStep);
     }
 
     get visibleCellWriteModeInfos() {
@@ -850,21 +846,21 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
         return this.applyKeys
             ? getFinalCellWriteMode(
-                controlKeysState,
-                this.persistentCellWriteMode,
-                this.gestureCellWriteMode,
-                this.allCellWriteModeInfos,
-                this.isReadonlyContext
-            )
-            : this.gestureCellWriteMode ?? this.persistentCellWriteMode;
+                  controlKeysState,
+                  this.persistentCellWriteMode,
+                  this.gestureCellWriteMode,
+                  this.allCellWriteModeInfos,
+                  this.isReadonlyContext,
+              )
+            : (this.gestureCellWriteMode ?? this.persistentCellWriteMode);
     }
 
     get cellWriteModeInfo() {
         profiler.trace();
 
-        const {cellWriteMode} = this;
+        const { cellWriteMode } = this;
 
-        return this.allCellWriteModeInfos.find(({mode}) => mode === cellWriteMode)!;
+        return this.allCellWriteModeInfos.find(({ mode }) => mode === cellWriteMode)!;
     }
 
     get lmdSolutionCode() {
@@ -879,12 +875,16 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     get fogVisibleCells() {
         profiler.trace();
-        const {fogProps} = this;
+        const { fogProps } = this;
         return fogProps && getFogVisibleCells(this, fogProps);
     }
 
     get disableFogDemo(): boolean {
-        const {puzzle: {typeManager: {disableFogDemo}}} = this;
+        const {
+            puzzle: {
+                typeManager: { disableFogDemo },
+            },
+        } = this;
 
         return typeof disableFogDemo === "function" ? disableFogDemo(this) : !!disableFogDemo;
     }
@@ -896,39 +896,31 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     get digitsCount() {
         profiler.trace();
-        return this.importOptionOverrides.digitsCount
-            ?? this.puzzle.digitsCount
-            ?? getDefaultDigitsCount(this.puzzle);
+        return this.importOptionOverrides.digitsCount ?? this.puzzle.digitsCount ?? getDefaultDigitsCount(this.puzzle);
     }
 
     get digitsCountInCurrentMode() {
         profiler.trace();
 
-        const {supportZero} = this.puzzle;
+        const { supportZero } = this.puzzle;
 
-        const {
-            isDigitMode,
-            digitsCount: digitsCountFunc = this.digitsCount + (isDigitMode && supportZero ? 1 : 0),
-        } = this.cellWriteModeInfo;
+        const { isDigitMode, digitsCount: digitsCountFunc = this.digitsCount + (isDigitMode && supportZero ? 1 : 0) } =
+            this.cellWriteModeInfo;
 
-        return typeof digitsCountFunc === "function"
-            ? digitsCountFunc(this)
-            : digitsCountFunc;
+        return typeof digitsCountFunc === "function" ? digitsCountFunc(this) : digitsCountFunc;
     }
 
     translate<PhraseT = string>(phrase: PartiallyTranslatable<PhraseT>) {
         return translate(phrase, this.languageCode);
     }
 
-    onStateChange(
-        actionsOrCallbacks: GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[],
-    ) {
+    onStateChange(actionsOrCallbacks: GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[]) {
         if (this._onStateChange) {
             this._onStateChange(actionsOrCallbacks);
             return;
         }
 
-        const {isEnabled, isHost} = this.multiPlayer;
+        const { isEnabled, isHost } = this.multiPlayer;
 
         actionsOrCallbacks = actionsOrCallbacks instanceof Array ? actionsOrCallbacks : [actionsOrCallbacks];
 
@@ -942,18 +934,26 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             const asAction = actionOrCallback as GameStateAction<any, T>;
             const isAction = typeof asAction.type === "object";
 
-            if (!isAction || !isEnabled || isHost || (!this.puzzle.params?.share && !this.puzzle.typeManager.isGlobalAction?.(asAction, processedContext))) {
+            if (
+                !isAction ||
+                !isEnabled ||
+                isHost ||
+                (!this.puzzle.params?.share && !this.puzzle.typeManager.isGlobalAction?.(asAction, processedContext))
+            ) {
                 const callback = isAction
                     ? asAction.type.callback(asAction.params, myClientId, asAction.actionId)
-                    : actionOrCallback as PartialGameStateEx<T> | GameStateActionCallback<T>;
+                    : (actionOrCallback as PartialGameStateEx<T> | GameStateActionCallback<T>);
 
                 const updates = typeof callback === "function" ? callback(processedContext) : callback;
                 if (updates.selectedCells) {
                     updates.selectedCells = updates.selectedCells.filter((cell) =>
-                        isSelectableCell(processedContext.puzzleIndex.getCellTypeProps(cell)));
+                        isSelectableCell(processedContext.puzzleIndex.getCellTypeProps(cell)),
+                    );
                 }
 
-                processedContext.update({myGameState: mergeGameStateWithUpdates(processedContext.myGameState, updates)});
+                processedContext.update({
+                    myGameState: mergeGameStateWithUpdates(processedContext.myGameState, updates),
+                });
             } else {
                 this.multiPlayer.sendMessage({
                     type: asAction.type.key,
@@ -977,7 +977,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             }
         }
 
-        this.update({myGameState: processedContext.myGameState});
+        this.update({ myGameState: processedContext.myGameState });
     }
 }
 
@@ -993,7 +993,7 @@ export const createEmptyContextForPuzzle = <T extends AnyPTM>(
     return new PuzzleContext({
         puzzle,
         myGameState: emptyGameState
-            ? emptyObject as unknown as GameStateEx<T>
+            ? (emptyObject as unknown as GameStateEx<T>)
             : getEmptyGameState(puzzle, false, true),
         cellSize,
         cellSizeForSidePanel: cellSize,

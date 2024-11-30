@@ -1,4 +1,4 @@
-import {HashSet} from "../struct/Set";
+import { HashSet } from "../struct/Set";
 
 export interface ColorChecker<T extends string | number> {
     isValidData(actualColor: string, expectedData: T): boolean;
@@ -40,8 +40,10 @@ export class ExactColorChecker implements ColorChecker<string> {
             expectedColor = this.unshadedCellColor = actualColor;
         }
 
-        return actualColor === expectedColor
-            && (this.unshadedCellColor === undefined || !this.usedSolutionColors[this.unshadedCellColor]);
+        return (
+            actualColor === expectedColor &&
+            (this.unshadedCellColor === undefined || !this.usedSolutionColors[this.unshadedCellColor])
+        );
     }
 
     isValidPuzzle() {

@@ -1,31 +1,32 @@
-import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {FieldLayer} from "../../types/sudoku/FieldLayer";
-import {observer} from "mobx-react-lite";
-import {RoundedPolyLine} from "../../components/svg/rounded-poly-line/RoundedPolyLine";
-import {darkGreyColor, greenColor, purpleColor, veryDarkGreyColor} from "../../components/app/globals";
-import {AutoSvg} from "../../components/svg/auto-svg/AutoSvg";
-import {rafTime} from "../../hooks/useRaf";
-import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
-import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
-import {AddGameStateEx, addGameStateExToSudokuManager} from "../../types/sudoku/SudokuTypeManagerPlugin";
-import {SudokuTypeManager} from "../../types/sudoku/SudokuTypeManager";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { observer } from "mobx-react-lite";
+import { RoundedPolyLine } from "../../components/svg/rounded-poly-line/RoundedPolyLine";
+import { darkGreyColor, greenColor, purpleColor, veryDarkGreyColor } from "../../components/app/globals";
+import { AutoSvg } from "../../components/svg/auto-svg/AutoSvg";
+import { rafTime } from "../../hooks/useRaf";
+import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
+import { AddGameStateEx, addGameStateExToSudokuManager } from "../../types/sudoku/SudokuTypeManagerPlugin";
+import { SudokuTypeManager } from "../../types/sudoku/SudokuTypeManager";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import {
     germanWhispersExplained,
     germanWhispersTitle,
-    normalSudokuRulesApply, renbanExplained,
+    normalSudokuRulesApply,
+    renbanExplained,
     renbanTitle,
-    ruleWithTitle
+    ruleWithTitle,
 } from "../ruleSnippets";
-import {makeAutoObservable, runInAction} from "mobx";
-import {profiler} from "../../utils/profiler";
-import {Button} from "../../components/layout/button/Button";
-import {loop} from "../../utils/math";
+import { makeAutoObservable, runInAction } from "mobx";
+import { profiler } from "../../utils/profiler";
+import { Button } from "../../components/layout/button/Button";
+import { loop } from "../../utils/math";
 
 const period = 3000;
 
@@ -108,9 +109,9 @@ type IsReadyPTM = AddGameStateEx<NumberPTM, IsReadyGameStateEx, {}>;
 
 const IsReadyTypeManager: SudokuTypeManager<IsReadyPTM> = {
     ...addGameStateExToSudokuManager(DigitSudokuTypeManager(), {
-        initialGameStateExtension: {isReady: false},
+        initialGameStateExtension: { isReady: false },
     }),
-    isReady({stateExtension: {isReady}}) {
+    isReady({ stateExtension: { isReady } }) {
         return isReady;
     },
     // Use the method just to handle the restart event, not to actually keep the state
@@ -126,141 +127,156 @@ const LinkageConstraint: Constraint<IsReadyPTM> = {
     cells: [],
     props: undefined,
     component: {
-        [FieldLayer.regular]: observer(function Linkage({context: {stateExtension: {isReady}}}) {
-            const angle = Math.cos(lineSync.time * 2 * Math.PI / period) * Math.PI / 2;
+        [FieldLayer.regular]: observer(function Linkage({
+            context: {
+                stateExtension: { isReady },
+            },
+        }) {
+            const angle = (Math.cos((lineSync.time * 2 * Math.PI) / period) * Math.PI) / 2;
 
-            const p0 = {left: 0, top: 0};
-            const p1 = {left: 1, top: 0};
+            const p0 = { left: 0, top: 0 };
+            const p1 = { left: 1, top: 0 };
 
             const x2 = 1 + Math.cos(angle);
             const y2 = Math.sin(angle);
             const len2 = Math.hypot(x2, y2);
-            const p2 = {left: x2, top: y2};
+            const p2 = { left: x2, top: y2 };
 
             const x3 = -1;
             const y3 = -y2 / x2;
-            const p3 = {left: x3, top: y3};
+            const p3 = { left: x3, top: y3 };
 
             const cx = (x2 + x3) / 2;
             const cy = (y2 + y3) / 2;
             const cLen = Math.hypot(cx, cy);
 
             const len4 = Math.sqrt(2 - cLen * cLen);
-            const dx = len4 * y2 / len2;
-            const dy = len4 * x2 / len2;
+            const dx = (len4 * y2) / len2;
+            const dy = (len4 * x2) / len2;
             const x4 = cx + dx;
             const y4 = cy - dy;
-            const p4 = {left: x4, top: y4};
+            const p4 = { left: x4, top: y4 };
             const x5 = cx - dx;
             const y5 = cy + dy;
-            const p5 = {left: x5, top: y5};
+            const p5 = { left: x5, top: y5 };
 
-            return <AutoSvg left={4.5} top={4.5} scale={2}>
-                {!isReady && <line
-                    x1={-1}
-                    y1={-1}
-                    x2={-1}
-                    y2={1}
-                    stroke={darkGreyColor}
-                    strokeWidth={0.02}
-                />}
+            return (
+                <AutoSvg left={4.5} top={4.5} scale={2}>
+                    {!isReady && <line x1={-1} y1={-1} x2={-1} y2={1} stroke={darkGreyColor} strokeWidth={0.02} />}
 
-                <RoundedPolyLine
-                    points={[p2, p4, p3, p5, p2]}
-                    strokeWidth={0.075}
-                    stroke={greenColor}
-                />
+                    <RoundedPolyLine points={[p2, p4, p3, p5, p2]} strokeWidth={0.075} stroke={greenColor} />
 
-                <RoundedPolyLine
-                    points={[p4, p0, p1, p2]}
-                    strokeWidth={0.06}
-                    stroke={purpleColor}
-                />
+                    <RoundedPolyLine points={[p4, p0, p1, p2]} strokeWidth={0.06} stroke={purpleColor} />
 
-                <RoundedPolyLine
-                    points={[p0, p5]}
-                    strokeWidth={0.06}
-                    stroke={purpleColor}
-                />
+                    <RoundedPolyLine points={[p0, p5]} strokeWidth={0.06} stroke={purpleColor} />
 
-                {(!isReady || lineSync.ending) && [p0, p1, p2, p3, p4, p5].map(({top, left}, index) => <circle
-                    key={index}
-                    cx={left}
-                    cy={top}
-                    r={0.055}
-                    fill={veryDarkGreyColor}
-                    stroke={"none"}
-                    strokeWidth={0}
-                    opacity={1 - lineSync.endAnimationCoeff}
-                />)}
-            </AutoSvg>;
+                    {(!isReady || lineSync.ending) &&
+                        [p0, p1, p2, p3, p4, p5].map(({ top, left }, index) => (
+                            <circle
+                                key={index}
+                                cx={left}
+                                cy={top}
+                                r={0.055}
+                                fill={veryDarkGreyColor}
+                                stroke={"none"}
+                                strokeWidth={0}
+                                opacity={1 - lineSync.endAnimationCoeff}
+                            />
+                        ))}
+                </AutoSvg>
+            );
         }),
-    }
+    },
 };
 
 export const PeaucellierLipkinLinkage: PuzzleDefinition<IsReadyPTM> = {
     noIndex: true,
-    title: {[LanguageCode.en]: "Peaucellier-Lipkin"},
-    author: {[LanguageCode.en]: "Palfly Kampling"},
+    title: { [LanguageCode.en]: "Peaucellier-Lipkin" },
+    author: { [LanguageCode.en]: "Palfly Kampling" },
     slug: "peaucellier-lipkin-linkage",
     typeManager: IsReadyTypeManager,
     fieldSize: FieldSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,
     rules: (translate, context) => {
-        const {stateExtension: {isReady}, cellSizeForSidePanel: cellSize} = context;
+        const {
+            stateExtension: { isReady },
+            cellSizeForSidePanel: cellSize,
+        } = context;
 
-        const setReady = () => context.onStateChange({extension: {isReady: true}});
+        const setReady = () => context.onStateChange({ extension: { isReady: true } });
 
-        return <>
-            {!isReady && <>
-                <RulesParagraph>{translate({
-                    [LanguageCode.en]: "This puzzle is based on a planar linkage that draws perfectly straight lines",
-                    [LanguageCode.ru]: "Эта головоломка основана на 2D-механизме, который может рисовать идеальную прямую линию",
-                    [LanguageCode.de]: "Dieses Rätsel ist basiert auf einem 2D Mechanismus der eine perfekte gerade linie zeichnen kann",
-                })}.</RulesParagraph>
+        return (
+            <>
+                {!isReady && (
+                    <>
+                        <RulesParagraph>
+                            {translate({
+                                [LanguageCode.en]:
+                                    "This puzzle is based on a planar linkage that draws perfectly straight lines",
+                                [LanguageCode.ru]:
+                                    "Эта головоломка основана на 2D-механизме, который может рисовать идеальную прямую линию",
+                                [LanguageCode.de]:
+                                    "Dieses Rätsel ist basiert auf einem 2D Mechanismus der eine perfekte gerade linie zeichnen kann",
+                            })}
+                            .
+                        </RulesParagraph>
 
-                {!lineSync.started && <RulesParagraph>
-                    <Button
-                        cellSize={cellSize}
-                        onClick={() => lineSync.start()}
-                    >
-                        {translate({
-                            [LanguageCode.en]: "Show me",
-                            [LanguageCode.ru]: "Покажи мне",
-                            [LanguageCode.de]: "Zeig mir",
-                        })}!
-                    </Button>
-                </RulesParagraph>}
+                        {!lineSync.started && (
+                            <RulesParagraph>
+                                <Button cellSize={cellSize} onClick={() => lineSync.start()}>
+                                    {translate({
+                                        [LanguageCode.en]: "Show me",
+                                        [LanguageCode.ru]: "Покажи мне",
+                                        [LanguageCode.de]: "Zeig mir",
+                                    })}
+                                    !
+                                </Button>
+                            </RulesParagraph>
+                        )}
 
-                {lineSync.started && <RulesParagraph>
-                    <Button
-                        cellSize={cellSize}
-                        disabled={lineSync.ending}
-                        onClick={() => lineSync.end().then(setReady)}
-                    >
-                        {translate({
-                            [LanguageCode.en]: "Gotcha",
-                            [LanguageCode.ru]: "Понятненько",
-                            [LanguageCode.de]: "Verstanden",
-                        })}!
-                    </Button>
-                </RulesParagraph>}
-            </>}
+                        {lineSync.started && (
+                            <RulesParagraph>
+                                <Button
+                                    cellSize={cellSize}
+                                    disabled={lineSync.ending}
+                                    onClick={() => lineSync.end().then(setReady)}
+                                >
+                                    {translate({
+                                        [LanguageCode.en]: "Gotcha",
+                                        [LanguageCode.ru]: "Понятненько",
+                                        [LanguageCode.de]: "Verstanden",
+                                    })}
+                                    !
+                                </Button>
+                            </RulesParagraph>
+                        )}
+                    </>
+                )}
 
-            {isReady && <>
-                <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-                <RulesParagraph>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</RulesParagraph>
-                <RulesParagraph>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</RulesParagraph>
-                <RulesParagraph>{translate({
-                    [LanguageCode.en]: "The line in box 5 is one 9-cell line",
-                    [LanguageCode.ru]: "Линия в квадрате 5 - это одна линия из 9 клеток",
-                    [LanguageCode.de]: "Die Linie in Box 5 ist eine 9-zellige Linie",
-                })}.</RulesParagraph>
-            </>}
-        </>;
+                {isReady && (
+                    <>
+                        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+                        <RulesParagraph>
+                            {ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.
+                        </RulesParagraph>
+                        <RulesParagraph>
+                            {ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.
+                        </RulesParagraph>
+                        <RulesParagraph>
+                            {translate({
+                                [LanguageCode.en]: "The line in box 5 is one 9-cell line",
+                                [LanguageCode.ru]: "Линия в квадрате 5 - это одна линия из 9 клеток",
+                                [LanguageCode.de]: "Die Linie in Box 5 ist eine 9-zellige Linie",
+                            })}
+                            .
+                        </RulesParagraph>
+                    </>
+                )}
+            </>
+        );
     },
-    initialDigits: {5: {5: 1}},
+    initialDigits: { 5: { 5: 1 } },
     items: [
         LinkageConstraint,
 
@@ -280,7 +296,10 @@ export const PeaucellierLipkinLinkage: PuzzleDefinition<IsReadyPTM> = {
         ...[
             WhispersConstraint<IsReadyPTM>(["R3C3", "R3C7", "R7C7", "R7C3"]),
             WhispersConstraint<IsReadyPTM>(["R3C3", "R7C3"]),
-            RenbanConstraint<IsReadyPTM>(["R7C3", "R6C4", "R5C5", "R4C6", "R3C7", "R5C6", "R5C7", "R6C7", "R7C7"], false),
+            RenbanConstraint<IsReadyPTM>(
+                ["R7C3", "R6C4", "R5C5", "R4C6", "R3C7", "R5C6", "R5C7", "R6C7", "R7C7"],
+                false,
+            ),
         ].map((constraint) => ({
             ...constraint,
             component: undefined,

@@ -1,10 +1,10 @@
-import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {PuzzleImporter} from "./PuzzleImporter";
-import {parsePositionLiteral, Position, PositionLiteral} from "../../types/layout/Position";
-import {CellColor} from "../../types/sudoku/CellColor";
-import {FieldSize} from "../../types/sudoku/FieldSize";
-import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
-import {Rect} from "../../types/layout/Rect";
+import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { PuzzleImporter } from "./PuzzleImporter";
+import { parsePositionLiteral, Position, PositionLiteral } from "../../types/layout/Position";
+import { CellColor } from "../../types/sudoku/CellColor";
+import { FieldSize } from "../../types/sudoku/FieldSize";
+import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
+import { Rect } from "../../types/layout/Rect";
 
 export abstract class GridParser<T extends AnyPTM, JsonT> {
     public readonly outsideBounds: Rect;
@@ -18,7 +18,7 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
         public colorsMap: Record<string, CellColor>,
         public importOptionOverrides: Partial<PuzzleImportOptions>,
     ) {
-        this.outsideBounds = {...bounds};
+        this.outsideBounds = { ...bounds };
     }
 
     abstract addToImporter(importer: PuzzleImporter<T>): void;
@@ -37,7 +37,7 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     }
 
     get regionWidth() {
-        const {rowsCount} = this;
+        const { rowsCount } = this;
 
         let bestHeight = 1;
 
@@ -63,7 +63,7 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     }
 
     offsetCoords(position: PositionLiteral): Position {
-        const {top, left} = parsePositionLiteral(position);
+        const { top, left } = parsePositionLiteral(position);
         return {
             top: top + this.offsetY,
             left: left + this.offsetX,
@@ -74,7 +74,7 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     }
 
     extendOutsideBoundsByCells(cells: Position[]) {
-        let {left, top, width, height} = this.outsideBounds;
+        let { left, top, width, height } = this.outsideBounds;
 
         let right = left + width;
         let bottom = top + height;

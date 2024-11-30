@@ -7,7 +7,7 @@ import {
     purpleColor,
     redColor,
     veryDarkGreyColor,
-    yellowColor
+    yellowColor,
 } from "../../components/app/globals";
 
 export enum CellColor {
@@ -40,4 +40,5 @@ export const cellColors: Record<CellColor, string> = {
 
 export type CellColorValue = CellColor | string;
 
-export const resolveCellColorValue = (value: CellColorValue) => typeof value === "string" ? value : cellColors[value as CellColor];
+export const resolveCellColorValue = (value: CellColorValue) =>
+    typeof value === "string" ? value : cellColors[value as CellColor];

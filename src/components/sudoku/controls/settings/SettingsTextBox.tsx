@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {textColor, textHeightCoeff} from "../../../app/globals";
+import { textColor, textHeightCoeff } from "../../../app/globals";
 
 interface SettingsTextBoxProps {
     cellSize: number;
@@ -9,8 +9,8 @@ interface SettingsTextBoxProps {
 export const SettingsTextBox = styled("input", {
     shouldForwardProp(propName) {
         return propName !== "cellSize";
-    }
-})(({cellSize}: SettingsTextBoxProps) => ({
+    },
+})(({ cellSize }: SettingsTextBoxProps) => ({
     padding: "0.25em",
     margin: 0,
     width: cellSize * 2,

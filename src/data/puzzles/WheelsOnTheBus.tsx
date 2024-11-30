@@ -1,19 +1,19 @@
 import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
-    PuzzleDefinition
+    PuzzleDefinition,
 } from "../../types/sudoku/PuzzleDefinition";
-import {RotatableCluesPTM} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {RotatableCluesSudokuTypeManager} from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {createWheel} from "../../components/sudoku/constraints/wheel/Wheel";
-import {createGivenDigitsMapFromArray} from "../../types/sudoku/GivenDigitsMap";
-import {indexes} from "../../utils/indexes";
-import {DisjointGroupsConstraint} from "../../types/sudoku/constraints/DisjointGroups";
+import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { RotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { createWheel } from "../../components/sudoku/constraints/wheel/Wheel";
+import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
+import { indexes } from "../../utils/indexes";
+import { DisjointGroupsConstraint } from "../../types/sudoku/constraints/DisjointGroups";
 
 const U = undefined;
 
@@ -27,7 +27,7 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Wheels on the Bus",
     },
-    typeManager: RotatableCluesSudokuTypeManager({baseTypeManager: DigitSudokuTypeManager(), isEquivalentLoop: true}),
+    typeManager: RotatableCluesSudokuTypeManager({ baseTypeManager: DigitSudokuTypeManager(), isEquivalentLoop: true }),
     fieldSize: FieldSize9,
     regions: Regions9,
     extension: {
@@ -43,18 +43,19 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
             createWheel("R8C8", 3, 9, U, 7),
         ],
     },
-    rules: () => <>
-        <RulesParagraph>Normal sudoku rules apply.</RulesParagraph>
-        <RulesParagraph>
-            Disjoint Groups: Cells in the same relative position in different boxes cannot contain the same digits.
-        </RulesParagraph>
-        <RulesParagraph>
-            Wheels: Digits in a circle have to be placed in the same circular order in the four cells that are touched by the circle.
-            The circle have to be rotated 90° clockwise N times from the current position.
-            N is the digit in the cell inside the circle.
-            Example: R2C8=6, then R1C8=8 and R2C9=4.
-        </RulesParagraph>
-    </>,
+    rules: () => (
+        <>
+            <RulesParagraph>Normal sudoku rules apply.</RulesParagraph>
+            <RulesParagraph>
+                Disjoint Groups: Cells in the same relative position in different boxes cannot contain the same digits.
+            </RulesParagraph>
+            <RulesParagraph>
+                Wheels: Digits in a circle have to be placed in the same circular order in the four cells that are
+                touched by the circle. The circle have to be rotated 90° clockwise N times from the current position. N
+                is the digit in the cell inside the circle. Example: R2C8=6, then R1C8=8 and R2C9=4.
+            </RulesParagraph>
+        </>
+    ),
     items: [DisjointGroupsConstraint(3)],
     allowDrawing: allDrawingModes,
     solution: createGivenDigitsMapFromArray([
@@ -78,8 +79,14 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
             return false;
         }
 
-        const {puzzle: {solution}} = context;
-        if ([1, 4, 7].every((top) => [1, 4, 7].every((left) => context.getCell(top, left)?.usersDigit === solution?.[top]?.[left]))) {
+        const {
+            puzzle: { solution },
+        } = context;
+        if (
+            [1, 4, 7].every((top) =>
+                [1, 4, 7].every((left) => context.getCell(top, left)?.usersDigit === solution?.[top]?.[left]),
+            )
+        ) {
             return {
                 isCorrectResult: false,
                 forceShowResult: true,

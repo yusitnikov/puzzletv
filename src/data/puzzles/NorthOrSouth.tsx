@@ -1,17 +1,17 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {XMarkConstraint} from "../../components/sudoku/constraints/xv/XV";
-import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { XMarkConstraint } from "../../components/sudoku/constraints/xv/XV";
+import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
 import React from "react";
-import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
-import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
-import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {RotatableDigitSudokuTypeManager} from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {Chameleon} from "../authors";
+import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
+import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
+import { KillerCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RotatableDigitSudokuTypeManager } from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { Chameleon } from "../authors";
 import {
     antiKnightRulesApply,
     antiKnightRulesExplained,
@@ -31,13 +31,13 @@ import {
     arrowsTitle,
     germanWhispersTitle,
     germanWhispersExplained,
-    antiKnight
+    antiKnight,
 } from "../ruleSnippets";
-import {rotatableSudokuRules} from "../../sudokuTypes/rotatable/data/ruleSnippets";
-import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {RotatableDigitPTM} from "../../sudokuTypes/rotatable/types/RotatablePTM";
-import {indexes} from "../../utils/indexes";
+import { rotatableSudokuRules } from "../../sudokuTypes/rotatable/data/ruleSnippets";
+import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
+import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { RotatableDigitPTM } from "../../sudokuTypes/rotatable/types/RotatablePTM";
+import { indexes } from "../../utils/indexes";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
@@ -47,37 +47,48 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
     },
     slug: "north-or-south",
     author: Chameleon,
-    rules: translate => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
-        <RulesParagraph>{ruleWithTitle(translate(antiKnightRulesApply), translate(antiKnightRulesExplained))}.</RulesParagraph>
-        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
-        <RulesUnorderedList>
-            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
-            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>
-            <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
-            <li>{ruleWithTitle(translate(kropkiDotsTitle), translate(blackKropkiDotsExplained))}.</li>
-            <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
-            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
-        </RulesUnorderedList>
-        <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
+            <RulesParagraph>
+                {ruleWithTitle(translate(antiKnightRulesApply), translate(antiKnightRulesExplained))}.
+            </RulesParagraph>
+            <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+            <RulesUnorderedList>
+                <li>
+                    {ruleWithTitle(
+                        translate(killerCagesTitle),
+                        translate(killerCagesExplained),
+                        translate(cannotRepeatInCage),
+                    )}
+                    .
+                </li>
+                <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>
+                <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
+                <li>{ruleWithTitle(translate(kropkiDotsTitle), translate(blackKropkiDotsExplained))}.</li>
+                <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
+                <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
+            </RulesUnorderedList>
+            <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
+        </>
+    ),
     typeManager: RotatableDigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
     initialDigits: {
         0: {
-            0: {digit: 6},
+            0: { digit: 6 },
         },
         4: {
-            2: {digit: 6},
+            2: { digit: 6 },
         },
         5: {
-            0: {digit: 9},
+            0: { digit: 9 },
         },
         8: {
-            4: {digit: 5},
-            5: {digit: 2},
+            4: { digit: 5 },
+            5: { digit: 2 },
         },
     },
     items: [
@@ -103,36 +114,47 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
         [LanguageCode.ru]: "Север или юг? (v2)",
     },
     slug: "north-or-south2",
-    rules: translate => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
-        <RulesParagraph>{ruleWithTitle(translate(antiKnightRulesApply), translate(antiKnightRulesExplained))}.</RulesParagraph>
-        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
-        <RulesUnorderedList>
-            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
-            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>
-            <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
-            <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
-            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
-        </RulesUnorderedList>
-        <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
+            <RulesParagraph>
+                {ruleWithTitle(translate(antiKnightRulesApply), translate(antiKnightRulesExplained))}.
+            </RulesParagraph>
+            <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+            <RulesUnorderedList>
+                <li>
+                    {ruleWithTitle(
+                        translate(killerCagesTitle),
+                        translate(killerCagesExplained),
+                        translate(cannotRepeatInCage),
+                    )}
+                    .
+                </li>
+                <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.</li>
+                <li>{ruleWithTitle(translate(thermometersTitle), translate(thermometersExplained))}.</li>
+                <li>{ruleWithTitle("XV", translate(xExplained))}.</li>
+                <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
+            </RulesUnorderedList>
+            <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
+        </>
+    ),
     initialDigits: {
         2: {
-            4: {digit: 1},
+            4: { digit: 1 },
         },
         4: {
-            2: {digit: 6},
+            2: { digit: 6 },
         },
         5: {
-            0: {digit: 9},
+            0: { digit: 9 },
         },
         6: {
-            3: {digit: 5},
-            4: {digit: 2},
+            3: { digit: 5 },
+            4: { digit: 2 },
         },
         8: {
-            8: {digit: 2},
+            8: { digit: 2 },
         },
     },
     items: [
@@ -155,10 +177,16 @@ export const NorthOrSouth2ShortRules: typeof NorthOrSouth = {
     ...NorthOrSouth2,
     noIndex: true,
     slug: "north-or-south2-sr",
-    rules: translate => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
-        <RulesParagraph>{translate(antiKnight)}, {translate(killerCagesTitle).toLowerCase()}, {translate(arrowsTitle).toLowerCase()}, {translate(thermometersTitle).toLowerCase()}, XV (no negative constraint), {translate(germanWhispersTitle).toLowerCase()}.</RulesParagraph>
-        <RulesParagraph>Please note that killer cage clues also do rotate.</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
+            <RulesParagraph>
+                {translate(antiKnight)}, {translate(killerCagesTitle).toLowerCase()},{" "}
+                {translate(arrowsTitle).toLowerCase()}, {translate(thermometersTitle).toLowerCase()}, XV (no negative
+                constraint), {translate(germanWhispersTitle).toLowerCase()}.
+            </RulesParagraph>
+            <RulesParagraph>Please note that killer cage clues also do rotate.</RulesParagraph>
+        </>
+    ),
 };

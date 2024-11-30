@@ -1,4 +1,4 @@
-import {trace} from "mobx";
+import { trace } from "mobx";
 
 class Profiler {
     enabled: boolean;
@@ -12,8 +12,10 @@ class Profiler {
     flush() {
         if (this.enabled) {
             console.debug(`[${this.runId}]`);
-            for (const [key, {count, time}] of Object.entries(this.data)) {
-                console.debug(`[${this.runId}] [${key}] ${time.toFixed(3)}s / ${count} = ${(time / count).toFixed(3 + count.toString().length)}s`);
+            for (const [key, { count, time }] of Object.entries(this.data)) {
+                console.debug(
+                    `[${this.runId}] [${key}] ${time.toFixed(3)}s / ${count} = ${(time / count).toFixed(3 + count.toString().length)}s`,
+                );
             }
 
             let changed = 0;
@@ -39,7 +41,7 @@ class Profiler {
     }
 
     private _track(key: string, time: number) {
-        this.data[key] = this.data[key] || {count: 0, time: 0};
+        this.data[key] = this.data[key] || { count: 0, time: 0 };
         ++this.data[key].count;
         this.data[key].time += time;
     }
@@ -51,7 +53,10 @@ class Profiler {
         });
     }
 
-    wrapFunc<TArgs extends Array<any>, TResult>(key: string, func: (...args: TArgs) => TResult): (...args: TArgs) => TResult {
+    wrapFunc<TArgs extends Array<any>, TResult>(
+        key: string,
+        func: (...args: TArgs) => TResult,
+    ): (...args: TArgs) => TResult {
         return (...args: TArgs) => {
             const tracker = this.track(key);
             try {
@@ -73,7 +78,7 @@ export const profiler = new Profiler();
 
 if (profiler.enabled) {
     const nativeConsoleLog = console.log.bind(console);
-    console.log = function(...args) {
+    console.log = function (...args) {
         const message = args[0];
         if (typeof message === "string" && message.startsWith("[mobx.trace] ")) {
             console.debug(...args);

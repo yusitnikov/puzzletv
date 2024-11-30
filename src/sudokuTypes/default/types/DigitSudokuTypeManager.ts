@@ -1,8 +1,8 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {RegularDigitComponentType} from "../../../components/sudoku/digit/RegularDigit";
-import {DigitCellDataComponentType} from "../components/DigitCellData";
-import {DigitComponentType} from "../../../components/sudoku/digit/DigitComponentType";
-import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { RegularDigitComponentType } from "../../../components/sudoku/digit/RegularDigit";
+import { DigitCellDataComponentType } from "../components/DigitCellData";
+import { DigitComponentType } from "../../../components/sudoku/digit/DigitComponentType";
+import { AnyNumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 
 export const DigitSudokuTypeManager = <T extends AnyNumberPTM>(
     digitComponentType: DigitComponentType<T> = RegularDigitComponentType(),

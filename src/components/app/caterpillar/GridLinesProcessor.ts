@@ -1,7 +1,7 @@
-import {Rect} from "../../../types/layout/Rect";
-import {Position} from "../../../types/layout/Position";
-import {getRegionBorders} from "../../../utils/regions";
-import {Scl} from "../../../utils/sudokuPad";
+import { Rect } from "../../../types/layout/Rect";
+import { Position } from "../../../types/layout/Position";
+import { getRegionBorders } from "../../../utils/regions";
+import { Scl } from "../../../utils/sudokuPad";
 
 interface PointLine {
     dashed: boolean;
@@ -26,7 +26,7 @@ export class GridLinesProcessor {
         top: number,
         left: number,
         direction: Direction,
-        processor: (prev?: PointLine) => (Omit<PointLine, "length"> | undefined),
+        processor: (prev?: PointLine) => Omit<PointLine, "length"> | undefined,
     ) {
         const result = processor(this.linesMap[direction][top]?.[left]);
         if (!result) {
@@ -37,7 +37,7 @@ export class GridLinesProcessor {
         this.height = Math.max(this.height, top + (direction === Direction.bottom ? 1 : 0));
 
         this.linesMap[direction][top] ??= {};
-        this.linesMap[direction][top][left] = {...result, length: 1};
+        this.linesMap[direction][top][left] = { ...result, length: 1 };
     }
 
     addGrid(bounds: Rect, regions: Position[][], dashed: boolean) {
@@ -116,32 +116,31 @@ export class GridLinesProcessor {
             return Object.entries(map1).flatMap(([topStr, map2]) => {
                 const top = Number(topStr);
 
-                return Object.entries(map2).flatMap(([leftStr, {dashed, bold, length}]): NonNullable<Scl["lines"]> => {
-                    const left = Number(leftStr);
+                return Object.entries(map2).flatMap(
+                    ([leftStr, { dashed, bold, length }]): NonNullable<Scl["lines"]> => {
+                        const left = Number(leftStr);
 
-                    return [
-                        {
-                            target: "cell-grids",
-                            thickness: bold ? 3 : 0.5,
-                            color: "#000000",
-                            fill: undefined,
-                            wayPoints: [
-                                [
-                                    top,
-                                    left,
+                        return [
+                            {
+                                target: "cell-grids",
+                                thickness: bold ? 3 : 0.5,
+                                color: "#000000",
+                                fill: undefined,
+                                wayPoints: [
+                                    [top, left],
+                                    [
+                                        top + (direction === Direction.bottom ? length : 0),
+                                        left + (direction === Direction.right ? length : 0),
+                                    ],
                                 ],
-                                [
-                                    top + (direction === Direction.bottom ? length : 0),
-                                    left + (direction === Direction.right ? length : 0),
-                                ],
-                            ],
-                            "stroke-dashoffset": dashed ? 1.9 : undefined,
-                            "stroke-dasharray": dashed ? "3.8,9" : undefined,
-                            "stroke-linecap": undefined,
-                            "stroke-linejoin": undefined,
-                        },
-                    ];
-                });
+                                "stroke-dashoffset": dashed ? 1.9 : undefined,
+                                "stroke-dasharray": dashed ? "3.8,9" : undefined,
+                                "stroke-linecap": undefined,
+                                "stroke-linejoin": undefined,
+                            },
+                        ];
+                    },
+                );
             });
         });
     }

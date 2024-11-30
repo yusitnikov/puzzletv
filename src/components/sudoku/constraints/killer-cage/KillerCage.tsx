@@ -1,26 +1,26 @@
-import {ReactElement, useMemo} from "react";
-import {blackColor} from "../../../app/globals";
+import { ReactElement, useMemo } from "react";
+import { blackColor } from "../../../app/globals";
 import {
     formatSvgPointsArray,
     parsePositionLiteral,
     parsePositionLiterals,
     Position,
-    PositionLiteral
+    PositionLiteral,
 } from "../../../../types/layout/Position";
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
-import {getRegionBorders, getRegionBoundingBox} from "../../../../utils/regions";
-import {isValidCellForRegion} from "../region/Region";
-import {indexes} from "../../../../utils/indexes";
-import {CenteredText} from "../../../svg/centered-text/CenteredText";
-import {incrementArrayItemByIndex} from "../../../../utils/array";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {PuzzleDefinition} from "../../../../types/sudoku/PuzzleDefinition";
-import {useCompensationAngle} from "../../../../contexts/TransformContext";
-import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../../utils/profiler";
-import {cosmeticTag} from "../decorative-shape/DecorativeShape";
+import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
+import { getRegionBorders, getRegionBoundingBox } from "../../../../utils/regions";
+import { isValidCellForRegion } from "../region/Region";
+import { indexes } from "../../../../utils/indexes";
+import { CenteredText } from "../../../svg/centered-text/CenteredText";
+import { incrementArrayItemByIndex } from "../../../../utils/array";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { PuzzleDefinition } from "../../../../types/sudoku/PuzzleDefinition";
+import { useCompensationAngle } from "../../../../contexts/TransformContext";
+import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../../utils/profiler";
+import { cosmeticTag } from "../decorative-shape/DecorativeShape";
 
 export const cageTag = "cage";
 
@@ -35,33 +35,31 @@ export interface KillerCageProps {
 }
 
 export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
-    [FieldLayer.regular]: observer(function KillerCage<T extends AnyPTM>(
-        {
-            context,
-            cells,
-            props: {
-                sum,
-                showBottomSum,
-                sumPointIndex = 0,
-                lineColor = blackColor,
-                fontColor = blackColor,
-                largeSum,
-                inverted,
-            },
-        }: ConstraintProps<T, KillerCageProps>
-    ) {
+    [FieldLayer.regular]: observer(function KillerCage<T extends AnyPTM>({
+        context,
+        cells,
+        props: {
+            sum,
+            showBottomSum,
+            sumPointIndex = 0,
+            lineColor = blackColor,
+            fontColor = blackColor,
+            largeSum,
+            inverted,
+        },
+    }: ConstraintProps<T, KillerCageProps>) {
         profiler.trace();
 
-        const {puzzle} = context;
-        const {prioritizeSelection} = puzzle;
+        const { puzzle } = context;
+        const { prioritizeSelection } = puzzle;
 
         const points = useMemo(() => getRegionBorders(cells, 1), [cells]);
 
         const boundingBox = useMemo(() => getRegionBoundingBox(cells, 1), [cells]);
         const bottom = boundingBox.top + boundingBox.height;
         const right = useMemo(
-            () => Math.max(...cells.filter(cell => cell.top === bottom - 1).map(cell => cell.left)) + 1,
-            [cells, bottom]
+            () => Math.max(...cells.filter((cell) => cell.top === bottom - 1).map((cell) => cell.left)) + 1,
+            [cells, bottom],
         );
 
         const borderPadding = (inverted ? -1 : 1) * (prioritizeSelection ? 0.15 : 0.1);
@@ -70,13 +68,13 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
 
         const angle = useCompensationAngle(context);
 
-        return <>
-            <polygon
-                points={formatSvgPointsArray(
-                    points
-                        .map(({left: x, top: y}, index) => {
-                            const {left: prevX, top: prevY} = incrementArrayItemByIndex(points, index, -1);
-                            const {left: nextX, top: nextY} = incrementArrayItemByIndex(points, index);
+        return (
+            <>
+                <polygon
+                    points={formatSvgPointsArray(
+                        points.map(({ left: x, top: y }, index) => {
+                            const { left: prevX, top: prevY } = incrementArrayItemByIndex(points, index, -1);
+                            const { left: nextX, top: nextY } = incrementArrayItemByIndex(points, index);
                             const prevDirX = Math.sign(x - prevX);
                             const prevDirY = Math.sign(y - prevY);
                             const nextDirX = Math.sign(nextX - x);
@@ -84,39 +82,44 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
 
                             return {
                                 left: x + borderPadding * (nextDirY + prevDirY),
-                                top: y - borderPadding * (nextDirX + prevDirX)
+                                top: y - borderPadding * (nextDirX + prevDirX),
                             };
-                        })
-                )}
-                strokeWidth={0.02}
-                strokeDasharray={0.15}
-                stroke={lineColor}
-                fill={"none"}
-            />
-
-            {sum && <>
-                <KillerCageSum
-                    puzzle={puzzle}
-                    sum={sum}
-                    size={sumDigitSize}
-                    left={points[sumPointIndex].left + sumPadding}
-                    top={points[sumPointIndex].top + sumPadding}
-                    color={fontColor}
-                    angle={angle}
+                        }),
+                    )}
+                    strokeWidth={0.02}
+                    strokeDasharray={0.15}
+                    stroke={lineColor}
+                    fill={"none"}
                 />
 
-                {showBottomSum && <KillerCageSum
-                    puzzle={puzzle}
-                    sum={sum}
-                    size={sumDigitSize}
-                    left={right - sumPadding}
-                    top={bottom - sumPadding}
-                    color={fontColor}
-                    angle={angle}
-                    reverse={true}
-                />}
-            </>}
-        </>;
+                {sum && (
+                    <>
+                        <KillerCageSum
+                            puzzle={puzzle}
+                            sum={sum}
+                            size={sumDigitSize}
+                            left={points[sumPointIndex].left + sumPadding}
+                            top={points[sumPointIndex].top + sumPadding}
+                            color={fontColor}
+                            angle={angle}
+                        />
+
+                        {showBottomSum && (
+                            <KillerCageSum
+                                puzzle={puzzle}
+                                sum={sum}
+                                size={sumDigitSize}
+                                left={right - sumPadding}
+                                top={bottom - sumPadding}
+                                color={fontColor}
+                                angle={angle}
+                                reverse={true}
+                            />
+                        )}
+                    </>
+                )}
+            </>
+        );
     }),
 };
 
@@ -129,57 +132,75 @@ interface KillerCageSumProps<T extends AnyPTM> extends Position {
     reverse?: boolean;
 }
 
-const KillerCageSum = observer(function KillerCageSum<T extends AnyPTM>(
-    {puzzle, sum, size, color = blackColor, left, top, reverse, angle = 0}: KillerCageSumProps<T>
-) {
+const KillerCageSum = observer(function KillerCageSum<T extends AnyPTM>({
+    puzzle,
+    sum,
+    size,
+    color = blackColor,
+    left,
+    top,
+    reverse,
+    angle = 0,
+}: KillerCageSumProps<T>) {
     profiler.trace();
 
     const {
         typeManager: {
-            digitComponentType: {
-                svgContentComponent: DigitSvgContent,
-                widthCoeff,
-            },
+            digitComponentType: { svgContentComponent: DigitSvgContent, widthCoeff },
         },
     } = puzzle;
 
     const width = size * widthCoeff * sum.toString().length;
 
-    return <AutoSvg
-        top={top}
-        left={left}
-        angle={-angle}
-    >
-        <AutoSvg left={(width - size * widthCoeff) / 2 * Math.cos((angle + (reverse ? 180 : 0) + 45) * Math.PI / 180) / Math.cos(Math.PI / 4) - width / 2}>
-            <rect
-                x={0}
-                y={-size / 2}
-                width={width}
-                height={size}
-                fill={["white", "#fff", "#ffffff"].includes(color.toLowerCase()) ? "#000" : "#fff"}
-            />
-
-            {typeof sum === "number" && sum.toString().split("").map((digit, index) => <DigitSvgContent
-                key={`digit-${index}`}
-                puzzle={puzzle}
-                digit={Number(digit)}
-                size={size}
-                left={size * widthCoeff * (index + 0.5)}
-                top={0}
-                color={color}
-            />)}
-
-            {typeof sum === "string" && sum.split("").map((character, index) => <CenteredText
-                key={`character-${index}`}
-                size={size}
-                left={size * widthCoeff * (index + 0.5)}
-                top={0}
-                fill={color}
+    return (
+        <AutoSvg top={top} left={left} angle={-angle}>
+            <AutoSvg
+                left={
+                    (((width - size * widthCoeff) / 2) *
+                        Math.cos(((angle + (reverse ? 180 : 0) + 45) * Math.PI) / 180)) /
+                        Math.cos(Math.PI / 4) -
+                    width / 2
+                }
             >
-                {character}
-            </CenteredText>)}
+                <rect
+                    x={0}
+                    y={-size / 2}
+                    width={width}
+                    height={size}
+                    fill={["white", "#fff", "#ffffff"].includes(color.toLowerCase()) ? "#000" : "#fff"}
+                />
+
+                {typeof sum === "number" &&
+                    sum
+                        .toString()
+                        .split("")
+                        .map((digit, index) => (
+                            <DigitSvgContent
+                                key={`digit-${index}`}
+                                puzzle={puzzle}
+                                digit={Number(digit)}
+                                size={size}
+                                left={size * widthCoeff * (index + 0.5)}
+                                top={0}
+                                color={color}
+                            />
+                        ))}
+
+                {typeof sum === "string" &&
+                    sum.split("").map((character, index) => (
+                        <CenteredText
+                            key={`character-${index}`}
+                            size={size}
+                            left={size * widthCoeff * (index + 0.5)}
+                            top={0}
+                            fill={color}
+                        >
+                            {character}
+                        </CenteredText>
+                    ))}
+            </AutoSvg>
         </AutoSvg>
-    </AutoSvg>;
+    );
 }) as <T extends AnyPTM>(props: KillerCageSumProps<T>) => ReactElement;
 
 export const DecorativeCageConstraint = <T extends AnyPTM>(
@@ -217,20 +238,20 @@ export const KillerCageConstraint = <T extends AnyPTM>(
     largeSum = false,
     inverted = false,
 ): Constraint<T, KillerCageProps> => ({
-    ...DecorativeCageConstraint(cellLiterals, sum, showBottomSum, sumPointIndex, lineColor, fontColor, largeSum, inverted),
+    ...DecorativeCageConstraint(
+        cellLiterals,
+        sum,
+        showBottomSum,
+        sumPointIndex,
+        lineColor,
+        fontColor,
+        largeSum,
+        inverted,
+    ),
     name: "killer cage",
     isObvious: true,
-    isValidCell(
-        cell,
-        digits,
-        cells,
-        context,
-        constraints,
-        constraint,
-        isFinalCheck,
-        onlyObvious
-    ) {
-        const {puzzle} = context;
+    isValidCell(cell, digits, cells, context, constraints, constraint, isFinalCheck, onlyObvious) {
+        const { puzzle } = context;
 
         const expectedSum = puzzle.typeManager.transformNumber
             ? puzzle.typeManager.transformNumber(sum ?? 0, context, cells[0], constraint)
@@ -268,14 +289,15 @@ export const KillerCageConstraintByRect = <T extends AnyPTM>(
     showBottomSum?: boolean,
     sumPointIndex?: number,
 ) => {
-    const {top, left} = parsePositionLiteral(topLeft);
+    const { top, left } = parsePositionLiteral(topLeft);
 
     return KillerCageConstraint<T>(
-        indexes(height).flatMap(dy => indexes(width).map(dx => ({top: top + dy, left: left + dx}))),
+        indexes(height).flatMap((dy) => indexes(width).map((dx) => ({ top: top + dy, left: left + dx }))),
         sum,
         showBottomSum,
         sumPointIndex,
     );
 };
 
-export const isCageConstraint = <T extends AnyPTM>(item: Constraint<T, any>): item is Constraint<T, KillerCageProps> => !!item.tags?.includes(cageTag);
+export const isCageConstraint = <T extends AnyPTM>(item: Constraint<T, any>): item is Constraint<T, KillerCageProps> =>
+    !!item.tags?.includes(cageTag);

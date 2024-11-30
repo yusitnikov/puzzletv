@@ -1,12 +1,12 @@
-import {ComponentMeta, ComponentStory} from "@storybook/react";
-import {App} from "../../components/app/App";
-import {WithHashContext} from "../../hooks/useHash";
+import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { App } from "../../components/app/App";
+import { WithHashContext } from "../../hooks/useHash";
 
 // noinspection JSUnusedGlobalSymbols
 export default {
     title: "Pages/Puzzles/Imported",
     component: App,
-    parameters: {layout: "fullscreen"},
+    parameters: { layout: "fullscreen" },
 } as ComponentMeta<typeof App>;
 
 const AppStory = WithHashContext(App);

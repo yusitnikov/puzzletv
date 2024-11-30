@@ -1,33 +1,36 @@
-import {Realtime, Types} from "ably/promises";
-import {useSingleton} from "./useSingleton";
-import {useCallback, useEffect, useRef, useState} from "react";
-import {usePureState} from "./usePureState";
-import {Chain} from "../utils/chain";
-import {useThrottleData} from "./useThrottle";
-import {unzip, zip} from "../utils/zip";
-import {useLastValueRef} from "./useLastValueRef";
-import {useObjectFromLocalStorage} from "../utils/localStorage";
-import {settings} from "../types/layout/Settings";
-import {myClientId} from "./useMultiPlayer";
-import {useTranslate} from "./useTranslate";
+import { Realtime, Types } from "ably/promises";
+import { useSingleton } from "./useSingleton";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePureState } from "./usePureState";
+import { Chain } from "../utils/chain";
+import { useThrottleData } from "./useThrottle";
+import { unzip, zip } from "../utils/zip";
+import { useLastValueRef } from "./useLastValueRef";
+import { useObjectFromLocalStorage } from "../utils/localStorage";
+import { settings } from "../types/layout/Settings";
+import { myClientId } from "./useMultiPlayer";
+import { useTranslate } from "./useTranslate";
 
-export const useAbly = (options: Types.ClientOptions) => useSingleton(
-    "ably",
-    () => new Realtime({...options, autoConnect: true})
-);
+export const useAbly = (options: Types.ClientOptions) =>
+    useSingleton("ably", () => new Realtime({ ...options, autoConnect: true }));
 
 export const useAblyChannel = (options: Types.ClientOptions, name: string, enabled = true) => {
     const ably = useAbly(options);
 
     return useSingleton(
         `ably-channel-${name}`,
-        () => ably.channels.get("persist:" + name, {params: {rewind: "1"}}),
+        () => ably.channels.get("persist:" + name, { params: { rewind: "1" } }),
         undefined,
         enabled,
     );
 };
 
-export const useAblyChannelMessages = (options: Types.ClientOptions, channelName: string, callback: (message: Types.Message) => void, enabled = callback !== undefined) => {
+export const useAblyChannelMessages = (
+    options: Types.ClientOptions,
+    channelName: string,
+    callback: (message: Types.Message) => void,
+    enabled = callback !== undefined,
+) => {
     const channel = useAblyChannel(options, channelName, enabled);
 
     const callbackRef = useLastValueRef(callback);
@@ -62,14 +65,17 @@ export const useAblyChannelState = <T>(
     // console.log("State is", state);
     // console.log("Channel state is", channel?.state);
     // console.log("Channel connected", connected);
-    const updateState = useCallback((newState: T) => {
-        if (!enabled || !channel) {
-            return;
-        }
+    const updateState = useCallback(
+        (newState: T) => {
+            if (!enabled || !channel) {
+                return;
+            }
 
-        setState(newState);
-        chain.then(() => channel.publish("state", newState));
-    }, [enabled, channel, chain, setState]);
+            setState(newState);
+            chain.then(() => channel.publish("state", newState));
+        },
+        [enabled, channel, chain, setState],
+    );
     (window as any).updateState = updateState;
 
     useEffect(() => {
@@ -96,7 +102,7 @@ const noMessages: Types.PresenceMessage[] = [];
 export const useAblyChannelPresence = (
     options: Types.ClientOptions,
     channelName: string,
-    enabled = true
+    enabled = true,
 ): [messages: Types.PresenceMessage[], loaded: boolean] => {
     const channel = useAblyChannel(options, channelName, enabled);
 
@@ -109,19 +115,20 @@ export const useAblyChannelPresence = (
             return;
         }
 
-        const chainUpdate = () => chain.then(async() => {
-            try {
-                let messages = await channel.presence.get();
-                messages = JSON.parse(JSON.stringify(messages));
-                messages = messages.map(({data, ...other}) => ({
-                    data: JSON.parse(unzip(data)),
-                    ...other,
-                }));
-                setPresenceMessages(messages);
-            } catch (err) {
-                console.warn("Failed to get the presence", err);
-            }
-        });
+        const chainUpdate = () =>
+            chain.then(async () => {
+                try {
+                    let messages = await channel.presence.get();
+                    messages = JSON.parse(JSON.stringify(messages));
+                    messages = messages.map(({ data, ...other }) => ({
+                        data: JSON.parse(unzip(data)),
+                        ...other,
+                    }));
+                    setPresenceMessages(messages);
+                } catch (err) {
+                    console.warn("Failed to get the presence", err);
+                }
+            });
 
         chain.then(() => channel.presence.subscribe(["enter", "leave", "update"], chainUpdate));
         chainUpdate();
@@ -138,7 +145,7 @@ export const useAblyChannelPresenceMap = <T>(
     options: Types.ClientOptions,
     channelName: string,
     preserve: boolean,
-    enabled = true
+    enabled = true,
 ): [Record<string, T>, boolean] => {
     const [messages, loaded] = useAblyChannelPresence(options, channelName, enabled);
 
@@ -148,18 +155,18 @@ export const useAblyChannelPresenceMap = <T>(
     }
     const map = mapRef.current;
 
-    for (const {clientId, data} of messages) {
+    for (const { clientId, data } of messages) {
         map[clientId] = data;
     }
 
     return [map, loaded];
-}
+};
 
 export const useSetMyAblyChannelPresence = (
     options: Types.ClientOptions,
     channelName: string,
     myPresenceData: any,
-    enabled = true
+    enabled = true,
 ) => {
     const channel = useAblyChannel(options, channelName, enabled);
 
@@ -204,12 +211,7 @@ export const useUserNames = (
     useSetMyAblyChannelPresence(ablyOptions, userNamesChannelName, settings.nickname.get());
     const [namesMap] = useAblyChannelPresenceMap<string>(ablyOptions, userNamesChannelName, true);
 
-    return (
-        clientId: string,
-        {
-            showYouLabel = defaultOptions.showYouLabel ?? true,
-        }: UseUserNamesOptions = {}
-    ) => {
+    return (clientId: string, { showYouLabel = defaultOptions.showYouLabel ?? true }: UseUserNamesOptions = {}) => {
         let result = namesMap[clientId]?.trim() || translate("guest");
 
         if (showYouLabel && clientId === myClientId) {

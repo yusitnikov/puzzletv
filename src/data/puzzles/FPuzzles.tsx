@@ -1,23 +1,28 @@
-import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {GridParser} from "./GridParser";
-import {FPuzzlesGridCell, FPuzzlesPuzzle, FPuzzlesText} from "fpuzzles-data";
-import {PuzzleImporter} from "./PuzzleImporter";
-import {parsePositionLiteral, Position, stringifyCellCoords} from "../../types/layout/Position";
-import {CellColor} from "../../types/sudoku/CellColor";
-import {ObjectParser} from "../../types/struct/ObjectParser";
-import {regionSumLineColor} from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
+import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { GridParser } from "./GridParser";
+import { FPuzzlesGridCell, FPuzzlesPuzzle, FPuzzlesText } from "fpuzzles-data";
+import { PuzzleImporter } from "./PuzzleImporter";
+import { parsePositionLiteral, Position, stringifyCellCoords } from "../../types/layout/Position";
+import { CellColor } from "../../types/sudoku/CellColor";
+import { ObjectParser } from "../../types/struct/ObjectParser";
+import { regionSumLineColor } from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
 import {
     lockoutLineDiamondBackgroundColor,
     lockoutLineDiamondLineColor,
-    lockoutLineLineColor
+    lockoutLineLineColor,
 } from "../../components/sudoku/constraints/lockout-line/LockoutLine";
-import {greenColor, purpleColor} from "../../components/app/globals";
-import {splitArrayIntoChunks} from "../../utils/array";
-import {decompressFromBase64} from "lz-string";
-import {PuzzleImportOptions} from "../../types/sudoku/PuzzleImportOptions";
+import { greenColor, purpleColor } from "../../components/app/globals";
+import { splitArrayIntoChunks } from "../../utils/array";
+import { decompressFromBase64 } from "lz-string";
+import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
 
 export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzlesPuzzle> {
-    constructor(puzzleJson: FPuzzlesPuzzle, offsetX: number, offsetY: number, importOptionOverrides: Partial<PuzzleImportOptions>) {
+    constructor(
+        puzzleJson: FPuzzlesPuzzle,
+        offsetX: number,
+        offsetY: number,
+        importOptionOverrides: Partial<PuzzleImportOptions>,
+    ) {
         super(
             puzzleJson,
             {
@@ -35,30 +40,29 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
     }
 
     addToImporter(importer: PuzzleImporter<T>) {
-        const parseOptionalNumber = (value?: string | number) => value === undefined ? undefined : Number(value);
+        const parseOptionalNumber = (value?: string | number) => (value === undefined ? undefined : Number(value));
 
-        const isFowText = ({cells, value}: FPuzzlesText) => value === "💡"
-            && cells.length === 1
-            && this.puzzleJson.fogofwar?.includes(cells[0]);
+        const isFowText = ({ cells, value }: FPuzzlesText) =>
+            value === "💡" && cells.length === 1 && this.puzzleJson.fogofwar?.includes(cells[0]);
 
         // TODO: go over rangsk solver and populate constraints from there
         new ObjectParser<FPuzzlesPuzzle>({
             // region Core fields
             size: undefined,
             grid: (grid) => {
-                importer.addRegions(this, grid.map((row) => row.map(({region}) => region)));
+                importer.addRegions(
+                    this,
+                    grid.map((row) => row.map(({ region }) => region)),
+                );
 
-                const allGridCells: (FPuzzlesGridCell & Position)[] = grid
-                    .flatMap(
-                        (row, top) => row.map(
-                            (cell, left) => ({top, left, ...cell})
-                        )
-                    );
+                const allGridCells: (FPuzzlesGridCell & Position)[] = grid.flatMap((row, top) =>
+                    row.map((cell, left) => ({ top, left, ...cell })),
+                );
 
-                for (const {top, left, ...cell} of allGridCells) {
+                for (const { top, left, ...cell } of allGridCells) {
                     new ObjectParser<FPuzzlesGridCell>({
                         region: undefined,
-                        value: (value, {given}) => {
+                        value: (value, { given }) => {
                             if (given && value !== undefined) {
                                 importer.addGiven(this, top, left, value);
                             }
@@ -87,7 +91,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                         givenPencilMarks: undefined,
                         centerPencilMarks: (value) => value === undefined || value === null,
                         cornerPencilMarks: (value) => value === undefined || value === null,
-                    }).parse(cell, `f-puzzles cell ${stringifyCellCoords({top, left})}`);
+                    }).parse(cell, `f-puzzles cell ${stringifyCellCoords({ top, left })}`);
                 }
             },
             title: (title) => importer.setTitle(title),
@@ -96,7 +100,13 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             // region Constraints
             littlekillersum: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, cells: [startCell], direction, value, ...other} of items) {
+                    for (const {
+                        cell,
+                        cells: [startCell],
+                        direction,
+                        value,
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles little killer sum");
 
                         importer.addLittleKiller(this, startCell, direction, parseOptionalNumber(value));
@@ -105,7 +115,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             arrow: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells, lines, ...other} of items) {
+                    for (const { cells, lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles arrow");
 
                         importer.addArrows(this, cells, lines);
@@ -114,7 +124,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             killercage: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells, value, outlineC, fontC, ...other} of items) {
+                    for (const { cells, value, outlineC, fontC, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles killer cage");
 
                         importer.addKillerCage(this, cells, parseOptionalNumber(value), outlineC, fontC);
@@ -143,7 +153,11 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             ratio: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells: [cell1, cell2], value, ...other} of items) {
+                    for (const {
+                        cells: [cell1, cell2],
+                        value,
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles ratio");
 
                         importer.addBlackKropki(this, cell1, cell2, parseOptionalNumber(value));
@@ -152,7 +166,11 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             difference: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells: [cell1, cell2], value, ...other} of items) {
+                    for (const {
+                        cells: [cell1, cell2],
+                        value,
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles difference");
 
                         importer.addWhiteKropki(this, cell1, cell2, parseOptionalNumber(value));
@@ -161,7 +179,11 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             xv: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells: [cell1, cell2], value, ...other} of items) {
+                    for (const {
+                        cells: [cell1, cell2],
+                        value,
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles XV");
 
                         switch (value) {
@@ -177,7 +199,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             thermometer: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles thermometer");
 
                         for (const cells of lines) {
@@ -188,7 +210,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             sandwichsum: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, value, ...other} of items) {
+                    for (const { cell, value, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles sandwich sum");
 
                         if (value !== undefined) {
@@ -199,7 +221,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             skyscraper: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, value, ...other} of items) {
+                    for (const { cell, value, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles skyscraper");
 
                         if (value !== undefined) {
@@ -210,7 +232,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             xsum: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, value, ...other} of items) {
+                    for (const { cell, value, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles x-sum");
 
                         if (value !== undefined) {
@@ -221,7 +243,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             even: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, ...other} of items) {
+                    for (const { cell, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles even cell");
 
                         importer.addEven(this, cell);
@@ -230,7 +252,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             odd: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, ...other} of items) {
+                    for (const { cell, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles odd cell");
 
                         importer.addOdd(this, cell);
@@ -239,7 +261,10 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             rowindexer: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells: [cell], ...other} of items) {
+                    for (const {
+                        cells: [cell],
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles row indexer");
 
                         importer.addRowIndexer(this, cell);
@@ -248,7 +273,10 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             columnindexer: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells: [cell], ...other} of items) {
+                    for (const {
+                        cells: [cell],
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles column indexer");
 
                         importer.addColumnIndexer(this, cell);
@@ -257,7 +285,10 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             boxindexer: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells: [cell], ...other} of items) {
+                    for (const {
+                        cells: [cell],
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles box indexer");
 
                         importer.addBoxIndexer(this, cell);
@@ -266,7 +297,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             extraregion: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells, ...other} of items) {
+                    for (const { cells, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles extra region");
 
                         importer.addExtraRegion(this, cells);
@@ -275,7 +306,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             clone: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells, cloneCells, ...other} of items) {
+                    for (const { cells, cloneCells, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles clone");
 
                         importer.addClones(this, [...cells, ...cloneCells]);
@@ -284,7 +315,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             quadruple: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells, values, ...other} of items) {
+                    for (const { cells, values, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles quadruple");
 
                         importer.addQuadruple(this, cells[3], values);
@@ -293,7 +324,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             betweenline: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles between line");
 
                         for (const cells of lines) {
@@ -304,7 +335,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             doublearrow: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles double arrow line");
 
                         for (const cells of lines) {
@@ -315,7 +346,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             regionsumline: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles region sum line");
 
                         for (const cells of lines) {
@@ -326,7 +357,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             lockout: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles lockout line");
 
                         for (const cells of lines) {
@@ -337,7 +368,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             minimum: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, ...other} of items) {
+                    for (const { cell, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles minimum");
 
                         importer.addMinimum(this, cell);
@@ -346,7 +377,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             maximum: (items) => {
                 if (items instanceof Array) {
-                    for (const {cell, ...other} of items) {
+                    for (const { cell, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles maximum");
 
                         importer.addMaximum(this, cell);
@@ -355,7 +386,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             palindrome: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles palindrome");
 
                         for (const cells of lines) {
@@ -366,7 +397,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             renban: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles renban line");
 
                         for (const cells of lines) {
@@ -377,7 +408,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             whispers: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, value, ...other} of items) {
+                    for (const { lines, value, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles whispers line");
 
                         for (const cells of lines) {
@@ -388,7 +419,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             entropicline: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles entropic line");
 
                         for (const cells of lines) {
@@ -399,7 +430,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             modularline: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, ...other} of items) {
+                    for (const { lines, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles modular line");
 
                         for (const cells of lines) {
@@ -410,7 +441,15 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             line: (items) => {
                 if (items instanceof Array) {
-                    for (const {lines, outlineC, width, isNewConstraint, fromConstraint, isLLConstraint, ...other} of items) {
+                    for (const {
+                        lines,
+                        outlineC,
+                        width,
+                        isNewConstraint,
+                        fromConstraint,
+                        isLLConstraint,
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles line");
 
                         let color = outlineC;
@@ -430,19 +469,26 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                         }
 
                         for (const cells of lines) {
-                            importer.addCosmeticLine(
-                                this,
-                                cells,
-                                color,
-                                width === undefined ? undefined : width / 2,
-                            );
+                            importer.addCosmeticLine(this, cells, color, width === undefined ? undefined : width / 2);
                         }
                     }
                 }
             },
             rectangle: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells, width, height, baseC, outlineC, value, fontC, angle, isLLConstraint, fromConstraint, ...other} of items) {
+                    for (const {
+                        cells,
+                        width,
+                        height,
+                        baseC,
+                        outlineC,
+                        value,
+                        fontC,
+                        angle,
+                        isLLConstraint,
+                        fromConstraint,
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles rect");
 
                         let outlineColor = outlineC;
@@ -452,16 +498,49 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                             baseColor = lockoutLineDiamondBackgroundColor;
                         }
 
-                        importer.addCosmeticRect(this, cells, width, height, baseColor, outlineColor, undefined, value, fontC, angle);
+                        importer.addCosmeticRect(
+                            this,
+                            cells,
+                            width,
+                            height,
+                            baseColor,
+                            outlineColor,
+                            undefined,
+                            value,
+                            fontC,
+                            angle,
+                        );
                     }
                 }
             },
             circle: (items) => {
                 if (items instanceof Array) {
-                    for (const {cells, width, height, baseC, outlineC, value, fontC, angle, fromConstraint, ...other} of items) {
+                    for (const {
+                        cells,
+                        width,
+                        height,
+                        baseC,
+                        outlineC,
+                        value,
+                        fontC,
+                        angle,
+                        fromConstraint,
+                        ...other
+                    } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles circle");
 
-                        importer.addCosmeticCircle(this, cells, width, height, baseC, outlineC, undefined, value, fontC, angle);
+                        importer.addCosmeticCircle(
+                            this,
+                            cells,
+                            width,
+                            height,
+                            baseC,
+                            outlineC,
+                            undefined,
+                            value,
+                            fontC,
+                            angle,
+                        );
                     }
                 }
             },
@@ -471,7 +550,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                         items = items.filter((obj) => !isFowText(obj));
                     }
 
-                    for (const {cells, value, fontC, size, angle, fromConstraint, ...other} of items) {
+                    for (const { cells, value, fontC, size, angle, fromConstraint, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles text");
 
                         if (!value || fromConstraint) {
@@ -486,7 +565,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                 if (items instanceof Array) {
                     const metadata: Record<string, string> = {};
 
-                    for (const {cells, value, outlineC, fontC, fromConstraint, ...other} of items) {
+                    for (const { cells, value, outlineC, fontC, fromConstraint, ...other } of items) {
                         ObjectParser.empty.parse(other, "f-puzzles cage");
 
                         if (fromConstraint) {
@@ -503,7 +582,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
 
                     new ObjectParser<Record<string, string>>({
                         msgcorrect: (message) => importer.setSuccessMessage(message),
-                    }).parse(metadata, "metadata from f-puzzles cages")
+                    }).parse(metadata, "metadata from f-puzzles cages");
                 }
             },
             "diagonal+": (diagonal) => {
@@ -529,7 +608,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                             const num = Number(value);
                             return Number.isFinite(num) ? num : value;
                         }),
-                        this.columnsCount
+                        this.columnsCount,
                     );
                     for (const [top, row] of solutionArray.entries()) {
                         for (const [left, value] of row.entries()) {
@@ -557,7 +636,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                 this,
                 this.puzzleJson.fogofwar,
                 this.puzzleJson.foglight,
-                this.puzzleJson.text?.filter(isFowText)?.flatMap(text => text.cells),
+                this.puzzleJson.text?.filter(isFowText)?.flatMap((text) => text.cells),
             );
         }
     }
@@ -569,17 +648,19 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
         return !!this.puzzleJson.fogofwar || !!this.puzzleJson.foglight;
     }
     get hasCosmeticElements() {
-        return !!this.puzzleJson.text?.length
-            || !!this.puzzleJson.line?.length
-            || !!this.puzzleJson.rectangle?.length
-            || !!this.puzzleJson.circle?.length
-            || !!this.puzzleJson.cage?.length;
+        return (
+            !!this.puzzleJson.text?.length ||
+            !!this.puzzleJson.line?.length ||
+            !!this.puzzleJson.rectangle?.length ||
+            !!this.puzzleJson.circle?.length ||
+            !!this.puzzleJson.cage?.length
+        );
     }
     get hasInitialColors() {
-        return this.puzzleJson.grid.some(row => row.some(cell => cell.c || cell.cArray?.length));
+        return this.puzzleJson.grid.some((row) => row.some((cell) => cell.c || cell.cArray?.length));
     }
     get hasSolutionColors() {
-        return this.puzzleJson.grid.some(row => row.some(cell => cell.highlight || cell.highlightArray?.length));
+        return this.puzzleJson.grid.some((row) => row.some((cell) => cell.highlight || cell.highlightArray?.length));
     }
     get hasArrows() {
         return !!this.puzzleJson.arrow;
@@ -589,7 +670,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
     }
 
     get quadruplePositions() {
-        return this.puzzleJson.quadruple?.map(({cells}) => parsePositionLiteral(cells[3])) ?? [];
+        return this.puzzleJson.quadruple?.map(({ cells }) => parsePositionLiteral(cells[3])) ?? [];
     }
 }
 

@@ -1,10 +1,10 @@
-import {parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint} from "../../../../types/sudoku/Constraint";
-import {splitMultiLine} from "../../../../utils/lines";
-import {isValidCellForRegion} from "../region/Region";
-import {LineComponent, LineProps} from "../line/Line";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {purpleColor} from "../../../app/globals";
+import { parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
+import { Constraint } from "../../../../types/sudoku/Constraint";
+import { splitMultiLine } from "../../../../utils/lines";
+import { isValidCellForRegion } from "../region/Region";
+import { LineComponent, LineProps } from "../line/Line";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { purpleColor } from "../../../app/globals";
 
 export const RenbanConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
@@ -22,19 +22,10 @@ export const RenbanConstraint = <T extends AnyPTM>(
         cells,
         color,
         component: LineComponent,
-        props: {width},
+        props: { width },
         isObvious: true,
-        isValidCell(
-            cell,
-            digits,
-            cells,
-            context,
-            constraints,
-            constraint,
-            isFinalCheck,
-            onlyObvious
-        ) {
-            const {puzzle} = context;
+        isValidCell(cell, digits, cells, context, constraints, constraint, isFinalCheck, onlyObvious) {
+            const { puzzle } = context;
 
             if (!isValidCellForRegion(cells, cell, digits, context)) {
                 return false;
@@ -45,9 +36,9 @@ export const RenbanConstraint = <T extends AnyPTM>(
             }
 
             const actualDigits = cells
-                .map((cell) => ({cell, data: digits[cell.top]?.[cell.left]}))
-                .filter(({data}) => data !== undefined)
-                .map(({cell, data}) => puzzle.typeManager.getDigitByCellData(data!, context, cell));
+                .map((cell) => ({ cell, data: digits[cell.top]?.[cell.left] }))
+                .filter(({ data }) => data !== undefined)
+                .map(({ cell, data }) => puzzle.typeManager.getDigitByCellData(data!, context, cell));
 
             return !actualDigits.length || Math.max(...actualDigits) - Math.min(...actualDigits) < cells.length;
         },

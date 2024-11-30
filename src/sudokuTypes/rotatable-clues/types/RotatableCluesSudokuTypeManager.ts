@@ -1,27 +1,33 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {RotatableCluesGameState, RotatableCluesProcessedGameState} from "./RotatableCluesGameState";
-import {getAveragePosition, stringifyPosition} from "../../../types/layout/Position";
-import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
-import {RotatableCluesPTM} from "./RotatableCluesPTM";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {ControlButtonItem, ControlButtonRegion} from "../../../components/sudoku/controls/ControlButtonsManager";
-import {RotatableClue} from "./RotatableCluesPuzzleExtension";
-import {Constraint, isValidFinishedPuzzleByConstraints} from "../../../types/sudoku/Constraint";
-import {DecorativeShapeProps, ellipseTag} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import {fieldStateHistoryAddState} from "../../../types/sudoku/FieldStateHistory";
-import {RotatableClueConstraint} from "../constraints/RotatableClue";
-import {RotateClueButton} from "../components/RotateClueButton";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {loop} from "../../../utils/math";
-import {ArrowProps, isArrowConstraint} from "../../../components/sudoku/constraints/arrow/Arrow";
-import {comparer, IReactionDisposer, reaction} from "mobx";
-import {settings} from "../../../types/layout/Settings";
-import {createWheel} from "../../../components/sudoku/constraints/wheel/Wheel";
-import {isTextConstraint} from "../../../components/sudoku/constraints/text/Text";
-import {addFieldStateExToSudokuManager, addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
-import {RotatableCluesFieldState} from "./RotatableCluesFieldState";
-import {rotateNumber} from "../../../components/sudoku/digit/DigitComponentType";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { RotatableCluesGameState, RotatableCluesProcessedGameState } from "./RotatableCluesGameState";
+import { getAveragePosition, stringifyPosition } from "../../../types/layout/Position";
+import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { RotatableCluesPTM } from "./RotatableCluesPTM";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { ControlButtonItem, ControlButtonRegion } from "../../../components/sudoku/controls/ControlButtonsManager";
+import { RotatableClue } from "./RotatableCluesPuzzleExtension";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/sudoku/Constraint";
+import {
+    DecorativeShapeProps,
+    ellipseTag,
+} from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { RotatableClueConstraint } from "../constraints/RotatableClue";
+import { RotateClueButton } from "../components/RotateClueButton";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { loop } from "../../../utils/math";
+import { ArrowProps, isArrowConstraint } from "../../../components/sudoku/constraints/arrow/Arrow";
+import { comparer, IReactionDisposer, reaction } from "mobx";
+import { settings } from "../../../types/layout/Settings";
+import { createWheel } from "../../../components/sudoku/constraints/wheel/Wheel";
+import { isTextConstraint } from "../../../components/sudoku/constraints/text/Text";
+import {
+    addFieldStateExToSudokuManager,
+    addGameStateExToSudokuManager,
+} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import { RotatableCluesFieldState } from "./RotatableCluesFieldState";
+import { rotateNumber } from "../../../components/sudoku/digit/DigitComponentType";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -37,54 +43,47 @@ interface RotatableCluesOptions<T extends AnyPTM> {
     angleStep?: number;
 }
 
-export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
-    {
-        baseTypeManager: {
-            postProcessPuzzle,
-            controlButtons = [],
-            ...baseTypeManager
-        },
-        isEquivalentLoop,
-        compensateConstraintDigitAngle = true,
-        cluesImporter,
-        angleStep = 90,
-    }: RotatableCluesOptions<T>
-): SudokuTypeManager<RotatableCluesPTM<T>> => ({
+export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>({
+    baseTypeManager: { postProcessPuzzle, controlButtons = [], ...baseTypeManager },
+    isEquivalentLoop,
+    compensateConstraintDigitAngle = true,
+    cluesImporter,
+    angleStep = 90,
+}: RotatableCluesOptions<T>): SudokuTypeManager<RotatableCluesPTM<T>> => ({
     ...addGameStateExToSudokuManager(
-        addFieldStateExToSudokuManager(
-            baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>,
-            {
-                initialFieldStateExtension(puzzle): RotatableCluesFieldState {
-                    return {
-                        clueAngles: puzzle?.extension?.clues.map(() => 0) ?? [],
-                    };
-                },
-            }
-        ),
+        addFieldStateExToSudokuManager(baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>, {
+            initialFieldStateExtension(puzzle): RotatableCluesFieldState {
+                return {
+                    clueAngles: puzzle?.extension?.clues.map(() => 0) ?? [],
+                };
+            },
+        }),
         {
             initialGameStateExtension(puzzle): RotatableCluesGameState {
                 return {
-                    clues: puzzle?.extension?.clues.map(() => ({animating: false})) ?? [],
+                    clues: puzzle?.extension?.clues.map(() => ({ animating: false })) ?? [],
                 };
             },
             useProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
                 const {
-                    fieldExtension: {clueAngles},
-                    stateExtension: {clues: clueAnimations},
+                    fieldExtension: { clueAngles },
+                    stateExtension: { clues: clueAnimations },
                 } = context;
 
                 return {
-                    // eslint-disable-next-line react-hooks/rules-of-hooks
-                    clueAngles: (clueAngles as number[]).map((angle, index) => useAnimatedValue(
-                        angle,
-                        clueAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0
-                    )),
+                    clueAngles: (clueAngles as number[]).map((angle, index) =>
+                        // eslint-disable-next-line react-hooks/rules-of-hooks
+                        useAnimatedValue(
+                            angle,
+                            clueAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
+                        ),
+                    ),
                 };
             },
-            getProcessedGameStateExtension({fieldExtension: {clueAngles}}): RotatableCluesProcessedGameState {
-                return {clueAngles};
+            getProcessedGameStateExtension({ fieldExtension: { clueAngles } }): RotatableCluesProcessedGameState {
+                return { clueAngles };
             },
-        }
+        },
     ),
 
     getReactions(context: PuzzleContext<RotatableCluesPTM<T>>): IReactionDisposer[] {
@@ -100,29 +99,31 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 () => {
                     const {
                         puzzle,
-                        fieldExtension: {clueAngles},
+                        fieldExtension: { clueAngles },
                     } = context;
                     const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
 
                     return (clueAngles as number[]).map((manualAngle, index) => {
-                        const {pivot: {top, left}} = clues[index];
+                        const {
+                            pivot: { top, left },
+                        } = clues[index];
                         const data = context.getCellDigit(top, left);
                         if (data === undefined) {
                             return manualAngle;
                         }
-                        const digit = puzzle.typeManager.getDigitByCellData(data, context, {top, left});
+                        const digit = puzzle.typeManager.getDigitByCellData(data, context, { top, left });
                         const forcedAngle = digit * angleStep;
                         // Find the closest angle to the manual angle, so that we don't have weird animation (but rotate only clockwise)
-                        return isEquivalentLoop
-                            ? manualAngle + loop(forcedAngle - manualAngle, 360)
-                            : forcedAngle;
+                        return isEquivalentLoop ? manualAngle + loop(forcedAngle - manualAngle, 360) : forcedAngle;
                     });
                 },
                 (processedClueAngles) => {
-                    const {fieldExtension: {clueAngles}} = context;
+                    const {
+                        fieldExtension: { clueAngles },
+                    } = context;
 
                     if (processedClueAngles.some((value, index) => value !== clueAngles[index])) {
-                        const {clientId, actionId} = context.currentFieldState;
+                        const { clientId, actionId } = context.currentFieldState;
 
                         context.onStateChange({
                             fieldStateHistory: fieldStateHistoryAddState(
@@ -136,11 +137,11 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                                         ...fieldState.extension,
                                         clueAngles: processedClueAngles,
                                     },
-                                })
+                                }),
                             ),
                             extension: {
                                 ...context.stateExtension,
-                                clues: context.stateExtension.clues.map(() => ({animating: true})),
+                                clues: context.stateExtension.clues.map(() => ({ animating: true })),
                             },
                         });
                     }
@@ -148,14 +149,16 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 {
                     name: "update clue angles according to digits",
                     equals: comparer.structural,
-                }
+                },
             ),
         ];
     },
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RotatableCluesPTM<T>> {
         if (postProcessPuzzle) {
-            puzzle = postProcessPuzzle(puzzle as unknown as PuzzleDefinition<T>) as unknown as PuzzleDefinition<RotatableCluesPTM<T>>;
+            puzzle = postProcessPuzzle(puzzle as unknown as PuzzleDefinition<T>) as unknown as PuzzleDefinition<
+                RotatableCluesPTM<T>
+            >;
         }
 
         if (!puzzle.extension?.clues) {
@@ -176,15 +179,15 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             ...puzzle,
             items: (context) => {
                 const {
-                    fieldExtension: {clueAngles},
-                    processedGameStateExtension: {clueAngles: animatedClueAngles},
+                    fieldExtension: { clueAngles },
+                    processedGameStateExtension: { clueAngles: animatedClueAngles },
                 } = context;
 
                 return [
                     ...(typeof prevItems === "function" ? prevItems(context) : prevItems),
-                    ...(puzzle.extension?.clues as RotatableClue[] ?? []).flatMap(
-                        (rootClue, index) => [rootClue, ...rootClue.dependentClues ?? []].flatMap(
-                            (clue) => RotatableClueConstraint(
+                    ...((puzzle.extension?.clues as RotatableClue[]) ?? []).flatMap((rootClue, index) =>
+                        [rootClue, ...(rootClue.dependentClues ?? [])].flatMap((clue) =>
+                            RotatableClueConstraint(
                                 clue,
                                 clueAngles[index] * (clue.coeff ?? 1),
                                 animatedClueAngles[index] * (clue.coeff ?? 1),
@@ -195,7 +198,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             },
         };
 
-        const {resultChecker} = puzzle;
+        const { resultChecker } = puzzle;
         if (resultChecker) {
             puzzle = {
                 ...puzzle,
@@ -235,9 +238,12 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
             const angle = loop((constraint as any)._rotatableClueAngle ?? 0, 360);
 
             switch (angle) {
-                case 0: return num;
-                case 180: return rotateNumber(context.puzzle, num);
-                default: return Number.NaN;
+                case 0:
+                    return num;
+                case 180:
+                    return rotateNumber(context.puzzle, num);
+                default:
+                    return Number.NaN;
             }
         }
 
@@ -249,117 +255,120 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>(
 
 export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
     options: Omit<RotatableCluesOptions<T>, "isEquivalentLoop" | "cluesImporter">,
-) => RotatableCluesSudokuTypeManager({
-    ...options,
-    isEquivalentLoop: true,
-    cluesImporter: (puzzle) => {
-        const isWheels = puzzle.importOptions?.wheels;
-        const keepCircles = puzzle.importOptions?.keepCircles;
+) =>
+    RotatableCluesSudokuTypeManager({
+        ...options,
+        isEquivalentLoop: true,
+        cluesImporter: (puzzle) => {
+            const isWheels = puzzle.importOptions?.wheels;
+            const keepCircles = puzzle.importOptions?.keepCircles;
 
-        let {items} = puzzle;
-        if (Array.isArray(items)) {
-            items = items.map(
-                (item) => isArrowConstraint(item)
-                    ? {
-                        ...item,
-                        props: {
-                            ...item.props,
-                            transparentCircle: true,
-                        },
-                    } as Constraint<RotatableCluesPTM<T>, ArrowProps>
-                    : item
-            );
+            let { items } = puzzle;
+            if (Array.isArray(items)) {
+                items = items.map((item) =>
+                    isArrowConstraint(item)
+                        ? ({
+                              ...item,
+                              props: {
+                                  ...item.props,
+                                  transparentCircle: true,
+                              },
+                          } as Constraint<RotatableCluesPTM<T>, ArrowProps>)
+                        : item,
+                );
 
-            const isPivot = (item: Constraint<RotatableCluesPTM<T>, any>): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
-                !!item.tags?.includes(ellipseTag) && item.cells.length === 1
-                && item.cells[0].top % 0.5 === 0 && item.cells[0].left % 0.5 === 0;
+                const isPivot = (
+                    item: Constraint<RotatableCluesPTM<T>, any>,
+                ): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
+                    !!item.tags?.includes(ellipseTag) &&
+                    item.cells.length === 1 &&
+                    item.cells[0].top % 0.5 === 0 &&
+                    item.cells[0].left % 0.5 === 0;
 
-            const pivots = items
-                .filter(isPivot)
-                .map(({cells: [cell], props: {width: diameter}}) => ({
+                const pivots = items.filter(isPivot).map(({ cells: [cell], props: { width: diameter } }) => ({
                     cell,
-                    radius: Math.max((keepCircles && !isWheels) ? diameter / 2 : 0.5, 0.5),
+                    radius: Math.max(keepCircles && !isWheels ? diameter / 2 : 0.5, 0.5),
                 }));
 
-            if (!keepCircles) {
-                items = items.filter((item) => !isPivot(item));
-            }
+                if (!keepCircles) {
+                    items = items.filter((item) => !isPivot(item));
+                }
 
-            const getCluePivot = ({cells}: Constraint<RotatableCluesPTM<T>>) => {
-                if (cells.length) {
-                    for (const {top, left} of [...cells, getAveragePosition(cells)]) {
-                        for (const {cell, radius} of pivots) {
-                            const dx = cell.left - left;
-                            const dy = cell.top - top;
+                const getCluePivot = ({ cells }: Constraint<RotatableCluesPTM<T>>) => {
+                    if (cells.length) {
+                        for (const { top, left } of [...cells, getAveragePosition(cells)]) {
+                            for (const { cell, radius } of pivots) {
+                                const dx = cell.left - left;
+                                const dy = cell.top - top;
 
-                            if (dx * dx + dy * dy <= radius * radius) {
-                                return cell;
+                                if (dx * dx + dy * dy <= radius * radius) {
+                                    return cell;
+                                }
                             }
                         }
                     }
-                }
 
-                return undefined;
-            }
-
-            const cluesMap: Record<string, RotatableClue> = {};
-            for (const clue of items) {
-                const pivot = getCluePivot(clue);
-                if (!pivot) {
-                    continue;
-                }
-                const key = stringifyPosition(pivot);
-                cluesMap[key] = cluesMap[key] ?? {
-                    pivot,
-                    clues: [],
+                    return undefined;
                 };
-                cluesMap[key].clues.push(clue);
-            }
-            let clues = Object.values(cluesMap);
-            if (isWheels) {
-                clues = clues.map(({pivot, clues}) => {
-                    const digits = Array<number | undefined>(4).fill(undefined);
 
-                    for (const clue of clues) {
-                        const {cells} = clue;
-                        if (!isTextConstraint(clue) || cells.length > 2) {
-                            continue;
-                        }
-
-                        const value = Number(clue.props.text);
-                        if (!Number.isFinite(value)) {
-                            continue;
-                        }
-
-                        const {top, left} = getAveragePosition(cells);
-                        const dx = pivot.left - left;
-                        const dy = pivot.top - top;
-
-                        if (dx === 0 && dy === -0.5) {
-                            digits[3] = value;
-                        }
-                        if (dx === 0.5 && dy === 0) {
-                            digits[0] = value;
-                        }
-                        if (dx === 0 && dy === 0.5) {
-                            digits[1] = value;
-                        }
-                        if (dx === -0.5 && dy === 0) {
-                            digits[2] = value;
-                        }
+                const cluesMap: Record<string, RotatableClue> = {};
+                for (const clue of items) {
+                    const pivot = getCluePivot(clue);
+                    if (!pivot) {
+                        continue;
                     }
+                    const key = stringifyPosition(pivot);
+                    cluesMap[key] = cluesMap[key] ?? {
+                        pivot,
+                        clues: [],
+                    };
+                    cluesMap[key].clues.push(clue);
+                }
+                let clues = Object.values(cluesMap);
+                if (isWheels) {
+                    clues = clues.map(({ pivot, clues }) => {
+                        const digits = Array<number | undefined>(4).fill(undefined);
 
-                    return createWheel(pivot, ...digits);
-                });
+                        for (const clue of clues) {
+                            const { cells } = clue;
+                            if (!isTextConstraint(clue) || cells.length > 2) {
+                                continue;
+                            }
+
+                            const value = Number(clue.props.text);
+                            if (!Number.isFinite(value)) {
+                                continue;
+                            }
+
+                            const { top, left } = getAveragePosition(cells);
+                            const dx = pivot.left - left;
+                            const dy = pivot.top - top;
+
+                            if (dx === 0 && dy === -0.5) {
+                                digits[3] = value;
+                            }
+                            if (dx === 0.5 && dy === 0) {
+                                digits[0] = value;
+                            }
+                            if (dx === 0 && dy === 0.5) {
+                                digits[1] = value;
+                            }
+                            if (dx === -0.5 && dy === 0) {
+                                digits[2] = value;
+                            }
+                        }
+
+                        return createWheel(pivot, ...digits);
+                    });
+                }
+                const noPivotItems = items.filter((clue) => !getCluePivot(clue));
+
+                return {
+                    clues: clues,
+                    filteredItems: noPivotItems,
+                };
             }
-            const noPivotItems = items.filter((clue) => !getCluePivot(clue));
 
-            return {
-                clues: clues,
-                filteredItems: noPivotItems,
-            };
-        }
-
-        return {clues: []};
-    },
-});
+            return { clues: [] };
+        },
+    });

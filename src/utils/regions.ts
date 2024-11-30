@@ -1,5 +1,5 @@
-import {isSamePosition, Position, stringifyCellCoords} from "../types/layout/Position";
-import {emptyRect, Rect} from "../types/layout/Rect";
+import { isSamePosition, Position, stringifyCellCoords } from "../types/layout/Position";
+import { emptyRect, Rect } from "../types/layout/Rect";
 
 export const getRegionMap = <T>(cells: Position[], value: T) => {
     const map: Record<string, T> = {};
@@ -16,8 +16,8 @@ export const getRegionBoundingBox = (cells: Position[], cellWidth: number): Rect
         return emptyRect;
     }
 
-    const tops = cells.map(cell => cell.top);
-    const lefts = cells.map(cell => cell.left);
+    const tops = cells.map((cell) => cell.top);
+    const lefts = cells.map((cell) => cell.left);
 
     const min: Position = {
         top: Math.min(...tops),
@@ -35,7 +35,12 @@ export const getRegionBoundingBox = (cells: Position[], cellWidth: number): Rect
     };
 };
 
-export const getRegionBorders = (cells: Position[], cellWidth: number, includeLoopedCell = false, optimize = true): Position[] => {
+export const getRegionBorders = (
+    cells: Position[],
+    cellWidth: number,
+    includeLoopedCell = false,
+    optimize = true,
+): Position[] => {
     if (!cells.length) {
         return [];
     }
@@ -46,7 +51,7 @@ export const getRegionBorders = (cells: Position[], cellWidth: number, includeLo
     const bordersGraph: Record<string, Position[]> = {};
     for (let top = boundingBox.top; top <= boundingBox.top + boundingBox.height; top++) {
         for (let left = boundingBox.left; left <= boundingBox.left + boundingBox.width; left++) {
-            const cellCoords: Position = {left, top};
+            const cellCoords: Position = { left, top };
             const cellCoordsStr = stringifyCellCoords(cellCoords);
 
             const addToGraph = (cellCoords2: Position) => {
@@ -60,41 +65,38 @@ export const getRegionBorders = (cells: Position[], cellWidth: number, includeLo
             };
 
             // Add the left border before the top border for the top-left cell, so that the region will go anti-clockwise
-            if (cellsMap[cellCoordsStr] !== cellsMap[stringifyCellCoords({left: left - 1, top})]) {
-                addToGraph({left, top: top + 1});
+            if (cellsMap[cellCoordsStr] !== cellsMap[stringifyCellCoords({ left: left - 1, top })]) {
+                addToGraph({ left, top: top + 1 });
             }
 
-            if (cellsMap[cellCoordsStr] !== cellsMap[stringifyCellCoords({left, top: top - 1})]) {
-                addToGraph({left: left + 1, top});
+            if (cellsMap[cellCoordsStr] !== cellsMap[stringifyCellCoords({ left, top: top - 1 })]) {
+                addToGraph({ left: left + 1, top });
             }
         }
     }
 
     const topLeftCell: Position = {
         top: boundingBox.top,
-        left: Math.min(
-            ...cells
-                .filter(cell => cell.top === boundingBox.top)
-                .map(cell => cell.left)
-        ),
+        left: Math.min(...cells.filter((cell) => cell.top === boundingBox.top).map((cell) => cell.left)),
     };
 
     const borderPoints = [topLeftCell];
     for (
-        let cell1 = topLeftCell,
-            cell1Str = stringifyCellCoords(cell1),
-            cell2: Position,
-            cell2Str: string;
+        let cell1 = topLeftCell, cell1Str = stringifyCellCoords(cell1), cell2: Position, cell2Str: string;
         bordersGraph[cell1Str].length;
         cell1 = cell2, cell1Str = cell2Str
     ) {
         // Peek the next cell and remove the border from the graph
         cell2 = bordersGraph[cell1Str].shift()!;
         cell2Str = stringifyCellCoords(cell2);
-        bordersGraph[cell2Str] = bordersGraph[cell2Str].filter(cell => !isSamePosition(cell, cell1));
+        bordersGraph[cell2Str] = bordersGraph[cell2Str].filter((cell) => !isSamePosition(cell, cell1));
 
         // Add the current border to the results (replace the previous point if the next point is the continuation)
-        if (optimize && borderPoints.length >= 2 && (borderPoints[borderPoints.length - 2].left === cell1.left) === (cell1.left === cell2.left)) {
+        if (
+            optimize &&
+            borderPoints.length >= 2 &&
+            (borderPoints[borderPoints.length - 2].left === cell1.left) === (cell1.left === cell2.left)
+        ) {
             borderPoints[borderPoints.length - 1] = cell2;
         } else {
             borderPoints.push(cell2);

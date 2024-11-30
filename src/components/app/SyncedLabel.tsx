@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {useState} from "react";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../utils/profiler";
-import {useAblyChannelState} from "../../hooks/useAbly";
-import {ablyOptions} from "../../hooks/useMultiPlayer";
-import {useEventListener} from "../../hooks/useEventListener";
+import { useState } from "react";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../utils/profiler";
+import { useAblyChannelState } from "../../hooks/useAbly";
+import { ablyOptions } from "../../hooks/useMultiPlayer";
+import { useEventListener } from "../../hooks/useEventListener";
 
 export interface SyncedLabelProps {
     name: string;
@@ -39,7 +39,7 @@ const StyledInput = styled.input({
     margin: 0,
 });
 
-export const SyncedLabel = observer(function SyncedLabel({name, isObs}: SyncedLabelProps) {
+export const SyncedLabel = observer(function SyncedLabel({ name, isObs }: SyncedLabelProps) {
     profiler.trace();
 
     const [text = "", setText, connected] = useAblyChannelState<string>(ablyOptions, "label-sync-" + name);
@@ -79,21 +79,25 @@ export const SyncedLabel = observer(function SyncedLabel({name, isObs}: SyncedLa
         }
     });
 
-    return <StyledContainer
-        onClick={() => {
-            if (connected && !isEditing) {
-                start();
-            }
-        }}
-    >
-        {!isEditing && <span>{text || (isObs ? "" : "click to edit...")}</span>}
+    return (
+        <StyledContainer
+            onClick={() => {
+                if (connected && !isEditing) {
+                    start();
+                }
+            }}
+        >
+            {!isEditing && <span>{text || (isObs ? "" : "click to edit...")}</span>}
 
-        {isEditing && <StyledInput
-            type={"text"}
-            placeholder={"Start typing..."}
-            value={textInput}
-            onInput={(ev) => setTextInput(ev.currentTarget.value)}
-            autoFocus={true}
-        />}
-    </StyledContainer>;
+            {isEditing && (
+                <StyledInput
+                    type={"text"}
+                    placeholder={"Start typing..."}
+                    value={textInput}
+                    onInput={(ev) => setTextInput(ev.currentTarget.value)}
+                    autoFocus={true}
+                />
+            )}
+        </StyledContainer>
+    );
 });

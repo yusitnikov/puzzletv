@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {textHeightCoeff} from "../../../app/globals";
+import { textHeightCoeff } from "../../../app/globals";
 
 interface SettingsCheckboxProps {
     cellSize: number;
@@ -9,8 +9,8 @@ interface SettingsCheckboxProps {
 export const SettingsCheckbox = styled("input", {
     shouldForwardProp(propName) {
         return propName !== "cellSize";
-    }
-})(({cellSize}: SettingsCheckboxProps) => ({
+    },
+})(({ cellSize }: SettingsCheckboxProps) => ({
     padding: 0,
     margin: 0,
     marginLeft: cellSize * textHeightCoeff,

@@ -1,33 +1,33 @@
-import {DigitComponentType} from "../../components/sudoku/digit/DigitComponentType";
-import {CellDataComponentType} from "../../components/sudoku/cell/CellDataComponentType";
-import {getLineVector, Position, PositionWithAngle} from "../layout/Position";
-import {SetInterface} from "../struct/Set";
-import {GameStateEx, PartialGameStateEx} from "./GameState";
-import {ComponentType, ReactNode} from "react";
-import {ControlsProps} from "../../components/sudoku/controls/Controls";
-import {Translatable} from "../translations/Translatable";
-import {getIsSamePuzzlePosition, PuzzleDefinition} from "./PuzzleDefinition";
-import {CellSelectionColor, CellSelectionByDataProps} from "../../components/sudoku/cell/CellSelection";
-import {GridRegion} from "./GridRegion";
-import {Constraint} from "./Constraint";
-import {PuzzleContext, PuzzleContextProps} from "./PuzzleContext";
-import {CellStateEx} from "./CellState";
-import {CellWriteMode} from "./CellWriteMode";
-import {CellWriteModeInfo} from "./CellWriteModeInfo";
-import {GameStateAction, GameStateActionType} from "./GameStateAction";
-import {useTranslate} from "../../hooks/useTranslate";
-import {KeyInfo} from "./KeyInfo";
-import {SettingsContentProps} from "../../components/sudoku/controls/settings/SettingsContent";
-import {regionTag} from "../../components/sudoku/constraints/region/Region";
-import {ControlButtonItem} from "../../components/sudoku/controls/ControlButtonsManager";
-import {AnyPTM} from "./PuzzleTypeMap";
-import {CellTypeProps, isSelectableCell} from "./CellTypeProps";
-import {IReactionDisposer} from "mobx";
-import {GivenDigitsMap} from "./GivenDigitsMap";
-import {ColorsImportMode, PuzzleImportOptions} from "./PuzzleImportOptions";
-import {PuzzleImporter} from "../../data/puzzles/PuzzleImporter";
-import {GridParser} from "../../data/puzzles/GridParser";
-import {FieldState} from "./FieldState";
+import { DigitComponentType } from "../../components/sudoku/digit/DigitComponentType";
+import { CellDataComponentType } from "../../components/sudoku/cell/CellDataComponentType";
+import { getLineVector, Position, PositionWithAngle } from "../layout/Position";
+import { SetInterface } from "../struct/Set";
+import { GameStateEx, PartialGameStateEx } from "./GameState";
+import { ComponentType, ReactNode } from "react";
+import { ControlsProps } from "../../components/sudoku/controls/Controls";
+import { Translatable } from "../translations/Translatable";
+import { getIsSamePuzzlePosition, PuzzleDefinition } from "./PuzzleDefinition";
+import { CellSelectionColor, CellSelectionByDataProps } from "../../components/sudoku/cell/CellSelection";
+import { GridRegion } from "./GridRegion";
+import { Constraint } from "./Constraint";
+import { PuzzleContext, PuzzleContextProps } from "./PuzzleContext";
+import { CellStateEx } from "./CellState";
+import { CellWriteMode } from "./CellWriteMode";
+import { CellWriteModeInfo } from "./CellWriteModeInfo";
+import { GameStateAction, GameStateActionType } from "./GameStateAction";
+import { useTranslate } from "../../hooks/useTranslate";
+import { KeyInfo } from "./KeyInfo";
+import { SettingsContentProps } from "../../components/sudoku/controls/settings/SettingsContent";
+import { regionTag } from "../../components/sudoku/constraints/region/Region";
+import { ControlButtonItem } from "../../components/sudoku/controls/ControlButtonsManager";
+import { AnyPTM } from "./PuzzleTypeMap";
+import { CellTypeProps, isSelectableCell } from "./CellTypeProps";
+import { IReactionDisposer } from "mobx";
+import { GivenDigitsMap } from "./GivenDigitsMap";
+import { ColorsImportMode, PuzzleImportOptions } from "./PuzzleImportOptions";
+import { PuzzleImporter } from "../../data/puzzles/PuzzleImporter";
+import { GridParser } from "../../data/puzzles/GridParser";
+import { FieldState } from "./FieldState";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -51,7 +51,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         // default: true
         useState?: boolean,
         // default: true
-        forConstraints?: boolean
+        forConstraints?: boolean,
     ): number;
 
     getCellDataHash(data: T["cell"], puzzle: PuzzleDefinition<T>): string;
@@ -74,16 +74,9 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     areFieldStateExtensionsEqual?(a: T["fieldStateEx"], b: T["fieldStateEx"]): boolean;
 
-    createCellDataByDisplayDigit(
-        digit: number,
-        context: PuzzleContext<T>,
-    ): T["cell"];
+    createCellDataByDisplayDigit(digit: number, context: PuzzleContext<T>): T["cell"];
 
-    createCellDataByTypedDigit(
-        digit: number,
-        context: PuzzleContext<T>,
-        position?: Position
-    ): T["cell"];
+    createCellDataByTypedDigit(digit: number, context: PuzzleContext<T>, position?: Position): T["cell"];
 
     createCellDataByImportedDigit(digit: number, importOptions: PuzzleImportOptions): T["cell"];
 
@@ -113,7 +106,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         clientId: string,
         context: PuzzleContext<T>,
         cellData: T["cell"],
-        defaultResult: PartialGameStateEx<T>
+        defaultResult: PartialGameStateEx<T>,
     ): PartialGameStateEx<T>;
 
     handleDigitInCell?(
@@ -125,7 +118,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         position: Position,
         context: PuzzleContext<T>,
         defaultResult: Partial<CellStateEx<T>>,
-        cache: any
+        cache: any,
     ): Partial<CellStateEx<T>>;
 
     extraCellWriteModes?: CellWriteModeInfo<T>[];
@@ -181,18 +174,15 @@ export interface SudokuTypeManager<T extends AnyPTM> {
         xDirection: number,
         yDirection: number,
         context: PuzzleContext<T>,
-        isMainKeyboard: boolean
-    ): {cell?: Position, state?: PartialGameStateEx<T>};
+        isMainKeyboard: boolean,
+    ): { cell?: Position; state?: PartialGameStateEx<T> };
 
     // Apply processArrowDirection() changes even if there are no selected cells
     applyArrowProcessorToNoCell?: boolean;
 
     applyArrowsToHistory?: boolean;
 
-    transformCoords?(
-        coords: Position,
-        context: PuzzleContext<T>,
-    ): Position;
+    transformCoords?(coords: Position, context: PuzzleContext<T>): Position;
 
     // true if transformCoords() doesn't distribute the coords evenly (if it has distortion)
     isOddTransformCoords?: boolean;
@@ -202,22 +192,18 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     regionSpecificUserMarks?: boolean;
 
-    items?: Constraint<T, any>[]
-        | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
+    items?: Constraint<T, any>[] | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
 
     cosmeticRegions?: boolean;
     getRegionsForRowsAndColumns?(context: PuzzleContext<T>): Constraint<T, any>[];
 
-    getAdditionalNeighbors?(
-        position: Position,
-        puzzle: PuzzleDefinition<T>,
-    ): Position[];
+    getAdditionalNeighbors?(position: Position, puzzle: PuzzleDefinition<T>): Position[];
 
     borderColor?: string;
 
     getCellSelectionType?(
         cell: Position,
-        context: PuzzleContext<T>
+        context: PuzzleContext<T>,
     ): Required<Pick<CellSelectionByDataProps<T>, "color" | "strokeWidth">> | undefined;
 
     mainControlsComponent?: ComponentType<ControlsProps<T>>;
@@ -233,50 +219,47 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     digitShortcuts?: (string | KeyInfo)[][];
 
-    digitShortcutTips?: (Translatable|undefined)[];
+    digitShortcutTips?: (Translatable | undefined)[];
 
     disableConflictChecker?: boolean;
 
-    getSharedState?(
-        puzzle: PuzzleDefinition<T>,
-        state: GameStateEx<T>
-    ): any;
+    getSharedState?(puzzle: PuzzleDefinition<T>, state: GameStateEx<T>): any;
 
     setSharedState?(context: PuzzleContext<T>, newState: any): GameStateEx<T>;
 
-    getInternalState?(
-        puzzle: PuzzleDefinition<T>,
-        state: GameStateEx<T>
-    ): any;
+    getInternalState?(puzzle: PuzzleDefinition<T>, state: GameStateEx<T>): any;
 
-    unserializeInternalState?(
-        puzzle: PuzzleDefinition<T>,
-        newState: any
-    ): PartialGameStateEx<T>;
+    unserializeInternalState?(puzzle: PuzzleDefinition<T>, newState: any): PartialGameStateEx<T>;
 
     supportedActionTypes?: GameStateActionType<any, T>[];
 
-    handleClearAction?(
-        context: PuzzleContext<T>,
-        clientId: string
-    ): PartialGameStateEx<T>;
+    handleClearAction?(context: PuzzleContext<T>, clientId: string): PartialGameStateEx<T>;
 
-    isGlobalAction?(
-        action: GameStateAction<any, T>,
-        context: PuzzleContext<T>
-    ): boolean;
+    isGlobalAction?(action: GameStateAction<any, T>, context: PuzzleContext<T>): boolean;
 
     getReactions?(context: PuzzleContext<T>): IReactionDisposer[];
 
     getPlayerScore?(context: PuzzleContext<T>, clientId: string): string | number;
 
     // TODO: transform into a component
-    getAboveRules?(translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>, isPortrait: boolean): ReactNode;
+    getAboveRules?(
+        translate: ReturnType<typeof useTranslate>,
+        context: PuzzleContext<T>,
+        isPortrait: boolean,
+    ): ReactNode;
 
     postProcessPuzzle?(puzzle: PuzzleDefinition<T>): typeof puzzle;
 
-    preProcessImportGrid?(puzzle: PuzzleDefinition<T>, importer: PuzzleImporter<T>, gridParser: GridParser<T, any>): void;
-    postProcessImportGrid?(puzzle: PuzzleDefinition<T>, importer: PuzzleImporter<T>, gridParser: GridParser<T, any>): void;
+    preProcessImportGrid?(
+        puzzle: PuzzleDefinition<T>,
+        importer: PuzzleImporter<T>,
+        gridParser: GridParser<T, any>,
+    ): void;
+    postProcessImportGrid?(
+        puzzle: PuzzleDefinition<T>,
+        importer: PuzzleImporter<T>,
+        gridParser: GridParser<T, any>,
+    ): void;
 
     onImportPuzzleProp?<P extends keyof PuzzleDefinition<T>>(
         puzzle: PuzzleDefinition<T>,
@@ -306,13 +289,18 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 // region Helper functions
 
 export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPTM>(
-    {left, top}: Position,
+    { left, top }: Position,
     xDirection: number,
     yDirection: number,
-    {puzzleIndex, puzzle: {fieldSize: {rowsCount, columnsCount}}}: PuzzleContext<T>
-): {cell?: Position, state?: undefined} => {
+    {
+        puzzleIndex,
+        puzzle: {
+            fieldSize: { rowsCount, columnsCount },
+        },
+    }: PuzzleContext<T>,
+): { cell?: Position; state?: undefined } => {
     const isTotallyValidCell = (position: Position) => {
-        const {top, left} = position;
+        const { top, left } = position;
         if (top < 0 || top >= rowsCount || left < 0 || left >= columnsCount) {
             return false;
         }
@@ -326,30 +314,32 @@ export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPT
     };
 
     if (isTotallyValidCell(newPosition)) {
-        return {cell: newPosition};
+        return { cell: newPosition };
     }
 
     // If the naive new position is not valid then go in the reverse direction while it's possible
     do {
         newPosition.left -= xDirection;
         newPosition.top -= yDirection;
-    } while (isTotallyValidCell({
-        left: newPosition.left - xDirection,
-        top: newPosition.top - yDirection,
-    }));
+    } while (
+        isTotallyValidCell({
+            left: newPosition.left - xDirection,
+            top: newPosition.top - yDirection,
+        })
+    );
 
-    return {cell: newPosition};
+    return { cell: newPosition };
 };
 
 export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM>(
-    {left, top}: Position,
+    { left, top }: Position,
     xDirection: number,
     yDirection: number,
-    {puzzleIndex}: PuzzleContext<T>,
+    { puzzleIndex }: PuzzleContext<T>,
     _isMainKeyboard?: boolean,
     enableBackwardSteps = true,
-): {cell?: Position, state?: undefined} => {
-    const {center, neighbors} = puzzleIndex.allCells[top][left];
+): { cell?: Position; state?: undefined } => {
+    const { center, neighbors } = puzzleIndex.allCells[top][left];
 
     let bestDist: number | undefined = undefined;
     let bestCell: Position | undefined = undefined;
@@ -360,7 +350,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
         }
 
         const center2 = puzzleIndex.allCells[neighbor.top][neighbor.left].center;
-        const vector = getLineVector({start: center, end: center2});
+        const vector = getLineVector({ start: center, end: center2 });
 
         const straightDist = vector.left * xDirection + vector.top * yDirection;
         if (!enableBackwardSteps && straightDist < 0) {
@@ -374,7 +364,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
         }
     }
 
-    return {cell: bestCell};
+    return { cell: bestCell };
 };
 
 export const defaultProcessArrowDirection = <T extends AnyPTM>(
@@ -384,9 +374,16 @@ export const defaultProcessArrowDirection = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     isMainKeyboard?: boolean,
     enableBackwardSteps?: boolean,
-): {cell?: Position, state?: undefined} => {
+): { cell?: Position; state?: undefined } => {
     return context.puzzle.customCellBounds
-        ? defaultProcessArrowDirectionForCustomCellBounds(position, xDirection, yDirection, context, isMainKeyboard, enableBackwardSteps)
+        ? defaultProcessArrowDirectionForCustomCellBounds(
+              position,
+              xDirection,
+              yDirection,
+              context,
+              isMainKeyboard,
+              enableBackwardSteps,
+          )
         : defaultProcessArrowDirectionForRegularCellBounds(position, xDirection, yDirection, context);
 };
 
@@ -405,7 +402,7 @@ export const getDefaultCellSelectionType = <T extends AnyPTM>(
     cell: Position,
     context: PuzzleContext<T>,
 ): ReturnType<Required<SudokuTypeManager<T>>["getCellSelectionType"]> => {
-    const {puzzle, selectedCells} = context;
+    const { puzzle, selectedCells } = context;
 
     if (context.selectedCellsCount === 0) {
         return undefined;
@@ -415,17 +412,17 @@ export const getDefaultCellSelectionType = <T extends AnyPTM>(
     const doesRegionContainCell = (cells: Position[], cell: Position) =>
         cells.some((cell2) => isSamePosition(cell2, cell));
     const seenRegions = context.allItems
-        .filter(({tags}) => tags?.includes(regionTag))
-        .map(({cells}) => cells)
+        .filter(({ tags }) => tags?.includes(regionTag))
+        .map(({ cells }) => cells)
         .filter((region) => doesRegionContainCell(region, cell));
-    const isSeen = selectedCells.items.every((selectedCell) => seenRegions.some(
-        (region) => doesRegionContainCell(region, selectedCell)
-    ));
+    const isSeen = selectedCells.items.every((selectedCell) =>
+        seenRegions.some((region) => doesRegionContainCell(region, selectedCell)),
+    );
     return isSeen
         ? {
-            color: CellSelectionColor.secondary,
-            strokeWidth: 1,
-        }
+              color: CellSelectionColor.secondary,
+              strokeWidth: 1,
+          }
         : undefined;
 };
 

@@ -1,26 +1,26 @@
-import {allDrawingModes, PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {Chameleon} from "../authors";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { Chameleon } from "../authors";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import {
     antiKnightRulesExplained,
     cannotRepeatInCage,
     killerCagesExplained,
-    normalSudokuRulesApply
+    normalSudokuRulesApply,
 } from "../ruleSnippets";
 import React from "react";
-import {Constraint, isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import {
     KillerCageConstraint,
-    KillerCageConstraintByRect
+    KillerCageConstraintByRect,
 } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
-import {SetInterface} from "../../types/struct/Set";
-import {CellColor} from "../../types/sudoku/CellColor";
-import {indexes} from "../../utils/indexes";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
+import { SetInterface } from "../../types/struct/Set";
+import { CellColor } from "../../types/sudoku/CellColor";
+import { indexes } from "../../utils/indexes";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 
 const correctAnswer: number[][] = [
     [9, 4, 5, 1, 8, 6, 7, 3, 2],
@@ -62,16 +62,17 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
-    rules: translate => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)}.</RulesParagraph>
-        <RulesParagraph>{translate(antiKnightRulesExplained)}.</RulesParagraph>
-    </>,
-    initialDigits: {0: {2: 5, 6: 7}},
-    items: [
-        ...items,
-        KillerCageConstraintByRect("R7C5", 1, 2, 7),
-    ],
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            <RulesParagraph>
+                {translate(killerCagesExplained)}. {translate(cannotRepeatInCage)}.
+            </RulesParagraph>
+            <RulesParagraph>{translate(antiKnightRulesExplained)}.</RulesParagraph>
+        </>
+    ),
+    initialDigits: { 0: { 2: 5, 6: 7 } },
+    items: [...items, KillerCageConstraintByRect("R7C5", 1, 2, 7)],
     allowDrawing: allDrawingModes,
     resultChecker: (context) => {
         if (isValidFinishedPuzzleByConstraints(context)) {
@@ -99,7 +100,11 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
 
         for (const [groupIndex1, groupColors1] of groupsColors.entries()) {
             for (const [groupIndex2, groupColors2] of groupsColors.entries()) {
-                if (groupIndex2 > groupIndex1 && Math.floor(groupIndex1 / 3) !== Math.floor(groupIndex2 / 3) && groupColors1!.equals(groupColors2!)) {
+                if (
+                    groupIndex2 > groupIndex1 &&
+                    Math.floor(groupIndex1 / 3) !== Math.floor(groupIndex2 / 3) &&
+                    groupColors1!.equals(groupColors2!)
+                ) {
                     return false;
                 }
             }

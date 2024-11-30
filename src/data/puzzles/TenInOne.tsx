@@ -1,14 +1,14 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {TenInOneSudokuTypeManager} from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
-import {createRegularFieldSize} from "../../types/sudoku/FieldSize";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { TenInOneSudokuTypeManager } from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
+import { createRegularFieldSize } from "../../types/sudoku/FieldSize";
 import {
     KillerCageConstraint,
-    KillerCageConstraintByRect
+    KillerCageConstraintByRect,
 } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import {AnalyticalNinja, Raumplaner} from "../authors";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import { AnalyticalNinja, Raumplaner } from "../authors";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import {
     arrowsExplained,
     arrowsTitle,
@@ -30,34 +30,37 @@ import {
     parityLineTitle,
     sameParityLineExplained,
     twoDigitArrowCirclesExplained,
-    whiteKropkiDotsExplained
+    whiteKropkiDotsExplained,
 } from "../ruleSnippets";
-import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
+import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
 import React from "react";
-import {tenInOneMultiBoxLineRules, tenInOneStage1Rules} from "../../sudokuTypes/ten-in-one/data/ruleSnippets";
-import {isValidFinishedPuzzleByStageConstraints} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
-import {RulesIndentedBlock} from "../../components/sudoku/rules/RulesIndentedBlock";
-import {processTranslations} from "../../utils/translate";
-import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
-import {Constraint, toDecorativeConstraint, toInvisibleConstraint} from "../../types/sudoku/Constraint";
-import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
-import {Position, PositionLiteral} from "../../types/layout/Position";
-import {AmbiguousLineConstraint} from "../../components/sudoku/constraints/ambiguous-line/AmbiguousLine";
-import {SameParityLineConstraint} from "../../components/sudoku/constraints/same-parity-line/SameParityLine";
-import {peachColor} from "../../components/app/globals";
-import {MultiStagePTM} from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
+import { tenInOneMultiBoxLineRules, tenInOneStage1Rules } from "../../sudokuTypes/ten-in-one/data/ruleSnippets";
+import { isValidFinishedPuzzleByStageConstraints } from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
+import { RulesIndentedBlock } from "../../components/sudoku/rules/RulesIndentedBlock";
+import { processTranslations } from "../../utils/translate";
+import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
+import { Constraint, toDecorativeConstraint, toInvisibleConstraint } from "../../types/sudoku/Constraint";
+import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
+import { Position, PositionLiteral } from "../../types/layout/Position";
+import { AmbiguousLineConstraint } from "../../components/sudoku/constraints/ambiguous-line/AmbiguousLine";
+import { SameParityLineConstraint } from "../../components/sudoku/constraints/same-parity-line/SameParityLine";
+import { peachColor } from "../../components/app/globals";
+import { MultiStagePTM } from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
 
 const remainingBoxPositionIndexes = [0, 4, 8];
 const keepDigitsAccordingBoxPositionText = {
-    [LanguageCode.en]: "Keep the digit from stage 1 in each box that corresponds to their box position " +
-    "(e.g. keep r1c1 in box 1, r5c9 in box 6, and r9c5 in box 8), clean up all other cells",
-    [LanguageCode.ru]: "Из этапа 1 оставьте в каждом квадрате цифру, которая соответствует положению её квадрата " +
-    "(например, оставьте r1c1 в квадрате 1, r5c9 в квадрате 6, и r9c5 в квадрате 8), очистите все остальные ячейки",
-    [LanguageCode.de]: "Behalten Sie die Ziffer aus Stufe 1 in jedem Kästchen, das ihrer Kästchenposition entspricht " +
-    "(z. B. behalten Sie r1c1 in Kästchen 1, r5c9 in Kästchen 6 und r9c5 in Kästchen 8) und bereinigen Sie alle anderen Zellen",
+    [LanguageCode.en]:
+        "Keep the digit from stage 1 in each box that corresponds to their box position " +
+        "(e.g. keep r1c1 in box 1, r5c9 in box 6, and r9c5 in box 8), clean up all other cells",
+    [LanguageCode.ru]:
+        "Из этапа 1 оставьте в каждом квадрате цифру, которая соответствует положению её квадрата " +
+        "(например, оставьте r1c1 в квадрате 1, r5c9 в квадрате 6, и r9c5 в квадрате 8), очистите все остальные ячейки",
+    [LanguageCode.de]:
+        "Behalten Sie die Ziffer aus Stufe 1 in jedem Kästchen, das ihrer Kästchenposition entspricht " +
+        "(z. B. behalten Sie r1c1 in Kästchen 1, r5c9 in Kästchen 6 und r9c5 in Kästchen 8) und bereinigen Sie alle anderen Zellen",
 };
-const keepDigitsAccordingBoxPositionCallback = ({top, left}: Position) =>
+const keepDigitsAccordingBoxPositionCallback = ({ top, left }: Position) =>
     remainingBoxPositionIndexes.includes(top) && remainingBoxPositionIndexes.includes(left);
 
 const fieldSize = createRegularFieldSize(9, 3);
@@ -73,36 +76,57 @@ export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
     slug: "abstract-killer-dots",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
     fieldSize,
-    rules: translate => <>
-        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
-        <RulesUnorderedList>
-            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
-            <li>{ruleWithTitle(
-                translate(kropkiDotsTitle),
-                translate(whiteKropkiDotsExplained),
-                translate(blackKropkiDotsExplained)
-            )}. {translate(notAllDotsGiven)}.</li>
-        </RulesUnorderedList>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
-        </RulesIndentedBlock>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
-            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        </RulesIndentedBlock>
-        <RulesParagraph>{translate(processTranslations(
-            (phrase, author) => phrase.replace("%1", author),
-            {
-                [LanguageCode.en]: "Many thanks to %1 for the help to make the 3x3 logic unique",
-                [LanguageCode.ru]: "Большое спасибо %1 за помощь в создании уникальной логики 3x3",
-                [LanguageCode.de]: "Vielen Dank an %1 für die Hilfe, die 3x3-Logik einzigartig zu machen",
-            },
-            AnalyticalNinja
-        ))}.</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+            <RulesUnorderedList>
+                <li>
+                    {ruleWithTitle(
+                        translate(killerCagesTitle),
+                        translate(killerCagesExplained),
+                        translate(cannotRepeatInCage),
+                    )}
+                    .
+                </li>
+                <li>
+                    {ruleWithTitle(
+                        translate(kropkiDotsTitle),
+                        translate(whiteKropkiDotsExplained),
+                        translate(blackKropkiDotsExplained),
+                    )}
+                    . {translate(notAllDotsGiven)}.
+                </li>
+            </RulesUnorderedList>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "1")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+                <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+            </RulesIndentedBlock>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "2")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
+                <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            </RulesIndentedBlock>
+            <RulesParagraph>
+                {translate(
+                    processTranslations(
+                        (phrase, author) => phrase.replace("%1", author),
+                        {
+                            [LanguageCode.en]: "Many thanks to %1 for the help to make the 3x3 logic unique",
+                            [LanguageCode.ru]: "Большое спасибо %1 за помощь в создании уникальной логики 3x3",
+                            [LanguageCode.de]: "Vielen Dank an %1 für die Hilfe, die 3x3-Logik einzigartig zu machen",
+                        },
+                        AnalyticalNinja,
+                    ),
+                )}
+                .
+            </RulesParagraph>
+        </>
+    ),
     items: [
         KillerCageConstraintByRect("R1C4", 3, 1, 13),
         KillerCageConstraintByRect("R2C2", 1, 2, 7),
@@ -155,40 +179,59 @@ export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
     slug: "lego-house",
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AO9",
     getLmdSolutionCode: () => "716571791716983254",
-    typeManager: TenInOneSudokuTypeManager(
-        ({top, left}) => {
-            const topBoxIndex = Math.floor(top / 3);
-            const leftBoxIndex = Math.floor(left / 3);
-            const boxIndex = topBoxIndex * 3 + leftBoxIndex;
+    typeManager: TenInOneSudokuTypeManager(({ top, left }) => {
+        const topBoxIndex = Math.floor(top / 3);
+        const leftBoxIndex = Math.floor(left / 3);
+        const boxIndex = topBoxIndex * 3 + leftBoxIndex;
 
-            return boxIndex === top;
-        }
-    ),
+        return boxIndex === top;
+    }),
     fieldSize,
-    rules: translate => <>
-        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
-        <RulesUnorderedList>
-            <li>{ruleWithTitle(translate(killerCagesTitle), translate(killerCagesExplained), translate(cannotRepeatInCage))}.</li>
-            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}. {translate(canRepeatOnArrows)}.</li>
-        </RulesUnorderedList>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
-        </RulesIndentedBlock>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate({
-                [LanguageCode.en]: "Erase all digits within the grid whose box number does not match their row number " +
-                "(e.g. you'll keep the digits in r4c1c2c3 within box 4)",
-                [LanguageCode.ru]: "Сотрите все цифры на поле, номер квадрата которых не соответствует их номеру строки " +
-                "(например, вы сохраните цифры в r4c1c2c3 в квадрате 4)",
-                [LanguageCode.de]: "Löschen Sie alle Ziffern im Raster, deren Boxnummer nicht mit ihrer Zeilennummer übereinstimmt " +
-                "(z. B. behalten Sie die Ziffern in r4c1c2c3 in Box 4)",
-            })}.</RulesParagraph>
-            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        </RulesIndentedBlock>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+            <RulesUnorderedList>
+                <li>
+                    {ruleWithTitle(
+                        translate(killerCagesTitle),
+                        translate(killerCagesExplained),
+                        translate(cannotRepeatInCage),
+                    )}
+                    .
+                </li>
+                <li>
+                    {ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}. {translate(canRepeatOnArrows)}.
+                </li>
+            </RulesUnorderedList>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "1")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+                <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+            </RulesIndentedBlock>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "2")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>
+                    {translate({
+                        [LanguageCode.en]:
+                            "Erase all digits within the grid whose box number does not match their row number " +
+                            "(e.g. you'll keep the digits in r4c1c2c3 within box 4)",
+                        [LanguageCode.ru]:
+                            "Сотрите все цифры на поле, номер квадрата которых не соответствует их номеру строки " +
+                            "(например, вы сохраните цифры в r4c1c2c3 в квадрате 4)",
+                        [LanguageCode.de]:
+                            "Löschen Sie alle Ziffern im Raster, deren Boxnummer nicht mit ihrer Zeilennummer übereinstimmt " +
+                            "(z. B. behalten Sie die Ziffern in r4c1c2c3 in Box 4)",
+                    })}
+                    .
+                </RulesParagraph>
+                <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            </RulesIndentedBlock>
+        </>
+    ),
     items: [
         ArrowConstraint("R1C2", ["R2C3", "R3C2"]),
         ArrowConstraint("R2C7", ["R1C7", "R3C9"]),
@@ -231,26 +274,35 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
     getLmdSolutionCode: () => "936261819318276945",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
     fieldSize,
-    rules: translate => <>
-        <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
-        <RulesUnorderedList>
-            <li>{ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}. {translate(twoDigitArrowCirclesExplained)}. {translate(canRepeatOnArrows)}.</li>
-            <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</li>
-            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
-        </RulesUnorderedList>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)}.</RulesParagraph>
-        </RulesIndentedBlock>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
-            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        </RulesIndentedBlock>
-    </>,
-    items: ({stateExtension: {stage}}) => {
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
+            <RulesUnorderedList>
+                <li>
+                    {ruleWithTitle(translate(arrowsTitle), translate(arrowsExplained))}.{" "}
+                    {translate(twoDigitArrowCirclesExplained)}. {translate(canRepeatOnArrows)}.
+                </li>
+                <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</li>
+                <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained()))}.</li>
+            </RulesUnorderedList>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "1")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+                <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+                <RulesParagraph>{translate(tenInOneMultiBoxLineRules)}.</RulesParagraph>
+            </RulesIndentedBlock>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "2")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
+                <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            </RulesIndentedBlock>
+        </>
+    ),
+    items: ({ stateExtension: { stage } }) => {
         let lines: Constraint<MultiStagePTM, any>[] = [
             RenbanConstraint(["R3C3", "R2C3", "R1C4", "R2C5"]),
             RenbanConstraint(["R5C6", "R6C6", "R6C7", "R5C8"]),
@@ -261,16 +313,18 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
             lines = lines.map(toDecorativeConstraint);
 
             // Add parts of the lines in each box separately
-            lines.push(...[
-                RenbanConstraint(["R3C3", "R2C3"]),
-                RenbanConstraint(["R1C4", "R2C5"]),
-                RenbanConstraint(["R5C6", "R6C6"]),
-                RenbanConstraint(["R6C7", "R5C8"]),
-                WhispersConstraint(["R5C5", "R4C4"]),
-                WhispersConstraint(["R5C3", "R6C2"]),
-                WhispersConstraint(["R7C2", "R8C2", "R8C3"]),
-                WhispersConstraint(["R8C4", "R8C6"]),
-            ].map(toInvisibleConstraint));
+            lines.push(
+                ...[
+                    RenbanConstraint(["R3C3", "R2C3"]),
+                    RenbanConstraint(["R1C4", "R2C5"]),
+                    RenbanConstraint(["R5C6", "R6C6"]),
+                    RenbanConstraint(["R6C7", "R5C8"]),
+                    WhispersConstraint(["R5C5", "R4C4"]),
+                    WhispersConstraint(["R5C3", "R6C2"]),
+                    WhispersConstraint(["R7C2", "R8C2", "R8C3"]),
+                    WhispersConstraint(["R8C4", "R8C6"]),
+                ].map(toInvisibleConstraint),
+            );
         }
 
         return [
@@ -296,12 +350,13 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
     resultChecker,
 };
 
-const MoodyLineConstraint = (cellLiterals: PositionLiteral[], visible = true) => AmbiguousLineConstraint<MultiStagePTM>(
-    cellLiterals,
-    [RenbanConstraint, WhispersConstraint, SameParityLineConstraint],
-    visible ? undefined : 0,
-    peachColor
-);
+const MoodyLineConstraint = (cellLiterals: PositionLiteral[], visible = true) =>
+    AmbiguousLineConstraint<MultiStagePTM>(
+        cellLiterals,
+        [RenbanConstraint, WhispersConstraint, SameParityLineConstraint],
+        visible ? undefined : 0,
+        peachColor,
+    );
 
 export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
     noIndex: true,
@@ -316,36 +371,55 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
     fieldSize,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000ASD",
     getLmdSolutionCode: () => "592648736742839615",
-    rules: translate => <>
-        <RulesParagraph>{translate(arrowsExplained)}. {translate(canRepeatOnArrows)}.</RulesParagraph>
-        <RulesParagraph>{translate(killerCagesExplained)}.</RulesParagraph>
-        <RulesParagraph>{translate({
-            [LanguageCode.en]: "Ambiguous lines, each line must be one of these types (at least)",
-            [LanguageCode.ru]: "Неоднозначные линии, каждая линия должна быть одного из этих типов (как минимум)",
-            [LanguageCode.de]: "Mehrdeutige Zeilen, jede Zeile muss (mindestens) einer dieser Typen sein",
-        })}:</RulesParagraph>
-        <RulesUnorderedList>
-            <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained(true)))}.</li>
-            <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained(true)))}.</li>
-            <li>{ruleWithTitle(translate(parityLineTitle), translate(sameParityLineExplained(true)))}.</li>
-        </RulesUnorderedList>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "1")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
-            <RulesParagraph>{translate(tenInOneMultiBoxLineRules)} ({translate({
-                [LanguageCode.en]: "in this stage, line segments in different boxes can be different line types",
-                [LanguageCode.ru]: "на этом этапе сегменты линий в разных квадратах могут быть линиями разных типов",
-                [LanguageCode.de]: "in dieser Phase können Liniensegmente in verschiedenen Feldern unterschiedliche Linientypen sein",
-            })}).</RulesParagraph>
-        </RulesIndentedBlock>
-        <RulesParagraph><strong>{translate("Stage %1").replace("%1", "2")}:</strong></RulesParagraph>
-        <RulesIndentedBlock>
-            <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
-            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        </RulesIndentedBlock>
-    </>,
-    items: ({stateExtension: {stage}}) => {
+    rules: (translate) => (
+        <>
+            <RulesParagraph>
+                {translate(arrowsExplained)}. {translate(canRepeatOnArrows)}.
+            </RulesParagraph>
+            <RulesParagraph>{translate(killerCagesExplained)}.</RulesParagraph>
+            <RulesParagraph>
+                {translate({
+                    [LanguageCode.en]: "Ambiguous lines, each line must be one of these types (at least)",
+                    [LanguageCode.ru]:
+                        "Неоднозначные линии, каждая линия должна быть одного из этих типов (как минимум)",
+                    [LanguageCode.de]: "Mehrdeutige Zeilen, jede Zeile muss (mindestens) einer dieser Typen sein",
+                })}
+                :
+            </RulesParagraph>
+            <RulesUnorderedList>
+                <li>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained(true)))}.</li>
+                <li>{ruleWithTitle(translate(germanWhispersTitle), translate(germanWhispersExplained(true)))}.</li>
+                <li>{ruleWithTitle(translate(parityLineTitle), translate(sameParityLineExplained(true)))}.</li>
+            </RulesUnorderedList>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "1")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>{translate(normalSudokuRulesDoNotApply)}.</RulesParagraph>
+                <RulesParagraph>{translate(tenInOneStage1Rules)}.</RulesParagraph>
+                <RulesParagraph>
+                    {translate(tenInOneMultiBoxLineRules)} (
+                    {translate({
+                        [LanguageCode.en]:
+                            "in this stage, line segments in different boxes can be different line types",
+                        [LanguageCode.ru]:
+                            "на этом этапе сегменты линий в разных квадратах могут быть линиями разных типов",
+                        [LanguageCode.de]:
+                            "in dieser Phase können Liniensegmente in verschiedenen Feldern unterschiedliche Linientypen sein",
+                    })}
+                    ).
+                </RulesParagraph>
+            </RulesIndentedBlock>
+            <RulesParagraph>
+                <strong>{translate("Stage %1").replace("%1", "2")}:</strong>
+            </RulesParagraph>
+            <RulesIndentedBlock>
+                <RulesParagraph>{translate(keepDigitsAccordingBoxPositionText)}.</RulesParagraph>
+                <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            </RulesIndentedBlock>
+        </>
+    ),
+    items: ({ stateExtension: { stage } }) => {
         let lines = [
             MoodyLineConstraint(["R5C2", "R3C2", "R1C4", "R1C5", "R2C5"]),
             MoodyLineConstraint(["R4C6", "R7C3", "R8C3", "R8C4", "R9C5"]),
@@ -353,7 +427,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
         ];
         if (stage === 1) {
             // Make the line constraints decorative (UI-only)
-            lines = lines.map(constraint => ({
+            lines = lines.map((constraint) => ({
                 ...constraint,
                 isValidCell: undefined,
                 isValidPuzzle: undefined,

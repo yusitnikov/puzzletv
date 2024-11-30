@@ -4,4 +4,4 @@ export const DragAction = {
     SetUndefined: undefined,
 };
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export type DragAction = typeof DragAction[keyof typeof DragAction];
+export type DragAction = (typeof DragAction)[keyof typeof DragAction];

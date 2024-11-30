@@ -1,4 +1,4 @@
-import {LanguageCode} from "../types/translations/LanguageCode";
+import { LanguageCode } from "../types/translations/LanguageCode";
 
 export const buildLink = (slug: string, language: LanguageCode, params: any = {}, fullUrl = false) => {
     params.lang = language === LanguageCode.en ? undefined : language;
@@ -28,7 +28,7 @@ export const buildLink = (slug: string, language: LanguageCode, params: any = {}
                 addValue(`${key}[${subKey}]`, item);
             }
         }
-    }
+    };
 
     for (const [key, value] of Object.entries(params)) {
         addValue(key, value);
@@ -53,7 +53,7 @@ const parseQueryParamKeyParts = (value: string) => {
     parts.unshift(value);
 
     return parts;
-}
+};
 
 export const parseLink = (hash: string) => {
     let [slug, ...encodedParams] = hash.split(":");
@@ -92,5 +92,5 @@ export const parseLink = (hash: string) => {
 
     params.lang = params.lang || LanguageCode.en;
 
-    return {slug, params};
+    return { slug, params };
 };

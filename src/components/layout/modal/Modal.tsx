@@ -1,11 +1,11 @@
-import {createPortal} from "react-dom";
-import {CSSProperties, HTMLAttributes, ReactNode} from "react";
-import {useEventListener} from "../../../hooks/useEventListener";
-import {globalPaddingCoeff, headerHeight, textColor, textHeightCoeff} from "../../app/globals";
-import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
+import { createPortal } from "react-dom";
+import { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import { useEventListener } from "../../../hooks/useEventListener";
+import { globalPaddingCoeff, headerHeight, textColor, textHeightCoeff } from "../../app/globals";
+import { usePuzzleContainer } from "../../../contexts/PuzzleContainerContext";
 import { runInAction } from "mobx";
-import {profiler} from "../../../utils/profiler";
-import {observer} from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
+import { observer } from "mobx-react-lite";
 
 export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
     cellSize: number;
@@ -16,14 +16,22 @@ export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
     children: ReactNode;
 }
 
-export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "center", borderless, noHeader, children, ...divProps}: ModalProps) {
+export const Modal = observer(function ModalFc({
+    cellSize,
+    onClose,
+    textAlign = "center",
+    borderless,
+    noHeader,
+    children,
+    ...divProps
+}: ModalProps) {
     profiler.trace();
 
     const padding = cellSize * globalPaddingCoeff;
 
     const puzzleContainer = usePuzzleContainer();
 
-    useEventListener(window, "keydown", ({code}) => {
+    useEventListener(window, "keydown", ({ code }) => {
         if (code === "Escape") {
             onClose?.();
         }
@@ -55,7 +63,7 @@ export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...(puzzleContainer ?? {inset: 0}),
+                    ...(puzzleContainer ?? { inset: 0 }),
                 }}
             >
                 <div
@@ -75,6 +83,6 @@ export const Modal = observer(function ModalFc({cellSize, onClose, textAlign = "
                 </div>
             </div>
         </div>,
-        document.body
+        document.body,
     );
 });

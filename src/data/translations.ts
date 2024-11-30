@@ -1,33 +1,33 @@
-import {LanguageCode} from "../types/translations/LanguageCode";
-import {TranslationItemNoEn} from "../types/translations/TranslationItem";
+import { LanguageCode } from "../types/translations/LanguageCode";
+import { TranslationItemNoEn } from "../types/translations/TranslationItem";
 
 export const translationsExactType = {
     // region Common
-    "by": {
+    by: {
         [LanguageCode.ru]: "от",
         [LanguageCode.de]: "von",
     },
-    "you": {
+    you: {
         [LanguageCode.ru]: "Вы",
         [LanguageCode.de]: "Du",
     },
-    "or": {
+    or: {
         [LanguageCode.ru]: "или",
         [LanguageCode.de]: "oder",
     },
-    "Tip": {
+    Tip: {
         [LanguageCode.ru]: "Подсказка",
         [LanguageCode.de]: "Hinweis",
     },
-    "ON": {
+    ON: {
         [LanguageCode.ru]: "ВКЛ",
         [LanguageCode.de]: "AN",
     },
-    "OFF": {
+    OFF: {
         [LanguageCode.ru]: "ВЫКЛ",
         [LanguageCode.de]: "AUS",
     },
-    "Play": {
+    Play: {
         [LanguageCode.ru]: "Играть",
         [LanguageCode.de]: "Spielen",
     },
@@ -35,31 +35,31 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Играть %1",
         [LanguageCode.de]: "%1 spielen",
     },
-    "Loading": {
+    Loading: {
         [LanguageCode.ru]: "Подключение",
         [LanguageCode.de]: "Wird geladen",
     },
-    "Back": {
+    Back: {
         [LanguageCode.ru]: "Назад",
         [LanguageCode.de]: "Zurück",
     },
-    "Yes": {
+    Yes: {
         [LanguageCode.ru]: "Да",
         [LanguageCode.de]: "Ja",
     },
-    "No": {
+    No: {
         [LanguageCode.ru]: "Нет",
         [LanguageCode.de]: "Nein",
     },
-    "Cancel": {
+    Cancel: {
         [LanguageCode.ru]: "Отмена",
         [LanguageCode.de]: "Stornieren",
     },
-    "Leave": {
+    Leave: {
         [LanguageCode.ru]: "Выйти",
         [LanguageCode.de]: "Verlassen",
     },
-    "Close": {
+    Close: {
         [LanguageCode.ru]: "Закрыть",
         [LanguageCode.de]: "Schließen",
     },
@@ -91,15 +91,15 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Это %1",
         [LanguageCode.de]: "Das ist %1",
     },
-    "Skip": {
+    Skip: {
         [LanguageCode.ru]: "Пропустить",
         [LanguageCode.de]: "Überspringen",
     },
-    "Next": {
+    Next: {
         [LanguageCode.ru]: "Следующий",
         [LanguageCode.de]: "Nächste",
     },
-    "Questions": {
+    Questions: {
         [LanguageCode.ru]: "Вопросы",
         [LanguageCode.de]: "Fragen",
     },
@@ -123,7 +123,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Начать игру",
         [LanguageCode.de]: "Starte das Spiel",
     },
-    "Submit": {
+    Submit: {
         [LanguageCode.ru]: "Отправить",
         [LanguageCode.de]: "Einreichen",
     },
@@ -157,11 +157,11 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Перейти к списку судоку",
         [LanguageCode.de]: "Alle Rätsel ansehen",
     },
-    "Puzzles": {
+    Puzzles: {
         [LanguageCode.ru]: "Судоку",
         [LanguageCode.de]: "Rätsel",
     },
-    "Games": {
+    Games: {
         [LanguageCode.ru]: "Игры",
         [LanguageCode.de]: "Spiele",
     },
@@ -169,17 +169,17 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Как импортировать головоломку",
         [LanguageCode.de]: "So importieren Sie ein Rätsel",
     },
-    "Contacts": {
+    Contacts: {
         [LanguageCode.ru]: "Контакты",
         [LanguageCode.de]: "Kontakte",
     },
     // endregion
     // region Common for controls
-    "Shortcut": {
+    Shortcut: {
         [LanguageCode.ru]: "Ярлык",
         [LanguageCode.de]: "Hotkey",
     },
-    "shortcut": {
+    shortcut: {
         [LanguageCode.ru]: "ярлык",
         [LanguageCode.de]: "Hotkey",
     },
@@ -205,7 +205,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Пожалуйста, подождите когда он присоединится",
         [LanguageCode.de]: "Warten Sie bitte, bis sie beitreten",
     },
-    "Join": {
+    Join: {
         [LanguageCode.ru]: "Присоединиться",
         [LanguageCode.de]: "Beitreten",
     },
@@ -215,23 +215,23 @@ export const translationsExactType = {
     },
     // endregion
     // region Controls
-    "Corner": {
+    Corner: {
         [LanguageCode.ru]: "Угол",
         [LanguageCode.de]: "Eckmarkierungen",
     },
-    "Center": {
+    Center: {
         [LanguageCode.ru]: "Центр",
         [LanguageCode.de]: "Mittelmarkierungen",
     },
-    "Colors": {
+    Colors: {
         [LanguageCode.ru]: "Цвета",
         [LanguageCode.de]: "Farben",
     },
-    "Shading": {
+    Shading: {
         [LanguageCode.ru]: "Штриховка",
         [LanguageCode.de]: "Schattierung",
     },
-    "Lines": {
+    Lines: {
         [LanguageCode.ru]: "Линии",
         [LanguageCode.de]: "Linien",
     },
@@ -255,11 +255,11 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Повторить последнее действие",
         [LanguageCode.de]: "Wiederholen Sie die letzte Aktion",
     },
-    "Undo": {
+    Undo: {
         [LanguageCode.ru]: "Отмена",
         [LanguageCode.de]: "Rückg.",
     },
-    "Redo": {
+    Redo: {
         [LanguageCode.ru]: "Повтор",
         [LanguageCode.de]: "Wdh.",
     },
@@ -275,7 +275,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Что-то тут не так",
         [LanguageCode.de]: "Irgendetwas ist hier falsch",
     },
-    "Congratulations": {
+    Congratulations: {
         [LanguageCode.ru]: "Поздравляем",
         [LanguageCode.de]: "Glückwunsch",
     },
@@ -345,7 +345,7 @@ export const translationsExactType = {
     },
     // endregion
     // region RulesSpoiler
-    "Spoiler": {
+    Spoiler: {
         [LanguageCode.ru]: "Спойлер",
         [LanguageCode.de]: "Spoiler",
     },
@@ -359,7 +359,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Ждём, когда люди подключатся",
         [LanguageCode.de]: "Ich warte darauf, dass sich Leute verbinden",
     },
-    "Score": {
+    Score: {
         [LanguageCode.ru]: "Счёт",
         [LanguageCode.de]: "Punktzahl",
     },
@@ -397,7 +397,7 @@ export const translationsExactType = {
     },
     // endregion
     // region SettingsContent
-    "Settings": {
+    Settings: {
         [LanguageCode.ru]: "Настройки",
         [LanguageCode.de]: "Einstellungen",
     },
@@ -421,7 +421,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Прорачность цвета фона",
         [LanguageCode.de]: "Deckkraft der Hintergrundfarbe",
     },
-    "Nickname": {
+    Nickname: {
         [LanguageCode.ru]: "Никнейм",
         [LanguageCode.de]: "Spitzname",
     },
@@ -437,7 +437,7 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Поделиться ссылкой на эту игру",
         [LanguageCode.de]: "Teilen Sie den Link zum Spiel",
     },
-    "Copy": {
+    Copy: {
         [LanguageCode.ru]: "Копировать",
         [LanguageCode.de]: "Kopieren",
     },
@@ -459,11 +459,11 @@ export const translationsExactType = {
     },
     // endregion
     // region useMultiPlayer
-    "host": {
+    host: {
         [LanguageCode.ru]: "ведущий",
         [LanguageCode.de]: "Host",
     },
-    "guest": {
+    guest: {
         [LanguageCode.ru]: "гость",
         [LanguageCode.de]: "Gast",
     },

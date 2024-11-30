@@ -18,4 +18,3 @@ export const toggleFullScreen = () => {
         (target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen).call(target);
     }
 };
-

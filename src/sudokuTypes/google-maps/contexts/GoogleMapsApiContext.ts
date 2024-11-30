@@ -1,4 +1,4 @@
-import {createContext, useContext} from "react";
+import { createContext, useContext } from "react";
 
 export const GoogleMapsApiContext = createContext<typeof google>(undefined as any);
 

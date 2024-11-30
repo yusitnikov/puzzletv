@@ -1,14 +1,14 @@
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
-import {useEffect, useMemo, useRef} from "react";
-import {Fireworks, FireworksHandlers} from "@fireworks-js/react";
-import {usePuzzleContainer} from "../../../contexts/PuzzleContainerContext";
-import {emptyRect} from "../../../types/layout/Rect";
-import {FireworksOptions} from "fireworks-js";
-import {makeAutoObservable, runInAction} from "mobx";
-import {settings} from "../../../types/layout/Settings";
-import {AnimationSpeed} from "../../../types/sudoku/AnimationSpeed";
-import {rafTime} from "../../../hooks/useRaf";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
+import { useEffect, useMemo, useRef } from "react";
+import { Fireworks, FireworksHandlers } from "@fireworks-js/react";
+import { usePuzzleContainer } from "../../../contexts/PuzzleContainerContext";
+import { emptyRect } from "../../../types/layout/Rect";
+import { FireworksOptions } from "fireworks-js";
+import { makeAutoObservable, runInAction } from "mobx";
+import { settings } from "../../../types/layout/Settings";
+import { AnimationSpeed } from "../../../types/sudoku/AnimationSpeed";
+import { rafTime } from "../../../hooks/useRaf";
 
 class FieldFireworksController {
     startTime = 0;
@@ -30,7 +30,7 @@ class FieldFireworksController {
 
     then(action: () => void | Promise<void>) {
         return runInAction(() => {
-            return this.promise = this.promise.then(action);
+            return (this.promise = this.promise.then(action));
         });
     }
 
@@ -47,31 +47,34 @@ export const fieldFireworksController = new FieldFireworksController();
 export const FieldFireworks = observer(function FieldFireworksFc() {
     profiler.trace();
 
-    const {width, height} = usePuzzleContainer() ?? emptyRect;
+    const { width, height } = usePuzzleContainer() ?? emptyRect;
     const sideMargin = Math.min(200, width / 3);
     const topMargin = Math.min(100, height / 3);
 
     const ref = useRef<FireworksHandlers | null>(null);
     (window as any).fireworks = ref;
 
-    const options = useMemo((): FireworksOptions => ({
-        autoresize: false,
-        boundaries: {
-            x: sideMargin,
-            y: topMargin,
-            // adding the margin to the width due to a bug in the code
-            width: width + sideMargin,
-            height,
-        },
-        rocketsPoint: {
-            min: 30,
-            max: 70,
-        },
-        traceSpeed: 5,
-    }), [width, height, sideMargin, topMargin]);
+    const options = useMemo(
+        (): FireworksOptions => ({
+            autoresize: false,
+            boundaries: {
+                x: sideMargin,
+                y: topMargin,
+                // adding the margin to the width due to a bug in the code
+                width: width + sideMargin,
+                height,
+            },
+            rocketsPoint: {
+                min: 30,
+                max: 70,
+            },
+            traceSpeed: 5,
+        }),
+        [width, height, sideMargin, topMargin],
+    );
 
     useEffect(() => {
-        ref.current?.updateSize({width, height});
+        ref.current?.updateSize({ width, height });
     }, [ref, width, height]);
 
     useEffect(() => {
@@ -89,10 +92,5 @@ export const FieldFireworks = observer(function FieldFireworksFc() {
         });
     }, [ref, isRunning]);
 
-    return <Fireworks
-        ref={ref}
-        style={{position: "absolute", inset: 0}}
-        autostart={false}
-        options={options}
-    />;
+    return <Fireworks ref={ref} style={{ position: "absolute", inset: 0 }} autostart={false} options={options} />;
 });

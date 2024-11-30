@@ -1,6 +1,6 @@
-import {AnyPTM} from "./PuzzleTypeMap";
-import {PuzzleContext} from "./PuzzleContext";
-import {CellWriteModeInfo} from "./CellWriteModeInfo";
+import { AnyPTM } from "./PuzzleTypeMap";
+import { PuzzleContext } from "./PuzzleContext";
+import { CellWriteModeInfo } from "./CellWriteModeInfo";
 
 export interface CellTypeProps<T extends AnyPTM> {
     isVisible?: boolean;
@@ -13,7 +13,7 @@ export interface CellTypeProps<T extends AnyPTM> {
     noBorders?: boolean;
 }
 
-export const isVisibleCell = <T extends AnyPTM>({isVisible = true}: CellTypeProps<T> = {}): boolean => isVisible;
+export const isVisibleCell = <T extends AnyPTM>({ isVisible = true }: CellTypeProps<T> = {}): boolean => isVisible;
 
 export const isInteractableCell = <T extends AnyPTM>(props: CellTypeProps<T> = {}): boolean =>
     isVisibleCell(props) && !props.noInteraction;

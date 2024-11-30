@@ -1,4 +1,4 @@
-import {SokobanClue} from "./SokobanPuzzleExtension";
+import { SokobanClue } from "./SokobanPuzzleExtension";
 
 export interface SokobanOptions {
     distinctMovementSteps?: boolean;

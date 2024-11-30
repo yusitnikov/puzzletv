@@ -1,20 +1,21 @@
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {createRegularRegions, FieldSize} from "../../../types/sudoku/FieldSize";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
+import { createRegularRegions, FieldSize } from "../../../types/sudoku/FieldSize";
 import {
-    getLineVector, Position,
+    getLineVector,
+    Position,
     PositionWithAngle,
     rotateVectorClockwise,
-    scaleVector
+    scaleVector,
 } from "../../../types/layout/Position";
-import {Rect} from "../../../types/layout/Rect";
-import {darkGreyColor} from "../../../components/app/globals";
-import {indexes} from "../../../utils/indexes";
-import {RegionConstraint} from "../../../components/sudoku/constraints/region/Region";
-import {Constraint} from "../../../types/sudoku/Constraint";
-import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
-import {FullCubePTM} from "./FullCubePTM";
-import {gameStateHandleRotateFullCube, ProcessedFullCubeGameState} from "./FullCubeGameState";
+import { Rect } from "../../../types/layout/Rect";
+import { darkGreyColor } from "../../../components/app/globals";
+import { indexes } from "../../../utils/indexes";
+import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
+import { Constraint } from "../../../types/sudoku/Constraint";
+import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
+import { FullCubePTM } from "./FullCubePTM";
+import { gameStateHandleRotateFullCube, ProcessedFullCubeGameState } from "./FullCubeGameState";
 import {
     getClosestAxis3D,
     initialCoordsBase3D,
@@ -23,17 +24,17 @@ import {
     roundVector3D,
     scalarMultiplication3D,
     subtractVectors3D,
-    vectorMultiplication3D
+    vectorMultiplication3D,
 } from "../../../types/layout/Position3D";
-import {useAnimatedValue} from "../../../hooks/useAnimatedValue";
-import {settings} from "../../../types/layout/Settings";
-import {GridRegion} from "../../../types/sudoku/GridRegion";
-import {FullCubeControls} from "../components/FullCubeControls";
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {FullCubeJssConstraint} from "../constraints/FullCubeJss";
-import {transformFullCubeCoords3D} from "../helpers/fullCubeHelpers";
-import {vector4} from "xyzw";
-import {addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { settings } from "../../../types/layout/Settings";
+import { GridRegion } from "../../../types/sudoku/GridRegion";
+import { FullCubeControls } from "../components/FullCubeControls";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { FullCubeJssConstraint } from "../constraints/FullCubeJss";
+import { transformFullCubeCoords3D } from "../helpers/fullCubeHelpers";
+import { vector4 } from "xyzw";
+import { addGameStateExToSudokuManager } from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
 /*
  * TODO:
@@ -42,37 +43,30 @@ import {addGameStateExToSudokuManager} from "../../../types/sudoku/SudokuTypeMan
  */
 
 export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
-    ...addGameStateExToSudokuManager(
-        DigitSudokuTypeManager<FullCubePTM>(),
-        {
-            initialGameStateExtension: {
-                coordsBase: initialCoordsBase3D,
-            },
-            useProcessedGameStateExtension({stateExtension: {coordsBase}}): ProcessedFullCubeGameState {
-                return {
-                    animatedCoordsBase: useAnimatedValue(
-                        coordsBase,
-                        settings.animationSpeed.get(),
-                        (a, b, coeff) => {
-                            // See https://en.wikipedia.org/wiki/Slerp
-                            const result = vector4.RotationSlerp(a, b, coeff);
-                            // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
-                            return Number.isFinite(result.w) ? result : b;
-                        },
-                    )
-                };
-            },
-            getProcessedGameStateExtension({stateExtension: {coordsBase}}): ProcessedFullCubeGameState {
-                return {animatedCoordsBase: coordsBase};
-            },
-        }
-    ),
+    ...addGameStateExToSudokuManager(DigitSudokuTypeManager<FullCubePTM>(), {
+        initialGameStateExtension: {
+            coordsBase: initialCoordsBase3D,
+        },
+        useProcessedGameStateExtension({ stateExtension: { coordsBase } }): ProcessedFullCubeGameState {
+            return {
+                animatedCoordsBase: useAnimatedValue(coordsBase, settings.animationSpeed.get(), (a, b, coeff) => {
+                    // See https://en.wikipedia.org/wiki/Slerp
+                    const result = vector4.RotationSlerp(a, b, coeff);
+                    // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
+                    return Number.isFinite(result.w) ? result : b;
+                }),
+            };
+        },
+        getProcessedGameStateExtension({ stateExtension: { coordsBase } }): ProcessedFullCubeGameState {
+            return { animatedCoordsBase: coordsBase };
+        },
+    }),
 
     fieldControlsComponent: FullCubeControls,
 
-    getCellTypeProps({top}, {fieldSize: {columnsCount}}): CellTypeProps<FullCubePTM> {
+    getCellTypeProps({ top }, { fieldSize: { columnsCount } }): CellTypeProps<FullCubePTM> {
         const realFieldSize = columnsCount / 3;
-        return {isSelectable: top < realFieldSize * 2};
+        return { isSelectable: top < realFieldSize * 2 };
     },
 
     processCellDataPosition(
@@ -85,7 +79,7 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     ): PositionWithAngle | undefined {
         const {
             puzzle: {
-                typeManager: {transformCoords},
+                typeManager: { transformCoords },
             },
         } = context;
 
@@ -94,23 +88,23 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         }
 
         const [p0, p1, p2] = [
-            {top: 0.5, left: 0.5},
-            {top: 0.5, left: 0.6},
-            {top: 0.6, left: 0.5},
+            { top: 0.5, left: 0.5 },
+            { top: 0.5, left: 0.6 },
+            { top: 0.6, left: 0.5 },
         ]
-            .map(({top, left}) => ({
+            .map(({ top, left }) => ({
                 top: cellPosition.top + top,
                 left: cellPosition.left + left,
             }))
             .map((point) => transformCoords?.(point, context) ?? point);
-        const v1 = getLineVector({start: p0, end: p1});
-        const v2 = getLineVector({start: p0, end: p2});
+        const v1 = getLineVector({ start: p0, end: p1 });
+        const v2 = getLineVector({ start: p0, end: p2 });
 
         const bestAngle = indexes(8)
             .map((index) => {
                 const angle = index * 45;
 
-                const {left: c1, top: c2} = rotateVectorClockwise({left: 0, top: 1}, angle);
+                const { left: c1, top: c2 } = rotateVectorClockwise({ left: 0, top: 1 }, angle);
 
                 return {
                     angle,
@@ -118,24 +112,24 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
                     y: v1.top * c1 + v2.top * c2,
                 };
             })
-            .filter(({y}) => y >= 0)
-            .sort((a, b) => Math.sign(a.x - b.x))
-            [0].angle;
+            .filter(({ y }) => y >= 0)
+            .sort((a, b) => Math.sign(a.x - b.x))[0].angle;
 
         return {
-            ...scaleVector(
-                rotateVectorClockwise(basePosition, bestAngle),
-                bestAngle % 90 === 0 ? 1 : 0.9
-            ),
+            ...scaleVector(rotateVectorClockwise(basePosition, bestAngle), bestAngle % 90 === 0 ? 1 : 0.9),
             angle: basePosition.angle + bestAngle,
         };
     },
 
     transformCoords(position, context) {
-        const {puzzle: {fieldSize: {columnsCount}}} = context;
+        const {
+            puzzle: {
+                fieldSize: { columnsCount },
+            },
+        } = context;
         const realFieldSize = columnsCount / 3;
 
-        const {x, y, z} = transformFullCubeCoords3D(position, context);
+        const { x, y, z } = transformFullCubeCoords3D(position, context);
 
         return {
             left: realFieldSize + x - z,
@@ -146,105 +140,128 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     getRegionsWithSameCoordsTransformation(context): GridRegion[] {
         const {
             puzzle: {
-                typeManager: {transformCoords},
-                fieldSize: {columnsCount},
+                typeManager: { transformCoords },
+                fieldSize: { columnsCount },
             },
         } = context;
 
         const realFieldSize = columnsCount / 3;
 
-        return [0, 1, 2].flatMap((left) => [0, 1, 2].map((top): GridRegion => {
-            const rect: Rect = {
-                left: realFieldSize * left,
-                top: realFieldSize * top,
-                width: realFieldSize,
-                height: realFieldSize,
-            };
+        return [0, 1, 2].flatMap((left) =>
+            [0, 1, 2].map((top): GridRegion => {
+                const rect: Rect = {
+                    left: realFieldSize * left,
+                    top: realFieldSize * top,
+                    width: realFieldSize,
+                    height: realFieldSize,
+                };
 
-            // Get projections of the rect points onto the screen
-            // (use inner points of the rect because transformCoords may fail on exact region borders)
-            const [p0, p1, p2] = [
-                {top: 0.1, left: 0.1},
-                {top: 0.1, left: 0.9},
-                {top: 0.9, left: 0.1},
-            ]
-                .map(({top, left}) => ({
-                    top: rect.top + rect.width * top,
-                    left: rect.left + rect.height * left,
-                }))
-                .map((point) => transformCoords?.(point, context) ?? point);
-            const v1 = getLineVector({start: p0, end: p1});
-            const v2 = getLineVector({start: p0, end: p2});
-            const isVisible = vectorMultiplication3D(
-                {
-                    x: v1.left,
-                    y: v1.top,
-                    z: 0,
-                },
-                {
-                    x: v2.left,
-                    y: v2.top,
-                    z: 0,
-                },
-            ).z > 0;
+                // Get projections of the rect points onto the screen
+                // (use inner points of the rect because transformCoords may fail on exact region borders)
+                const [p0, p1, p2] = [
+                    { top: 0.1, left: 0.1 },
+                    { top: 0.1, left: 0.9 },
+                    { top: 0.9, left: 0.1 },
+                ]
+                    .map(({ top, left }) => ({
+                        top: rect.top + rect.width * top,
+                        left: rect.left + rect.height * left,
+                    }))
+                    .map((point) => transformCoords?.(point, context) ?? point);
+                const v1 = getLineVector({ start: p0, end: p1 });
+                const v2 = getLineVector({ start: p0, end: p2 });
+                const isVisible =
+                    vectorMultiplication3D(
+                        {
+                            x: v1.left,
+                            y: v1.top,
+                            z: 0,
+                        },
+                        {
+                            x: v2.left,
+                            y: v2.top,
+                            z: 0,
+                        },
+                    ).z > 0;
 
-            return {
-                ...rect,
-                opacity: isVisible ? 1 : 0.1,
-                zIndex: isVisible ? 2 : 1,
-                // noBorders: top === 2,
-                noInteraction: top === 2,
-            };
-        }));
+                return {
+                    ...rect,
+                    opacity: isVisible ? 1 : 0.1,
+                    zIndex: isVisible ? 2 : 1,
+                    // noBorders: top === 2,
+                    noInteraction: top === 2,
+                };
+            }),
+        );
     },
 
-    getRegionsForRowsAndColumns({puzzle: {fieldSize: {columnsCount}}}): Constraint<FullCubePTM, any>[] {
+    getRegionsForRowsAndColumns({
+        puzzle: {
+            fieldSize: { columnsCount },
+        },
+    }): Constraint<FullCubePTM, any>[] {
         const realFieldSize = columnsCount / 3;
 
-        return [0, 1, 2].flatMap((left) => [0, 1].flatMap((top) => indexes(realFieldSize).flatMap((i) => [
-            RegionConstraint(
-                indexes(realFieldSize).map(j => ({
-                    left: left * realFieldSize + i,
-                    top: top * realFieldSize + j,
-                })),
-                false,
-                "column"
+        return [0, 1, 2].flatMap((left) =>
+            [0, 1].flatMap((top) =>
+                indexes(realFieldSize).flatMap((i) => [
+                    RegionConstraint(
+                        indexes(realFieldSize).map((j) => ({
+                            left: left * realFieldSize + i,
+                            top: top * realFieldSize + j,
+                        })),
+                        false,
+                        "column",
+                    ),
+                    RegionConstraint(
+                        indexes(realFieldSize).map((j) => ({
+                            left: left * realFieldSize + j,
+                            top: top * realFieldSize + i,
+                        })),
+                        false,
+                        "row",
+                    ),
+                ]),
             ),
-            RegionConstraint(
-                indexes(realFieldSize).map(j => ({
-                    left: left * realFieldSize + j,
-                    top: top * realFieldSize + i,
-                })),
-                false,
-                "row"
-            ),
-        ])));
+        );
     },
 
-    processArrowDirection({top, left}, xDirection, yDirection, context) {
-        const {puzzle: {fieldSize: {columnsCount}}} = context;
+    processArrowDirection({ top, left }, xDirection, yDirection, context) {
+        const {
+            puzzle: {
+                fieldSize: { columnsCount },
+            },
+        } = context;
         const realFieldSize = columnsCount / 3;
 
-        const cellCenter: Position = {top: top + 0.5, left: left + 0.5};
+        const cellCenter: Position = { top: top + 0.5, left: left + 0.5 };
         const cellCenter3D = transformFullCubeCoords3D(cellCenter, context, false);
-        const dx = roundVector3D(normalizeVector3D(subtractVectors3D(
-            transformFullCubeCoords3D({top: cellCenter.top, left: cellCenter.left + 0.1}, context, false),
-            cellCenter3D,
-        )));
-        const dy = roundVector3D(normalizeVector3D(subtractVectors3D(
-            transformFullCubeCoords3D({top: cellCenter.top + 0.1, left: cellCenter.left}, context, false),
-            cellCenter3D,
-        )));
+        const dx = roundVector3D(
+            normalizeVector3D(
+                subtractVectors3D(
+                    transformFullCubeCoords3D({ top: cellCenter.top, left: cellCenter.left + 0.1 }, context, false),
+                    cellCenter3D,
+                ),
+            ),
+        );
+        const dy = roundVector3D(
+            normalizeVector3D(
+                subtractVectors3D(
+                    transformFullCubeCoords3D({ top: cellCenter.top + 0.1, left: cellCenter.left }, context, false),
+                    cellCenter3D,
+                ),
+            ),
+        );
 
         const cellDirection3D = getClosestAxis3D(cellCenter3D);
 
         let direction3D: Position3D;
         if (cellDirection3D.x !== 0) {
-            direction3D = {x: 0, y: yDirection, z: -xDirection};
+            direction3D = { x: 0, y: yDirection, z: -xDirection };
         } else if (cellDirection3D.y !== 0) {
-            direction3D = {x: xDirection, y: 0, z: yDirection};
+            direction3D = { x: xDirection, y: 0, z: yDirection };
         } else {
-            direction3D = {x: xDirection, y: yDirection, z: 0};
+            direction3D = { x: xDirection, y: yDirection, z: 0 };
         }
 
         xDirection = Math.round(scalarMultiplication3D(direction3D, dx));
@@ -341,26 +358,25 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
             }
         }
 
-        const newCellDirection3D = getClosestAxis3D(transformFullCubeCoords3D(
-            {top: newTop + 0.5, left: newLeft + 0.5},
-            context,
-            false,
-        ));
+        const newCellDirection3D = getClosestAxis3D(
+            transformFullCubeCoords3D({ top: newTop + 0.5, left: newLeft + 0.5 }, context, false),
+        );
 
         // How good is the axis for the UI?
-        const [axisRank, newAxisRank] = [cellDirection3D, newCellDirection3D].map(
-            ({x, y, z}: Position3D) => (x < 0 || y > 0 || z < 0) ? 0 : y < 0 ? 1 : 2
+        const [axisRank, newAxisRank] = [cellDirection3D, newCellDirection3D].map(({ x, y, z }: Position3D) =>
+            x < 0 || y > 0 || z < 0 ? 0 : y < 0 ? 1 : 2,
         );
 
         return {
-            state: newAxisRank < axisRank
-                ? gameStateHandleRotateFullCube(
-                    context,
-                    vectorMultiplication3D(newCellDirection3D, cellDirection3D),
-                    90
-                )
-                : undefined,
-            cell: {top: newTop, left: newLeft},
+            state:
+                newAxisRank < axisRank
+                    ? gameStateHandleRotateFullCube(
+                          context,
+                          vectorMultiplication3D(newCellDirection3D, cellDirection3D),
+                          90,
+                      )
+                    : undefined,
+            cell: { top: newTop, left: newLeft },
         };
     },
 
@@ -370,7 +386,7 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
 
     postProcessPuzzle(puzzle): PuzzleDefinition<FullCubePTM> {
         const {
-            fieldSize: {rowsCount, columnsCount},
+            fieldSize: { rowsCount, columnsCount },
             fieldMargin = 0,
             allowDrawing,
             items,
@@ -402,12 +418,20 @@ export const createFullCubeFieldSize = (fieldSize: number, withJss = false): Fie
     columnsCount: fieldSize * 3,
 });
 
-export const createFullCubeRegions = (fieldSize: number, regionWidth: number, regionHeight = fieldSize / regionWidth) => {
+export const createFullCubeRegions = (
+    fieldSize: number,
+    regionWidth: number,
+    regionHeight = fieldSize / regionWidth,
+) => {
     const regions = createRegularRegions(fieldSize, fieldSize, regionWidth, regionHeight);
-    return [0, 1, 2].flatMap((leftQuad) => [0, 1].flatMap((topQuad) => regions.map(
-        (region) => region.map(({top, left}) => ({
-            top: topQuad * fieldSize + top,
-            left: leftQuad * fieldSize + left,
-        }))
-    )));
+    return [0, 1, 2].flatMap((leftQuad) =>
+        [0, 1].flatMap((topQuad) =>
+            regions.map((region) =>
+                region.map(({ top, left }) => ({
+                    top: topQuad * fieldSize + top,
+                    left: leftQuad * fieldSize + left,
+                })),
+            ),
+        ),
+    );
 };

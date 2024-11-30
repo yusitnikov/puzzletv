@@ -1,6 +1,6 @@
-import {Constraint} from "../../../../types/sudoku/Constraint";
-import {isValidCellForRegion} from "../region/Region";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import { Constraint } from "../../../../types/sudoku/Constraint";
+import { isValidCellForRegion } from "../region/Region";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const AutoRegionConstraint = <T extends AnyPTM>(): Constraint<T> => {
     return {
@@ -8,10 +8,7 @@ export const AutoRegionConstraint = <T extends AnyPTM>(): Constraint<T> => {
         cells: [],
         props: undefined,
         isValidCell(cell, digits, cells, context, constraints, constraint, isFinalCheck) {
-            const {
-                puzzleIndex,
-                digitsCount: expectedSize,
-            } = context;
+            const { puzzleIndex, digitsCount: expectedSize } = context;
 
             const region = puzzleIndex.getCustomRegionByBorderLinesAt(context, cell);
 

@@ -1,7 +1,7 @@
-import {useEventListener} from "./useEventListener";
-import {useRef} from "react";
-import {makeAutoObservable} from "mobx";
-import {profiler} from "../utils/profiler";
+import { useEventListener } from "./useEventListener";
+import { useRef } from "react";
+import { makeAutoObservable } from "mobx";
+import { profiler } from "../utils/profiler";
 
 interface ControlKeysStateOptions {
     isCtrlDown: boolean;
@@ -23,12 +23,8 @@ export class ControlKeysState implements ControlKeysStateOptions {
     get keysStr() {
         profiler.trace();
 
-        return [
-            this.isCtrlDown ? "Ctrl" : "",
-            this.isAltDown ? "Alt" : "",
-            this.isShiftDown ? "Shift" : "",
-        ]
-            .filter(s => s)
+        return [this.isCtrlDown ? "Ctrl" : "", this.isAltDown ? "Alt" : "", this.isShiftDown ? "Shift" : ""]
+            .filter((s) => s)
             .join("+");
     }
 
@@ -36,7 +32,7 @@ export class ControlKeysState implements ControlKeysStateOptions {
         makeAutoObservable(this);
     }
 
-    update({isCtrlDown, isAltDown, isShiftDown}: ControlKeysStateOptions) {
+    update({ isCtrlDown, isAltDown, isShiftDown }: ControlKeysStateOptions) {
         this.isCtrlDown = isCtrlDown;
         this.isAltDown = isAltDown;
         this.isShiftDown = isShiftDown;
@@ -56,13 +52,19 @@ export const controlKeysState = new ControlKeysState();
 export const useUpdateControlKeysState = () => {
     const shiftTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-    const handleKeyboardEvent = ({ctrlKey: winCtrlKey, metaKey: macCtrlKey, altKey: isAltDown, shiftKey: isShiftDown}: KeyboardEvent) => {
+    const handleKeyboardEvent = ({
+        ctrlKey: winCtrlKey,
+        metaKey: macCtrlKey,
+        altKey: isAltDown,
+        shiftKey: isShiftDown,
+    }: KeyboardEvent) => {
         const isCtrlDown = winCtrlKey || macCtrlKey;
-        const doSet = () => controlKeysState.update({
-            isCtrlDown: isCtrlDown,
-            isAltDown: isAltDown,
-            isShiftDown: isShiftDown,
-        });
+        const doSet = () =>
+            controlKeysState.update({
+                isCtrlDown: isCtrlDown,
+                isAltDown: isAltDown,
+                isShiftDown: isShiftDown,
+            });
         if (shiftTimeoutRef.current) {
             clearTimeout(shiftTimeoutRef.current);
         }

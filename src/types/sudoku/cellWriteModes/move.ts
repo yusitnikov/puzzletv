@@ -1,12 +1,12 @@
-import {CellWriteMode} from "../CellWriteMode";
-import type {CellWriteModeInfo} from "../CellWriteModeInfo";
-import {gameStateApplyFieldDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx} from "../GameState";
-import {GestureMetrics} from "../../../utils/gestures";
-import {getRectCenter} from "../../layout/Rect";
-import {isCellGestureExtraData} from "../CellGestureExtraData";
-import {AnyPTM} from "../PuzzleTypeMap";
-import {roundToStep} from "../../../utils/math";
-import {MoveDigitModeButton} from "../../../components/sudoku/controls/MoveDigitModeButton";
+import { CellWriteMode } from "../CellWriteMode";
+import type { CellWriteModeInfo } from "../CellWriteModeInfo";
+import { gameStateApplyFieldDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx } from "../GameState";
+import { GestureMetrics } from "../../../utils/gestures";
+import { getRectCenter } from "../../layout/Rect";
+import { isCellGestureExtraData } from "../CellGestureExtraData";
+import { AnyPTM } from "../PuzzleTypeMap";
+import { roundToStep } from "../../../utils/math";
+import { MoveDigitModeButton } from "../../../components/sudoku/controls/MoveDigitModeButton";
 
 export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
     mode: CellWriteMode.move,
@@ -15,29 +15,21 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
         {
             loopHorizontally = false,
             loopVertically = false,
-            typeManager: {allowMove = false, allowRotation = false, allowScale = false},
+            typeManager: { allowMove = false, allowRotation = false, allowScale = false },
         },
-        includeHidden
+        includeHidden,
     ) => loopHorizontally || loopVertically || allowMove || (includeHidden && (allowRotation || allowScale)),
     applyToWholeField: true,
     disableCellHandlers: true,
     hotKeyStr: ["Alt+Shift"],
     isNoSelectionMode: true,
     digitsCount: 0,
-    isValidGesture: (isCurrentCellWriteMode, {gesture: {pointers}}) =>
+    isValidGesture: (isCurrentCellWriteMode, { gesture: { pointers } }) =>
         isCurrentCellWriteMode || pointers.length > 1 || !isCellGestureExtraData(pointers[0].start.extraData),
-    onMove: (
-        {
-            gesture: {state: startContext},
-            startMetrics,
-            currentMetrics,
-        },
-        context,
-        fieldRect,
-    ) => {
-        const {cellSize} = context;
+    onMove: ({ gesture: { state: startContext }, startMetrics, currentMetrics }, context, fieldRect) => {
+        const { cellSize } = context;
         const fieldCenter = getRectCenter(fieldRect);
-        const screenToField = ({x, y, rotation, scale}: GestureMetrics): GestureMetrics => ({
+        const screenToField = ({ x, y, rotation, scale }: GestureMetrics): GestureMetrics => ({
             x: (x - fieldCenter.left) / cellSize,
             y: (y - fieldCenter.top) / cellSize,
             rotation,
@@ -52,25 +44,15 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
             false,
         );
     },
-    onGestureEnd: (
-        props,
-        context
-    ) => {
+    onGestureEnd: (props, context) => {
         const {
             puzzle: {
-                typeManager: {
-                    angleStep,
-                    allowRotation,
-                    isFreeRotation,
-                    scaleStep,
-                    allowScale,
-                    isFreeScale,
-                },
+                typeManager: { angleStep, allowRotation, isFreeRotation, scaleStep, allowScale, isFreeScale },
             },
         } = context;
 
-        context.onStateChange(({angle, scale}) => {
-            let result: PartialGameStateEx<T> = {animating: true};
+        context.onStateChange(({ angle, scale }) => {
+            let result: PartialGameStateEx<T> = { animating: true };
             if (allowRotation && !isFreeRotation && angleStep) {
                 result = {
                     ...result,

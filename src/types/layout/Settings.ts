@@ -1,19 +1,25 @@
-import {makeAutoObservable} from "mobx";
-import {localStorageManager} from "../../utils/localStorage";
-import {PencilmarksCheckerMode} from "../sudoku/PencilmarksCheckerMode";
-import {AnimationSpeed} from "../sudoku/AnimationSpeed";
-import {UAParser} from "ua-parser-js";
+import { makeAutoObservable } from "mobx";
+import { localStorageManager } from "../../utils/localStorage";
+import { PencilmarksCheckerMode } from "../sudoku/PencilmarksCheckerMode";
+import { AnimationSpeed } from "../sudoku/AnimationSpeed";
+import { UAParser } from "ua-parser-js";
 
 class Settings {
     isOpened = false;
 
     readonly enableConflictChecker = localStorageManager.getBoolManager("enableConflictChecker", true);
 
-    readonly pencilmarksCheckerMode = localStorageManager.getNumberManager<PencilmarksCheckerMode>("pencilmarksCheckerMode", PencilmarksCheckerMode.CheckObvious);
+    readonly pencilmarksCheckerMode = localStorageManager.getNumberManager<PencilmarksCheckerMode>(
+        "pencilmarksCheckerMode",
+        PencilmarksCheckerMode.CheckObvious,
+    );
 
     readonly autoCheckOnFinish = localStorageManager.getBoolManager("autoCheckOnFinish", true);
 
-    readonly animationSpeed = localStorageManager.getNumberManager<AnimationSpeed>("animationSpeed", AnimationSpeed.regular);
+    readonly animationSpeed = localStorageManager.getNumberManager<AnimationSpeed>(
+        "animationSpeed",
+        AnimationSpeed.regular,
+    );
 
     readonly flipKeypad = localStorageManager.getBoolManager("flipKeypad");
 
@@ -27,7 +33,7 @@ class Settings {
 
     readonly simplifiedGraphics = localStorageManager.getBoolManager(
         "simplifiedGraphics",
-        !process.env.STORYBOOK && (new UAParser()).getResult().device.vendor !== "apple"
+        !process.env.STORYBOOK && new UAParser().getResult().device.vendor !== "apple",
     );
 
     constructor() {

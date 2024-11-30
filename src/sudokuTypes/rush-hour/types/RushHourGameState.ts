@@ -1,5 +1,5 @@
-import {RushHourGameCarState} from "./RushHourGameCarState";
-import {Position} from "../../../types/layout/Position";
+import { RushHourGameCarState } from "./RushHourGameCarState";
+import { Position } from "../../../types/layout/Position";
 
 export interface RushHourGameState {
     cars: RushHourGameCarState[];

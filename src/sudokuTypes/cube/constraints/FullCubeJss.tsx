@@ -1,21 +1,21 @@
-import {Constraint, ConstraintProps} from "../../../types/sudoku/Constraint";
-import {FullCubePTM} from "../types/FullCubePTM";
-import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
-import {AutoSvg} from "../../../components/svg/auto-svg/AutoSvg";
-import {getRectCenter} from "../../../types/layout/Rect";
-import {getVectorLength3D, Position3D, subtractVectors3D} from "../../../types/layout/Position3D";
-import {transformFullCubeCoords3D} from "../helpers/fullCubeHelpers";
-import {GridRegion} from "../../../types/sudoku/GridRegion";
-import {Position} from "../../../types/layout/Position";
-import {indexes} from "../../../utils/indexes";
-import {CellColorValue, resolveCellColorValue} from "../../../types/sudoku/CellColor";
-import {CenteredText} from "../../../components/svg/centered-text/CenteredText";
-import {textColor} from "../../../components/app/globals";
+import { Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
+import { FullCubePTM } from "../types/FullCubePTM";
+import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
+import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
+import { getRectCenter } from "../../../types/layout/Rect";
+import { getVectorLength3D, Position3D, subtractVectors3D } from "../../../types/layout/Position3D";
+import { transformFullCubeCoords3D } from "../helpers/fullCubeHelpers";
+import { GridRegion } from "../../../types/sudoku/GridRegion";
+import { Position } from "../../../types/layout/Position";
+import { indexes } from "../../../utils/indexes";
+import { CellColorValue, resolveCellColorValue } from "../../../types/sudoku/CellColor";
+import { CenteredText } from "../../../components/svg/centered-text/CenteredText";
+import { textColor } from "../../../components/app/globals";
 
 const FullCubeJss = {
-    [FieldLayer.regular]: observer(function FullCubeJssFc({context, region}: ConstraintProps<FullCubePTM>) {
+    [FieldLayer.regular]: observer(function FullCubeJssFc({ context, region }: ConstraintProps<FullCubePTM>) {
         profiler.trace();
 
         if (!region?.noInteraction) {
@@ -24,7 +24,7 @@ const FullCubeJss = {
 
         const {
             puzzle: {
-                fieldSize: {fieldSize},
+                fieldSize: { fieldSize },
                 solution,
                 solutionColors,
             },
@@ -35,7 +35,7 @@ const FullCubeJss = {
         const radius = realFieldSize / 2;
 
         const regionsWithPositions = regions
-            .filter(({noInteraction}) => !noInteraction)
+            .filter(({ noInteraction }) => !noInteraction)
             .map((region) => ({
                 region,
                 vector: transformFullCubeCoords3D(getRectCenter(region), context),
@@ -47,18 +47,22 @@ const FullCubeJss = {
         }
         type PositionFn = (position: Position3D) => Position;
         const findRegion = (vector: Position3D) => {
-            return regionsWithPositions
-                .find((region) => getVectorLength3D(subtractVectors3D(region.vector, vector)) < 0.01)
-                ?.region;
+            return regionsWithPositions.find(
+                (region) => getVectorLength3D(subtractVectors3D(region.vector, vector)) < 0.01,
+            )?.region;
         };
         const getRegionData = (region: GridRegion, positionFn: PositionFn) => {
-            const result: {digit?: number, color?: CellColorValue}[][] = indexes(realFieldSize).map(() => indexes(realFieldSize).map(() => ({})));
+            const result: { digit?: number; color?: CellColorValue }[][] = indexes(realFieldSize).map(() =>
+                indexes(realFieldSize).map(() => ({})),
+            );
 
             for (const dx of indexes(realFieldSize)) {
                 const left = region.left + dx;
                 for (const dy of indexes(realFieldSize)) {
                     const top = region.top + dy;
-                    const cluePosition = positionFn(transformFullCubeCoords3D({top: top + 0.5, left: left + 0.5}, context));
+                    const cluePosition = positionFn(
+                        transformFullCubeCoords3D({ top: top + 0.5, left: left + 0.5 }, context),
+                    );
                     const clueTop = Math.floor(cluePosition.top) + radius;
                     const clueLeft = Math.floor(cluePosition.left) + radius;
                     if (clueTop in result && clueLeft in result[clueTop]) {
@@ -93,7 +97,7 @@ const FullCubeJss = {
                 const result: Clue[] = [];
                 let lastColor: CellColorValue | undefined = undefined;
 
-                for (const {digit, color} of row) {
+                for (const { digit, color } of row) {
                     if (color !== undefined) {
                         if (color !== lastColor) {
                             result.push({
@@ -118,62 +122,63 @@ const FullCubeJss = {
         switch (region.left / realFieldSize) {
             case 0:
                 clues = getClues(
-                    {x: 0, y: 0, z: radius},
-                    ({x, y}) => ({top: y, left: x}),
-                    {x: radius, y: 0, z: 0},
-                    ({y, z}) => ({top: y, left: -z}),
+                    { x: 0, y: 0, z: radius },
+                    ({ x, y }) => ({ top: y, left: x }),
+                    { x: radius, y: 0, z: 0 },
+                    ({ y, z }) => ({ top: y, left: -z }),
                 );
                 break;
             case 1:
                 // noinspection JSSuspiciousNameCombination
                 clues = getClues(
-                    {x: 0, y: -radius, z: 0},
-                    ({x, z}) => ({top: z, left: x}),
-                    {x: radius, y: 0, z: 0},
-                    ({y, z}) => ({top: z, left: y}),
+                    { x: 0, y: -radius, z: 0 },
+                    ({ x, z }) => ({ top: z, left: x }),
+                    { x: radius, y: 0, z: 0 },
+                    ({ y, z }) => ({ top: z, left: y }),
                 );
                 break;
             default:
                 switchDirection = true;
                 // noinspection JSSuspiciousNameCombination
                 clues = getClues(
-                    {x: 0, y: -radius, z: 0},
-                    ({x, z}) => ({top: x, left: z}),
-                    {x: 0, y: 0, z: radius},
-                    ({x, y}) => ({top: x, left: y}),
+                    { x: 0, y: -radius, z: 0 },
+                    ({ x, z }) => ({ top: x, left: z }),
+                    { x: 0, y: 0, z: radius },
+                    ({ x, y }) => ({ top: x, left: y }),
                 );
                 break;
         }
 
-        return <AutoSvg top={region.top} left={region.left}>
-            {clues.flatMap((row, top) => row.map(({color, sum}, left) => {
-                // Move the clues to the end of the row
-                left += realFieldSize - row.length;
+        return (
+            <AutoSvg top={region.top} left={region.left}>
+                {clues.flatMap((row, top) =>
+                    row.map(({ color, sum }, left) => {
+                        // Move the clues to the end of the row
+                        left += realFieldSize - row.length;
 
-                return <AutoSvg
-                    key={`${top}-${left}`}
-                    top={switchDirection ? left : top}
-                    left={switchDirection ? top : left}
-                >
-                    <rect
-                        width={1}
-                        height={1}
-                        strokeWidth={0}
-                        stroke={"none"}
-                        fill={resolveCellColorValue(color)}
-                    />
+                        return (
+                            <AutoSvg
+                                key={`${top}-${left}`}
+                                top={switchDirection ? left : top}
+                                left={switchDirection ? top : left}
+                            >
+                                <rect
+                                    width={1}
+                                    height={1}
+                                    strokeWidth={0}
+                                    stroke={"none"}
+                                    fill={resolveCellColorValue(color)}
+                                />
 
-                    <CenteredText
-                        top={0.5}
-                        left={0.5}
-                        size={0.7}
-                        fill={textColor}
-                    >
-                        {sum}
-                    </CenteredText>
-                </AutoSvg>;
-            }))}
-        </AutoSvg>;
+                                <CenteredText top={0.5} left={0.5} size={0.7} fill={textColor}>
+                                    {sum}
+                                </CenteredText>
+                            </AutoSvg>
+                        );
+                    }),
+                )}
+            </AutoSvg>
+        );
     }),
 };
 

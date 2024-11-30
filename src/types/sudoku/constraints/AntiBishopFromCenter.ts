@@ -1,24 +1,19 @@
-import {Constraint} from "../Constraint";
-import {isSamePosition} from "../../layout/Position";
-import {loop} from "../../../utils/math";
-import {AnyPTM} from "../PuzzleTypeMap";
+import { Constraint } from "../Constraint";
+import { isSamePosition } from "../../layout/Position";
+import { loop } from "../../../utils/math";
+import { AnyPTM } from "../PuzzleTypeMap";
 
 export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: number): Constraint<T> => ({
     name: "anti-bishop from center",
     cells: [],
     props: undefined,
     isObvious: true,
-    isValidCell(
-        cell,
-        digits,
-        _,
-        context
-    ) {
+    isValidCell(cell, digits, _, context) {
         const {
-            typeManager: {areSameCellData},
+            typeManager: { areSameCellData },
             loopHorizontally,
             loopVertically,
-            fieldSize: {rowsCount, columnsCount, fieldSize},
+            fieldSize: { rowsCount, columnsCount, fieldSize },
         } = context.puzzle;
 
         const digit = digits[cell.top][cell.left]!;
@@ -46,7 +41,7 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
                     continue;
                 }
 
-                const cell2 = {left: x, top: y};
+                const cell2 = { left: x, top: y };
                 if (isSamePosition(cell, cell2)) {
                     continue;
                 }

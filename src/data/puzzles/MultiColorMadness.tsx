@@ -1,8 +1,8 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import {
     antiBishopFromCenterRulesExplained,
     antiKnightRulesExplained,
@@ -10,15 +10,15 @@ import {
     inequalitySignsExplained,
     moveButtonTip,
     normalSudokuRulesApply,
-    toroidalRulesApply
+    toroidalRulesApply,
 } from "../ruleSnippets";
-import {AntiKnightConstraint} from "../../types/sudoku/constraints/AntiKnight";
-import {AntiBishopFromCenterConstraint} from "../../types/sudoku/constraints/AntiBishopFromCenter";
-import {GreaterConstraint} from "../../components/sudoku/constraints/greater/Greater";
-import {KillerCageConstraintByRect} from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {indexes} from "../../utils/indexes";
+import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
+import { AntiBishopFromCenterConstraint } from "../../types/sudoku/constraints/AntiBishopFromCenter";
+import { GreaterConstraint } from "../../components/sudoku/constraints/greater/Greater";
+import { KillerCageConstraintByRect } from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { indexes } from "../../utils/indexes";
 
 export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     slug: "multi-color-madness",
@@ -28,14 +28,18 @@ export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     author: {
         [LanguageCode.en]: "Joseph",
     },
-    rules: translate => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>{translate(cannotRepeatInCage)}.</RulesParagraph>
-        <RulesParagraph>{translate(inequalitySignsExplained)}.</RulesParagraph>
-        <RulesParagraph>{translate(antiKnightRulesExplained)}.</RulesParagraph>
-        <RulesParagraph>{translate(antiBishopFromCenterRulesExplained)}.</RulesParagraph>
-        <RulesParagraph>{translate(toroidalRulesApply)}. {translate(moveButtonTip)}.</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(cannotRepeatInCage)}.</RulesParagraph>
+            <RulesParagraph>{translate(inequalitySignsExplained)}.</RulesParagraph>
+            <RulesParagraph>{translate(antiKnightRulesExplained)}.</RulesParagraph>
+            <RulesParagraph>{translate(antiBishopFromCenterRulesExplained)}.</RulesParagraph>
+            <RulesParagraph>
+                {translate(toroidalRulesApply)}. {translate(moveButtonTip)}.
+            </RulesParagraph>
+        </>
+    ),
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
@@ -61,7 +65,5 @@ export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     resultChecker: isValidFinishedPuzzleByConstraints,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=0008A2",
     getLmdSolutionCode: (context) =>
-        [0, 8]
-            .flatMap((top) => indexes(9).map((left) => context.getCellDigit(top, left)))
-            .join(""),
+        [0, 8].flatMap((top) => indexes(9).map((left) => context.getCellDigit(top, left))).join(""),
 };

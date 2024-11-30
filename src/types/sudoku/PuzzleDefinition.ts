@@ -1,13 +1,13 @@
-import {GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps} from "./GivenDigitsMap";
-import {ComponentType, ReactNode} from "react";
-import {SudokuTypeManager} from "./SudokuTypeManager";
-import {FieldSize} from "./FieldSize";
-import {PartiallyTranslatable} from "../translations/Translatable";
-import {useTranslate} from "../../hooks/useTranslate";
-import {Constraint} from "./Constraint";
-import {CellColorValue} from "./CellColor";
-import {PuzzleContext, PuzzleContextProps} from "./PuzzleContext";
-import {CustomCellBounds} from "./CustomCellBounds";
+import { GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps } from "./GivenDigitsMap";
+import { ComponentType, ReactNode } from "react";
+import { SudokuTypeManager } from "./SudokuTypeManager";
+import { FieldSize } from "./FieldSize";
+import { PartiallyTranslatable } from "../translations/Translatable";
+import { useTranslate } from "../../hooks/useTranslate";
+import { Constraint } from "./Constraint";
+import { CellColorValue } from "./CellColor";
+import { PuzzleContext, PuzzleContextProps } from "./PuzzleContext";
+import { CustomCellBounds } from "./CustomCellBounds";
 import {
     getLineVector,
     invertLine,
@@ -18,18 +18,18 @@ import {
     Position,
     stringifyCellCoords,
     stringifyLine,
-    stringifyPosition
+    stringifyPosition,
 } from "../layout/Position";
-import {PuzzleResultCheck} from "./PuzzleResultCheck";
-import {CellMark, getCenterMarksMap, parseCellMark} from "./CellMark";
-import {loop} from "../../utils/math";
-import {LanguageCode} from "../translations/LanguageCode";
-import type {PuzzleImportOptions} from "./PuzzleImportOptions";
-import {AnyPTM} from "./PuzzleTypeMap";
-import {isSolutionCheckCell} from "./CellTypeProps";
-import {profiler} from "../../utils/profiler";
-import {ColorChecker, ColorMapChecker, ExactColorChecker} from "./ColorChecker";
-import {settings} from "../layout/Settings";
+import { PuzzleResultCheck } from "./PuzzleResultCheck";
+import { CellMark, getCenterMarksMap, parseCellMark } from "./CellMark";
+import { loop } from "../../utils/math";
+import { LanguageCode } from "../translations/LanguageCode";
+import type { PuzzleImportOptions } from "./PuzzleImportOptions";
+import { AnyPTM } from "./PuzzleTypeMap";
+import { isSolutionCheckCell } from "./CellTypeProps";
+import { profiler } from "../../utils/profiler";
+import { ColorChecker, ColorMapChecker, ExactColorChecker } from "./ColorChecker";
+import { settings } from "../layout/Settings";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
     // The field is required. Marking it as optional here only to avoid adding empty object to each puzzle.
@@ -45,7 +45,11 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     getNewHostedGameParams?: () => any;
     author?: PartiallyTranslatable<ReactNode>;
     rules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>) => ReactNode;
-    aboveRules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>, isPortrait: boolean) => ReactNode;
+    aboveRules?: (
+        translate: ReturnType<typeof useTranslate>,
+        context: PuzzleContext<T>,
+        isPortrait: boolean,
+    ) => ReactNode;
     successMessage?: string;
     typeManager: SudokuTypeManager<T>;
     fieldSize: FieldSize;
@@ -60,14 +64,17 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     supportZero?: boolean;
     initialDigits?: GivenDigitsMap<T["cell"]>;
     initialLetters?: GivenDigitsMap<string>;
-    initialColors?: GivenDigitsMap<CellColorValue[]> | ((context: PuzzleContext<T>) => GivenDigitsMap<CellColorValue[]>);
+    initialColors?:
+        | GivenDigitsMap<CellColorValue[]>
+        | ((context: PuzzleContext<T>) => GivenDigitsMap<CellColorValue[]>);
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
     disableBackgroundColorOpacity?: boolean;
-    resultChecker?: (context: PuzzleContext<T>) => boolean | PuzzleResultCheck<ReactNode | PartiallyTranslatable<ReactNode>>,
+    resultChecker?: (
+        context: PuzzleContext<T>,
+    ) => boolean | PuzzleResultCheck<ReactNode | PartiallyTranslatable<ReactNode>>;
     forceAutoCheckOnFinish?: boolean;
-    items?: Constraint<T, any>[]
-        | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
+    items?: Constraint<T, any>[] | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
     borderColor?: string;
     allowDrawing?: ("center-line" | "border-line" | "center-mark" | "border-mark" | "corner-mark")[];
     disableDiagonalCenterLines?: boolean;
@@ -96,13 +103,19 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     dashedGrid?: boolean;
 }
 
-export const allDrawingModes: PuzzleDefinition<AnyPTM>["allowDrawing"] = ["center-line", "border-line", "center-mark", "border-mark", "corner-mark"];
+export const allDrawingModes: PuzzleDefinition<AnyPTM>["allowDrawing"] = [
+    "center-line",
+    "border-line",
+    "center-mark",
+    "border-mark",
+    "corner-mark",
+];
 
 export interface PuzzleDefinitionLoader<T extends AnyPTM> {
     slug: string;
     noIndex?: boolean;
     fulfillParams?: (params: any) => any;
-    loadPuzzle: (params: any, isPreview?: boolean) => Omit<PuzzleDefinition<T>, "noIndex" | "slug"> & {slug?: string};
+    loadPuzzle: (params: any, isPreview?: boolean) => Omit<PuzzleDefinition<T>, "noIndex" | "slug"> & { slug?: string };
 }
 
 export type PuzzleDefinitionOrLoader<T extends AnyPTM> = PuzzleDefinition<T> | PuzzleDefinitionLoader<T>;
@@ -112,18 +125,14 @@ export const loadPuzzle = <T extends AnyPTM>(
     params: any = {},
     isPreview = false,
 ): PuzzleDefinition<T> => {
-    const {
-        loadPuzzle,
-        fulfillParams = params => params,
-    } = puzzleOrLoader as PuzzleDefinitionLoader<T>;
+    const { loadPuzzle, fulfillParams = (params) => params } = puzzleOrLoader as PuzzleDefinitionLoader<T>;
 
-    const fulfilledParams = typeof loadPuzzle === "function"
-        ? fulfillParams(params)
-        : params;
+    const fulfilledParams = typeof loadPuzzle === "function" ? fulfillParams(params) : params;
 
-    const basePuzzle = typeof loadPuzzle === "function"
-        ? loadPuzzle(fulfilledParams, isPreview)
-        : puzzleOrLoader as PuzzleDefinition<T>;
+    const basePuzzle =
+        typeof loadPuzzle === "function"
+            ? loadPuzzle(fulfilledParams, isPreview)
+            : (puzzleOrLoader as PuzzleDefinition<T>);
 
     const puzzle: PuzzleDefinition<T> = {
         ...basePuzzle,
@@ -138,9 +147,11 @@ export const loadPuzzle = <T extends AnyPTM>(
     return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 };
 
-export const getDefaultDigitsCount = <T extends AnyPTM>(
-    {typeManager: {maxDigitsCount}, fieldSize: {fieldSize}, importOptions: {stickyRegion} = {}}: PuzzleDefinition<T>
-) => {
+export const getDefaultDigitsCount = <T extends AnyPTM>({
+    typeManager: { maxDigitsCount },
+    fieldSize: { fieldSize },
+    importOptions: { stickyRegion } = {},
+}: PuzzleDefinition<T>) => {
     if (stickyRegion) {
         fieldSize = Math.min(fieldSize, Math.max(stickyRegion.width, stickyRegion.height));
     }
@@ -149,52 +160,41 @@ export const getDefaultDigitsCount = <T extends AnyPTM>(
 };
 
 export const normalizePuzzlePosition = <T extends AnyPTM>(
-    {top, left}: Position,
-    {
-        fieldSize: {rowsCount, columnsCount},
-        loopHorizontally,
-        loopVertically,
-    }: PuzzleDefinition<T>
+    { top, left }: Position,
+    { fieldSize: { rowsCount, columnsCount }, loopHorizontally, loopVertically }: PuzzleDefinition<T>,
 ): Position => ({
-    top: loopVertically
-        ? loop(top, rowsCount)
-        : top,
-    left: loopHorizontally
-        ? loop(left, columnsCount)
-        : left,
+    top: loopVertically ? loop(top, rowsCount) : top,
+    left: loopHorizontally ? loop(left, columnsCount) : left,
 });
 
-export const getIsSamePuzzlePosition = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
-    (a: Position, b: Position) => isSamePosition(normalizePuzzlePosition(a, puzzle), normalizePuzzlePosition(b, puzzle));
+export const getIsSamePuzzlePosition =
+    <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
+    (a: Position, b: Position) =>
+        isSamePosition(normalizePuzzlePosition(a, puzzle), normalizePuzzlePosition(b, puzzle));
 
-export const getPuzzlePositionHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
-    (position: Position) => stringifyPosition(normalizePuzzlePosition(position, puzzle));
+export const getPuzzlePositionHasher =
+    <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
+    (position: Position) =>
+        stringifyPosition(normalizePuzzlePosition(position, puzzle));
 
-export const normalizePuzzleVector = <T extends AnyPTM>(
-    vector: Position,
-    puzzle: PuzzleDefinition<T>
-): Position => {
+export const normalizePuzzleVector = <T extends AnyPTM>(vector: Position, puzzle: PuzzleDefinition<T>): Position => {
     const {
-        fieldSize: {rowsCount, columnsCount},
+        fieldSize: { rowsCount, columnsCount },
         loopHorizontally,
         loopVertically,
     } = puzzle;
 
-    const {top, left} = normalizePuzzlePosition(vector, puzzle);
+    const { top, left } = normalizePuzzlePosition(vector, puzzle);
 
     return {
-        top: loopVertically && top * 2 > rowsCount
-            ? top - rowsCount
-            : top,
-        left: loopHorizontally && left * 2 > columnsCount
-            ? left - columnsCount
-            : left,
+        top: loopVertically && top * 2 > rowsCount ? top - rowsCount : top,
+        left: loopHorizontally && left * 2 > columnsCount ? left - columnsCount : left,
     };
 };
 
 export const normalizePuzzleLine = <T extends AnyPTM, LineT extends Line = Line>(
     line: LineT,
-    puzzle: PuzzleDefinition<T>
+    puzzle: PuzzleDefinition<T>,
 ): LineT => {
     let vector = normalizePuzzleVector(getLineVector(line), puzzle);
     if (vector.top < 0 || (vector.top === 0 && vector.left < 0)) {
@@ -215,14 +215,18 @@ export const normalizePuzzleLine = <T extends AnyPTM, LineT extends Line = Line>
 };
 
 // noinspection JSUnusedGlobalSymbols
-export const getIsSamePuzzleLine = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
-    (a: Line, b: Line) => isSameLine(normalizePuzzleLine(a, puzzle), normalizePuzzleLine(b, puzzle));
+export const getIsSamePuzzleLine =
+    <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
+    (a: Line, b: Line) =>
+        isSameLine(normalizePuzzleLine(a, puzzle), normalizePuzzleLine(b, puzzle));
 
-export const getPuzzleLineHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
-    (line: Line) => stringifyLine(normalizePuzzleLine(line, puzzle));
+export const getPuzzleLineHasher =
+    <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) =>
+    (line: Line) =>
+        stringifyLine(normalizePuzzleLine(line, puzzle));
 
 export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
-    context: PuzzleContext<T>
+    context: PuzzleContext<T>,
 ): boolean | PuzzleResultCheck<PartiallyTranslatable<ReactNode>> => {
     const timer = profiler.track("isValidFinishedPuzzleByEmbeddedSolution");
 
@@ -230,16 +234,16 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         puzzle,
         puzzleIndex,
         userDigits,
-        currentFieldStateWithFogDemo: {cells, marks},
+        currentFieldStateWithFogDemo: { cells, marks },
     } = context;
     const {
-        typeManager: {getDigitByCellData},
+        typeManager: { getDigitByCellData },
         initialCellMarks = [],
         solution = {},
         solutionColors = {},
         allowMappingSolutionColors,
         ignoreEmptySolutionColors,
-        importOptions: {stickyRegion, noStickyRegionValidation} = {},
+        importOptions: { stickyRegion, noStickyRegionValidation } = {},
     } = puzzle;
 
     const hasSolutionColors = Object.keys(solutionColors).length !== 0;
@@ -256,15 +260,20 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     let loggedEmptyDigits = false;
     let loggedEmptyColors = false;
     for (const [top, row] of cells.entries()) {
-        for (const [left, {colors}] of row.entries()) {
-            if (!isSolutionCheckCell(puzzleIndex.getCellTypeProps({top, left}))) {
+        for (const [left, { colors }] of row.entries()) {
+            if (!isSolutionCheckCell(puzzleIndex.getCellTypeProps({ top, left }))) {
                 continue;
             }
 
             if (stickyRegion && noStickyRegionValidation) {
                 const stickyTop = top - stickyRegion.top;
                 const stickyLeft = left - stickyRegion.left;
-                if (stickyTop >= 0 && stickyLeft >= 0 && stickyTop < stickyRegion.height && stickyLeft < stickyRegion.width) {
+                if (
+                    stickyTop >= 0 &&
+                    stickyLeft >= 0 &&
+                    stickyTop < stickyRegion.height &&
+                    stickyLeft < stickyRegion.width
+                ) {
                     continue;
                 }
             }
@@ -278,11 +287,19 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             }
             const actualMark = (initialCenterMarks?.[top]?.[left] ?? userCenterMarks?.[top]?.[left])?.type;
             const actualDigit = userDigits[top]?.[left];
-            const actualData = actualDigit !== undefined ? getDigitByCellData(actualDigit, context, {top, left}) : actualMark;
+            const actualData =
+                actualDigit !== undefined ? getDigitByCellData(actualDigit, context, { top, left }) : actualMark;
             if (actualData !== expectedData) {
                 if (settings.debugSolutionChecker.get()) {
                     if (actualData !== undefined || !loggedEmptyDigits) {
-                        console.warn("Wrong digit at", stringifyCellCoords({top, left}), "expected", expectedData, "got", actualData);
+                        console.warn(
+                            "Wrong digit at",
+                            stringifyCellCoords({ top, left }),
+                            "expected",
+                            expectedData,
+                            "got",
+                            actualData,
+                        );
                     }
                     if (actualData === undefined) {
                         loggedEmptyDigits = true;
@@ -291,20 +308,28 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                 areCorrectDigits = false;
             }
 
-            let expectedColor = [...solutionColors[top]?.[left] ?? []].sort().join(",");
+            let expectedColor = [...(solutionColors[top]?.[left] ?? [])].sort().join(",");
             const actualColor = colors.sorted().items.join(",");
 
             if (!expectedData) {
                 areCorrectColorsByDigits = false;
             } else if (typeof expectedData === "number") {
-                areCorrectColorsByDigits = areCorrectColorsByDigits && colorsByDigitsChecker.isValidData(actualColor, expectedData);
+                areCorrectColorsByDigits =
+                    areCorrectColorsByDigits && colorsByDigitsChecker.isValidData(actualColor, expectedData);
             }
 
             if (hasSolutionColors && (expectedColor || !ignoreEmptySolutionColors)) {
                 if (!colorsBySolutionChecker.isValidData(actualColor, expectedColor)) {
                     if (settings.debugSolutionChecker.get()) {
                         if (actualColor || !loggedEmptyColors) {
-                            console.warn("Wrong color at", stringifyCellCoords({top, left}), "expected", expectedColor, "got", actualColor);
+                            console.warn(
+                                "Wrong color at",
+                                stringifyCellCoords({ top, left }),
+                                "expected",
+                                expectedColor,
+                                "got",
+                                actualColor,
+                            );
                         }
                         if (!actualColor) {
                             loggedEmptyColors = true;
@@ -360,7 +385,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
 export const getRegionCells = <T extends AnyPTM>(region: Position[] | Constraint<T, any>) =>
     Array.isArray(region) ? region : region.cells;
 
-export const isStickyRegionCell = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, {top, left}: Position) => {
+export const isStickyRegionCell = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, { top, left }: Position) => {
     const stickyRegion = puzzle.importOptions?.stickyRegion;
     if (!stickyRegion) {
         return false;
@@ -375,26 +400,18 @@ export const importGivenColorsAsSolution = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
     isRegionCell: (cell: Position) => boolean = () => true,
 ) => {
-    const {
-        initialColors = {},
-        solutionColors = {},
-    } = puzzle;
+    const { initialColors = {}, solutionColors = {} } = puzzle;
     if (typeof initialColors !== "object" || typeof solutionColors !== "object") {
         throw new Error("puzzle.initialColors and puzzle.solutionColors are expected to be objects");
     }
 
     puzzle.solutionColors = mergeGivenDigitsMaps(
         solutionColors,
-        processGivenDigitsMaps(
-            ([colors], position) =>
-                isRegionCell(position) ? colors : undefined,
-            [initialColors]
-        )
+        processGivenDigitsMaps(([colors], position) => (isRegionCell(position) ? colors : undefined), [initialColors]),
     );
     puzzle.initialColors = processGivenDigitsMaps(
-        ([colors], position) =>
-            isRegionCell(position) ? undefined : colors,
-        [initialColors]
+        ([colors], position) => (isRegionCell(position) ? undefined : colors),
+        [initialColors],
     );
 };
 
@@ -402,10 +419,7 @@ export const importSolutionColorsAsGiven = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
     isRegionCell: (cell: Position) => boolean = () => true,
 ) => {
-    const {
-        initialColors = {},
-        solutionColors = {},
-    } = puzzle;
+    const { initialColors = {}, solutionColors = {} } = puzzle;
     if (typeof initialColors !== "object" || typeof solutionColors !== "object") {
         throw new Error("puzzle.initialColors and puzzle.solutionColors are expected to be objects");
     }
@@ -413,14 +427,12 @@ export const importSolutionColorsAsGiven = <T extends AnyPTM>(
     puzzle.initialColors = mergeGivenDigitsMaps(
         initialColors,
         processGivenDigitsMaps(
-            ([colors], position) =>
-                isRegionCell(position) && colors.length ? colors : undefined,
-            [solutionColors]
-        )
+            ([colors], position) => (isRegionCell(position) && colors.length ? colors : undefined),
+            [solutionColors],
+        ),
     );
     puzzle.solutionColors = processGivenDigitsMaps(
-        ([colors], position) =>
-            isRegionCell(position) ? undefined : colors,
-        [solutionColors]
+        ([colors], position) => (isRegionCell(position) ? undefined : colors),
+        [solutionColors],
     );
 };

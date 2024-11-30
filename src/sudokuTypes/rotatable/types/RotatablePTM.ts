@@ -1,6 +1,6 @@
-import {PTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {RotatableGameState} from "./RotatableGameState";
-import {RotatableDigit} from "./RotatableDigit";
+import { PTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { RotatableGameState } from "./RotatableGameState";
+import { RotatableDigit } from "./RotatableDigit";
 
 export type RotatablePTM<CellType> = PTM<CellType, RotatableGameState>;
 

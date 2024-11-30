@@ -1,10 +1,10 @@
-import {FPuzzles} from "./Import";
-import {PuzzleDefinition, PuzzleDefinitionLoader} from "../../types/sudoku/PuzzleDefinition";
-import {JigsawPTM} from "../../sudokuTypes/jigsaw/types/JigsawPTM";
-import {PuzzleImportOptions, PuzzleImportPuzzleType} from "../../types/sudoku/PuzzleImportOptions";
-import {JigsawFieldState} from "../../sudokuTypes/jigsaw/types/JigsawFieldState";
-import {stringifyPosition} from "../../types/layout/Position";
-import {JigsawPieceInfo} from "../../sudokuTypes/jigsaw/types/JigsawPieceInfo";
+import { FPuzzles } from "./Import";
+import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
+import { JigsawPTM } from "../../sudokuTypes/jigsaw/types/JigsawPTM";
+import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/sudoku/PuzzleImportOptions";
+import { JigsawFieldState } from "../../sudokuTypes/jigsaw/types/JigsawFieldState";
+import { stringifyPosition } from "../../types/layout/Position";
+import { JigsawPieceInfo } from "../../sudokuTypes/jigsaw/types/JigsawPieceInfo";
 
 export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
     loadPuzzle: () => {
@@ -30,7 +30,9 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
             ],
         } as PuzzleImportOptions);
 
-        const baseInitialStateFn = puzzle.typeManager.initialFieldStateExtension as ((puzzle: PuzzleDefinition<JigsawPTM>) => JigsawFieldState);
+        const baseInitialStateFn = puzzle.typeManager.initialFieldStateExtension as (
+            puzzle: PuzzleDefinition<JigsawPTM>,
+        ) => JigsawFieldState;
 
         const initialScale = 0.85;
         return {
@@ -45,7 +47,7 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
                 initialFieldStateExtension: (puzzle) => {
                     const pieces: JigsawPieceInfo[] = puzzle.extension!.pieces;
                     const pieceIndexByCell: Record<string, number> = {};
-                    for (const [index, {cells}] of pieces.entries()) {
+                    for (const [index, { cells }] of pieces.entries()) {
                         for (const cell of cells) {
                             pieceIndexByCell[stringifyPosition(cell)] = index;
                         }
@@ -54,7 +56,7 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
                     const result = baseInitialStateFn(puzzle);
 
                     const movePiece = (top: number, left: number, newTop: number, newLeft: number, angle: number) => {
-                        const index = pieceIndexByCell[stringifyPosition({top: top - 1, left: left + 9})];
+                        const index = pieceIndexByCell[stringifyPosition({ top: top - 1, left: left + 9 })];
                         const position = result.pieces[index];
                         position.top = newTop - top - 1.5;
                         position.left = newLeft - left;
@@ -98,7 +100,7 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
 
                     return result;
                 },
-            }
+            },
         };
     },
     noIndex: true,

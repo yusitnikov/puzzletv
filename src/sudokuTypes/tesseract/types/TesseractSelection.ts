@@ -1,10 +1,10 @@
-import {useCallback, useState} from "react";
-import {loadStringFromLocalStorage, saveStringToLocalStorage} from "../../../utils/localStorage";
-import {isSamePosition, Position} from "../../../types/layout/Position";
-import {CellSelectionColor} from "../../../components/sudoku/cell/CellSelection";
-import {SudokuTypeManager} from "../../../types/sudoku/SudokuTypeManager";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import { useCallback, useState } from "react";
+import { loadStringFromLocalStorage, saveStringToLocalStorage } from "../../../utils/localStorage";
+import { isSamePosition, Position } from "../../../types/layout/Position";
+import { CellSelectionColor } from "../../../components/sudoku/cell/CellSelection";
+import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 
 export enum TesseractSelectionType {
     Always = "always",
@@ -14,15 +14,19 @@ export enum TesseractSelectionType {
 
 const localStorageKey = "tesseractSelection";
 
-const getTesseractSelectionType = () => loadStringFromLocalStorage<TesseractSelectionType>(localStorageKey, TesseractSelectionType.Clues);
+const getTesseractSelectionType = () =>
+    loadStringFromLocalStorage<TesseractSelectionType>(localStorageKey, TesseractSelectionType.Clues);
 
 export const useTesseractSelectionType = (): [TesseractSelectionType, (type: TesseractSelectionType) => void] => {
     const [type, setType] = useState<TesseractSelectionType>(getTesseractSelectionType);
 
-    const handleSetType = useCallback((type: TesseractSelectionType) => {
-        setType(type);
-        saveStringToLocalStorage(localStorageKey, type);
-    }, [setType]);
+    const handleSetType = useCallback(
+        (type: TesseractSelectionType) => {
+            setType(type);
+            saveStringToLocalStorage(localStorageKey, type);
+        },
+        [setType],
+    );
 
     return [type, handleSetType];
 };
@@ -40,13 +44,17 @@ export const getTesseractCellSelectionType = <T extends AnyPTM>(
         case TesseractSelectionType.Never:
             return undefined;
         case TesseractSelectionType.Clues:
-            if (!context.allItems.some(({name, cells}) => name === "ellipse" && isSamePosition(cells[0], selectedCell))) {
+            if (
+                !context.allItems.some(
+                    ({ name, cells }) => name === "ellipse" && isSamePosition(cells[0], selectedCell),
+                )
+            ) {
                 return undefined;
             }
             break;
     }
 
-    const getTesseractsCoords = ({top, left}: Position) => [
+    const getTesseractsCoords = ({ top, left }: Position) => [
         top % 3,
         left % 3,
         Math.floor(top / 3),

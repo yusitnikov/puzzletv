@@ -1,20 +1,19 @@
-import {Position} from "../../../types/layout/Position";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {FullCubePTM} from "../types/FullCubePTM";
-import {
-    Position3D,
-    rotateVector3D,
-    vectorOx,
-    vectorOy
-} from "../../../types/layout/Position3D";
-import {matrix3, vector3} from "xyzw";
+import { Position } from "../../../types/layout/Position";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { FullCubePTM } from "../types/FullCubePTM";
+import { Position3D, rotateVector3D, vectorOx, vectorOy } from "../../../types/layout/Position3D";
+import { matrix3, vector3 } from "xyzw";
 
 export const transformFullCubeCoords3D = (
-    {top, left}: Position,
+    { top, left }: Position,
     context: PuzzleContext<FullCubePTM>,
     useAnimatedCoords = true,
 ) => {
-    const {puzzle: {fieldSize: {columnsCount}}} = context;
+    const {
+        puzzle: {
+            fieldSize: { columnsCount },
+        },
+    } = context;
 
     const coordsBase = useAnimatedCoords
         ? context.processedGameStateExtension.animatedCoordsBase

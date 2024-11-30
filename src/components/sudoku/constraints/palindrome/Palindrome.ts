@@ -1,9 +1,9 @@
-import {isSamePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint} from "../../../../types/sudoku/Constraint";
-import {splitMultiLine} from "../../../../utils/lines";
-import {LineComponent, LineProps} from "../line/Line";
-import {lightGreyColor} from "../../../app/globals";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
+import { isSamePosition, parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
+import { Constraint } from "../../../../types/sudoku/Constraint";
+import { splitMultiLine } from "../../../../utils/lines";
+import { LineComponent, LineProps } from "../line/Line";
+import { lightGreyColor } from "../../../app/globals";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 
 export const BasePalindromeConstraint = <T extends AnyPTM>(
     name: string,
@@ -22,13 +22,17 @@ export const BasePalindromeConstraint = <T extends AnyPTM>(
         name,
         cells,
         color,
-        props: {width},
+        props: { width },
         component: LineComponent,
         isObvious: true,
         isValidCell(cell, digits, cells, context) {
-            const {puzzle: {typeManager: {getDigitByCellData}}} = context;
+            const {
+                puzzle: {
+                    typeManager: { getDigitByCellData },
+                },
+            } = context;
 
-            const index = cells.findIndex(position => isSamePosition(cell, position));
+            const index = cells.findIndex((position) => isSamePosition(cell, position));
             if (index < 0) {
                 return false;
             }
@@ -48,11 +52,4 @@ export const PalindromeConstraint = <T extends AnyPTM>(
     split = true,
     color = lightGreyColor,
     width: number | undefined = undefined,
-) => BasePalindromeConstraint<T>(
-    "palindrome",
-    color,
-    cellLiterals,
-    undefined,
-    width,
-    split,
-);
+) => BasePalindromeConstraint<T>("palindrome", color, cellLiterals, undefined, width, split);

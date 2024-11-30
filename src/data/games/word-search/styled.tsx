@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {lightGreyColor} from "../../../components/app/globals";
+import { lightGreyColor } from "../../../components/app/globals";
 
 export const GridItem = styled("div")({
     display: "flex",

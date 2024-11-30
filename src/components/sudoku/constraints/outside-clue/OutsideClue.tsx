@@ -3,15 +3,15 @@ import {
     parsePositionLiteral,
     parsePositionLiterals,
     Position,
-    PositionLiteral
+    PositionLiteral,
 } from "../../../../types/layout/Position";
-import {FieldSize} from "../../../../types/sudoku/FieldSize";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFcMap} from "../../../../types/sudoku/Constraint";
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {observer} from "mobx-react-lite";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {profiler} from "../../../../utils/profiler";
-import {PuzzleContext} from "../../../../types/sudoku/PuzzleContext";
+import { FieldSize } from "../../../../types/sudoku/FieldSize";
+import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
+import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { observer } from "mobx-react-lite";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { profiler } from "../../../../utils/profiler";
+import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
 
 export enum OutsideClueLineDirectionType {
     straight = "straight",
@@ -23,35 +23,39 @@ export type OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType | Pos
 
 export const detectOutsideClueDirection = (
     startCellLiteral: PositionLiteral,
-    {rowsCount, columnsCount}: FieldSize,
+    { rowsCount, columnsCount }: FieldSize,
     directionType: OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType.straight,
 ) => {
     let startCell = parsePositionLiteral(startCellLiteral);
 
     const detectDirection = (diagonalCoeff: number): Position => {
         if (startCell.top < 0) {
-            return {top: 1, left: -diagonalCoeff};
+            return { top: 1, left: -diagonalCoeff };
         } else if (startCell.top >= columnsCount) {
-            return {top: -1, left: diagonalCoeff};
+            return { top: -1, left: diagonalCoeff };
         } else if (startCell.left < 0) {
-            return {top: -diagonalCoeff, left: 1};
+            return { top: -diagonalCoeff, left: 1 };
         } else if (startCell.left >= rowsCount) {
-            return {top: diagonalCoeff, left: -1};
+            return { top: diagonalCoeff, left: -1 };
         } else if (startCell.top <= 0) {
-            return {top: 1, left: -diagonalCoeff};
+            return { top: 1, left: -diagonalCoeff };
         } else if (startCell.top >= columnsCount - 1) {
-            return {top: -1, left: diagonalCoeff};
+            return { top: -1, left: diagonalCoeff };
         } else if (startCell.left <= 0) {
-            return {top: -diagonalCoeff, left: 1};
+            return { top: -diagonalCoeff, left: 1 };
         } else {
-            return {top: diagonalCoeff, left: -1};
+            return { top: diagonalCoeff, left: -1 };
         }
     };
     switch (directionType) {
-        case OutsideClueLineDirectionType.straight: return detectDirection(0);
-        case OutsideClueLineDirectionType.positiveDiagonal: return detectDirection(1);
-        case OutsideClueLineDirectionType.negativeDiagonal: return detectDirection(-1);
-        default: return parsePositionLiteral(directionType);
+        case OutsideClueLineDirectionType.straight:
+            return detectDirection(0);
+        case OutsideClueLineDirectionType.positiveDiagonal:
+            return detectDirection(1);
+        case OutsideClueLineDirectionType.negativeDiagonal:
+            return detectDirection(-1);
+        default:
+            return parsePositionLiteral(directionType);
     }
 };
 
@@ -60,7 +64,7 @@ export const getLineCellsByOutsideCell = (
     fieldSize: FieldSize,
     directionLiteral: OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType.straight,
 ) => {
-    const {rowsCount, columnsCount} = fieldSize;
+    const { rowsCount, columnsCount } = fieldSize;
 
     let startCell = parsePositionLiteral(startCellLiteral);
     const direction = detectOutsideClueDirection(startCellLiteral, fieldSize, directionLiteral);
@@ -74,8 +78,8 @@ export const getLineCellsByOutsideCell = (
     }
 
     const cells: Position[] = [];
-    for (let {top, left} = startCell; isInnerCell(top, left); top += direction.top, left += direction.left) {
-        cells.push({top, left});
+    for (let { top, left } = startCell; isInnerCell(top, left); top += direction.top, left += direction.left) {
+        cells.push({ top, left });
     }
 
     return cells;
@@ -87,26 +91,39 @@ export interface OutsideClueProps {
 }
 
 export const OutsideClue: ConstraintPropsGenericFcMap<OutsideClueProps> = {
-    [FieldLayer.regular]: observer(function OutsideClue<T extends AnyPTM>(
-        {context: {puzzle}, color, props: {clueCell: {top, left}, value}}: ConstraintProps<T, OutsideClueProps>
-    ) {
+    [FieldLayer.regular]: observer(function OutsideClue<T extends AnyPTM>({
+        context: { puzzle },
+        color,
+        props: {
+            clueCell: { top, left },
+            value,
+        },
+    }: ConstraintProps<T, OutsideClueProps>) {
         profiler.trace();
 
-        const {typeManager: {digitComponentType: {svgContentComponent: DigitSvgContent, widthCoeff}}} = puzzle;
+        const {
+            typeManager: {
+                digitComponentType: { svgContentComponent: DigitSvgContent, widthCoeff },
+            },
+        } = puzzle;
 
         const valueArr = value.toString().split("").map(Number);
 
-        return <>
-            {valueArr.map((num, index) => <DigitSvgContent
-                key={index}
-                puzzle={puzzle}
-                color={color}
-                digit={num}
-                size={0.5}
-                left={left + 0.5 + 0.5 * widthCoeff * (index - (valueArr.length - 1) / 2)}
-                top={top + 0.5}
-            />)}
-        </>;
+        return (
+            <>
+                {valueArr.map((num, index) => (
+                    <DigitSvgContent
+                        key={index}
+                        puzzle={puzzle}
+                        color={color}
+                        digit={num}
+                        size={0.5}
+                        left={left + 0.5 + 0.5 * widthCoeff * (index - (valueArr.length - 1) / 2)}
+                        top={top + 0.5}
+                    />
+                ))}
+            </>
+        );
     }),
 };
 
@@ -134,31 +151,33 @@ export const OutsideClueConstraint = <T extends AnyPTM>(
         name,
         cells,
         color,
-        props: {clueCell, value},
+        props: { clueCell, value },
         component: OutsideClue,
         isValidCell(cell, digits, cells, context, _constraints, _constraint, isFinalCheck = false) {
-            const {puzzle: {typeManager: {getDigitByCellData, transformNumber}}} = context;
+            const {
+                puzzle: {
+                    typeManager: { getDigitByCellData, transformNumber },
+                },
+            } = context;
 
             const currentDigit = getDigitByCellData(digits[cell.top][cell.left], context, cell);
             const cellDigits = cells.map((cell) => {
                 const data = digits[cell.top]?.[cell.left];
                 return data === undefined ? undefined : getDigitByCellData(data, context, cell);
             });
-            const cellIndex = cells.findIndex(position => isSamePosition(cell, position));
+            const cellIndex = cells.findIndex((position) => isSamePosition(cell, position));
 
-            const expectedValue = transformNumber
-                ? transformNumber(value ?? 0, context, cells[0], constraint)
-                : value;
+            const expectedValue = transformNumber ? transformNumber(value ?? 0, context, cells[0], constraint) : value;
 
             return isValidCell(currentDigit, cellDigits, context, isFinalCheck, cellIndex, expectedValue);
         },
-        clone(constraint, {processCellCoords}): Constraint<T, OutsideClueProps> {
+        clone(constraint, { processCellCoords }): Constraint<T, OutsideClueProps> {
             return {
                 ...constraint,
                 props: {
                     ...constraint.props,
                     clueCell: processCellCoords(constraint.props.clueCell),
-                }
+                },
             };
         },
     };

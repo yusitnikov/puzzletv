@@ -1,5 +1,5 @@
-import {LanguageCode} from "../types/translations/LanguageCode";
-import {PartiallyTranslatable, Translatable} from "../types/translations/Translatable";
+import { LanguageCode } from "../types/translations/LanguageCode";
+import { PartiallyTranslatable, Translatable } from "../types/translations/Translatable";
 
 export const Chameleon: Translatable = {
     [LanguageCode.en]: "Chameleon",

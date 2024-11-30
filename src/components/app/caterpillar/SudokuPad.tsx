@@ -1,11 +1,11 @@
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
-import {HTMLAttributes, useEffect, useMemo, useState} from "react";
-import {Rect} from "../../../types/layout/Rect";
-import {puzzleIdToScl, sclToPuzzleId} from "../../../utils/sudokuPad";
-import {safetyMargin} from "./globals";
-import {serializeToLocalStorage, unserializeFromLocalStorage} from "../../../utils/localStorage";
-import {GridLinesProcessor} from "./GridLinesProcessor";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
+import { HTMLAttributes, useEffect, useMemo, useState } from "react";
+import { Rect } from "../../../types/layout/Rect";
+import { puzzleIdToScl, sclToPuzzleId } from "../../../utils/sudokuPad";
+import { safetyMargin } from "./globals";
+import { serializeToLocalStorage, unserializeFromLocalStorage } from "../../../utils/localStorage";
+import { GridLinesProcessor } from "./GridLinesProcessor";
 
 interface SudokuPadProps {
     data: string;
@@ -13,7 +13,7 @@ interface SudokuPadProps {
     dashed?: boolean;
 }
 
-export const SudokuPad = observer(function SudokuPad({data, bounds, dashed}: SudokuPadProps) {
+export const SudokuPad = observer(function SudokuPad({ data, bounds, dashed }: SudokuPadProps) {
     profiler.trace();
 
     const fixedData = useMemo(() => {
@@ -33,7 +33,7 @@ export const SudokuPad = observer(function SudokuPad({data, bounds, dashed}: Sud
                 thickness: 0,
                 backgroundColor: "transparent",
                 borderColor: "transparent",
-            } as typeof parsedData.underlays[0]);
+            } as (typeof parsedData.underlays)[0]);
 
             return sclToPuzzleId(parsedData);
         } catch {
@@ -45,16 +45,18 @@ export const SudokuPad = observer(function SudokuPad({data, bounds, dashed}: Sud
         return null;
     }
 
-    return <SudokuPadImage
-        data={fixedData}
-        dashed={dashed}
-        cache={true}
-        style={{
-            position: "absolute",
-            pointerEvents: "none",
-            ...bounds,
-        }}
-    />;
+    return (
+        <SudokuPadImage
+            data={fixedData}
+            dashed={dashed}
+            cache={true}
+            style={{
+                position: "absolute",
+                pointerEvents: "none",
+                ...bounds,
+            }}
+        />
+    );
 });
 
 interface SudokuPadImageProps extends HTMLAttributes<HTMLIFrameElement> {
@@ -63,7 +65,12 @@ interface SudokuPadImageProps extends HTMLAttributes<HTMLIFrameElement> {
     cache?: boolean;
 }
 
-export const SudokuPadImage = observer(function SudokuPadImage({data, dashed = false, cache = false, ...props}: SudokuPadImageProps) {
+export const SudokuPadImage = observer(function SudokuPadImage({
+    data,
+    dashed = false,
+    cache = false,
+    ...props
+}: SudokuPadImageProps) {
     profiler.trace();
 
     const [svgText, setSvgText] = useState("");
@@ -77,17 +84,14 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, dashed = f
             const size = parsedData.cells.length;
             const gridLinesProcessor = new GridLinesProcessor();
             gridLinesProcessor.addGrid(
-                {top: 0, left: 0, width: size, height: size},
-                (parsedData.regions ?? []).map(region => region.map(([top, left]) => ({top, left}))),
+                { top: 0, left: 0, width: size, height: size },
+                (parsedData.regions ?? []).map((region) => region.map(([top, left]) => ({ top, left }))),
                 dashed,
             );
             parsedData = {
                 ...parsedData,
                 regions: undefined,
-                lines: [
-                    ...gridLinesProcessor.getLines(),
-                    ...parsedData.lines ?? [],
-                ],
+                lines: [...gridLinesProcessor.getLines(), ...(parsedData.lines ?? [])],
             };
 
             return sclToPuzzleId(parsedData);
@@ -152,32 +156,37 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, dashed = f
     }, [fixedData, cache]);
 
     if (isError || !fixedData) {
-        return <div style={{
-            ...props.style,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "red",
-            fontSize: typeof props.style?.height === "number" ? props.style.height * 0.08 : undefined,
-        }}>
-            ERROR
-        </div>;
+        return (
+            <div
+                style={{
+                    ...props.style,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    color: "red",
+                    fontSize: typeof props.style?.height === "number" ? props.style.height * 0.08 : undefined,
+                }}
+            >
+                ERROR
+            </div>
+        );
     }
 
     if (!svgText) {
         return null;
     }
 
-    return <iframe
-        {...props}
-        style={{
-            ...props.style,
-            border: "none",
-            outline: "none",
-            margin: 0,
-            padding: 0,
-        }}
-        srcDoc={`
+    return (
+        <iframe
+            {...props}
+            style={{
+                ...props.style,
+                border: "none",
+                outline: "none",
+                margin: 0,
+                padding: 0,
+            }}
+            srcDoc={`
             <style>
                 svg {
                     position: fixed;
@@ -191,5 +200,6 @@ export const SudokuPadImage = observer(function SudokuPadImage({data, dashed = f
             </style>
             ${svgText}
         `}
-    />;
+        />
+    );
 });

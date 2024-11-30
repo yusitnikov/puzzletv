@@ -1,18 +1,18 @@
-import {PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {Position} from "../../../types/layout/Position";
-import {ComponentType, ReactElement, useMemo} from "react";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {CellWriteModeInfo, getAllowedCellWriteModeInfos} from "../../../types/sudoku/CellWriteModeInfo";
-import {ResetButton} from "./ResetButton";
-import {SettingsButton} from "./SettingsButton";
-import {ResultCheckButton} from "./ResultCheckButton";
-import {UndoButton} from "./UndoButton";
-import {RedoButton} from "./RedoButton";
-import {DeleteButton} from "./DeleteButton";
-import {MultiSelectionButton} from "./MultiSelectionButton";
-import {isTouchDevice} from "../../../utils/isTouchDevice";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { Position } from "../../../types/layout/Position";
+import { ComponentType, ReactElement, useMemo } from "react";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
+import { CellWriteModeInfo, getAllowedCellWriteModeInfos } from "../../../types/sudoku/CellWriteModeInfo";
+import { ResetButton } from "./ResetButton";
+import { SettingsButton } from "./SettingsButton";
+import { ResultCheckButton } from "./ResultCheckButton";
+import { UndoButton } from "./UndoButton";
+import { RedoButton } from "./RedoButton";
+import { DeleteButton } from "./DeleteButton";
+import { MultiSelectionButton } from "./MultiSelectionButton";
+import { isTouchDevice } from "../../../utils/isTouchDevice";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 
 export enum ControlButtonRegion {
     // main digit, corner marks, center marks, colors, pen tool, etc.
@@ -32,7 +32,9 @@ export interface ControlButtonItemProps<T extends AnyPTM> extends Position {
     info?: CellWriteModeInfo<T>;
 }
 
-export type ControlButtonItemPropsGenericFc = <T extends AnyPTM>(props: ControlButtonItemProps<T>) => (ReactElement | null);
+export type ControlButtonItemPropsGenericFc = <T extends AnyPTM>(
+    props: ControlButtonItemProps<T>,
+) => ReactElement | null;
 
 export interface ControlButtonItem<T extends AnyPTM> {
     key: string;
@@ -58,11 +60,7 @@ export class ControlButtonsManager<T extends AnyPTM> {
         private readonly puzzle: PuzzleDefinition<T>,
         private readonly isHorizontal: boolean,
     ) {
-        const {
-            resultChecker,
-            forceAutoCheckOnFinish = false,
-            hideDeleteButton,
-        } = puzzle;
+        const { resultChecker, forceAutoCheckOnFinish = false, hideDeleteButton } = puzzle;
 
         const {
             [ControlButtonRegion.modes]: modes,
@@ -77,12 +75,12 @@ export class ControlButtonsManager<T extends AnyPTM> {
         if (allowedCellWriteModes.length > 1) {
             modes.push(
                 ...allowedCellWriteModes
-                    .filter(({mode, mainButtonContent}) => mainButtonContent)
+                    .filter(({ mode, mainButtonContent }) => mainButtonContent)
                     .map<Omit<ControlButtonItem<T>, "region">>((info) => ({
                         key: `mode-${info.mode}`,
                         Component: info.mainButtonContent!,
                         info,
-                    }))
+                    })),
             );
         }
 
@@ -131,13 +129,13 @@ export class ControlButtonsManager<T extends AnyPTM> {
 
         for (const item of puzzle.typeManager.controlButtons ?? []) {
             if (item) {
-                const {region, ...other} = item;
+                const { region, ...other } = item;
                 this.regions[region].push(other);
             }
         }
 
         this.isCompact = !allowedCellWriteModes.some(
-            ({mode, isDigitMode}) => isDigitMode || [CellWriteMode.color, CellWriteMode.shading].includes(mode)
+            ({ mode, isDigitMode }) => isDigitMode || [CellWriteMode.color, CellWriteMode.shading].includes(mode),
         );
 
         const hasBottomRowControls = additional.length !== 0 || modes.length + right.length > 8;
@@ -167,60 +165,56 @@ export class ControlButtonsManager<T extends AnyPTM> {
         const isRevertedRight = this.isCompact === this.isHorizontal;
         const rightColumn = this.isCompact ? 1 : 4;
 
-        return <>
-            {modes.slice(0, realHeight).map(({key, Component, info}, index) => <Component
-                key={key}
-                context={context}
-                top={index}
-                left={3}
-                info={info}
-            />)}
+        return (
+            <>
+                {modes.slice(0, realHeight).map(({ key, Component, info }, index) => (
+                    <Component key={key} context={context} top={index} left={3} info={info} />
+                ))}
 
-            {[...right, ...modes.slice(realHeight)].map(({key, Component, info}, index) => <Component
-                key={key}
-                context={context}
-                top={isRevertedRight ? rightColumn : index}
-                left={isRevertedRight ? index : rightColumn}
-                info={info}
-            />)}
+                {[...right, ...modes.slice(realHeight)].map(({ key, Component, info }, index) => (
+                    <Component
+                        key={key}
+                        context={context}
+                        top={isRevertedRight ? rightColumn : index}
+                        left={isRevertedRight ? index : rightColumn}
+                        info={info}
+                    />
+                ))}
 
-            {bottom.map(({key, Component, info}, index) => {
-                const content = <Component
-                    key={key}
-                    context={context}
-                    top={isRevertedBottom ? index : bottomRow}
-                    left={isRevertedBottom ? bottomRow : index}
-                    info={info}
-                />;
+                {bottom.map(({ key, Component, info }, index) => {
+                    const content = (
+                        <Component
+                            key={key}
+                            context={context}
+                            top={isRevertedBottom ? index : bottomRow}
+                            left={isRevertedBottom ? bottomRow : index}
+                            info={info}
+                        />
+                    );
 
-                if (!(context.digitsCountInCurrentMode < 10 || index !== 1)) {
-                    // Render the button as hidden, but support the hotkeys
-                    return <div key={key} style={{display: "none"}}>{content}</div>;
-                }
+                    if (!(context.digitsCountInCurrentMode < 10 || index !== 1)) {
+                        // Render the button as hidden, but support the hotkeys
+                        return (
+                            <div key={key} style={{ display: "none" }}>
+                                {content}
+                            </div>
+                        );
+                    }
 
-                return content;
-            })}
+                    return content;
+                })}
 
-            {additional.map(({key, Component, info}, index) => <Component
-                key={key}
-                context={context}
-                top={realHeight - 1}
-                left={index}
-                info={info}
-            />)}
+                {additional.map(({ key, Component, info }, index) => (
+                    <Component key={key} context={context} top={realHeight - 1} left={index} info={info} />
+                ))}
 
-            {custom.map(({key, Component, info}) => <Component
-                key={key}
-                context={context}
-                top={0}
-                left={0}
-                info={info}
-            />)}
-        </>;
+                {custom.map(({ key, Component, info }) => (
+                    <Component key={key} context={context} top={0} left={0} info={info} />
+                ))}
+            </>
+        );
     }
 }
 
-export const useControlButtonsManager = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>,
-    isHorizontal: boolean,
-) => useMemo(() => new ControlButtonsManager(puzzle, isHorizontal), [puzzle, isHorizontal]);
+export const useControlButtonsManager = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>, isHorizontal: boolean) =>
+    useMemo(() => new ControlButtonsManager(puzzle, isHorizontal), [puzzle, isHorizontal]);

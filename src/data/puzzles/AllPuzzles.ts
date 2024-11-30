@@ -1,6 +1,6 @@
-import {loadPuzzle, PuzzleDefinitionOrLoader} from "../../types/sudoku/PuzzleDefinition";
-import {NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules} from "./NorthOrSouth";
-import {NewDiscovery, RealChessPuzzle, RealChessPuzzle2, RealChessPuzzleCompatibilitySlug} from "./RealChessPuzzle";
+import { loadPuzzle, PuzzleDefinitionOrLoader } from "../../types/sudoku/PuzzleDefinition";
+import { NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules } from "./NorthOrSouth";
+import { NewDiscovery, RealChessPuzzle, RealChessPuzzle2, RealChessPuzzleCompatibilitySlug } from "./RealChessPuzzle";
 import {
     EmptyChaosConstruction,
     EmptyChaosConstructionLoop,
@@ -13,51 +13,51 @@ import {
     EmptyMonumentValleyMini,
     EmptyRegular,
     EmptyRotatable,
-    EmptyToroidal
+    EmptyToroidal,
 } from "./Empty";
-import {CubeIt, IntroToCubedoku} from "./Cubedoku";
-import {Miraculous} from "./Miraculous";
-import {MeteorShower} from "./MeteorShower";
-import {MultiColorMadness} from "./MultiColorMadness";
-import {Africa} from "./Africa";
-import {generateQuadMasters} from "./QuadMasters";
-import {HiddenSetup} from "./HiddenSetup";
-import {SonataSemplice} from "./SonataSemplice";
-import {HeptapagonLikeLoop, HeptapagonLikeLoopMini} from "./HeptapagonLikeLoop";
-import {FPuzzles, SudokuMaker} from "./Import";
-import {HeartsCube} from "./HeartsCube";
-import {AbstractKillerDots, DollHouse, LegoHouse, MoodyLines} from "./TenInOne";
-import {TheOnlyThingThatMatters, TheOnlyThingThatMattersNoGivens} from "./TheOnlyThingThatMatters";
-import {LumosMaxima, LumosMaximaNoFog} from "./LumosMaxima";
-import {MonumentValley, MonumentValleyMini} from "./MonumentValley";
-import {ToroidalYinYang} from "./ToroidalYinYang";
-import {TheAngelIslington} from "./TheAngelIslington";
-import {Embark, EmbarkWeirdSlug} from "./Embark";
-import {ToroidalRenbanmometers} from "./ToroidalRenbanmometers";
-import {PenroseTiles} from "./PenroseTiles";
-import {AnyPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {RushHour} from "./RushHour";
-import {InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdge} from "./InfinityLoop";
-import {ReservedParking} from "./ReservedParking";
-import {JssChicken, MakeAPicture} from "./JigsawJss";
-import {EasterSokoban, Sudokuban} from "./Sudokuban";
-import {Pacman} from "./Pacman";
-import {Astronavigation} from "./Astronavigation";
-import {CherryBlossom, Revolutionary, SumwhereAroundHere} from "./RotatableClues";
-import {Gears} from "./Gears";
-import {WheelsOnTheBus} from "./WheelsOnTheBus";
-import {HappyBirthdayDumediat} from "./HbdDumediat";
-import {ChessMoves} from "./ChessMoves";
-import {BuySomethinWillYa, BuySomethinWillYaShopItems} from "./BuySomethinWillYa";
-import {Screws} from "./Screws";
-import {Find3} from "./Find3";
-import {Shuffled} from "./Shuffled";
-import {Karaoke} from "./Karaoke";
-import {NationalGeographic} from "./NationalGeographic";
-import {BodoniSudoku} from "./BodoniSudoku";
-import {EndlessChristmas} from "./EndlessChristmas";
-import {CaterpillarPoc} from "./Caterpillar";
-import {PeaucellierLipkinLinkage} from "./PeaucellierLipkinLinkage";
+import { CubeIt, IntroToCubedoku } from "./Cubedoku";
+import { Miraculous } from "./Miraculous";
+import { MeteorShower } from "./MeteorShower";
+import { MultiColorMadness } from "./MultiColorMadness";
+import { Africa } from "./Africa";
+import { generateQuadMasters } from "./QuadMasters";
+import { HiddenSetup } from "./HiddenSetup";
+import { SonataSemplice } from "./SonataSemplice";
+import { HeptapagonLikeLoop, HeptapagonLikeLoopMini } from "./HeptapagonLikeLoop";
+import { FPuzzles, SudokuMaker } from "./Import";
+import { HeartsCube } from "./HeartsCube";
+import { AbstractKillerDots, DollHouse, LegoHouse, MoodyLines } from "./TenInOne";
+import { TheOnlyThingThatMatters, TheOnlyThingThatMattersNoGivens } from "./TheOnlyThingThatMatters";
+import { LumosMaxima, LumosMaximaNoFog } from "./LumosMaxima";
+import { MonumentValley, MonumentValleyMini } from "./MonumentValley";
+import { ToroidalYinYang } from "./ToroidalYinYang";
+import { TheAngelIslington } from "./TheAngelIslington";
+import { Embark, EmbarkWeirdSlug } from "./Embark";
+import { ToroidalRenbanmometers } from "./ToroidalRenbanmometers";
+import { PenroseTiles } from "./PenroseTiles";
+import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { RushHour } from "./RushHour";
+import { InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdge } from "./InfinityLoop";
+import { ReservedParking } from "./ReservedParking";
+import { JssChicken, MakeAPicture } from "./JigsawJss";
+import { EasterSokoban, Sudokuban } from "./Sudokuban";
+import { Pacman } from "./Pacman";
+import { Astronavigation } from "./Astronavigation";
+import { CherryBlossom, Revolutionary, SumwhereAroundHere } from "./RotatableClues";
+import { Gears } from "./Gears";
+import { WheelsOnTheBus } from "./WheelsOnTheBus";
+import { HappyBirthdayDumediat } from "./HbdDumediat";
+import { ChessMoves } from "./ChessMoves";
+import { BuySomethinWillYa, BuySomethinWillYaShopItems } from "./BuySomethinWillYa";
+import { Screws } from "./Screws";
+import { Find3 } from "./Find3";
+import { Shuffled } from "./Shuffled";
+import { Karaoke } from "./Karaoke";
+import { NationalGeographic } from "./NationalGeographic";
+import { BodoniSudoku } from "./BodoniSudoku";
+import { EndlessChristmas } from "./EndlessChristmas";
+import { CaterpillarPoc } from "./Caterpillar";
+import { PeaucellierLipkinLinkage } from "./PeaucellierLipkinLinkage";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -193,4 +193,5 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 ];
 
-export const getAllPuzzlesForPreview = () => AllPuzzles.filter(({noIndex}) => !noIndex).map((puzzle) => loadPuzzle(puzzle, undefined, true));
+export const getAllPuzzlesForPreview = () =>
+    AllPuzzles.filter(({ noIndex }) => !noIndex).map((puzzle) => loadPuzzle(puzzle, undefined, true));

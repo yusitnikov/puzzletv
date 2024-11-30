@@ -1,6 +1,6 @@
-import {Position} from "../../../types/layout/Position";
-import {ChessPiece} from "../types/ChessPiece";
-import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
+import { Position } from "../../../types/layout/Position";
+import { ChessPiece } from "../types/ChessPiece";
+import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
 
 export const chessColumnNameFromIndex = (column: number) => String.fromCharCode("a".charCodeAt(0) + column);
 
@@ -19,7 +19,7 @@ export const chessInitialPiecesByCellNames = (pieces: Record<string, ChessPiece>
     const result: GivenDigitsMap<ChessPiece> = {};
 
     for (const [cell, piece] of Object.entries(pieces)) {
-        const {top, left} = chessCellNameToCoords(cell);
+        const { top, left } = chessCellNameToCoords(cell);
 
         result[top] = result[top] || {};
         result[top][left] = piece;

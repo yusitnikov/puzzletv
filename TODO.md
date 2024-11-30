@@ -1,6 +1,7 @@
 # TODO/TOFIX
+
 | Type | Easy? |  Important?  | Task                                                                      |
-|:----:|:-----:|:------------:|---------------------------------------------------------------------------|
+| :--: | :---: | :----------: | ------------------------------------------------------------------------- |
 | Feat | Easy  |  Must have   | Fully import the cubedoku pack.                                           |
 | Feat |  Mid  |  Must have   | Letters.                                                                  |
 | Feat | Hard  |  Must have   | Undo/redo via network.                                                    |

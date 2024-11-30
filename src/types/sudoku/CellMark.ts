@@ -1,11 +1,11 @@
-import {Position} from "../layout/Position";
-import {getPuzzlePositionHasher, PuzzleDefinition} from "./PuzzleDefinition";
-import {HashSet} from "../struct/Set";
-import {CellColorValue} from "./CellColor";
-import {GivenDigitsMap} from "./GivenDigitsMap";
-import {SudokuCellsIndex} from "./SudokuCellsIndex";
-import {CellPart} from "./CellPart";
-import {AnyPTM} from "./PuzzleTypeMap";
+import { Position } from "../layout/Position";
+import { getPuzzlePositionHasher, PuzzleDefinition } from "./PuzzleDefinition";
+import { HashSet } from "../struct/Set";
+import { CellColorValue } from "./CellColor";
+import { GivenDigitsMap } from "./GivenDigitsMap";
+import { SudokuCellsIndex } from "./SudokuCellsIndex";
+import { CellPart } from "./CellPart";
+import { AnyPTM } from "./PuzzleTypeMap";
 
 export enum CellMarkType {
     Any = "",
@@ -26,14 +26,11 @@ export interface CellMark {
 export const getMarkHasher = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>) => {
     const positionHasher = getPuzzlePositionHasher(puzzle);
 
-    return ({position, isCenter = false}: CellMark) => `${positionHasher(position)}:${isCenter}`;
+    return ({ position, isCenter = false }: CellMark) => `${positionHasher(position)}:${isCenter}`;
 };
 
 export class CellMarkSet<T extends AnyPTM> extends HashSet<CellMark> {
-    constructor(
-        puzzle: PuzzleDefinition<T>,
-        items: CellMark[] = []
-    ) {
+    constructor(puzzle: PuzzleDefinition<T>, items: CellMark[] = []) {
         const hasher = getMarkHasher(puzzle);
 
         super(items, {
@@ -42,10 +39,7 @@ export class CellMarkSet<T extends AnyPTM> extends HashSet<CellMark> {
         });
     }
 
-    static unserialize<T extends AnyPTM>(
-        puzzle: PuzzleDefinition<T>,
-        items: any
-    ) {
+    static unserialize<T extends AnyPTM>(puzzle: PuzzleDefinition<T>, items: any) {
         return new CellMarkSet(puzzle, items);
     }
 }
@@ -59,7 +53,7 @@ export const getCenterMarksMap = <T extends AnyPTM>(
     for (const mark of marks) {
         const cellInfo = cellsIndex.getPointInfo(mark.position);
         if (cellInfo?.type === CellPart.center) {
-            const {top, left} = cellInfo.cells.first()!;
+            const { top, left } = cellInfo.cells.first()!;
             map[top] = map[top] ?? {};
             map[top][left] = mark;
         }

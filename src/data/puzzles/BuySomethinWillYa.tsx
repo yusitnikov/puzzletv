@@ -1,10 +1,10 @@
 import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
-    PuzzleDefinition
+    PuzzleDefinition,
 } from "../../types/sudoku/PuzzleDefinition";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import {
     blackKropkiDotsExplained,
     cannotRepeatInCage,
@@ -13,26 +13,26 @@ import {
     killerCagesExplained,
     oddExplained,
     renbanExplained,
-    whiteKropkiDotsExplained
+    whiteKropkiDotsExplained,
 } from "../ruleSnippets";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {FieldSize9, Regions9} from "../../types/sudoku/FieldSize";
-import {KillerCageConstraint} from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import {Constraint, toDecorativeConstraint} from "../../types/sudoku/Constraint";
-import {parsePositionLiteral, PositionLiteral} from "../../types/layout/Position";
-import {KropkiDotConstraint} from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import {OddConstraint} from "../../components/sudoku/constraints/odd/Odd";
-import {ArrowConstraint} from "../../components/sudoku/constraints/arrow/Arrow";
-import {WhispersConstraint} from "../../components/sudoku/constraints/whispers/Whispers";
-import {EvenConstraint} from "../../components/sudoku/constraints/even/Even";
-import {GreaterConstraint} from "../../components/sudoku/constraints/greater/Greater";
-import {RenbanConstraint} from "../../components/sudoku/constraints/renban/Renban";
-import {PuzzleContext} from "../../types/sudoku/PuzzleContext";
-import {createGivenDigitsMapFromArray, GivenDigitsMap, mergeGivenDigitsMaps} from "../../types/sudoku/GivenDigitsMap";
-import {CellColorValue} from "../../types/sudoku/CellColor";
-import {RulesUnorderedList} from "../../components/sudoku/rules/RulesUnorderedList";
-import {buildLink} from "../../utils/link";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { KillerCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import { Constraint, toDecorativeConstraint } from "../../types/sudoku/Constraint";
+import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
+import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import { OddConstraint } from "../../components/sudoku/constraints/odd/Odd";
+import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
+import { EvenConstraint } from "../../components/sudoku/constraints/even/Even";
+import { GreaterConstraint } from "../../components/sudoku/constraints/greater/Greater";
+import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
+import { PuzzleContext } from "../../types/sudoku/PuzzleContext";
+import { createGivenDigitsMapFromArray, GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
+import { CellColorValue } from "../../types/sudoku/CellColor";
+import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { buildLink } from "../../utils/link";
 
 const blackColor = "#000";
 const greyColor = "#aaa";
@@ -51,28 +51,39 @@ interface ShopItems {
 
 const getShopItems = (item: number | undefined, offset: number): ShopItems => {
     const offsetCell = (cell: PositionLiteral) => {
-        const {top, left} = parsePositionLiteral(cell);
-        return {top, left: left + offset};
+        const { top, left } = parsePositionLiteral(cell);
+        return { top, left: left + offset };
     };
     const offsetCells = (...cells: PositionLiteral[]) => cells.map(offsetCell);
     const colorsMap = (color: CellColorValue, ...cells: PositionLiteral[]) => {
         const result: GivenDigitsMap<CellColorValue[]> = {};
-        for (const {top, left} of offsetCells(...cells)) {
+        for (const { top, left } of offsetCells(...cells)) {
             result[top] = result[top] ?? {};
             result[top][left] = [color];
         }
         return result;
-    }
+    };
 
     switch (item) {
         case 0:
             return {
                 constraints: [
-                    KillerCageConstraint(offsetCells("R4C1", "R4C2", "R4C3", "R5C1", "R5C2", "R5C3", "R6C1", "R6C2", "R6C3")),
-                    KillerCageConstraint(offsetCells("R5C2"), undefined, undefined, undefined, undefined, undefined, false, true),
+                    KillerCageConstraint(
+                        offsetCells("R4C1", "R4C2", "R4C3", "R5C1", "R5C2", "R5C3", "R6C1", "R6C2", "R6C3"),
+                    ),
+                    KillerCageConstraint(
+                        offsetCells("R5C2"),
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        false,
+                        true,
+                    ),
                     KropkiDotConstraint(offsetCell("R3C2"), offsetCell("R4C2"), false),
-                    ...offset === 0 ? [] : [KropkiDotConstraint(offsetCell("R5C0"), offsetCell("R5C1"), false)],
-                    ...offset === 6 ? [] : [KropkiDotConstraint(offsetCell("R5C3"), offsetCell("R5C4"), false)],
+                    ...(offset === 0 ? [] : [KropkiDotConstraint(offsetCell("R5C0"), offsetCell("R5C1"), false)]),
+                    ...(offset === 6 ? [] : [KropkiDotConstraint(offsetCell("R5C3"), offsetCell("R5C4"), false)]),
                     KropkiDotConstraint(offsetCell("R6C2"), offsetCell("R7C2"), false),
                     OddConstraint(offsetCell("R4C2")),
                     OddConstraint(offsetCell("R5C2")),
@@ -164,7 +175,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                 constraints: [
                     KillerCageConstraint(offsetCells("R3C1", "R4C1", "R5C1", "R6C1")),
                     KropkiDotConstraint(offsetCell("R2C1"), offsetCell("R3C1"), false),
-                    ...offset === 0 ? [] : [KropkiDotConstraint(offsetCell("R3C0"), offsetCell("R3C1"), false)],
+                    ...(offset === 0 ? [] : [KropkiDotConstraint(offsetCell("R3C0"), offsetCell("R3C1"), false)]),
                     KropkiDotConstraint(offsetCell("R4C1"), offsetCell("R3C1"), false),
                     ArrowConstraint(offsetCell("R6C1"), offsetCells("R3C1")),
                     ArrowConstraint(offsetCell("R6C2"), offsetCells("R3C2")),
@@ -193,7 +204,21 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     KropkiDotConstraint(offsetCell("R6C2"), offsetCell("R6C3"), false),
                 ],
                 colors: mergeGivenDigitsMaps(
-                    colorsMap(lightRedColor, "R1C1", "R1C2", "R1C3", "R3C1", "R3C2", "R3C3", "R4C1", "R4C2", "R4C3", "R6C1", "R6C2", "R6C3"),
+                    colorsMap(
+                        lightRedColor,
+                        "R1C1",
+                        "R1C2",
+                        "R1C3",
+                        "R3C1",
+                        "R3C2",
+                        "R3C3",
+                        "R4C1",
+                        "R4C2",
+                        "R4C3",
+                        "R6C1",
+                        "R6C2",
+                        "R6C3",
+                    ),
                     colorsMap(blackColor, "R2C1", "R2C2", "R2C3", "R5C1", "R5C2", "R5C3"),
                 ),
             };
@@ -209,26 +234,38 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
         case 9:
             return {
                 constraints: [
-                    KillerCageConstraint(offsetCells("R3C2", "R4C1", "R4C2", "R4C3", "R5C1", "R5C2", "R5C3", "R6C1", "R6C2", "R6C3"), 45),
+                    KillerCageConstraint(
+                        offsetCells("R3C2", "R4C1", "R4C2", "R4C3", "R5C1", "R5C2", "R5C3", "R6C1", "R6C2", "R6C3"),
+                        45,
+                    ),
                     RenbanConstraint(offsetCells("R3C2", "R2C2", "R2C3")),
                     OddConstraint(offsetCell("R2C3")),
                 ],
-                colors: colorsMap(redColor, "R3C2", "R4C1", "R4C2", "R4C3", "R5C1", "R5C2", "R5C3", "R6C1", "R6C2", "R6C3"),
+                colors: colorsMap(
+                    redColor,
+                    "R3C2",
+                    "R4C1",
+                    "R4C2",
+                    "R4C3",
+                    "R5C1",
+                    "R5C2",
+                    "R5C3",
+                    "R6C1",
+                    "R6C2",
+                    "R6C3",
+                ),
             };
     }
 
-    return {constraints: [], colors: {}};
+    return { constraints: [], colors: {} };
 };
 
 const getShopItemsByContext = (context: PuzzleContext<NumberPTM>): ShopItems => {
-    const result = [0, 3, 6].flatMap((offset) => getShopItems(
-        context.getCell(8, offset + 1)?.usersDigit,
-        offset
-    ));
+    const result = [0, 3, 6].flatMap((offset) => getShopItems(context.getCell(8, offset + 1)?.usersDigit, offset));
 
     return {
-        constraints: result.flatMap(({constraints}) => constraints),
-        colors: mergeGivenDigitsMaps(...result.map(({colors}) => colors)),
+        constraints: result.flatMap(({ constraints }) => constraints),
+        colors: mergeGivenDigitsMaps(...result.map(({ colors }) => colors)),
     };
 };
 
@@ -236,8 +273,8 @@ const slug = "buy-somethin-will-ya";
 
 export const base: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
-    title: {[LanguageCode.en]: "Buy Somethin' Will Ya!"},
-    author: {[LanguageCode.en]: "ViKingPrime"},
+    title: { [LanguageCode.en]: "Buy Somethin' Will Ya!" },
+    author: { [LanguageCode.en]: "ViKingPrime" },
     slug,
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
@@ -252,61 +289,134 @@ const S = undefined;
 export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
     ...base,
     noIndex: true,
-    rules: (translate, {languageCode}) => <>
-        <RulesParagraph>
-            <details open={true}>
-                <summary>"Normal" Schrödinger rules apply.</summary>
+    rules: (translate, { languageCode }) => (
+        <>
+            <RulesParagraph>
+                <details open={true}>
+                    <summary>"Normal" Schrödinger rules apply.</summary>
+                    <RulesUnorderedList>
+                        <li>place the digits 0 through 9 once each in every row, column, and box;</li>
+                        <li>two of the digits will have to share a Schrödinger cell;</li>
+                        <li>each row, column and box contains exactly one Schrödinger cell.</li>
+                    </RulesUnorderedList>
+                </details>
+            </RulesParagraph>
+            <RulesParagraph>
+                <details open={false}>
+                    <summary>
+                        Normal arrow, German whisper (green), killer, kropki, odd/even and renban (purple) rules apply.
+                    </summary>
+                    <RulesUnorderedList>
+                        <li>{translate(germanWhispersExplained())};</li>
+                        <li>
+                            {translate(killerCagesExplained)}. {translate(cannotRepeatInCage)};
+                        </li>
+                        <li>{translate(whiteKropkiDotsExplained)};</li>
+                        <li>{translate(blackKropkiDotsExplained)};</li>
+                        <li>{translate(evenExplained)};</li>
+                        <li>{translate(oddExplained)};</li>
+                        <li>{translate(renbanExplained())}.</li>
+                    </RulesUnorderedList>
+                </details>
+            </RulesParagraph>
+            <RulesParagraph>
+                If a Schrödinger cell falls within
                 <RulesUnorderedList>
-                    <li>place the digits 0 through 9 once each in every row, column, and box;</li>
-                    <li>two of the digits will have to share a Schrödinger cell;</li>
-                    <li>each row, column and box contains exactly one Schrödinger cell.</li>
+                    <li>an arrow, German whisper line or killer cage, both digits contribute their value;</li>
+                    <li>
+                        a Kropki dot, an Odd/Even cell or a Renban line, both digits must satisfy the condition (i.e.
+                        both are consecutive with or both are in a ratio of 1:2 with the adjacent cell; both digits are
+                        odd or even; or both digits are part of a consecutive, non-repeating set of digits in any
+                        order).
+                    </li>
                 </RulesUnorderedList>
-            </details>
-        </RulesParagraph>
-        <RulesParagraph>
-            <details open={false}>
-                <summary>Normal arrow, German whisper (green), killer, kropki, odd/even and renban (purple) rules apply.</summary>
-                <RulesUnorderedList>
-                    <li>{translate(germanWhispersExplained())};</li>
-                    <li>{translate(killerCagesExplained)}. {translate(cannotRepeatInCage)};</li>
-                    <li>{translate(whiteKropkiDotsExplained)};</li>
-                    <li>{translate(blackKropkiDotsExplained)};</li>
-                    <li>{translate(evenExplained)};</li>
-                    <li>{translate(oddExplained)};</li>
-                    <li>{translate(renbanExplained())}.</li>
-                </RulesUnorderedList>
-            </details>
-        </RulesParagraph>
-        <RulesParagraph>
-            If a Schrödinger cell falls within
+            </RulesParagraph>
+            <RulesParagraph>The digit "0" is by definition an even digit.</RulesParagraph>
+            <RulesParagraph>
+                The letter "V" indicates a greater/lesser-than relationship between those two cells.
+            </RulesParagraph>
+            <RulesParagraph>
+                Spin the Wheel: You have ten rupees to spend! (the three green boxes will add up to ten total) - modify
+                the grid, depending on what digits are placed in row 9, columns 2 / 5 / 8 (only one combination will be
+                valid, to be deduced by the solver).
+            </RulesParagraph>
+            <RulesParagraph>
+                No counterfit currency! (only single digits are permitted within those cells).
+            </RulesParagraph>
             <RulesUnorderedList>
-                <li>an arrow, German whisper line or killer cage, both digits contribute their value;</li>
                 <li>
-                    a Kropki dot, an Odd/Even cell or a Renban line, both digits must satisfy the condition
-                    (i.e. both are consecutive with or both are in a ratio of 1:2 with the adjacent cell; both digits are odd or even; or both digits are part of a consecutive, non-repeating set of digits in any order).
+                    if a "0" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-0-compass", languageCode)}>
+                        Compass
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "1" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-1-arrow", languageCode)}>
+                        Arrow
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "2" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-2-candle", languageCode)}>
+                        Candle
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "3" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-3-hookshot", languageCode)}>
+                        Hookshot
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "4" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-4-sword", languageCode)}>
+                        Sword
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "5" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-5-flute", languageCode)}>
+                        Flute
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "6" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-6-bow-quiver", languageCode)}>
+                        Bow &amp; Quiver
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "7" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-7-raft", languageCode)}>
+                        Raft
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "8" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-8-bomb", languageCode)}>
+                        Bomb
+                    </a>{" "}
+                    to the shop;
+                </li>
+                <li>
+                    if a "9" is placed, add a{" "}
+                    <a target={"_blank"} href={buildLink(slug + "-9-super-bomb", languageCode)}>
+                        Super Bomb
+                    </a>{" "}
+                    to the shop;
                 </li>
             </RulesUnorderedList>
-        </RulesParagraph>
-        <RulesParagraph>The digit "0" is by definition an even digit.</RulesParagraph>
-        <RulesParagraph>The letter "V" indicates a greater/lesser-than relationship between those two cells.</RulesParagraph>
-        <RulesParagraph>
-            Spin the Wheel: You have ten rupees to spend! (the three green boxes will add up to ten total) -
-            modify the grid, depending on what digits are placed in row 9, columns 2 / 5 / 8 (only one combination will be valid, to be deduced by the solver).
-        </RulesParagraph>
-        <RulesParagraph>No counterfit currency! (only single digits are permitted within those cells).</RulesParagraph>
-        <RulesUnorderedList>
-            <li>if a "0" is placed, add a <a target={"_blank"} href={buildLink(slug + "-0-compass", languageCode)}>Compass</a> to the shop;</li>
-            <li>if a "1" is placed, add a <a target={"_blank"} href={buildLink(slug + "-1-arrow", languageCode)}>Arrow</a> to the shop;</li>
-            <li>if a "2" is placed, add a <a target={"_blank"} href={buildLink(slug + "-2-candle", languageCode)}>Candle</a> to the shop;</li>
-            <li>if a "3" is placed, add a <a target={"_blank"} href={buildLink(slug + "-3-hookshot", languageCode)}>Hookshot</a> to the shop;</li>
-            <li>if a "4" is placed, add a <a target={"_blank"} href={buildLink(slug + "-4-sword", languageCode)}>Sword</a> to the shop;</li>
-            <li>if a "5" is placed, add a <a target={"_blank"} href={buildLink(slug + "-5-flute", languageCode)}>Flute</a> to the shop;</li>
-            <li>if a "6" is placed, add a <a target={"_blank"} href={buildLink(slug + "-6-bow-quiver", languageCode)}>Bow &amp; Quiver</a> to the shop;</li>
-            <li>if a "7" is placed, add a <a target={"_blank"} href={buildLink(slug + "-7-raft", languageCode)}>Raft</a> to the shop;</li>
-            <li>if a "8" is placed, add a <a target={"_blank"} href={buildLink(slug + "-8-bomb", languageCode)}>Bomb</a> to the shop;</li>
-            <li>if a "9" is placed, add a <a target={"_blank"} href={buildLink(slug + "-9-super-bomb", languageCode)}>Super Bomb</a> to the shop;</li>
-        </RulesUnorderedList>
-    </>,
+        </>
+    ),
     items: (context) => {
         return [
             KillerCageConstraint(["R7C1", "R7C2", "R7C3", "R8C2"], 14),
@@ -373,18 +483,29 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
 };
 
-export const BuySomethinWillYaShopItems: PuzzleDefinition<NumberPTM>[] = ["Compass", "Arrow", "Candle", "Hookshot", "Sword", "Flute", "Bow & Quiver", "Raft", "Bomb", "Super Bomb"].map((title, index) => {
-    const {constraints, colors} = getShopItems(index, 3);
+export const BuySomethinWillYaShopItems: PuzzleDefinition<NumberPTM>[] = [
+    "Compass",
+    "Arrow",
+    "Candle",
+    "Hookshot",
+    "Sword",
+    "Flute",
+    "Bow & Quiver",
+    "Raft",
+    "Bomb",
+    "Super Bomb",
+].map((title, index) => {
+    const { constraints, colors } = getShopItems(index, 3);
 
     return {
         ...base,
         slug: `${slug}-${index}-${title.toLowerCase().replace(/\W+/g, "-")}`,
-        title: {[LanguageCode.en]: title},
+        title: { [LanguageCode.en]: title },
         items: constraints.map(toDecorativeConstraint),
-        initialDigits: {8: {4: index}},
+        initialDigits: { 8: { 4: index } },
         initialColors: {
             ...colors,
-            8: {4: [greenColor]}
+            8: { 4: [greenColor] },
         },
     };
 });

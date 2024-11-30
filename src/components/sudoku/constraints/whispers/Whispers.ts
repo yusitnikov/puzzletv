@@ -1,7 +1,7 @@
-import {PositionLiteral} from "../../../../types/layout/Position";
-import {DominoLineConstraint} from "../domino-line/DominoLine";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {greenColor} from "../../../app/globals";
+import { PositionLiteral } from "../../../../types/layout/Position";
+import { DominoLineConstraint } from "../domino-line/DominoLine";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { greenColor } from "../../../app/globals";
 
 export const WhispersConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
@@ -15,7 +15,7 @@ export const WhispersConstraint = <T extends AnyPTM>(
         true,
         color,
         cellLiterals,
-        (digit1, digit2, {digitsCount}) => {
+        (digit1, digit2, { digitsCount }) => {
             return Math.abs(digit1 - digit2) >= (minDifference ?? Math.ceil(digitsCount / 2));
         },
         width,

@@ -1,16 +1,25 @@
-import {Constraint} from "../../../types/sudoku/Constraint";
-import {ChessPieceType} from "../types/ChessPieceType";
-import {isSamePosition, Position} from "../../../types/layout/Position";
-import {ChessPTM} from "../types/ChessPTM";
+import { Constraint } from "../../../types/sudoku/Constraint";
+import { ChessPieceType } from "../types/ChessPieceType";
+import { isSamePosition, Position } from "../../../types/layout/Position";
+import { ChessPTM } from "../types/ChessPTM";
 
 export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
     name: "valid chess position",
     cells: [],
     props: undefined,
     isObvious: true,
-    isValidCell(cell, pieces, regionCells, {puzzle: {fieldSize: {fieldSize}}}): boolean {
-        const {left, top} = cell;
-        const {color, type} = pieces[top][left]!;
+    isValidCell(
+        cell,
+        pieces,
+        regionCells,
+        {
+            puzzle: {
+                fieldSize: { fieldSize },
+            },
+        },
+    ): boolean {
+        const { left, top } = cell;
+        const { color, type } = pieces[top][left]!;
 
         let samePiecesCount = 1;
         let lastSamePiece: Position | undefined = undefined;
@@ -42,7 +51,10 @@ export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
                 return samePiecesCount <= 2;
             case ChessPieceType.bishop:
                 // There can't be 2 white-square or 2 black-square bishops of the same color
-                return samePiecesCount <= 2 && (!lastSamePiece || (lastSamePiece.left + lastSamePiece.top + left + top) % 2 !== 0);
+                return (
+                    samePiecesCount <= 2 &&
+                    (!lastSamePiece || (lastSamePiece.left + lastSamePiece.top + left + top) % 2 !== 0)
+                );
             case ChessPieceType.rook:
                 return samePiecesCount <= 2;
             case ChessPieceType.queen:
@@ -51,4 +63,4 @@ export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
                 return samePiecesCount <= 1;
         }
     },
-}
+};

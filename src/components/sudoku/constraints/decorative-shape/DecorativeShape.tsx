@@ -1,17 +1,17 @@
-import {textColor} from "../../../app/globals";
-import {FieldLayer} from "../../../../types/sudoku/FieldLayer";
-import {getAveragePosition, parsePositionLiterals, PositionLiteral} from "../../../../types/layout/Position";
-import {Constraint, ConstraintProps, ConstraintPropsGenericFc} from "../../../../types/sudoku/Constraint";
-import {CenteredText} from "../../../svg/centered-text/CenteredText";
-import {AutoSvg} from "../../../svg/auto-svg/AutoSvg";
-import {Size} from "../../../../types/layout/Size";
-import {ComponentType, SVGAttributes} from "react";
-import {AnyPTM} from "../../../../types/sudoku/PuzzleTypeMap";
-import {resolveCellColorValue} from "../../../../types/sudoku/CellColor";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../../utils/profiler";
-import {ArrowEnd} from "../../../svg/arrow-end/ArrowEnd";
-import {parseColorWithOpacity} from "../../../../utils/color";
+import { textColor } from "../../../app/globals";
+import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { getAveragePosition, parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
+import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../../types/sudoku/Constraint";
+import { CenteredText } from "../../../svg/centered-text/CenteredText";
+import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
+import { Size } from "../../../../types/layout/Size";
+import { ComponentType, SVGAttributes } from "react";
+import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
+import { resolveCellColorValue } from "../../../../types/sudoku/CellColor";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../../utils/profiler";
+import { ArrowEnd } from "../../../svg/arrow-end/ArrowEnd";
+import { parseColorWithOpacity } from "../../../../utils/color";
 
 export const cosmeticTag = "cosmetic";
 
@@ -23,94 +23,82 @@ export interface DecorativeShapeProps extends Size {
 }
 
 export const DecorativeShapeComponent = <T extends AnyPTM>(
-    Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>
-) => observer(function DecorativeShapeComponent(
-    {
-        context: {puzzle: {typeManager: {digitComponentType: {widthCoeff}}}},
-        cells,
-        props: {
-            width,
-            height,
-            borderColor,
-            borderWidth = 0.03,
-            text,
-            textColor: textC = textColor,
+    Component: ComponentType<Size & Omit<SVGAttributes<any>, keyof Size>>,
+) =>
+    observer(function DecorativeShapeComponent({
+        context: {
+            puzzle: {
+                typeManager: {
+                    digitComponentType: { widthCoeff },
+                },
+            },
         },
+        cells,
+        props: { width, height, borderColor, borderWidth = 0.03, text, textColor: textC = textColor },
         color: backgroundColor = "none",
         angle = 0,
-    }: ConstraintProps<T, DecorativeShapeProps>
-) {
-    profiler.trace();
+    }: ConstraintProps<T, DecorativeShapeProps>) {
+        profiler.trace();
 
-    const {top, left} = getAveragePosition(cells);
+        const { top, left } = getAveragePosition(cells);
 
-    return <AutoSvg
-        top={top + 0.5}
-        left={left + 0.5}
-        angle={angle}
-    >
-        <Component
-            width={width}
-            height={height}
-            fill={backgroundColor}
-            stroke={borderColor || "none"}
-            strokeWidth={borderColor ? borderWidth : 0}
-        />
+        return (
+            <AutoSvg top={top + 0.5} left={left + 0.5} angle={angle}>
+                <Component
+                    width={width}
+                    height={height}
+                    fill={backgroundColor}
+                    stroke={borderColor || "none"}
+                    strokeWidth={borderColor ? borderWidth : 0}
+                />
 
-        {!!text && <CenteredText
-            size={Math.min(0.5, width / (text.length + 1) / widthCoeff, height)}
-            fill={textC}
-        >
-            {text}
-        </CenteredText>}
-    </AutoSvg>;
-} as ConstraintPropsGenericFc<DecorativeShapeProps>);
+                {!!text && (
+                    <CenteredText size={Math.min(0.5, width / (text.length + 1) / widthCoeff, height)} fill={textC}>
+                        {text}
+                    </CenteredText>
+                )}
+            </AutoSvg>
+        );
+    } as ConstraintPropsGenericFc<DecorativeShapeProps>);
 
-const RectComponent = DecorativeShapeComponent(observer(function RectFc(props) {
-    profiler.trace();
+const RectComponent = DecorativeShapeComponent(
+    observer(function RectFc(props) {
+        profiler.trace();
 
-    return <rect
-        x={-props.width / 2}
-        y={-props.height / 2}
-        {...props}
-    />;
-}));
+        return <rect x={-props.width / 2} y={-props.height / 2} {...props} />;
+    }),
+);
 
-const EllipseComponent = DecorativeShapeComponent(observer(function EllipseFc({width, height, ...props}) {
-    profiler.trace();
+const EllipseComponent = DecorativeShapeComponent(
+    observer(function EllipseFc({ width, height, ...props }) {
+        profiler.trace();
 
-    return <ellipse
-        cx={0}
-        cy={0}
-        rx={width / 2}
-        ry={height / 2}
-        {...props}
-    />;
-}));
+        return <ellipse cx={0} cy={0} rx={width / 2} ry={height / 2} {...props} />;
+    }),
+);
 
-const ArrowComponent = DecorativeShapeComponent(observer(function ArrowFc({width, height, stroke = textColor, strokeWidth = 0}) {
-    profiler.trace();
+const ArrowComponent = DecorativeShapeComponent(
+    observer(function ArrowFc({ width, height, stroke = textColor, strokeWidth = 0 }) {
+        profiler.trace();
 
-    const {rgb, a} = parseColorWithOpacity(stroke);
-    strokeWidth = Number(strokeWidth);
+        const { rgb, a } = parseColorWithOpacity(stroke);
+        strokeWidth = Number(strokeWidth);
 
-    return <g opacity={a}>
-        <line
-            x1={-width / 2}
-            x2={width / 2 - strokeWidth / 2}
-            stroke={rgb}
-            strokeWidth={strokeWidth}
-        />
+        return (
+            <g opacity={a}>
+                <line x1={-width / 2} x2={width / 2 - strokeWidth / 2} stroke={rgb} strokeWidth={strokeWidth} />
 
-        <ArrowEnd
-            position={{top: 0, left: width / 2 - strokeWidth / Math.SQRT2}}
-            direction={{top: 0, left: 1}}
-            arrowSize={height / Math.SQRT2}
-            lineWidth={strokeWidth}
-            color={rgb}
-        />
-    </g>;
-}));
+                <ArrowEnd
+                    position={{ top: 0, left: width / 2 - strokeWidth / Math.SQRT2 }}
+                    direction={{ top: 0, left: 1 }}
+                    arrowSize={height / Math.SQRT2}
+                    lineWidth={strokeWidth}
+                    color={rgb}
+                />
+            </g>
+        );
+    }),
+);
 
 export const DecorativeShapeConstraint = <T extends AnyPTM>(
     name: string,
@@ -123,7 +111,7 @@ export const DecorativeShapeConstraint = <T extends AnyPTM>(
     borderWidth?: number,
     text?: string,
     textColor?: string,
-    angle?: number
+    angle?: number,
 ): Constraint<T, DecorativeShapeProps> => {
     return {
         name,
@@ -139,11 +127,11 @@ export const DecorativeShapeConstraint = <T extends AnyPTM>(
         },
         color: backgroundColor,
         angle,
-        component: {[layer]: component},
+        component: { [layer]: component },
         renderSingleCellInUserArea: true,
         clone(
-            {props: {borderColor, textColor, ...props}, ...constraint},
-            {processColor},
+            { props: { borderColor, textColor, ...props }, ...constraint },
+            { processColor },
         ): Constraint<T, DecorativeShapeProps> {
             return {
                 ...constraint,
@@ -168,7 +156,20 @@ export const RectConstraint = <T extends AnyPTM>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.afterLines,
-) => DecorativeShapeConstraint<T>(rectTag, layer, RectComponent, cellLiterals, size, backgroundColor, borderColor, borderWidth, text, textColor, angle);
+) =>
+    DecorativeShapeConstraint<T>(
+        rectTag,
+        layer,
+        RectComponent,
+        cellLiterals,
+        size,
+        backgroundColor,
+        borderColor,
+        borderWidth,
+        text,
+        textColor,
+        angle,
+    );
 
 export const ellipseTag = "ellipse";
 export const EllipseConstraint = <T extends AnyPTM>(
@@ -181,7 +182,20 @@ export const EllipseConstraint = <T extends AnyPTM>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.afterLines,
-) => DecorativeShapeConstraint<T>(ellipseTag, layer, EllipseComponent, cellLiterals, size, backgroundColor, borderColor, borderWidth, text, textColor, angle);
+) =>
+    DecorativeShapeConstraint<T>(
+        ellipseTag,
+        layer,
+        EllipseComponent,
+        cellLiterals,
+        size,
+        backgroundColor,
+        borderColor,
+        borderWidth,
+        text,
+        textColor,
+        angle,
+    );
 
 export const cosmeticArrowTag = "cosmetic arrow";
 export const CosmeticArrowConstraint = <T extends AnyPTM>(
@@ -194,16 +208,17 @@ export const CosmeticArrowConstraint = <T extends AnyPTM>(
     textColor?: string,
     angle?: number,
     layer = FieldLayer.afterLines,
-) => DecorativeShapeConstraint<T>(
-    cosmeticArrowTag,
-    layer,
-    ArrowComponent,
-    cellLiterals,
-    {width: length, height: headSize},
-    undefined,
-    borderColor,
-    borderWidth,
-    text,
-    textColor,
-    angle,
-);
+) =>
+    DecorativeShapeConstraint<T>(
+        cosmeticArrowTag,
+        layer,
+        ArrowComponent,
+        cellLiterals,
+        { width: length, height: headSize },
+        undefined,
+        borderColor,
+        borderWidth,
+        text,
+        textColor,
+        angle,
+    );

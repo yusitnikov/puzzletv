@@ -1,29 +1,29 @@
-import {SafeCrackerPuzzleParams} from "./SafeCrackerPuzzleParams";
-import {DigitSudokuTypeManager} from "../../default/types/DigitSudokuTypeManager";
-import {Position, PositionWithAngle} from "../../../types/layout/Position";
+import { SafeCrackerPuzzleParams } from "./SafeCrackerPuzzleParams";
+import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
+import { Position, PositionWithAngle } from "../../../types/layout/Position";
 import {
     defaultProcessArrowDirection,
     defaultProcessArrowDirectionForRegularCellBounds,
-    SudokuTypeManager
+    SudokuTypeManager,
 } from "../../../types/sudoku/SudokuTypeManager";
-import {SafeCrackerStarConstraint} from "../constraints/SafeCrackerStarConstraint";
-import {indexes} from "../../../utils/indexes";
-import {safeCrackerArrowsCellWriteModeInfo} from "./LeftRightArrow";
-import {BaseSafeCrackerPuzzle} from "./BaseSafeCrackerPuzzle";
-import {getDefaultDigitsCount, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {isTextConstraint} from "../../../components/sudoku/constraints/text/Text";
-import {CellMarkType, parseCellMark} from "../../../types/sudoku/CellMark";
-import {CellColor} from "../../../types/sudoku/CellColor";
-import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
-import {Constraint} from "../../../types/sudoku/Constraint";
-import {FieldLayer} from "../../../types/sudoku/FieldLayer";
-import {AnyNumberPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {CellTypeProps} from "../../../types/sudoku/CellTypeProps";
+import { SafeCrackerStarConstraint } from "../constraints/SafeCrackerStarConstraint";
+import { indexes } from "../../../utils/indexes";
+import { safeCrackerArrowsCellWriteModeInfo } from "./LeftRightArrow";
+import { BaseSafeCrackerPuzzle } from "./BaseSafeCrackerPuzzle";
+import { getDefaultDigitsCount, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { isTextConstraint } from "../../../components/sudoku/constraints/text/Text";
+import { CellMarkType, parseCellMark } from "../../../types/sudoku/CellMark";
+import { CellColor } from "../../../types/sudoku/CellColor";
+import { SudokuCellsIndex } from "../../../types/sudoku/SudokuCellsIndex";
+import { Constraint } from "../../../types/sudoku/Constraint";
+import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { AnyNumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
 
 export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
-    params: SafeCrackerPuzzleParams
+    params: SafeCrackerPuzzleParams,
 ): SudokuTypeManager<T> => {
-    const {size, circleRegionsCount, codeCellsCount} = params;
+    const { size, circleRegionsCount, codeCellsCount } = params;
 
     const baseTypeManager = DigitSudokuTypeManager<T>();
 
@@ -31,41 +31,51 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
 
     return {
         ...baseTypeManager,
-        extraCellWriteModes: [
-            ...baseTypeManager.extraCellWriteModes ?? [],
-            arrowsCellWriteModeInfo,
-        ],
-        getCellTypeProps({top, left}, puzzle): CellTypeProps<T> {
-            const {digitsCount = getDefaultDigitsCount(puzzle)} = puzzle;
+        extraCellWriteModes: [...(baseTypeManager.extraCellWriteModes ?? []), arrowsCellWriteModeInfo],
+        getCellTypeProps({ top, left }, puzzle): CellTypeProps<T> {
+            const { digitsCount = getDefaultDigitsCount(puzzle) } = puzzle;
             if (left >= digitsCount) {
-                return {isVisible: false};
+                return { isVisible: false };
             }
 
             switch (top - circleRegionsCount * 2) {
-                case 0: return {};
-                case 1: return {isVisible: left < codeCellsCount};
-                default: return top % 2 === 1 ? {} : {
-                    isSelectable: false,
-                    forceCellWriteMode: arrowsCellWriteModeInfo,
-                };
+                case 0:
+                    return {};
+                case 1:
+                    return { isVisible: left < codeCellsCount };
+                default:
+                    return top % 2 === 1
+                        ? {}
+                        : {
+                              isSelectable: false,
+                              forceCellWriteMode: arrowsCellWriteModeInfo,
+                          };
             }
         },
         processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard) {
             if (currentCell.top < circleRegionsCount * 2) {
-                return defaultProcessArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard, false);
+                return defaultProcessArrowDirection(
+                    currentCell,
+                    xDirection,
+                    yDirection,
+                    context,
+                    isMainKeyboard,
+                    false,
+                );
             }
 
             if (yDirection) {
                 return {
-                    cell: currentCell.top === circleRegionsCount * 2
-                        ? {
-                            top: circleRegionsCount * 2 + 1,
-                            left: Math.min(currentCell.left, codeCellsCount - 1),
-                        }
-                        : {
-                            top: circleRegionsCount * 2,
-                            left: currentCell.left,
-                        }
+                    cell:
+                        currentCell.top === circleRegionsCount * 2
+                            ? {
+                                  top: circleRegionsCount * 2 + 1,
+                                  left: Math.min(currentCell.left, codeCellsCount - 1),
+                              }
+                            : {
+                                  top: circleRegionsCount * 2,
+                                  left: currentCell.left,
+                              },
                 };
             }
 
@@ -82,13 +92,15 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
             if (cellPosition && cellPosition.top < circleRegionsCount * 2 && cellPosition.top % 2 === 0) {
                 return {
                     ...basePosition,
-                    angle: 360 * (cellPosition.top / 2 + cellPosition.left / size) / circleRegionsCount,
+                    angle: (360 * (cellPosition.top / 2 + cellPosition.left / size)) / circleRegionsCount,
                 };
             }
 
             return basePosition;
         },
-        items: indexes(codeCellsCount).map(left => SafeCrackerStarConstraint([{top: circleRegionsCount * 2 + 1, left}])),
+        items: indexes(codeCellsCount).map((left) =>
+            SafeCrackerStarConstraint([{ top: circleRegionsCount * 2 + 1, left }]),
+        ),
         postProcessPuzzle(puzzle): PuzzleDefinition<T> {
             puzzle = {
                 ...puzzle,
@@ -101,7 +113,7 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
             const cellsIndex = new SudokuCellsIndex(puzzle);
 
             const processText = (text: string, cells: Position[], layer?: FieldLayer) => {
-                const [{top, left}] = cells;
+                const [{ top, left }] = cells;
                 const center = cellsIndex.allCells[top]?.[left]?.center;
                 const mark = parseCellMark(text);
                 if (mark !== undefined && mark !== CellMarkType.O && center) {
@@ -126,7 +138,7 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
                 const top = Number(topStr);
                 for (const [leftStr, text] of Object.entries(row)) {
                     const left = Number(leftStr);
-                    if (processText(text, [{top, left}])) {
+                    if (processText(text, [{ top, left }])) {
                         delete initialLetters[top][left];
                     }
                 }
@@ -154,6 +166,6 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
             };
 
             return puzzle;
-        }
+        },
     };
 };

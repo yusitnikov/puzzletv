@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {textColor, textHeightCoeff} from "../../../app/globals";
+import { textColor, textHeightCoeff } from "../../../app/globals";
 
 interface SettingsSelectProps {
     cellSize: number;
@@ -9,8 +9,8 @@ interface SettingsSelectProps {
 export const SettingsSelect = styled("select", {
     shouldForwardProp(propName) {
         return propName !== "cellSize";
-    }
-})(({cellSize}: SettingsSelectProps) => ({
+    },
+})(({ cellSize }: SettingsSelectProps) => ({
     padding: "0.25em",
     margin: 0,
     // width: cellSize * 2,

@@ -1,4 +1,4 @@
-import {EventHandlerProps} from "../types/dom/EventHandlerProps";
+import { EventHandlerProps } from "../types/dom/EventHandlerProps";
 
 export const mergeEventHandlerProps = <T>(...args: EventHandlerProps<T>[]): EventHandlerProps<T> => {
     const result: EventHandlerProps<T> = {};

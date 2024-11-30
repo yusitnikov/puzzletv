@@ -1,35 +1,38 @@
-import {observer} from "mobx-react-lite";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {ChessPTM} from "../types/ChessPTM";
-import {unserializeFieldState} from "../../../types/sudoku/FieldState";
-import {ChessColor} from "../types/ChessColor";
-import {ChessPieceType} from "../types/ChessPieceType";
-import {Line} from "../../../types/layout/Position";
-import {RulesParagraph} from "../../../components/sudoku/rules/RulesParagraph";
-import {lightenColorStr} from "../../../utils/color";
-import {purpleColor} from "../../../components/app/globals";
-import {splitArrayIntoChunks} from "../../../utils/array";
-import {ChessMove, getChessMoveDescription} from "../types/ChessMove";
-import {ChessPiece} from "../types/ChessPiece";
-import {computedFn} from "mobx-utils";
-import {comparer, makeAutoObservable} from "mobx";
+import { observer } from "mobx-react-lite";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { ChessPTM } from "../types/ChessPTM";
+import { unserializeFieldState } from "../../../types/sudoku/FieldState";
+import { ChessColor } from "../types/ChessColor";
+import { ChessPieceType } from "../types/ChessPieceType";
+import { Line } from "../../../types/layout/Position";
+import { RulesParagraph } from "../../../components/sudoku/rules/RulesParagraph";
+import { lightenColorStr } from "../../../utils/color";
+import { purpleColor } from "../../../components/app/globals";
+import { splitArrayIntoChunks } from "../../../utils/array";
+import { ChessMove, getChessMoveDescription } from "../types/ChessMove";
+import { ChessPiece } from "../types/ChessPiece";
+import { computedFn } from "mobx-utils";
+import { comparer, makeAutoObservable } from "mobx";
 
 interface ChessHistoryProps {
     context: PuzzleContext<ChessPTM>;
 }
 
-export const ChessHistory = observer(function ChessHistory({context}: ChessHistoryProps) {
+export const ChessHistory = observer(function ChessHistory({ context }: ChessHistoryProps) {
     const moves = ChessHistoryManager.getInstance(context).getChessHistory(false);
 
-    return <RulesParagraph>
-        {splitArrayIntoChunks(moves, 2).map((pair, index) => <div key={index}>
-            {index + 1}.
-            &nbsp;
-            {pair[0] ? <Move context={context} {...pair[0]}/> : "..."}
-            &nbsp;
-            {pair[1] ? <Move context={context} {...pair[1]}/> : pair.length === 2 ? "..." : undefined}
-        </div>)}
-    </RulesParagraph>;
+    return (
+        <RulesParagraph>
+            {splitArrayIntoChunks(moves, 2).map((pair, index) => (
+                <div key={index}>
+                    {index + 1}. &nbsp;
+                    {pair[0] ? <Move context={context} {...pair[0]} /> : "..."}
+                    &nbsp;
+                    {pair[1] ? <Move context={context} {...pair[1]} /> : pair.length === 2 ? "..." : undefined}
+                </div>
+            ))}
+        </RulesParagraph>
+    );
 });
 
 interface MoveProps extends ChessMove {
@@ -37,25 +40,28 @@ interface MoveProps extends ChessMove {
     index: number;
 }
 
-const Move = observer(function Move({context, index, ...move}: MoveProps) {
-    return <span
-        onClick={() => context.onStateChange({
-            fieldStateHistory: context.fieldStateHistory.seek(index),
-        })}
-        style={{
-            cursor: "pointer",
-            background: context.fieldStateHistory.currentIndex === index
-                ? lightenColorStr(purpleColor, 0.7)
-                : undefined,
-        }}
-    >
-        {getChessMoveDescription(move, false)}
-    </span>;
+const Move = observer(function Move({ context, index, ...move }: MoveProps) {
+    return (
+        <span
+            onClick={() =>
+                context.onStateChange({
+                    fieldStateHistory: context.fieldStateHistory.seek(index),
+                })
+            }
+            style={{
+                cursor: "pointer",
+                background:
+                    context.fieldStateHistory.currentIndex === index ? lightenColorStr(purpleColor, 0.7) : undefined,
+            }}
+        >
+            {getChessMoveDescription(move, false)}
+        </span>
+    );
 });
 
 export class ChessHistoryManager {
     static getInstance(context: PuzzleContext<ChessPTM>): ChessHistoryManager {
-        return context.puzzleIndex.cache[ChessHistoryManager.name] ??= new ChessHistoryManager(context);
+        return (context.puzzleIndex.cache[ChessHistoryManager.name] ??= new ChessHistoryManager(context));
     }
 
     private constructor(private context: PuzzleContext<ChessPTM>) {
@@ -64,12 +70,12 @@ export class ChessHistoryManager {
 
     readonly getChessHistory = computedFn(
         function getChessHistory(this: ChessHistoryManager, untilCurrentState: boolean) {
-            const {fieldStateHistory, puzzle} = this.context;
+            const { fieldStateHistory, puzzle } = this.context;
 
-            let states = fieldStateHistory.states.map(
-                (state) => unserializeFieldState(JSON.parse(state), puzzle)
-                    .cells
-                    .map((row) => row.map(({usersDigit}) => usersDigit))
+            let states = fieldStateHistory.states.map((state) =>
+                unserializeFieldState(JSON.parse(state), puzzle).cells.map((row) =>
+                    row.map(({ usersDigit }) => usersDigit),
+                ),
             );
             if (untilCurrentState) {
                 states = states.slice(0, fieldStateHistory.currentIndex + 1);
@@ -81,10 +87,15 @@ export class ChessHistoryManager {
                 const prev = states[i];
                 const next = states[i + 1];
 
-                const changes: Partial<Record<ChessColor, {
-                    captured?: ChessPiece,
-                    movesMap: Partial<Record<ChessPieceType, Partial<Line>>>
-                }>> = {};
+                const changes: Partial<
+                    Record<
+                        ChessColor,
+                        {
+                            captured?: ChessPiece;
+                            movesMap: Partial<Record<ChessPieceType, Partial<Line>>>;
+                        }
+                    >
+                > = {};
                 let invalidMove = false;
                 for (const [top, prevRow] of prev.entries()) {
                     for (const [left, prevPiece] of prevRow.entries()) {
@@ -99,30 +110,30 @@ export class ChessHistoryManager {
                                 break;
                             }
 
-                            changes[nextPiece.color] ??= {movesMap: {}};
+                            changes[nextPiece.color] ??= { movesMap: {} };
                             changes[nextPiece.color]!.captured = prevPiece;
                         }
 
                         if (prevPiece && !nextPiece) {
-                            const {color, type} = prevPiece;
-                            changes[color] ??= {movesMap: {}};
+                            const { color, type } = prevPiece;
+                            changes[color] ??= { movesMap: {} };
                             changes[color]!.movesMap[type] ??= {};
                             if (changes[color]!.movesMap[type]!.start) {
                                 invalidMove = true;
                                 break;
                             }
-                            changes[color]!.movesMap[type]!.start = {top, left};
+                            changes[color]!.movesMap[type]!.start = { top, left };
                         }
 
                         if (nextPiece) {
-                            const {color, type} = nextPiece;
-                            changes[color] ??= {movesMap: {}};
+                            const { color, type } = nextPiece;
+                            changes[color] ??= { movesMap: {} };
                             changes[color]!.movesMap[type] ??= {};
                             if (changes[color]!.movesMap[type]!.end) {
                                 invalidMove = true;
                                 break;
                             }
-                            changes[color]!.movesMap[type]!.end = {top, left};
+                            changes[color]!.movesMap[type]!.end = { top, left };
                         }
                     }
 
@@ -138,7 +149,7 @@ export class ChessHistoryManager {
                 if (changesArr.length !== 1) {
                     continue;
                 }
-                const [moveColorStr, {captured, movesMap}] = changesArr[0];
+                const [moveColorStr, { captured, movesMap }] = changesArr[0];
                 const moveColor = Number(moveColorStr) as ChessColor;
 
                 let promotionPiece: ChessPieceType | undefined;
@@ -154,13 +165,18 @@ export class ChessHistoryManager {
                 }
 
                 const movesArr = Object.entries(movesMap);
-                if (movesArr.some(([, {start, end}]) => !start || !end)) {
+                if (movesArr.some(([, { start, end }]) => !start || !end)) {
                     continue;
                 }
 
                 let moveObj: ChessMove;
-                if (movesArr.length === 2 && !captured && movesMap[ChessPieceType.king] && movesMap[ChessPieceType.rook]) {
-                    const {start, end} = movesMap[ChessPieceType.king]!;
+                if (
+                    movesArr.length === 2 &&
+                    !captured &&
+                    movesMap[ChessPieceType.king] &&
+                    movesMap[ChessPieceType.rook]
+                ) {
+                    const { start, end } = movesMap[ChessPieceType.king]!;
                     moveObj = {
                         start: start!,
                         end: end!,
@@ -170,7 +186,7 @@ export class ChessHistoryManager {
                         },
                     };
                 } else if (movesArr.length === 1) {
-                    const [typeStr, {start, end}] = movesArr[0];
+                    const [typeStr, { start, end }] = movesArr[0];
                     const type = Number(typeStr) as ChessPieceType;
                     moveObj = {
                         start: start!,
@@ -187,7 +203,7 @@ export class ChessHistoryManager {
                 }
 
                 const add = (move?: ChessMove) => {
-                    moves.push(move ? {...move, index: i + 1} : undefined);
+                    moves.push(move ? { ...move, index: i + 1 } : undefined);
                     isBlackMove = !isBlackMove;
                 };
                 if (moveColor !== (isBlackMove ? ChessColor.black : ChessColor.white)) {
@@ -198,6 +214,6 @@ export class ChessHistoryManager {
 
             return moves;
         },
-        {equals: comparer.structural}
+        { equals: comparer.structural },
     );
 }

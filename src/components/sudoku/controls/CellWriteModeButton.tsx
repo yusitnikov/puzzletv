@@ -1,12 +1,12 @@
-import {CellWriteMode} from "../../../types/sudoku/CellWriteMode";
-import {CellState} from "../../../types/sudoku/CellState";
-import {ReactElement, ReactNode, useCallback} from "react";
-import {ControlButton} from "./ControlButton";
-import {CellContent} from "../cell/CellContent";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {AnyPTM} from "../../../types/sudoku/PuzzleTypeMap";
-import {observer} from "mobx-react-lite";
-import {profiler} from "../../../utils/profiler";
+import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
+import { CellState } from "../../../types/sudoku/CellState";
+import { ReactElement, ReactNode, useCallback } from "react";
+import { ControlButton } from "./ControlButton";
+import { CellContent } from "../cell/CellContent";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { observer } from "mobx-react-lite";
+import { profiler } from "../../../utils/profiler";
 
 export interface CellWriteModeButtonProps<T extends AnyPTM> {
     cellWriteMode: CellWriteMode;
@@ -22,48 +22,41 @@ export interface CellWriteModeButtonProps<T extends AnyPTM> {
     fullHeight?: boolean;
 }
 
-export const CellWriteModeButton = observer(function CellWriteModeButtonFc<T extends AnyPTM>(
-    {
-        cellWriteMode,
-        top,
-        left = 3,
-        data,
-        title,
-        context,
-        noBorders,
-        childrenOnTopOfBorders,
-        fullHeight,
-    }: CellWriteModeButtonProps<T>
-) {
+export const CellWriteModeButton = observer(function CellWriteModeButtonFc<T extends AnyPTM>({
+    cellWriteMode,
+    top,
+    left = 3,
+    data,
+    title,
+    context,
+    noBorders,
+    childrenOnTopOfBorders,
+    fullHeight,
+}: CellWriteModeButtonProps<T>) {
     profiler.trace();
 
-    const {cellSizeForSidePanel: cellSize} = context;
+    const { cellSizeForSidePanel: cellSize } = context;
 
     const handleSetCellWriteMode = useCallback(
-        () => context.onStateChange({persistentCellWriteMode: cellWriteMode}),
-        [context, cellWriteMode]
+        () => context.onStateChange({ persistentCellWriteMode: cellWriteMode }),
+        [context, cellWriteMode],
     );
 
-    return <ControlButton
-        left={left}
-        top={top}
-        cellSize={cellSize}
-        innerBorderWidth={noBorders ? 0 : 1}
-        checked={context.cellWriteMode === cellWriteMode}
-        onClick={handleSetCellWriteMode}
-        title={title}
-        childrenOnTopOfBorders={childrenOnTopOfBorders}
-        fullHeight={fullHeight}
-    >
-        {
-            typeof data === "function"
+    return (
+        <ControlButton
+            left={left}
+            top={top}
+            cellSize={cellSize}
+            innerBorderWidth={noBorders ? 0 : 1}
+            checked={context.cellWriteMode === cellWriteMode}
+            onClick={handleSetCellWriteMode}
+            title={title}
+            childrenOnTopOfBorders={childrenOnTopOfBorders}
+            fullHeight={fullHeight}
+        >
+            {typeof data === "function"
                 ? data
-                : contentSize => <CellContent
-                    context={context}
-                    data={data}
-                    size={contentSize}
-                    mainColor={true}
-                />
-        }
-    </ControlButton>;
+                : (contentSize) => <CellContent context={context} data={data} size={contentSize} mainColor={true} />}
+        </ControlButton>
+    );
 }) as <T extends AnyPTM>(props: CellWriteModeButtonProps<T>) => ReactElement;

@@ -3,10 +3,14 @@ type Cloner<ItemT> = (item: ItemT) => ItemT;
 type Serializer<ItemT> = (item: ItemT) => any;
 type Hasher<ItemT> = (item: ItemT) => string;
 
-const defaultComparer: Comparer<any> = (item1, item2) => typeof item1 === "object" ? JSON.stringify(item1) === JSON.stringify(item2) : item1 === item2;
-const defaultCloner: Cloner<any> = item => typeof item === "object" ? JSON.parse(JSON.stringify(item)) : item;
-const defaultSerializer: Serializer<any> = item => item;
-const defaultHasher = (serializer: Serializer<any>): Hasher<any> => item => serializer(item).toString();
+const defaultComparer: Comparer<any> = (item1, item2) =>
+    typeof item1 === "object" ? JSON.stringify(item1) === JSON.stringify(item2) : item1 === item2;
+const defaultCloner: Cloner<any> = (item) => (typeof item === "object" ? JSON.parse(JSON.stringify(item)) : item);
+const defaultSerializer: Serializer<any> = (item) => item;
+const defaultHasher =
+    (serializer: Serializer<any>): Hasher<any> =>
+    (item) =>
+        serializer(item).toString();
 
 export interface SetInterface<ItemT, AlternativeItemsArrayT = never> {
     readonly items: ItemT[];
@@ -55,15 +59,16 @@ export interface SetInterface<ItemT, AlternativeItemsArrayT = never> {
     serialize(): any;
 }
 
-export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetInterface<ItemT, AlternativeItemsArrayT> {
+export abstract class Set<ItemT, AlternativeItemsArrayT = never>
+    implements SetInterface<ItemT, AlternativeItemsArrayT>
+{
     private cache: Record<string, any> = {};
 
     protected constructor(
         public readonly cloner: Cloner<ItemT> = defaultCloner,
         public readonly comparer: Comparer<ItemT> = defaultComparer,
-        public readonly serializer: Serializer<ItemT> = defaultSerializer
-    ) {
-    }
+        public readonly serializer: Serializer<ItemT> = defaultSerializer,
+    ) {}
 
     abstract get items(): ItemT[];
 
@@ -82,14 +87,17 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     abstract bulkRemove(items: ItemT[]): this;
 
     containsOneOf(items: ItemT[]) {
-        return items.some(item => this.contains(item));
+        return items.some((item) => this.contains(item));
     }
 
     equals(set: SetInterface<ItemT>) {
-        return this.size === set.size && this.items.every(item => {
-            const matchingItem = set.find(item);
-            return matchingItem !== undefined && this.comparer(item, matchingItem);
-        });
+        return (
+            this.size === set.size &&
+            this.items.every((item) => {
+                const matchingItem = set.find(item);
+                return matchingItem !== undefined && this.comparer(item, matchingItem);
+            })
+        );
     }
 
     at(index: number) {
@@ -129,10 +137,7 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     }
 
     bulkAdd(items: ItemT[]) {
-        return this.set([
-            ...this.bulkRemove(items).items,
-            ...items,
-        ]);
+        return this.set([...this.bulkRemove(items).items, ...items]);
     }
 
     toggle(item: ItemT, forcedEnable?: boolean) {
@@ -177,7 +182,10 @@ export abstract class Set<ItemT, AlternativeItemsArrayT = never> implements SetI
     }
 }
 
-export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements SetInterface<ItemT, Record<string, ItemT>> {
+export class HashSet<ItemT>
+    extends Set<ItemT, Record<string, ItemT>>
+    implements SetInterface<ItemT, Record<string, ItemT>>
+{
     public readonly hasher: Hasher<ItemT>;
 
     private _items: ItemT[] | undefined;
@@ -191,10 +199,10 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
             hasher = defaultHasher(serializer),
             comparer = (item1, item2) => hasher(item1) === hasher(item2),
         }: {
-            cloner?: Cloner<ItemT>,
-            serializer?: Serializer<ItemT>,
-            hasher?: Hasher<ItemT>,
-            comparer?: Comparer<ItemT>,
+            cloner?: Cloner<ItemT>;
+            serializer?: Serializer<ItemT>;
+            hasher?: Hasher<ItemT>;
+            comparer?: Comparer<ItemT>;
         } = {},
     ) {
         super(cloner, comparer, serializer);
@@ -219,7 +227,7 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     }
 
     get items() {
-        return this._items = this._items ?? Object.values(this._map);
+        return (this._items = this._items ?? Object.values(this._map));
     }
 
     contains(item: ItemT) {
@@ -241,7 +249,7 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     remove(item: ItemT) {
         const hash = this.hasher(item);
 
-        const map = {...this._map};
+        const map = { ...this._map };
         if (hash in map) {
             delete map[hash];
         }
@@ -250,7 +258,7 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     }
 
     bulkRemove(items: ItemT[]) {
-        const map = {...this._map};
+        const map = { ...this._map };
 
         for (const item of items) {
             const hash = this.hasher(item);
@@ -265,7 +273,7 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     add(item: ItemT) {
         const hash = this.hasher(item);
 
-        const map = {...this._map};
+        const map = { ...this._map };
         if (hash in map) {
             delete map[hash];
         }
@@ -275,7 +283,7 @@ export class HashSet<ItemT> extends Set<ItemT, Record<string, ItemT>> implements
     }
 
     bulkAdd(items: ItemT[]) {
-        const map = {...this._map};
+        const map = { ...this._map };
 
         for (const item of items) {
             const hash = this.hasher(item);

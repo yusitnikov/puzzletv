@@ -1,5 +1,5 @@
-import {JigsawGamePieceState} from "./JigsawGamePieceState";
-import {PositionWithAngle} from "../../../types/layout/Position";
+import { JigsawGamePieceState } from "./JigsawGamePieceState";
+import { PositionWithAngle } from "../../../types/layout/Position";
 
 export enum JigsawJssCluesVisibility {
     All,

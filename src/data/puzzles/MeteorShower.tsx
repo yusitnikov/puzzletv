@@ -1,14 +1,14 @@
-import {PuzzleDefinition} from "../../types/sudoku/PuzzleDefinition";
-import {createRegularFieldSize, createRegularRegions} from "../../types/sudoku/FieldSize";
-import {LanguageCode} from "../../types/translations/LanguageCode";
-import {DigitSudokuTypeManager} from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import {ThermometerConstraint} from "../../components/sudoku/constraints/thermometer/Thermometer";
-import {RulesParagraph} from "../../components/sudoku/rules/RulesParagraph";
-import {moveButtonTip, normalSudokuRulesApply, thermometersExplained, toroidalRulesApply} from "../ruleSnippets";
-import {darkGreyColor} from "../../components/app/globals";
-import {isValidFinishedPuzzleByConstraints} from "../../types/sudoku/Constraint";
-import {Position} from "../../types/layout/Position";
-import {NumberPTM} from "../../types/sudoku/PuzzleTypeMap";
+import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { createRegularFieldSize, createRegularRegions } from "../../types/sudoku/FieldSize";
+import { LanguageCode } from "../../types/translations/LanguageCode";
+import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
+import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { moveButtonTip, normalSudokuRulesApply, thermometersExplained, toroidalRulesApply } from "../ruleSnippets";
+import { darkGreyColor } from "../../components/app/globals";
+import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { Position } from "../../types/layout/Position";
+import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 
 export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: true,
@@ -20,19 +20,23 @@ export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => 
     author: {
         [LanguageCode.en]: "Scott Strosahl",
     },
-    rules: translate => <>
-        <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
-        <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
-        <RulesParagraph>{translate(toroidalRulesApply)}. {translate(moveButtonTip)}.</RulesParagraph>
-    </>,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
+            <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
+            <RulesParagraph>
+                {translate(toroidalRulesApply)}. {translate(moveButtonTip)}.
+            </RulesParagraph>
+        </>
+    ),
     typeManager: DigitSudokuTypeManager(),
     borderColor: darkGreyColor,
     fieldSize: createRegularFieldSize(8, 2),
-    regions: createRegularRegions(8, 8, 2).map(
-        (region, index) => (region as Position[]).map(({left, top}) => ({
+    regions: createRegularRegions(8, 8, 2).map((region, index) =>
+        (region as Position[]).map(({ left, top }) => ({
             left,
-            top: (top + [-1, -3, -2, -1, -1, -3, -2, -1][index]),
-        }))
+            top: top + [-1, -3, -2, -1, -1, -3, -2, -1][index],
+        })),
     ),
     items: [
         ThermometerConstraint(["R7C7", "R1C1"], true, false, colorful ? "#edff6399" : undefined),

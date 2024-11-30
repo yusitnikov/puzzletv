@@ -1,45 +1,42 @@
-import {JigsawDigit} from "./JigsawDigit";
-import {
-    arrayContainsPosition,
-    Position,
-    PositionSet,
-    PositionWithAngle,
-} from "../../../types/layout/Position";
-import {SudokuCellsIndex} from "../../../types/sudoku/SudokuCellsIndex";
-import {loop, roundToStep} from "../../../utils/math";
-import {getRegionCells, isStickyRegionCell, PuzzleDefinition} from "../../../types/sudoku/PuzzleDefinition";
-import {getRegionBoundingBox} from "../../../utils/regions";
-import {JigsawPieceInfo} from "./JigsawPieceInfo";
-import {JigsawPTM} from "./JigsawPTM";
-import {isRotatableDigit, rotateDigit} from "../../../components/sudoku/digit/DigitComponentType";
-import {getPointsBoundingBox, getRectCenter, getRectPoints, Rect} from "../../../types/layout/Rect";
-import {indexes} from "../../../utils/indexes";
-import {GridRegion} from "../../../types/sudoku/GridRegion";
-import {applyMetricsDiff, emptyGestureMetrics, GestureMetrics} from "../../../utils/gestures";
-import {JigsawFieldPieceState} from "./JigsawFieldState";
-import {GivenDigitsMap} from "../../../types/sudoku/GivenDigitsMap";
-import {PuzzleContext} from "../../../types/sudoku/PuzzleContext";
-import {JigsawPieceRegion} from "./JigsawPieceRegion";
+import { JigsawDigit } from "./JigsawDigit";
+import { arrayContainsPosition, Position, PositionSet, PositionWithAngle } from "../../../types/layout/Position";
+import { SudokuCellsIndex } from "../../../types/sudoku/SudokuCellsIndex";
+import { loop, roundToStep } from "../../../utils/math";
+import { getRegionCells, isStickyRegionCell, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { getRegionBoundingBox } from "../../../utils/regions";
+import { JigsawPieceInfo } from "./JigsawPieceInfo";
+import { JigsawPTM } from "./JigsawPTM";
+import { isRotatableDigit, rotateDigit } from "../../../components/sudoku/digit/DigitComponentType";
+import { getPointsBoundingBox, getRectCenter, getRectPoints, Rect } from "../../../types/layout/Rect";
+import { indexes } from "../../../utils/indexes";
+import { GridRegion } from "../../../types/sudoku/GridRegion";
+import { applyMetricsDiff, emptyGestureMetrics, GestureMetrics } from "../../../utils/gestures";
+import { JigsawFieldPieceState } from "./JigsawFieldState";
+import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
+import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { JigsawPieceRegion } from "./JigsawPieceRegion";
 
 export const getJigsawPieces = (
     cellsIndex: SudokuCellsIndex<JigsawPTM>,
     getCenter: (piece: Omit<JigsawPieceInfo, "center">) => Position,
-): { pieces: JigsawPieceInfo[], otherCells: Position[] } => {
-    const {puzzle} = cellsIndex;
+): { pieces: JigsawPieceInfo[]; otherCells: Position[] } => {
+    const { puzzle } = cellsIndex;
     const {
         regions = [],
-        fieldSize: {rowsCount, columnsCount},
+        fieldSize: { rowsCount, columnsCount },
         importOptions,
     } = puzzle;
 
     let regionCells = regions.map(getRegionCells);
 
-    let otherCells = new PositionSet(indexes(rowsCount).flatMap(
-        (top) => indexes(columnsCount).map((left) => ({top, left}))
-    )).bulkRemove(regionCells.flat());
+    let otherCells = new PositionSet(
+        indexes(rowsCount).flatMap((top) => indexes(columnsCount).map((left) => ({ top, left }))),
+    ).bulkRemove(regionCells.flat());
 
     if (importOptions?.stickyRegion) {
-        const otherActiveCells = otherCells.filter((cell) => isStickyRegionCell(puzzle, cell) && cellsIndex.allCells[cell.top]?.[cell.left]?.isActive);
+        const otherActiveCells = otherCells.filter(
+            (cell) => isStickyRegionCell(puzzle, cell) && cellsIndex.allCells[cell.top]?.[cell.left]?.isActive,
+        );
         otherCells = otherCells.bulkRemove(otherActiveCells.items);
 
         if (otherActiveCells.size) {
@@ -61,25 +58,20 @@ export const getJigsawPieces = (
         return {
             ...piece,
             center: getCenter(piece),
-        }
+        };
     });
 
-    return {pieces, otherCells: otherCells.items};
+    return { pieces, otherCells: otherCells.items };
 };
 
 export const getJigsawRegionWithCache = (context: PuzzleContext<JigsawPTM>, index: number): JigsawPieceRegion => {
-    const {cache} = context.puzzleIndex;
+    const { cache } = context.puzzleIndex;
     const key = `jigsawRegion${index}`;
-    return cache[key] = cache[key] ?? new JigsawPieceRegion(context, index);
+    return (cache[key] = cache[key] ?? new JigsawPieceRegion(context, index));
 };
 
-export const getJigsawPieceIndexByCell = (
-    puzzle: PuzzleDefinition<JigsawPTM>,
-    cell: Position,
-): number | undefined => {
-    const index = puzzle.extension!.pieces.findIndex(
-        ({cells}) => arrayContainsPosition(cells, cell)
-    );
+export const getJigsawPieceIndexByCell = (puzzle: PuzzleDefinition<JigsawPTM>, cell: Position): number | undefined => {
+    const index = puzzle.extension!.pieces.findIndex(({ cells }) => arrayContainsPosition(cells, cell));
     return index >= 0 ? index : undefined;
 };
 
@@ -90,12 +82,13 @@ export const getJigsawPieceIndexesByCell = (
 ) => {
     const index = getJigsawPieceIndexByCell(puzzle, cell);
 
-    return index === undefined
-        ? []
-        : getJigsawPieceIndexesByZIndex(piecePositions, piecePositions[index].zIndex);
+    return index === undefined ? [] : getJigsawPieceIndexesByZIndex(piecePositions, piecePositions[index].zIndex);
 };
 
-export const normalizeJigsawDigit = (puzzle: PuzzleDefinition<JigsawPTM>, {digit, angle}: JigsawDigit): JigsawDigit => {
+export const normalizeJigsawDigit = (
+    puzzle: PuzzleDefinition<JigsawPTM>,
+    { digit, angle }: JigsawDigit,
+): JigsawDigit => {
     angle = loop(angle, 360);
     if (angle >= 180 && isRotatableDigit(puzzle, digit)) {
         return {
@@ -103,20 +96,20 @@ export const normalizeJigsawDigit = (puzzle: PuzzleDefinition<JigsawPTM>, {digit
             angle: angle - 180,
         };
     }
-    return {digit, angle};
+    return { digit, angle };
 };
 
 export const rotateJigsawDigitByPiece = (
-    {puzzle, fieldExtension: {pieces}}: PuzzleContext<JigsawPTM>,
+    { puzzle, fieldExtension: { pieces } }: PuzzleContext<JigsawPTM>,
     data: JigsawDigit,
     cell: Position,
 ): JigsawDigit => {
     const regionIndex = getJigsawPieceIndexByCell(puzzle, cell);
     return regionIndex !== undefined
         ? normalizeJigsawDigit(puzzle, {
-            digit: data.digit,
-            angle: data.angle + pieces[regionIndex].angle,
-        })
+              digit: data.digit,
+              angle: data.angle + pieces[regionIndex].angle,
+          })
         : data;
 };
 
@@ -124,7 +117,7 @@ export const getActiveJigsawPieceZIndex = (pieces: JigsawFieldPieceState[]) => {
     if (pieces.length === 0) {
         return 0;
     }
-    const zIndexes = pieces.map(({zIndex}) => zIndex);
+    const zIndexes = pieces.map(({ zIndex }) => zIndex);
     return Math.max(...zIndexes);
 };
 
@@ -151,7 +144,7 @@ export const groupJigsawPiecesByZIndex = (context: PuzzleContext<JigsawPTM>): Ji
     for (const index of indexes(pieces.length)) {
         const info = pieces[index];
         const position = context.fieldExtension.pieces[index];
-        const {zIndex} = position;
+        const { zIndex } = position;
 
         piecesByZIndex[zIndex] = piecesByZIndex[zIndex] ?? [];
         piecesByZIndex[zIndex].push({
@@ -162,30 +155,33 @@ export const groupJigsawPiecesByZIndex = (context: PuzzleContext<JigsawPTM>): Ji
         });
     }
 
-    return Object.entries(piecesByZIndex)
-        .map(([zIndexStr, pieces]): JigsawPiecesGroup => {
-            const boundingRect = getPointsBoundingBox(...pieces.flatMap(
-                ({info: {boundingRect}, region}) =>
-                    getRectPoints(boundingRect).map((point) => region.transformCoords?.(point) ?? point)
-            ));
+    return Object.entries(piecesByZIndex).map(([zIndexStr, pieces]): JigsawPiecesGroup => {
+        const boundingRect = getPointsBoundingBox(
+            ...pieces.flatMap(({ info: { boundingRect }, region }) =>
+                getRectPoints(boundingRect).map((point) => region.transformCoords?.(point) ?? point),
+            ),
+        );
 
-            let groupCenter: Position;
-            if (pieces.length === 1) {
-                const {region, info: {center}} = pieces[0];
-                groupCenter = region.transformCoords?.(center) ?? center;
-            } else {
-                groupCenter = getRectCenter(boundingRect);
-            }
+        let groupCenter: Position;
+        if (pieces.length === 1) {
+            const {
+                region,
+                info: { center },
+            } = pieces[0];
+            groupCenter = region.transformCoords?.(center) ?? center;
+        } else {
+            groupCenter = getRectCenter(boundingRect);
+        }
 
-            return {
-                zIndex: Number(zIndexStr),
-                boundingRect,
-                center: groupCenter,
-                pieces,
-                cells: pieces.flatMap(({info: {cells}}) => cells),
-                indexes: pieces.map(({index}) => index),
-            };
-        });
+        return {
+            zIndex: Number(zIndexStr),
+            boundingRect,
+            center: groupCenter,
+            pieces,
+            cells: pieces.flatMap(({ info: { cells } }) => cells),
+            indexes: pieces.map(({ index }) => index),
+        };
+    });
 };
 
 export const moveJigsawPieceByGroupGesture = (
@@ -200,7 +196,7 @@ export const moveJigsawPieceByGroupGesture = (
         y: gesture.y + group.center.top - piece.center.top,
     });
 
-    const {x, y, rotation} = applyMetricsDiff(
+    const { x, y, rotation } = applyMetricsDiff(
         {
             x: prevPosition.left,
             y: prevPosition.top,
@@ -220,16 +216,16 @@ export const moveJigsawPieceByGroupGesture = (
 
 export const getJigsawPieceIndexesByZIndex = (pieces: JigsawFieldPieceState[], zIndex?: number): number[] =>
     pieces
-        .map((piece, index) => ({piece, index}))
-        .filter(({piece}) => piece.zIndex === zIndex)
-        .map(({index}) => index);
+        .map((piece, index) => ({ piece, index }))
+        .filter(({ piece }) => piece.zIndex === zIndex)
+        .map(({ index }) => index);
 
 export const getActiveJigsawPieceIndexes = (piecePositions: JigsawFieldPieceState[]): number[] =>
     getJigsawPieceIndexesByZIndex(piecePositions, getActiveJigsawPieceZIndex(piecePositions));
 
 export const sortJigsawPiecesByPosition = (pieces: JigsawPieceInfo[], piecePositions: Position[]) =>
     piecePositions
-        .map(({top, left}, index) => {
+        .map(({ top, left }, index) => {
             const center = pieces[index].center;
             return {
                 index,
@@ -237,11 +233,11 @@ export const sortJigsawPiecesByPosition = (pieces: JigsawPieceInfo[], piecePosit
                 left: left + center.left,
             };
         })
-        .sort((a, b) => Math.sign(a.top - b.top) || Math.sign(a.left - b.left) || (a.index - b.index))
-        .map(({index}) => index);
+        .sort((a, b) => Math.sign(a.top - b.top) || Math.sign(a.left - b.left) || a.index - b.index)
+        .map(({ index }) => index);
 
-export const getJigsawCellCenterAbsolutePosition = (region: GridRegion, {top, left}: Position, round: boolean) => {
-    let center: Position = {top: top + 0.5, left: left + 0.5};
+export const getJigsawCellCenterAbsolutePosition = (region: GridRegion, { top, left }: Position, round: boolean) => {
+    let center: Position = { top: top + 0.5, left: left + 0.5 };
     center = region.transformCoords?.(center) ?? center;
     if (round) {
         center = {
@@ -252,21 +248,21 @@ export const getJigsawCellCenterAbsolutePosition = (region: GridRegion, {top, le
     return center;
 };
 
-export const getJigsawCellCenterAbsolutePositionsIndex = (groups: JigsawPiecesGroup[]) => groups.map(
-    ({pieces, indexes, zIndex}) => {
-        const cells = pieces.flatMap(
-            ({info: {cells}, region, index}) => cells.map(
-                (cell) => ({
-                    pieceIndex: index,
-                    cell,
-                    position: getJigsawCellCenterAbsolutePosition(region, cell, true),
-                })
-            )
+export const getJigsawCellCenterAbsolutePositionsIndex = (groups: JigsawPiecesGroup[]) =>
+    groups.map(({ pieces, indexes, zIndex }) => {
+        const cells = pieces.flatMap(({ info: { cells }, region, index }) =>
+            cells.map((cell) => ({
+                pieceIndex: index,
+                cell,
+                position: getJigsawCellCenterAbsolutePosition(region, cell, true),
+            })),
         );
 
-        const cellsMap: GivenDigitsMap<typeof cells[0]> = {};
+        const cellsMap: GivenDigitsMap<(typeof cells)[0]> = {};
         for (const cell of cells) {
-            const {position: {top, left}} = cell;
+            const {
+                position: { top, left },
+            } = cell;
             cellsMap[top] = cellsMap[top] ?? {};
             cellsMap[top][left] = cell;
         }
@@ -277,5 +273,4 @@ export const getJigsawCellCenterAbsolutePositionsIndex = (groups: JigsawPiecesGr
             cells,
             cellsMap,
         };
-    }
-);
+    });

@@ -1,19 +1,19 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import {ReactNode, useCallback, useState} from "react";
-import {lightGreyColor, textColor} from "../../app/globals";
-import {createPortal} from "react-dom";
-import {useEventListener} from "../../../hooks/useEventListener";
+import { ReactNode, useCallback, useState } from "react";
+import { lightGreyColor, textColor } from "../../app/globals";
+import { createPortal } from "react-dom";
+import { useEventListener } from "../../../hooks/useEventListener";
 import FocusTrap from "focus-trap-react";
-import {runInAction} from "mobx";
-import {profiler} from "../../../utils/profiler";
-import {observer} from "mobx-react-lite";
+import { runInAction } from "mobx";
+import { profiler } from "../../../utils/profiler";
+import { observer } from "mobx-react-lite";
 
 interface DropdownItem {
     label: ReactNode;
     isSelected: boolean;
     href?: string;
-    onClick?: () => void,
+    onClick?: () => void;
 }
 
 interface DropdownProps {
@@ -23,58 +23,71 @@ interface DropdownProps {
     align?: "left" | "right";
 }
 
-export const Dropdown = observer(function DropdownFc({className, button, items, align = "left"}: DropdownProps) {
+export const Dropdown = observer(function DropdownFc({ className, button, items, align = "left" }: DropdownProps) {
     profiler.trace();
 
     const [open, setOpen] = useState(false);
-    const toggleOpen = useCallback(() => setOpen(open => !open), [setOpen]);
+    const toggleOpen = useCallback(() => setOpen((open) => !open), [setOpen]);
     const close = useCallback(() => setOpen(false), [setOpen]);
 
-    return <>
-        {open && <BackDrop onClose={close}/>}
+    return (
+        <>
+            {open && <BackDrop onClose={close} />}
 
-        <div
-            className={className}
-            onClick={() => runInAction(toggleOpen)}
-            style={{position: "relative", cursor: "pointer"}}
-        >
-            {button}
+            <div
+                className={className}
+                onClick={() => runInAction(toggleOpen)}
+                style={{ position: "relative", cursor: "pointer" }}
+            >
+                {button}
 
-            {open && <FocusTrap focusTrapOptions={{
-                allowOutsideClick: true,
-                initialFocus: false,
-            }}>
-                <div style={{
-                    position: "absolute",
-                    zIndex: 2,
-                    border: `1px solid ${textColor}`,
-                    backgroundColor: lightGreyColor,
-                    lineHeight: "1em",
-                    marginTop: "0.25em",
-                    right: align === "right" ? 0 : undefined,
-                }}>
-                    {items.map(({label, isSelected, href = "#", onClick}, index) => <StyledItem
-                        key={index}
-                        href={href}
-                        active={isSelected}
-                        onClick={onClick && ((ev) => {
-                            onClick();
-                            ev.preventDefault();
-                        })}
+                {open && (
+                    <FocusTrap
+                        focusTrapOptions={{
+                            allowOutsideClick: true,
+                            initialFocus: false,
+                        }}
                     >
-                        {label}
-                    </StyledItem>)}
-                </div>
-            </FocusTrap>}
-        </div>
-    </>;
+                        <div
+                            style={{
+                                position: "absolute",
+                                zIndex: 2,
+                                border: `1px solid ${textColor}`,
+                                backgroundColor: lightGreyColor,
+                                lineHeight: "1em",
+                                marginTop: "0.25em",
+                                right: align === "right" ? 0 : undefined,
+                            }}
+                        >
+                            {items.map(({ label, isSelected, href = "#", onClick }, index) => (
+                                <StyledItem
+                                    key={index}
+                                    href={href}
+                                    active={isSelected}
+                                    onClick={
+                                        onClick &&
+                                        ((ev) => {
+                                            onClick();
+                                            ev.preventDefault();
+                                        })
+                                    }
+                                >
+                                    {label}
+                                </StyledItem>
+                            ))}
+                        </div>
+                    </FocusTrap>
+                )}
+            </div>
+        </>
+    );
 });
 
 const StyledItem = styled("a", {
     shouldForwardProp(propName) {
         return propName !== "active";
     },
-})(({active}: {active: boolean}) => ({
+})(({ active }: { active: boolean }) => ({
     display: "flex",
     alignItems: "center",
     gap: "0.25em",
@@ -94,10 +107,10 @@ interface BackDropProps {
     onClose: () => void;
 }
 
-const BackDrop = observer(function BackDropFc({onClose}: BackDropProps) {
+const BackDrop = observer(function BackDropFc({ onClose }: BackDropProps) {
     profiler.trace();
 
-    useEventListener(window, "keydown", ({code}) => {
+    useEventListener(window, "keydown", ({ code }) => {
         if (code === "Escape") {
             onClose();
         }
@@ -112,6 +125,6 @@ const BackDrop = observer(function BackDropFc({onClose}: BackDropProps) {
             }}
             onClick={() => runInAction(onClose)}
         />,
-        window.document.body
+        window.document.body,
     );
 });
