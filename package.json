@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
+        "postinstall": "git config blame.ignoreRevsFile .git-blame-ignore-revs",
         "start": "react-scripts start",
         "build": "cross-env CI=false react-scripts build",
         "serve": "http-server ./build",
