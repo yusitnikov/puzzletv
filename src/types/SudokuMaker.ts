@@ -466,6 +466,7 @@ export interface BetweenLinesConstraintConfig extends LineWithEndPointsConfigBas
 export interface FogConfig {
     type: ConstraintType.Fog;
     cells: CellId[];
+    useDefaults?: boolean;
     triggers?: Record<CellId, CellId[]>;
 }
 

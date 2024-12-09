@@ -95,6 +95,7 @@ import { BaseEntropicLineConstraint } from "../../components/sudoku/constraints/
 import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
 import { SequenceLineConstraint } from "../../components/sudoku/constraints/sequence-line/SequenceLine";
 import { loop } from "../../utils/math";
+import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {
     constructor(
@@ -140,6 +141,9 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
 
     addToImporter(importer: PuzzleImporter<T>) {
         let fogCells: Position[] = [];
+        // The default is for old puzzles that use cages. FogConstraint will override it.
+        let fogUseDefaults = true;
+        let fogTriggers: GivenDigitsMap<Position[]> = {};
 
         new ObjectParser<CompressedPuzzle>(
             {
@@ -828,7 +832,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                                     } else {
                                                         importer.addCosmeticCage(
                                                             this,
-                                                            this.parseCellIds(cells),
+                                                            parsedCells,
                                                             value,
                                                             cageColor,
                                                             fontColor,
@@ -999,9 +1003,16 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     cells: (cells) => {
                                         fogCells = [...fogCells, ...this.parseCellIds(cells)];
                                     },
-                                    // triggers: (triggers) => {
-                                    //     // TODO
-                                    // },
+                                    useDefaults: (useDefaults = false) => {
+                                        fogUseDefaults = useDefaults;
+                                    },
+                                    triggers: (triggers = {}) => {
+                                        for (const [srcCellIdStr, dstCellIds] of Object.entries(triggers)) {
+                                            const { top, left } = this.parseCellId(Number(srcCellIdStr) as CellId);
+                                            fogTriggers[top] ??= {};
+                                            fogTriggers[top][left] = this.parseCellIds(dstCellIds);
+                                        }
+                                    },
                                 }).parse(constraint, "fog");
                                 break;
                             default:
@@ -1031,7 +1042,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
         ).parse(this.puzzleJson, "SudokuMaker data");
 
         if (this.hasFog) {
-            importer.addFog(this, [], fogCells);
+            importer.addFog(this, { startCells: fogCells, useDefaultTriggers: fogUseDefaults, triggers: fogTriggers });
         }
     }
 

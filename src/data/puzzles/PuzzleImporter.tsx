@@ -1,5 +1,5 @@
 import { Position, PositionLiteral, PositionSet } from "../../types/layout/Position";
-import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
+import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
 import { CellColorValue } from "../../types/sudoku/CellColor";
 import { Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/sudoku/Constraint";
 import {
@@ -74,7 +74,7 @@ import {
     RectConstraint,
 } from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { TextConstraint } from "../../components/sudoku/constraints/text/Text";
-import { FogConstraint } from "../../components/sudoku/constraints/fog/Fog";
+import { FogConstraint, FogProps } from "../../components/sudoku/constraints/fog/Fog";
 import { DoubleArrowConstraint } from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
 import {
     EntropicLineConstraint,
@@ -312,17 +312,33 @@ export class PuzzleImporter<T extends AnyPTM> {
 
     addFog(
         gridParser: GridParser<T, any>,
-        startCell3x3Literals: PositionLiteral[] = [],
-        startCellLiterals: PositionLiteral[] = [],
-        bulbCellLiterals = startCell3x3Literals,
+        {
+            startCells3x3 = [],
+            startCells = [],
+            bulbCells = startCells3x3,
+            triggers = {},
+            ...other
+        }: FogProps<T, PositionLiteral>,
     ) {
         this.puzzle.prioritizeSelection = true;
 
+        const offsetTriggers: GivenDigitsMap<Position[]> = {};
+        processGivenDigitsMaps(
+            ([cells], position) => {
+                const { top, left } = gridParser.offsetCoords(position);
+                offsetTriggers[top] ??= {};
+                offsetTriggers[top][left] = gridParser.offsetCoordsArray(cells);
+            },
+            [triggers],
+        );
+
         this.addItems(
             FogConstraint({
-                startCells3x3: gridParser.offsetCoordsArray(startCell3x3Literals),
-                startCells: gridParser.offsetCoordsArray(startCellLiterals),
-                bulbCells: gridParser.offsetCoordsArray(bulbCellLiterals),
+                startCells3x3: gridParser.offsetCoordsArray(startCells3x3),
+                startCells: gridParser.offsetCoordsArray(startCells),
+                bulbCells: gridParser.offsetCoordsArray(bulbCells),
+                triggers: offsetTriggers,
+                ...other,
             }),
         );
     }

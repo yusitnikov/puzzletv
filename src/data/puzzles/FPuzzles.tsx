@@ -632,12 +632,11 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
         }).parse(this.puzzleJson, "f-puzzles data");
 
         if (this.hasFog) {
-            importer.addFog(
-                this,
-                this.puzzleJson.fogofwar,
-                this.puzzleJson.foglight,
-                this.puzzleJson.text?.filter(isFowText)?.flatMap((text) => text.cells),
-            );
+            importer.addFog(this, {
+                startCells3x3: this.puzzleJson.fogofwar,
+                startCells: this.puzzleJson.foglight,
+                bulbCells: this.puzzleJson.text?.filter(isFowText)?.flatMap((text) => text.cells),
+            });
         }
     }
 

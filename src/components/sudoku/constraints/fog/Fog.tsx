@@ -16,9 +16,9 @@ import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
 import { useAutoIncrementId } from "../../../../hooks/useAutoIncrementId";
 import { CellColor } from "../../../../types/sudoku/CellColor";
 import { PuzzlePositionSet } from "../../../../types/sudoku/PuzzlePositionSet";
-import { indexes } from "../../../../utils/indexes";
+import { indexes, indexesFromTo } from "../../../../utils/indexes";
 import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
-import { GivenDigitsMap } from "../../../../types/sudoku/GivenDigitsMap";
+import { GivenDigitsMap, processGivenDigitsMaps } from "../../../../types/sudoku/GivenDigitsMap";
 import { PuzzleLineSet } from "../../../../types/sudoku/PuzzleLineSet";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
@@ -38,6 +38,8 @@ export interface FogProps<T extends AnyPTM, PositionT = Position> {
     bulbCells?: PositionT[];
     revealByCenterLines?: boolean | PuzzleLineSet<T>;
     revealByColors?: CellColor[] | GivenDigitsMap<CellColor>;
+    useDefaultTriggers?: boolean;
+    triggers?: GivenDigitsMap<PositionT[]>;
     fogRenderer?: ComponentType<FogRendererProps<T>>;
 }
 
@@ -47,7 +49,14 @@ const DarkReaderRectOverride = styled("rect")(({ fill }) => ({
 
 export const getFogVisibleCells = <T extends AnyPTM>(
     context: PuzzleContext<T>,
-    { startCells, startCells3x3, revealByColors, revealByCenterLines }: FogProps<T>,
+    {
+        startCells = [],
+        startCells3x3 = [],
+        revealByColors,
+        revealByCenterLines,
+        useDefaultTriggers = true,
+        triggers = {},
+    }: FogProps<T>,
 ) => {
     const {
         puzzle,
@@ -64,9 +73,26 @@ export const getFogVisibleCells = <T extends AnyPTM>(
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
     const initialColors = context.puzzleInitialColors;
 
-    const visible3x3Centers = indexes(rowsCount).map((top) =>
-        indexes(columnsCount).map(
-            (left) =>
+    const result = indexes(rowsCount).map(() => indexes(columnsCount).map(() => false));
+
+    for (const { top, left } of startCells) {
+        result[top][left] = true;
+    }
+
+    const safeClearFog = (top: number, left: number) => {
+        if (result[top]?.[left] !== undefined) {
+            result[top][left] = true;
+        }
+    };
+
+    for (const top of indexes(rowsCount)) {
+        for (const left of indexes(columnsCount)) {
+            let triggeredCells = triggers[top]?.[left];
+            if (!triggeredCells && !useDefaultTriggers) {
+                continue;
+            }
+
+            const isTrigger =
                 arrayContainsPosition(startCells3x3 ?? [], { top, left }) ||
                 (!!givenDigits[top]?.[left] &&
                     (typeof solution?.[top]?.[left] !== "number" ||
@@ -76,53 +102,39 @@ export const getFogVisibleCells = <T extends AnyPTM>(
                     !initialColors[top]?.[left] &&
                     (Array.isArray(revealByColors)
                         ? revealByColors.includes(cells[top][left].colors.first()!)
-                        : cells[top][left].colors.first() === revealByColors[top]?.[left])),
-        ),
-    );
-    const visible3x3 = indexes(rowsCount).map((top) =>
-        indexes(columnsCount).map(
-            (left) =>
-                visible3x3Centers[top - 1]?.[left - 1] ||
-                visible3x3Centers[top - 1]?.[left] ||
-                visible3x3Centers[top - 1]?.[left + 1] ||
-                visible3x3Centers[top][left - 1] ||
-                visible3x3Centers[top][left] ||
-                visible3x3Centers[top][left + 1] ||
-                visible3x3Centers[top + 1]?.[left - 1] ||
-                visible3x3Centers[top + 1]?.[left] ||
-                visible3x3Centers[top + 1]?.[left + 1],
-        ),
-    );
+                        : cells[top][left].colors.first() === revealByColors[top]?.[left]));
+            if (!isTrigger) {
+                continue;
+            }
 
-    const linePoints = new PuzzlePositionSet(
-        puzzle,
-        puzzleIndex
-            .getCenterLines(lines.items, true)
-            .filter((line) => typeof revealByCenterLines !== "object" || revealByCenterLines.contains(line))
-            .flatMap(({ start, end }) => [start, end]),
-    );
-    const visibleCrossCenters = indexes(rowsCount).map((top) =>
-        indexes(columnsCount).map((left) => revealByCenterLines && linePoints.contains({ top, left })),
-    );
-    const visibleCross = indexes(rowsCount).map((top) =>
-        indexes(columnsCount).map(
-            (left) =>
-                visibleCrossCenters[top - 1]?.[left] ||
-                visibleCrossCenters[top][left - 1] ||
-                visibleCrossCenters[top][left] ||
-                visibleCrossCenters[top][left + 1] ||
-                visibleCrossCenters[top + 1]?.[left],
-        ),
-    );
+            triggeredCells ??= indexesFromTo(top - 1, top + 1, true).flatMap((top) =>
+                indexesFromTo(left - 1, left + 1, true).map((left) => ({ top, left })),
+            );
+            for (const { top, left } of triggeredCells) {
+                safeClearFog(top, left);
+            }
+        }
+    }
 
-    return indexes(rowsCount).map((top) =>
-        indexes(columnsCount).map(
-            (left) =>
-                arrayContainsPosition(startCells ?? [], { top, left }) ||
-                visible3x3[top][left] ||
-                visibleCross[top][left],
-        ),
-    );
+    if (revealByCenterLines) {
+        const linePoints = new PuzzlePositionSet(
+            puzzle,
+            puzzleIndex
+                .getCenterLines(lines.items, true)
+                .filter((line) => typeof revealByCenterLines !== "object" || revealByCenterLines.contains(line))
+                .flatMap(({ start, end }) => [start, end]),
+        );
+
+        for (const { top, left } of linePoints.items) {
+            result[top][left] = true;
+            safeClearFog(top - 1, left);
+            safeClearFog(top + 1, left);
+            safeClearFog(top, left - 1);
+            safeClearFog(top, left + 1);
+        }
+    }
+
+    return result;
 };
 
 export const Fog = {
@@ -280,6 +292,7 @@ export const FogConstraint = <T extends AnyPTM>({
     bulbCells = startCells3x3,
     revealByCenterLines = false,
     revealByColors = {},
+    triggers = {},
     ...other
 }: FogProps<T, PositionLiteral> = {}): Constraint<T, FogProps<T>> => ({
     name: "fog",
@@ -291,6 +304,7 @@ export const FogConstraint = <T extends AnyPTM>({
         bulbCells: parsePositionLiterals(bulbCells),
         revealByCenterLines,
         revealByColors,
+        triggers: processGivenDigitsMaps(([cells]) => parsePositionLiterals(cells), [triggers]),
         ...other,
     },
     component: Fog,
