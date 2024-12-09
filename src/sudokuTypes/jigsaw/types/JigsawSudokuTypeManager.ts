@@ -44,7 +44,12 @@ import { createRandomGenerator } from "../../../utils/random";
 import { PuzzleImportOptions } from "../../../types/sudoku/PuzzleImportOptions";
 import { SudokuCellsIndex } from "../../../types/sudoku/SudokuCellsIndex";
 import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/sudoku/Constraint";
-import { getRegionCells, isStickyRegionCell, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import {
+    getRegionCells,
+    isStickyRegionCell,
+    processPuzzleItems,
+    PuzzleDefinition,
+} from "../../../types/sudoku/PuzzleDefinition";
 import { jssTag } from "../../jss/constraints/Jss";
 import { FieldLayer } from "../../../types/sudoku/FieldLayer";
 import { JigsawJss } from "../constraints/JigsawJss";
@@ -449,16 +454,7 @@ export const JigsawSudokuTypeManager = (
                         };
                     }
 
-                    const processJss = (items: Constraint<JigsawPTM, any>[]) => [
-                        ...items.map((constraint) =>
-                            constraint.tags?.includes(jssTag)
-                                ? { ...constraint, component: { [FieldLayer.noClip]: JigsawJss } }
-                                : constraint,
-                        ),
-                        JigsawGluedPiecesConstraint,
-                    ];
-
-                    const { items, inactiveCells, resultChecker } = puzzle;
+                    const { inactiveCells, resultChecker } = puzzle;
 
                     // Mark all cells that don't belong to a region as inactive
                     let newInactiveCells = new PositionSet(inactiveCells);
@@ -471,16 +467,21 @@ export const JigsawSudokuTypeManager = (
                             }
                         }
                     }
-                    puzzle = { ...puzzle, inactiveCells: newInactiveCells.items };
-
-                    switch (typeof items) {
-                        case "function":
-                            puzzle = { ...puzzle, items: (...args) => processJss(items(...args)) };
-                            break;
-                        case "object":
-                            puzzle = { ...puzzle, items: processJss(items) };
-                            break;
-                    }
+                    puzzle = {
+                        ...puzzle,
+                        inactiveCells: newInactiveCells.items,
+                        items: processPuzzleItems(
+                            (items) => [
+                                ...items.map((constraint) =>
+                                    constraint.tags?.includes(jssTag)
+                                        ? { ...constraint, component: { [FieldLayer.noClip]: JigsawJss } }
+                                        : constraint,
+                                ),
+                                JigsawGluedPiecesConstraint,
+                            ],
+                            puzzle.items,
+                        ),
+                    };
 
                     if (resultChecker) {
                         puzzle = {

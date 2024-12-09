@@ -4,7 +4,7 @@ import { CaterpillarPTM } from "./CaterpillarPTM";
 import { ZoomInButtonItem, ZoomOutButtonItem } from "../../../components/sudoku/controls/ZoomButton";
 import { CaterpillarPuzzleExtension } from "./CaterpillarPuzzleExtension";
 import { CaterpillarGrid } from "./CaterpillarGrid";
-import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { mergePuzzleItems, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import { isCellInRect } from "../../../types/layout/Rect";
 import { RulesParagraph } from "../../../components/sudoku/rules/RulesParagraph";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
@@ -73,15 +73,11 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
         postProcessPuzzle(puzzle): PuzzleDefinition<CaterpillarPTM<T>> {
             const grids = (puzzle.extension as CaterpillarPuzzleExtension)?.caterpillarGrids ?? [];
 
-            const { items = [] } = puzzle;
             const extraItems = grids.map((grid) => CaterpillarGridFocusConstraint<CaterpillarPTM<T>>(grid.bounds));
 
             return {
                 ...puzzle,
-                items:
-                    typeof items === "function"
-                        ? (context) => [...extraItems, ...items(context)]
-                        : [...extraItems, ...items],
+                items: mergePuzzleItems(extraItems, puzzle.items),
                 rules: (translate, context) => {
                     const selectedCells = context.selectedCells.items;
 

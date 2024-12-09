@@ -1,9 +1,8 @@
 import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { CellSelectionColor, CellSelectionByDataProps } from "../../../components/sudoku/cell/CellSelection";
 import { CubeTypeManager } from "../../cube/types/CubeTypeManager";
-import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { mergePuzzleItems, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import { CubedokuIndexingConstraint } from "../constraints/CubedokuIndexing";
-import { Constraint } from "../../../types/sudoku/Constraint";
 import { NumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 
 export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
@@ -86,15 +85,9 @@ export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
     },
 
     postProcessPuzzle({ items, ...puzzle }): PuzzleDefinition<NumberPTM> {
-        const addConstraint = (items: Constraint<NumberPTM, any>[]): Constraint<NumberPTM, any>[] => [
-            CubedokuIndexingConstraint(),
-            ...items,
-        ];
-
         return {
             ...puzzle,
-            items:
-                typeof items === "function" ? (context) => addConstraint(items(context)) : addConstraint(items ?? []),
+            items: mergePuzzleItems([CubedokuIndexingConstraint()], items),
         };
     },
 };

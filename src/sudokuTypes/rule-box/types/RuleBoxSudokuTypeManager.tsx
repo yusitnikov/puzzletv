@@ -4,11 +4,11 @@ import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { addGameStateExToSudokuManager } from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import { RuleBoxGameState } from "./RuleBoxGameState";
 import { ToRuleBoxPTM } from "./RuleBoxPTM";
-import { Constraint } from "../../../types/sudoku/Constraint";
 import { isCageConstraint } from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import { isRuleBoxConstraint, RuleBoxConstraint } from "../components/RuleBox";
 import { RulesParagraph } from "../../../components/sudoku/rules/RulesParagraph";
 import { ParsedRulesHtml } from "../../../components/sudoku/rules/ParsedRulesHtml";
+import { processPuzzleItems } from "../../../types/sudoku/PuzzleDefinition";
 
 const rulePrefix = "rule:";
 
@@ -27,29 +27,30 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
         postProcessPuzzle(puzzle) {
             puzzle = extendedTypeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 
-            const { items = [], importOptions: { htmlRules } = {} } = puzzle;
+            const { importOptions: { htmlRules } = {} } = puzzle;
 
             const rulesMap: Record<string, ReactNode> = {};
 
-            const processItems = (items: Constraint<ToRuleBoxPTM<T>, any>[]): Constraint<ToRuleBoxPTM<T>, any>[] =>
-                items.map((item) => {
-                    if (
-                        isCageConstraint(item) &&
-                        typeof item.props.sum === "string" &&
-                        item.props.sum.startsWith(rulePrefix)
-                    ) {
-                        const text = item.props.sum.substring(rulePrefix.length).trim();
-                        const html = htmlRules ? <ParsedRulesHtml>{text}</ParsedRulesHtml> : text;
-                        rulesMap[text] = html;
-                        return RuleBoxConstraint(item.cells, text, html);
-                    } else {
-                        return item;
-                    }
-                });
-
             puzzle = {
                 ...puzzle,
-                items: typeof items === "function" ? (...args) => processItems(items(...args)) : processItems(items),
+                items: processPuzzleItems(
+                    (items) =>
+                        items.map((item) => {
+                            if (
+                                isCageConstraint(item) &&
+                                typeof item.props.sum === "string" &&
+                                item.props.sum.startsWith(rulePrefix)
+                            ) {
+                                const text = item.props.sum.substring(rulePrefix.length).trim();
+                                const html = htmlRules ? <ParsedRulesHtml>{text}</ParsedRulesHtml> : text;
+                                rulesMap[text] = html;
+                                return RuleBoxConstraint(item.cells, text, html);
+                            } else {
+                                return item;
+                            }
+                        }),
+                    puzzle.items,
+                ),
             };
 
             const baseRules = puzzle.rules;

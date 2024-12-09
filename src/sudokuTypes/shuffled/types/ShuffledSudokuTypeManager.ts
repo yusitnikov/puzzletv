@@ -3,8 +3,8 @@ import { PuzzleImportOptions } from "../../../types/sudoku/PuzzleImportOptions";
 import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { JigsawPTM } from "../../jigsaw/types/JigsawPTM";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
-import { isStickyRegionCell, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
-import { Constraint, toDecorativeConstraint } from "../../../types/sudoku/Constraint";
+import { isStickyRegionCell, processPuzzleItems, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { toDecorativeConstraint } from "../../../types/sudoku/Constraint";
 import { RectConstraint } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { PositionSet } from "../../../types/layout/Position";
 
@@ -41,25 +41,22 @@ export const ShuffledSudokuTypeManager = (options: PuzzleImportOptions): SudokuT
         postProcessPuzzle(puzzle): PuzzleDefinition<JigsawPTM> {
             puzzle = baseTypeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 
-            const items = puzzle.items ?? [];
-            const processItems = (items: Constraint<JigsawPTM, any>[]): Constraint<JigsawPTM, any>[] => {
-                const constraintCells = items
-                    .flatMap((item) => item.cells)
-                    .filter((cell) => isStickyRegionCell(puzzle, cell));
-                const uniqueConstraintCells = new PositionSet(constraintCells).items;
-
-                return [
-                    ...items.map((item) => {
-                        const cell = item.cells[0];
-                        return cell && isStickyRegionCell(puzzle, cell) ? toDecorativeConstraint(item) : item;
-                    }),
-                    ...uniqueConstraintCells.map((cell) => RectConstraint([cell], 1, "rgba(224, 200, 200, 0.5)")),
-                ];
-            };
-
             return {
                 ...puzzle,
-                items: typeof items === "function" ? (...args) => processItems(items(...args)) : processItems(items),
+                items: processPuzzleItems((items) => {
+                    const constraintCells = items
+                        .flatMap((item) => item.cells)
+                        .filter((cell) => isStickyRegionCell(puzzle, cell));
+                    const uniqueConstraintCells = new PositionSet(constraintCells).items;
+
+                    return [
+                        ...items.map((item) => {
+                            const cell = item.cells[0];
+                            return cell && isStickyRegionCell(puzzle, cell) ? toDecorativeConstraint(item) : item;
+                        }),
+                        ...uniqueConstraintCells.map((cell) => RectConstraint([cell], 1, "rgba(224, 200, 200, 0.5)")),
+                    ];
+                }, puzzle.items),
             };
         },
     };

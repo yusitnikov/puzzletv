@@ -436,3 +436,18 @@ export const importSolutionColorsAsGiven = <T extends AnyPTM>(
         [solutionColors],
     );
 };
+
+export const processPuzzleItems = <T extends AnyPTM>(
+    processor: (...itemsArray: Constraint<T, any>[][]) => Constraint<T, any>[],
+    ...itemsArrays: PuzzleDefinition<T>["items"][]
+): PuzzleDefinition<T>["items"] => {
+    if (itemsArrays.some((items) => typeof items === "function")) {
+        return (context) =>
+            processor(...itemsArrays.map((items = []) => (typeof items === "function" ? items(context) : items)));
+    } else {
+        return processor(...itemsArrays.map((items = []) => items as Constraint<T, any>[]));
+    }
+};
+
+export const mergePuzzleItems = <T extends AnyPTM>(...itemsArrays: PuzzleDefinition<T>["items"][]) =>
+    processPuzzleItems((...itemsArray) => itemsArray.flat(), ...itemsArrays);

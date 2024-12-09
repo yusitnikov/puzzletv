@@ -5,7 +5,7 @@ import { getCellDataSortIndexes } from "../../../components/sudoku/cell/CellDigi
 import { PositionWithAngle } from "../../../types/layout/Position";
 import { defaultProcessArrowDirection, SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { CenteredCalculatorDigitComponentType } from "../../../components/sudoku/digit/CalculatorDigit";
-import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { processPuzzleItems, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import { isCageConstraint, KillerCageProps } from "../../../components/sudoku/constraints/killer-cage/KillerCage";
 import { ControlButtonRegion } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { RotateLeftButton, RotateRightButton } from "../components/RotateButton";
@@ -65,11 +65,11 @@ export const RotatableDigitSudokuTypeManagerBase = <T extends AnyPTM>(
         },
     ],
 
-    getInternalState(puzzle, { extension: { isStickyMode } }): any {
+    getInternalState(_puzzle, { extension: { isStickyMode } }): any {
         return { isStickyMode };
     },
 
-    unserializeInternalState(puzzle, { isStickyMode }: any) {
+    unserializeInternalState(_puzzle, { isStickyMode }: any) {
         return { extension: { isStickyMode } };
     },
 
@@ -207,21 +207,24 @@ export const RotatableDigitSudokuTypeManager = ({
                 return defaultProcessArrowDirection(currentCell, coeff * xDirection, coeff * yDirection, context);
             },
 
-            postProcessPuzzle({ items = [], ...puzzle }): PuzzleDefinition<RotatableDigitPTM> {
+            postProcessPuzzle(puzzle): PuzzleDefinition<RotatableDigitPTM> {
                 return {
                     ...puzzle,
-                    items: (context) =>
-                        (typeof items === "function" ? items(context) : items).map((item) =>
-                            isCageConstraint(item)
-                                ? {
-                                      ...item,
-                                      props: {
-                                          ...item.props,
-                                          showBottomSum: true,
-                                      } as KillerCageProps,
-                                  }
-                                : item,
-                        ),
+                    items: processPuzzleItems(
+                        (items) =>
+                            items.map((item) =>
+                                isCageConstraint(item)
+                                    ? {
+                                          ...item,
+                                          props: {
+                                              ...item.props,
+                                              showBottomSum: true,
+                                          } as KillerCageProps,
+                                      }
+                                    : item,
+                            ),
+                        puzzle.items,
+                    ),
                 };
             },
         },
