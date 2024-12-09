@@ -8,7 +8,7 @@ import {
 } from "../../../../types/layout/Position";
 import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
 import { Constraint, ConstraintProps } from "../../../../types/sudoku/Constraint";
-import { Fragment, ReactElement } from "react";
+import { ComponentType, Fragment, ReactElement } from "react";
 import { gameStateGetCurrentGivenDigitsByCells } from "../../../../types/sudoku/GameState";
 import { darkGreyColor } from "../../../app/globals";
 import { FieldCellBackground } from "../../cell/CellBackground";
@@ -27,12 +27,18 @@ import { settings } from "../../../../types/layout/Settings";
 
 export const fogTag = "fog";
 
-export interface FogProps<T extends AnyPTM> {
-    startCells?: Position[];
-    startCells3x3?: Position[];
-    bulbCells?: Position[];
+export interface FogRendererProps<T extends AnyPTM> {
+    context: PuzzleContext<T>;
+    shadowSize: number;
+}
+
+export interface FogProps<T extends AnyPTM, PositionT = Position> {
+    startCells?: PositionT[];
+    startCells3x3?: PositionT[];
+    bulbCells?: PositionT[];
     revealByCenterLines?: boolean | PuzzleLineSet<T>;
     revealByColors?: CellColor[] | GivenDigitsMap<CellColor>;
+    fogRenderer?: ComponentType<FogRendererProps<T>>;
 }
 
 const DarkReaderRectOverride = styled("rect")(({ fill }) => ({
@@ -123,15 +129,13 @@ export const Fog = {
     [FieldLayer.regular]: observer(function Fog<T extends AnyPTM>({ context, props }: ConstraintProps<T, FogProps<T>>) {
         profiler.trace();
 
-        const { bulbCells } = props;
+        const { bulbCells, fogRenderer: FogRenderer } = props;
 
         const {
             puzzle: {
                 fieldSize: { rowsCount, columnsCount },
             },
         } = context;
-
-        const visible = getFogVisibleCells(context, props);
 
         const id = useAutoIncrementId();
         const enableShadow = !settings.simplifiedGraphics.get();
@@ -157,22 +161,26 @@ export const Fog = {
                                 strokeWidth={0}
                             />
 
-                            {visible.flatMap((row, top) =>
-                                row.map(
-                                    (vis, left) =>
-                                        !vis && (
-                                            <Fragment key={`${top}-${left}`}>
-                                                <DarkReaderRectOverride
-                                                    y={top - shadowSize}
-                                                    x={left - shadowSize}
-                                                    width={1 + 2 * shadowSize}
-                                                    height={1 + 2 * shadowSize}
-                                                    fill={"#fff"}
-                                                    strokeWidth={0}
-                                                />
-                                            </Fragment>
-                                        ),
-                                ),
+                            {FogRenderer ? (
+                                <FogRenderer context={context} shadowSize={shadowSize} />
+                            ) : (
+                                getFogVisibleCells(context, props).flatMap((row, top) =>
+                                    row.map(
+                                        (vis, left) =>
+                                            !vis && (
+                                                <Fragment key={`${top}-${left}`}>
+                                                    <DarkReaderRectOverride
+                                                        y={top - shadowSize}
+                                                        x={left - shadowSize}
+                                                        width={1 + 2 * shadowSize}
+                                                        height={1 + 2 * shadowSize}
+                                                        fill={"#fff"}
+                                                        strokeWidth={0}
+                                                    />
+                                                </Fragment>
+                                            ),
+                                    ),
+                                )
                             )}
                         </g>
                     </mask>
@@ -266,22 +274,24 @@ const FogCellsBackground = observer(function FogCellsBackground<T extends AnyPTM
     );
 }) as <T extends AnyPTM>(props: FogCellsBackgroundProps<T>) => ReactElement;
 
-export const FogConstraint = <T extends AnyPTM>(
-    startCell3x3Literals: PositionLiteral[] = [],
-    startCellLiterals: PositionLiteral[] = [],
-    bulbCellLiterals = startCell3x3Literals,
-    revealByCenterLines: boolean | PuzzleLineSet<T> = false,
-    revealByColors: CellColor[] | GivenDigitsMap<CellColor> = {},
-): Constraint<T, FogProps<T>> => ({
+export const FogConstraint = <T extends AnyPTM>({
+    startCells3x3 = [],
+    startCells = [],
+    bulbCells = startCells3x3,
+    revealByCenterLines = false,
+    revealByColors = {},
+    ...other
+}: FogProps<T, PositionLiteral> = {}): Constraint<T, FogProps<T>> => ({
     name: "fog",
     tags: [fogTag],
     cells: [],
     props: {
-        startCells3x3: parsePositionLiterals(startCell3x3Literals),
-        startCells: parsePositionLiterals(startCellLiterals),
-        bulbCells: parsePositionLiterals(bulbCellLiterals),
+        startCells3x3: parsePositionLiterals(startCells3x3),
+        startCells: parsePositionLiterals(startCells),
+        bulbCells: parsePositionLiterals(bulbCells),
         revealByCenterLines,
         revealByColors,
+        ...other,
     },
     component: Fog,
     noPencilmarkCheck: true,

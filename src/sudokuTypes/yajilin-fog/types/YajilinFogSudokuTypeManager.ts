@@ -80,15 +80,15 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                         const { startCells3x3, startCells, bulbCells } = props as FogProps<T>;
 
                         items.push(
-                            FogConstraint(
-                                startCells3x3,
-                                startCells,
-                                bulbCells,
-                                yajilinFogLineSolution.size ? yajilinFogLineSolution : true,
-                                Object.keys(yajilinFogShadeSolution).length
+                            FogConstraint({
+                                startCells3x3: startCells3x3,
+                                startCells: startCells,
+                                bulbCells: bulbCells,
+                                revealByCenterLines: yajilinFogLineSolution.size ? yajilinFogLineSolution : true,
+                                revealByColors: Object.keys(yajilinFogShadeSolution).length
                                     ? yajilinFogShadeSolution
                                     : [CellColor.black],
-                            ),
+                            }),
                         );
 
                         continue;

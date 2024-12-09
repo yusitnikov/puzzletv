@@ -319,11 +319,11 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.puzzle.prioritizeSelection = true;
 
         this.addItems(
-            FogConstraint(
-                gridParser.offsetCoordsArray(startCell3x3Literals),
-                gridParser.offsetCoordsArray(startCellLiterals),
-                gridParser.offsetCoordsArray(bulbCellLiterals),
-            ),
+            FogConstraint({
+                startCells3x3: gridParser.offsetCoordsArray(startCell3x3Literals),
+                startCells: gridParser.offsetCoordsArray(startCellLiterals),
+                bulbCells: gridParser.offsetCoordsArray(bulbCellLiterals),
+            }),
         );
     }
 

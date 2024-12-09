@@ -81,7 +81,10 @@ export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
         [8, 6, 4, 7, 1, 2, 5, 9, 3],
         [3, 2, 1, 8, 9, 5, 6, 7, 4],
     ]),
-    items: [...(LumosMaximaNoFog.items as Constraint<NumberPTM, any>[]), FogConstraint(["R2C2", "R8C7"])],
+    items: [
+        ...(LumosMaximaNoFog.items as Constraint<NumberPTM, any>[]),
+        FogConstraint({ startCells3x3: ["R2C2", "R8C7"] }),
+    ],
     rules: (translate, context) => (
         <>
             {LumosMaximaNoFog.rules!(translate, context)}
