@@ -73,6 +73,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     resultChecker?: (
         context: PuzzleContext<T>,
     ) => boolean | PuzzleResultCheck<ReactNode | PartiallyTranslatable<ReactNode>>;
+    allowEmptyCells?: boolean;
     forceAutoCheckOnFinish?: boolean;
     items?: Constraint<T, any>[] | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
     borderColor?: string;

@@ -163,6 +163,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
         digitsCount,
         fieldSize: { rowsCount, columnsCount },
         importOptions: { stickyRegion, noStickyRegionValidation } = {},
+        allowEmptyCells,
     } = puzzle;
     const constraints = context.allItems;
 
@@ -198,10 +199,15 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
                         }
                     }
 
-                    return (
-                        !isSelectableCell(puzzleIndex.getCellTypeProps(position)) ||
-                        (digit !== undefined && isValidUserDigit(position, context.userDigits, context, true))
-                    );
+                    if (!isSelectableCell(puzzleIndex.getCellTypeProps(position))) {
+                        return true;
+                    }
+
+                    if (digit === undefined) {
+                        return allowEmptyCells;
+                    }
+
+                    return isValidUserDigit(position, context.userDigits, context, true);
                 }),
             )) &&
         getInvalidUserLines(context, true).size === 0;

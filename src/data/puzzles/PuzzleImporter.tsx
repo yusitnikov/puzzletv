@@ -1022,6 +1022,7 @@ export class PuzzleImporter<T extends AnyPTM> {
 
         if (Object.keys(this.puzzle.solution ?? {}).length || Object.keys(this.puzzle.solutionColors ?? {}).length) {
             this.puzzle.resultChecker = isValidFinishedPuzzleByEmbeddedSolution;
+            this.puzzle.allowEmptyCells = true;
         }
 
         if (this.importOptions.splitUnconnectedRegions) {
