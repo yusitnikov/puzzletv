@@ -10,7 +10,7 @@ import { RotatableClue } from "./RotatableCluesPuzzleExtension";
 import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/sudoku/Constraint";
 import {
     DecorativeShapeProps,
-    ellipseTag,
+    isEllipse,
 } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
 import { RotatableClueConstraint } from "../constraints/RotatableClue";
@@ -280,7 +280,7 @@ export const ImportedRotatableCluesSudokuTypeManager = <T extends AnyPTM>(
                 const isPivot = (
                     item: Constraint<RotatableCluesPTM<T>, any>,
                 ): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
-                    !!item.tags?.includes(ellipseTag) &&
+                    isEllipse(item) &&
                     item.cells.length === 1 &&
                     item.cells[0].top % 0.5 === 0 &&
                     item.cells[0].left % 0.5 === 0;

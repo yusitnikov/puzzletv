@@ -8,7 +8,7 @@ import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManag
 import { emptyPosition, Position } from "../../../types/layout/Position";
 import { Constraint } from "../../../types/sudoku/Constraint";
 import { isCageConstraint } from "../../../components/sudoku/constraints/killer-cage/KillerCage";
-import { cosmeticTag, ellipseTag } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import { cosmeticTag, isEllipse } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { SokobanClueConstraint, sokobanTag } from "../constraints/SokobanClue";
 import { SokobanPlayerConstraint } from "../constraints/SokobanPlayer";
 import { moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo } from "./SokobanMovePlayerCellWriteModeInfo";
@@ -109,8 +109,7 @@ export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTy
 
         const isSokobanClue = (item: Constraint<SokobanPTM, any>) =>
             item.tags?.includes(sokobanTag) || isCageConstraint(item);
-        const isSokobanPlayer = ({ tags, cells: { length } }: Constraint<SokobanPTM, any>) =>
-            tags?.includes(ellipseTag) && length === 1;
+        const isSokobanPlayer = (item: Constraint<SokobanPTM, any>) => isEllipse(item) && item.cells.length === 1;
         const sokobanPlayer = items.find(isSokobanPlayer);
         if (!sokobanPlayer) {
             throw new Error("Didn't find the sokoban player start position");

@@ -44,6 +44,7 @@ import { RuleBoxSudokuTypeManager } from "../../sudokuTypes/rule-box/types/RuleB
 import { CaterpillarSudokuTypeManager } from "../../sudokuTypes/caterpillar/types/CaterpillarSudokuTypeManager";
 import { FPuzzlesGridParserFactory } from "./FPuzzles";
 import { SudokuMakerGridParserFactory } from "./SudokuMaker";
+import { SlideAndSeekTypeManager } from "../../sudokuTypes/slide-and-seek/types/SlideAndSeekTypeManager";
 
 const getGridParsersByImportOptions = <T extends AnyPTM>(
     importOptions: PuzzleImportOptions,
@@ -87,6 +88,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
 
     const {
         tesseract,
+        slideAndSeek,
         yajilinFog,
         fogStars,
         fillableDigitalDisplay,
@@ -139,6 +141,9 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     }
     if (tesseract) {
         typeManager = TesseractSudokuTypeManager(typeManager);
+    }
+    if (slideAndSeek) {
+        typeManager = SlideAndSeekTypeManager(typeManager);
     }
     if (yajilinFog) {
         typeManager = YajilinFogSudokuTypeManager(typeManager);

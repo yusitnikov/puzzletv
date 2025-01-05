@@ -49,6 +49,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     htmlRules?: boolean;
     digitsCount?: number;
     tesseract?: boolean;
+    slideAndSeek?: boolean;
     fillableQuads?: boolean;
     find3?: boolean;
     giftsInSight?: boolean;
@@ -120,6 +121,7 @@ export const sanitizeImportOptions = (
         digitType,
         htmlRules,
         tesseract,
+        slideAndSeek,
         fillableQuads,
         find3,
         giftsInSight,
@@ -178,6 +180,7 @@ export const sanitizeImportOptions = (
         digitType,
         htmlRules,
         tesseract,
+        slideAndSeek,
         fillableQuads,
         find3,
         giftsInSight,

@@ -100,6 +100,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [allowOverrideColors, setAllowOverrideColors] = useBoolFromLocalStorage("fpwAllowOverrideColors");
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
+    const [slideAndSeek, setSlideAndSeek] = useBoolFromLocalStorage("fpwSlideAndSeek");
     const [fillableQuads, setFillableQuads] = useBoolFromLocalStorage("fpwFillableQuads");
     const [find3, setFind3] = useBoolFromLocalStorage("fpwFind3");
     const [giftsInSight, setGiftsInSight] = useBoolFromLocalStorage("fpwGiftsInSight");
@@ -241,6 +242,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         sokoban: !isSpecialGrid && sokoban,
         eggs: !isSpecialGrid && sokoban && eggs,
         tesseract: !isSpecialGrid && tesseract,
+        slideAndSeek: !isSpecialGrid && slideAndSeek,
         fillableQuads: !isSpecialGrid && fillableQuads,
         find3,
         giftsInSight: find3 && giftsInSight,
@@ -570,6 +572,17 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                             type={"checkbox"}
                                             checked={tesseract}
                                             onChange={(ev) => setTesseract(ev.target.checked)}
+                                        />
+                                    </label>
+                                </Paragraph>
+
+                                <Paragraph>
+                                    <label>
+                                        Slide & Seek:&nbsp;
+                                        <input
+                                            type={"checkbox"}
+                                            checked={slideAndSeek}
+                                            onChange={(ev) => setSlideAndSeek(ev.target.checked)}
                                         />
                                     </label>
                                 </Paragraph>

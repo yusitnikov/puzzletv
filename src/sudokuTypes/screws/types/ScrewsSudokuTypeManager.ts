@@ -6,8 +6,7 @@ import { ScrewsPTM } from "./ScrewsPTM";
 import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { Screw, ScrewsPuzzleExtension } from "./ScrewsPuzzleExtension";
-import { Constraint } from "../../../types/sudoku/Constraint";
-import { DecorativeShapeProps, rectTag } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+import { isRect } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { settings } from "../../../types/layout/Settings";
 import { Rect } from "../../../types/layout/Rect";
 import { indexes } from "../../../utils/indexes";
@@ -194,9 +193,7 @@ export const ImportedScrewsSudokuTypeManager = <T extends AnyPTM>(baseTypeManage
         const { items } = puzzle;
 
         if (Array.isArray(items)) {
-            const isScrew = (
-                item: Constraint<ScrewsPTM<T>, any>,
-            ): item is Constraint<ScrewsPTM<T>, DecorativeShapeProps> => !!item.tags?.includes(rectTag);
+            const isScrew = isRect;
 
             const screws = items.filter(isScrew).map(({ cells, props: { width, height } }): Rect => {
                 const center = getAveragePosition(cells);

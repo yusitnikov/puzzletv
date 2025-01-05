@@ -222,3 +222,9 @@ export const CosmeticArrowConstraint = <T extends AnyPTM>(
         textColor,
         angle,
     );
+
+export const isRect = <T extends AnyPTM>(item: Constraint<T, any>): item is Constraint<T, DecorativeShapeProps> =>
+    item.tags?.includes(rectTag) ?? false;
+
+export const isEllipse = <T extends AnyPTM>(item: Constraint<T, any>): item is Constraint<T, DecorativeShapeProps> =>
+    item.tags?.includes(ellipseTag) ?? false;
