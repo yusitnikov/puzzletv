@@ -15,6 +15,8 @@ import { parseColorWithOpacity } from "../../../../utils/color";
 
 export const cosmeticTag = "cosmetic";
 
+export const defaultCosmeticShapeBorderWidth = 0.03;
+
 export interface DecorativeShapeProps extends Size {
     borderColor?: string;
     text?: string;
@@ -34,7 +36,14 @@ export const DecorativeShapeComponent = <T extends AnyPTM>(
             },
         },
         cells,
-        props: { width, height, borderColor, borderWidth = 0.03, text, textColor: textC = textColor },
+        props: {
+            width,
+            height,
+            borderColor,
+            borderWidth = defaultCosmeticShapeBorderWidth,
+            text,
+            textColor: textC = textColor,
+        },
         color: backgroundColor = "none",
         angle = 0,
     }: ConstraintProps<T, DecorativeShapeProps>) {
