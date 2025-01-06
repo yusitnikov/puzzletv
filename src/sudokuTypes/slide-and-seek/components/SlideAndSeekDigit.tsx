@@ -34,6 +34,32 @@ export const SlideAndSeekDigitSvgContent = observer(function SlideAndSeekDigitSv
 }: DigitProps<SlideAndSeekPTM<T>>) {
     profiler.trace();
 
+    if (digit === 0) {
+        size *= 0.7;
+        const strokeWidth = size * defaultCosmeticShapeBorderWidth;
+
+        return (
+            <g transform={`translate(${left}px, ${top}px)`}>
+                <line
+                    x1={-size / 2}
+                    y1={-size / 2}
+                    x2={size / 2}
+                    y2={size / 2}
+                    stroke={color}
+                    strokeWidth={strokeWidth}
+                />
+                <line
+                    x1={-size / 2}
+                    y1={size / 2}
+                    x2={size / 2}
+                    y2={-size / 2}
+                    stroke={color}
+                    strokeWidth={strokeWidth}
+                />
+            </g>
+        );
+    }
+
     const constraint = (puzzle.extension as SlideAndSeekPuzzleExtension).shapes[digit - 1];
     if (!constraint) {
         return null;

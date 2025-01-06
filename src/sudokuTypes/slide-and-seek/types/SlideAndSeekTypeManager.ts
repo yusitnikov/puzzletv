@@ -63,7 +63,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
 
             return {
                 ...puzzle,
-                supportZero: false,
+                supportZero: true,
                 digitsCount: shapes.length,
                 items: newItems,
                 extension: {
