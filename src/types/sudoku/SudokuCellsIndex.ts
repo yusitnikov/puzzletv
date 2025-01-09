@@ -261,7 +261,8 @@ export class SudokuCellsIndex<T extends AnyPTM> {
 
                     let remainingLength = length / 2;
                     let center = start;
-                    for (const { lineStart, lineVector, lineLength } of multiLine) {
+                    let centerIndex = 0;
+                    for (const [lineIndex, { lineStart, lineVector, lineLength }] of multiLine.entries()) {
                         if (!lineLength) {
                             continue;
                         }
@@ -276,6 +277,7 @@ export class SudokuCellsIndex<T extends AnyPTM> {
                             top: lineStart.top + coeff * lineVector.top,
                             left: lineStart.left + coeff * lineVector.left,
                         };
+                        centerIndex = lineIndex;
                         break;
                     }
 
@@ -288,6 +290,10 @@ export class SudokuCellsIndex<T extends AnyPTM> {
                         this.allCells[cell.top][cell.left].borderSegments[lineKey] = {
                             line,
                             center,
+                            halves: [
+                                [...line.slice(0, centerIndex + 1), center],
+                                [center, ...line.slice(centerIndex + 1)],
+                            ],
                             neighbors: cells.remove(cell),
                         };
                     }
@@ -633,6 +639,7 @@ export interface SudokuCellBorderInfo {
 export interface SudokuCellBorderSegmentInfo {
     line: Position[];
     center: Position;
+    halves: [Position[], Position[]];
     neighbors: SetInterface<Position>;
 }
 

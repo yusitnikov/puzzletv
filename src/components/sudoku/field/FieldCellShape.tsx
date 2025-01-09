@@ -10,16 +10,20 @@ import { profiler } from "../../../utils/profiler";
 
 interface FieldCellShapeProps<T extends AnyPTM>
     extends Partial<Rect>,
-        Omit<SVGAttributes<SVGRectElement | SVGPolygonElement | SVGPolylineElement>, keyof Rect> {
+        Omit<SVGAttributes<SVGRectElement | SVGPolygonElement | SVGPolylineElement | SVGEllipseElement>, keyof Rect> {
     context?: PuzzleContext<T>;
     cellPosition?: Position;
     line?: Position[];
+    polygon?: Position[];
+    point?: Position;
 }
 
 export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPTM>({
     context,
     cellPosition,
     line,
+    polygon,
+    point,
     left = 0,
     top = 0,
     width = 1,
@@ -68,6 +72,39 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
                         ...props.style,
                         pointerEvents: "stroke",
                     }}
+                />
+            </AutoSvg>
+        );
+    }
+
+    if (polygon) {
+        return (
+            <AutoSvg clip={<FieldCellShape context={context} cellPosition={cellPosition} />}>
+                <polygon
+                    points={formatSvgPointsArray(polygon)}
+                    fill={"none"}
+                    stroke={"none"}
+                    strokeWidth={0}
+                    opacity={0.5}
+                    {...props}
+                />
+            </AutoSvg>
+        );
+    }
+
+    if (point) {
+        return (
+            <AutoSvg clip={<FieldCellShape context={context} cellPosition={cellPosition} />}>
+                <ellipse
+                    cx={point.left}
+                    cy={point.top}
+                    rx={width}
+                    ry={height}
+                    fill={"none"}
+                    stroke={"none"}
+                    strokeWidth={0}
+                    opacity={0.5}
+                    {...props}
                 />
             </AutoSvg>
         );

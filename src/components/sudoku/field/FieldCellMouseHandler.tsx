@@ -1,4 +1,4 @@
-import { Position } from "../../../types/layout/Position";
+import { getLineVector, getVectorLength, Position, stringifyPosition } from "../../../types/layout/Position";
 import { Rect } from "../../../types/layout/Rect";
 import { globalPaddingCoeff } from "../../app/globals";
 import { indexes } from "../../../utils/indexes";
@@ -77,6 +77,24 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
 
     const { areCustomBounds, center, borderSegments } = puzzleIndex.allCells[top][left];
 
+    const getCornersMap = () => {
+        const cornersMap: Record<string, { corner: Position; length: number }> = {};
+        for (const { line } of Object.values(borderSegments)) {
+            const start = line[0],
+                end = line[line.length - 1];
+            const startKey = stringifyPosition(start),
+                endKey = stringifyPosition(end);
+            const length = getVectorLength(getLineVector({ start, end }));
+
+            const startCorner = (cornersMap[startKey] ??= { corner: start, length: length });
+            startCorner.length = Math.min(startCorner.length, length);
+
+            const endCorner = (cornersMap[endKey] ??= { corner: end, length: length });
+            endCorner.length = Math.min(endCorner.length, length);
+        }
+        return cornersMap;
+    };
+
     const cellPosition = useMemo((): Position => ({ top, left }), [top, left]);
 
     const centerExactPosition = useMemo(
@@ -136,35 +154,61 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
 
                     {areCustomBounds && (
                         <>
-                            <MouseHandlerRect
-                                key={"draw-center"}
-                                context={context}
-                                cellPosition={cellPosition}
-                                cellExactPosition={centerExactPosition}
-                                regionIndex={regionIndex}
-                                handlers={handlers}
-                            />
+                            {Object.entries(borderSegments).flatMap(([key, { line, halves, center: borderCenter }]) =>
+                                halves.flatMap((half, halfIndex) => {
+                                    const corner = line[halfIndex ? line.length - 1 : 0];
 
-                            {Object.entries(borderSegments).map(([key, { line, center: borderCenter }]) => {
-                                const exactPosition: CellExactPosition = {
-                                    center,
-                                    corner: cellPosition,
-                                    round: borderCenter,
-                                    type: CellPart.border,
-                                };
+                                    return [
+                                        <MouseHandlerRect
+                                            key={`draw-center-segment-${key}-${halfIndex}`}
+                                            context={context}
+                                            cellPosition={cellPosition}
+                                            cellExactPosition={{
+                                                center,
+                                                corner,
+                                                round: center,
+                                                type: CellPart.center,
+                                            }}
+                                            regionIndex={regionIndex}
+                                            polygon={[...half, center]}
+                                            handlers={handlers}
+                                        />,
+                                        <MouseHandlerRect
+                                            key={`draw-border-${key}-${halfIndex}`}
+                                            context={context}
+                                            cellPosition={cellPosition}
+                                            cellExactPosition={{
+                                                center,
+                                                corner,
+                                                round: borderCenter,
+                                                type: CellPart.border,
+                                            }}
+                                            regionIndex={regionIndex}
+                                            line={half}
+                                            handlers={handlers}
+                                        />,
+                                    ];
+                                }),
+                            )}
 
-                                return (
-                                    <MouseHandlerRect
-                                        key={`draw-border-${key}`}
-                                        context={context}
-                                        cellPosition={cellPosition}
-                                        cellExactPosition={exactPosition}
-                                        regionIndex={regionIndex}
-                                        line={line}
-                                        handlers={handlers}
-                                    />
-                                );
-                            })}
+                            {Object.entries(getCornersMap()).map(([key, { corner, length }]) => (
+                                <MouseHandlerRect
+                                    key={`draw-corner-${key}`}
+                                    context={context}
+                                    cellPosition={cellPosition}
+                                    cellExactPosition={{
+                                        center,
+                                        corner,
+                                        round: corner,
+                                        type: CellPart.corner,
+                                    }}
+                                    regionIndex={regionIndex}
+                                    point={corner}
+                                    width={0.25 * length}
+                                    height={0.25 * length}
+                                    handlers={handlers}
+                                />
+                            ))}
                         </>
                     )}
                 </>
@@ -213,6 +257,8 @@ interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
     cellExactPosition: CellExactPosition;
     regionIndex?: number;
     line?: Position[];
+    polygon?: Position[];
+    point?: Position;
     handlers: GestureHandler<any>[];
     skipEnter?: boolean;
 }
@@ -222,10 +268,9 @@ const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>({
     cellPosition,
     cellExactPosition,
     regionIndex,
-    line,
     handlers,
     skipEnter,
-    ...rect
+    ...other
 }: MouseHandlerRectProps<T>) {
     profiler.trace();
 
@@ -233,7 +278,6 @@ const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>({
         <FieldCellShape
             context={context}
             cellPosition={cellPosition}
-            line={line}
             style={{
                 cursor: "pointer",
                 pointerEvents: "all",
@@ -256,7 +300,7 @@ const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>({
                     }),
                 ),
             )}
-            {...rect}
+            {...other}
         />
     );
 }) as <T extends AnyPTM>(props: MouseHandlerRectProps<T>) => ReactElement;
