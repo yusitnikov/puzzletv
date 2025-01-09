@@ -151,11 +151,9 @@ export class PuzzleImporter<T extends AnyPTM> {
     private cosmeticsLayer(gridParser: GridParser<T, any>, beforeLines = false) {
         const { rotatableClues, keepCircles, cosmeticsBehindFog } = this.finalImportOptions(gridParser);
 
-        return rotatableClues && keepCircles
+        return (rotatableClues && keepCircles) || beforeLines || cosmeticsBehindFog
             ? FieldLayer.beforeSelection
-            : beforeLines || cosmeticsBehindFog
-              ? FieldLayer.regular
-              : FieldLayer.afterLines;
+            : FieldLayer.afterLines;
     }
 
     addGrid<JsonT>(gridParser: GridParser<T, JsonT>) {
