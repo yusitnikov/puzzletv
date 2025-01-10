@@ -35,6 +35,7 @@ import {
     MisterFantasticSource,
 } from "../../data/puzzles/InfinityLoop";
 import { OpenInNew } from "@emotion-icons/material";
+import { Cornered } from "../../data/puzzles/SlideAndSeek";
 
 export const HowToImport = observer(function HowToImport() {
     profiler.trace();
@@ -656,6 +657,40 @@ export const HowToImport = observer(function HowToImport() {
                                         [LanguageCode.en]: "Cages are currently not supported",
                                         [LanguageCode.ru]: "Клетки в настоящее время не поддерживаются",
                                         [LanguageCode.de]: "Käfige werden derzeit nicht unterstützt",
+                                    })}
+                                    .
+                                </p>
+                            </>
+                        ),
+                    },
+                    {
+                        id: "slide-and-seek",
+                        title: (
+                            <ExampleTab title={translate({ [LanguageCode.en]: "Slide & Seek" })} puzzle={Cornered} />
+                        ),
+                        contents: (
+                            <>
+                                <p>
+                                    {translate(selectGridTypeTranslation("Regular"))}.<br />
+                                    {translate(selectAdditionalConstraintTranslation("Slide & Seek"))}.<br />
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            "Use cosmetic shapes and lines for initial shape placement and borders",
+                                        [LanguageCode.ru]:
+                                            "Используйте косметические фигуры и линии для первоначального размещения фигур и границ",
+                                        [LanguageCode.de]:
+                                            "Verwenden Sie kosmetische Formen und Linien für die anfängliche Formplatzierung und Grenzen",
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]: "Use given digits for the given length of the shape's path",
+                                        [LanguageCode.ru]: "Используйте данные цифры для указанной длины пути фигуры",
+                                        [LanguageCode.de]:
+                                            "Benutze die angegebenen Ziffern für die angegebene Länge des Pfades der Form",
                                     })}
                                     .
                                 </p>

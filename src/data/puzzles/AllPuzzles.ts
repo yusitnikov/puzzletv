@@ -59,6 +59,7 @@ import { EndlessChristmas } from "./EndlessChristmas";
 import { CaterpillarPoc } from "./Caterpillar";
 import { PeaucellierLipkinLinkage } from "./PeaucellierLipkinLinkage";
 import { JsTest } from "./JsTest";
+import { Cornered, SlideAndSeekExample, SlideAndSeekIntro, TheBlackSheep, TheGap, WaxOnWaxOff } from "./SlideAndSeek";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -87,6 +88,12 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    SlideAndSeekExample,
+    SlideAndSeekIntro,
+    TheBlackSheep,
+    TheGap,
+    Cornered,
+
     JsTest,
 
     PeaucellierLipkinLinkage,
@@ -156,6 +163,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    WaxOnWaxOff,
+
     EndlessChristmas,
 
     EasterSokoban,
