@@ -39,7 +39,7 @@ export const SlideAndSeekDigitSvgContent = observer(function SlideAndSeekDigitSv
         const strokeWidth = size * defaultCosmeticShapeBorderWidth;
 
         return (
-            <g transform={`translate(${left}px, ${top}px)`}>
+            <g transform={`translate(${left} ${top})`}>
                 <line
                     x1={-size / 2}
                     y1={-size / 2}
