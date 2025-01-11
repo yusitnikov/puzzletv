@@ -3,14 +3,15 @@ import { DecorativeShapeProps } from "../../../components/sudoku/constraints/dec
 import { Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
 import { observer } from "mobx-react-lite";
 import { ComponentType } from "react";
-import { isSamePosition, PositionSet } from "../../../types/layout/Position";
+import { isSamePosition } from "../../../types/layout/Position";
+import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
+import { SlideAndSeekShape } from "../types/SlideAndSeekShape";
 
 const SlidableShapeComponent = <T extends AnyPTM>(
     BaseComponent: ComponentType<ConstraintProps<T, DecorativeShapeProps>>,
-    getAllSlidableCells: () => PositionSet,
+    allGivenShapes: GivenDigitsMap<SlideAndSeekShape>,
 ) =>
     observer(function SlidableShapeComponent({ cells: [cell], ...props }: ConstraintProps<T, DecorativeShapeProps>) {
-        const allSlidableCells = getAllSlidableCells();
         cell = { top: cell.top + 0.5, left: cell.left + 0.5 };
 
         let endPoint = cell;
@@ -21,7 +22,11 @@ const SlidableShapeComponent = <T extends AnyPTM>(
             }
 
             // Check that the line doesn't contain other slidable shapes
-            if (segment.points.some((point) => !isSamePosition(point, cell) && allSlidableCells.contains(point))) {
+            if (
+                segment.points.some(
+                    (point) => !isSamePosition(point, cell) && allGivenShapes[point.top - 0.5]?.[point.left - 0.5],
+                )
+            ) {
                 continue;
             }
 
@@ -55,13 +60,13 @@ const SlidableShapeComponent = <T extends AnyPTM>(
 
 export const SlidableShapeConstraint = <T extends AnyPTM>(
     baseConstraint: Constraint<T, DecorativeShapeProps>,
-    getAllSlidableCells: () => PositionSet,
+    allGivenShapes: GivenDigitsMap<SlideAndSeekShape>,
 ): Constraint<T, DecorativeShapeProps> => ({
     ...baseConstraint,
     component: Object.fromEntries(
         Object.entries(baseConstraint.component ?? {}).map(([layer, component]) => [
             layer,
-            SlidableShapeComponent(component, getAllSlidableCells),
+            SlidableShapeComponent(component, allGivenShapes),
         ]),
     ),
     renderSingleCellInUserArea: false,

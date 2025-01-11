@@ -68,3 +68,6 @@ export const LineConstraint = <T extends AnyPTM>(
         component: { [layer]: LineComponentInLayer },
     };
 };
+
+export const isLine = <T extends AnyPTM>(item: Constraint<T, any>): item is Constraint<T, LineProps> =>
+    item.tags?.includes(lineTag) ?? false;

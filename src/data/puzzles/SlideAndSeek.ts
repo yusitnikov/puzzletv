@@ -12,6 +12,7 @@ export const loadPuzzle = (
     loadPuzzle: () =>
         SudokuMaker.loadPuzzle({
             slideAndSeek: true,
+            noSpecialRules: true,
             load,
         } as PuzzleImportOptions),
     noIndex,

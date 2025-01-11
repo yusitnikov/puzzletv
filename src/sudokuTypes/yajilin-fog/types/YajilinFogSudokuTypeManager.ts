@@ -1,6 +1,6 @@
 import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { CellColor } from "../../../types/sudoku/CellColor";
-import { lineTag } from "../../../components/sudoku/constraints/line/Line";
+import { isLine } from "../../../components/sudoku/constraints/line/Line";
 import { PuzzleLineSet } from "../../../types/sudoku/PuzzleLineSet";
 import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/sudoku/GivenDigitsMap";
 import { indexes } from "../../../utils/indexes";
@@ -65,7 +65,7 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                 for (const item of originalItems) {
                     const { tags, color, cells, props } = item;
 
-                    if (tags?.includes(lineTag) && color === "#000000") {
+                    if (isLine(item) && color === "#000000") {
                         yajilinFogLineSolution = yajilinFogLineSolution.bulkAdd(
                             indexes(cells.length - 1).map((i) => ({
                                 start: cells[i],
