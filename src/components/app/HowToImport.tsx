@@ -677,6 +677,17 @@ export const HowToImport = observer(function HowToImport() {
                                 <p>
                                     {translate({
                                         [LanguageCode.en]:
+                                            'Check the "Verify the solution based on the conflict checker" flag in the "Miscellaneous" section if the puzzle does not have non-standard rules',
+                                        [LanguageCode.ru]:
+                                            "Установите флажок «Verify the solution based on the conflict checker» в разделе «Miscellaneous», если головоломка не имеет нестандартных правил",
+                                        [LanguageCode.de]:
+                                            'Aktivieren Sie das Kontrollkästchen "Verify the solution based on the conflict checker" im Abschnitt "Miscellaneous", wenn das Puzzle keine nicht standardmäßigen Regeln enthält',
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
                                             "Use cosmetic shapes and lines for initial shape placement and borders",
                                         [LanguageCode.ru]:
                                             "Используйте косметические фигуры и линии для первоначального размещения фигур и границ",
@@ -691,6 +702,17 @@ export const HowToImport = observer(function HowToImport() {
                                         [LanguageCode.ru]: "Используйте данные цифры для указанной длины пути фигуры",
                                         [LanguageCode.de]:
                                             "Benutze die angegebenen Ziffern für die angegebene Länge des Pfades der Form",
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            'Use white cosmetic lines to hide borders between "hole" cells',
+                                        [LanguageCode.ru]:
+                                            "Используйте белые косметические линии, чтобы спрятать границы между клетками-«дырками»",
+                                        [LanguageCode.de]:
+                                            'Verwenden Sie weiße kosmetische Linien, um Grenzen zwischen "Loch"-Zellen zu verbergen',
                                     })}
                                     .
                                 </p>
