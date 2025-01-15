@@ -9,31 +9,42 @@ import {
 import { SlidableShapeConstraint } from "../constraints/SlidableShape";
 import { Constraint } from "../../../types/sudoku/Constraint";
 import { SlideAndSeekPTM } from "./SlideAndSeekPTM";
-import { GivenDigitsMap, givenDigitsMapToArray } from "../../../types/sudoku/GivenDigitsMap";
+import { GivenDigitsMap, givenDigitsMapToArray, processGivenDigitsMaps } from "../../../types/sudoku/GivenDigitsMap";
 import { TextConstraint } from "../../../components/sudoku/constraints/text/Text";
 import { SlideAndSeekDigit, SlideAndSeekDigitSvgContent } from "../components/SlideAndSeekDigit";
 import { DigitCellDataComponentType } from "../../default/components/DigitCellData";
 import { SlideAndSeekValidationConstraint } from "../constraints/SlideAndSeekValidation";
 import { SlideAndSeekShape } from "./SlideAndSeekShape";
 import { isLine } from "../../../components/sudoku/constraints/line/Line";
-import { PositionSet } from "../../../types/layout/Position";
+import { Position, PositionSet } from "../../../types/layout/Position";
 import { indexes } from "../../../utils/indexes";
+import { ColorsImportMode } from "../../../types/sudoku/PuzzleImportOptions";
+import { PortalConstraint } from "../constraints/Portal";
+import { resolveCellColorValue } from "../../../types/sudoku/CellColor";
+import { PuzzleLine } from "../../../types/sudoku/PuzzleLine";
 
 export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
     baseTypeManager: SudokuTypeManager<T>,
 ): SudokuTypeManager<SlideAndSeekPTM<T>> => {
     const baseTypeManagerCast = baseTypeManager as unknown as SudokuTypeManager<SlideAndSeekPTM<T>>;
 
+    const extraPuzzleLines: PuzzleLine[] = [];
+
     return {
         ...baseTypeManagerCast,
+
+        colorsImportMode: ColorsImportMode.Initials,
 
         postProcessPuzzle(puzzle: PuzzleDefinition<SlideAndSeekPTM<T>>): typeof puzzle {
             puzzle = baseTypeManagerCast.postProcessPuzzle?.(puzzle) ?? puzzle;
 
-            const { items } = puzzle;
+            const { items, initialColors = {} } = puzzle;
 
             if (!Array.isArray(items)) {
                 throw new Error("Only array items are supported in SlideAndSeekTypeManager");
+            }
+            if (typeof initialColors !== "object") {
+                throw new Error("Only object initialColors are supported in SlideAndSeekTypeManager");
             }
 
             type ShapeConstraint = Constraint<SlideAndSeekPTM<T>, DecorativeShapeProps>;
@@ -92,7 +103,25 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                     constraint.pathLength = data;
                 }
             }
-            puzzle.initialDigits = undefined;
+
+            const portalsByPosition = processGivenDigitsMaps(
+                ([colors]) => (colors.length === 1 ? resolveCellColorValue(colors[0]) : undefined),
+                [initialColors],
+            );
+            let letterChar = "A".charCodeAt(0);
+            const portalsByColor: Record<string, { cells: Position[]; letter: string }> = {};
+            for (const { data: color, position } of givenDigitsMapToArray(portalsByPosition)) {
+                const portals = (portalsByColor[color] ??= { cells: [], letter: String.fromCharCode(letterChar++) });
+                portals.cells.push({ top: position.top + 0.5, left: position.left + 0.5 });
+                if (portals.cells.length === 2) {
+                    extraPuzzleLines.push({
+                        start: portals.cells[0],
+                        end: portals.cells[1],
+                    });
+                }
+
+                newItems.unshift(PortalConstraint(position, color, portals.letter));
+            }
 
             // Find regions isolated by given borders
             const { rowsCount, columnsCount } = puzzle.fieldSize;
@@ -145,6 +174,8 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                 supportZero: true,
                 allowEmptyCells: true,
                 digitsCount: shapes.length,
+                initialDigits: undefined,
+                initialColors: undefined,
                 items: newItems,
                 extension: {
                     ...puzzle.extension!,
@@ -152,6 +183,8 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                 },
             };
         },
+
+        getHiddenLines: () => extraPuzzleLines,
 
         cellDataComponentType: DigitCellDataComponentType(1),
         cellDataDigitComponentType: {

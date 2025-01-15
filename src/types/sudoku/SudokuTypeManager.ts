@@ -28,6 +28,7 @@ import { ColorsImportMode, PuzzleImportOptions } from "./PuzzleImportOptions";
 import { PuzzleImporter } from "../../data/puzzles/PuzzleImporter";
 import { GridParser } from "../../data/puzzles/GridParser";
 import { FieldState } from "./FieldState";
+import { PuzzleLine } from "./PuzzleLine";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
     /*
@@ -284,6 +285,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     disableFogDemo?: boolean | ((context: PuzzleContext<T>) => boolean);
 
     importOptionOverrides?: (context: PuzzleContext<T>) => Partial<PuzzleImportOptions>;
+
+    getHiddenLines?: (context: PuzzleContext<T>) => PuzzleLine[];
 }
 
 // region Helper functions

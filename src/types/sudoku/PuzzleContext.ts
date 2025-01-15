@@ -455,6 +455,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.currentFieldState.lines;
     }
 
+    get linesWithHiddenLines() {
+        profiler.trace();
+        return this.lines.bulkAdd(this.puzzle.typeManager.getHiddenLines?.(this) ?? []);
+    }
+
     get marks() {
         profiler.trace();
         return this.currentFieldState.marks;
@@ -779,7 +784,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     get centerLineSegments() {
         profiler.trace();
-        return this.puzzleIndex.getCenterLineSegments(this.lines.items);
+        return this.puzzleIndex.getCenterLineSegments(this.linesWithHiddenLines.items);
     }
 
     get isReady() {
