@@ -89,6 +89,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     const {
         tesseract,
         slideAndSeek,
+        slideAndSeekDigits,
         yajilinFog,
         fogStars,
         fillableDigitalDisplay,
@@ -143,7 +144,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         typeManager = TesseractSudokuTypeManager(typeManager);
     }
     if (slideAndSeek) {
-        typeManager = SlideAndSeekTypeManager(typeManager);
+        typeManager = SlideAndSeekTypeManager(typeManager, slideAndSeekDigits);
     }
     if (yajilinFog) {
         typeManager = YajilinFogSudokuTypeManager(typeManager);

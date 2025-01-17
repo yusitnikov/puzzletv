@@ -101,6 +101,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [fillableDigitalDisplay, setFillableDigitalDisplay] = useBoolFromLocalStorage("fpwFillableDigitalDisplay");
     const [tesseract, setTesseract] = useBoolFromLocalStorage("fpwTesseract");
     const [slideAndSeek, setSlideAndSeek] = useBoolFromLocalStorage("fpwSlideAndSeek");
+    const [slideAndSeekDigits, setSlideAndSeekDigits] = useBoolFromLocalStorage("fpwSlideAndSeekDigits");
     const [fillableQuads, setFillableQuads] = useBoolFromLocalStorage("fpwFillableQuads");
     const [find3, setFind3] = useBoolFromLocalStorage("fpwFind3");
     const [giftsInSight, setGiftsInSight] = useBoolFromLocalStorage("fpwGiftsInSight");
@@ -243,6 +244,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         eggs: !isSpecialGrid && sokoban && eggs,
         tesseract: !isSpecialGrid && tesseract,
         slideAndSeek: !isSpecialGrid && slideAndSeek,
+        slideAndSeekDigits: !isSpecialGrid && slideAndSeek && slideAndSeekDigits,
         fillableQuads: !isSpecialGrid && fillableQuads,
         find3,
         giftsInSight: find3 && giftsInSight,
@@ -585,6 +587,17 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                             onChange={(ev) => setSlideAndSeek(ev.target.checked)}
                                         />
                                     </label>
+                                    &nbsp;
+                                    {slideAndSeek && (
+                                        <label>
+                                            Allow entering digits:&nbsp;
+                                            <input
+                                                type={"checkbox"}
+                                                checked={slideAndSeekDigits}
+                                                onChange={(ev) => setSlideAndSeekDigits(ev.target.checked)}
+                                            />
+                                        </label>
+                                    )}
                                 </Paragraph>
 
                                 <Paragraph>

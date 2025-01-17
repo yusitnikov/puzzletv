@@ -25,12 +25,13 @@ import { PuzzleLine } from "../../../types/sudoku/PuzzleLine";
 
 export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
     baseTypeManager: SudokuTypeManager<T>,
+    allowDigits = false,
 ): SudokuTypeManager<SlideAndSeekPTM<T>> => {
     const baseTypeManagerCast = baseTypeManager as unknown as SudokuTypeManager<SlideAndSeekPTM<T>>;
 
     const extraPuzzleLines: PuzzleLine[] = [];
 
-    return {
+    let result: SudokuTypeManager<SlideAndSeekPTM<T>> = {
         ...baseTypeManagerCast,
 
         colorsImportMode: ColorsImportMode.Initials,
@@ -169,11 +170,17 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
 
             newItems.push(SlideAndSeekValidationConstraint(givenShapes, givenBorders, emptyCells));
 
+            if (!allowDigits) {
+                puzzle = {
+                    ...puzzle,
+                    allowEmptyCells: true,
+                    supportZero: true,
+                    digitsCount: shapes.length,
+                };
+            }
+
             return {
                 ...puzzle,
-                supportZero: true,
-                allowEmptyCells: true,
-                digitsCount: shapes.length,
                 initialDigits: undefined,
                 initialColors: undefined,
                 items: newItems,
@@ -185,12 +192,19 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
         },
 
         getHiddenLines: () => extraPuzzleLines,
-
-        cellDataComponentType: DigitCellDataComponentType(1),
-        cellDataDigitComponentType: {
-            component: SlideAndSeekDigit,
-            svgContentComponent: SlideAndSeekDigitSvgContent,
-            widthCoeff: 1,
-        },
     };
+
+    if (!allowDigits) {
+        result = {
+            ...result,
+            cellDataComponentType: DigitCellDataComponentType(1),
+            cellDataDigitComponentType: {
+                component: SlideAndSeekDigit,
+                svgContentComponent: SlideAndSeekDigitSvgContent,
+                widthCoeff: 1,
+            },
+        };
+    }
+
+    return result;
 };
