@@ -565,7 +565,6 @@ const Wrapper = observer(function SlitherlinkTestWrapper({
 const BordersCount = (index: number, count: number) => CellBorderLinesCountConstraint({ top: 0, left: index }, count);
 
 export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
-    noIndex: true,
     slug: "elephant-slitherlink",
     title: {
         [LanguageCode.en]: "Elephant slitherlink",
