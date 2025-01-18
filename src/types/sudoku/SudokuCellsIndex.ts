@@ -132,7 +132,7 @@ export class SudokuCellsIndex<T extends AnyPTM> {
                         const pointInfo = (this.realCellPointMap[pointKey] = this.realCellPointMap[pointKey] || {
                             position: point,
                             cells: new PuzzlePositionSet(puzzle),
-                            type: areCustomBounds ? CellPart.border : CellPart.corner,
+                            type: (puzzle.mergeGridLines ?? areCustomBounds) ? CellPart.border : CellPart.corner,
                             neighbors: new PuzzlePositionSet(puzzle),
                             diagonalNeighbors: new PuzzlePositionSet(puzzle),
                         });
