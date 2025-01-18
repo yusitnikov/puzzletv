@@ -48,6 +48,7 @@ import { PuzzleResultCheck } from "./PuzzleResultCheck";
 import { profiler } from "../../utils/profiler";
 import { getGridRegionCells, GridRegion } from "./GridRegion";
 import { PuzzleImportOptions } from "./PuzzleImportOptions";
+import { CellPart } from "./CellPart";
 
 const emptyObject = {};
 
@@ -785,7 +786,17 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     get centerLineSegments() {
         profiler.trace();
-        return this.puzzleIndex.getCenterLineSegments(this.linesWithHiddenLines.items);
+        return this.puzzleIndex.getLineSegmentsByType(this.linesWithHiddenLines.items, CellPart.center);
+    }
+
+    get borderLineSegments() {
+        profiler.trace();
+        return this.puzzleIndex.getLineSegmentsByType(this.linesWithHiddenLines.items, CellPart.border);
+    }
+
+    get cornerLineSegments() {
+        profiler.trace();
+        return this.puzzleIndex.getLineSegmentsByType(this.linesWithHiddenLines.items, CellPart.corner);
     }
 
     get isReady() {

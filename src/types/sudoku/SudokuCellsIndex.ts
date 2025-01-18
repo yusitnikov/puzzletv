@@ -364,6 +364,10 @@ export class SudokuCellsIndex<T extends AnyPTM> {
     }
 
     getCenterLines(lines: Line[], convertToCellPoints: boolean): Line[] {
+        return this.getLinesByType(lines, CellPart.center, convertToCellPoints);
+    }
+
+    getLinesByType(lines: Line[], type: CellPart, convertToCellPoints: boolean): Line[] {
         const linesWithPointInfo = lines
             .map(({ start, end }) => ({
                 start: {
@@ -375,7 +379,7 @@ export class SudokuCellsIndex<T extends AnyPTM> {
                     info: this.getPointInfo(end),
                 },
             }))
-            .filter(({ start: { info } }) => info?.type === CellPart.center);
+            .filter(({ start: { info } }) => info?.type === type);
 
         return linesWithPointInfo.map(({ start, end }) => ({
             start: convertToCellPoints ? start.info!.cells.first()! : start.point,
@@ -383,11 +387,11 @@ export class SudokuCellsIndex<T extends AnyPTM> {
         }));
     }
 
-    getCenterLineSegments(lines: Line[]): SudokuMultiLine[] {
+    getLineSegmentsByType(lines: Line[], type: CellPart): SudokuMultiLine[] {
         const map: Record<string, SetInterface<Position>> = {};
         let remainingPoints: SetInterface<Position> = new PuzzlePositionSet(this.puzzle);
 
-        for (const { start, end } of this.getCenterLines(lines, false)) {
+        for (const { start, end } of this.getLinesByType(lines, type, false)) {
             const startKey = this.getPositionHash(start);
             const endKey = this.getPositionHash(end);
 

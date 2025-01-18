@@ -12,6 +12,7 @@ import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import { loopRulesApply, tapCluesApply } from "../ruleSnippets";
 import { AnyNumberPTM, NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { roundToStep } from "../../utils/math";
+import { CellPart } from "../../types/sudoku/CellPart";
 
 export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
     fieldSize: number,
@@ -207,7 +208,7 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
         disableDiagonalCenterLines: true,
         disableDiagonalBorderLines: true,
         disableLineColors: true,
-        items: [LoopLineConstraint(), ...constraints],
+        items: [LoopLineConstraint(CellPart.center), ...constraints],
         resultChecker: isValidFinishedPuzzleByConstraints,
     };
 };
