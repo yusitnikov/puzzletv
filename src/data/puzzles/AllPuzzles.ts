@@ -60,7 +60,7 @@ import { CaterpillarPoc } from "./Caterpillar";
 import { PeaucellierLipkinLinkage } from "./PeaucellierLipkinLinkage";
 import { JsTest } from "./JsTest";
 import { Cornered, SlideAndSeekExample, SlideAndSeekIntro, TheBlackSheep, TheGap, WaxOnWaxOff } from "./SlideAndSeek";
-import { SlitherlinkTest } from "./Slitherlink";
+import { ElephantSlitherlink } from "./Slitherlink";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -89,7 +89,7 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
-    SlitherlinkTest,
+    ElephantSlitherlink,
 
     SlideAndSeekExample,
     SlideAndSeekIntro,

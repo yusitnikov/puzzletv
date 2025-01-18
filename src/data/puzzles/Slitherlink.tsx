@@ -15,6 +15,7 @@ import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constrain
 import { PropsWithChildren } from "react";
 import { PuzzleContextProps } from "../../types/sudoku/PuzzleContext";
 import { ZoomInButtonItem, ZoomOutButtonItem } from "../../components/sudoku/controls/ZoomButton";
+import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
 
 const scale = 0.01;
 const imageWidth = 1132,
@@ -563,18 +564,47 @@ const Wrapper = observer(function SlitherlinkTestWrapper({
 
 const BordersCount = (index: number, count: number) => CellBorderLinesCountConstraint({ top: 0, left: index }, count);
 
-export const SlitherlinkTest: PuzzleDefinition<NumberPTM> = {
+export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
-    slug: "slitherlink-test",
+    slug: "elephant-slitherlink",
     title: {
-        [LanguageCode.en]: "Slitherlink test",
+        [LanguageCode.en]: "Elephant slitherlink",
+        [LanguageCode.ru]: "Слон-slitherlink",
+        [LanguageCode.de]: "Elefanten-Rundweg",
     },
     author: {
         [LanguageCode.en]: "superrabbit",
     },
-    rules: () => (
+    rules: (translate) => (
         <>
-            <RulesParagraph>Rules text TBD...</RulesParagraph>
+            <RulesParagraph>
+                {translate({
+                    [LanguageCode.en]: "Slitherlink (irregular)",
+                    [LanguageCode.ru]: "Slitherlink (нестандартный)",
+                    [LanguageCode.de]: "Rundweg (irregulär)",
+                })}
+                :
+            </RulesParagraph>
+            <RulesUnorderedList>
+                <li>
+                    {translate({
+                        [LanguageCode.en]: "Draw a loop over dotted lines which does not branch or intersect itself",
+                        [LanguageCode.ru]:
+                            "Нарисуйте замкнутую линию над пунктирными линиями, которая не разветвляется и не пересекает сама себя",
+                        [LanguageCode.de]:
+                            "Zeichnen Sie eine Schleife über gepunktete Linien, die sich nicht verzweigt oder kreuzt",
+                    })}
+                    .
+                </li>
+                <li>
+                    {translate({
+                        [LanguageCode.en]: "Number clues show how many cell edges are used by the loop",
+                        [LanguageCode.ru]: "Числа в клетках показывают, сколько рёбер клеток используется на линии",
+                        [LanguageCode.de]: "Zahlenhinweise zeigen, wie viele Zellränder die Linie nutzt",
+                    })}
+                    .
+                </li>
+            </RulesUnorderedList>
         </>
     ),
     typeManager: {

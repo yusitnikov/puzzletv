@@ -325,14 +325,14 @@ export const littleKillerExplained: Translatable = {
 
 export const loopRulesApply: Translatable = {
     [LanguageCode.en]: "Draw a non-intersecting loop through the centers of some empty cells",
-    [LanguageCode.ru]: "Нарисуйте непересекающуюся петлю через центры некоторых пустых ячеек",
+    [LanguageCode.ru]: "Нарисуйте непересекающуюся замкнутую линию через центры некоторых пустых ячеек",
     [LanguageCode.de]:
         "Zeichnen Sie eine sich nicht überschneidende Schleife durch die Mittelpunkte einiger leerer Zellen",
 };
 
 export const tapCluesApply = (maxNeighborsCount = 8): Translatable => ({
     [LanguageCode.en]: `Clues represent the numbers of consecutive cells occupied by the loop each time it enters the (up to) ${maxNeighborsCount} cells surrounding the clue`,
-    [LanguageCode.ru]: `Подсказки указывают на количество последовательных ячеек, занимаемых петлей каждый раз, когда она проходит через (до) ${maxNeighborsCount} ячеек, окружающих подсказку`,
+    [LanguageCode.ru]: `Подсказки указывают на количество последовательных ячеек, занимаемых линией каждый раз, когда она проходит через (до) ${maxNeighborsCount} ячеек, окружающих подсказку`,
     [LanguageCode.de]: `Hinweise stellen die Anzahl aufeinanderfolgender Zellen dar, die von der Schleife jedes Mal belegt werden, wenn sie in die (bis zu) ${maxNeighborsCount} Zellen rund um den Hinweis eintritt`,
 });
 
