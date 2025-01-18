@@ -94,7 +94,7 @@ export const getFogVisibleCells = <T extends AnyPTM>(
 
             const isTrigger =
                 arrayContainsPosition(startCells3x3 ?? [], { top, left }) ||
-                (!!givenDigits[top]?.[left] &&
+                (givenDigits[top]?.[left] !== undefined &&
                     (typeof solution?.[top]?.[left] !== "number" ||
                         getDigitByCellData(givenDigits[top][left], context, { top, left }) === solution[top][left])) ||
                 (revealByColors &&
