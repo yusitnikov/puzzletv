@@ -631,6 +631,7 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
     disableDiagonalBorderLines: true,
     noGridLines: true,
     mergeGridLines: false,
+    borderMarkSize: 0.08,
     items: [
         BordersCount(25, 2),
         BordersCount(20, 1),

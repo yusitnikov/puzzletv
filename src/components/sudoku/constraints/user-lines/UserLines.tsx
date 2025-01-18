@@ -181,7 +181,7 @@ export const UserMarkByData = observer(function UserMarkByData<T extends AnyPTM>
         }
     }
 
-    const radius = isCenter ? 0.3 * userAreaSize : 0.15;
+    const radius = isCenter ? 0.3 * userAreaSize : (context?.puzzle.borderMarkSize ?? 0.15);
     const lineWidth = isCenter ? borderWidth * userAreaSize : borderWidth / 2;
     const opacity = isCenter ? 0.5 : 1;
 
