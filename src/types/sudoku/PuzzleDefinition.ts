@@ -102,6 +102,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     importOptions?: Partial<PuzzleImportOptions>;
     inactiveCells?: Position[];
     dashedGrid?: boolean;
+    noGridLines?: boolean;
 }
 
 export const allDrawingModes: PuzzleDefinition<AnyPTM>["allowDrawing"] = [

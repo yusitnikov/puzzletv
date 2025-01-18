@@ -711,10 +711,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         const {
             regions = [],
             typeManager: { cosmeticRegions },
+            noGridLines,
         } = this.puzzle;
 
         return [
-            FieldLinesConstraint(),
+            ...(noGridLines ? [] : [FieldLinesConstraint<T>()]),
             ...regions.map((region) => {
                 if (Array.isArray(region)) {
                     region = RegionConstraint<T>(region);
