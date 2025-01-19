@@ -2,9 +2,9 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { DecorativeShapeProps } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
 import { observer } from "mobx-react-lite";
-import { ComponentType } from "react";
+import { ComponentType, useMemo } from "react";
 import { isSamePosition } from "../../../types/layout/Position";
-import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
+import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/sudoku/GivenDigitsMap";
 import { SlideAndSeekShape } from "../types/SlideAndSeekShape";
 
 const SlidableShapeComponent = <T extends AnyPTM>(
@@ -12,11 +12,27 @@ const SlidableShapeComponent = <T extends AnyPTM>(
     allGivenShapes: GivenDigitsMap<SlideAndSeekShape>,
 ) =>
     observer(function SlidableShapeComponent({ cells: [cell], ...props }: ConstraintProps<T, DecorativeShapeProps>) {
+        const {
+            context: { centerLineSegments, fogVisibleCells },
+            props: { width, height, ...componentProps },
+        } = props;
+
         cell = { top: cell.top + 0.5, left: cell.left + 0.5 };
 
         let endPoint = cell;
 
-        for (const segment of props.context.centerLineSegments) {
+        const visibleGivenShapes = useMemo(
+            () =>
+                fogVisibleCells === undefined
+                    ? allGivenShapes
+                    : processGivenDigitsMaps(
+                          ([shape], { top, left }) => (fogVisibleCells[top]?.[left] ? shape : undefined),
+                          [allGivenShapes],
+                      ),
+            [fogVisibleCells],
+        );
+
+        for (const segment of centerLineSegments) {
             if (segment.isBranching || segment.isLoop) {
                 continue;
             }
@@ -24,7 +40,7 @@ const SlidableShapeComponent = <T extends AnyPTM>(
             // Check that the line doesn't contain other slidable shapes
             if (
                 segment.points.some(
-                    (point) => !isSamePosition(point, cell) && allGivenShapes[point.top - 0.5]?.[point.left - 0.5],
+                    (point) => !isSamePosition(point, cell) && visibleGivenShapes[point.top - 0.5]?.[point.left - 0.5],
                 )
             ) {
                 continue;
@@ -49,7 +65,7 @@ const SlidableShapeComponent = <T extends AnyPTM>(
                         <BaseComponent
                             {...props}
                             cells={[{ top: cell.top - 0.5, left: cell.left - 0.5 }]}
-                            props={{ ...props.props, width: props.props.width / 2, height: props.props.height / 2 }}
+                            props={{ ...componentProps, width: width / 2, height: height / 2 }}
                         />
                     </g>
                 )}
