@@ -22,6 +22,7 @@ import { ColorsImportMode } from "../../../types/sudoku/PuzzleImportOptions";
 import { PortalConstraint } from "../constraints/Portal";
 import { resolveCellColorValue } from "../../../types/sudoku/CellColor";
 import { PuzzleLine } from "../../../types/sudoku/PuzzleLine";
+import { loop } from "../../../utils/math";
 
 export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
     baseTypeManager: SudokuTypeManager<T>,
@@ -67,8 +68,8 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                         const start = item.cells[index],
                             end = item.cells[index + 1];
                         if (
-                            start.top % 1 === 0.5 &&
-                            end.left % 1 === 0.5 &&
+                            loop(start.top, 1) === 0.5 &&
+                            loop(end.left, 1) === 0.5 &&
                             Math.abs(end.top - start.top) + Math.abs(end.left - start.left) === 1
                         ) {
                             givenBorders = givenBorders.add({

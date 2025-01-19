@@ -6,6 +6,7 @@ import { SlideAndSeekShape } from "../types/SlideAndSeekShape";
 import { indexes } from "../../../utils/indexes";
 import { Line, PositionSet } from "../../../types/layout/Position";
 import { settings } from "../../../types/layout/Settings";
+import { loop } from "../../../utils/math";
 
 const debug = (...args: any[]) => {
     if (settings.debugSolutionChecker.get()) {
@@ -132,16 +133,20 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
             if (Math.abs(end.top - start.top) + Math.abs(end.left - start.left) !== 1) {
                 return true;
             }
-            return (
-                start.top % 1 === 0.5 &&
-                start.left % 1 === 0.5 &&
-                end.top % 1 === 0.5 &&
-                end.left % 1 === 0.5 &&
-                givenBorders.contains({
-                    top: (start.top + end.top) / 2,
-                    left: (start.left + end.left) / 2,
-                })
-            );
+
+            if (
+                loop(start.top, 1) !== 0.5 ||
+                loop(start.left, 1) !== 0.5 ||
+                loop(end.top, 1) !== 0.5 ||
+                loop(end.left, 1) !== 0.5
+            ) {
+                return false;
+            }
+
+            return givenBorders.contains({
+                top: (start.top + end.top) / 2,
+                left: (start.left + end.left) / 2,
+            });
         });
     },
 });
