@@ -128,7 +128,9 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
 
         return true;
     },
-    getInvalidUserLines(lines): Line[] {
+    getInvalidUserLines(lines, _digits, _regionCells, context, isFinalCheck): Line[] {
+        const { fogVisibleCells } = context;
+
         return lines.items.filter(({ start, end }) => {
             if (Math.abs(end.top - start.top) + Math.abs(end.left - start.left) !== 1) {
                 return true;
@@ -139,6 +141,15 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
                 loop(start.left, 1) !== 0.5 ||
                 loop(end.top, 1) !== 0.5 ||
                 loop(end.left, 1) !== 0.5
+            ) {
+                return false;
+            }
+
+            if (
+                !isFinalCheck &&
+                fogVisibleCells !== undefined &&
+                !fogVisibleCells[start.top - 0.5]?.[start.left - 0.5] &&
+                !fogVisibleCells[end.top - 0.5]?.[end.left - 0.5]
             ) {
                 return false;
             }
