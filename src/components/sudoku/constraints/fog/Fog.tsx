@@ -146,11 +146,12 @@ export const Fog = {
         const {
             puzzle: {
                 fieldSize: { rowsCount, columnsCount },
+                disableFancyFog,
             },
         } = context;
 
         const id = useAutoIncrementId();
-        const enableShadow = !settings.simplifiedGraphics.get();
+        const enableShadow = !disableFancyFog && !settings.simplifiedGraphics.get();
         const blurFilterId = `blur-filter-${id}`;
         const fogMaskId = `fog-mask-${id}`;
         const fogBulbId = `fog-bulb-${id}`;

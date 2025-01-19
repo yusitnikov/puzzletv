@@ -105,6 +105,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     noGridLines?: boolean;
     mergeGridLines?: boolean;
     borderMarkSize?: number;
+    disableFancyFog?: boolean;
 }
 
 export const allDrawingModes: PuzzleDefinition<AnyPTM>["allowDrawing"] = [

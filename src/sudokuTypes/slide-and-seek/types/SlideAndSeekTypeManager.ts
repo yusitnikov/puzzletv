@@ -184,6 +184,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                 ...puzzle,
                 initialDigits: undefined,
                 initialColors: undefined,
+                disableFancyFog: true,
                 items: newItems,
                 extension: {
                     ...puzzle.extension!,
