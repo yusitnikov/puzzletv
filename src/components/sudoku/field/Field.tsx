@@ -342,6 +342,23 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
 
                                             {isReady && !region?.noInteraction && (
                                                 <g data-layer="mouse-handler">
+                                                    {/* Render mouse handlers for outside cells with no clipping first */}
+                                                    {renderCellsLayer(
+                                                        (top, left) => (
+                                                            <FieldCellMouseHandler
+                                                                context={readOnlySafeContext}
+                                                                top={top}
+                                                                left={left}
+                                                                regionIndex={regionIndex}
+                                                                handlers={cellGestureHandlers}
+                                                                outsideHandlers={true}
+                                                            />
+                                                        ),
+                                                        region,
+                                                        true,
+                                                    )}
+
+                                                    {/* Then render accurate mouse handlers for all cells over them */}
                                                     {renderCellsLayer(
                                                         (top, left) => (
                                                             <FieldCellMouseHandler

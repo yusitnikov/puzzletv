@@ -21,6 +21,8 @@ export interface FieldCellMouseHandlerProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
     regionIndex?: number;
     handlers: GestureHandler<any>[];
+    // Render only handlers of area outside the grid (less cell clipping)
+    outsideHandlers?: boolean;
 }
 
 export const FieldCellMouseHandler = observer(function FieldCellMouseHandler<T extends AnyPTM>(
@@ -70,6 +72,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
     regionIndex,
     handlers,
     hasCellHandlers,
+    outsideHandlers,
 }: FieldCellMouseHandlerInnerProps<T>) {
     profiler.trace();
 
@@ -82,15 +85,24 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
         for (const { line } of Object.values(borderSegments)) {
             const start = line[0],
                 end = line[line.length - 1];
-            const startKey = stringifyPosition(start),
-                endKey = stringifyPosition(end);
             const length = getVectorLength(getLineVector({ start, end }));
 
-            const startCorner = (cornersMap[startKey] ??= { corner: start, length: length });
-            startCorner.length = Math.min(startCorner.length, length);
+            for (const corner of [start, end]) {
+                if (outsideHandlers) {
+                    /*
+                     * Process only outside corners.
+                     * Point is outside when it has more connected lines than connected cells.
+                     */
+                    const pointInfo = puzzleIndex.getPointInfo(corner);
+                    if (pointInfo?.cells.size === pointInfo?.neighbors.size) {
+                        continue;
+                    }
+                }
 
-            const endCorner = (cornersMap[endKey] ??= { corner: end, length: length });
-            endCorner.length = Math.min(endCorner.length, length);
+                const key = stringifyPosition(corner);
+                const cornerInfo = (cornersMap[key] ??= { corner, length });
+                cornerInfo.length = Math.min(cornerInfo.length, length);
+            }
         }
         return cornersMap;
     };
@@ -106,6 +118,10 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
         }),
         [center, cellPosition],
     );
+
+    if (!areCustomBounds && outsideHandlers) {
+        return null;
+    }
 
     return (
         <>
@@ -147,6 +163,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
                                         top={topOffset * 0.25}
                                         width={0.25}
                                         height={0.25}
+                                        outsideHandlers={outsideHandlers}
                                     />
                                 );
                             }),
@@ -154,41 +171,49 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
 
                     {areCustomBounds && (
                         <>
-                            {Object.entries(borderSegments).flatMap(([key, { line, halves, center: borderCenter }]) =>
-                                halves.flatMap((half, halfIndex) => {
-                                    const corner = line[halfIndex ? line.length - 1 : 0];
+                            {Object.entries(borderSegments).flatMap(
+                                ([key, { line, halves, center: borderCenter, neighbors }]) =>
+                                    halves.flatMap((half, halfIndex) => {
+                                        const corner = line[halfIndex ? line.length - 1 : 0];
+                                        const isOutside = neighbors.size === 0;
 
-                                    return [
-                                        <MouseHandlerRect
-                                            key={`draw-center-segment-${key}-${halfIndex}`}
-                                            context={context}
-                                            cellPosition={cellPosition}
-                                            cellExactPosition={{
-                                                center,
-                                                corner,
-                                                round: center,
-                                                type: CellPart.center,
-                                            }}
-                                            regionIndex={regionIndex}
-                                            polygon={[...half, center]}
-                                            handlers={handlers}
-                                        />,
-                                        <MouseHandlerRect
-                                            key={`draw-border-${key}-${halfIndex}`}
-                                            context={context}
-                                            cellPosition={cellPosition}
-                                            cellExactPosition={{
-                                                center,
-                                                corner,
-                                                round: borderCenter,
-                                                type: CellPart.border,
-                                            }}
-                                            regionIndex={regionIndex}
-                                            line={half}
-                                            handlers={handlers}
-                                        />,
-                                    ];
-                                }),
+                                        return [
+                                            !outsideHandlers && (
+                                                <MouseHandlerRect
+                                                    key={`draw-center-segment-${key}-${halfIndex}`}
+                                                    context={context}
+                                                    cellPosition={cellPosition}
+                                                    cellExactPosition={{
+                                                        center,
+                                                        corner,
+                                                        round: center,
+                                                        type: CellPart.center,
+                                                    }}
+                                                    regionIndex={regionIndex}
+                                                    polygon={[...half, center]}
+                                                    handlers={handlers}
+                                                    outsideHandlers={outsideHandlers}
+                                                />
+                                            ),
+                                            (!outsideHandlers || isOutside) && (
+                                                <MouseHandlerRect
+                                                    key={`draw-border-${key}-${halfIndex}`}
+                                                    context={context}
+                                                    cellPosition={cellPosition}
+                                                    cellExactPosition={{
+                                                        center,
+                                                        corner,
+                                                        round: borderCenter,
+                                                        type: CellPart.border,
+                                                    }}
+                                                    regionIndex={regionIndex}
+                                                    line={half}
+                                                    handlers={handlers}
+                                                    outsideHandlers={outsideHandlers}
+                                                />
+                                            ),
+                                        ];
+                                    }),
                             )}
 
                             {Object.entries(getCornersMap()).map(([key, { corner, length }]) => (
@@ -207,6 +232,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
                                     width={0.25 * length}
                                     height={0.25 * length}
                                     handlers={handlers}
+                                    outsideHandlers={outsideHandlers}
                                 />
                             ))}
                         </>
@@ -214,7 +240,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
                 </>
             )}
 
-            {!hasCellHandlers && (
+            {!hasCellHandlers && !outsideHandlers && (
                 <>
                     <MouseHandlerRect
                         key={"cell-selection"}
@@ -223,6 +249,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
                         cellExactPosition={centerExactPosition}
                         regionIndex={regionIndex}
                         handlers={handlers}
+                        outsideHandlers={outsideHandlers}
                     />
 
                     {!areCustomBounds &&
@@ -241,6 +268,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
                                         height={borderPaddingCoeff}
                                         handlers={handlers}
                                         skipEnter={true}
+                                        outsideHandlers={outsideHandlers}
                                     />
                                 );
                             }),
@@ -261,6 +289,7 @@ interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
     point?: Position;
     handlers: GestureHandler<any>[];
     skipEnter?: boolean;
+    outsideHandlers?: boolean;
 }
 
 const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>({
@@ -270,6 +299,7 @@ const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>({
     regionIndex,
     handlers,
     skipEnter,
+    outsideHandlers,
     ...other
 }: MouseHandlerRectProps<T>) {
     profiler.trace();
@@ -278,6 +308,7 @@ const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>({
         <FieldCellShape
             context={context}
             cellPosition={cellPosition}
+            noClip={outsideHandlers}
             style={{
                 cursor: "pointer",
                 pointerEvents: "all",

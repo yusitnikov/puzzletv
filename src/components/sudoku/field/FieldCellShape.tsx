@@ -16,6 +16,7 @@ interface FieldCellShapeProps<T extends AnyPTM>
     line?: Position[];
     polygon?: Position[];
     point?: Position;
+    noClip?: boolean;
 }
 
 export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPTM>({
@@ -24,6 +25,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
     line,
     polygon,
     point,
+    noClip,
     left = 0,
     top = 0,
     width = 1,
@@ -38,6 +40,8 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
         context && cellPosition && context.puzzleIndex.allCells[cellPosition.top][cellPosition.left].areCustomBounds
             ? context.getCellTransformedBounds(cellPosition.top, cellPosition.left)
             : undefined;
+
+    const clip = noClip ? undefined : <FieldCellShape context={context} cellPosition={cellPosition} />;
 
     if (!context || !cellPosition || !customCellBounds) {
         return (
@@ -60,7 +64,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
         const sizeCoeff = context.puzzle.fieldFitsWrapper ? 1 : 1 / context.cellSize;
 
         return (
-            <AutoSvg clip={<FieldCellShape context={context} cellPosition={cellPosition} />}>
+            <AutoSvg clip={clip}>
                 <polyline
                     points={formatSvgPointsArray(line)}
                     fill={"none"}
@@ -79,7 +83,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
 
     if (polygon) {
         return (
-            <AutoSvg clip={<FieldCellShape context={context} cellPosition={cellPosition} />}>
+            <AutoSvg clip={clip}>
                 <polygon
                     points={formatSvgPointsArray(polygon)}
                     fill={"none"}
@@ -94,7 +98,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
 
     if (point) {
         return (
-            <AutoSvg clip={<FieldCellShape context={context} cellPosition={cellPosition} />}>
+            <AutoSvg clip={clip}>
                 <ellipse
                     cx={point.left}
                     cy={point.top}
