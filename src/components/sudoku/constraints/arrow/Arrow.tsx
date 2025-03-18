@@ -187,11 +187,11 @@ export const ArrowConstraint = <T extends AnyPTM>(
         },
         clone(
             { props: { circleCells, arrowCells, transparentCircle } },
-            { processCellCoords },
+            { processCellsCoords },
         ): Constraint<T, ArrowProps> {
             return ArrowConstraint(
-                circleCells.map(processCellCoords),
-                arrowCells.map(processCellCoords),
+                processCellsCoords(circleCells),
+                processCellsCoords(arrowCells),
                 transparentCircle,
                 undefined,
                 product,

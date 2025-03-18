@@ -6,9 +6,15 @@ import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
 import { RotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { blueColor, greenColor, redColor } from "../../components/app/globals";
+import { blueColor, darkPurpleColor, greenColor, pinkColor, purpleColor } from "../../components/app/globals";
 import { createRotatableClue } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPuzzleExtension";
 import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+import { rgba } from "../../utils/color";
+import { toDecorativeConstraint } from "../../types/sudoku/Constraint";
+import { loop } from "../../utils/math";
+
+const lighten = (color: string) => rgba(color, 0.5);
 
 export const Gears: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     slug: "gears-test",
@@ -27,11 +33,145 @@ export const Gears: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     regions: Regions9,
     extension: {
         clues: [
-            createRotatableClue("R3C3", 1, redColor, [KropkiDotConstraint("R3C3", "R3C4", false)], -1),
-            createRotatableClue("R6C6", 1.5, redColor, [KropkiDotConstraint("R6C6", "R7C6", false)], 1, [
-                createRotatableClue("R6C4", 0.5, greenColor, [KropkiDotConstraint("R6C4", "R7C4", true)], -3),
-                createRotatableClue(["R4C7", "R4C8"], 1, greenColor, [KropkiDotConstraint("R4C6", "R4C7", true)], -1.5),
-                createRotatableClue(["R2C7", "R3C8"], 0.5, blueColor, [KropkiDotConstraint("R2C8", "R3C8", false)], 3),
+            createRotatableClue(
+                "R3C3",
+                0.5,
+                lighten(greenColor),
+                [ArrowConstraint("R2C3", ["R3C3", "R2C2"], true)],
+                -4,
+                [
+                    createRotatableClue(["R4C3", "R5C3"], 1, lighten(blueColor), [], 2),
+                    createRotatableClue(
+                        "R7C3",
+                        1.5,
+                        lighten(purpleColor),
+                        [
+                            // Arrow UI
+                            toDecorativeConstraint(
+                                ArrowConstraint({ top: 6, left: -0.2 }, ["R7C3"], true, undefined, false, false),
+                            ),
+                            // Arrow validation
+                            {
+                                ...ArrowConstraint("R7C1", ["R7C3"], true),
+                                component: undefined,
+                                processRotatableCellsCoords: ({ pivot: { top, left } }, angle, cells) => {
+                                    const isCircle = cells.length === 1;
+
+                                    switch (loop(angle, 360)) {
+                                        case 120:
+                                            return isCircle
+                                                ? [{ top: top - 2, left: left + 1 }]
+                                                : [
+                                                      { top: top - 1, left: left + 1 },
+                                                      { top: top - 1, left },
+                                                      { top, left },
+                                                  ];
+                                        case 240:
+                                            return isCircle
+                                                ? [{ top: top + 2, left: left + 1 }]
+                                                : [
+                                                      { top: top + 1, left: left + 1 },
+                                                      { top: top + 1, left },
+                                                      { top, left },
+                                                  ];
+                                        case 0:
+                                        default:
+                                            return cells;
+                                    }
+                                },
+                            },
+                        ],
+                        -4 / 3,
+                    ),
+                    createRotatableClue("R7C5", 0.5, lighten(darkPurpleColor), [], 4),
+                ],
+            ),
+            createRotatableClue("R2C4", 0.5, lighten(greenColor), [], -4, [
+                createRotatableClue(
+                    "R2C6",
+                    1.5,
+                    lighten(purpleColor),
+                    [
+                        ...[1, -1].flatMap((sign) => [
+                            // Arrow UI
+                            toDecorativeConstraint(
+                                ArrowConstraint(
+                                    { top: 1 - sign * 1.35, left: 5 },
+                                    [
+                                        { top: 1, left: 5 - sign * 0.75 },
+                                        { top: 1 + sign * 0.8, left: 5 - sign * 0.75 },
+                                    ],
+                                    true,
+                                    undefined,
+                                    false,
+                                    false,
+                                ),
+                            ),
+                            // Arrow validation
+                            {
+                                ...ArrowConstraint(
+                                    { top: 1 - sign * 1.3, left: 5 },
+                                    [
+                                        { top: 1 - sign * 0.4, left: 5 - sign * 0.6 },
+                                        { top: 1 + sign, left: 5 - sign },
+                                    ],
+                                    true,
+                                    undefined,
+                                    false,
+                                    false,
+                                ),
+                                component: undefined,
+                            },
+                        ]),
+                        {
+                            ...KropkiDotConstraint("R2C5", "R2C6", true),
+                            processRotatableCellsCoords: ({ pivot: { top, left } }, angle, cells) => {
+                                switch (loop(angle, 360)) {
+                                    case 120:
+                                        return [
+                                            { top, left },
+                                            {
+                                                top: top - 1,
+                                                left,
+                                            },
+                                        ];
+                                    case 240:
+                                        return [
+                                            { top, left },
+                                            {
+                                                top: top + 1,
+                                                left,
+                                            },
+                                        ];
+                                    // case 0:
+                                    default:
+                                        return cells;
+                                }
+                            },
+                        },
+                    ],
+                    4 / 3,
+                ),
+            ]),
+            createRotatableClue("R9C7", 0.5, lighten(greenColor), [ArrowConstraint("R9C7", ["R8C6"], true)], -4, [
+                createRotatableClue(
+                    ["R7C7", "R8C7"],
+                    1,
+                    lighten(blueColor),
+                    [ArrowConstraint("R6C6", ["R6C8"], true)],
+                    2,
+                ),
+                createRotatableClue(
+                    ["R4C7", "R5C7"],
+                    2,
+                    lighten(pinkColor),
+                    [
+                        ArrowConstraint("R3C9", ["R6C9"], true),
+                        KropkiDotConstraint("R3C7", "R3C8", true),
+                        KropkiDotConstraint("R5C5", "R6C5", true),
+                    ],
+                    -1,
+                ),
             ]),
         ],
     },
@@ -40,6 +180,17 @@ export const Gears: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
             <RulesParagraph>Normal Sudoku rules apply.</RulesParagraph>
         </>
     ),
-    items: [],
+    initialDigits: {
+        1: {
+            8: 4,
+        },
+    },
+    items: [
+        KropkiDotConstraint("R3C1", "R4C1", true),
+        KropkiDotConstraint("R5C1", "R5C2", true),
+        KropkiDotConstraint("R8C8", "R8C9", true),
+        KropkiDotConstraint("R7C1", "R8C1", true),
+        ArrowConstraint("R9C8", ["R7C8"], true),
+    ],
     allowDrawing: allDrawingModes,
 };

@@ -216,31 +216,35 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
 };
 
 export interface CloneConstraintOptions {
+    processCellsCoords: (coords: Position[]) => Position[];
     processCellCoords: (coords: Position) => Position;
     processColor: (color: CellColorValue) => CellColorValue;
 }
 export const cloneConstraint = <T extends AnyPTM, DataT>(
     constraint: Constraint<T, DataT>,
     {
-        processCellCoords = (coords: Position) => coords,
-        processColor = (color: CellColorValue) => color,
+        processCellCoords = (coords) => coords,
+        processCellsCoords = (coords) => coords.map(processCellCoords),
+        processColor = (color) => color,
     }: Partial<CloneConstraintOptions> = {},
 ): Constraint<T, DataT> => {
     constraint = {
         ...constraint,
-        cells: constraint.cells.map(processCellCoords),
+        cells: processCellsCoords(constraint.cells),
         color: constraint.color && resolveCellColorValue(processColor(constraint.color)),
     };
-    return constraint.clone?.(constraint, { processCellCoords, processColor }) ?? constraint;
+    return constraint.clone?.(constraint, { processCellsCoords, processCellCoords, processColor }) ?? constraint;
 };
 
-export const toDecorativeConstraint = <T extends AnyPTM, DataT>(
-    constraint: Constraint<T, DataT>,
-): Constraint<T, DataT> => ({
+export const toDecorativeConstraint = <T extends AnyPTM, DataT>({
+    clone,
+    ...constraint
+}: Constraint<T, DataT>): Constraint<T, DataT> => ({
     ...constraint,
     isValidCell: undefined,
     isValidPuzzle: undefined,
     getInvalidUserLines: undefined,
+    clone: clone && ((...args) => toDecorativeConstraint(clone(...args))),
 });
 
 export const toInvisibleConstraint = <T extends AnyPTM, DataT>(

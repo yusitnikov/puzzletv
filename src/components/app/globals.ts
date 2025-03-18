@@ -24,6 +24,7 @@ export const lighterMutedBlueColor = "#e7e6ff";
 export const greenColor = "#20ea20";
 export const darkGreenColor = "#00b600";
 export const purpleColor = "#ac68f1";
+export const darkPurpleColor = "#7647a5";
 export const pinkColor = "#ff6db6";
 export const redColor = "#b60000";
 export const lightRedColor = "#db0000";

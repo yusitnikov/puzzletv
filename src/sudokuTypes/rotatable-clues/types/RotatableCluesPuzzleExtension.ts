@@ -5,12 +5,25 @@ import { CellColorValue, resolveCellColorValue } from "../../../types/sudoku/Cel
 import { EllipseConstraint } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { blackColor } from "../../../components/app/globals";
 import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { ComponentType, ReactNode } from "react";
 
 export interface RotatableClue {
     pivot: Position;
-    clues: Constraint<AnyPTM, any>[];
+    clues: RotatableClueItemConstraint<AnyPTM, any>[];
     coeff?: number;
     dependentClues?: RotatableClue[];
+}
+
+export interface RotatableClueItemConstraint<T extends AnyPTM, DataT = undefined> extends Constraint<T, DataT> {
+    processRotatableCellCoords?: (rotatableClue: RotatableClue, angle: number, cell: Position) => Position;
+    processRotatableCellsCoords?: (rotatableClue: RotatableClue, angle: number, cells: Position[]) => Position[];
+    rotatableProcessorComponent?: ComponentType<RotatableClueProcessorProps>;
+}
+
+export interface RotatableClueProcessorProps {
+    rotatableClue: RotatableClue;
+    animatedAngle: number;
+    children: ReactNode;
 }
 
 export interface RotatableCluesPuzzleExtension {
@@ -20,8 +33,8 @@ export interface RotatableCluesPuzzleExtension {
 export const createRotatableClue = (
     pivotCells: PositionLiteral | PositionLiteral[],
     radius: number,
-    color: CellColorValue | undefined,
-    clues: Constraint<AnyPTM, any>[],
+    color: CellColorValue | undefined = undefined,
+    clues: RotatableClueItemConstraint<AnyPTM, any>[] = [],
     coeff = 1,
     dependentClues: RotatableClue[] = [],
 ): RotatableClue => {

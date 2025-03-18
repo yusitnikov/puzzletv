@@ -1,7 +1,7 @@
 import { cloneConstraint, Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { RotatableCluesPTM } from "../types/RotatableCluesPTM";
-import { RotatableClue } from "../types/RotatableCluesPuzzleExtension";
+import { RotatableClueItemConstraint, RotatableClue } from "../types/RotatableCluesPuzzleExtension";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { getLineVector, Position, rotateVectorClockwise } from "../../../types/layout/Position";
 import { loop } from "../../../utils/math";
@@ -19,27 +19,36 @@ const pivotRadius = 0.15;
 const pivotLineWidth = pivotRadius * 0.1;
 
 export const RotatableClueConstraint = <T extends AnyPTM>(
-    { clues, pivot, coeff = 1 }: RotatableClue,
+    rotatableClue: RotatableClue,
     angle: number,
     animatedAngle: number,
 ): Constraint<RotatableCluesPTM<T>, any>[] => {
+    const { clues, pivot, coeff = 1 } = rotatableClue;
+
     const roundedAnimatedAngle = loop(Math.round(animatedAngle), 360);
     const pivotDirection = rotateVectorClockwise({ top: -pivotRadius, left: 0 }, roundedAnimatedAngle);
 
-    const processCellCoords = (cell: Position): Position => {
-        const { top, left } = rotateVectorClockwise(getLineVector({ start: pivot, end: cell }), angle);
+    const processCellsCoords = (clue: RotatableClueItemConstraint<AnyPTM, any>, cells = clue.cells): Position[] =>
+        clue.processRotatableCellsCoords?.(rotatableClue, angle, cells) ??
+        cells.map((cell) => {
+            if (clue.processRotatableCellCoords) {
+                return clue.processRotatableCellCoords(rotatableClue, angle, cell);
+            }
 
-        return {
-            top: pivot.top + Math.round(top),
-            left: pivot.left + Math.round(left),
-        };
-    };
-    const processedCells = clues.flatMap(({ cells }) => cells).map(processCellCoords);
+            const { top, left } = rotateVectorClockwise(getLineVector({ start: pivot, end: cell }), angle);
+
+            return {
+                top: pivot.top + Math.round(top),
+                left: pivot.left + Math.round(left),
+            };
+        });
+
+    const processedCells = clues.flatMap((clue) => processCellsCoords(clue, clue.cells));
 
     return [
         ...clues.flatMap((clue) => [
             {
-                ...cloneConstraint(clue, { processCellCoords }),
+                ...cloneConstraint(clue, { processCellsCoords: (cells) => processCellsCoords(clue, cells) }),
                 name: `${clue.name} - validation`,
                 component: undefined,
                 _rotatableClueAngle: angle,
@@ -53,6 +62,15 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                         Object.entries(clue.component).map(([layer, Component]) => [
                             layer,
                             (props: ConstraintProps<RotatableCluesPTM<T>, any>) => {
+                                const Wrapper = clue.rotatableProcessorComponent;
+                                if (Wrapper) {
+                                    return (
+                                        <Wrapper rotatableClue={rotatableClue} animatedAngle={animatedAngle}>
+                                            <Component {...props} />
+                                        </Wrapper>
+                                    );
+                                }
+
                                 const offsetTop = pivot.top + 0.5;
                                 const offsetLeft = pivot.left + 0.5;
 
