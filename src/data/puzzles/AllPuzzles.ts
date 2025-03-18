@@ -61,6 +61,7 @@ import { PeaucellierLipkinLinkage } from "./PeaucellierLipkinLinkage";
 import { JsTest } from "./JsTest";
 import { Cornered, SlideAndSeekExample, SlideAndSeekIntro, TheBlackSheep, TheGap, WaxOnWaxOff } from "./SlideAndSeek";
 import { ElephantSlitherlink } from "./Slitherlink";
+import { SparkKropki } from "./Spark";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -89,6 +90,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    SparkKropki,
+
     ElephantSlitherlink,
 
     SlideAndSeekExample,

@@ -8,7 +8,7 @@ import { TranslationItem } from "../types/translations/TranslationItem";
 
 export const ruleWithTitle = (title: ReactNode, ...explained: string[]) => (
     <>
-        {title}: {explained.map((s) => s.toLowerCase()).join(", ")}
+        {title}: {explained.map((s) => s.substring(0, 1).toLowerCase() + s.substring(1)).join(", ")}
     </>
 );
 
@@ -212,6 +212,12 @@ export const vExplained: Translatable = {
     [LanguageCode.en]: "Cells separated by V must sum to 5",
     [LanguageCode.ru]: "Сумма цифр, разделённых знаком V, равна 5",
     [LanguageCode.de]: "Durch V getrennte Zellen müssen in der Summe 5 ergeben",
+};
+
+export const notAllXVGiven: Translatable = {
+    [LanguageCode.en]: "Not all possible XV marks are necessarily given (no negative constraint)",
+    [LanguageCode.ru]: "Не все возможные пометки XV присутствуют на поле",
+    [LanguageCode.de]: "Nicht alle möglichen XV-Markierungen sind gegeben (keine negative Einschränkung)",
 };
 
 export const germanWhispersTitle: Translatable = {
