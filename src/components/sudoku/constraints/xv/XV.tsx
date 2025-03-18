@@ -10,7 +10,7 @@ import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
 import { useCompensationAngle } from "../../../../contexts/TransformContext";
 
 const radius = 0.2;
-const lineWidth = 0.03;
+const lineWidth = 0.04;
 
 export const XMark: ConstraintPropsGenericFc = observer(function XMark<T extends AnyPTM>({
     cells: [cell1, cell2],
@@ -22,6 +22,8 @@ export const XMark: ConstraintPropsGenericFc = observer(function XMark<T extends
 
     return (
         <AutoSvg left={(cell1.left + cell2.left) / 2 + 0.5} top={(cell1.top + cell2.top) / 2 + 0.5} angle={-angle}>
+            <circle r={radius * 1.2} opacity={0.7} fill={"#fff"} strokeWidth={0} />
+
             <line
                 x1={-radius * 0.7}
                 y1={-radius * 0.7}
@@ -53,6 +55,8 @@ export const VMark: ConstraintPropsGenericFc = observer(function VMark<T extends
 
     return (
         <AutoSvg left={(cell1.left + cell2.left) / 2 + 0.5} top={(cell1.top + cell2.top) / 2 + 0.5} angle={-angle}>
+            <circle r={radius * 1.2} opacity={0.7} fill={"#fff"} strokeWidth={0} />
+
             <polyline
                 points={formatSvgPointsArray([
                     { top: -radius * 0.7, left: -radius * 0.7 },
