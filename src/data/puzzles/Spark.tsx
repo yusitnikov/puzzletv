@@ -248,7 +248,7 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
             component: undefined,
         },
         toDecorativeConstraint(RenbanConstraint(["R1C3", "R1C4", "R2C5", "R3C5", "R4C6", "R4C7", "R5C8"])),
-        toDecorativeConstraint(RenbanConstraint(["R2C9", "R1C10", "R1C11"])),
+        toDecorativeConstraint(RenbanConstraint(["R1.7C9.3", "R1C10", "R1C11"], false)),
 
         {
             ...RenbanConstraint(["R4C3", "R3C3", "R3C4", "R4C4", "R4C10", "R3C10", "R3C11", "R4C11"], false),
