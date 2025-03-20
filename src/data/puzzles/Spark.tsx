@@ -179,8 +179,7 @@ export const EmptySpark: PuzzleDefinition<NumberPTM> = {
     typeManager: SparkTypeManager,
     fieldSize,
     regions: createSparkRegions(fieldSize),
-    digitsCount: 9,
-    supportZero: true,
+    digitsCount: 8,
     rules: (translate) => (
         <>
             <RulesParagraph>
@@ -197,7 +196,35 @@ export const EmptySpark: PuzzleDefinition<NumberPTM> = {
     ),
     items: [...SparkGridArrowsConstraint(fieldSize)],
     allowDrawing: allDrawingModes,
-    resultChecker: isValidFinishedPuzzleByConstraints,
+};
+
+const fieldSize6x6 = createSparkFieldSize(3, 3, 3);
+export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
+    noIndex: true,
+    title: {
+        [LanguageCode.en]: "Empty spark 6x6",
+    },
+    slug: "empty-spark-6x6",
+    typeManager: SparkTypeManager,
+    fieldSize: fieldSize6x6,
+    regions: createSparkRegions(fieldSize6x6),
+    digitsCount: 9,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>
+                {translate({
+                    [LanguageCode.en]: "Fill every row/column (arrow direction) and bolded region with digits 1 to 9",
+                    [LanguageCode.ru]:
+                        "Заполните каждую строку/столбец (по направление стрелки) и выделенную жирными линиями область цифрами от 1 до 9",
+                    [LanguageCode.de]:
+                        "Füllen Sie jede Zeile/Spalte (entsprechend der Pfeilrichtung) und den fettgedruckten Bereich mit den Ziffern 1 bis 9",
+                })}
+                .
+            </RulesParagraph>
+        </>
+    ),
+    items: [...SparkGridArrowsConstraint(fieldSize6x6)],
+    allowDrawing: allDrawingModes,
 };
 
 export const Sparkster: PuzzleDefinition<NumberPTM> = {
