@@ -1,4 +1,4 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { isValidFinishedPuzzleByConstraints, toDecorativeConstraint } from "../../types/sudoku/Constraint";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
@@ -7,6 +7,8 @@ import {
     kropkiDotsTitle,
     notAllDotsGiven,
     notAllXVGiven,
+    renbanExplained,
+    renbanTitle,
     ruleWithTitle,
     vExplained,
     whiteKropkiDotsExplained,
@@ -26,6 +28,7 @@ import { darkGreyColor } from "../../components/app/globals";
 import { FieldLayer } from "../../types/sudoku/FieldLayer";
 import { rgba } from "../../utils/color";
 import { SparkGridArrowsConstraint } from "../../sudokuTypes/spark/components/SparkGridArrows";
+import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
 
 const extraRegion = ["R1C1", "R3C1", "R1C8", "R2C7", "R8C1", "R1C13", "R3C13", "R8C13"];
 const fieldSize = createSparkFieldSize(4, 2);
@@ -164,5 +167,103 @@ export const SparkKropki: PuzzleDefinition<NumberPTM> = {
         toDecorativeConstraint(KropkiDotConstraint("R4C8", "R5C8", false)),
         toDecorativeConstraint(KropkiDotConstraint("R1C9", "R1C10", false)),
     ],
+    resultChecker: isValidFinishedPuzzleByConstraints,
+};
+
+export const EmptySpark: PuzzleDefinition<NumberPTM> = {
+    noIndex: true,
+    title: {
+        [LanguageCode.en]: "Empty spark",
+    },
+    slug: "empty-spark",
+    typeManager: SparkTypeManager,
+    fieldSize,
+    regions: createSparkRegions(fieldSize),
+    digitsCount: 9,
+    supportZero: true,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>
+                {translate({
+                    [LanguageCode.en]: "Fill every row/column (arrow direction) and bolded region with digits 1 to 8",
+                    [LanguageCode.ru]:
+                        "Заполните каждую строку/столбец (по направление стрелки) и выделенную жирными линиями область цифрами от 1 до 8",
+                    [LanguageCode.de]:
+                        "Füllen Sie jede Zeile/Spalte (entsprechend der Pfeilrichtung) und den fettgedruckten Bereich mit den Ziffern 1 bis 8",
+                })}
+                .
+            </RulesParagraph>
+        </>
+    ),
+    items: [...SparkGridArrowsConstraint(fieldSize)],
+    allowDrawing: allDrawingModes,
+    resultChecker: isValidFinishedPuzzleByConstraints,
+};
+
+export const Sparkster: PuzzleDefinition<NumberPTM> = {
+    noIndex: true,
+    title: {
+        [LanguageCode.en]: "Sparkster",
+    },
+    slug: "sparkster",
+    typeManager: SparkTypeManager,
+    fieldSize,
+    regions: createSparkRegions(fieldSize),
+    digitsCount: 9,
+    supportZero: true,
+    rules: (translate) => (
+        <>
+            <RulesParagraph>
+                {translate({
+                    [LanguageCode.en]: "Fill every row/column (arrow direction) and bolded region with digits 1 to 8",
+                    [LanguageCode.ru]:
+                        "Заполните каждую строку/столбец (по направление стрелки) и выделенную жирными линиями область цифрами от 1 до 8",
+                    [LanguageCode.de]:
+                        "Füllen Sie jede Zeile/Spalte (entsprechend der Pfeilrichtung) und den fettgedruckten Bereich mit den Ziffern 1 bis 8",
+                })}
+                .
+            </RulesParagraph>
+            <RulesParagraph>{ruleWithTitle(translate(renbanTitle), translate(renbanExplained()))}.</RulesParagraph>
+            <RulesParagraph>
+                {ruleWithTitle("XV", translate(xExplained))}. {translate(notAllXVGiven)}.
+            </RulesParagraph>
+        </>
+    ),
+    items: [
+        ...SparkGridArrowsConstraint(fieldSize),
+        RenbanConstraint(["R2C4", "R2C3", "R3C2", "R6C2", "R7C3", "R7C4"]),
+        RenbanConstraint(["R2C10", "R2C11", "R3C12", "R6C12", "R7C11", "R7C10"]),
+        RenbanConstraint(["R1C7", "R2C8"]),
+        RenbanConstraint(["R2C7", "R3C8"]),
+        RenbanConstraint(["R2C6", "R4C8"]),
+        RenbanConstraint(["R5C3", "R6C3"]),
+        RenbanConstraint(["R5C4", "R6C4", "R6C10"]),
+        RenbanConstraint(["R5C11", "R6C11"]),
+        RenbanConstraint(["R6C1", "R7C1", "R8C2", "R8C3"]),
+        RenbanConstraint(["R6C13", "R7C12"]),
+        RenbanConstraint(["R1C12", "R2C13", "R3C13"]),
+
+        {
+            ...RenbanConstraint(["R1C3", "R1C4", "R2C5", "R3C5", "R4C6", "R4C7", "R1C10", "R1C11"], false),
+            component: undefined,
+        },
+        toDecorativeConstraint(RenbanConstraint(["R1C3", "R1C4", "R2C5", "R3C5", "R4C6", "R4C7", "R5C8"])),
+        toDecorativeConstraint(RenbanConstraint(["R2C9", "R1C10", "R1C11"])),
+
+        {
+            ...RenbanConstraint(["R4C3", "R3C3", "R3C4", "R4C4", "R4C10", "R3C10", "R3C11", "R4C11"], false),
+            component: undefined,
+        },
+        toDecorativeConstraint(RenbanConstraint(["R4C3", "R3C3", "R3C4", "R4C4", "R4.5C4.5", "R5C5"], false)),
+        toDecorativeConstraint(RenbanConstraint(["R5C9", "R4.5C9.5", "R4C10", "R3C10", "R3C11", "R4C11"], false)),
+
+        {
+            ...XMarkConstraint("R8C4", "R8C10"),
+            component: undefined,
+        },
+        toDecorativeConstraint(XMarkConstraint("R8C4", "R8C5")),
+        toDecorativeConstraint(XMarkConstraint("R8C9", "R8C10")),
+    ],
+    allowDrawing: ["center-mark"],
     resultChecker: isValidFinishedPuzzleByConstraints,
 };

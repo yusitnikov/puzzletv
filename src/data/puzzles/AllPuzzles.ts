@@ -61,7 +61,7 @@ import { PeaucellierLipkinLinkage } from "./PeaucellierLipkinLinkage";
 import { JsTest } from "./JsTest";
 import { Cornered, SlideAndSeekExample, SlideAndSeekIntro, TheBlackSheep, TheGap, WaxOnWaxOff } from "./SlideAndSeek";
 import { ElephantSlitherlink } from "./Slitherlink";
-import { SparkKropki } from "./Spark";
+import { EmptySpark, SparkKropki, Sparkster } from "./Spark";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -77,6 +77,7 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     EmptyCube,
     EmptyToroidal,
     EmptyLatin,
+    EmptySpark,
     // endregion
 
     FPuzzles,
@@ -169,6 +170,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    Sparkster,
+
     WaxOnWaxOff,
 
     EndlessChristmas,
