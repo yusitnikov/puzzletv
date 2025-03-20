@@ -209,8 +209,7 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
     typeManager: SparkTypeManager,
     fieldSize,
     regions: createSparkRegions(fieldSize),
-    digitsCount: 9,
-    supportZero: true,
+    digitsCount: 8,
     rules: (translate) => (
         <>
             <RulesParagraph>
