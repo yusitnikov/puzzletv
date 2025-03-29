@@ -227,15 +227,18 @@ export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
     allowDrawing: allDrawingModes,
 };
 
+const fieldSizeWithNote = createSparkFieldSize(4, 2, 4, true);
+
 export const Sparkster: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title: {
         [LanguageCode.en]: "Sparkster",
     },
     slug: "sparkster",
+    saveStateKey: "sparkster-notes",
     typeManager: SparkTypeManager,
-    fieldSize,
-    regions: createSparkRegions(fieldSize),
+    fieldSize: fieldSizeWithNote,
+    regions: createSparkRegions(fieldSizeWithNote),
     digitsCount: 8,
     rules: (translate) => (
         <>
@@ -253,10 +256,18 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
             <RulesParagraph>
                 {ruleWithTitle("XV", translate(xExplained))}. {translate(notAllXVGiven)}.
             </RulesParagraph>
+            <RulesParagraph>
+                {translate({
+                    [LanguageCode.en]: "8 empty cells in the bottom are for note-taking",
+                    [LanguageCode.ru]: "8 пустых клеток внизу - для заметок",
+                    [LanguageCode.de]: "8 leere Zellen unten dienen zum Notieren",
+                })}
+                .
+            </RulesParagraph>
         </>
     ),
     items: [
-        ...SparkGridArrowsConstraint(fieldSize),
+        ...SparkGridArrowsConstraint(fieldSizeWithNote),
         RenbanConstraint(["R2C4", "R2C3", "R3C2", "R6C2", "R7C3", "R7C4"]),
         RenbanConstraint(["R2C10", "R2C11", "R3C12", "R6C12", "R7C11", "R7C10"]),
         RenbanConstraint(["R1C7", "R2C8"]),

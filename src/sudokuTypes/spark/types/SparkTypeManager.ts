@@ -13,84 +13,90 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
     ...DigitSudokuTypeManager(),
 
     getCellTypeProps({ top, left }, { fieldSize }): CellTypeProps<NumberPTM> {
-        const { gridSize } = parseSparkFieldSize(fieldSize);
+        const { gridSize, realRowsCount } = parseSparkFieldSize(fieldSize);
 
         return {
-            isVisible: left !== gridSize * 2 && (top < gridSize || left < gridSize || left >= gridSize * 2),
+            isVisible:
+                top < realRowsCount
+                    ? left !== gridSize * 2 && (top < gridSize || left < gridSize || left >= gridSize * 2)
+                    : top > realRowsCount && left < realRowsCount,
+            isCheckingSolution: top < realRowsCount,
         };
     },
 
     processArrowDirection(cell, xDirection, yDirection, context, ...args) {
-        const { gridSize, columnsCount } = parseSparkFieldSize(context.puzzle.fieldSize);
+        const { gridSize, columnsCount, realRowsCount } = parseSparkFieldSize(context.puzzle.fieldSize);
         const { top, left } = cell;
 
-        if (top >= gridSize) {
-            if (left === 0 && xDirection === -1) {
-                return {
-                    cell: {
-                        top,
-                        left: columnsCount - 1,
-                    },
-                };
-            }
-            if (left === columnsCount - 1 && xDirection === 1) {
-                return {
-                    cell: {
-                        top,
-                        left: 0,
-                    },
-                };
-            }
-            if (left === columnsCount - gridSize && xDirection === -1) {
-                return {
-                    cell: {
-                        top,
-                        left: gridSize - 1,
-                    },
-                };
-            }
-            if (left === gridSize - 1 && xDirection === 1) {
-                return {
-                    cell: {
-                        top,
-                        left: columnsCount - gridSize,
-                    },
-                };
-            }
-        } else {
-            if (left === columnsCount - 1 && xDirection === 1) {
-                return {
-                    cell: {
-                        top: 0,
-                        left: gridSize * 2 - 1 - top,
-                    },
-                };
-            }
-            if (left === columnsCount - gridSize && xDirection === -1) {
-                return {
-                    cell: {
-                        top: gridSize - 1,
-                        left: gridSize * 2 - 1 - top,
-                    },
-                };
-            }
-
-            if (left >= gridSize && left < gridSize * 2) {
-                if (top === 0 && yDirection === -1) {
+        if (top < realRowsCount) {
+            if (top >= gridSize) {
+                if (left === 0 && xDirection === -1) {
                     return {
                         cell: {
-                            top: gridSize * 2 - 1 - left,
+                            top,
                             left: columnsCount - 1,
                         },
                     };
                 }
-                if (top === gridSize - 1 && yDirection === 1) {
+                if (left === columnsCount - 1 && xDirection === 1) {
                     return {
                         cell: {
-                            top: gridSize * 2 - 1 - left,
+                            top,
+                            left: 0,
+                        },
+                    };
+                }
+                if (left === columnsCount - gridSize && xDirection === -1) {
+                    return {
+                        cell: {
+                            top,
+                            left: gridSize - 1,
+                        },
+                    };
+                }
+                if (left === gridSize - 1 && xDirection === 1) {
+                    return {
+                        cell: {
+                            top,
                             left: columnsCount - gridSize,
                         },
                     };
+                }
+            } else {
+                if (left === columnsCount - 1 && xDirection === 1) {
+                    return {
+                        cell: {
+                            top: 0,
+                            left: gridSize * 2 - 1 - top,
+                        },
+                    };
+                }
+                if (left === columnsCount - gridSize && xDirection === -1) {
+                    return {
+                        cell: {
+                            top: gridSize - 1,
+                            left: gridSize * 2 - 1 - top,
+                        },
+                    };
+                }
+
+                if (left >= gridSize && left < gridSize * 2) {
+                    if (top === 0 && yDirection === -1) {
+                        return {
+                            cell: {
+                                top: gridSize * 2 - 1 - left,
+                                left: columnsCount - 1,
+                            },
+                        };
+                    }
+                    if (top === gridSize - 1 && yDirection === 1) {
+                        return {
+                            cell: {
+                                top: gridSize * 2 - 1 - left,
+                                left: columnsCount - gridSize,
+                            },
+                        };
+                    }
                 }
             }
         }
@@ -99,7 +105,7 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
     },
 
     transformCoords({ top, left }, { puzzle: { fieldSize } }) {
-        const { gridSize } = parseSparkFieldSize(fieldSize);
+        const { gridSize, realRowsCount } = parseSparkFieldSize(fieldSize);
 
         const a10 = Math.PI / 10;
         const s10 = Math.sin(a10);
@@ -113,6 +119,11 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
 
         let dx = left - gridSize;
         const dy = top - gridSize;
+
+        if (top >= realRowsCount) {
+            return { left: cx + dx, top: cy + dy + 1 };
+        }
+
         if (dx >= gridSize + 0.75) {
             dx -= gridSize + 1;
 
@@ -135,11 +146,11 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
     },
 
     getRegionsWithSameCoordsTransformation({ puzzle: { fieldSize, fieldMargin = 0 } }): Rect[] {
-        const { gridSize } = parseSparkFieldSize(fieldSize);
+        const { gridSize, realRowsCount, extraRowsCount } = parseSparkFieldSize(fieldSize);
 
         const fullMargin = fieldMargin + 1;
 
-        return [
+        const result: Rect[] = [
             {
                 left: -fullMargin,
                 top: -fullMargin,
@@ -150,7 +161,7 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
                 left: -fullMargin,
                 top: gridSize,
                 width: gridSize + fullMargin,
-                height: gridSize + fullMargin,
+                height: gridSize + 0.5,
             },
             {
                 left: gridSize,
@@ -168,39 +179,50 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
                 left: gridSize * 2 + 1,
                 top: gridSize,
                 width: gridSize + fullMargin,
-                height: gridSize + fullMargin,
+                height: gridSize + 0.5,
             },
         ];
+
+        if (extraRowsCount) {
+            result.push({
+                left: -fullMargin,
+                top: realRowsCount + 0.5,
+                width: gridSize * 2 + fullMargin * 2,
+                height: extraRowsCount + fullMargin,
+            });
+        }
+
+        return result;
     },
 
     getRegionsForRowsAndColumns({ puzzle: { fieldSize } }): Constraint<NumberPTM, any>[] {
-        const { gridSize, rowsCount, columnsCount } = parseSparkFieldSize(fieldSize);
+        const { gridSize, realRowsCount, columnsCount } = parseSparkFieldSize(fieldSize);
 
         return [
             ...indexes(gridSize).map((i) =>
                 RegionConstraint(
-                    indexes(rowsCount).map((j) => ({ left: i, top: j })),
+                    indexes(realRowsCount).map((j) => ({ left: i, top: j })),
                     false,
                     "column",
                 ),
             ),
             ...indexes(gridSize).map((i) =>
                 RegionConstraint(
-                    indexes(rowsCount).map((j) => ({ left: columnsCount - gridSize + i, top: j })),
+                    indexes(realRowsCount).map((j) => ({ left: columnsCount - gridSize + i, top: j })),
                     false,
                     "column",
                 ),
             ),
             ...indexes(gridSize).map((i) =>
                 RegionConstraint(
-                    indexes(rowsCount).map((j) => ({ left: j, top: i })),
+                    indexes(realRowsCount).map((j) => ({ left: j, top: i })),
                     false,
                     "row",
                 ),
             ),
             ...indexes(gridSize).map((i) =>
                 RegionConstraint(
-                    indexes(rowsCount).map((j) => ({
+                    indexes(realRowsCount).map((j) => ({
                         left: j < gridSize ? j : gridSize + 1 + j,
                         top: gridSize + i,
                     })),
@@ -210,7 +232,7 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
             ),
             ...indexes(gridSize).map((i) =>
                 RegionConstraint(
-                    indexes(rowsCount).map((j) => ({
+                    indexes(realRowsCount).map((j) => ({
                         left: j < gridSize ? gridSize + i : gridSize + 1 + j,
                         top: j < gridSize ? j : gridSize - 1 - i,
                     })),
@@ -226,15 +248,30 @@ export const createSparkFieldSize = (
     gridSize: number,
     regionWidth: number,
     regionHeight = (gridSize * 2) / regionWidth,
+    withNotes = false,
 ): Required<FieldSize> => {
     const columnsCount = gridSize * 3 + 1;
+    const notesHeight = withNotes ? 2 : 0;
 
     return {
-        fieldSize: columnsCount,
+        fieldSize: columnsCount + notesHeight,
         columnsCount,
-        rowsCount: gridSize * 2,
+        rowsCount: gridSize * 2 + notesHeight,
         regionWidth,
         regionHeight,
+    };
+};
+
+export const parseSparkFieldSize = ({ columnsCount, rowsCount }: FieldSize) => {
+    const gridSize = (columnsCount - 1) / 3;
+    const realRowsCount = gridSize * 2;
+
+    return {
+        columnsCount,
+        rowsCount,
+        realRowsCount,
+        extraRowsCount: rowsCount - realRowsCount,
+        gridSize,
     };
 };
 
@@ -258,9 +295,3 @@ export const createSparkRegions = (fieldSize: Required<FieldSize>): Position[][]
         ),
     ];
 };
-
-export const parseSparkFieldSize = ({ columnsCount, rowsCount }: FieldSize) => ({
-    columnsCount,
-    rowsCount,
-    gridSize: rowsCount / 2,
-});

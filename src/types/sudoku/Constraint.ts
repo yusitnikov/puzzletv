@@ -7,7 +7,7 @@ import { SetInterface } from "../struct/Set";
 import { LineWithColor } from "./LineWithColor";
 import { FieldLayer } from "./FieldLayer";
 import { AnyPTM } from "./PuzzleTypeMap";
-import { isSelectableCell } from "./CellTypeProps";
+import { isSelectableCell, isSolutionCheckCell } from "./CellTypeProps";
 import { GridRegion } from "./GridRegion";
 import { CellColorValue, resolveCellColorValue } from "./CellColor";
 import { profiler } from "../../utils/profiler";
@@ -199,12 +199,13 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
                         }
                     }
 
-                    if (!isSelectableCell(puzzleIndex.getCellTypeProps(position))) {
+                    const cellTypeProps = puzzleIndex.getCellTypeProps(position);
+                    if (!isSelectableCell(cellTypeProps)) {
                         return true;
                     }
 
                     if (digit === undefined) {
-                        return allowEmptyCells;
+                        return allowEmptyCells || !isSolutionCheckCell(cellTypeProps);
                     }
 
                     return isValidUserDigit(position, context.userDigits, context, true);

@@ -29,7 +29,7 @@ const SparkGridArrowConstraint = ({ top, left }: Position, angle: number) => {
     );
 };
 export const SparkGridArrowsConstraint = (fieldSize: Required<FieldSize>) => {
-    const { gridSize, rowsCount, columnsCount } = parseSparkFieldSize(fieldSize);
+    const { gridSize, realRowsCount, columnsCount } = parseSparkFieldSize(fieldSize);
 
     return [
         SparkGridArrowConstraint({ top: gridSize, left: -padding }, -90),
@@ -38,8 +38,8 @@ export const SparkGridArrowsConstraint = (fieldSize: Required<FieldSize>) => {
         SparkGridArrowConstraint({ top: gridSize, left: columnsCount + padding }, 90),
         SparkGridArrowConstraint({ top: -padding, left: gridSize }, 0),
         SparkGridArrowConstraint({ top: -padding, left: gridSize }, 180),
-        SparkGridArrowConstraint({ top: rowsCount + padding, left: gridSize }, 180),
-        SparkGridArrowConstraint({ top: rowsCount + padding, left: columnsCount - gridSize }, 0),
+        SparkGridArrowConstraint({ top: realRowsCount + padding, left: gridSize }, 180),
+        SparkGridArrowConstraint({ top: realRowsCount + padding, left: columnsCount - gridSize }, 0),
         SparkGridArrowConstraint({ top: gridSize, left: gridSize * 2 + padding }, -90),
         SparkGridArrowConstraint({ top: -padding, left: columnsCount - gridSize }, 0),
     ];
