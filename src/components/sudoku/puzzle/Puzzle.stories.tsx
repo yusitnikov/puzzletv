@@ -135,3 +135,30 @@ EasterSokoban.args = { _hash: "easter-sokoban" };
 
 export const EndlessChristmas = Template.bind({});
 EndlessChristmas.args = { _hash: "endless-christmas" };
+
+export const SlideAndSeekExample = Template.bind({});
+SlideAndSeekExample.args = { _hash: "slide-and-seek-example" };
+
+export const SlideAndSeekIntro = Template.bind({});
+SlideAndSeekIntro.args = { _hash: "slide-and-seek-intro" };
+
+export const TheBlackSheep = Template.bind({});
+TheBlackSheep.args = { _hash: "the-black-sheep" };
+
+export const TheGap = Template.bind({});
+TheGap.args = { _hash: "the-gap" };
+
+export const Cornered = Template.bind({});
+Cornered.args = { _hash: "cornered" };
+
+export const WaxOnWaxOff = Template.bind({});
+WaxOnWaxOff.args = { _hash: "wax-on-wax-off" };
+
+export const ElephantSlitherlink = Template.bind({});
+ElephantSlitherlink.args = { _hash: "elephant-slitherlink" };
+
+export const SparkKropkiXV = Template.bind({});
+SparkKropkiXV.args = { _hash: "spark-kropki-xv" };
+
+export const Sparkster = Template.bind({});
+Sparkster.args = { _hash: "sparkster" };
