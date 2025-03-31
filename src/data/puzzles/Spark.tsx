@@ -230,7 +230,6 @@ export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
 const fieldSizeWithNote = createSparkFieldSize(4, 2, 4, true);
 
 export const Sparkster: PuzzleDefinition<NumberPTM> = {
-    noIndex: true,
     title: {
         [LanguageCode.en]: "Sparkster",
     },
