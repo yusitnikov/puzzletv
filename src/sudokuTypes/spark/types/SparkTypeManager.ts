@@ -104,8 +104,8 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
         return defaultProcessArrowDirection(cell, xDirection, yDirection, context, ...args);
     },
 
-    transformCoords({ top, left }, { puzzle: { fieldSize } }) {
-        const { gridSize, realRowsCount } = parseSparkFieldSize(fieldSize);
+    transformCoords({ top, left }, { puzzle: { fieldSize }, isReadonlyContext: isPreview }) {
+        const { gridSize, realRowsCount, extraRowsCount } = parseSparkFieldSize(fieldSize);
 
         const a10 = Math.PI / 10;
         const s10 = Math.sin(a10);
@@ -115,7 +115,7 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
         const c5 = Math.cos(a5);
 
         const cx = gridSize * 1.5 + 0.5;
-        const cy = gridSize + 0.5;
+        const cy = gridSize + 0.5 + (isPreview ? extraRowsCount / 2 : 0);
 
         let dx = left - gridSize;
         const dy = top - gridSize;
@@ -145,7 +145,10 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
         }
     },
 
-    getRegionsWithSameCoordsTransformation({ puzzle: { fieldSize, fieldMargin = 0 } }): Rect[] {
+    getRegionsWithSameCoordsTransformation({
+        puzzle: { fieldSize, fieldMargin = 0 },
+        isReadonlyContext: isPreview,
+    }): Rect[] {
         const { gridSize, realRowsCount, extraRowsCount } = parseSparkFieldSize(fieldSize);
 
         const fullMargin = fieldMargin + 1;
@@ -183,7 +186,7 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
             },
         ];
 
-        if (extraRowsCount) {
+        if (extraRowsCount && !isPreview) {
             result.push({
                 left: -fullMargin,
                 top: realRowsCount + 0.5,
