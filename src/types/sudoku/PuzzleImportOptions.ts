@@ -92,6 +92,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     supportZero?: boolean;
     caterpillar?: boolean;
     dashedGrid?: boolean;
+    fractionalSudoku?: boolean;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -166,6 +167,7 @@ export const sanitizeImportOptions = (
         supportZero,
         caterpillar,
         dashedGrid,
+        fractionalSudoku,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -234,6 +236,7 @@ export const sanitizeImportOptions = (
         supportZero,
         caterpillar,
         dashedGrid,
+        fractionalSudoku,
     };
 
     return result;

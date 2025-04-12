@@ -127,6 +127,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
     const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
     const [dashedGrid, setDashedGrid] = useBoolFromLocalStorage("fpwDashedGrid");
+    const [fractionalSudoku, setFractionalSudoku] = useBoolFromLocalStorage("fpwFractionalSudoku");
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
     const [extraGridSource, setExtraGridSource] = useState(source);
     const [caterpillar, setCaterpillar] = useBoolFromLocalStorage("fpwCaterpillar");
@@ -141,6 +142,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const isShuffled = type === PuzzleImportPuzzleType.Shuffled;
     const isJigsawLike = isJigsaw || isTetris || isShuffled;
     const isRushHour = type === PuzzleImportPuzzleType.RushHour;
+    const isMergedCells = type === PuzzleImportPuzzleType.MergedCells;
     const isRotatableGrid = [
         PuzzleImportPuzzleType.Rotatable,
         PuzzleImportPuzzleType.Jigsaw,
@@ -279,6 +281,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         splitUnconnectedRegions,
         givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
         dashedGrid,
+        fractionalSudoku: isMergedCells && fractionalSudoku,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
         offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
@@ -680,6 +683,19 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                     </Paragraph>
                                 )}
                             </>
+                        )}
+
+                        {isMergedCells && (
+                            <Paragraph>
+                                <label>
+                                    Fractional sudoku:&nbsp;
+                                    <input
+                                        type={"checkbox"}
+                                        checked={fractionalSudoku}
+                                        onChange={(ev) => setFractionalSudoku(ev.target.checked)}
+                                    />
+                                </label>
+                            </Paragraph>
                         )}
 
                         <Paragraph>

@@ -2,7 +2,7 @@ import { AnyNumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
 import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
-import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { mergePuzzleItems, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import {
     createRegionsByGivenDigitsMap,
     GivenDigitsMap,
@@ -12,8 +12,12 @@ import { CustomCellBounds } from "../../../types/sudoku/CustomCellBounds";
 import { getRegionBorders } from "../../../utils/regions";
 import { getAverageModePosition } from "../../../types/layout/Position";
 import { ColorsImportMode } from "../../../types/sudoku/PuzzleImportOptions";
+import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
+import { indexes } from "../../../utils/indexes";
+import { MergedCellShape } from "./MergedCellShape";
+import { FractionalSudokuHouseConstraint } from "../constraints/FractionalSudokuHouse";
 
-export const MergedCellsTypeManager = <T extends AnyNumberPTM>(): SudokuTypeManager<T> => {
+export const MergedCellsTypeManager = <T extends AnyNumberPTM>(fractionalSudoku = false): SudokuTypeManager<T> => {
     const baseTypeManager = DigitSudokuTypeManager<T>();
 
     return {
@@ -34,10 +38,13 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
                 throw new Error("initialColors must be a plain object");
             }
 
+            const {
+                fieldSize: { rowsCount, columnsCount },
+            } = puzzle;
             const cellRegions = createRegionsByGivenDigitsMap(
                 processGivenDigitsMaps((colors) => colors.join(), [initialColors]),
-                puzzle.fieldSize.columnsCount,
-                puzzle.fieldSize.rowsCount,
+                columnsCount,
+                rowsCount,
             );
 
             const customCellBounds: GivenDigitsMap<CustomCellBounds> = {};
@@ -59,6 +66,48 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
                 ...puzzle,
                 customCellBounds,
             };
+
+            if (fractionalSudoku) {
+                if (rowsCount !== columnsCount || rowsCount % 2 === 1) {
+                    throw new Error("Invalid grid size for fractional sudoku");
+                }
+                const size = rowsCount / 2;
+
+                const cellShapes = cellRegions.map(
+                    (cells): MergedCellShape => ({
+                        mainCell: cells[0],
+                        cellsCount: cells.length,
+                    }),
+                );
+
+                const cells: MergedCellShape[][][] = indexes(size).map(() => indexes(size).map(() => []));
+                for (const cellShape of cellShapes) {
+                    cells[Math.floor(cellShape.mainCell.top / 2)][Math.floor(cellShape.mainCell.left / 2)].push(
+                        cellShape,
+                    );
+                }
+
+                const houses = [
+                    ...indexes(size).map((top) => indexes(size).map((left) => ({ top, left }))),
+                    ...indexes(size).map((left) => indexes(size).map((top) => ({ top, left }))),
+                ].map((houseCells) => houseCells.flatMap(({ top, left }) => cells[top][left]));
+
+                puzzle = {
+                    ...puzzle,
+                    // TODO: support regions
+                    // regions: undefined,
+                    items: mergePuzzleItems(puzzle.items, [
+                        ...cells.flat().map((cellShapes) =>
+                            RegionConstraint<T>(
+                                cellShapes.map((region) => region.mainCell),
+                                false,
+                                "cell",
+                            ),
+                        ),
+                        ...houses.map((cellShapes) => FractionalSudokuHouseConstraint<T>(cellShapes)),
+                    ]),
+                };
+            }
 
             return puzzle;
         },
