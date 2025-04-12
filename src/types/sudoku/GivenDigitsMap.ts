@@ -1,6 +1,7 @@
-import { Position } from "../layout/Position";
+import { isSamePosition, Position } from "../layout/Position";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
+import { indexes } from "../../utils/indexes";
 
 export type GivenDigitsMap<CellType> = Record<number, Record<number, CellType>>;
 
@@ -117,3 +118,59 @@ export const unserializeGivenDigitsMap = <CellType>(
     map: any,
     unserializer: (item: any) => CellType,
 ): GivenDigitsMap<CellType> => processGivenDigitsMaps(([cell]) => unserializer(cell), [map]);
+
+export const createRegionsByGivenDigitsMap = <CellType>(
+    map: GivenDigitsMap<CellType>,
+    width: number,
+    height: number,
+): Position[][] => {
+    interface Region {
+        value?: CellType;
+        // The first cell's coordinates is the region's temporary ID
+        id: Position;
+        cells: Position[];
+    }
+
+    // Make each cell a separate region, initially
+    const regions = indexes(height).map((top) =>
+        indexes(width).map(
+            (left): Region => ({
+                id: { top, left },
+                value: map[top]?.[left],
+                cells: [{ top, left }],
+            }),
+        ),
+    );
+
+    // Merge all regions one by one
+    const merge = (top1: number, left1: number, top2: number, left2: number) => {
+        const region1 = regions[top1][left1];
+        const region2 = regions[top2][left2];
+        if (region1 === region2 || region1.value !== region2.value) {
+            return;
+        }
+
+        // Merge region 2 to region 1
+        region1.cells.push(...region2.cells);
+
+        // Assign region 1 to the cells of region 2
+        for (const { top, left } of region2.cells) {
+            regions[top][left] = region1;
+        }
+    };
+    for (let top = 0; top < height; top++) {
+        for (let left = 0; left < width; left++) {
+            if (top !== 0) {
+                merge(top - 1, left, top, left);
+            }
+            if (left !== 0) {
+                merge(top, left - 1, top, left);
+            }
+        }
+    }
+
+    return regions
+        .flat()
+        .filter((region) => isSamePosition(region.id, region.cells[0]))
+        .map((region) => region.cells);
+};

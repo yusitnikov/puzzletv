@@ -2,11 +2,16 @@ import { AnyNumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
 import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
-import { getRegionCells, PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
-import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
+import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import {
+    createRegionsByGivenDigitsMap,
+    GivenDigitsMap,
+    processGivenDigitsMaps,
+} from "../../../types/sudoku/GivenDigitsMap";
 import { CustomCellBounds } from "../../../types/sudoku/CustomCellBounds";
 import { getRegionBorders } from "../../../utils/regions";
 import { getAverageModePosition } from "../../../types/layout/Position";
+import { ColorsImportMode } from "../../../types/sudoku/PuzzleImportOptions";
 
 export const MergedCellsTypeManager = <T extends AnyNumberPTM>(): SudokuTypeManager<T> => {
     const baseTypeManager = DigitSudokuTypeManager<T>();
@@ -23,11 +28,20 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
                 isVisible: puzzle.customCellBounds?.[top]?.[left] !== undefined,
             };
         },
-        postProcessPuzzle({ regions = [], ...puzzle }): PuzzleDefinition<T> {
-            const customCellBounds: GivenDigitsMap<CustomCellBounds> = {};
+        colorsImportMode: ColorsImportMode.Initials,
+        postProcessPuzzle({ initialColors = {}, ...puzzle }): PuzzleDefinition<T> {
+            if (typeof initialColors !== "object") {
+                throw new Error("initialColors must be a plain object");
+            }
 
-            for (const region of regions) {
-                const cells = getRegionCells(region);
+            const cellRegions = createRegionsByGivenDigitsMap(
+                processGivenDigitsMaps((colors) => colors.join(), [initialColors]),
+                puzzle.fieldSize.columnsCount,
+                puzzle.fieldSize.rowsCount,
+            );
+
+            const customCellBounds: GivenDigitsMap<CustomCellBounds> = {};
+            for (const cells of cellRegions) {
                 const mainCell = cells[0];
 
                 customCellBounds[mainCell.top] ??= {};
