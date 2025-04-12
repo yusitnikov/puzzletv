@@ -169,8 +169,14 @@ export const createRegionsByGivenDigitsMap = <CellType>(
         }
     }
 
-    return regions
-        .flat()
-        .filter((region) => isSamePosition(region.id, region.cells[0]))
-        .map((region) => region.cells);
+    // Filter unique regions
+    const result: Position[][] = [];
+    for (const [top, row] of regions.entries()) {
+        for (const [left, { cells }] of row.entries()) {
+            if (isSamePosition({ top, left }, cells[0])) {
+                result.push(cells);
+            }
+        }
+    }
+    return result;
 };
