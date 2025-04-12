@@ -45,6 +45,7 @@ import { CaterpillarSudokuTypeManager } from "../../sudokuTypes/caterpillar/type
 import { FPuzzlesGridParserFactory } from "./FPuzzles";
 import { SudokuMakerGridParserFactory } from "./SudokuMaker";
 import { SlideAndSeekTypeManager } from "../../sudokuTypes/slide-and-seek/types/SlideAndSeekTypeManager";
+import { MergedCellsTypeManager } from "../../sudokuTypes/merged-cells/types/MergedCellsTypeManager";
 
 const getGridParsersByImportOptions = <T extends AnyPTM>(
     importOptions: PuzzleImportOptions,
@@ -134,6 +135,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         [PuzzleImportPuzzleType.Tetris]: TetrisSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.Shuffled]: ShuffledSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.RushHour]: RushHourSudokuTypeManager,
+        [PuzzleImportPuzzleType.MergedCells]: MergedCellsTypeManager(),
     };
 
     let typeManager = typesMap[type] ?? regularTypeManager;

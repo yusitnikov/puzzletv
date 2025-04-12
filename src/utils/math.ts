@@ -11,3 +11,12 @@ export const sum = (values: number[]) => {
 };
 
 export const average = (values: number[]) => (values.length ? sum(values) / values.length : 0);
+
+export const averageMode = (values: number[]) => {
+    const { length } = values;
+    if (length === 0) return 0;
+
+    const middle = Math.floor(length / 2);
+    values = [...values].sort();
+    return length % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
+};

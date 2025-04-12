@@ -13,6 +13,7 @@ export enum PuzzleImportPuzzleType {
     Tetris = "tetris",
     Shuffled = "shuffled",
     RushHour = "rush-hour",
+    MergedCells = "merged-cells",
 }
 
 export enum PuzzleImportDigitType {
