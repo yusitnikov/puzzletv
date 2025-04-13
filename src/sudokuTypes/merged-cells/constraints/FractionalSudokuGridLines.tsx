@@ -20,7 +20,7 @@ export const FractionalSudokuGridLines: ConstraintPropsGenericFcMap = {
         profiler.trace();
 
         const scale = useTransformScale();
-        const borderWidth = 2 / scale;
+        const borderWidth = 1 / scale;
 
         return (
             <>

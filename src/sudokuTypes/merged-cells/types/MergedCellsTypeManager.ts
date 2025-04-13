@@ -16,7 +16,7 @@ import { RegionConstraint } from "../../../components/sudoku/constraints/region/
 import { indexes } from "../../../utils/indexes";
 import { MergedCellShape } from "./MergedCellShape";
 import { FractionalSudokuHouseConstraint } from "../constraints/FractionalSudokuHouse";
-import { darkGreyColor } from "../../../components/app/globals";
+import { lightGreyColor } from "../../../components/app/globals";
 import { FractionalSudokuGridLinesConstraint } from "../constraints/FractionalSudokuGridLines";
 
 export const MergedCellsTypeManager = <T extends AnyNumberPTM>(fractionalSudoku = false): SudokuTypeManager<T> => {
@@ -103,7 +103,7 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>(fractionalSudoku 
 
                 puzzle = {
                     ...puzzle,
-                    borderColor: darkGreyColor,
+                    borderColor: lightGreyColor,
                     items: mergePuzzleItems(puzzle.items, [
                         FractionalSudokuGridLinesConstraint<T>(),
                         ...cells.flat().map((cellShapes) =>

@@ -43,4 +43,4 @@ export const userDigitColor = darkBlueColor;
 
 export const regionHighlightColor = "#fe4";
 
-export const getRegionBorderWidth = (cellSize: number) => Math.min(5 / cellSize, 0.07);
+export const getRegionBorderWidth = (cellSize: number) => Math.min(5 / cellSize, 0.1);
