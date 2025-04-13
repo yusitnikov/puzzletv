@@ -82,6 +82,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         PuzzleImportDigitType.Regular,
     );
     const [areHtmlRules, setAreHtmlRules] = useBoolFromLocalStorage("fpwHtmlRules");
+    const [htmlSuccessMessage, setHtmlSuccessMessage] = useBoolFromLocalStorage("fpwHtmlSuccessMessage");
     const [loopX, setLoopX] = useBoolFromLocalStorage("fpwLoopX");
     const [loopY, setLoopY] = useBoolFromLocalStorage("fpwLoopY");
     const [isJss, setIsJss] = useBoolFromLocalStorage("fpwIsJss");
@@ -230,6 +231,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         type,
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
+        htmlSuccessMessage,
         digitsCount:
             maxDigit === undefined && digitsCount === fieldSize && !filteredExtraGrids.length ? undefined : digitsCount,
         supportZero: minDigit === undefined && supportZero,
@@ -352,6 +354,29 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                 <input type={"checkbox"} checked={stickyDigits} onChange={(ev) => setStickyDigits(ev.target.checked)} />
             </label>
         </Paragraph>
+    );
+
+    const htmlUsageNotes = (
+        <Details>
+            Notes:
+            <ul style={{ margin: 0 }}>
+                <li>
+                    Line breaks in the text will <strong>not</strong> be applied automatically in the HTML mode. Please
+                    use the <code>&lt;p&gt;</code> tag for paragraphs.
+                </li>
+                <li>
+                    The following HTML tags are allowed: <code>{allowedRulesHtmlTags.join(", ")}</code>.<br />
+                    Tag attributes are not supported and will be stripped, except for the common attributes of{" "}
+                    <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.
+                    <br />
+                    Please{" "}
+                    <a href={buildLink("contacts", languageCode)} target={"_blank"}>
+                        contact the site creator
+                    </a>{" "}
+                    to add support for other tags or attributes.
+                </li>
+            </ul>
+        </Details>
     );
 
     return (
@@ -998,29 +1023,19 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                     onChange={(ev) => setAreHtmlRules(ev.target.checked)}
                                 />
                             </label>
-                            {areHtmlRules && (
-                                <Details>
-                                    Notes:
-                                    <ul style={{ margin: 0 }}>
-                                        <li>
-                                            Line breaks in the text will <strong>not</strong> be applied automatically
-                                            in the HTML mode. Please use the <code>&lt;p&gt;</code> tag for paragraphs.
-                                        </li>
-                                        <li>
-                                            The following HTML tags are allowed:{" "}
-                                            <code>{allowedRulesHtmlTags.join(", ")}</code>.<br />
-                                            Tag attributes are not supported and will be stripped, except for the common
-                                            attributes of <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.
-                                            <br />
-                                            Please{" "}
-                                            <a href={buildLink("contacts", languageCode)} target={"_blank"}>
-                                                contact the site creator
-                                            </a>{" "}
-                                            to add support for other tags or attributes.
-                                        </li>
-                                    </ul>
-                                </Details>
-                            )}
+                            {areHtmlRules && htmlUsageNotes}
+                        </Paragraph>
+
+                        <Paragraph>
+                            <label>
+                                Success message is HTML:&nbsp;
+                                <input
+                                    type={"checkbox"}
+                                    checked={htmlSuccessMessage}
+                                    onChange={(ev) => setHtmlSuccessMessage(ev.target.checked)}
+                                />
+                            </label>
+                            {htmlSuccessMessage && htmlUsageNotes}
                         </Paragraph>
 
                         <Paragraph>

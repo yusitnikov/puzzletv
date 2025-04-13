@@ -218,8 +218,14 @@ export class PuzzleImporter<T extends AnyPTM> {
             }
         }
     }
-    setSuccessMessage(message: string) {
-        this.puzzle.successMessage = message;
+    setSuccessMessage(gridParser: GridParser<T, any>, message: string) {
+        if (message && !this.puzzle.successMessage) {
+            if (this.finalImportOptions(gridParser).htmlSuccessMessage) {
+                this.puzzle.successMessage = <ParsedRulesHtml>{message}</ParsedRulesHtml>;
+            } else {
+                this.puzzle.successMessage = message;
+            }
+        }
     }
 
     isVisibleGridCell({ top, left }: Position) {

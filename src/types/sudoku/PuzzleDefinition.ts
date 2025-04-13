@@ -50,7 +50,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
         context: PuzzleContext<T>,
         isPortrait: boolean,
     ) => ReactNode;
-    successMessage?: string;
+    successMessage?: ReactNode;
     typeManager: SudokuTypeManager<T>;
     fieldSize: FieldSize;
     regions?: (Position[] | Constraint<T, any>)[];

@@ -131,5 +131,5 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     allowMappingSolutionColors: true,
     ignoreEmptySolutionColors: true,
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
-    successMessage: "Congratulations!\n" + "You found your way to the star!\n" + "The solution is correct.",
+    successMessage: "Congratulations!\nYou found your way to the star!\nThe solution is correct.",
 };

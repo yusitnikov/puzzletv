@@ -581,7 +581,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                     }
 
                     new ObjectParser<Record<string, string>>({
-                        msgcorrect: (message) => importer.setSuccessMessage(message),
+                        msgcorrect: (message) => importer.setSuccessMessage(this, message),
                     }).parse(metadata, "metadata from f-puzzles cages");
                 }
             },
@@ -621,7 +621,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
             },
             successMessage: (successMessage) => {
                 if (successMessage) {
-                    importer.setSuccessMessage(successMessage);
+                    importer.setSuccessMessage(this, successMessage);
                 }
             },
             disabledlogic: undefined,

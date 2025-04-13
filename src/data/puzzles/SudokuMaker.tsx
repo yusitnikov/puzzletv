@@ -1028,7 +1028,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                     new ObjectParser<CompressedPuzzle["messages"]>({
                         completion: (message) => {
                             if (message) {
-                                importer.setSuccessMessage(message);
+                                importer.setSuccessMessage(this, message);
                             }
                         },
                     }).parse(messages, "SudokuMaker messages"),
