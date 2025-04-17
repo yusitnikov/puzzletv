@@ -36,6 +36,7 @@ import {
 } from "../../data/puzzles/InfinityLoop";
 import { OpenInNew } from "@emotion-icons/material";
 import { Cornered } from "../../data/puzzles/SlideAndSeek";
+import { CloseQuarters, CloseQuartersSource } from "../../data/puzzles/FractionalSudoku";
 
 export const HowToImport = observer(function HowToImport() {
     profiler.trace();
@@ -713,6 +714,98 @@ export const HowToImport = observer(function HowToImport() {
                                             "Используйте белые косметические линии, чтобы спрятать границы между клетками-«дырками»",
                                         [LanguageCode.de]:
                                             'Verwenden Sie weiße kosmetische Linien, um Grenzen zwischen "Loch"-Zellen zu verbergen',
+                                    })}
+                                    .
+                                </p>
+                            </>
+                        ),
+                    },
+                    {
+                        id: "fractional-sudoku",
+                        title: (
+                            <ExampleTab
+                                title={translate({ [LanguageCode.en]: "Fractional sudoku" })}
+                                puzzle={CloseQuarters}
+                            />
+                        ),
+                        contents: (
+                            <>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]: "Create a puzzle twice the desired size",
+                                        [LanguageCode.ru]: "Создайте головоломку размером в два раза больше желаемого",
+                                        [LanguageCode.de]:
+                                            "Erstellen Sie ein Puzzle in der doppelten gewünschten Größe",
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]: "Mark each cell piece with a different color",
+                                        [LanguageCode.ru]: "Отметьте каждую часть клетки различным цветом",
+                                        [LanguageCode.de]: "Markieren Sie jedes Zellstück mit einer anderen Farbe",
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            "Define sudoku regions as usual, ignore Sudoku Maker's warnings about exceeding the region size",
+                                        [LanguageCode.ru]:
+                                            "Определите регионы судоку как обычно, игнорируйте предупреждения Sudoku Maker-а о превышении размера региона",
+                                        [LanguageCode.de]:
+                                            "Definieren Sie Sudoku-Regionen wie gewohnt und ignorieren Sie die Warnungen des Sudoku Makers bezüglich der Überschreitung der Regionsgröße",
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            "Put given digits and the digits of the embedded solution in the first cell (in the reading order) that represents the cell piece",
+                                        [LanguageCode.ru]:
+                                            "Поместите заданные цифры и цифры встроенного решения в первую клетку (в порядке чтения), которая представляет часть клетки",
+                                        [LanguageCode.de]:
+                                            "Tragen Sie die angegebenen Ziffern und die Ziffern der eingebetteten Lösung in die erste Zelle (in der Lesereihenfolge) ein, die das Zellstück darstellt",
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            "Note: it's not recommended to include the embedded solution (to avoid forcing the order of entering digits in equally sized cell pieces), it's better to rely on the conflict checker only",
+                                        [LanguageCode.ru]:
+                                            "Примечание: не рекомендуется включать встроенное решение (чтобы избежать принудительного порядка ввода цифр в ячейки одинакового размера), лучше полагаться только на средство проверки конфликтов",
+                                        [LanguageCode.de]:
+                                            "Hinweis: Es wird nicht empfohlen, die eingebettete Lösung einzuschließen (um zu vermeiden, dass die Reihenfolge der Eingabe von Ziffern in gleich großen Zellteilen erzwungen wird). Es ist besser, sich nur auf den Konfliktprüfer zu verlassen",
+                                    })}
+                                    .
+                                </p>
+                                <MappingIllustration
+                                    puzzle={(plain) => (plain ? CloseQuartersSource : CloseQuarters)}
+                                />
+                                <p>
+                                    {translate(selectGridTypeTranslation("Merged cells"))}.<br />
+                                    {translate(selectAdditionalConstraintTranslation("Fractional sudoku"))}.<br />
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            'Check the "Verify the solution based on the conflict checker" flag in the "Miscellaneous" section if the puzzle does not have non-standard rules',
+                                        [LanguageCode.ru]:
+                                            "Установите флажок «Verify the solution based on the conflict checker» в разделе «Miscellaneous», если головоломка не имеет нестандартных правил",
+                                        [LanguageCode.de]:
+                                            'Aktivieren Sie das Kontrollkästchen "Verify the solution based on the conflict checker" im Abschnitt "Miscellaneous", wenn das Puzzle keine nicht standardmäßigen Regeln enthält',
+                                    })}
+                                    .
+                                </p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            "Note: variant constraints (e.g. cages, renban) are currently not supported. Please contact Chameleon if you're going to use them in your puzzle",
+                                        [LanguageCode.ru]:
+                                            "Примечание: ограничения вариантов (например, клетки, ренбан) в настоящее время не поддерживаются. Пожалуйста, свяжитесь с Chameleon-ом, если вы собираетесь использовать их в своей головоломке",
+                                        [LanguageCode.de]:
+                                            "Hinweis: Variantenbeschränkungen (z. B. Käfige, Renban) werden derzeit nicht unterstützt. Bitte kontaktieren Sie Chameleon, wenn Sie diese in Ihrem Puzzle verwenden möchten",
                                     })}
                                     .
                                 </p>
