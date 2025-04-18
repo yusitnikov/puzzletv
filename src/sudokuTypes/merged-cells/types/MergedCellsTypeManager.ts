@@ -50,6 +50,7 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>(fractionalSudoku 
                 rowsCount,
             );
 
+            let { initialDigits, solution } = puzzle;
             const customCellBounds: GivenDigitsMap<CustomCellBounds> = {};
             for (const cells of cellRegions) {
                 const mainCell = cells[0];
@@ -63,11 +64,25 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>(fractionalSudoku 
                         height: 1,
                     },
                 };
+
+                // Move given/solution digits to the main cell of the cell part
+                for (const map of [initialDigits, solution]) {
+                    for (const { top, left } of cells.slice(1)) {
+                        const value = map?.[top]?.[left];
+                        if (value !== undefined) {
+                            map![mainCell.top] ??= {};
+                            map![mainCell.top][mainCell.left] = value;
+                            delete map![top][left];
+                        }
+                    }
+                }
             }
 
             puzzle = {
                 ...puzzle,
                 customCellBounds,
+                initialDigits,
+                solution,
             };
 
             if (fractionalSudoku) {

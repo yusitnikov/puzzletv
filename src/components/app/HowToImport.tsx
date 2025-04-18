@@ -761,11 +761,11 @@ export const HowToImport = observer(function HowToImport() {
                                 <p>
                                     {translate({
                                         [LanguageCode.en]:
-                                            "Put given digits and the digits of the embedded solution in the first cell (in the reading order) that represents the cell piece",
+                                            "Put given digits and the digits of the embedded solution in any cell of the cell piece",
                                         [LanguageCode.ru]:
-                                            "Поместите заданные цифры и цифры встроенного решения в первую клетку (в порядке чтения), которая представляет часть клетки",
+                                            "Поместите заданные цифры и цифры встроенного решения в любую клетку части клетки",
                                         [LanguageCode.de]:
-                                            "Tragen Sie die angegebenen Ziffern und die Ziffern der eingebetteten Lösung in die erste Zelle (in der Lesereihenfolge) ein, die das Zellstück darstellt",
+                                            "Setzen Sie die angegebenen Ziffern und die Ziffern der eingebetteten Lösung in eine beliebige Zelle des Zellstücks ein",
                                     })}
                                     .
                                 </p>
