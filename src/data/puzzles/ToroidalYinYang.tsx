@@ -14,6 +14,7 @@ import {
 import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
+import { errorResultCheck, notFinishedResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
 
 const S = CellColor.shaded;
 const U = CellColor.unshaded;
@@ -72,10 +73,21 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
     enableShading: true,
     allowDrawing: ["center-line", "border-line", "border-mark"],
     resultChecker: (context) => {
-        return correctAnswer.every((row, top) =>
-            row.every(
-                (answer, left) => (givenColors[top]?.[left] ?? context.getCellColors(top, left).first()) === answer,
-            ),
-        );
+        let finished = true;
+
+        for (const [top, row] of correctAnswer.entries()) {
+            for (const [left, answer] of row.entries()) {
+                const actualColor = givenColors[top]?.[left] ?? context.getCellColors(top, left).first();
+                if (actualColor === undefined) {
+                    finished = false;
+                    continue;
+                }
+                if (actualColor !== answer) {
+                    return errorResultCheck();
+                }
+            }
+        }
+
+        return finished ? successResultCheck(context.puzzle) : notFinishedResultCheck();
     },
 };

@@ -196,5 +196,5 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
     customCellBounds: createGivenDigitsMapFromArray([cells]),
     allowDrawing: ["center-mark", "center-line"],
     items: [NonRepeatingNeighborsConstraint()],
-    resultChecker: (context) => isValidFinishedPuzzleByEmbeddedSolution(context),
+    resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
 };

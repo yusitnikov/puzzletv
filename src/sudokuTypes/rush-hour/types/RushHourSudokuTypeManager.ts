@@ -326,11 +326,11 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                             },
                         });
 
-                        if (
-                            resultChecker !== isValidFinishedPuzzleByConstraints &&
-                            !isValidFinishedPuzzleByConstraints(fixedContext)
-                        ) {
-                            return false;
+                        if (resultChecker !== isValidFinishedPuzzleByConstraints) {
+                            const result2 = isValidFinishedPuzzleByConstraints(fixedContext);
+                            if (!result2.isCorrectResult) {
+                                return result2;
+                            }
                         }
 
                         return resultChecker!(fixedContext);

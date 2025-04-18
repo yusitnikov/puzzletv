@@ -20,6 +20,7 @@ import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/sudoku/GivenDi
 import { Position } from "../../types/layout/Position";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { comparer, IReactionDisposer, reaction } from "mobx";
+import { notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
 
 // TODO: accessibility for color-blind
 
@@ -167,8 +168,10 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
 
                             return {
                                 ...item,
-                                isValidPuzzle(lines, digits, regionCells, context): boolean {
-                                    return hasParkedCar(context, boundingBox);
+                                isValidPuzzle(_lines, _digits, _cells, context): PuzzleResultCheck {
+                                    return hasParkedCar(context, boundingBox)
+                                        ? successResultCheck(context.puzzle)
+                                        : notFinishedResultCheck();
                                 },
                             };
                         } else {
@@ -201,15 +204,14 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
             },
             resultChecker: (context) => {
                 // Hack the digits count in the context to check only the global constraints, not the digits
-                if (
-                    !isValidFinishedPuzzleByConstraints(
-                        context.cloneWith({ puzzle: { ...context.puzzle, digitsCount: 0 } }),
-                    )
-                ) {
-                    return false;
+                const result = isValidFinishedPuzzleByConstraints(
+                    context.cloneWith({ puzzle: { ...context.puzzle, digitsCount: 0 } }),
+                );
+                if (!result) {
+                    return result;
                 }
 
-                return resultChecker?.(context) ?? true;
+                return resultChecker?.(context) ?? result;
             },
         };
     },

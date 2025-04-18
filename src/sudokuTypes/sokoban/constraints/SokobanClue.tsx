@@ -4,6 +4,7 @@ import { getLineVector, Position } from "../../../types/layout/Position";
 import { SokobanPTM } from "../types/SokobanPTM";
 import { SokobanClue } from "../types/SokobanPuzzleExtension";
 import { isCageConstraint, KillerCageProps } from "../../../components/sudoku/constraints/killer-cage/KillerCage";
+import { errorResultCheck } from "../../../types/sudoku/PuzzleResultCheck";
 
 export const sokobanTag = "sokoban";
 
@@ -49,7 +50,5 @@ export const SokobanClueConstraint = (
           ((cell, digits, regionCells, context, constraints, constraint, isFinalCheck, ...args): boolean =>
               !isFinalCheck ||
               isValidCell(cell, digits, regionCells, context, constraints, constraint, isFinalCheck, ...args)),
-    isValidPuzzle(...args): boolean {
-        return !smashed && isValidPuzzle?.(...args) !== false;
-    },
+    isValidPuzzle: smashed ? errorResultCheck : isValidPuzzle,
 });

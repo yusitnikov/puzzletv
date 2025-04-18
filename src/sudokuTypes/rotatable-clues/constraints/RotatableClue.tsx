@@ -14,6 +14,7 @@ import { rgba } from "../../../utils/color";
 import { CellSelectionColor } from "../../../components/sudoku/cell/CellSelection";
 import { cancelOutsideClickProps } from "../../../utils/gestures";
 import { runInAction } from "mobx";
+import { notFinishedResultCheck, successResultCheck } from "../../../types/sudoku/PuzzleResultCheck";
 
 const pivotRadius = 0.15;
 const pivotLineWidth = pivotRadius * 0.1;
@@ -180,11 +181,15 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
             },
             renderSingleCellInUserArea: true,
             isObvious: true,
-            isValidPuzzle(lines, digits, regionCells, { puzzleIndex: { allCells } }): boolean {
+            isValidPuzzle(_lines, _digits, _cells, context) {
+                const {
+                    puzzleIndex: { allCells },
+                } = context;
+
                 // Verify that the rotated cells are still within the grid
-                return processedCells.every(
-                    ({ top, left }) => top % 1 !== 0 || left % 1 !== 0 || allCells[top]?.[left],
-                );
+                return processedCells.every(({ top, left }) => top % 1 !== 0 || left % 1 !== 0 || allCells[top]?.[left])
+                    ? successResultCheck(context.puzzle)
+                    : notFinishedResultCheck();
             },
             isValidCell(cell, digits, regionCells, context, constraints, constraint, isFinalCheck): boolean {
                 const {

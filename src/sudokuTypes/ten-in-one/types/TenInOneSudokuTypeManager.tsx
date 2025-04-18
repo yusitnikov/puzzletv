@@ -17,7 +17,11 @@ export const TenInOneSudokuTypeManager = (
 ): SudokuTypeManager<MultiStagePTM> => ({
     ...MultiStageSudokuTypeManager({
         getStage: (context) =>
-            context.stateExtension.stage === 1 ? (isValidFinishedPuzzleByConstraints(context) ? 2 : 1) : 3,
+            context.stateExtension.stage === 1
+                ? isValidFinishedPuzzleByConstraints(context).isCorrectResult
+                    ? 2
+                    : 1
+                : 3,
         onStageChange: (context, stage) => {
             const { puzzle, stateInitialDigits } = context;
             const {

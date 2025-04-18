@@ -11,7 +11,7 @@ import {
     setAllShareState,
 } from "./GameState";
 import { MessageWithClientId, myClientId, UseMultiPlayerResult } from "../../hooks/useMultiPlayer";
-import { Dispatch, ReactNode } from "react";
+import { Dispatch } from "react";
 import {
     coreGameStateActionTypes,
     GameStateAction,
@@ -41,10 +41,8 @@ import { setComparer, SetInterface } from "../struct/Set";
 import { PuzzleLine } from "./PuzzleLine";
 import { CellMark } from "./CellMark";
 import { areCellStatesEqual, CellState } from "./CellState";
-import { LanguageCode } from "../translations/LanguageCode";
 import { translate } from "../../utils/translate";
-import { PartiallyTranslatable } from "../translations/Translatable";
-import { PuzzleResultCheck } from "./PuzzleResultCheck";
+import { errorResultCheck, PuzzleResultCheck } from "./PuzzleResultCheck";
 import { profiler } from "../../utils/profiler";
 import { getGridRegionCells, GridRegion } from "./GridRegion";
 import { PuzzleImportOptions } from "./PuzzleImportOptions";
@@ -630,35 +628,18 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     }
     // endregion
 
-    get resultCheck(): PuzzleResultCheck<ReactNode> {
+    get resultCheck(): PuzzleResultCheck {
         profiler.trace();
 
         if (this.lives === 0) {
             return {
                 isCorrectResult: false,
+                isPending: false,
                 resultPhrase: translate("You lost") + "!",
             };
         }
 
-        const result = this.puzzle.resultChecker?.(this) ?? false;
-        return typeof result === "boolean"
-            ? {
-                  isCorrectResult: result,
-                  resultPhrase: result
-                      ? (this.puzzle.successMessage ?? `${translate("Absolutely right")}!`)
-                      : `${translate("Something's wrong here")}...`,
-              }
-            : {
-                  isCorrectResult: result.isCorrectResult,
-                  resultPhrase:
-                      typeof result.resultPhrase === "string" ||
-                      (result.resultPhrase &&
-                          typeof result.resultPhrase === "object" &&
-                          LanguageCode.en in result.resultPhrase)
-                          ? translate(result.resultPhrase as PartiallyTranslatable<ReactNode>)
-                          : result.resultPhrase,
-                  forceShowResult: result.forceShowResult,
-              };
+        return this.puzzle.resultChecker?.(this) ?? errorResultCheck();
     }
 
     get regionsForRowsAndColumns(): Constraint<T, any>[] {

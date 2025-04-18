@@ -76,8 +76,9 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     items: [...items, KillerCageConstraintByRect("R7C5", 1, 2, 7)],
     allowDrawing: allDrawingModes,
     resultChecker: (context) => {
-        if (isValidFinishedPuzzleByConstraints(context)) {
-            return true;
+        const result = isValidFinishedPuzzleByConstraints(context);
+        if (result.isCorrectResult) {
+            return result;
         }
 
         // Check that cells with the same digit contain the same set of colors
@@ -94,7 +95,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
                 }
 
                 if (!groupColors.equals(cellColors)) {
-                    return false;
+                    return result;
                 }
             }
         }
@@ -106,14 +107,15 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
                     Math.floor(groupIndex1 / 3) !== Math.floor(groupIndex2 / 3) &&
                     groupColors1!.equals(groupColors2!)
                 ) {
-                    return false;
+                    return result;
                 }
             }
         }
 
         return {
             isCorrectResult: true,
-            resultPhrase: {
+            isPending: false,
+            resultPhrase: translate({
                 [LanguageCode.en]: [
                     "Congratulations, you solved the puzzle!",
                     "No-one cares about the digits.",
@@ -126,7 +128,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
                     "Полностью разукрашенного поля вполне достаточно.",
                     "В конце концов, лишь это важно.",
                 ].join("\n"),
-            },
+            }),
         };
     },
 };

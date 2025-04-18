@@ -267,14 +267,6 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Проверить результат",
         [LanguageCode.de]: "Überprüfen Sie das Ergebnis",
     },
-    "Absolutely right": {
-        [LanguageCode.ru]: "Совершенно верно",
-        [LanguageCode.de]: "Absolut richtig",
-    },
-    "Something's wrong here": {
-        [LanguageCode.ru]: "Что-то тут не так",
-        [LanguageCode.de]: "Irgendetwas ist hier falsch",
-    },
     Congratulations: {
         [LanguageCode.ru]: "Поздравляем",
         [LanguageCode.de]: "Glückwunsch",

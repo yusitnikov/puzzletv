@@ -388,9 +388,10 @@ const rotateDigitsMap = (map: GivenDigitsMap<number>, puzzle: PuzzleDefinition<M
     );
 };
 
-export const fixMonumentValleyDigitForConstraint = <DataT>(
-    constraint: Constraint<MonumentValleyPTM, DataT>,
-): Constraint<MonumentValleyPTM, DataT> => ({
+export const fixMonumentValleyDigitForConstraint = <DataT>({
+    isValidPuzzle,
+    ...constraint
+}: Constraint<MonumentValleyPTM, DataT>): Constraint<MonumentValleyPTM, DataT> => ({
     ...constraint,
     isValidCell(cell, digits, regionCells, context, ...args) {
         return (
@@ -398,9 +399,10 @@ export const fixMonumentValleyDigitForConstraint = <DataT>(
             true
         );
     },
-    isValidPuzzle(lines, digits, regionCells, context) {
-        return constraint.isValidPuzzle?.(lines, rotateDigitsMap(digits, context.puzzle), regionCells, context) ?? true;
-    },
+    isValidPuzzle: isValidPuzzle
+        ? (lines, digits, regionCells, context) =>
+              isValidPuzzle(lines, rotateDigitsMap(digits, context.puzzle), regionCells, context)
+        : undefined,
 });
 
 export const rotateCellCoords = (

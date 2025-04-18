@@ -19,7 +19,7 @@ import {
     stringifyLine,
     stringifyPosition,
 } from "../layout/Position";
-import { PuzzleResultCheck } from "./PuzzleResultCheck";
+import { errorResultCheck, notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "./PuzzleResultCheck";
 import { CellMark, getCenterMarksMap, parseCellMark } from "./CellMark";
 import { loop } from "../../utils/math";
 import { LanguageCode } from "../translations/LanguageCode";
@@ -29,6 +29,7 @@ import { isSolutionCheckCell } from "./CellTypeProps";
 import { profiler } from "../../utils/profiler";
 import { ColorChecker, ColorMapChecker, ExactColorChecker } from "./ColorChecker";
 import { settings } from "../layout/Settings";
+import { translate } from "../../utils/translate";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
     // The field is required. Marking it as optional here only to avoid adding empty object to each puzzle.
@@ -65,9 +66,7 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
     disableBackgroundColorOpacity?: boolean;
-    resultChecker?: (
-        context: PuzzleContext<T>,
-    ) => boolean | PuzzleResultCheck<ReactNode | PartiallyTranslatable<ReactNode>>;
+    resultChecker?: (context: PuzzleContext<T>) => PuzzleResultCheck;
     allowEmptyCells?: boolean;
     forceAutoCheckOnFinish?: boolean;
     items?: Constraint<T, any>[] | ((context: PuzzleContext<T>) => Constraint<T, any>[]);
@@ -227,7 +226,7 @@ export const getPuzzleLineHasher =
 
 export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     context: PuzzleContext<T>,
-): boolean | PuzzleResultCheck<PartiallyTranslatable<ReactNode>> => {
+): PuzzleResultCheck => {
     const timer = profiler.track("isValidFinishedPuzzleByEmbeddedSolution");
 
     const {
@@ -251,7 +250,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     const initialCenterMarks = getCenterMarksMap(initialCellMarks, puzzleIndex);
     const userCenterMarks = getCenterMarksMap(marks.items, puzzleIndex);
 
-    let areCorrectDigits = true;
+    let finished = true;
     let areCorrectColorsByDigits = true;
     const colorsByDigitsChecker: ColorChecker<number> = new ColorMapChecker<number>();
     const colorsBySolutionChecker: ColorChecker<string> = allowMappingSolutionColors
@@ -305,7 +304,11 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                         loggedEmptyDigits = true;
                     }
                 }
-                areCorrectDigits = false;
+                if (actualData !== undefined) {
+                    timer.stop();
+                    return errorResultCheck();
+                }
+                finished = false;
             }
 
             let expectedColor = [...(solutionColors[top]?.[left] ?? [])].sort().join(",");
@@ -314,8 +317,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             if (!expectedData) {
                 areCorrectColorsByDigits = false;
             } else if (typeof expectedData === "number") {
-                areCorrectColorsByDigits =
-                    areCorrectColorsByDigits && colorsByDigitsChecker.isValidData(actualColor, expectedData);
+                areCorrectColorsByDigits &&= colorsByDigitsChecker.isValidData(actualColor, expectedData);
             }
 
             if (hasSolutionColors && (expectedColor || !ignoreEmptySolutionColors)) {
@@ -335,26 +337,25 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                             loggedEmptyColors = true;
                         }
                     }
-                    timer.stop();
-                    return false;
+                    if (!actualColor) {
+                        finished = false;
+                    } else {
+                        timer.stop();
+                        return errorResultCheck();
+                    }
                 }
-            }
-
-            if (!areCorrectDigits && !areCorrectColorsByDigits) {
-                timer.stop();
-                return false;
             }
         }
     }
 
     if (hasSolutionColors && !colorsBySolutionChecker.isValidPuzzle()) {
         timer.stop();
-        return false;
+        return errorResultCheck();
     }
 
-    if (areCorrectDigits) {
+    if (finished) {
         timer.stop();
-        return true;
+        return successResultCheck(puzzle);
     }
 
     if (areCorrectColorsByDigits) {
@@ -362,7 +363,8 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             timer.stop();
             return {
                 isCorrectResult: true,
-                resultPhrase: {
+                isPending: false,
+                resultPhrase: translate({
                     [LanguageCode.en]: [
                         "Congratulations, you solved the puzzle!",
                         "No-one cares about the digits.",
@@ -373,13 +375,13 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
                         "Никого не интересуют цифры.",
                         "Полностью разукрашенного поля вполне достаточно.",
                     ].join("\n"),
-                },
+                }),
             };
         }
     }
 
     timer.stop();
-    return false;
+    return notFinishedResultCheck();
 };
 
 export const getRegionCells = <T extends AnyPTM>(region: Position[] | Constraint<T, any>) =>

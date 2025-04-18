@@ -35,6 +35,7 @@ import { indexes, indexesFromTo } from "../../utils/indexes";
 import { AntiBishopConstraint } from "../../types/sudoku/constraints/AntiBishop";
 import { TextConstraint } from "../../components/sudoku/constraints/text/Text";
 import { translate } from "../../utils/translate";
+import { errorResultCheck, PuzzleResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
 
 const mandatorySolutionPieces = chessInitialPiecesByCellNames({
     g8: { color: ChessColor.black, type: ChessPieceType.knight },
@@ -52,7 +53,7 @@ const isValidSolution = (
     context: PuzzleContext<ChessPTM>,
     mandatorySolutionPieces: GivenDigitsMap<ChessPiece>,
     optionalSolutionPieces: GivenDigitsMap<ChessPiece> = {},
-) => {
+): PuzzleResultCheck => {
     const currentFinalDigits = mergeGivenDigitsMaps(context.userDigits, optionalSolutionPieces);
 
     const correctFinalDigits = mergeGivenDigitsMaps(
@@ -61,7 +62,9 @@ const isValidSolution = (
         optionalSolutionPieces,
     );
 
-    return areSameGivenDigitsMapsByContext(context, currentFinalDigits, correctFinalDigits);
+    return areSameGivenDigitsMapsByContext(context, currentFinalDigits, correctFinalDigits)
+        ? successResultCheck(context.puzzle)
+        : errorResultCheck();
 };
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
@@ -339,8 +342,8 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
         TextConstraint(["R8C8"], "7", undefined, 0.7),
     ],
     allowDrawing: allDrawingModes,
-    resultChecker: (context) =>
-        isValidSolution(
+    resultChecker: (context) => {
+        const result = isValidSolution(
             context,
             chessInitialPiecesByCellNames({
                 c7: { color: ChessColor.white, type: ChessPieceType.knight },
@@ -349,9 +352,11 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
                 h2: { color: ChessColor.white, type: ChessPieceType.bishop },
                 d4: { color: ChessColor.black, type: ChessPieceType.queen },
             }),
-        )
+        );
+        return result.isCorrectResult
             ? {
                   isCorrectResult: true,
+                  isPending: false,
                   resultPhrase: (
                       <>
                           <div>{translate("Congratulations")}!</div>
@@ -375,5 +380,6 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
                       </>
                   ),
               }
-            : false,
+            : result;
+    },
 };

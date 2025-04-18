@@ -14,6 +14,7 @@ import { OddConstraint } from "../../components/sudoku/constraints/odd/Odd";
 import { GoogleMapsTypeManager } from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
 import { GoogleMapsPTM } from "../../sudokuTypes/google-maps/types/GoogleMapsPTM";
 import { indexes } from "../../utils/indexes";
+import { errorResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
 
 export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
     noIndex: true,
@@ -75,7 +76,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             name: "neighbors",
             cells: [],
             props: undefined,
-            isValidCell(cell, digits, regionCells, context): boolean {
+            isValidCell(cell, digits, _cells, context): boolean {
                 const digit = digits[cell.top][cell.left]!;
 
                 const { puzzle, puzzleIndex } = context;
@@ -110,8 +111,9 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         ].map((left: number) => toInvisibleConstraint(OddConstraint({ top: 0, left }))),
     ],
     resultChecker: (context) => {
-        if (!isValidFinishedPuzzleByConstraints(context)) {
-            return false;
+        const result = isValidFinishedPuzzleByConstraints(context);
+        if (!result.isCorrectResult) {
+            return result;
         }
 
         const digits = indexes(context.puzzle.fieldSize.columnsCount).map((left) => context.getCellDigit(0, left)!);
@@ -133,7 +135,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         }
 
         // Dots are counted twice
-        return product === 0 && dots === 18;
+        return product === 0 && dots === 18 ? successResultCheck(context.puzzle) : errorResultCheck();
     },
     // TODO: allowDrawing: ["border-mark"],
 };

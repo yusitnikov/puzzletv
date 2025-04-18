@@ -7,6 +7,7 @@ import { indexes } from "../../../utils/indexes";
 import { FogConstraint, FogProps, fogTag } from "../../../components/sudoku/constraints/fog/Fog";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
+import { errorResultCheck, notFinishedResultCheck } from "../../../types/sudoku/PuzzleResultCheck";
 
 export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager: SudokuTypeManager<T>,
@@ -111,33 +112,46 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                         currentFieldStateWithFogDemo: { cells, lines },
                     } = context;
 
-                    if (
-                        Object.keys(yajilinFogShadeSolution).length &&
-                        !cells.every((row, top) =>
-                            row.every(({ colors }, left) => {
+                    let result = originalResultChecker(context);
+                    if (!result.isCorrectResult && !result.isPending) {
+                        return result;
+                    }
+
+                    if (Object.keys(yajilinFogShadeSolution).length) {
+                        for (const [top, row] of cells.entries()) {
+                            for (const [left, { colors }] of row.entries()) {
                                 if (initialColors[top]?.[left]?.length) {
-                                    return true;
+                                    continue;
                                 }
 
                                 const isActualBlack = colors.size === 1 && colors.first() === CellColor.black;
                                 const isExpectedBlack = !!yajilinFogShadeSolution[top]?.[left];
-                                return isActualBlack === isExpectedBlack;
-                            }),
-                        )
-                    ) {
-                        return false;
+                                if (isActualBlack && !isExpectedBlack) {
+                                    return errorResultCheck();
+                                }
+                                if (!isActualBlack && isExpectedBlack) {
+                                    result = notFinishedResultCheck();
+                                }
+                            }
+                        }
                     }
 
-                    if (
-                        yajilinFogLineSolution.size &&
-                        !new PuzzleLineSet(puzzle, puzzleIndex.getCenterLines(lines.items, true)).equals(
-                            yajilinFogLineSolution,
-                        )
-                    ) {
-                        return false;
+                    if (yajilinFogLineSolution.size) {
+                        const actualLines = new PuzzleLineSet(puzzle, puzzleIndex.getCenterLines(lines.items, true));
+                        if (
+                            actualLines.size > yajilinFogLineSolution.size ||
+                            actualLines.items.some((item) => !yajilinFogLineSolution.contains(item))
+                        ) {
+                            return errorResultCheck();
+                        }
+                        // The previous condition confirmed that yajilinFogLineSolution contains all items of actualLines,
+                        // so the check for having equal sets could be simplified to comparing the set sizes
+                        if (actualLines.size !== yajilinFogLineSolution.size) {
+                            result = notFinishedResultCheck();
+                        }
                     }
 
-                    return originalResultChecker(context);
+                    return result;
                 };
             }
 

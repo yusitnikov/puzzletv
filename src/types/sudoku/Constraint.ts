@@ -12,6 +12,8 @@ import { GridRegion } from "./GridRegion";
 import { CellColorValue, resolveCellColorValue } from "./CellColor";
 import { profiler } from "../../utils/profiler";
 import { indexes } from "../../utils/indexes";
+import { errorResultCheck, notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "./PuzzleResultCheck";
+import { settings } from "../layout/Settings";
 
 export type Constraint<T extends AnyPTM, DataT = undefined> = {
     name: string;
@@ -40,7 +42,7 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
         digits: GivenDigitsMap<T["cell"]>,
         regionCells: Position[],
         context: PuzzleContext<T>,
-    ): boolean;
+    ): PuzzleResultCheck;
     getInvalidUserLines?(
         lines: SetInterface<Line>,
         digits: GivenDigitsMap<T["cell"]>,
@@ -155,7 +157,7 @@ export const getInvalidUserLines = <T extends AnyPTM>(
     return result;
 };
 
-export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: PuzzleContext<T>) => {
+export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: PuzzleContext<T>): PuzzleResultCheck => {
     const timer = profiler.track("isValidFinishedPuzzleByConstraints");
 
     const { puzzleIndex, puzzle, lines, userDigits } = context;
@@ -167,51 +169,71 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
     } = puzzle;
     const constraints = context.allItems;
 
+    let result = successResultCheck(puzzle);
+
     for (const constraint of constraints) {
         const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);
 
-        if (
-            constraint.isValidPuzzle &&
-            !constraint.isValidPuzzle(lines, userDigits, normalizedConstraintCells, context)
-        ) {
-            timer.stop();
-            return false;
+        if (constraint.isValidPuzzle) {
+            const constraintResult = constraint.isValidPuzzle(lines, userDigits, normalizedConstraintCells, context);
+            if (!constraintResult.isCorrectResult) {
+                if (!constraintResult.isPending) {
+                    if (settings.debugSolutionChecker.get()) {
+                        console.warn("Failed constraint", constraint);
+                    }
+                    timer.stop();
+                    return constraintResult;
+                }
+                result = constraintResult;
+            }
         }
     }
 
-    const result =
-        (digitsCount === 0 ||
-            indexes(rowsCount).every((top) =>
-                indexes(columnsCount).every((left) => {
-                    const position: Position = { left, top };
-                    const digit = userDigits[top]?.[left];
+    if (digitsCount !== 0) {
+        for (const top of indexes(rowsCount)) {
+            for (const left of indexes(columnsCount)) {
+                const position: Position = { left, top };
+                const digit = userDigits[top]?.[left];
 
-                    if (stickyRegion && noStickyRegionValidation) {
-                        const stickyTop = top - stickyRegion.top;
-                        const stickyLeft = left - stickyRegion.left;
-                        if (
-                            stickyTop >= 0 &&
-                            stickyLeft >= 0 &&
-                            stickyTop < stickyRegion.height &&
-                            stickyLeft < stickyRegion.width
-                        ) {
-                            return true;
-                        }
+                if (stickyRegion && noStickyRegionValidation) {
+                    const stickyTop = top - stickyRegion.top;
+                    const stickyLeft = left - stickyRegion.left;
+                    if (
+                        stickyTop >= 0 &&
+                        stickyLeft >= 0 &&
+                        stickyTop < stickyRegion.height &&
+                        stickyLeft < stickyRegion.width
+                    ) {
+                        continue;
                     }
+                }
 
-                    const cellTypeProps = puzzleIndex.getCellTypeProps(position);
-                    if (!isSelectableCell(cellTypeProps)) {
-                        return true;
+                const cellTypeProps = puzzleIndex.getCellTypeProps(position);
+                if (!isSelectableCell(cellTypeProps)) {
+                    continue;
+                }
+
+                if (digit === undefined) {
+                    if (!allowEmptyCells && isSolutionCheckCell(cellTypeProps)) {
+                        result = notFinishedResultCheck();
                     }
+                    continue;
+                }
 
-                    if (digit === undefined) {
-                        return allowEmptyCells || !isSolutionCheckCell(cellTypeProps);
-                    }
+                if (!isValidUserDigit(position, context.userDigits, context, true)) {
+                    timer.stop();
+                    return errorResultCheck();
+                }
+            }
+        }
+    }
 
-                    return isValidUserDigit(position, context.userDigits, context, true);
-                }),
-            )) &&
-        getInvalidUserLines(context, true).size === 0;
+    if (getInvalidUserLines(context, true).size !== 0) {
+        const hasVisibleInvalidLines = getInvalidUserLines(context).size !== 0;
+        timer.stop();
+        return hasVisibleInvalidLines ? errorResultCheck() : notFinishedResultCheck();
+    }
+
     timer.stop();
     return result;
 };

@@ -4,6 +4,12 @@ import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
 import { incrementArrayItemByIndex } from "../../../../utils/array";
 import { SetInterface } from "../../../../types/struct/Set";
+import {
+    errorResultCheck,
+    notFinishedResultCheck,
+    PuzzleResultCheck,
+    successResultCheck,
+} from "../../../../types/sudoku/PuzzleResultCheck";
 
 export const CellBorderLinesCountConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
@@ -25,7 +31,11 @@ export const CellBorderLinesCountConstraint = <T extends AnyPTM>(
         props: undefined,
         isValidPuzzle(lines, _digits, _cells, context) {
             const borders = getBorders(context, lines);
-            return borders.length === expectedCount;
+            return borders.length > expectedCount
+                ? errorResultCheck()
+                : borders.length === expectedCount
+                  ? successResultCheck(context.puzzle)
+                  : notFinishedResultCheck();
         },
         getInvalidUserLines(lines, _digits, _cells, context): Line[] {
             const borders = getBorders(context, lines);

@@ -7,6 +7,7 @@ import { indexes } from "../../../utils/indexes";
 import { Line, PositionSet } from "../../../types/layout/Position";
 import { settings } from "../../../types/layout/Settings";
 import { loop } from "../../../utils/math";
+import { errorResultCheck, notFinishedResultCheck, successResultCheck } from "../../../types/sudoku/PuzzleResultCheck";
 
 const debug = (...args: any[]) => {
     if (settings.debugSolutionChecker.get()) {
@@ -30,7 +31,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
     name: "slide & seek",
     cells: [],
     props: undefined,
-    isValidPuzzle(_lines, _digits, _regionCells, context): boolean {
+    isValidPuzzle(_lines, _digits, _regionCells, context) {
         const { rowsCount, columnsCount } = context.puzzle.fieldSize;
 
         const finalShapes = processGivenDigitsMaps<SlideAndSeekShape, ShapeInfo | PathInfo>(
@@ -41,7 +42,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
         for (const segment of context.centerLineSegments) {
             if (segment.isBranching || segment.isLoop) {
                 debug("branch/loop");
-                return false;
+                return errorResultCheck();
             }
 
             const normalizedPoints = segment.points.map(({ top, left }) => ({ top: top - 0.5, left: left - 0.5 }));
@@ -52,7 +53,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
 
             if (shapePoints.length !== 1) {
                 debug(`line touching wrong number of shapes - ${shapePoints.length}`);
-                return false;
+                return errorResultCheck();
             }
 
             const [{ index: startIndex, point: start }] = shapePoints;
@@ -60,7 +61,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
             const end = normalizedPoints[endIndex];
             if (startIndex !== 0 && endIndex !== 0) {
                 debug("line touching a shape mid-path");
-                return false;
+                return errorResultCheck();
             }
 
             const constraint = finalShapes[start.top][start.left] as ShapeInfo;
@@ -74,18 +75,21 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
             };
         }
 
+        let finished = true;
+        let broken = false;
+
         for (const top of indexes(rowsCount)) {
             for (const left of indexes(columnsCount)) {
                 const cellName = `R${top + 1}C${left + 1}`;
 
                 const shape = finalShapes[top]?.[left];
                 if (!shape) {
-                    if (emptyCells.contains({ top, left })) {
-                        continue;
+                    if (!emptyCells.contains({ top, left })) {
+                        debug(`empty cell ${cellName}`);
+                        finished = false;
                     }
 
-                    debug(`empty cell ${cellName}`);
-                    return false;
+                    continue;
                 }
 
                 if (shape.type === "path") {
@@ -94,12 +98,17 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
 
                 if (shape.pathLength !== undefined && shape.actualLength !== shape.pathLength) {
                     debug(`wrong path length at ${cellName}: expected ${shape.pathLength}, got ${shape.actualLength}`);
-                    return false;
+                    if (shape.actualLength > shape.pathLength) {
+                        return errorResultCheck();
+                    }
+                    broken = true;
+                    continue;
                 }
 
                 if (shape.mustMove && shape.actualLength === 0) {
                     debug(`shape at ${cellName} must move`);
-                    return false;
+                    broken = true;
+                    continue;
                 }
 
                 for (const [dx, dy] of [
@@ -117,7 +126,8 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
                         if (shape2?.type === "shape") {
                             if (shape2.shapeKey === shape.shapeKey) {
                                 debug(`shape at ${cellName} sees same shape at R${top2 + 1}C${left2 + 1}`);
-                                return false;
+                                broken = true;
+                                continue;
                             }
                             break;
                         }
@@ -126,7 +136,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
             }
         }
 
-        return true;
+        return !finished ? notFinishedResultCheck() : broken ? errorResultCheck() : successResultCheck(context.puzzle);
     },
     getInvalidUserLines(lines, _digits, _regionCells, context, isFinalCheck): Line[] {
         const { fogVisibleCells } = context;

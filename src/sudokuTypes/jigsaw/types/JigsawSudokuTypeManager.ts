@@ -489,15 +489,11 @@ export const JigsawSudokuTypeManager = (
                             resultChecker: (context) => {
                                 const result = resultChecker(context);
 
-                                if (result === false || (typeof result === "object" && !result.isCorrectResult)) {
-                                    return result;
-                                }
-
-                                if (
-                                    resultChecker !== isValidFinishedPuzzleByConstraints &&
-                                    !isValidFinishedPuzzleByConstraints(context)
-                                ) {
-                                    return false;
+                                if (result.isCorrectResult && resultChecker !== isValidFinishedPuzzleByConstraints) {
+                                    const result2 = isValidFinishedPuzzleByConstraints(context);
+                                    if (!result2.isCorrectResult) {
+                                        return result2;
+                                    }
                                 }
 
                                 return result;

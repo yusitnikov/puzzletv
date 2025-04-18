@@ -14,6 +14,8 @@ import { createWheel } from "../../components/sudoku/constraints/wheel/Wheel";
 import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
 import { indexes } from "../../utils/indexes";
 import { DisjointGroupsConstraint } from "../../types/sudoku/constraints/DisjointGroups";
+import { translate } from "../../utils/translate";
+import { errorResultCheck } from "../../types/sudoku/PuzzleResultCheck";
 
 const U = undefined;
 
@@ -70,13 +72,14 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         [4, 2, 9, 3, 8, 5, 1, 7, 6],
     ]),
     resultChecker: (context) => {
-        if (isValidFinishedPuzzleByEmbeddedSolution(context)) {
-            return true;
+        const result = isValidFinishedPuzzleByEmbeddedSolution(context);
+        if (result.isCorrectResult) {
+            return result;
         }
 
         // The puzzle is wrong if all cells are fulfilled, but the digits are not right
         if (indexes(9).every((top) => indexes(9).every((left) => context.getCell(top, left)?.usersDigit))) {
-            return false;
+            return errorResultCheck();
         }
 
         const {
@@ -89,13 +92,14 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         ) {
             return {
                 isCorrectResult: false,
+                isPending: true,
                 forceShowResult: true,
-                resultPhrase: {
+                resultPhrase: translate({
                     [LanguageCode.en]: "Congratulations! You resolved the wheels correctly!",
-                },
+                }),
             };
         }
 
-        return false;
+        return result;
     },
 };

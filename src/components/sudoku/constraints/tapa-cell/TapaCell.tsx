@@ -9,6 +9,7 @@ import { PuzzleLineSet } from "../../../../types/sudoku/PuzzleLineSet";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../../utils/profiler";
+import { notFinishedResultCheck, successResultCheck } from "../../../../types/sudoku/PuzzleResultCheck";
 
 export interface TapaCellProps {
     clues: (number | undefined)[];
@@ -71,7 +72,9 @@ export const TapaCellConstraint = <T extends AnyPTM>(
         isValidPuzzle(lines, digits, cells, context) {
             const neighborCenters = getNeighborCenters(context);
 
-            return context.centerLineSegments.some(({ points }) => neighborCenters.containsOneOf(points));
+            return context.centerLineSegments.some(({ points }) => neighborCenters.containsOneOf(points))
+                ? successResultCheck(context.puzzle)
+                : notFinishedResultCheck();
         },
         getInvalidUserLines(lines, digits, cells, context, isFinalCheck): Line[] {
             const { center } = getCellInfo(context);
