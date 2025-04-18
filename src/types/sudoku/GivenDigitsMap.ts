@@ -174,6 +174,8 @@ export const createRegionsByGivenDigitsMap = <CellType>(
     for (const [top, row] of regions.entries()) {
         for (const [left, { cells }] of row.entries()) {
             if (isSamePosition({ top, left }, cells[0])) {
+                // Sort the cells in the reading order
+                cells.sort((a, b) => Math.sign(a.top - b.top) || Math.sign(a.left - b.left));
                 result.push(cells);
             }
         }
