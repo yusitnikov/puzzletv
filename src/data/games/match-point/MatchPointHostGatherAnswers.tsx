@@ -11,19 +11,15 @@ import { Button } from "../../../components/layout/button/Button";
 import { Check } from "@emotion-icons/material";
 import { Copy } from "@emotion-icons/boxicons-regular";
 import { QRCodeSVG } from "qrcode.react";
-import { useLanguageCode, useTranslate } from "../../../hooks/useTranslate";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
-import { getRussianPluralForm } from "../../../utils/translate";
+import { getRussianPluralForm, translate } from "../../../utils/translate";
 
 export const MatchPointHostGatherAnswers = observer(function MatchPointHostGatherAnswers({
     controller,
 }: MatchPointGameControllerProps) {
-    const languageCode = useLanguageCode();
-    const translate = useTranslate();
-
     const [copy, copied] = useCopyToClipboard();
 
-    const link = controller.getLink(languageCode, controller.gameId);
+    const link = controller.getLink(controller.gameId);
 
     const [playerMessages] = useAblyChannelPresence(
         ablyOptions,

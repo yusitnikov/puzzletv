@@ -29,6 +29,7 @@ import { FieldLayer } from "../../types/sudoku/FieldLayer";
 import { rgba } from "../../utils/color";
 import { SparkGridArrowsConstraint } from "../../sudokuTypes/spark/components/SparkGridArrows";
 import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
+import { translate } from "../../utils/translate";
 
 const extraRegion = ["R1C1", "R3C1", "R1C8", "R2C7", "R8C1", "R1C13", "R3C13", "R8C13"];
 const fieldSize = createSparkFieldSize(4, 2);
@@ -45,7 +46,7 @@ export const SparkKropki: PuzzleDefinition<NumberPTM> = {
     fieldSize,
     regions: createSparkRegions(fieldSize),
     digitsCount: 8,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate({
@@ -180,7 +181,7 @@ export const EmptySpark: PuzzleDefinition<NumberPTM> = {
     fieldSize,
     regions: createSparkRegions(fieldSize),
     digitsCount: 8,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate({
@@ -209,7 +210,7 @@ export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
     fieldSize: fieldSize6x6,
     regions: createSparkRegions(fieldSize6x6),
     digitsCount: 9,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate({
@@ -239,7 +240,7 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
     fieldSize: fieldSizeWithNote,
     regions: createSparkRegions(fieldSizeWithNote),
     digitsCount: 8,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate({

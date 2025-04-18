@@ -1,5 +1,4 @@
 import { currentPlayerColor, h2HeightCoeff, otherPlayerColor, textColor } from "../../app/globals";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { Fragment, ReactElement } from "react";
 import { myClientId } from "../../../hooks/useMultiPlayer";
@@ -8,6 +7,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export interface MultiPlayerInfoProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -17,8 +17,6 @@ export const MultiPlayerInfo = observer(function MultiPlayerInfo<T extends AnyPT
     context,
 }: MultiPlayerInfoProps<T>) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     if (!context.multiPlayer.isEnabled) {
         return null;

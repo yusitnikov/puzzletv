@@ -4,20 +4,18 @@ import { ChessColor } from "../types/ChessColor";
 import { Absolute } from "../../../components/layout/absolute/Absolute";
 import { ArrowLeft } from "@emotion-icons/fluentui-system-filled";
 import { useCallback, useState } from "react";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { ControlButtonItemProps } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { ChessPTM } from "../types/ChessPTM";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
+import { translate } from "../../../utils/translate";
 
 export const ChessMainControls = observer(function ChessMainControls({ context }: ControlButtonItemProps<ChessPTM>) {
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize } = context;
-
-    const translate = useTranslate();
 
     const [usedColorSelectionOnce, setUsedColorSelectionOnce] = useState(false);
 

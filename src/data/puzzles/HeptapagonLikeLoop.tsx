@@ -13,6 +13,7 @@ import { loopRulesApply, tapCluesApply } from "../ruleSnippets";
 import { AnyNumberPTM, NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { roundToStep } from "../../utils/math";
 import { CellPart } from "../../types/sudoku/CellPart";
+import { translate } from "../../utils/translate";
 
 export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
     fieldSize: number,
@@ -185,7 +186,7 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
         author: {
             [LanguageCode.en]: "BenceJoful",
         },
-        rules: (translate) => (
+        rules: () => (
             <>
                 <RulesParagraph>{translate(loopRulesApply)}.</RulesParagraph>
                 <RulesParagraph>{translate(tapCluesApply(7))}.</RulesParagraph>

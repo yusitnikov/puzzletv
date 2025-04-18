@@ -15,7 +15,6 @@ import { CellStateEx } from "./CellState";
 import { CellWriteMode } from "./CellWriteMode";
 import { CellWriteModeInfo } from "./CellWriteModeInfo";
 import { GameStateAction, GameStateActionType } from "./GameStateAction";
-import { useTranslate } from "../../hooks/useTranslate";
 import { KeyInfo } from "./KeyInfo";
 import { SettingsContentProps } from "../../components/sudoku/controls/settings/SettingsContent";
 import { regionTag } from "../../components/sudoku/constraints/region/Region";
@@ -243,11 +242,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     getPlayerScore?(context: PuzzleContext<T>, clientId: string): string | number;
 
     // TODO: transform into a component
-    getAboveRules?(
-        translate: ReturnType<typeof useTranslate>,
-        context: PuzzleContext<T>,
-        isPortrait: boolean,
-    ): ReactNode;
+    getAboveRules?(context: PuzzleContext<T>, isPortrait: boolean): ReactNode;
 
     postProcessPuzzle?(puzzle: PuzzleDefinition<T>): typeof puzzle;
 

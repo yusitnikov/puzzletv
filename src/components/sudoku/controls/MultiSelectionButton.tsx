@@ -1,11 +1,11 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { ControlButton } from "./ControlButton";
 import { Grid } from "@emotion-icons/fluentui-system-filled";
 import { CellSelectionColor } from "../cell/CellSelection";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const MultiSelectionButton: ControlButtonItemPropsGenericFc = observer(function MultiSelectionButton<
     T extends AnyPTM,
@@ -13,8 +13,6 @@ export const MultiSelectionButton: ControlButtonItemPropsGenericFc = observer(fu
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize, isMultiSelection } = context;
-
-    const translate = useTranslate();
 
     return (
         <ControlButton

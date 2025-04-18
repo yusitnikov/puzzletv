@@ -1,19 +1,16 @@
-import { useLanguageCode, useTranslate } from "../../hooks/useTranslate";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { buildLink } from "../../utils/link";
 import { profiler } from "../../utils/profiler";
 import { observer } from "mobx-react-lite";
+import { translate } from "../../utils/translate";
 
 export const HomePage = observer(function HomePage() {
     profiler.trace();
 
-    const language = useLanguageCode();
-    const translate = useTranslate();
-
-    const puzzlesLink = buildLink("puzzles", language);
-    const gamesLink = buildLink("games", language);
-    const settersLink = buildLink("for-setters", language);
-    const contactMeLink = buildLink("contacts", language);
+    const puzzlesLink = buildLink("puzzles");
+    const gamesLink = buildLink("games");
+    const settersLink = buildLink("for-setters");
+    const contactMeLink = buildLink("contacts");
     const commonAppLinks = (
         <>
             <a href="https://sudokupad.app/" target="_blank">

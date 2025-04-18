@@ -3,7 +3,6 @@ import styled from "@emotion/styled";
 import { PuzzleContextProps } from "../../../types/sudoku/PuzzleContext";
 import { textColor } from "../../../components/app/globals";
 import { controlButtonOptions, controlButtonStyles } from "../../../components/sudoku/controls/ControlButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { FullCubePTM } from "../types/FullCubePTM";
@@ -11,6 +10,7 @@ import { gameStateHandleRotateFullCube } from "../types/FullCubeGameState";
 import { vectorOx, vectorOy, vectorOz } from "../../../types/layout/Position3D";
 import { KeyboardArrowUp, KeyboardArrowDown, KeyboardArrowRight, KeyboardArrowLeft } from "@emotion-icons/material";
 import { useEventListener } from "../../../hooks/useEventListener";
+import { translate } from "../../../utils/translate";
 
 const StyledButton = styled("button", {
     ...controlButtonOptions,
@@ -44,7 +44,6 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
         isReadonlyContext,
     } = context;
 
-    const translate = useTranslate();
     const buttonTitle = (key: string) => `${translate("Rotate the puzzle")} (${translate("shortcut")}: ${key})`;
 
     const leftUp = () => context.onStateChange((context) => gameStateHandleRotateFullCube(context, vectorOx, 90));

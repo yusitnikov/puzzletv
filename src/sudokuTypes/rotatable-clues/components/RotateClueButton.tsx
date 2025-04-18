@@ -1,6 +1,5 @@
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { ControlButtonItemProps } from "../../../components/sudoku/controls/ControlButtonsManager";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { ControlButton } from "../../../components/sudoku/controls/ControlButton";
 import { RotateLeft, RotateRight } from "@emotion-icons/material";
@@ -14,14 +13,13 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const RotateClueButton = <T extends AnyPTM>(direction: number) =>
     observer(function RotateClueButton({ context, top, left }: ControlButtonItemProps<RotatableCluesPTM<T>>) {
         profiler.trace();
 
         const { puzzle, cellSizeForSidePanel: cellSize } = context;
-
-        const translate = useTranslate();
 
         const isClockwise = direction > 0;
         const isShift = !isClockwise;

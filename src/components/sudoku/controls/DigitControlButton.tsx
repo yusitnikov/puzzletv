@@ -1,4 +1,3 @@
-import { useTranslate } from "../../../hooks/useTranslate";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { ReactElement, useCallback } from "react";
 import { useEventListener } from "../../../hooks/useEventListener";
@@ -11,6 +10,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export interface DigitControlButtonProps<T extends AnyPTM> {
     index: number;
@@ -22,8 +22,6 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
     context,
 }: DigitControlButtonProps<T>) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     const {
         puzzle: {

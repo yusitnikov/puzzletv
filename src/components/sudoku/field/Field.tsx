@@ -20,7 +20,6 @@ import { getCellWriteModeGestureHandler } from "../../../types/sudoku/CellWriteM
 import { PassThrough } from "../../layout/pass-through/PassThrough";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { FieldRegionsWithSameCoordsTransformation } from "./FieldRegionsWithSameCoordsTransformation";
 import { getGestureHandlerProps, useGestureHandlers, useOutsideClick } from "../../../utils/gestures";
 import { usePuzzleContainer } from "../../../contexts/PuzzleContainerContext";
@@ -34,6 +33,7 @@ import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
 import { FieldCellsLayer } from "./FieldCellsLayer";
 import { FieldFireworks } from "./FieldFireworks";
+import { translate } from "../../../utils/translate";
 
 export interface FieldProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -42,8 +42,6 @@ export interface FieldProps<T extends AnyPTM> {
 
 export const Field = observer(function Field<T extends AnyPTM>({ context, rect }: FieldProps<T>) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     const {
         readOnlySafeContext,

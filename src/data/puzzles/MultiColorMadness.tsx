@@ -19,6 +19,7 @@ import { KillerCageConstraintByRect } from "../../components/sudoku/constraints/
 import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { indexes } from "../../utils/indexes";
+import { translate } from "../../utils/translate";
 
 export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     slug: "multi-color-madness",
@@ -28,7 +29,7 @@ export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     author: {
         [LanguageCode.en]: "Joseph",
     },
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(cannotRepeatInCage)}.</RulesParagraph>

@@ -9,7 +9,6 @@ import { useWindowSize } from "../../../hooks/useWindowSize";
 import { useGame } from "../../../hooks/sudoku/useGame";
 import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import { Title } from "../../layout/title/Title";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { PuzzleContainerContext } from "../../../contexts/PuzzleContainerContext";
 import { Rect } from "../../../types/layout/Rect";
 import { profiler } from "../../../utils/profiler";
@@ -18,6 +17,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { PuzzleMultiPlayerWarnings } from "./PuzzleMultiPlayerWarnings";
 import { usePureMemo } from "../../../hooks/usePureMemo";
 import { observer } from "mobx-react-lite";
+import { translate } from "../../../utils/translate";
 
 export interface PuzzleProps<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
@@ -34,8 +34,6 @@ export const Puzzle = observer(function Puzzle<T extends AnyPTM>({ puzzle }: Puz
         fieldSize: { fieldSize },
         fieldMargin = 0,
     } = puzzle;
-
-    const translate = useTranslate();
 
     // region Size calculation
     const windowSize = useWindowSize();

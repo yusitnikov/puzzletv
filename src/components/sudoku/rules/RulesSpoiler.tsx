@@ -1,7 +1,7 @@
 import { ReactNode, useState } from "react";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export interface RulesSpoilerProps {
     children: ReactNode;
@@ -11,8 +11,6 @@ export const RulesSpoiler = observer(function RulesSpoiler({ children }: RulesSp
     profiler.trace();
 
     const [spoiled, setSpoiled] = useState(false);
-
-    const translate = useTranslate();
 
     return (
         <span

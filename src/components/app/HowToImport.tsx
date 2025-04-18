@@ -1,4 +1,3 @@
-import { useTranslate } from "../../hooks/useTranslate";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
@@ -37,11 +36,10 @@ import {
 import { OpenInNew } from "@emotion-icons/material";
 import { Cornered } from "../../data/puzzles/SlideAndSeek";
 import { CloseQuarters, CloseQuartersSource } from "../../data/puzzles/FractionalSudoku";
+import { translate } from "../../utils/translate";
 
 export const HowToImport = observer(function HowToImport() {
     profiler.trace();
-
-    const translate = useTranslate();
 
     const fPuzzlesLink = (
         <a href="https://f-puzzles.com" target="_blank">

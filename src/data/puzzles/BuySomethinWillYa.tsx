@@ -33,6 +33,7 @@ import { createGivenDigitsMapFromArray, GivenDigitsMap, mergeGivenDigitsMaps } f
 import { CellColorValue } from "../../types/sudoku/CellColor";
 import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
 import { buildLink } from "../../utils/link";
+import { translate } from "../../utils/translate";
 
 const blackColor = "#000";
 const greyColor = "#aaa";
@@ -289,7 +290,7 @@ const S = undefined;
 export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
     ...base,
     noIndex: true,
-    rules: (translate, { languageCode }) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 <details open={true}>
@@ -346,70 +347,70 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
             <RulesUnorderedList>
                 <li>
                     if a "0" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-0-compass", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-0-compass")}>
                         Compass
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "1" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-1-arrow", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-1-arrow")}>
                         Arrow
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "2" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-2-candle", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-2-candle")}>
                         Candle
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "3" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-3-hookshot", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-3-hookshot")}>
                         Hookshot
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "4" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-4-sword", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-4-sword")}>
                         Sword
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "5" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-5-flute", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-5-flute")}>
                         Flute
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "6" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-6-bow-quiver", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-6-bow-quiver")}>
                         Bow &amp; Quiver
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "7" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-7-raft", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-7-raft")}>
                         Raft
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "8" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-8-bomb", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-8-bomb")}>
                         Bomb
                     </a>{" "}
                     to the shop;
                 </li>
                 <li>
                     if a "9" is placed, add a{" "}
-                    <a target={"_blank"} href={buildLink(slug + "-9-super-bomb", languageCode)}>
+                    <a target={"_blank"} href={buildLink(slug + "-9-super-bomb")}>
                         Super Bomb
                     </a>{" "}
                     to the shop;

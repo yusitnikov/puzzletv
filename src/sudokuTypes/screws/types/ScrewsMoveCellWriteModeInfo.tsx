@@ -18,12 +18,12 @@ import {
 } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { CellWriteModeButton } from "../../../components/sudoku/controls/CellWriteModeButton";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { textColor } from "../../../components/app/globals";
 import { ScrewByData } from "../constraints/Screw";
 import { ScrewsGameState } from "./ScrewsGameState";
+import { translate } from "../../../utils/translate";
 
 const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function ScrewsMoveButton<T extends AnyPTM>({
     context,
@@ -32,8 +32,6 @@ const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function Scre
     info,
 }: ControlButtonItemProps<T>) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     return (
         <>

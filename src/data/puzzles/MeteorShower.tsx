@@ -9,6 +9,7 @@ import { darkGreyColor } from "../../components/app/globals";
 import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import { Position } from "../../types/layout/Position";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { translate } from "../../utils/translate";
 
 export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: true,
@@ -20,7 +21,7 @@ export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => 
     author: {
         [LanguageCode.en]: "Scott Strosahl",
     },
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>

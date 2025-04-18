@@ -13,6 +13,7 @@ import {
 } from "../ruleSnippets";
 import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { translate } from "../../utils/translate";
 
 const S = CellColor.shaded;
 const U = CellColor.unshaded;
@@ -56,7 +57,7 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
     loopHorizontally: true,
     loopVertically: true,
     fieldMargin: 0.99,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate(normalYinYangRulesApply)}. {translate(normalYinYangRulesExplained)}.

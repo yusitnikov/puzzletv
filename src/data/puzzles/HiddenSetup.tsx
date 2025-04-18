@@ -35,6 +35,7 @@ import {
 import { PuzzleContext } from "../../types/sudoku/PuzzleContext";
 import { Constraint } from "../../types/sudoku/Constraint";
 import { MultiStagePTM } from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
+import { translate } from "../../utils/translate";
 
 const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
     switch (stage) {
@@ -172,7 +173,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
     },
     fieldSize: FieldSize9,
     regions: Regions9,
-    rules: (translate, { stateExtension: { stage } }) => {
+    rules: ({ stateExtension: { stage } }) => {
         return (
             <>
                 <RulesParagraph>

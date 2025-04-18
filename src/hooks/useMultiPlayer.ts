@@ -7,6 +7,7 @@ import { AnyPTM } from "../types/sudoku/PuzzleTypeMap";
 import { getAllShareState } from "../types/sudoku/GameState";
 import { settings } from "../types/layout/Settings";
 import { profiler } from "../utils/profiler";
+import { translate } from "../utils/translate";
 
 const emptyObject = {};
 
@@ -112,8 +113,8 @@ export class UseMultiPlayerResult<T extends AnyPTM> {
     get playerNicknames(): Record<string, string> {
         profiler.trace();
 
-        const hostStr = this.context.translate("host");
-        const guestStr = this.context.translate("guest");
+        const hostStr = translate("host");
+        const guestStr = translate("guest");
 
         return Object.fromEntries(
             Object.values(this.playersDataMap).map(({ clientId, data }) => [

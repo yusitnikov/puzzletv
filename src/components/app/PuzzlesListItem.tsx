@@ -1,12 +1,12 @@
 import { headerPadding, lighterGreyColor } from "./globals";
 import React, { ReactElement } from "react";
-import { useLanguageCode, useTranslate } from "../../hooks/useTranslate";
 import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
 import { buildLink } from "../../utils/link";
 import { FieldPreview } from "../sudoku/field/FieldPreview";
 import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
+import { translate } from "../../utils/translate";
 
 const padding = headerPadding;
 
@@ -23,14 +23,11 @@ export const PuzzlesListItem = observer(function PuzzlesListItem<T extends AnyPT
 }: PuzzlesListItemProps<T>) {
     profiler.trace();
 
-    const language = useLanguageCode();
-    const translate = useTranslate();
-
     const thumbnailWidth = (width - padding * 2) * 0.4;
 
     return (
         <a
-            href={buildLink(puzzle.slug, language)}
+            href={buildLink(puzzle.slug)}
             style={{
                 background: lighterGreyColor,
                 flex: "1 1 100%",

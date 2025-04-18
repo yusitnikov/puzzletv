@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { buildLink } from "../../../utils/link";
-import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 
 export enum MatchPointGameState {
@@ -61,12 +60,12 @@ export class MatchPointGameController {
         this.setQuestions(newQuestions);
     }
 
-    getLink(languageCode: LanguageCode, gameId?: string) {
-        return buildLink("match-point", languageCode, { host: myClientId, game: gameId }, true);
+    getLink(gameId?: string) {
+        return buildLink("match-point", { host: myClientId, game: gameId }, true);
     }
 
     get link() {
-        return this.getLink(LanguageCode.en, this.gameId);
+        return this.getLink(this.gameId);
     }
 
     startAnswering() {

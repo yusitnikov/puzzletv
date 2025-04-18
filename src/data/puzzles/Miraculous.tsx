@@ -20,6 +20,7 @@ import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudo
 import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
 import { ConsecutiveNeighborsConstraint } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { translate } from "../../utils/translate";
 
 const initialColors: GivenDigitsMap<CellColorValue> = {
     1: {
@@ -61,7 +62,7 @@ const SameColorRegionConstraint: Constraint<NumberPTM> = {
         })),
     ),
     props: undefined,
-    isValidCell(cell, digits, cells, context) {
+    isValidCell(cell, _digits, _cells, context) {
         const color = initialColors[cell.top][cell.left];
 
         const region = context.puzzleIndex.getCustomRegionByBorderLinesAt(context, cell);
@@ -82,7 +83,7 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
         [LanguageCode.ru]: "Smank, Raumplaner и Uklusi",
         [LanguageCode.de]: "Smank, Raumplaner und Uklusi",
     },
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(chaosConstructionRulesApply)}.</RulesParagraph>

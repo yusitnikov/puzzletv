@@ -1,13 +1,13 @@
 import { ControlButtonItemProps } from "./ControlButtonsManager";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { CellWriteModeButton } from "./CellWriteModeButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { CellDataSet } from "../../../types/sudoku/CellDataSet";
 import { ctrlKeyText } from "../../../utils/os";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { profiler } from "../../../utils/profiler";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
+import { translate } from "../../../utils/translate";
 
 export const CenterDigitModeButton = observer(function CenterDigitModeButton<T extends AnyPTM>({
     context,
@@ -17,8 +17,6 @@ export const CenterDigitModeButton = observer(function CenterDigitModeButton<T e
     profiler.trace();
 
     const { puzzle } = context;
-
-    const translate = useTranslate();
 
     return (
         <CellWriteModeButton

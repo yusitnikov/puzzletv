@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
-import { useTranslate } from "../../hooks/useTranslate";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { Size } from "../../types/layout/Size";
 import { textColor } from "./globals";
+import { translate } from "../../utils/translate";
 
 export interface GamesListItemProps {
     name: string;
@@ -25,8 +25,6 @@ export const GamesListItem = observer(function GamesListItem({
     children,
 }: GamesListItemProps) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     return (
         <>

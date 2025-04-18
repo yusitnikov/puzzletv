@@ -21,6 +21,7 @@ import { SetInterface } from "../../types/struct/Set";
 import { CellColor } from "../../types/sudoku/CellColor";
 import { indexes } from "../../utils/indexes";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { translate } from "../../utils/translate";
 
 const correctAnswer: number[][] = [
     [9, 4, 5, 1, 8, 6, 7, 3, 2],
@@ -62,7 +63,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>

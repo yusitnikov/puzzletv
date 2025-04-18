@@ -1,10 +1,10 @@
-import { useTranslate } from "../../../hooks/useTranslate";
 import { Modal } from "../../layout/modal/Modal";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export interface PuzzleMultiPlayerWarningsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -14,8 +14,6 @@ export const PuzzleMultiPlayerWarnings = observer(function PuzzleMultiPlayerWarn
     context,
 }: PuzzleMultiPlayerWarningsProps<T>) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     const {
         cellSizeForSidePanel,

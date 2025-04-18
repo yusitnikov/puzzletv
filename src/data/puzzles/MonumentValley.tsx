@@ -12,17 +12,19 @@ import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import React from "react";
 import { MonumentValleyGridBordersConstraint } from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
 import { MonumentValleyPTM } from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
+import { translate } from "../../utils/translate";
 
 const author: PartiallyTranslatable = {
     [LanguageCode.en]: "TrevorTao",
 };
 
-const rules = (validDigits: string): PartiallyTranslatable => ({
-    [LanguageCode.en]: `
+const rules = (validDigits: string) =>
+    translate({
+        [LanguageCode.en]: `
         Fill cells with digits ${validDigits} so that each of the three subgrids forms a valid Sudoku.
         All non-zero digits can be rotated by 90 degrees.
     `,
-});
+    });
 
 export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     title: {
@@ -35,7 +37,7 @@ export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     fieldSize: createMonumentValleyFieldSize(9, 3),
     regions: createMonumentValleyRegions(9, 3),
     digitsCount: 9,
-    rules: (translate) => <RulesParagraph>{translate(rules("0 1 6 8 9"))}</RulesParagraph>,
+    rules: () => <RulesParagraph>{rules("0 1 6 8 9")}</RulesParagraph>,
     items: [MonumentValleyGridBordersConstraint()],
     initialDigits: parseMonumentValleyDigitsMap({
         0: {
@@ -140,7 +142,7 @@ export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     typeManager: MonumentValleyTypeManager,
     fieldSize: createMonumentValleyFieldSize(5, 1, 2),
     digitsCount: 5,
-    rules: (translate) => <RulesParagraph>{translate(rules("0 1 8"))}</RulesParagraph>,
+    rules: () => <RulesParagraph>{rules("0 1 8")}</RulesParagraph>,
     items: [MonumentValleyGridBordersConstraint()],
     initialDigits: parseMonumentValleyDigitsMap({
         0: {

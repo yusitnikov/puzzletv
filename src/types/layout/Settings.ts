@@ -3,9 +3,12 @@ import { localStorageManager } from "../../utils/localStorage";
 import { PencilmarksCheckerMode } from "../sudoku/PencilmarksCheckerMode";
 import { AnimationSpeed } from "../sudoku/AnimationSpeed";
 import { UAParser } from "ua-parser-js";
+import { LanguageCode } from "../translations/LanguageCode";
 
 class Settings {
     isOpened = false;
+
+    languageCode = LanguageCode.en;
 
     readonly enableConflictChecker = localStorageManager.getBoolManager("enableConflictChecker", true);
 
@@ -42,6 +45,12 @@ class Settings {
 
     toggle(open: boolean) {
         this.isOpened = open;
+    }
+
+    setLanguageCode(languageCode: LanguageCode) {
+        if (this.languageCode !== languageCode) {
+            this.languageCode = languageCode;
+        }
     }
 }
 

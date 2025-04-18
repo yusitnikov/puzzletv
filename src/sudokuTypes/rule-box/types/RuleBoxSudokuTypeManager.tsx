@@ -56,9 +56,9 @@ export const RuleBoxSudokuTypeManager = <T extends AnyPTM>(
             const baseRules = puzzle.rules;
             puzzle = {
                 ...puzzle,
-                rules: (translate, context) => (
+                rules: (context) => (
                     <>
-                        {baseRules?.(translate, context)}
+                        {baseRules?.(context)}
 
                         {Object.entries((context.stateExtension as RuleBoxGameState).ruleBoxes ?? {}).map(
                             ([ruleText, wasClicked]) =>

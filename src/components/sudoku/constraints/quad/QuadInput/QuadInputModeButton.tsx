@@ -1,6 +1,5 @@
 import { CellWriteMode } from "../../../../../types/sudoku/CellWriteMode";
 import { CellWriteModeButton } from "../../../controls/CellWriteModeButton";
-import { useTranslate } from "../../../../../hooks/useTranslate";
 import { quads } from "../../../../../sudokuTypes/quad-masters/data/translations";
 import { AutoSvg } from "../../../../svg/auto-svg/AutoSvg";
 import { QuadByData } from "../Quad";
@@ -16,12 +15,11 @@ import { getNextActionId } from "../../../../../types/sudoku/GameStateAction";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../../../types/layout/Settings";
 import { profiler } from "../../../../../utils/profiler";
+import { translate } from "../../../../../utils/translate";
 
 export const QuadInputModeButton = <T extends AnyQuadInputPTM>(options: QuadInputSudokuTypeManagerOptions<T>) =>
     observer(function QuadInputModeButtonFc({ context, top, left }: ControlButtonItemProps<T>) {
         profiler.trace();
-
-        const translate = useTranslate();
 
         const { isQuadle = false, isQuadAllowedFn = () => true, onQuadFinish, radius } = options;
 

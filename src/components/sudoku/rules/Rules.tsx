@@ -13,7 +13,6 @@ import {
     rulesMarginCoeff,
     textHeightCoeff,
 } from "../../app/globals";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { ReactElement } from "react";
 import { myClientId } from "../../../hooks/useMultiPlayer";
@@ -31,6 +30,7 @@ import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
 import { MultiPlayerInfo } from "./MultiPlayerInfo";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 const liveHeartCoeff = 0.3;
 const liveHeartMarginCoeff = 0.1;
@@ -47,8 +47,6 @@ export interface RulesProps<T extends AnyPTM> {
 
 export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }: RulesProps<T>) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     const isFullScreen = useIsFullScreen();
     const windowSize = useWindowSize();
@@ -264,8 +262,8 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
                 </div>
             )}
 
-            {puzzleAboveRules?.(translate, context, isPortrait)}
-            {typeAboveRules?.(translate, context, isPortrait)}
+            {puzzleAboveRules?.(context, isPortrait)}
+            {typeAboveRules?.(context, isPortrait)}
 
             <div
                 style={{
@@ -283,7 +281,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
                         fontSize: cellSize * textHeightCoeff,
                     }}
                 >
-                    {rules?.(translate, context)}
+                    {rules?.(context)}
                 </div>
             </div>
         </StyledContainer>

@@ -1,10 +1,8 @@
 import { observer } from "mobx-react-lite";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { translate } from "../../../utils/translate";
 
 export const MatchPointExplanation = observer(function MatchPointExplanation() {
-    const translate = useTranslate();
-
     return (
         <div>
             <p>

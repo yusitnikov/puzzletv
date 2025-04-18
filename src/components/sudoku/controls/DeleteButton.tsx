@@ -1,7 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
 import { ControlButton } from "./ControlButton";
 import { Clear } from "@emotion-icons/material";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { useCallback } from "react";
 import { clearSelectionAction, getNextActionId } from "../../../types/sudoku/GameStateAction";
 import { useEventListener } from "../../../hooks/useEventListener";
@@ -9,6 +8,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const deleteHotkeys = ["Delete", "Backspace"];
 
@@ -20,8 +20,6 @@ export const DeleteButton: ControlButtonItemPropsGenericFc = observer(function D
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize, isReady } = context;
-
-    const translate = useTranslate();
 
     const handleClear = useCallback(() => context.onStateChange(clearSelectionAction(getNextActionId())), [context]);
 

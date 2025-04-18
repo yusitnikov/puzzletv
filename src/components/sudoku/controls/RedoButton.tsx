@@ -1,7 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
 import { ControlButton } from "./ControlButton";
 import { Redo } from "@emotion-icons/material";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { useCallback } from "react";
 import { ctrlKeyText } from "../../../utils/os";
 import { getNextActionId, redoAction, seekHistoryAction } from "../../../types/sudoku/GameStateAction";
@@ -10,6 +9,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const RedoButton: ControlButtonItemPropsGenericFc = observer(function RedoButton<T extends AnyPTM>({
     context,
@@ -26,8 +26,6 @@ export const RedoButton: ControlButtonItemPropsGenericFc = observer(function Red
         isReady,
         multiPlayer: { isEnabled },
     } = context;
-
-    const translate = useTranslate();
 
     const handleRedo = useCallback(() => context.onStateChange(redoAction(getNextActionId())), [context]);
 

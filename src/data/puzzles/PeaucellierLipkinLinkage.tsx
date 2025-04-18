@@ -27,6 +27,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import { profiler } from "../../utils/profiler";
 import { Button } from "../../components/layout/button/Button";
 import { loop } from "../../utils/math";
+import { translate } from "../../utils/translate";
 
 const period = 3000;
 
@@ -198,7 +199,7 @@ export const PeaucellierLipkinLinkage: PuzzleDefinition<IsReadyPTM> = {
     fieldSize: FieldSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,
-    rules: (translate, context) => {
+    rules: (context) => {
         const {
             stateExtension: { isReady },
             cellSizeForSidePanel: cellSize,

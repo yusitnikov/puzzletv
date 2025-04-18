@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { Puzzle } from "../sudoku/puzzle/Puzzle";
 import { useRoute } from "../../hooks/useRoute";
 import { AllPuzzles } from "../../data/puzzles/AllPuzzles";
-import { useLanguageCode, useTranslate } from "../../hooks/useTranslate";
 import { PageLayout } from "../layout/page-layout/PageLayout";
 import { PuzzlesList } from "./PuzzlesList";
 import { buildLink } from "../../utils/link";
@@ -23,6 +22,8 @@ import { PuzzleImportSource } from "../../types/sudoku/PuzzleImportOptions";
 import { MatchPointHost } from "../../data/games/match-point/MatchPointHost";
 import { MatchPointPlayer } from "../../data/games/match-point/MatchPointPlayer";
 import { WordSearch } from "../../data/games/word-search/WordSearch";
+import { settings } from "../../types/layout/Settings";
+import { translate } from "../../utils/translate";
 
 interface AppProps {
     onPageLoaded?: () => void;
@@ -31,8 +32,7 @@ interface AppProps {
 export const App = observer(({ onPageLoaded }: AppProps) => {
     const { hash = "", slug, params } = useRoute();
 
-    const language = useLanguageCode();
-    const translate = useTranslate();
+    settings.setLanguageCode(params.lang as LanguageCode);
 
     useGesturesGlobalEvents();
     useUpdateControlKeysState();
@@ -172,7 +172,7 @@ export const App = observer(({ onPageLoaded }: AppProps) => {
 
     return (
         <PageLayout scrollable={true} title={translate("Oops, the puzzle not found!")}>
-            <a href={buildLink("", language)}>{translate("Go to the home page")}</a>
+            <a href={buildLink("")}>{translate("Go to the home page")}</a>
         </PageLayout>
     );
 });

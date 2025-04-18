@@ -11,6 +11,7 @@ import { lighterBlueColor } from "../../components/app/globals";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { roundToStep } from "../../utils/math";
 import { CellTypeProps } from "../../types/sudoku/CellTypeProps";
+import { translate } from "../../utils/translate";
 
 const coeff = Math.sqrt(3) / 2;
 const areaRadius = 1 / 3;
@@ -131,7 +132,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
     author: {
         [LanguageCode.en]: "HilariousHappystar",
     },
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate({

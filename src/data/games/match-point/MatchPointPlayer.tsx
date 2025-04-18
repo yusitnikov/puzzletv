@@ -7,8 +7,8 @@ import { MatchPointGameState, MatchPointHostInfo, MatchPointPlayerInfo } from ".
 import { LargeButton, Paragraph, SubHeader } from "./styled";
 import { settings } from "../../../types/layout/Settings";
 import { MatchPointPlayStep } from "./MatchPointPlayStep";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { translate } from "../../../utils/translate";
 
 interface MatchPointPlayerProps {
     host: string;
@@ -17,8 +17,6 @@ interface MatchPointPlayerProps {
 
 const emptyObject = {};
 export const MatchPointPlayer = observer(function MatchPointPlayer({ host, gameId }: MatchPointPlayerProps) {
-    const translate = useTranslate();
-
     const [hostInfoMessages, hostInfoLoaded] = useAblyChannelPresence(
         ablyOptions,
         getMatchPointHostChannelName(gameId),

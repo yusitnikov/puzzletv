@@ -12,7 +12,6 @@ import {
     getGridParserFactoryByName,
     getPuzzleImportLoader,
 } from "../../data/puzzles/Import";
-import { useLanguageCode } from "../../hooks/useTranslate";
 import { darkGreyColor, headerPadding } from "./globals";
 import { allowedRulesHtmlTags } from "../sudoku/rules/ParsedRulesHtml";
 import { usePureMemo } from "../../hooks/usePureMemo";
@@ -66,8 +65,6 @@ interface WizardPageProps {
 }
 
 export const WizardPage = observer(({ load, slug, title, source }: WizardPageProps) => {
-    const languageCode = useLanguageCode();
-
     const { width, height } = useWindowSize();
     const previewSize = Math.min(width, height) - 2 * headerPadding;
 
@@ -333,7 +330,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const handleSubmit = (ev: FormEvent) => {
         ev.preventDefault();
 
-        window.location.hash = buildLink(slug, languageCode, importOptions);
+        window.location.hash = buildLink(slug, importOptions);
 
         return false;
     };
@@ -370,7 +367,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                     <code>&lt;a&gt;</code> and <code>&lt;img&gt;</code> tags.
                     <br />
                     Please{" "}
-                    <a href={buildLink("contacts", languageCode)} target={"_blank"}>
+                    <a href={buildLink("contacts")} target={"_blank"}>
                         contact the site creator
                     </a>{" "}
                     to add support for other tags or attributes.
@@ -1267,7 +1264,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                         </button>
 
                         <a
-                            href={isValidForm ? buildLink(slug, languageCode, importOptions) : "#"}
+                            href={isValidForm ? buildLink(slug, importOptions) : "#"}
                             target={"_blank"}
                             onClick={(ev) => {
                                 if (!isValidForm) {

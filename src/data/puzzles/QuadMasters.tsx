@@ -28,6 +28,7 @@ import {
 import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
 import { PartiallyTranslatable } from "../../types/translations/Translatable";
 import { QuadMastersPTM } from "../../sudokuTypes/quad-masters/types/QuadMastersPTM";
+import { translate } from "../../utils/translate";
 
 export const getQuadMastersTitle = (
     daily: boolean,
@@ -82,7 +83,7 @@ export const generateQuadMasters = (
             resultChecker: isValidFinishedPuzzleByConstraints,
             forceAutoCheckOnFinish: true,
             fieldMargin: Math.max(0, (7 - fieldSize) / 2),
-            rules: (translate) => (
+            rules: () => (
                 <>
                     <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
                     <RulesParagraph>{translate(host ? multiPlayerTurnsRules : twoPhasesGame)}.</RulesParagraph>

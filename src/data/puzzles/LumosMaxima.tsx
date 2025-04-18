@@ -20,6 +20,7 @@ import { FogConstraint } from "../../components/sudoku/constraints/fog/Fog";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
 import { indexes } from "../../utils/indexes";
+import { translate } from "../../utils/translate";
 
 export const LumosMaximaNoFog: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
@@ -29,7 +30,7 @@ export const LumosMaximaNoFog: PuzzleDefinition<NumberPTM> = {
     typeManager: DigitSudokuTypeManager(),
     fieldSize: FieldSize9,
     regions: Regions9,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>
@@ -85,9 +86,9 @@ export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
         ...(LumosMaximaNoFog.items as Constraint<NumberPTM, any>[]),
         FogConstraint({ startCells3x3: ["R2C2", "R8C7"] }),
     ],
-    rules: (translate, context) => (
+    rules: (context) => (
         <>
-            {LumosMaximaNoFog.rules!(translate, context)}
+            {LumosMaximaNoFog.rules!(context)}
             <RulesParagraph>
                 {translate({
                     [LanguageCode.en]:

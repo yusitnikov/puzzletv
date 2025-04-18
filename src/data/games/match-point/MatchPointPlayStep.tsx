@@ -2,8 +2,8 @@ import { MatchPointHostInfo } from "./types";
 import { observer } from "mobx-react-lite";
 import { LargeButton, Paragraph, SubHeader } from "./styled";
 import { useState } from "react";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
+import { translate } from "../../../utils/translate";
 
 interface MatchPointPlayStepProps extends Omit<MatchPointHostInfo, "name" | "state"> {
     onSelect?: (playerIndex?: number) => void;
@@ -16,8 +16,6 @@ export const MatchPointPlayStep = observer(function MatchPointPlayStep({
     isShowingResults,
     onSelect,
 }: MatchPointPlayStepProps) {
-    const translate = useTranslate();
-
     const [playerIndexes, setPlayerIndexes] = useState<(number | undefined)[]>([]);
     const setPlayerIndex = (playerIndex?: number) => {
         const newIndexes = [...playerIndexes];

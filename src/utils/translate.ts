@@ -1,9 +1,10 @@
 import { translations } from "../data/translations";
-import { allLanguageCodes, LanguageCode } from "../types/translations/LanguageCode";
+import { allLanguageCodes } from "../types/translations/LanguageCode";
 import { PartiallyTranslatable } from "../types/translations/Translatable";
 import { TranslationItem } from "../types/translations/TranslationItem";
+import { settings } from "../types/layout/Settings";
 
-export const translate = <T = string>(phrase: PartiallyTranslatable<T>, languageCode: LanguageCode): T => {
+export const translate = <T = string>(phrase: PartiallyTranslatable<T>, languageCode = settings.languageCode): T => {
     if (typeof phrase === "string") {
         // phrase is a key of the dictionary item, T is string
         const result: string = translations[phrase][languageCode] || phrase;
@@ -13,11 +14,6 @@ export const translate = <T = string>(phrase: PartiallyTranslatable<T>, language
         return phrase[languageCode] || phrase.en;
     }
 };
-
-export const bindTranslate =
-    (languageCode: LanguageCode) =>
-    <T = string>(phrase: PartiallyTranslatable<T>) =>
-        translate(phrase, languageCode);
 
 export const processTranslations = <T = string, ResT = T>(
     processor: (...items: T[]) => ResT,

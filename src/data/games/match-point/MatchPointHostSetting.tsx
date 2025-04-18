@@ -3,15 +3,12 @@ import { MatchPointGameControllerProps } from "./types";
 import { DeleteButton, LargeButton, LinkText, Paragraph, SubHeader } from "./styled";
 import { darkGreyColor } from "../../../components/app/globals";
 import { settings } from "../../../types/layout/Settings";
-import { useLanguageCode, useTranslate } from "../../../hooks/useTranslate";
+import { translate } from "../../../utils/translate";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 
 export const MatchPointHostSetting = observer(function MatchPointHostSetting({
     controller,
 }: MatchPointGameControllerProps) {
-    const languageCode = useLanguageCode();
-    const translate = useTranslate();
-
     return (
         <div>
             <Paragraph>
@@ -33,7 +30,7 @@ export const MatchPointHostSetting = observer(function MatchPointHostSetting({
                             color: darkGreyColor,
                         }}
                     >
-                        <LinkText>{controller.getLink(languageCode)}</LinkText>
+                        <LinkText>{controller.getLink()}</LinkText>
                     </span>
                     <LinkText>:game=</LinkText>
                     <input

@@ -13,7 +13,7 @@ import React, { ReactNode } from "react";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { isValidFinishedPuzzleByConstraints } from "../../../types/sudoku/Constraint";
 import { PartiallyTranslatable } from "../../../types/translations/Translatable";
-import { processTranslations } from "../../../utils/translate";
+import { processTranslations, translate } from "../../../utils/translate";
 import { AnyMultiStagePTM } from "./MultiStagePTM";
 import { addGameStateExToSudokuManager } from "../../../types/sudoku/SudokuTypeManagerPlugin";
 
@@ -36,7 +36,7 @@ export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>({
         initialGameStateExtension: { stage: 1 },
     }),
 
-    getAboveRules: (translate, context, isPortrait) => {
+    getAboveRules: (context, isPortrait) => {
         const { cellSizeForSidePanel: cellSize } = context;
         const stage = getStage(context);
         const isNext = stage > context.stateExtension.stage;
@@ -44,7 +44,7 @@ export const MultiStageSudokuTypeManager = <T extends AnyMultiStagePTM>({
 
         return (
             <>
-                {baseTypeManager.getAboveRules?.(translate, context, isPortrait)}
+                {baseTypeManager.getAboveRules?.(context, isPortrait)}
 
                 <div
                     style={{

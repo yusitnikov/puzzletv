@@ -14,6 +14,7 @@ import { CubedokuIndexingConstraint } from "../../sudokuTypes/cubedoku/constrain
 import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import { createCubeFieldSize, createCubeRegions } from "../../sudokuTypes/cube/types/CubeTypeManager";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { translate } from "../../utils/translate";
 
 const Andrewsarchus = {
     [LanguageCode.en]: "Andrewsarchus",
@@ -43,7 +44,7 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
     ],
     digitsCount: 4,
     fieldMargin: 1,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(cubedokuNormalSudokuRules(4))}.</RulesParagraph>
             <RulesParagraph>{translate(cubedokuIndexingRules)}.</RulesParagraph>
@@ -95,7 +96,7 @@ export const CubeIt: PuzzleDefinition<NumberPTM> = {
         ["R9C9", "R10C6", "R10C7", "R10C8", "R10C9"],
     ]),
     digitsCount: 5,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(cubedokuNormalSudokuRules(5))}.</RulesParagraph>
             <RulesParagraph>{translate(cubedokuIndexingRules)}.</RulesParagraph>

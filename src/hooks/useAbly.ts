@@ -9,7 +9,7 @@ import { useLastValueRef } from "./useLastValueRef";
 import { useObjectFromLocalStorage } from "../utils/localStorage";
 import { settings } from "../types/layout/Settings";
 import { myClientId } from "./useMultiPlayer";
-import { useTranslate } from "./useTranslate";
+import { translate } from "../utils/translate";
 
 export const useAbly = (options: Types.ClientOptions) =>
     useSingleton("ably", () => new Realtime({ ...options, autoConnect: true }));
@@ -206,8 +206,6 @@ export const useUserNames = (
     ablyOptions: Types.ClientOptions,
     defaultOptions: UseUserNamesOptions = {},
 ): UserNameFunc => {
-    const translate = useTranslate();
-
     useSetMyAblyChannelPresence(ablyOptions, userNamesChannelName, settings.nickname.get());
     const [namesMap] = useAblyChannelPresenceMap<string>(ablyOptions, userNamesChannelName, true);
 

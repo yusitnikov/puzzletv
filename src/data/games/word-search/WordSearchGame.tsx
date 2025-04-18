@@ -3,7 +3,6 @@ import { WordSearchGameSettings, WordSearchGameState, WordSearchPlayerState, Wor
 import { Button } from "../../../components/layout/button/Button";
 import { useAblyChannelPresenceMap, UserNameFunc, useSetMyAblyChannelPresence } from "../../../hooks/useAbly";
 import { ablyOptions, myClientId } from "../../../hooks/useMultiPlayer";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { SetStateAction, useState } from "react";
 import { greenColor, lightRedColor, textColor } from "../../../components/app/globals";
 import { arrayContainsPosition, isSamePosition } from "../../../types/layout/Position";
@@ -11,6 +10,7 @@ import { rgba } from "../../../utils/color";
 import { Crown } from "@emotion-icons/boxicons-regular";
 import { cellSize, clientColors, smallCellSize } from "./constants";
 import { WordSearchLetter } from "./WordSearchLetter";
+import { translate } from "../../../utils/translate";
 
 interface WordSearchGameProps {
     hostId: string;
@@ -24,8 +24,6 @@ export const WordSearchGame = observer(function WordSearchGame(props: WordSearch
     const { hostId, roomId, hostGameSettings, onLeave } = props;
 
     const isHost = hostId === myClientId;
-
-    const translate = useTranslate();
 
     const [hostGameState, setHostGameState] = useState<WordSearchGameState | undefined>(
         () =>
@@ -101,8 +99,6 @@ const WordSearchGameInner = observer(function WordSearchGameInner({
     setPlayerState,
 }: WordSearchGameInnerProps) {
     const isHost = hostId === myClientId;
-
-    const translate = useTranslate();
 
     const { playerIds, letters, turnIndex, words, letterOwners } = gameState;
 

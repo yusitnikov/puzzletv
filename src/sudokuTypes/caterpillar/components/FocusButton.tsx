@@ -6,7 +6,6 @@ import {
     ControlButtonRegion,
 } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { profiler } from "../../../utils/profiler";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { gameStateFocusRect, gameStateSetSelectedCells } from "../../../types/sudoku/GameState";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { settings } from "../../../types/layout/Settings";
@@ -22,6 +21,7 @@ import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { Button } from "../../../components/layout/button/Button";
 import { Translatable } from "../../../types/translations/Translatable";
 import { getGridRegionCells } from "../../../types/sudoku/GridRegion";
+import { translate } from "../../../utils/translate";
 
 const buttonLabel: Translatable = {
     [LanguageCode.en]: "Focus next grid",
@@ -56,8 +56,6 @@ const FocusButton = observer(function FocusButtonComponent<T extends AnyPTM>({
     profiler.trace();
 
     const fieldRect = usePuzzleContainer(true)!;
-
-    const translate = useTranslate();
 
     const handleAction = () => focusNextGrid(context, fieldRect);
 
@@ -96,8 +94,6 @@ export const FocusButtonRule = observer(function FocusButtonRule<T extends AnyPT
     profiler.trace();
 
     const fieldRect = usePuzzleContainer(true)!;
-
-    const translate = useTranslate();
 
     return (
         <Button

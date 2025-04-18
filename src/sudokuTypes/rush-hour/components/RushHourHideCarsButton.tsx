@@ -1,6 +1,5 @@
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { ControlButton } from "../../../components/sudoku/controls/ControlButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { ControlButtonItemProps } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
@@ -12,6 +11,7 @@ import { transformRect } from "../../../types/layout/Rect";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 const crossLineWidth = 0.1;
 
@@ -27,8 +27,6 @@ export const RushHourHideCarsButton = observer(function RushHourHideCarsButtonFc
         cellWriteMode,
         stateExtension: { hideCars },
     } = context;
-
-    const translate = useTranslate();
 
     const handleToggle = () => context.onStateChange({ extension: { hideCars: !hideCars } });
 

@@ -3,17 +3,17 @@ import styled from "@emotion/styled";
 import { ReactElement } from "react";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
-import { useLanguageCode } from "../../../hooks/useTranslate";
 import { allLanguageCodes, LanguageCode, languageNames } from "../../../types/translations/LanguageCode";
 import { darkGreyColor } from "../../app/globals";
 import { Dropdown } from "../dropdown/Dropdown";
 import { useRoute } from "../../../hooks/useRoute";
 import { buildLink } from "../../../utils/link";
+import { settings } from "../../../types/layout/Settings";
 
 export const LanguageSelector = observer(function LanguageSelector() {
     profiler.trace();
 
-    const currentLanguage = useLanguageCode();
+    const currentLanguage = settings.languageCode;
     const { slug, params } = useRoute();
 
     return (
@@ -28,7 +28,7 @@ export const LanguageSelector = observer(function LanguageSelector() {
                     </>
                 ),
                 isSelected: language === currentLanguage,
-                href: buildLink(slug, language, params),
+                href: buildLink(slug, params, false, language),
             }))}
         />
     );

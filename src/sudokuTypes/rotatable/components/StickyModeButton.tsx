@@ -1,5 +1,4 @@
 import { ControlButtonItemProps } from "../../../components/sudoku/controls/ControlButtonsManager";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { PushPin } from "@emotion-icons/material";
 import { ControlButton } from "../../../components/sudoku/controls/ControlButton";
 import { useEventListener } from "../../../hooks/useEventListener";
@@ -8,6 +7,7 @@ import { ReactElement } from "react";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
 import { observer } from "mobx-react-lite";
+import { translate } from "../../../utils/translate";
 
 export const StickyModeButton = observer(function StickyModeButton<T extends AnyRotatablePTM>({
     context,
@@ -20,8 +20,6 @@ export const StickyModeButton = observer(function StickyModeButton<T extends Any
         cellSizeForSidePanel: cellSize,
         stateExtension: { isStickyMode },
     } = context;
-
-    const translate = useTranslate();
 
     const handleToggleStickyMode = () =>
         context.onStateChange(({ stateExtension: { isStickyMode } }) => ({

@@ -111,7 +111,7 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         ];
     },
 
-    getAboveRules(_translate, context) {
+    getAboveRules(context) {
         return <ChessEngine context={context} />;
     },
 
@@ -120,10 +120,10 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
 
         return {
             ...puzzle,
-            rules(translate, context) {
+            rules(context) {
                 return (
                     <>
-                        {puzzle.rules?.(translate, context)}
+                        {puzzle.rules?.(context)}
 
                         <ChessHistory context={context} />
                     </>

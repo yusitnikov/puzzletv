@@ -55,6 +55,7 @@ import { VolumeUp } from "@emotion-icons/material";
 import { DecorativeCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
 import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
+import { translate } from "../../utils/translate";
 
 (window as any).player = [];
 
@@ -334,7 +335,7 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
     },
     regions: Regions9,
     digitsCount: 9,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>

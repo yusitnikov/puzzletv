@@ -2,13 +2,11 @@ import { observer } from "mobx-react-lite";
 import { MatchPointGameControllerProps } from "./types";
 import { LargeButton } from "./styled";
 import { MatchPointExplanation } from "./MatchPointExplanation";
-import { useTranslate } from "../../../hooks/useTranslate";
+import { translate } from "../../../utils/translate";
 
 export const MatchPointHostHomePage = observer(function MatchPointHostHomePage({
     controller,
 }: MatchPointGameControllerProps) {
-    const translate = useTranslate();
-
     return (
         <div>
             <MatchPointExplanation />

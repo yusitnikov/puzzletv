@@ -4,7 +4,6 @@ import { HTMLAttributes, ReactNode, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { useRoute } from "../../../hooks/useRoute";
-import { useLanguageCode } from "../../../hooks/useTranslate";
 import { buildLink } from "../../../utils/link";
 import { headerPadding, lighterGreyColor, lightGreyColor } from "../../app/globals";
 
@@ -25,7 +24,6 @@ export const Tabs = observer(function Tabs({ tabs, urlParam, style, ...divProps 
     profiler.trace();
 
     const { slug, params } = useRoute();
-    const language = useLanguageCode();
     const [selectedTabIdState, setSelectedTabIdState] = useState(tabs[0].id);
     const selectedTabId = urlParam ? params[urlParam] : selectedTabIdState;
     const selectedTab = tabs.find(({ id }) => id === selectedTabId);
@@ -48,7 +46,7 @@ export const Tabs = observer(function Tabs({ tabs, urlParam, style, ...divProps 
                         isSelected={selectedTabId === id}
                         onClick={() => {
                             if (urlParam) {
-                                window.location.replace(buildLink(slug, language, { ...params, [urlParam]: id }, true));
+                                window.location.replace(buildLink(slug, { ...params, [urlParam]: id }, true));
                             } else {
                                 setSelectedTabIdState(id);
                             }

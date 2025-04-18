@@ -1,4 +1,3 @@
-import { useLanguageCode, useTranslate } from "../../hooks/useTranslate";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { getQuadMastersTitle } from "../../data/puzzles/QuadMasters";
 import { buildLink } from "../../utils/link";
@@ -8,12 +7,10 @@ import { OpenInNew } from "@emotion-icons/material";
 import { profiler } from "../../utils/profiler";
 import { observer } from "mobx-react-lite";
 import { MatchPointExplanation } from "../../data/games/match-point/MatchPointExplanation";
+import { translate } from "../../utils/translate";
 
 export const GamesList = observer(function GamesList() {
     profiler.trace();
-
-    const language = useLanguageCode();
-    const translate = useTranslate();
 
     return (
         <>
@@ -23,7 +20,7 @@ export const GamesList = observer(function GamesList() {
                 imageSize={{ width: 300, height: 258 }}
                 imageBorder={true}
                 author={translate(Chameleon)}
-                playLink={<a href={buildLink("match-point", language)}>Match Point!</a>}
+                playLink={<a href={buildLink("match-point")}>Match Point!</a>}
             >
                 <MatchPointExplanation />
             </GamesListItem>
@@ -34,13 +31,9 @@ export const GamesList = observer(function GamesList() {
                 author={"Maff"}
                 playLink={
                     <>
-                        <a href={buildLink("quad-masters", language)}>
-                            {translate(getQuadMastersTitle(false, false, true))}
-                        </a>{" "}
+                        <a href={buildLink("quad-masters")}>{translate(getQuadMastersTitle(false, false, true))}</a>{" "}
                         {translate("or")}{" "}
-                        <a href={buildLink("daily-quad-masters", language)}>
-                            {translate(getQuadMastersTitle(true, false))}
-                        </a>
+                        <a href={buildLink("daily-quad-masters")}>{translate(getQuadMastersTitle(true, false))}</a>
                     </>
                 }
             >
@@ -107,9 +100,9 @@ export const GamesList = observer(function GamesList() {
                 imageSize={167}
                 playLink={
                     <>
-                        <a href={buildLink("quadle", language)}>{translate(getQuadMastersTitle(false, true, true))}</a>{" "}
+                        <a href={buildLink("quadle")}>{translate(getQuadMastersTitle(false, true, true))}</a>{" "}
                         {translate("or")}{" "}
-                        <a href={buildLink("daily-quadle", language)}>{translate(getQuadMastersTitle(true, true))}</a>
+                        <a href={buildLink("daily-quadle")}>{translate(getQuadMastersTitle(true, true))}</a>
                     </>
                 }
             >

@@ -1,11 +1,11 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { CellWriteModeButton } from "./CellWriteModeButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { CellDataSet } from "../../../types/sudoku/CellDataSet";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const CornerDigitModeButton: ControlButtonItemPropsGenericFc = observer(function CornerDigitModeButton<
     T extends AnyPTM,
@@ -13,8 +13,6 @@ export const CornerDigitModeButton: ControlButtonItemPropsGenericFc = observer(f
     profiler.trace();
 
     const { puzzle } = context;
-
-    const translate = useTranslate();
 
     return (
         <CellWriteModeButton

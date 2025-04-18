@@ -11,6 +11,7 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { CaterpillarGridFocusConstraint } from "../constraints/CaterpillarGridFocus";
 import { lightGreyColor } from "../../../components/app/globals";
 import { FocusButtonItem, FocusButtonRule } from "../components/FocusButton";
+import { translate } from "../../../utils/translate";
 
 export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
     baseTypeManager: SudokuTypeManager<T>,
@@ -78,7 +79,7 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
             return {
                 ...puzzle,
                 items: mergePuzzleItems(extraItems, puzzle.items),
-                rules: (translate, context) => {
+                rules: (context) => {
                     const selectedCells = context.selectedCells.items;
 
                     const gridRules = grids
@@ -100,7 +101,7 @@ export const CaterpillarSudokuTypeManager = <T extends AnyPTM>(
                                             </RulesParagraph>
                                         )}
 
-                                        {!!props.rules && props.rules(translate, context)}
+                                        {!!props.rules && props.rules(context)}
                                     </div>
                                 );
                             }

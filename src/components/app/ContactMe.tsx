@@ -1,17 +1,14 @@
-import { useLanguageCode, useTranslate } from "../../hooks/useTranslate";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { buildLink } from "../../utils/link";
 import { DiscordAlt, Whatsapp } from "@emotion-icons/boxicons-logos";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
+import { translate } from "../../utils/translate";
 
 export const ContactMe = observer(function ContactMe() {
     profiler.trace();
 
-    const language = useLanguageCode();
-    const translate = useTranslate();
-
-    const settersLink = buildLink("for-setters", language);
+    const settersLink = buildLink("for-setters");
 
     return (
         <>
@@ -64,8 +61,6 @@ export const ContactMe = observer(function ContactMe() {
 
 export const ContactMeShort = observer(function ContactMeShort() {
     profiler.trace();
-
-    const translate = useTranslate();
 
     return (
         <>

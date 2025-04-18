@@ -9,6 +9,7 @@ import { NonRatioNeighborsConstraint } from "../../components/sudoku/constraints
 import { blackKropkiDotsExplained, ratioDotsExplained } from "../ruleSnippets";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { greenColor } from "../../components/app/globals";
+import { translate } from "../../utils/translate";
 
 export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: showRatio,
@@ -23,7 +24,7 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
     fieldSize: createCubeFieldSize(3),
     regions: createCubeRegions(3, 3, 3),
     digitsCount: 9,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate({

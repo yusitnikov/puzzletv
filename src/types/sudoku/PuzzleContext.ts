@@ -64,7 +64,6 @@ export interface PuzzleContextOptions<T extends AnyPTM> {
     isReadonlyContext: boolean;
     applyKeys: boolean;
     applyPendingMessages: boolean;
-    languageCode?: LanguageCode;
 }
 
 // It's not a React context! Just a regular class.
@@ -77,7 +76,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     isReadonlyContext: boolean;
     applyKeys: boolean;
     applyPendingMessages: boolean;
-    languageCode = LanguageCode.en;
 
     readonly multiPlayer: UseMultiPlayerResult<T>;
 
@@ -224,7 +222,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 isReadonlyContext,
                 applyKeys,
                 applyPendingMessages,
-                languageCode,
             } = updates;
 
             if (puzzle !== undefined) {
@@ -259,9 +256,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             }
             if (applyPendingMessages !== undefined) {
                 this.applyPendingMessages = applyPendingMessages;
-            }
-            if (languageCode !== undefined) {
-                this.languageCode = languageCode;
             }
         });
     }
@@ -642,7 +636,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         if (this.lives === 0) {
             return {
                 isCorrectResult: false,
-                resultPhrase: this.translate("You lost") + "!",
+                resultPhrase: translate("You lost") + "!",
             };
         }
 
@@ -651,8 +645,8 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             ? {
                   isCorrectResult: result,
                   resultPhrase: result
-                      ? (this.puzzle.successMessage ?? `${this.translate("Absolutely right")}!`)
-                      : `${this.translate("Something's wrong here")}...`,
+                      ? (this.puzzle.successMessage ?? `${translate("Absolutely right")}!`)
+                      : `${translate("Something's wrong here")}...`,
               }
             : {
                   isCorrectResult: result.isCorrectResult,
@@ -661,7 +655,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                       (result.resultPhrase &&
                           typeof result.resultPhrase === "object" &&
                           LanguageCode.en in result.resultPhrase)
-                          ? this.translate(result.resultPhrase as PartiallyTranslatable<ReactNode>)
+                          ? translate(result.resultPhrase as PartiallyTranslatable<ReactNode>)
                           : result.resultPhrase,
                   forceShowResult: result.forceShowResult,
               };
@@ -925,10 +919,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             this.cellWriteModeInfo;
 
         return typeof digitsCountFunc === "function" ? digitsCountFunc(this) : digitsCountFunc;
-    }
-
-    translate<PhraseT = string>(phrase: PartiallyTranslatable<PhraseT>) {
-        return translate(phrase, this.languageCode);
     }
 
     onStateChange(actionsOrCallbacks: GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[]) {

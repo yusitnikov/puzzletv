@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { useLanguageCode, useTranslate } from "../../../../hooks/useTranslate";
+import { translate } from "../../../../utils/translate";
 import { textHeightCoeff } from "../../../app/globals";
 import InputSlider from "react-input-slider";
 import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
@@ -50,9 +50,6 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
 
     const enableConflictChecker = settings.enableConflictChecker.get();
 
-    const language = useLanguageCode();
-    const translate = useTranslate();
-
     const textSize = cellSize * textHeightCoeff;
 
     const [copy, isCopied] = useCopyToClipboard();
@@ -83,7 +80,6 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                                 window.open(
                                     buildLink(
                                         slug,
-                                        language,
                                         {
                                             ...getNewHostedGameParams(),
                                             host: myClientId,
@@ -107,7 +103,6 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                                 window.open(
                                     buildLink(
                                         slug,
-                                        language,
                                         {
                                             ...params,
                                             // ...getNewHostedGameParams?.(),

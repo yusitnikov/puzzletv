@@ -1,16 +1,13 @@
-import { useLanguageCode, useTranslate } from "../../hooks/useTranslate";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { ContactMeShort } from "./ContactMe";
 import { ReactNode } from "react";
 import { buildLink } from "../../utils/link";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
+import { translate } from "../../utils/translate";
 
 export const ForSetters = observer(function ForSetters() {
     profiler.trace();
-
-    const language = useLanguageCode();
-    const translate = useTranslate();
 
     const fPuzzlesLink = (
         <a href="https://f-puzzles.com" target="_blank">
@@ -22,7 +19,7 @@ export const ForSetters = observer(function ForSetters() {
             Sudoku Maker
         </a>
     );
-    const importLink = buildLink("how-to-import-puzzle", language);
+    const importLink = buildLink("how-to-import-puzzle");
 
     return (
         <>

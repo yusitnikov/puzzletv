@@ -10,7 +10,6 @@ import {
     WordSearchRoomSettings,
 } from "./types";
 import { Button } from "../../../components/layout/button/Button";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { Grid } from "../../../components/layout/grid/Grid";
 import { GridItem, GridItemList, GridItemTitle } from "./styled";
 import { shuffleArray } from "../../../utils/random";
@@ -21,12 +20,11 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { fieldSizePreference } from "./constants";
 import { WordSearchLetter } from "./WordSearchLetter";
 import { darkGreyColor } from "../../../components/app/globals";
+import { translate } from "../../../utils/translate";
 
 const lobbyChannelName = "word-search-lobby";
 
 export const WordSearch = observer(function WordSearch() {
-    const translate = useTranslate();
-
     const [myNaiveState, setMyState] = useState<WordSearchLobbyDynamicState>({});
     const myPreferredWidth = fieldSizePreference.width.get();
     const myPreferredHeight = fieldSizePreference.height.get();

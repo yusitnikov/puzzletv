@@ -5,12 +5,12 @@ import { Replay } from "@emotion-icons/material";
 import { Modal } from "../../layout/modal/Modal";
 import { Button } from "../../layout/button/Button";
 import { globalPaddingCoeff, textHeightCoeff } from "../../app/globals";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { useCallback, useState } from "react";
 import { getEmptyGameState, mergeGameStateWithUpdates } from "../../../types/sudoku/GameState";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const ResetButton: ControlButtonItemPropsGenericFc = observer(function ResetButton<T extends AnyPTM>({
     context,
@@ -24,8 +24,6 @@ export const ResetButton: ControlButtonItemPropsGenericFc = observer(function Re
         multiPlayer: { isEnabled, isHost },
     } = context;
     const canRestart = !isEnabled || isHost;
-
-    const translate = useTranslate();
 
     const [isShowingRestartConfirmation, setIsShowingRestartConfirmation] = useState(false);
 

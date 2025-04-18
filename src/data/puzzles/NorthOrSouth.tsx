@@ -38,6 +38,7 @@ import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight"
 import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import { RotatableDigitPTM } from "../../sudokuTypes/rotatable/types/RotatablePTM";
 import { indexes } from "../../utils/indexes";
+import { translate } from "../../utils/translate";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
@@ -47,7 +48,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
     },
     slug: "north-or-south",
     author: Chameleon,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
@@ -114,7 +115,7 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
         [LanguageCode.ru]: "Север или юг? (v2)",
     },
     slug: "north-or-south2",
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>
@@ -177,7 +178,7 @@ export const NorthOrSouth2ShortRules: typeof NorthOrSouth = {
     ...NorthOrSouth2,
     noIndex: true,
     slug: "north-or-south2-sr",
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(rotatableSudokuRules)}</RulesParagraph>

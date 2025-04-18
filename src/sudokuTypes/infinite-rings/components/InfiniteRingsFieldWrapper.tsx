@@ -7,7 +7,6 @@ import { controlButtonOptions, controlButtonStyles } from "../../../components/s
 import { gameStateHandleZoomClick, gameStateSetScaleLog } from "../../../types/sudoku/GameState";
 import { getInfiniteLoopRegionBorderWidth } from "./InfiniteRingsBorderLines";
 import { focusRingsSetting, isShowingAllInfiniteRings } from "../types/InfiniteRingsLayout";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { indexes } from "../../../utils/indexes";
 import { loop } from "../../../utils/math";
 import { isTouchDevice } from "../../../utils/isTouchDevice";
@@ -15,6 +14,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 const StyledButton = styled("button", controlButtonOptions)(controlButtonStyles);
 
@@ -67,8 +67,6 @@ export const InfiniteRingsFieldWrapper = <T extends AnyPTM>(visibleRingsCountArg
             cellSize,
             isReadonlyContext,
         } = context;
-
-        const translate = useTranslate();
 
         const ringOffset = Math.round(scaleLog);
         const showingAllInfiniteRings = isShowingAllInfiniteRings(context, visibleRingsCountArg);

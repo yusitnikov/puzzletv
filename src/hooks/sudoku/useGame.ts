@@ -8,7 +8,6 @@ import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { profiler } from "../../utils/profiler";
 import { autorun } from "mobx";
 import { settings } from "../../types/layout/Settings";
-import { useLanguageCode } from "../useTranslate";
 
 const emptyObject: any = {};
 
@@ -24,8 +23,6 @@ export const useGame = <T extends AnyPTM>(
 
     const { useProcessedGameStateExtension = () => emptyObject as T["processedStateEx"] } = typeManager;
 
-    const languageCode = useLanguageCode();
-
     const [context] = useState(
         () =>
             new PuzzleContext({
@@ -36,14 +33,12 @@ export const useGame = <T extends AnyPTM>(
                 isReadonlyContext,
                 applyKeys: true,
                 applyPendingMessages: true,
-                languageCode,
             }),
     );
     useEffect(() => context.update({ puzzle }), [context, puzzle]);
     useEffect(() => context.update({ cellSize }), [context, cellSize]);
     useEffect(() => context.update({ cellSizeForSidePanel }), [context, cellSizeForSidePanel]);
     useEffect(() => context.update({ isReadonlyContext }), [context, isReadonlyContext]);
-    useEffect(() => context.update({ languageCode }), [context, languageCode]);
 
     // TODO: make it not update the state?
     const processedGameStateExtension = useProcessedGameStateExtension(context);

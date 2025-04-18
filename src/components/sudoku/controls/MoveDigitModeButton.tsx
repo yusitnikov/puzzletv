@@ -1,7 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { CellWriteModeButton } from "./CellWriteModeButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { textColor } from "../../app/globals";
 import { ControlButton } from "./ControlButton";
@@ -10,6 +9,7 @@ import { emptyPosition } from "../../../types/layout/Position";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const MoveDigitModeButton: ControlButtonItemPropsGenericFc = observer(function MoveDigitModeButton<
     T extends AnyPTM,
@@ -25,8 +25,6 @@ export const MoveDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
         cellSizeForSidePanel: cellSize,
         cellWriteMode,
     } = context;
-
-    const translate = useTranslate();
 
     const handleResetPosition = useCallback(
         () =>

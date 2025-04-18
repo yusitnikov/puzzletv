@@ -2,7 +2,6 @@
 import styled from "@emotion/styled";
 import { textColor } from "../../app/globals";
 import { Menu } from "@emotion-icons/material";
-import { useLanguageCode } from "../../../hooks/useTranslate";
 import { buildLink } from "../../../utils/link";
 import { useRoute } from "../../../hooks/useRoute";
 import { profiler } from "../../../utils/profiler";
@@ -29,7 +28,6 @@ interface StyledMenuItemProps {
 export const VerticalMenu = observer(function VerticalMenuFc({ items }: MenuProps) {
     profiler.trace();
 
-    const language = useLanguageCode();
     const { slug } = useRoute();
 
     return (
@@ -38,7 +36,7 @@ export const VerticalMenu = observer(function VerticalMenuFc({ items }: MenuProp
             items={items.map((item) => ({
                 label: item.name,
                 isSelected: isCurrentMenuItem(item, slug),
-                href: buildLink(item.slug, language),
+                href: buildLink(item.slug),
             }))}
         />
     );
@@ -47,7 +45,6 @@ export const VerticalMenu = observer(function VerticalMenuFc({ items }: MenuProp
 export const HorizontalMenu = observer(function HorizontalMenuFc({ items }: MenuProps) {
     profiler.trace();
 
-    const language = useLanguageCode();
     const { slug } = useRoute();
 
     return (
@@ -55,7 +52,7 @@ export const HorizontalMenu = observer(function HorizontalMenuFc({ items }: Menu
             {items.map((item, index) => (
                 <StyledHorizontalMenuItem
                     key={index}
-                    href={buildLink(item.slug, language)}
+                    href={buildLink(item.slug)}
                     active={isCurrentMenuItem(item, slug)}
                 >
                     {item.name}

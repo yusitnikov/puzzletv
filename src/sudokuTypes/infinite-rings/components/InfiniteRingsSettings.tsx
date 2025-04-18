@@ -1,5 +1,4 @@
 import { SettingsContentProps } from "../../../components/sudoku/controls/settings/SettingsContent";
-import { useTranslate } from "../../../hooks/useTranslate";
 import {
     focusRingsSetting,
     isShowingAllInfiniteRings,
@@ -13,12 +12,11 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { ReactElement } from "react";
+import { translate } from "../../../utils/translate";
 
 export const InfiniteRingsSettings = (visibleRingsCountArg = 2) =>
     observer(function InfiniteRingsSettingsComponent<T extends AnyPTM>({ context, cellSize }: SettingsContentProps<T>) {
         profiler.trace();
-
-        const translate = useTranslate();
 
         const showingAllInfiniteRings = isShowingAllInfiniteRings(context, visibleRingsCountArg);
 

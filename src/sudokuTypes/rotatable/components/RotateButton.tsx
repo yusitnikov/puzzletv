@@ -2,7 +2,6 @@ import {
     ControlButtonItemProps,
     ControlButtonItemPropsGenericFc,
 } from "../../../components/sudoku/controls/ControlButtonsManager";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { RotateLeft, RotateRight } from "@emotion-icons/material";
 import { ControlButton, controlButtonPaddingCoeff } from "../../../components/sudoku/controls/ControlButton";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
@@ -16,6 +15,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 const handleRotate = <T extends AnyPTM>(context: PuzzleContext<T>, direction: number) => {
     const {
@@ -49,8 +49,6 @@ export const RotateRightButton: ControlButtonItemPropsGenericFc = observer(funct
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize, isReady } = context;
-
-    const translate = useTranslate();
 
     useEventListener(window, "keydown", (ev) => {
         if (!settings.isOpened && ev.code === "KeyR") {
@@ -105,8 +103,6 @@ export const RotateLeftButton: ControlButtonItemPropsGenericFc = observer(functi
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize } = context;
-
-    const translate = useTranslate();
 
     return (
         <ControlButton

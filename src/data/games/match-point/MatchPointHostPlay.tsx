@@ -2,11 +2,9 @@ import { observer } from "mobx-react-lite";
 import { MatchPointGameControllerProps } from "./types";
 import { MatchPointPlayStep } from "./MatchPointPlayStep";
 import { LargeButton, Paragraph } from "./styled";
-import { useTranslate } from "../../../hooks/useTranslate";
+import { translate } from "../../../utils/translate";
 
 export const MatchPointHostPlay = observer(function MatchPointHostPlay({ controller }: MatchPointGameControllerProps) {
-    const translate = useTranslate();
-
     const { questionsForGame: questions, answers, currentAnswerIndex, isShowingResults } = controller;
 
     const isLastPlayer = currentAnswerIndex === answers.length - 1;

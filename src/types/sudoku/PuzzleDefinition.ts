@@ -3,7 +3,6 @@ import { ComponentType, ReactNode } from "react";
 import { SudokuTypeManager } from "./SudokuTypeManager";
 import { FieldSize } from "./FieldSize";
 import { PartiallyTranslatable } from "../translations/Translatable";
-import { useTranslate } from "../../hooks/useTranslate";
 import { Constraint } from "./Constraint";
 import { CellColorValue } from "./CellColor";
 import { PuzzleContext, PuzzleContextProps } from "./PuzzleContext";
@@ -44,12 +43,8 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     };
     getNewHostedGameParams?: () => any;
     author?: PartiallyTranslatable<ReactNode>;
-    rules?: (translate: ReturnType<typeof useTranslate>, context: PuzzleContext<T>) => ReactNode;
-    aboveRules?: (
-        translate: ReturnType<typeof useTranslate>,
-        context: PuzzleContext<T>,
-        isPortrait: boolean,
-    ) => ReactNode;
+    rules?: (context: PuzzleContext<T>) => ReactNode;
+    aboveRules?: (context: PuzzleContext<T>, isPortrait: boolean) => ReactNode;
     successMessage?: ReactNode;
     typeManager: SudokuTypeManager<T>;
     fieldSize: FieldSize;

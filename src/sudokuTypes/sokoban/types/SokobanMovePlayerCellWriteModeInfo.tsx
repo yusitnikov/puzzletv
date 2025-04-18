@@ -6,7 +6,6 @@ import { ControlButtonItemProps } from "../../../components/sudoku/controls/Cont
 import { CellWriteModeButton } from "../../../components/sudoku/controls/CellWriteModeButton";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { SokobanPlayerByData } from "../constraints/SokobanPlayer";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { ControlButton, controlButtonPaddingCoeff } from "../../../components/sudoku/controls/ControlButton";
 import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp } from "@emotion-icons/fluentui-system-filled";
 import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
@@ -18,6 +17,7 @@ import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { SokobanClue } from "./SokobanPuzzleExtension";
 import { Position } from "../../../types/layout/Position";
+import { translate } from "../../../utils/translate";
 
 const base = MoveCellWriteModeInfo<SokobanPTM>();
 
@@ -231,8 +231,6 @@ const ButtonComponent = observer(function ButtonFc({ context, top, left }: Contr
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize, cellWriteMode } = context;
-
-    const translate = useTranslate();
 
     return (
         <>

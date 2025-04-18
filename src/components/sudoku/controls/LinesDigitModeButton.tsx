@@ -1,13 +1,13 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { CellWriteModeButton } from "./CellWriteModeButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { UserLinesByData, UserMarkByData } from "../constraints/user-lines/UserLines";
 import { CellMarkType } from "../../../types/sudoku/CellMark";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { profiler } from "../../../utils/profiler";
 import { observer } from "mobx-react-lite";
+import { translate } from "../../../utils/translate";
 
 export const LinesDigitModeButton: ControlButtonItemPropsGenericFc = observer(function LinesDigitModeButton<
     T extends AnyPTM,
@@ -18,8 +18,6 @@ export const LinesDigitModeButton: ControlButtonItemPropsGenericFc = observer(fu
         cellSizeForSidePanel: cellSize,
         puzzle: { allowDrawing = [] },
     } = context;
-
-    const translate = useTranslate();
 
     return (
         <CellWriteModeButton

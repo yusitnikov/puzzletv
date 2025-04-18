@@ -22,6 +22,7 @@ import { myClientId } from "../../../hooks/useMultiPlayer";
 import { getNextActionId } from "../../../types/sudoku/GameStateAction";
 import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
 import { addFieldStateExToSudokuManager } from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import { translate } from "../../../utils/translate";
 
 export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
     baseTypeManager: SudokuTypeManager<any> = DigitSudokuTypeManager(),
@@ -34,7 +35,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
         },
     }),
 
-    getAboveRules: function Find3AboveRules(translate, context, isPortrait) {
+    getAboveRules: function Find3AboveRules(context, isPortrait) {
         // Cell to use as a gift - a confirmation popup will be shown when it's set
         const [confirmationCell, setConfirmationCell] = useState<Position | undefined>(undefined);
         const [showExplanation, setShowExplanation] = useState(false);
@@ -56,7 +57,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
 
         return (
             <>
-                {baseTypeManager.getAboveRules?.(translate, context, isPortrait)}
+                {baseTypeManager.getAboveRules?.(context, isPortrait)}
 
                 <div
                     style={{
@@ -133,7 +134,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                 {showExplanation && (
                     <Modal cellSize={cellSize} onClose={() => setShowExplanation(false)}>
                         <div>
-                            {context.translate({
+                            {translate({
                                 [LanguageCode.en]:
                                     "Please select one empty cell" +
                                     (giftsInSight ? " in sight of a 3" : "") +
@@ -168,7 +169,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                 {confirmationCell && (
                     <Modal cellSize={cellSize} onClose={() => setConfirmationCell(undefined)}>
                         <div>
-                            {context.translate({
+                            {translate({
                                 [LanguageCode.en]: "Are you sure that you want to use the gift for this cell",
                                 [LanguageCode.ru]:
                                     "Пожалуйста, выберите одну пустую ячейку, чтобы показать цифру в ней",
@@ -210,7 +211,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                                 }}
                                 style={{ padding: "0.5em 1em" }}
                             >
-                                {context.translate("Yes")}
+                                {translate("Yes")}
                             </Button>
 
                             <Button
@@ -220,7 +221,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                                 autoFocus={true}
                                 style={{ padding: "0.5em 1em" }}
                             >
-                                {context.translate("No")}
+                                {translate("No")}
                             </Button>
                         </div>
                     </Modal>

@@ -2,7 +2,6 @@ import { JigsawPTM } from "../types/JigsawPTM";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { Absolute } from "../../../components/layout/absolute/Absolute";
 import { controlButtonPaddingCoeff } from "../../../components/sudoku/controls/ControlButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { ControlButtonItemProps } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { jssTag } from "../../jss/constraints/Jss";
@@ -11,6 +10,7 @@ import { observer } from "mobx-react-lite";
 import { useComputed } from "../../../hooks/useComputed";
 import { profiler } from "../../../utils/profiler";
 import { JigsawSudokuPhrases } from "../types/JigsawSudokuPhrases";
+import { translate } from "../../../utils/translate";
 
 interface JigsawMoveButtonHintProps extends ControlButtonItemProps<JigsawPTM> {
     phrases: JigsawSudokuPhrases;
@@ -21,8 +21,6 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({
     phrases,
 }: JigsawMoveButtonHintProps) {
     profiler.trace();
-
-    const translate = useTranslate();
 
     const isJss = useComputed(function isJss() {
         return context.allItems.some(({ tags }) => tags?.includes(jssTag));

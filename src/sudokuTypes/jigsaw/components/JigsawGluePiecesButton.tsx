@@ -1,7 +1,6 @@
 import { JigsawPTM } from "../types/JigsawPTM";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { ControlButton } from "../../../components/sudoku/controls/ControlButton";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { ControlButtonItemProps } from "../../../components/sudoku/controls/ControlButtonsManager";
 import {
     getActiveJigsawPieceIndexes,
@@ -22,6 +21,7 @@ import { comparer } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useComputed, useComputedValue } from "../../../hooks/useComputed";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton({
     context,
@@ -29,8 +29,6 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton({
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize } = context;
-
-    const translate = useTranslate();
 
     const getPiecePositions = useComputed(
         function getPiecePositions() {

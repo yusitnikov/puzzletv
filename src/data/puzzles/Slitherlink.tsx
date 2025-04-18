@@ -16,6 +16,7 @@ import { PropsWithChildren } from "react";
 import { PuzzleContextProps } from "../../types/sudoku/PuzzleContext";
 import { ZoomInButtonItem, ZoomOutButtonItem } from "../../components/sudoku/controls/ZoomButton";
 import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { translate } from "../../utils/translate";
 
 const scale = 0.01;
 const imageWidth = 1132,
@@ -574,7 +575,7 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
     author: {
         [LanguageCode.en]: "superrabbit",
     },
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate({

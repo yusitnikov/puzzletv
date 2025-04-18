@@ -1,7 +1,8 @@
 import { LanguageCode } from "../types/translations/LanguageCode";
+import { settings } from "../types/layout/Settings";
 
-export const buildLink = (slug: string, language: LanguageCode, params: any = {}, fullUrl = false) => {
-    params.lang = language === LanguageCode.en ? undefined : language;
+export const buildLink = (slug: string, params: any = {}, fullUrl = false, languageCode = settings.languageCode) => {
+    params.lang = languageCode === LanguageCode.en ? undefined : languageCode;
 
     let href = `${fullUrl ? window.location.origin + window.location.pathname : ""}#${slug}`;
 

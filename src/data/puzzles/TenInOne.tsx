@@ -37,7 +37,7 @@ import React from "react";
 import { tenInOneMultiBoxLineRules, tenInOneStage1Rules } from "../../sudokuTypes/ten-in-one/data/ruleSnippets";
 import { isValidFinishedPuzzleByStageConstraints } from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
 import { RulesIndentedBlock } from "../../components/sudoku/rules/RulesIndentedBlock";
-import { processTranslations } from "../../utils/translate";
+import { processTranslations, translate } from "../../utils/translate";
 import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
 import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
 import { Constraint, toDecorativeConstraint, toInvisibleConstraint } from "../../types/sudoku/Constraint";
@@ -76,7 +76,7 @@ export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
     slug: "abstract-killer-dots",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
     fieldSize,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
             <RulesUnorderedList>
@@ -187,7 +187,7 @@ export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
         return boxIndex === top;
     }),
     fieldSize,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
             <RulesUnorderedList>
@@ -274,7 +274,7 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
     getLmdSolutionCode: () => "936261819318276945",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
     fieldSize,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
             <RulesUnorderedList>
@@ -371,7 +371,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
     fieldSize,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000ASD",
     getLmdSolutionCode: () => "592648736742839615",
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate(arrowsExplained)}. {translate(canRepeatOnArrows)}.

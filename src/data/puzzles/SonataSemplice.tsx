@@ -17,6 +17,7 @@ import { headerHeight } from "../../components/app/globals";
 import { QuadInputPTM } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputPTM";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
+import { translate } from "../../utils/translate";
 
 const noteRadius = 0.2;
 const noteLineWidth = 0.05;
@@ -253,7 +254,7 @@ export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
         LittleKillerConstraint("R7C3", "UL", fieldSize, 16),
         LittleKillerConstraint("R7C5", "UL", fieldSize, 16),
     ],
-    rules: (translate, { cellSizeForSidePanel }) => (
+    rules: ({ cellSizeForSidePanel }) => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>
             <RulesParagraph>{translate(littleKillerExplained)}.</RulesParagraph>

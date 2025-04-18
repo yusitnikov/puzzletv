@@ -2,7 +2,7 @@
 import styled from "@emotion/styled";
 import React, { CSSProperties, FC, ReactNode } from "react";
 import { headerHeight, headerPadding, lightGreyColor, textColor } from "../../app/globals";
-import { useLanguageCode, useTranslate } from "../../../hooks/useTranslate";
+import { translate } from "../../../utils/translate";
 import { buildLink } from "../../../utils/link";
 import { HorizontalMenu, MenuItem, VerticalMenu } from "../menu/Menu";
 import { useWindowSize } from "../../../hooks/useWindowSize";
@@ -32,9 +32,6 @@ export const PageLayout = observer(function PageLayout({
     children,
 }: PageLayoutProps) {
     profiler.trace();
-
-    const language = useLanguageCode();
-    const translate = useTranslate();
 
     const { width: windowWidth } = useWindowSize();
     const showHorizontalMenu = windowWidth >= 800;
@@ -83,7 +80,7 @@ export const PageLayout = observer(function PageLayout({
                         {!showHorizontalMenu && <VerticalMenu items={menuItems} />}
 
                         <a
-                            href={buildLink("", language)}
+                            href={buildLink("")}
                             style={{
                                 display: "flex",
                                 alignItems: "center",

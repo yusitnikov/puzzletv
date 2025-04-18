@@ -4,13 +4,13 @@ import { Check } from "@emotion-icons/material";
 import { Modal } from "../../layout/modal/Modal";
 import { Button } from "../../layout/button/Button";
 import { globalPaddingCoeff, textColor } from "../../app/globals";
-import { useTranslate } from "../../../hooks/useTranslate";
 import { useState } from "react";
 import { useEffectExceptInit } from "../../../hooks/useEffectExceptInit";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
+import { translate } from "../../../utils/translate";
 
 export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(function ResultCheckButton<
     T extends AnyPTM,
@@ -32,8 +32,6 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
     const { getPlayerScore, onCloseCorrectResultPopup } = typeManager;
 
     const isLmdAllowed = !!params?.lmd;
-
-    const translate = useTranslate();
 
     const [isShowingResult, setIsShowingResult] = useState(false);
 

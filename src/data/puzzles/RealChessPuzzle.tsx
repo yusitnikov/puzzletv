@@ -34,6 +34,7 @@ import { ChessPiece } from "../../sudokuTypes/chess/types/ChessPiece";
 import { indexes, indexesFromTo } from "../../utils/indexes";
 import { AntiBishopConstraint } from "../../types/sudoku/constraints/AntiBishop";
 import { TextConstraint } from "../../components/sudoku/constraints/text/Text";
+import { translate } from "../../utils/translate";
 
 const mandatorySolutionPieces = chessInitialPiecesByCellNames({
     g8: { color: ChessColor.black, type: ChessPieceType.knight },
@@ -71,7 +72,7 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
     },
     slug: "real-chess-sudoku",
     author: Chameleon,
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>
                 {translate(chessSudokuRules)}. {translate(optionalChessPiecesRules)}.
@@ -156,7 +157,7 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
         [LanguageCode.en]: "Chameleon & Raumplaner",
         [LanguageCode.ru]: "Хамелеона и Raumplaner'а",
     },
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(chessSudokuRules)}.</RulesParagraph>
             <RulesParagraph>
@@ -291,7 +292,7 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
     author: {
         [LanguageCode.en]: "ojppe",
     },
-    rules: (translate) => (
+    rules: () => (
         <>
             <RulesParagraph>{translate(chessSudokuRules)}.</RulesParagraph>
             <RulesParagraph>
@@ -353,9 +354,9 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
                   isCorrectResult: true,
                   resultPhrase: (
                       <>
-                          <div>{context.translate("Congratulations")}!</div>
+                          <div>{translate("Congratulations")}!</div>
                           <div>
-                              {context.translate({
+                              {translate({
                                   [LanguageCode.en]: "The chess part completed successfully",
                                   [LanguageCode.ru]: "Шахматная часть выполнена успешно",
                                   [LanguageCode.de]: "Der Schachteil wurde erfolgreich abgeschlossen",
@@ -364,7 +365,7 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
                           </div>
                           <div style={{ marginTop: "0.5em" }}>
                               <a href={"https://sudokupad.app/qx2toxcwwn"}>
-                                  {context.translate({
+                                  {translate({
                                       [LanguageCode.en]: "Go to the sudoku part",
                                       [LanguageCode.ru]: "Перейти к части судоку",
                                       [LanguageCode.de]: "Gehen Sie zum Sudoku-Teil",
