@@ -30,6 +30,7 @@ import { rgba } from "../../utils/color";
 import { SparkGridArrowsConstraint } from "../../sudokuTypes/spark/components/SparkGridArrows";
 import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
 import { translate } from "../../utils/translate";
+import { Chameleon } from "../authors";
 
 const extraRegion = ["R1C1", "R3C1", "R1C8", "R2C7", "R8C1", "R1C13", "R3C13", "R8C13"];
 const fieldSize = createSparkFieldSize(4, 2);
@@ -234,6 +235,7 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
     title: {
         [LanguageCode.en]: "Sparkster",
     },
+    author: Chameleon,
     slug: "sparkster",
     saveStateKey: "sparkster-notes",
     typeManager: SparkTypeManager,
