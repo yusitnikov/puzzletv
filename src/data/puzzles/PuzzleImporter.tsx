@@ -283,7 +283,7 @@ export class PuzzleImporter<T extends AnyPTM> {
                 )
                 .filter(({ length }) => length);
         });
-        if (regions.length > 1) {
+        if (regions.length > 1 || (this.typeManager.supportSingleRegion && regions.length === 1)) {
             this.regions.push(...regions);
         }
     }

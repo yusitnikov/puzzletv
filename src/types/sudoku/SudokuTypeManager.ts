@@ -197,6 +197,8 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     cosmeticRegions?: boolean;
     getRegionsForRowsAndColumns?(context: PuzzleContext<T>): Constraint<T, any>[];
 
+    supportSingleRegion?: boolean;
+
     getAdditionalNeighbors?(position: Position, puzzle: PuzzleDefinition<T>): Position[];
 
     borderColor?: string;
