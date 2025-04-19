@@ -4,6 +4,7 @@ import { ColorsImportMode, PuzzleImportOptions, PuzzleImportPuzzleType } from ".
 import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { buildLink } from "../../utils/link";
+import { LanguageCode } from "../../types/translations/LanguageCode";
 
 const loadPuzzle = (options: PuzzleImportOptions) =>
     SudokuMaker.loadPuzzle({
@@ -108,15 +109,39 @@ export const CloseQuarters: PuzzleDefinitionLoader<NumberPTM> = {
     slug: "close-quarters",
     noIndex: true,
 };
-export const CloseQuartersSeries = addSuccessMessage(
-    "1-close-quarters",
-    CloseQuarters,
-    <>
-        Well done! (1/5 complete)
-        <br />
-        Next up: <a href={buildLink(MitosisSeries.slug)}>Mitosis</a>
-    </>,
-);
+// The first puzzle of the pack is published on the main page as a pack
+export const CloseQuartersSeries: PuzzleDefinitionLoader<NumberPTM> = {
+    loadPuzzle: (_options, isPreview) => {
+        let puzzle = {
+            ...CloseQuarters.loadPuzzle({}),
+            successMessage: (
+                <>
+                    Well done! (1/5 complete)
+                    <br />
+                    Next up: <a href={buildLink(MitosisSeries.slug)}>Mitosis</a>
+                </>
+            ),
+        };
+
+        if (isPreview) {
+            puzzle = {
+                ...puzzle,
+                title: {
+                    [LanguageCode.en]: "Introduction to Fractional Sudoku (5 puzzles)",
+                    [LanguageCode.ru]: "Введение в дробное судоку (5 головоломок)",
+                    [LanguageCode.de]: "Einführung in Bruch-Sudoku (5 Rätsel)",
+                },
+                author: {
+                    [LanguageCode.en]: "Michael Lefkowitz & Mitchell Lee",
+                },
+            };
+        }
+
+        return puzzle;
+    },
+    slug: "1-close-quarters",
+    noIndex: false,
+};
 export const CloseQuartersSource: PuzzleDefinitionLoader<NumberPTM> = {
     loadPuzzle: () =>
         SudokuMaker.loadPuzzle({
