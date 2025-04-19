@@ -162,3 +162,9 @@ SparkKropkiXV.args = { _hash: "spark-kropki-xv" };
 
 export const Sparkster = Template.bind({});
 Sparkster.args = { _hash: "sparkster" };
+
+export const CloseQuarters = Template.bind({});
+CloseQuarters.args = { _hash: "close-quarters" };
+
+export const Superposition = Template.bind({});
+Superposition.args = { _hash: "4-superposition" };

@@ -62,6 +62,18 @@ import { JsTest } from "./JsTest";
 import { Cornered, SlideAndSeekExample, SlideAndSeekIntro, TheBlackSheep, TheGap, WaxOnWaxOff } from "./SlideAndSeek";
 import { ElephantSlitherlink } from "./Slitherlink";
 import { EmptySpark, EmptySpark6x6, SparkKropki, Sparkster } from "./Spark";
+import {
+    CloseQuarters,
+    CloseQuartersSeries,
+    FractionallyHarder,
+    FractionallyHarderSeries,
+    FunkyTown,
+    FunkyTownSeries,
+    Mitosis,
+    MitosisSeries,
+    Superposition,
+    SuperpositionSeries,
+} from "./FractionalSudoku";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -92,6 +104,17 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    CloseQuarters,
+    CloseQuartersSeries,
+    Mitosis,
+    MitosisSeries,
+    FunkyTown,
+    FunkyTownSeries,
+    Superposition,
+    SuperpositionSeries,
+    FractionallyHarder,
+    FractionallyHarderSeries,
+
     SparkKropki,
 
     ElephantSlitherlink,
