@@ -722,7 +722,11 @@ export const HowToImport = observer(function HowToImport() {
                         id: "fractional-sudoku",
                         title: (
                             <ExampleTab
-                                title={translate({ [LanguageCode.en]: "Fractional sudoku" })}
+                                title={translate({
+                                    [LanguageCode.en]: "Fractional sudoku",
+                                    [LanguageCode.ru]: "Дробное судоку",
+                                    [LanguageCode.de]: "Bruch-Sudoku",
+                                })}
                                 puzzle={CloseQuarters}
                             />
                         ),
