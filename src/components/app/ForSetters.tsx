@@ -165,13 +165,13 @@ export const ForSetters = observer(function ForSetters() {
                             {translate({
                                 [LanguageCode.en]:
                                     "Does the puzzle contain unique rules or mechanics that other popular platforms don't support? " +
-                                    "If f-puzzles (imported into SudokuPad) or penpa+ can handle the puzzle, it will not be published on Puzzle TV.",
+                                    "If f-puzzles/Sudoku Maker (imported into SudokuPad) or penpa+ can handle the puzzle, it will not be published on Puzzle TV.",
                                 [LanguageCode.ru]:
                                     "Содержит ли головоломка уникальные правила или механику, которые не поддерживаются другими популярными платформами? " +
-                                    "Если f-puzzles (импортированный в SudokuPad) или penpa+ могут справиться с головоломкой, она не будет опубликована на Puzzle TV.",
+                                    "Если f-puzzles/Sudoku Maker (импортированный в SudokuPad) или penpa+ могут справиться с головоломкой, она не будет опубликована на Puzzle TV.",
                                 [LanguageCode.de]:
                                     "Enthält das Rätsel einzigartige Regeln oder Mechanismen, die andere beliebte Plattformen nicht unterstützen? " +
-                                    "Wenn f-puzzles (in SudokuPad importiert) oder penpa+ mit dem Rätsel umgehen können, wird es nicht auf Puzzle TV veröffentlicht.",
+                                    "Wenn f-puzzles/Sudoku Maker (in SudokuPad importiert) oder penpa+ mit dem Rätsel umgehen können, wird es nicht auf Puzzle TV veröffentlicht.",
                             })}
                         </li>
 
