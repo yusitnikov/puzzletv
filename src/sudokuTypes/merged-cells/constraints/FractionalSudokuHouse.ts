@@ -6,6 +6,7 @@ export const FractionalSudokuHouseConstraint = <T extends AnyPTM>(cellShapes: Me
     name: "house",
     cells: cellShapes.map((region) => region.mainCell),
     props: undefined,
+    isObvious: true,
     isValidCell: (position, digits, _cells, context): boolean => {
         const digit = context.puzzle.typeManager.getDigitByCellData(
             digits[position.top][position.left],
