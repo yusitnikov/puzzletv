@@ -17,6 +17,6 @@ export const averageMode = (values: number[]) => {
     if (length === 0) return 0;
 
     const middle = Math.floor(length / 2);
-    values = [...values].sort();
+    values = [...values].sort((a, b) => a - b);
     return length % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
 };
