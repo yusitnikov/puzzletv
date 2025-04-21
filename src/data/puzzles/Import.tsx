@@ -135,7 +135,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         [PuzzleImportPuzzleType.Tetris]: TetrisSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.Shuffled]: ShuffledSudokuTypeManager(importOptions),
         [PuzzleImportPuzzleType.RushHour]: RushHourSudokuTypeManager,
-        [PuzzleImportPuzzleType.MergedCells]: MergedCellsTypeManager(importOptions.fractionalSudoku),
+        [PuzzleImportPuzzleType.MergedCells]: MergedCellsTypeManager(importOptions),
     };
 
     let typeManager = typesMap[type] ?? regularTypeManager;

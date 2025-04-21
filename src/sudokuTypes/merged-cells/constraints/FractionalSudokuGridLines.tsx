@@ -14,6 +14,7 @@ export const FractionalSudokuGridLines: ConstraintPropsGenericFcMap = {
         context: {
             puzzle: {
                 fieldSize: { columnsCount, rowsCount },
+                importOptions: { cellPieceWidth = 2, cellPieceHeight = 2 } = {},
             },
         },
     }: ConstraintProps<T>) {
@@ -26,7 +27,7 @@ export const FractionalSudokuGridLines: ConstraintPropsGenericFcMap = {
             <>
                 {indexes(rowsCount, true).map(
                     (top) =>
-                        top % 2 === 0 && (
+                        top % cellPieceHeight === 0 && (
                             <line
                                 key={`horizontal-${top}`}
                                 strokeWidth={borderWidth}
@@ -41,7 +42,7 @@ export const FractionalSudokuGridLines: ConstraintPropsGenericFcMap = {
 
                 {indexes(columnsCount, true).map(
                     (left) =>
-                        left % 2 === 0 && (
+                        left % cellPieceWidth === 0 && (
                             <line
                                 key={`vertical-${left}`}
                                 strokeWidth={borderWidth}

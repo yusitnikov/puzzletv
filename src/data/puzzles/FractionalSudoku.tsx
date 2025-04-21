@@ -150,3 +150,25 @@ export const CloseQuartersSource: PuzzleDefinitionLoader<NumberPTM> = {
         } as PuzzleImportOptions),
     slug: "close-quarters-source",
 };
+
+const random3x3LoadString =
+    "N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhAOV4oO6dAAJ0jACYQA1o1og4jBAAtoBEEoQBPevxABjRugQQYSgO6Zp6gkQBMdNSkwBzNQgfOQ8AB4AIh6Y3vgALHRGImzoBADaoEYQbNBx%2BI4AvjRJKWkEWTnGeRgF2bmppfhOABzlIABucGyM-JHFlem19cmdBHVFvfkRPSXp4aN9%2BADMhRXD3YNjPgPzVYtr6XONza0E01HLGZPD20NVs-VNLfxEh1OXRdd7GffDqzs3BW9VE0tTf1Az1uP3Sj02KyuuzaoMh-2G4I6pxOVTORzRDwxCKxVQ%2B53GKIJ8IuOK6jjxRw2IHcmAaKDw%2BAQUFadGBDlhM1J-UJ3OJYK51XJPMFFKmVLZMw5AoFouRfLK8uOT2h3yRuOFHwldzV-OF4pVEQ5VPxcIhSrN2wlvhN%2BE1BoOOoVQIN2ptRAAbFCvobHSKNf7ld72m6hYrEVqOYibeGXUbPYqPQGLXr42bjUcoxmBYDfbL1YqBemxaG0yXPi9XVnhZnMdXLbHfTHvdajjmbXbmxyOy8HTbC2WJcHKWWaXSGUyWeX%2BL30XWvT2pcL60GOe620c18L11M8%2Bld07fUWFmW%2B3OC0v5zDDyfh-vORfz2HC6nDy%2BbWQnEnc1%2BQ3f9d7K1rQMF19aVL3ZRtn3A6o42gmcpg-GVoJbHcf1vPUbyA5NH1AUd6QICcUFZA0h2LO9N2Aq8bQos1ELQ1DFTqABdQ4cDMKA4EwHAEHSRIQD0AwIKgFAaVwXjKBoCSpMkmS7jkmh5LuaTlNkhS1MUmSVOkjSNK0zT1IM%2BS9O0wyDOM1SdLU5xrJoGznAOByaEcg47Nstz7KczznPcnybO87zXNc-yvN80LgscwKfPCpymPqAT%2BEoTJYsyIA";
+export const RandomFractional3x3: PuzzleDefinitionLoader<NumberPTM> = {
+    loadPuzzle: () =>
+        loadPuzzle({
+            digitsCount: 4,
+            cellPieceWidth: 3,
+            cellPieceHeight: 3,
+            load: random3x3LoadString,
+        }),
+    slug: "random-fractional-3x3",
+    noIndex: true,
+};
+export const RandomFractional3x3Source: PuzzleDefinitionLoader<NumberPTM> = {
+    loadPuzzle: () =>
+        SudokuMaker.loadPuzzle({
+            colorsImportMode: ColorsImportMode.Initials,
+            load: random3x3LoadString,
+        } as PuzzleImportOptions),
+    slug: "random-fractional-3x3-source",
+};

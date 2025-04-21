@@ -8,11 +8,11 @@ export const FractionalSudokuHouseConstraint = <T extends AnyPTM>(cellShapes: Me
     props: undefined,
     isObvious: true,
     isValidCell: (position, digits, _cells, context): boolean => {
-        const digit = context.puzzle.typeManager.getDigitByCellData(
-            digits[position.top][position.left],
-            context,
-            position,
-        );
+        const {
+            puzzle: { typeManager, importOptions: { cellPieceWidth = 2, cellPieceHeight = 2 } = {} },
+        } = context;
+
+        const digit = typeManager.getDigitByCellData(digits[position.top][position.left], context, position);
 
         let sum = 0;
         for (const { mainCell, cellsCount } of cellShapes) {
@@ -20,12 +20,12 @@ export const FractionalSudokuHouseConstraint = <T extends AnyPTM>(cellShapes: Me
             if (cellData2 === undefined) {
                 continue;
             }
-            const digit2 = context.puzzle.typeManager.getDigitByCellData(cellData2, context, mainCell);
+            const digit2 = typeManager.getDigitByCellData(cellData2, context, mainCell);
             if (digit2 === digit) {
                 sum += cellsCount;
             }
         }
 
-        return sum <= 4;
+        return sum <= cellPieceWidth * cellPieceHeight;
     },
 });

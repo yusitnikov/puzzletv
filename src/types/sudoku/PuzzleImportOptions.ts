@@ -94,6 +94,8 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     caterpillar?: boolean;
     dashedGrid?: boolean;
     fractionalSudoku?: boolean;
+    cellPieceWidth?: number;
+    cellPieceHeight?: number;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -170,6 +172,8 @@ export const sanitizeImportOptions = (
         caterpillar,
         dashedGrid,
         fractionalSudoku,
+        cellPieceWidth = 2,
+        cellPieceHeight = 2,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -240,6 +244,8 @@ export const sanitizeImportOptions = (
         caterpillar,
         dashedGrid,
         fractionalSudoku,
+        cellPieceWidth: Number(cellPieceWidth),
+        cellPieceHeight: Number(cellPieceHeight),
     };
 
     return result;

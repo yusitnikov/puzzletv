@@ -126,6 +126,8 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
     const [dashedGrid, setDashedGrid] = useBoolFromLocalStorage("fpwDashedGrid");
     const [fractionalSudoku, setFractionalSudoku] = useBoolFromLocalStorage("fpwFractionalSudoku");
+    const [cellPieceWidth, setCellPieceWidth] = useNumberFromLocalStorage("fpwCellPieceWidth", 2);
+    const [cellPieceHeight, setCellPieceHeight] = useNumberFromLocalStorage("fpwCellPieceHeight", 2);
     const [extraGrids, setExtraGrids] = useState<Required<PuzzleGridImportOptions>[]>([]);
     const [extraGridSource, setExtraGridSource] = useState(source);
     const [caterpillar, setCaterpillar] = useBoolFromLocalStorage("fpwCaterpillar");
@@ -281,6 +283,8 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
         dashedGrid,
         fractionalSudoku: isMergedCells && fractionalSudoku,
+        cellPieceWidth: isMergedCells && fractionalSudoku ? cellPieceWidth : undefined,
+        cellPieceHeight: isMergedCells && fractionalSudoku ? cellPieceHeight : undefined,
         load,
         offsetX: globalOffsetX !== 0 ? globalOffsetX : undefined,
         offsetY: globalOffsetY !== 0 ? globalOffsetY : undefined,
@@ -717,6 +721,31 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                         onChange={(ev) => setFractionalSudoku(ev.target.checked)}
                                     />
                                 </label>
+
+                                {fractionalSudoku && (
+                                    <>
+                                        &nbsp; Cell size:&nbsp;
+                                        <input
+                                            type={"number"}
+                                            value={cellPieceWidth}
+                                            min={1}
+                                            max={fieldSize}
+                                            step={1}
+                                            onChange={(ev) => setCellPieceWidth(ev.target.valueAsNumber)}
+                                            style={{ width: 35, textAlign: "center" }}
+                                        />
+                                        x
+                                        <input
+                                            type={"number"}
+                                            value={cellPieceHeight}
+                                            min={1}
+                                            max={fieldSize}
+                                            step={1}
+                                            onChange={(ev) => setCellPieceHeight(ev.target.valueAsNumber)}
+                                            style={{ width: 35, textAlign: "center" }}
+                                        />
+                                    </>
+                                )}
                             </Paragraph>
                         )}
 
@@ -1296,6 +1325,7 @@ interface PuzzleImportSourceSelectProps {
     value: PuzzleImportSource;
     onChange: (value: PuzzleImportSource) => void;
 }
+
 const PuzzleImportSourceSelect = observer(function PuzzleImportSourceSelect({
     value,
     onChange,
@@ -1314,6 +1344,7 @@ const PuzzleImportSourceSelect = observer(function PuzzleImportSourceSelect({
 interface CollapsableFieldSetProps {
     legend: string;
 }
+
 const CollapsableFieldSet: FC<CollapsableFieldSetProps> = observer(function CollapsableFieldSet({ legend, children }) {
     profiler.trace();
 

@@ -35,7 +35,12 @@ import {
 } from "../../data/puzzles/InfinityLoop";
 import { OpenInNew } from "@emotion-icons/material";
 import { Cornered } from "../../data/puzzles/SlideAndSeek";
-import { CloseQuarters, CloseQuartersSource } from "../../data/puzzles/FractionalSudoku";
+import {
+    CloseQuarters,
+    CloseQuartersSource,
+    RandomFractional3x3,
+    RandomFractional3x3Source,
+} from "../../data/puzzles/FractionalSudoku";
 import { translate } from "../../utils/translate";
 
 export const HowToImport = observer(function HowToImport() {
@@ -734,10 +739,12 @@ export const HowToImport = observer(function HowToImport() {
                             <>
                                 <p>
                                     {translate({
-                                        [LanguageCode.en]: "Create a puzzle twice the desired size",
-                                        [LanguageCode.ru]: "Создайте головоломку размером в два раза больше желаемого",
+                                        [LanguageCode.en]:
+                                            "Create a grid big enough to have each cell piece as a regular cell",
+                                        [LanguageCode.ru]:
+                                            "Создайте поле достаточно большого размера, чтобы каждая часть клетки стала обычной клеткой",
                                         [LanguageCode.de]:
-                                            "Erstellen Sie ein Puzzle in der doppelten gewünschten Größe",
+                                            "Erstellen Sie ein Raster, das groß genug ist, um jedes Zellstück als normale Zelle darzustellen",
                                     })}
                                     .
                                 </p>
@@ -782,9 +789,16 @@ export const HowToImport = observer(function HowToImport() {
                                     })}
                                     .
                                 </p>
-                                <MappingIllustration
-                                    puzzle={(plain) => (plain ? CloseQuartersSource : CloseQuarters)}
-                                />
+                                <p>
+                                    <MappingIllustration
+                                        puzzle={(plain) => (plain ? CloseQuartersSource : CloseQuarters)}
+                                    />
+                                </p>
+                                <p>
+                                    <MappingIllustration
+                                        puzzle={(plain) => (plain ? RandomFractional3x3Source : RandomFractional3x3)}
+                                    />
+                                </p>
                                 <p>
                                     {translate(selectGridTypeTranslation("Merged cells"))}.<br />
                                     {translate(selectAdditionalConstraintTranslation("Fractional sudoku"))}.<br />

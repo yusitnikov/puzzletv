@@ -11,7 +11,7 @@ import {
 import { CustomCellBounds } from "../../../types/sudoku/CustomCellBounds";
 import { getRegionBorders } from "../../../utils/regions";
 import { getAverageModePosition, Position, PositionSet } from "../../../types/layout/Position";
-import { ColorsImportMode } from "../../../types/sudoku/PuzzleImportOptions";
+import { ColorsImportMode, PuzzleImportOptions } from "../../../types/sudoku/PuzzleImportOptions";
 import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
 import { indexes } from "../../../utils/indexes";
 import { MergedCellShape } from "./MergedCellShape";
@@ -19,7 +19,11 @@ import { FractionalSudokuHouseConstraint } from "../constraints/FractionalSudoku
 import { lightGreyColor } from "../../../components/app/globals";
 import { FractionalSudokuGridLinesConstraint } from "../constraints/FractionalSudokuGridLines";
 
-export const MergedCellsTypeManager = <T extends AnyNumberPTM>(fractionalSudoku = false): SudokuTypeManager<T> => {
+export const MergedCellsTypeManager = <T extends AnyNumberPTM>({
+    fractionalSudoku = false,
+    cellPieceWidth = 2,
+    cellPieceHeight = 2,
+}: PuzzleImportOptions): SudokuTypeManager<T> => {
     const baseTypeManager = DigitSudokuTypeManager<T>();
 
     return {
@@ -87,14 +91,14 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>(fractionalSudoku 
             };
 
             if (fractionalSudoku) {
-                if (rowsCount % 2 === 1 || columnsCount % 2 === 1) {
+                if (rowsCount % cellPieceHeight !== 0 || columnsCount % cellPieceWidth !== 0) {
                     throw new Error("Invalid grid size for fractional sudoku");
                 }
-                const sudokuRowsCount = rowsCount / 2;
-                const sudokuColumnsCount = columnsCount / 2;
+                const sudokuRowsCount = rowsCount / cellPieceHeight;
+                const sudokuColumnsCount = columnsCount / cellPieceWidth;
                 const toSudokuCell = ({ top, left }: Position): Position => ({
-                    top: Math.floor(top / 2),
-                    left: Math.floor(left / 2),
+                    top: Math.floor(top / cellPieceHeight),
+                    left: Math.floor(left / cellPieceWidth),
                 });
 
                 const cellShapes = cellRegions.map(
