@@ -7,7 +7,6 @@ import { SetInterface } from "../../../../types/struct/Set";
 import {
     errorResultCheck,
     notFinishedResultCheck,
-    PuzzleResultCheck,
     successResultCheck,
 } from "../../../../types/sudoku/PuzzleResultCheck";
 
