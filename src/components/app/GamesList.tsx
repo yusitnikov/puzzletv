@@ -6,7 +6,7 @@ import { GamesListItem } from "./GamesListItem";
 import { OpenInNew } from "@emotion-icons/material";
 import { profiler } from "../../utils/profiler";
 import { observer } from "mobx-react-lite";
-import { MatchPointExplanation } from "../../data/games/match-point/MatchPointExplanation";
+// import { MatchPointExplanation } from "../../data/games/match-point/MatchPointExplanation";
 import { translate } from "../../utils/translate";
 
 export const GamesList = observer(function GamesList() {
@@ -14,16 +14,16 @@ export const GamesList = observer(function GamesList() {
 
     return (
         <>
-            <GamesListItem
-                name={"Match Point!"}
-                imageUrl={"/images/MatchPoint.png"}
-                imageSize={{ width: 300, height: 258 }}
-                imageBorder={true}
-                author={translate(Chameleon)}
-                playLink={<a href={buildLink("match-point")}>Match Point!</a>}
-            >
-                <MatchPointExplanation />
-            </GamesListItem>
+            {/*<GamesListItem*/}
+            {/*    name={"Match Point!"}*/}
+            {/*    imageUrl={"/images/MatchPoint.png"}*/}
+            {/*    imageSize={{ width: 300, height: 258 }}*/}
+            {/*    imageBorder={true}*/}
+            {/*    author={translate(Chameleon)}*/}
+            {/*    playLink={<a href={buildLink("match-point")}>Match Point!</a>}*/}
+            {/*>*/}
+            {/*    <MatchPointExplanation />*/}
+            {/*</GamesListItem>*/}
 
             <GamesListItem
                 name={"Quad Masters"}
