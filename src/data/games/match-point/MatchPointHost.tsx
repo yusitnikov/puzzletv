@@ -3,8 +3,7 @@ import { useMemo, useState } from "react";
 import { MatchPointGameController, MatchPointGameState, MatchPointHostInfo } from "./types";
 import { settings } from "../../../types/layout/Settings";
 import { useSetMyAblyChannelPresence } from "../../../hooks/useAbly";
-import { ablyOptions } from "../../../hooks/useMultiPlayer";
-import { getMatchPointHostChannelName } from "./network";
+import { getMatchPointHostChannelName, matchPointAblyOptions } from "./network";
 import { MatchPointHostHomePage } from "./MatchPointHostHomePage";
 import { MatchPointHostSetting } from "./MatchPointHostSetting";
 import { MatchPointHostGatherAnswers } from "./MatchPointHostGatherAnswers";
@@ -21,7 +20,7 @@ export const MatchPointHost = observer(function MatchPointHost() {
     );
 
     useSetMyAblyChannelPresence(
-        ablyOptions,
+        matchPointAblyOptions,
         getMatchPointHostChannelName(controller.gameId),
         channelPresenceData,
         controller.state >= MatchPointGameState.Answer,

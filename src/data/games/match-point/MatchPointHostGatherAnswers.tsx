@@ -4,8 +4,8 @@ import { observer } from "mobx-react-lite";
 import { MatchPointGameControllerProps, MatchPointPlayerInfo } from "./types";
 import { useCopyToClipboard } from "../../../hooks/useCopyToClipboard";
 import { useAblyChannelPresence } from "../../../hooks/useAbly";
-import { ablyOptions, myClientId } from "../../../hooks/useMultiPlayer";
-import { getMatchPointPlayerChannelName } from "./network";
+import { myClientId } from "../../../hooks/useMultiPlayer";
+import { getMatchPointPlayerChannelName, matchPointAblyOptions } from "./network";
 import { LargeButton, paragraphGap, SubHeader } from "./styled";
 import { Button } from "../../../components/layout/button/Button";
 import { Check } from "@emotion-icons/material";
@@ -22,7 +22,7 @@ export const MatchPointHostGatherAnswers = observer(function MatchPointHostGathe
     const link = controller.getLink(controller.gameId);
 
     const [playerMessages] = useAblyChannelPresence(
-        ablyOptions,
+        matchPointAblyOptions,
         getMatchPointPlayerChannelName(myClientId, controller.gameId),
     );
     const players = playerMessages.map((message) => message.data as MatchPointPlayerInfo);

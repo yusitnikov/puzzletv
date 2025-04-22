@@ -2,13 +2,13 @@ import { observer } from "mobx-react-lite";
 import { WordSearchGameSettings, WordSearchGameState, WordSearchPlayerState, WordSearchSelectedLetter } from "./types";
 import { Button } from "../../../components/layout/button/Button";
 import { useAblyChannelPresenceMap, UserNameFunc, useSetMyAblyChannelPresence } from "../../../hooks/useAbly";
-import { ablyOptions, myClientId } from "../../../hooks/useMultiPlayer";
+import { myClientId } from "../../../hooks/useMultiPlayer";
 import { SetStateAction, useState } from "react";
 import { greenColor, lightRedColor, textColor } from "../../../components/app/globals";
 import { arrayContainsPosition, isSamePosition } from "../../../types/layout/Position";
 import { rgba } from "../../../utils/color";
 import { Crown } from "@emotion-icons/boxicons-regular";
-import { cellSize, clientColors, smallCellSize } from "./constants";
+import { cellSize, clientColors, smallCellSize, wordSearchAblyOptions } from "./constants";
 import { WordSearchLetter } from "./WordSearchLetter";
 import { translate } from "../../../utils/translate";
 
@@ -36,9 +36,9 @@ export const WordSearchGame = observer(function WordSearchGame(props: WordSearch
     );
 
     const gameStateChannelName = `word-search-state-${roomId}`;
-    useSetMyAblyChannelPresence(ablyOptions, gameStateChannelName, hostGameState, isHost);
+    useSetMyAblyChannelPresence(wordSearchAblyOptions, gameStateChannelName, hostGameState, isHost);
     const [gameStateMap] = useAblyChannelPresenceMap<WordSearchGameState>(
-        ablyOptions,
+        wordSearchAblyOptions,
         gameStateChannelName,
         true,
         !isHost,
@@ -50,9 +50,9 @@ export const WordSearchGame = observer(function WordSearchGame(props: WordSearch
         word: [],
     }));
     const playerStateChannelName = `word-search-player-${roomId}`;
-    useSetMyAblyChannelPresence(ablyOptions, playerStateChannelName, playerState);
+    useSetMyAblyChannelPresence(wordSearchAblyOptions, playerStateChannelName, playerState);
     const [playerStateMap] = useAblyChannelPresenceMap<WordSearchPlayerState>(
-        ablyOptions,
+        wordSearchAblyOptions,
         playerStateChannelName,
         false,
     );

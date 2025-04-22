@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useAblyChannelPresence, useSetMyAblyChannelPresence } from "../../../hooks/useAbly";
-import { ablyOptions } from "../../../hooks/useMultiPlayer";
-import { getMatchPointHostChannelName, getMatchPointPlayerChannelName } from "./network";
+import { getMatchPointHostChannelName, getMatchPointPlayerChannelName, matchPointAblyOptions } from "./network";
 import { useState } from "react";
 import { MatchPointGameState, MatchPointHostInfo, MatchPointPlayerInfo } from "./types";
 import { LargeButton, Paragraph, SubHeader } from "./styled";
@@ -18,7 +17,7 @@ interface MatchPointPlayerProps {
 const emptyObject = {};
 export const MatchPointPlayer = observer(function MatchPointPlayer({ host, gameId }: MatchPointPlayerProps) {
     const [hostInfoMessages, hostInfoLoaded] = useAblyChannelPresence(
-        ablyOptions,
+        matchPointAblyOptions,
         getMatchPointHostChannelName(gameId),
     );
 
@@ -32,7 +31,7 @@ export const MatchPointPlayer = observer(function MatchPointPlayer({ host, gameI
     const name = settings.nickname.get();
 
     useSetMyAblyChannelPresence(
-        ablyOptions,
+        matchPointAblyOptions,
         getMatchPointPlayerChannelName(host, gameId),
         submittedAnswers ?? emptyObject,
         hostInfo?.state === MatchPointGameState.Answer && submittedAnswers !== undefined,

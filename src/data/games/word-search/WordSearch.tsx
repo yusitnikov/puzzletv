@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useAblyChannelPresenceMap, useSetMyAblyChannelPresence, useUserNames } from "../../../hooks/useAbly";
-import { ablyOptions, myClientId } from "../../../hooks/useMultiPlayer";
+import { myClientId } from "../../../hooks/useMultiPlayer";
 import { useEffect, useMemo, useState } from "react";
 import { settings } from "../../../types/layout/Settings";
 import {
@@ -17,7 +17,7 @@ import { alphabet, scrambleLetterForShuffling } from "../../alphabet";
 import { indexes } from "../../../utils/indexes";
 import { WordSearchGame } from "./WordSearchGame";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
-import { fieldSizePreference } from "./constants";
+import { fieldSizePreference, wordSearchAblyOptions } from "./constants";
 import { WordSearchLetter } from "./WordSearchLetter";
 import { darkGreyColor } from "../../../components/app/globals";
 import { translate } from "../../../utils/translate";
@@ -45,11 +45,15 @@ export const WordSearch = observer(function WordSearch() {
 
     const [gameSettings, setGameSettings] = useState<WordSearchGameSettings>();
 
-    const getPlayerName = useUserNames(ablyOptions);
+    const getPlayerName = useUserNames(wordSearchAblyOptions);
 
-    useSetMyAblyChannelPresence(ablyOptions, lobbyChannelName, myLobbyState);
+    useSetMyAblyChannelPresence(wordSearchAblyOptions, lobbyChannelName, myLobbyState);
 
-    const [playersMap] = useAblyChannelPresenceMap<WordSearchLobbyState>(ablyOptions, lobbyChannelName, false);
+    const [playersMap] = useAblyChannelPresenceMap<WordSearchLobbyState>(
+        wordSearchAblyOptions,
+        lobbyChannelName,
+        false,
+    );
 
     const roomsMap: Record<
         string,
