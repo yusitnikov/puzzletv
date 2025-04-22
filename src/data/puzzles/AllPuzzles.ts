@@ -63,6 +63,7 @@ import { Cornered, SlideAndSeekExample, SlideAndSeekIntro, TheBlackSheep, TheGap
 import { ElephantSlitherlink } from "./Slitherlink";
 import { EmptySpark, EmptySpark6x6, SparkKropki, Sparkster } from "./Spark";
 import {
+    Chainsaw,
     CloseQuarters,
     CloseQuartersSeries,
     FractionallyHarder,
@@ -194,6 +195,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    Chainsaw,
+
     Sparkster,
 
     WaxOnWaxOff,
