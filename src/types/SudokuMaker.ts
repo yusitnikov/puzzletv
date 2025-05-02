@@ -200,6 +200,7 @@ export enum ConstraintType {
 
     // Misc
     Fog = 4000,
+    CustomFogClearing,
 }
 
 export interface LineConstraintConfigBase {
@@ -466,8 +467,24 @@ export interface BetweenLinesConstraintConfig extends LineWithEndPointsConfigBas
 export interface FogConfig {
     type: ConstraintType.Fog;
     cells: CellId[];
-    useDefaults?: boolean;
-    triggers?: Record<CellId, CellId[]>;
+}
+
+export interface CustomFogClearingConfig {
+    type: ConstraintType.CustomFogClearing;
+    patterns?: CustomFogClearingPattern[];
+    overrides?: CellId[];
+    triggers?: { label: string; cells: CellId[] }[];
+    effects?: { label: string; cells: CellId[] }[];
+    editor?: { defaultDisabling?: boolean };
+}
+
+export enum CustomFogClearingPattern {
+    self,
+    orthogonalNeighbors,
+    diagonalNeighbors,
+    knightsMove,
+    row,
+    column,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -599,6 +616,7 @@ export type ConstraintConfigMap = {
     [ConstraintType.XSums]: XSumsConstraintConfig;
     [ConstraintType.XV]: XVConstraintConfig;
     [ConstraintType.Fog]: FogConfig;
+    [ConstraintType.CustomFogClearing]: CustomFogClearingConfig;
 };
 
 export type ConstraintConfig = ConstraintConfigMap[ConstraintType];

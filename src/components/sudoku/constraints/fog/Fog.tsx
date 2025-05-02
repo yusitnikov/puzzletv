@@ -5,6 +5,7 @@ import {
     parsePositionLiterals,
     Position,
     PositionLiteral,
+    PositionSet,
 } from "../../../../types/layout/Position";
 import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
 import { Constraint, ConstraintProps } from "../../../../types/sudoku/Constraint";
@@ -18,7 +19,7 @@ import { CellColor } from "../../../../types/sudoku/CellColor";
 import { PuzzlePositionSet } from "../../../../types/sudoku/PuzzlePositionSet";
 import { indexes, indexesFromTo } from "../../../../utils/indexes";
 import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../../../types/sudoku/GivenDigitsMap";
+import { GivenDigitsMap } from "../../../../types/sudoku/GivenDigitsMap";
 import { PuzzleLineSet } from "../../../../types/sudoku/PuzzleLineSet";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
@@ -38,9 +39,17 @@ export interface FogProps<T extends AnyPTM, PositionT = Position> {
     bulbCells?: PositionT[];
     revealByCenterLines?: boolean | PuzzleLineSet<T>;
     revealByColors?: CellColor[] | GivenDigitsMap<CellColor>;
-    useDefaultTriggers?: boolean;
-    triggers?: GivenDigitsMap<PositionT[]>;
+    effects?: FogEffect<PositionT>[];
+    defaultEffect?: FogEffectPattern<T>;
+    defaultEffectExceptions?: PositionT[];
     fogRenderer?: ComponentType<FogRendererProps<T>>;
+}
+
+export type FogEffectPattern<T extends AnyPTM> = (cell: Position, context: PuzzleContext<T>) => Position[];
+
+export interface FogEffect<PositionT = Position> {
+    triggerCells: PositionT[];
+    affectedCells: PositionT[];
 }
 
 const DarkReaderRectOverride = styled("rect")(({ fill }) => ({
@@ -54,8 +63,22 @@ export const getFogVisibleCells = <T extends AnyPTM>(
         startCells3x3 = [],
         revealByColors,
         revealByCenterLines,
-        useDefaultTriggers = true,
-        triggers = {},
+        effects = [],
+        defaultEffect = (
+            { top, left },
+            {
+                puzzle: {
+                    fieldSize: { rowsCount, columnsCount },
+                },
+            },
+        ) =>
+            indexesFromTo(Math.max(top - 1, 0), Math.min(top + 1, rowsCount - 1), true).flatMap((top2) =>
+                indexesFromTo(Math.max(left - 1, 0), Math.min(left + 1, columnsCount - 1), true).map((left2) => ({
+                    top: top2,
+                    left: left2,
+                })),
+            ),
+        defaultEffectExceptions = [],
     }: FogProps<T>,
 ) => {
     const {
@@ -69,6 +92,8 @@ export const getFogVisibleCells = <T extends AnyPTM>(
         fieldSize: { rowsCount, columnsCount },
         typeManager: { getDigitByCellData },
     } = puzzle;
+
+    const defaultEffectExceptionsSet = new PositionSet(defaultEffectExceptions);
 
     const givenDigits = gameStateGetCurrentGivenDigitsByCells(cells);
     const initialColors = context.puzzleInitialColors;
@@ -85,32 +110,39 @@ export const getFogVisibleCells = <T extends AnyPTM>(
         }
     };
 
+    const isTrigger = (position: Position) => {
+        const { top, left } = position;
+        return (
+            arrayContainsPosition(startCells3x3 ?? [], position) ||
+            (givenDigits[top]?.[left] !== undefined &&
+                (typeof solution?.[top]?.[left] !== "number" ||
+                    getDigitByCellData(givenDigits[top][left], context, position) === solution[top][left])) ||
+            (revealByColors &&
+                cells[top][left].colors.size === 1 &&
+                !initialColors[top]?.[left] &&
+                (Array.isArray(revealByColors)
+                    ? revealByColors.includes(cells[top][left].colors.first()!)
+                    : cells[top][left].colors.first() === revealByColors[top]?.[left]))
+        );
+    };
+
+    for (const { triggerCells, affectedCells } of effects) {
+        if (triggerCells.every(isTrigger)) {
+            for (const cell of affectedCells) {
+                safeClearFog(cell.top, cell.left);
+            }
+        }
+    }
+
     for (const top of indexes(rowsCount)) {
         for (const left of indexes(columnsCount)) {
-            let triggeredCells = triggers[top]?.[left];
-            if (!triggeredCells && !useDefaultTriggers) {
+            const cell = { top, left };
+
+            if (defaultEffectExceptionsSet.contains(cell) || !isTrigger(cell)) {
                 continue;
             }
 
-            const isTrigger =
-                arrayContainsPosition(startCells3x3 ?? [], { top, left }) ||
-                (givenDigits[top]?.[left] !== undefined &&
-                    (typeof solution?.[top]?.[left] !== "number" ||
-                        getDigitByCellData(givenDigits[top][left], context, { top, left }) === solution[top][left])) ||
-                (revealByColors &&
-                    cells[top][left].colors.size === 1 &&
-                    !initialColors[top]?.[left] &&
-                    (Array.isArray(revealByColors)
-                        ? revealByColors.includes(cells[top][left].colors.first()!)
-                        : cells[top][left].colors.first() === revealByColors[top]?.[left]));
-            if (!isTrigger) {
-                continue;
-            }
-
-            triggeredCells ??= indexesFromTo(top - 1, top + 1, true).flatMap((top) =>
-                indexesFromTo(left - 1, left + 1, true).map((left) => ({ top, left })),
-            );
-            for (const { top, left } of triggeredCells) {
+            for (const { top, left } of defaultEffect(cell, context)) {
                 safeClearFog(top, left);
             }
         }
@@ -293,7 +325,8 @@ export const FogConstraint = <T extends AnyPTM>({
     bulbCells = startCells3x3,
     revealByCenterLines = false,
     revealByColors = {},
-    triggers = {},
+    effects = [],
+    defaultEffectExceptions = [],
     ...other
 }: FogProps<T, PositionLiteral> = {}): Constraint<T, FogProps<T>> => ({
     name: "fog",
@@ -305,7 +338,11 @@ export const FogConstraint = <T extends AnyPTM>({
         bulbCells: parsePositionLiterals(bulbCells),
         revealByCenterLines,
         revealByColors,
-        triggers: processGivenDigitsMaps(([cells]) => parsePositionLiterals(cells), [triggers]),
+        effects: effects?.map(({ triggerCells, affectedCells }) => ({
+            triggerCells: parsePositionLiterals(triggerCells),
+            affectedCells: parsePositionLiterals(affectedCells),
+        })),
+        defaultEffectExceptions: parsePositionLiterals(defaultEffectExceptions),
         ...other,
     },
     component: Fog,

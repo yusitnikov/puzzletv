@@ -25,6 +25,8 @@ import {
     CosmeticSymbol,
     CosmeticSymbolConstraintConfig,
     CustomConstraintConfig,
+    CustomFogClearingConfig,
+    CustomFogClearingPattern,
     DiagonalMinusConstraintConfig,
     DiagonalPlusConstraintConfig,
     DiagonalType,
@@ -76,7 +78,7 @@ import {
     XVConstraintConfig,
 } from "../../types/SudokuMaker";
 import { PuzzleImporter } from "./PuzzleImporter";
-import { Position, stringifyCellCoords } from "../../types/layout/Position";
+import { Position, PositionSet, stringifyCellCoords } from "../../types/layout/Position";
 import { CellColor } from "../../types/sudoku/CellColor";
 import { ObjectParser, ObjectParserFieldMap } from "../../types/struct/ObjectParser";
 import { splitArrayIntoChunks } from "../../utils/array";
@@ -95,7 +97,8 @@ import { BaseEntropicLineConstraint } from "../../components/sudoku/constraints/
 import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
 import { SequenceLineConstraint } from "../../components/sudoku/constraints/sequence-line/SequenceLine";
 import { loop } from "../../utils/math";
-import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
+import { FogEffect, FogEffectPattern } from "../../components/sudoku/constraints/fog/Fog";
+import { indexes } from "../../utils/indexes";
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {
     constructor(
@@ -141,9 +144,9 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
 
     addToImporter(importer: PuzzleImporter<T>) {
         let fogCells: Position[] = [];
-        // The default is for old puzzles that use cages. FogConstraint will override it.
-        let fogUseDefaults = true;
-        let fogTriggers: GivenDigitsMap<Position[]> = {};
+        const fogEffects: FogEffect[] = [];
+        let fogDefaultEffect: FogEffectPattern<T> | undefined = undefined;
+        let fogDefaultEffectExceptions: Position[] = [];
 
         new ObjectParser<CompressedPuzzle>(
             {
@@ -1003,16 +1006,97 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                     cells: (cells) => {
                                         fogCells = [...fogCells, ...this.parseCellIds(cells)];
                                     },
-                                    useDefaults: (useDefaults = false) => {
-                                        fogUseDefaults = useDefaults;
+                                }).parse(constraint, "fog");
+                                break;
+                            case ConstraintType.CustomFogClearing:
+                                new ObjectParser<CustomFogClearingConfig>({
+                                    type: undefined,
+                                    editor: undefined,
+                                    patterns: (patterns = []) => {
+                                        fogDefaultEffect = (
+                                            { top, left },
+                                            {
+                                                puzzle: {
+                                                    fieldSize: { rowsCount, columnsCount },
+                                                },
+                                            },
+                                        ) => {
+                                            const result: Position[] = [];
+
+                                            const addArea = (
+                                                size: number,
+                                                filter: (dx: number, dy: number) => boolean,
+                                            ) => {
+                                                for (let top2 = top - size; top2 <= top + size; top2++) {
+                                                    for (let left2 = left - size; left2 <= left + size; left2++) {
+                                                        if (filter(Math.abs(left2 - left), Math.abs(top2 - top))) {
+                                                            result.push({ top: top2, left: left2 });
+                                                        }
+                                                    }
+                                                }
+                                            };
+
+                                            for (const pattern of patterns) {
+                                                switch (pattern) {
+                                                    case CustomFogClearingPattern.self:
+                                                        result.push({ top, left });
+                                                        break;
+                                                    case CustomFogClearingPattern.row:
+                                                        result.push(
+                                                            ...indexes(columnsCount).map((left) => ({ top, left })),
+                                                        );
+                                                        break;
+                                                    case CustomFogClearingPattern.column:
+                                                        result.push(
+                                                            ...indexes(rowsCount).map((top) => ({ top, left })),
+                                                        );
+                                                        break;
+                                                    case CustomFogClearingPattern.orthogonalNeighbors:
+                                                        addArea(1, (dx, dy) => dx + dy === 1);
+                                                        break;
+                                                    case CustomFogClearingPattern.diagonalNeighbors:
+                                                        addArea(1, (dx, dy) => dx === 1 && dy === 1);
+                                                        break;
+                                                    case CustomFogClearingPattern.knightsMove:
+                                                        addArea(2, (dx, dy) => dx + dy === 3);
+                                                        break;
+                                                    default:
+                                                        console.warn("Unrecognized fog clearing pattern:", pattern);
+                                                        break;
+                                                }
+                                            }
+
+                                            return new PositionSet(
+                                                result.filter(
+                                                    ({ top, left }) =>
+                                                        top >= 0 && left >= 0 && top < rowsCount && left < columnsCount,
+                                                ),
+                                            ).items;
+                                        };
                                     },
-                                    triggers: (triggers = {}) => {
-                                        for (const [srcCellIdStr, dstCellIds] of Object.entries(triggers)) {
-                                            const { top, left } = this.parseCellId(Number(srcCellIdStr) as CellId);
-                                            fogTriggers[top] ??= {};
-                                            fogTriggers[top][left] = this.parseCellIds(dstCellIds);
+                                    overrides: (overrides = []) => {
+                                        fogDefaultEffectExceptions = this.parseCellIds(overrides);
+                                    },
+                                    triggers: (triggers = [], { effects = [] }) => {
+                                        for (const trigger of triggers) {
+                                            new ObjectParser<typeof trigger>({
+                                                label: (label, { cells = [] }) => {
+                                                    fogEffects.push({
+                                                        triggerCells: this.parseCellIds(cells),
+                                                        affectedCells: new PositionSet(
+                                                            this.parseCellIds(
+                                                                effects
+                                                                    .filter((effect) => effect.label === label)
+                                                                    .flatMap((effect) => effect.cells),
+                                                            ),
+                                                        ).items,
+                                                    });
+                                                },
+                                                cells: undefined,
+                                            }).parse(trigger, "fog trigger");
                                         }
                                     },
+                                    effects: undefined, // processed in triggers
                                 }).parse(constraint, "fog");
                                 break;
                             default:
@@ -1042,7 +1126,12 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
         ).parse(this.puzzleJson, "SudokuMaker data");
 
         if (this.hasFog) {
-            importer.addFog(this, { startCells: fogCells, useDefaultTriggers: fogUseDefaults, triggers: fogTriggers });
+            importer.addFog(this, {
+                startCells: fogCells,
+                effects: fogEffects,
+                defaultEffect: fogDefaultEffect,
+                defaultEffectExceptions: fogDefaultEffectExceptions,
+            });
         }
     }
 
@@ -1149,6 +1238,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
             (item) =>
                 !item.disabled &&
                 (item.type === ConstraintType.Fog ||
+                    item.type === ConstraintType.CustomFogClearing ||
                     (item.type === ConstraintType.CosmeticCage && item.cages.some(isFowCage))),
         );
     }

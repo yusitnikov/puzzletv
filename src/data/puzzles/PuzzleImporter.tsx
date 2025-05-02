@@ -1,5 +1,5 @@
 import { Position, PositionLiteral, PositionSet } from "../../types/layout/Position";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
+import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
 import { CellColorValue } from "../../types/sudoku/CellColor";
 import { Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/sudoku/Constraint";
 import {
@@ -320,28 +320,23 @@ export class PuzzleImporter<T extends AnyPTM> {
             startCells3x3 = [],
             startCells = [],
             bulbCells = startCells3x3,
-            triggers = {},
+            effects = [],
+            defaultEffectExceptions = [],
             ...other
         }: FogProps<T, PositionLiteral>,
     ) {
         this.puzzle.prioritizeSelection = true;
-
-        const offsetTriggers: GivenDigitsMap<Position[]> = {};
-        processGivenDigitsMaps(
-            ([cells], position) => {
-                const { top, left } = gridParser.offsetCoords(position);
-                offsetTriggers[top] ??= {};
-                offsetTriggers[top][left] = gridParser.offsetCoordsArray(cells);
-            },
-            [triggers],
-        );
 
         this.addItems(
             FogConstraint({
                 startCells3x3: gridParser.offsetCoordsArray(startCells3x3),
                 startCells: gridParser.offsetCoordsArray(startCells),
                 bulbCells: gridParser.offsetCoordsArray(bulbCells),
-                triggers: offsetTriggers,
+                effects: effects.map(({ triggerCells, affectedCells }) => ({
+                    triggerCells: gridParser.offsetCoordsArray(triggerCells),
+                    affectedCells: gridParser.offsetCoordsArray(affectedCells),
+                })),
+                defaultEffectExceptions: gridParser.offsetCoordsArray(defaultEffectExceptions),
                 ...other,
             }),
         );
