@@ -928,45 +928,51 @@ export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
         }));
     const clearLines = () => gameStateDeleteAllLines(context, clientId, actionId);
 
-    switch (context.cellWriteMode) {
-        case CellWriteMode.main:
-            if (
+    const handlers: { mode: CellWriteMode; check: () => boolean; process: () => PartialGameStateEx<T> }[] = [
+        {
+            mode: CellWriteMode.main,
+            check: () =>
                 gameStateIsAnySelectedCell(
                     context,
                     (cell, { top, left }) =>
                         context.allInitialDigits[top]?.[left] === undefined && cell.usersDigit !== undefined,
-                )
-            ) {
-                return gameStateProcessSelectedCells(context, clientId, actionId, (_, { top, left }) =>
+                ),
+            process: () =>
+                gameStateProcessSelectedCells(context, clientId, actionId, (_, { top, left }) =>
                     context.allInitialDigits[top]?.[left] === undefined ? { usersDigit: undefined } : {},
-                );
-            }
+                ),
+        },
+        {
+            mode: CellWriteMode.center,
+            check: () => gameStateIsAnySelectedCell(context, (cell) => !!cell.centerDigits.size),
+            process: clearCenter,
+        },
+        {
+            mode: CellWriteMode.corner,
+            check: () => gameStateIsAnySelectedCell(context, (cell) => !!cell.cornerDigits.size),
+            process: clearCorner,
+        },
+        {
+            mode: CellWriteMode.color,
+            check: () => gameStateIsAnySelectedCell(context, (cell) => !!cell.colors.size),
+            process: clearColor,
+        },
+        {
+            mode: CellWriteMode.lines,
+            check: () => true,
+            process: clearLines,
+        },
+    ];
 
-            if (gameStateIsAnySelectedCell(context, (cell) => !!cell.centerDigits.size)) {
-                return clearCenter();
-            }
+    const currentModeHandler = handlers.find((handler) => handler.mode === context.cellWriteMode);
+    if (currentModeHandler?.check()) {
+        return currentModeHandler.process();
+    }
 
-            if (gameStateIsAnySelectedCell(context, (cell) => !!cell.cornerDigits.size)) {
-                return clearCorner();
-            }
-
-            if (gameStateIsAnySelectedCell(context, (cell) => !!cell.colors.size)) {
-                return clearColor();
-            }
-
-            return clearLines();
-
-        case CellWriteMode.center:
-            return clearCenter();
-
-        case CellWriteMode.corner:
-            return clearCorner();
-
-        case CellWriteMode.color:
-            return clearColor();
-
-        case CellWriteMode.lines:
-            return clearLines();
+    for (const handler of handlers) {
+        if (handler.check()) {
+            return handler.process();
+        }
     }
 
     return typeManager.handleClearAction?.(context, clientId) || {};
