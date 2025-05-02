@@ -1147,25 +1147,30 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
     get hasFog() {
         return this.puzzleJson.constraints.some(
             (item) =>
-                item.type === ConstraintType.Fog ||
-                (item.type === ConstraintType.CosmeticCage && item.cages.some(isFowCage)),
+                !item.disabled &&
+                (item.type === ConstraintType.Fog ||
+                    (item.type === ConstraintType.CosmeticCage && item.cages.some(isFowCage))),
         );
     }
     get hasCosmeticElements() {
-        return this.puzzleJson.constraints.some(({ type }) =>
-            [ConstraintType.CosmeticLine, ConstraintType.CosmeticCage, ConstraintType.CosmeticSymbol].includes(type),
+        return this.puzzleJson.constraints.some(
+            ({ type, disabled }) =>
+                !disabled &&
+                [ConstraintType.CosmeticLine, ConstraintType.CosmeticCage, ConstraintType.CosmeticSymbol].includes(
+                    type,
+                ),
         );
     }
     get hasSolutionColors() {
         return this.puzzleJson.cells.some((cell) => cell?.colors);
     }
     get hasArrows() {
-        return this.puzzleJson.constraints.some(({ type }) => type === ConstraintType.Arrow);
+        return this.puzzleJson.constraints.some(({ type, disabled }) => !disabled && type === ConstraintType.Arrow);
     }
 
     get quadruplePositions() {
         return this.puzzleJson.constraints.flatMap((constraint) =>
-            constraint.type === ConstraintType.Quadruple
+            !constraint.disabled && constraint.type === ConstraintType.Quadruple
                 ? constraint.clues.map(({ corner }) => this.offsetCoords(this.parseCornerId(corner)))
                 : [],
         );
