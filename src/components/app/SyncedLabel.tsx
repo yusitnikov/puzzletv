@@ -4,7 +4,7 @@ import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { useAblyChannelState } from "../../hooks/useAbly";
-import { ablyOptions } from "../../hooks/useMultiPlayer";
+import { caterpillarAblyOptions } from "./Caterpillar";
 import { useEventListener } from "../../hooks/useEventListener";
 
 export interface SyncedLabelProps {
@@ -42,7 +42,7 @@ const StyledInput = styled.input({
 export const SyncedLabel = observer(function SyncedLabel({ name, isObs }: SyncedLabelProps) {
     profiler.trace();
 
-    const [text = "", setText, connected] = useAblyChannelState<string>(ablyOptions, "label-sync-" + name);
+    const [text = "", setText, connected] = useAblyChannelState<string>(caterpillarAblyOptions, "label-sync-" + name);
     const [textInput, setTextInput] = useState("");
     const [isEditing, setIsEditing] = useState(false);
 

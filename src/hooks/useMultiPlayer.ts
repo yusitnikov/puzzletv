@@ -14,8 +14,8 @@ const emptyObject = {};
 export const myClientId: string = (window.localStorage.clientId =
     window.localStorage.clientId || Math.random().toString().substring(2));
 
-export const ablyOptions: Types.ClientOptions = {
-    key: "fzkxHw.SEUR7g:J1rgfUWwc397XqQ34wjLftylIcQlAWZeJHxV-bFpPuM",
+const ablyOptions: Types.ClientOptions = {
+    key: "fzkxHw.6QoA4w:VLouQX2faOhELoyD3HPD9ZmXyYw62i334WrFN5HjIBQ",
     clientId: myClientId,
 };
 

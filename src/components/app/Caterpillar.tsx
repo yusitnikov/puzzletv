@@ -3,7 +3,7 @@ import { profiler } from "../../utils/profiler";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { Absolute } from "../layout/absolute/Absolute";
 import { useAblyChannelPresence, useAblyChannelState, useSetMyAblyChannelPresence } from "../../hooks/useAbly";
-import { ablyOptions, myClientId } from "../../hooks/useMultiPlayer";
+import { myClientId } from "../../hooks/useMultiPlayer";
 import { emptyPosition } from "../../types/layout/Position";
 import { errorColor, greenColor, lightOrangeColor, lightRedColor } from "./globals";
 import { indexes } from "../../utils/indexes";
@@ -22,6 +22,12 @@ import { sortGrids } from "./caterpillar/compileGrids";
 import { GridsCompilation } from "./caterpillar/GridsCompilation";
 import { PublishModal } from "./caterpillar/PublishModal";
 import { DownloadModal } from "./caterpillar/DownloadModal";
+import { Types } from "ably/promises";
+
+export const caterpillarAblyOptions: Types.ClientOptions = {
+    key: "Iwws0A.CqxuBA:0nLZIYLU8iJBz3rEjipcw3WvWa76sJN0mxxMpO2cqTY",
+    clientId: myClientId,
+};
 
 interface PresenceData {
     nickname: string;
@@ -60,8 +66,8 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({ chunk }: 
         }),
         [myNickname, hasUnsubmittedChanges],
     );
-    useSetMyAblyChannelPresence(ablyOptions, channelName, myPresenceData);
-    const [presenceMessages] = useAblyChannelPresence(ablyOptions, channelName);
+    useSetMyAblyChannelPresence(caterpillarAblyOptions, channelName, myPresenceData);
+    const [presenceMessages] = useAblyChannelPresence(caterpillarAblyOptions, channelName);
     const otherPeople = presenceMessages
         .filter(({ clientId }) => clientId !== myClientId)
         .map(({ data }) => data as PresenceData);
@@ -525,4 +531,5 @@ export const CaterpillarConsumer = observer(function CaterpillarConsumer({ chunk
 
 const getChannelName = (chunk = "") => "caterpillar" + chunk;
 
-const useGrids = (chunk = "") => useAblyChannelState<CaterpillarGrid[]>(ablyOptions, getChannelName(chunk), []);
+const useGrids = (chunk = "") =>
+    useAblyChannelState<CaterpillarGrid[]>(caterpillarAblyOptions, getChannelName(chunk), []);
