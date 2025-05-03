@@ -12,13 +12,13 @@ import { myClientId } from "./useMultiPlayer";
 import { translate } from "../utils/translate";
 
 export const useAbly = (options: Types.ClientOptions) =>
-    useSingleton("ably", () => new Realtime({ ...options, autoConnect: false }));
+    useSingleton(`ably-${options.key}`, () => new Realtime({ ...options, autoConnect: false }));
 
 export const useAblyChannel = (options: Types.ClientOptions, name: string, enabled = true) => {
     const ably = useAbly(options);
 
     return useSingleton(
-        `ably-channel-${name}`,
+        `ably-${options.key}-channel-${name}`,
         () => {
             ably.connect();
             return ably.channels.get("persist:" + name, { params: { rewind: "1" } });
@@ -38,7 +38,7 @@ export const useAblyChannelMessages = (
 
     const callbackRef = useLastValueRef(callback);
 
-    const chain = useSingleton(`ably-messages-chain-${channelName}`, () => new Chain());
+    const chain = useSingleton(`ably-${options.key}-messages-chain-${channelName}`, () => new Chain());
 
     useEffect(() => {
         if (!enabled || !channel) {
@@ -61,7 +61,7 @@ export const useAblyChannelState = <T>(
 ): [T | undefined, (value: T) => void, boolean] => {
     const channel = useAblyChannel(options, channelName, enabled);
 
-    const chain = useSingleton(`ably-state-chain-${channelName}`, () => new Chain());
+    const chain = useSingleton(`ably-${options.key}-state-chain-${channelName}`, () => new Chain());
 
     const [state, setState] = useObjectFromLocalStorage<T>("ablyState-" + channelName, initialState);
     const [connected, setConnected] = useState(false);
@@ -111,7 +111,7 @@ export const useAblyChannelPresence = (
 
     const [presenceMessages, setPresenceMessages] = usePureState<Types.PresenceMessage[] | undefined>(undefined);
 
-    const chain = useSingleton(`ably-presence-chain-${channelName}`, () => new Chain());
+    const chain = useSingleton(`ably-${options.key}-presence-chain-${channelName}`, () => new Chain());
 
     useEffect(() => {
         if (!enabled || !channel) {
@@ -173,7 +173,7 @@ export const useSetMyAblyChannelPresence = (
 ) => {
     const channel = useAblyChannel(options, channelName, enabled);
 
-    const chain = useSingleton(`ably-set-my-presence-chain-${channelName}`, () => new Chain());
+    const chain = useSingleton(`ably-${options.key}-set-my-presence-chain-${channelName}`, () => new Chain());
 
     const myThrottledPresenceData = useThrottleData(200, myPresenceData);
 
