@@ -12,14 +12,17 @@ import { myClientId } from "./useMultiPlayer";
 import { translate } from "../utils/translate";
 
 export const useAbly = (options: Types.ClientOptions) =>
-    useSingleton("ably", () => new Realtime({ ...options, autoConnect: true }));
+    useSingleton("ably", () => new Realtime({ ...options, autoConnect: false }));
 
 export const useAblyChannel = (options: Types.ClientOptions, name: string, enabled = true) => {
     const ably = useAbly(options);
 
     return useSingleton(
         `ably-channel-${name}`,
-        () => ably.channels.get("persist:" + name, { params: { rewind: "1" } }),
+        () => {
+            ably.connect();
+            return ably.channels.get("persist:" + name, { params: { rewind: "1" } });
+        },
         undefined,
         enabled,
     );
