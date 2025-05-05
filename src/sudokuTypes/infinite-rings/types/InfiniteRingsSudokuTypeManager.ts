@@ -7,7 +7,7 @@ import { Position } from "../../../types/layout/Position";
 import { Constraint } from "../../../types/sudoku/Constraint";
 import { indexes } from "../../../utils/indexes";
 import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
-import { InfiniteRingsFieldWrapper } from "../components/InfiniteRingsFieldWrapper";
+import { InfiniteRingsFieldControls } from "../components/InfiniteRingsFieldControls";
 import { gameStateSetScaleLog, PartialGameStateEx } from "../../../types/sudoku/GameState";
 import { loop } from "../../../utils/math";
 import { InfiniteRingsBorderLinesConstraint } from "../components/InfiniteRingsBorderLines";
@@ -56,6 +56,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         allowScale: true,
         isFreeScale: false,
         fieldWrapperHandlesScale: true,
+        fieldControlsComponent: InfiniteRingsFieldControls(visibleRingsCountArg),
         controlButtons: [ZoomInButtonItem(), ZoomOutButtonItem()],
         getCellTypeProps({ top, left }, { fieldSize: { rowsCount: fieldSize } }): CellTypeProps<T> {
             const quadSize = fieldSize / 2;
@@ -266,7 +267,6 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                 regions: [],
                 customCellBounds,
                 ignoreRowsColumnCountInTheWrapper: true,
-                fieldWrapperComponent: InfiniteRingsFieldWrapper(visibleRingsCountArg),
                 allowDrawing: puzzle.allowDrawing?.filter((type) => ["center-mark"].includes(type)),
             };
         },
