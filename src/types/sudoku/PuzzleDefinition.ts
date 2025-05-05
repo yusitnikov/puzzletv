@@ -52,9 +52,6 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     regions?: (Position[] | Constraint<T, any>)[];
     disableSudokuRules?: boolean;
     fieldMargin?: number;
-    fieldWrapperComponent?: ComponentType<PuzzleContextProps<T>>;
-    fieldFitsWrapper?: boolean;
-    ignoreRowsColumnCountInTheWrapper?: boolean;
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
     supportZero?: boolean;

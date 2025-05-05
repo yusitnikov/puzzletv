@@ -52,15 +52,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
         isReady,
     } = context;
 
-    const {
-        typeManager,
-        fieldMargin = 0,
-        fieldWrapperComponent: FieldWrapper = PassThrough,
-        fieldFitsWrapper,
-        loopHorizontally,
-        loopVertically,
-        prioritizeSelection,
-    } = puzzle;
+    const { typeManager, fieldMargin = 0, loopHorizontally, loopVertically, prioritizeSelection } = puzzle;
 
     const {
         disableArrowLetterShortcuts,
@@ -69,6 +61,8 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
         fieldWrapperHandlesScale,
         gridBackgroundColor = "#fff",
         regionBackgroundColor,
+        fieldWrapperComponent: FieldWrapper = PassThrough,
+        fieldFitsWrapper,
         fieldControlsComponent: FieldControls,
     } = typeManager;
 

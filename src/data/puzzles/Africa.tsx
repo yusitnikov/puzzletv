@@ -50,14 +50,12 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             </RulesUnorderedList>
         </>
     ),
-    typeManager: GoogleMapsTypeManager(DigitSudokuTypeManager()),
-    fieldWrapperComponent: GoogleMapsFieldWrapper({
+    typeManager: GoogleMapsTypeManager(DigitSudokuTypeManager(), {
         west: -7.5,
         east: 41.5,
         south: -25,
         north: 27,
     }),
-    fieldFitsWrapper: true,
     fieldSize: {
         fieldSize: 9,
         rowsCount: 1,

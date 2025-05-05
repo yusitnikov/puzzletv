@@ -192,13 +192,15 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
                 <RulesParagraph>{translate(tapCluesApply(7))}.</RulesParagraph>
             </>
         ),
-        typeManager: DigitSudokuTypeManager(),
+        typeManager: {
+            ...DigitSudokuTypeManager(),
+            ignoreRowsColumnCountInTheWrapper: true,
+        },
         fieldSize: {
             fieldSize,
             rowsCount: 1,
             columnsCount: bounds.length,
         },
-        ignoreRowsColumnCountInTheWrapper: true,
         digitsCount: 0,
         disableColoring: true,
         hideDeleteButton: true,

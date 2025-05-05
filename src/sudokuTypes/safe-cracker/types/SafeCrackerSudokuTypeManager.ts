@@ -31,6 +31,7 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
 
     return {
         ...baseTypeManager,
+        ignoreRowsColumnCountInTheWrapper: true,
         extraCellWriteModes: [...(baseTypeManager.extraCellWriteModes ?? []), arrowsCellWriteModeInfo],
         getCellTypeProps({ top, left }, puzzle): CellTypeProps<T> {
             const { digitsCount = getDefaultDigitsCount(puzzle) } = puzzle;

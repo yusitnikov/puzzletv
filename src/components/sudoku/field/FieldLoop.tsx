@@ -18,7 +18,7 @@ export const FieldLoop = observer(function FieldLoop<T extends AnyPTM>({
 
     let {
         fieldSize: { fieldSize, rowsCount, columnsCount },
-        ignoreRowsColumnCountInTheWrapper,
+        typeManager: { ignoreRowsColumnCountInTheWrapper },
         loopHorizontally,
         loopVertically,
     } = puzzle;

@@ -275,6 +275,12 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     onCloseCorrectResultPopup?(context: PuzzleContext<T>): void;
 
+    fieldWrapperComponent?: ComponentType<PuzzleContextProps<T>>;
+
+    fieldFitsWrapper?: boolean;
+
+    ignoreRowsColumnCountInTheWrapper?: boolean;
+
     fieldControlsComponent?: ComponentType<PuzzleContextProps<T>>;
 
     getInitialDigits?: (context: PuzzleContext<T>) => GivenDigitsMap<T["cell"]>;

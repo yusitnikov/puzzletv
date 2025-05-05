@@ -13,13 +13,7 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(
     params: SafeCrackerPuzzleParams,
 ): Pick<
     PuzzleDefinition<T>,
-    | "fieldSize"
-    | "regions"
-    | "digitsCount"
-    | "customCellBounds"
-    | "ignoreRowsColumnCountInTheWrapper"
-    | "typeManager"
-    | "allowDrawing"
+    "fieldSize" | "regions" | "digitsCount" | "customCellBounds" | "typeManager" | "allowDrawing"
 > => {
     const { size, circleRegionsCount, codeCellsCount } = params;
 
@@ -137,7 +131,6 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(
                 },
             })),
         ]),
-        ignoreRowsColumnCountInTheWrapper: true,
         typeManager: SafeCrackerSudokuTypeManager(params),
         allowDrawing: ["center-mark", "border-mark"],
     };

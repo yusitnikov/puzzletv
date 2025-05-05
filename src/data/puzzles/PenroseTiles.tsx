@@ -168,6 +168,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
     ),
     typeManager: {
         ...DigitSudokuTypeManager(),
+        ignoreRowsColumnCountInTheWrapper: true,
         getCellTypeProps: ({ left }): CellTypeProps<NumberPTM> => ({ noInteraction: left >= 64 }),
     },
     fieldSize: {
@@ -175,7 +176,6 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
         rowsCount: 1,
         columnsCount: 72,
     },
-    ignoreRowsColumnCountInTheWrapper: true,
     digitsCount: 8,
     initialDigits: {
         0: Object.fromEntries(cells.map(({ digit }, index) => [index, digit]).filter(([, digit]) => digit > 0)),

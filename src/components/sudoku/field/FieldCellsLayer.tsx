@@ -30,9 +30,9 @@ export const FieldCellsLayer = observer(function FieldCellsLayer<T extends AnyPT
 
     const { puzzleIndex, puzzle } = context;
 
-    const { typeManager, fieldSize, fieldMargin = 0, fieldFitsWrapper, customCellBounds } = puzzle;
+    const { typeManager, fieldSize, fieldMargin = 0, customCellBounds } = puzzle;
 
-    const { allowRotation, allowScale, transformCoords } = typeManager;
+    const { allowRotation, allowScale, transformCoords, fieldFitsWrapper } = typeManager;
 
     return (
         <>

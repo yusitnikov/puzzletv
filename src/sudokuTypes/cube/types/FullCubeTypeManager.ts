@@ -62,6 +62,7 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         },
     }),
 
+    ignoreRowsColumnCountInTheWrapper: true,
     fieldControlsComponent: FullCubeControls,
 
     getCellTypeProps({ top }, { fieldSize: { columnsCount } }): CellTypeProps<FullCubePTM> {
@@ -404,7 +405,6 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
                 rowsCount: isJss ? columnsCount : rowsCount,
             },
             fieldMargin: Math.max(fieldMargin, realFieldSize),
-            ignoreRowsColumnCountInTheWrapper: true,
             allowDrawing: allowDrawing?.filter((item) => item === "center-mark"),
         };
     },

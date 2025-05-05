@@ -61,7 +61,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
     if (line) {
         const cellTransformedSize = getTransformedRectAverageSize(customCellBounds.userArea);
 
-        const sizeCoeff = context.puzzle.fieldFitsWrapper ? 1 : 1 / context.cellSize;
+        const sizeCoeff = context.puzzle.typeManager.fieldFitsWrapper ? 1 : 1 / context.cellSize;
 
         return (
             <AutoSvg clip={clip}>

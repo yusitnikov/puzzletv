@@ -76,6 +76,8 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         },
     ),
 
+    ignoreRowsColumnCountInTheWrapper: true,
+
     processArrowDirection(
         { top, left },
         xDirection,
@@ -184,7 +186,6 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                 ...puzzle.fieldSize,
                 columnsCount: fieldSize * 2,
             },
-            ignoreRowsColumnCountInTheWrapper: true,
             allowDrawing: undefined,
         };
 

@@ -16,9 +16,8 @@ export const FieldSvg = observer(function FieldSvg<T extends AnyPTM>({
     const { puzzle, cellSize, regions } = context;
     let {
         fieldSize: { fieldSize, rowsCount, columnsCount },
+        typeManager: { fieldFitsWrapper, ignoreRowsColumnCountInTheWrapper },
         fieldMargin = 0,
-        fieldFitsWrapper,
-        ignoreRowsColumnCountInTheWrapper,
     } = puzzle;
 
     if (ignoreRowsColumnCountInTheWrapper) {

@@ -613,6 +613,8 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
         allowMove: true,
         allowScale: true,
         isFreeScale: true,
+        fieldWrapperComponent: Wrapper,
+        ignoreRowsColumnCountInTheWrapper: true,
         controlButtons: [ZoomInButtonItem(), ZoomOutButtonItem()],
     },
     fieldSize: {
@@ -620,8 +622,6 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
         rowsCount: 1,
         columnsCount: bounds.length,
     },
-    fieldWrapperComponent: Wrapper,
-    ignoreRowsColumnCountInTheWrapper: true,
     digitsCount: 0,
     customCellBounds: {
         0: Object.fromEntries(bounds.entries()),
