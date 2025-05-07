@@ -14,6 +14,9 @@ interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
     regionNoClipChildren?: ReactNode | ((region?: GridRegion, index?: number) => ReactNode);
 }
 
+/**
+ * Render transformed regions returned from `SudokuTypeManager.getRegionsWithSameCoordsTransformation()`.
+ */
 export const FieldRegionsWithSameCoordsTransformation = observer(function FieldRegionsWithSameCoordsTransformation<
     T extends AnyPTM,
 >({ context, children, regionNoClipChildren }: FieldRegionsWithSameCoordsTransformationProps<T>) {

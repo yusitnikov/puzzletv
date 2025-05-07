@@ -40,6 +40,11 @@ export interface FieldProps<T extends AnyPTM> {
     rect: Rect;
 }
 
+/**
+ * Render puzzle's grid and everything on it: cells, pen tool's lines and mark, constraints, custom on-grid elements.
+ *
+ * See the "docs/Puzzle rendering.md" file for more details about how the puzzle grid is rendered.
+ */
 export const Field = observer(function Field<T extends AnyPTM>({ context, rect }: FieldProps<T>) {
     profiler.trace();
 
@@ -206,6 +211,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
 
     return (
         <>
+            {/* the main absolutely-positioned container of the grid area - applies the background and handles mouse gestures */}
             <StyledWrapper
                 {...rect}
                 style={{
@@ -219,7 +225,9 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                 }}
                 {...getGestureHandlerProps(fieldGestureHandlers)}
             >
+                {/* custom wrapper defined by the type manager - implement it to modify the DOM structure */}
                 <FieldWrapper context={context}>
+                    {/* apply panning, rotating and zooming transformations to the grid */}
                     <Absolute
                         left={context.animatedNormalizedLeft * cellSize}
                         top={context.animatedNormalizedTop * cellSize}
@@ -229,6 +237,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                         scale={fieldWrapperHandlesScale ? 1 : context.animatedScale}
                         fitParent={fieldFitsWrapper}
                     >
+                        {/* The main SVG element that contains all drawings and interactions of the grid */}
                         <FieldSvg context={readOnlySafeContext}>
                             {applyShadowFilter && (
                                 <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
@@ -242,6 +251,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                                 </filter>
                             )}
 
+                            {/* transformed regions returned from SudokuTypeManager.getRegionsWithSameCoordsTransformation() */}
                             <FieldRegionsWithSameCoordsTransformation
                                 context={readOnlySafeContext}
                                 regionNoClipChildren={(region, regionIndex) => (
@@ -377,6 +387,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                         </FieldSvg>
                     </Absolute>
 
+                    {/* toroidal grid's "shade out" effect */}
                     {loopHorizontally && fieldMargin && (
                         <>
                             <Absolute
@@ -398,6 +409,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                         </>
                     )}
 
+                    {/* toroidal grid's "shade out" effect */}
                     {loopVertically && fieldMargin && (
                         <>
                             <Absolute
@@ -420,6 +432,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                     )}
                 </FieldWrapper>
 
+                {/* custom controls that are not related to specific cells, defined by the type manager */}
                 <Absolute
                     top={fieldMargin * cellSize}
                     left={fieldMargin * cellSize}
@@ -432,6 +445,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                 </Absolute>
             </StyledWrapper>
 
+            {/* "no fog reveal mode" warning layer */}
             {fogDemoFieldStateHistory && (
                 <Absolute
                     {...rect}

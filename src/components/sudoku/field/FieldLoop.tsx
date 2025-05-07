@@ -10,6 +10,9 @@ export interface FieldLoopProps<T extends AnyPTM> extends PuzzleContextProps<T> 
     children: ReactNode | ((topOffset: number, leftOffset: number) => ReactNode);
 }
 
+/**
+ * Render the puzzle's grid multiple times with different offset to support looping (toroidal) grids.
+ */
 export const FieldLoop = observer(function FieldLoop<T extends AnyPTM>({
     context: { puzzle },
     children,
