@@ -99,6 +99,9 @@ export interface CellDigitsProps<T extends AnyPTM> {
     isValidUserDigit?: (digit?: T["cell"]) => boolean;
 }
 
+// Default value for the `isValidUserDigit` prop - make sure it's constant reference
+const defaultIsValidUserDigit = () => true;
+
 export const CellDigits = observer(function CellDigits<T extends AnyPTM>({
     context,
     data,
@@ -107,7 +110,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>({
     size,
     cellPosition,
     mainColor = false,
-    isValidUserDigit = () => true,
+    isValidUserDigit = defaultIsValidUserDigit,
 }: CellDigitsProps<T>) {
     profiler.trace();
 
