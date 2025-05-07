@@ -84,10 +84,7 @@ export const CellBackground = observer(function CellBackground<T extends AnyPTM>
         [cellPosition],
     );
     const getAreCustomBounds = useComputed(
-        () =>
-            cellPosition &&
-            !!getCustomBounds &&
-            context.puzzleIndex.allCells[cellPosition.top][cellPosition.left].areCustomBounds,
+        () => !!cellPosition && context.puzzleIndex.allCells[cellPosition.top][cellPosition.left].areCustomBounds,
         { name: `CellBackground:areCustomBounds[${cellPosition?.top}][${cellPosition?.left}]` },
         [cellPosition, getCustomBounds],
     );
@@ -131,7 +128,7 @@ export const CellBackground = observer(function CellBackground<T extends AnyPTM>
         customCellRect.top + customCellRect.height - customCellCenter.top,
     );
 
-    const clip = colors.length > 1 || !!getAreCustomBounds();
+    const clip = colors.length > 1 || getAreCustomBounds();
     const opacity = noOpacity ? 1 : settings.backgroundOpacity.get();
 
     return (
