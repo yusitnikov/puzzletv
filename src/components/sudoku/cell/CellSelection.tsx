@@ -77,9 +77,9 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
     const selectionBorderWidth2 = 2 / scale;
 
     const { areCustomBounds } = context.puzzleIndex.allCells[cellPosition.top][cellPosition.left];
-    const { userArea } = context.getCellTransformedBounds(cellPosition.top, cellPosition.left);
 
     if (areCustomBounds) {
+        const { userArea } = context.getCellTransformedBounds(cellPosition.top, cellPosition.left);
         const cellTransformedSize = getTransformedRectAverageSize(userArea);
 
         selectionBorderWidth = Math.max(selectionBorderWidth * cellTransformedSize, 7 / scale);
@@ -92,14 +92,12 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
                     stroke={"#fff"}
                     strokeWidth={selectionBorderWidth + selectionBorderWidth2}
                 />
-                ;
                 <FieldCellShape
                     context={context}
                     cellPosition={cellPosition}
                     stroke={color}
                     strokeWidth={selectionBorderWidth}
                 />
-                ;
             </AutoSvg>
         );
     }
