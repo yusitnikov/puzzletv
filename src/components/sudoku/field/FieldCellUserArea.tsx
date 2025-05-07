@@ -5,6 +5,7 @@ import { TransformedRectGraphics } from "../../../contexts/TransformContext";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 
 interface FieldCellUserAreaProps<T extends AnyPTM> {
     context?: PuzzleContext<T>;
@@ -24,11 +25,11 @@ export const FieldCellUserArea = observer(function FieldCellUserArea<T extends A
             ? context.getCellTransformedBounds(cellPosition.top, cellPosition.left).userArea
             : undefined;
 
-    return (
-        <>
-            {customRect && <TransformedRectGraphics rect={customRect}>{children}</TransformedRectGraphics>}
-
-            {!customRect && children}
-        </>
+    return customRect ? (
+        <TransformedRectGraphics rect={customRect}>{children}</TransformedRectGraphics>
+    ) : cellPosition ? (
+        <AutoSvg {...cellPosition}>{children}</AutoSvg>
+    ) : (
+        <>{children}</>
     );
 }) as <T extends AnyPTM>(props: FieldCellUserAreaProps<T>) => ReactElement;

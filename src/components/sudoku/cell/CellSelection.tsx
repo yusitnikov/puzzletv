@@ -105,8 +105,8 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
     return (
         <>
             <rect
-                x={selectionBorderWidth / 2}
-                y={selectionBorderWidth / 2}
+                x={cellPosition.left + selectionBorderWidth / 2}
+                y={cellPosition.top + selectionBorderWidth / 2}
                 width={1 - selectionBorderWidth}
                 height={1 - selectionBorderWidth}
                 fill={"none"}
@@ -114,8 +114,8 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
                 stroke={color}
             />
             <rect
-                x={selectionBorderWidth + selectionBorderWidth2 / 2}
-                y={selectionBorderWidth + selectionBorderWidth2 / 2}
+                x={cellPosition.left + selectionBorderWidth + selectionBorderWidth2 / 2}
+                y={cellPosition.top + selectionBorderWidth + selectionBorderWidth2 / 2}
                 width={1 - selectionBorderWidth * 2 - selectionBorderWidth2}
                 height={1 - selectionBorderWidth * 2 - selectionBorderWidth2}
                 fill={"none"}

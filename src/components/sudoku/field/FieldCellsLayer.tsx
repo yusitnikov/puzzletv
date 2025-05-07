@@ -7,7 +7,6 @@ import { profiler } from "../../../utils/profiler";
 import { indexes } from "../../../utils/indexes";
 import { Position } from "../../../types/layout/Position";
 import { isInteractableCell, isVisibleCell } from "../../../types/sudoku/CellTypeProps";
-import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 
 export interface FieldCellsLayerProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -43,10 +42,12 @@ export const FieldCellsLayer = observer(function FieldCellsLayer<T extends AnyPT
                         top: rowIndex,
                     };
 
+                    // Skip the cell if it doesn't belong to the currently rendered region
                     if (region && !customCellBounds && !doesGridRegionContainCell(region, cellPosition)) {
                         return null;
                     }
 
+                    // Skip the cell if it's out of the view because of panning and toroidal grid's looping
                     if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation && !transformCoords) {
                         const finalTop = topOffset + context.animatedNormalizedTop + rowIndex;
                         if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
@@ -59,24 +60,19 @@ export const FieldCellsLayer = observer(function FieldCellsLayer<T extends AnyPT
                         }
                     }
 
+                    // Skip the cell if it's not interactable (when rendering the interactions layer) or not visible
                     const cellTypeProps = puzzleIndex.getCellTypeProps(cellPosition);
                     if (!(isInteractionMode ? isInteractableCell(cellTypeProps) : isVisibleCell(cellTypeProps))) {
                         return null;
                     }
 
+                    // Skip the cell if it has no contents
                     const content = children(cellPosition.top, cellPosition.left);
                     if (!content) {
                         return null;
                     }
 
-                    const key = `cell-${rowIndex}-${columnIndex}`;
-                    return customCellBounds ? (
-                        <Fragment key={key}>{content}</Fragment>
-                    ) : (
-                        <AutoSvg key={key} {...cellPosition} width={1} height={1}>
-                            {content}
-                        </AutoSvg>
-                    );
+                    return <Fragment key={`cell-${rowIndex}-${columnIndex}`}>{content}</Fragment>;
                 }),
             )}
         </>

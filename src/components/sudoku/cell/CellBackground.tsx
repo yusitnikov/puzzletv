@@ -5,7 +5,7 @@ import { CellColorValue, resolveCellColorValue } from "../../../types/sudoku/Cel
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { FieldCellShape } from "../field/FieldCellShape";
 import { getRegionBoundingBox } from "../../../utils/regions";
-import { getTransformedRectCenter, Rect } from "../../../types/layout/Rect";
+import { getRectCenter, getTransformedRectCenter, Rect } from "../../../types/layout/Rect";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { comparer } from "mobx";
@@ -89,43 +89,38 @@ export const CellBackground = observer(function CellBackground<T extends AnyPTM>
         [cellPosition, getCustomBounds],
     );
 
-    const getCustomCellRect = useComputed(
+    const getCellRect = useComputed(
         (): Rect =>
             getAreCustomBounds()
                 ? getRegionBoundingBox(getCustomBounds()!.borders.flat(), 0)
                 : {
-                      left: 0,
-                      top: 0,
+                      left: (cellPosition?.left ?? 0) * size,
+                      top: (cellPosition?.top ?? 0) * size,
                       width: size,
                       height: size,
                   },
         { name: `CellBackground:customCellRect[${cellPosition?.top}][${cellPosition?.left}]` },
         [getAreCustomBounds, getCustomBounds, size],
     );
-    const getCustomCellCenter = useComputed(
+    const getCellCenter = useComputed(
         (): Position =>
-            getAreCustomBounds()
-                ? getTransformedRectCenter(getCustomBounds()!.userArea)
-                : {
-                      left: size / 2,
-                      top: size / 2,
-                  },
+            getAreCustomBounds() ? getTransformedRectCenter(getCustomBounds()!.userArea) : getRectCenter(getCellRect()),
         { name: `CellBackground:customCellCenter[${cellPosition?.top}][${cellPosition?.left}]` },
-        [getAreCustomBounds, getCustomBounds, size],
+        [getAreCustomBounds, getCustomBounds, getCellRect],
     );
 
     if (!colors.length) {
         return null;
     }
 
-    const customCellRect = getCustomCellRect();
-    const customCellCenter = getCustomCellCenter();
+    const cellRect = getCellRect();
+    const cellCenter = getCellCenter();
 
-    const customCellRadius = Math.max(
-        customCellCenter.left - customCellRect.left,
-        customCellRect.left + customCellRect.width - customCellCenter.left,
-        customCellCenter.top - customCellRect.top,
-        customCellRect.top + customCellRect.height - customCellCenter.top,
+    const cellRadius = Math.max(
+        cellCenter.left - cellRect.left,
+        cellRect.left + cellRect.width - cellCenter.left,
+        cellCenter.top - cellRect.top,
+        cellRect.top + cellRect.height - cellCenter.top,
     );
 
     const clip = colors.length > 1 || getAreCustomBounds();
@@ -139,10 +134,10 @@ export const CellBackground = observer(function CellBackground<T extends AnyPTM>
             style={{ opacity }}
         >
             <rect
-                x={customCellRect.left}
-                y={customCellRect.top}
-                width={customCellRect.width}
-                height={customCellRect.height}
+                x={cellRect.left}
+                y={cellRect.top}
+                width={cellRect.width}
+                height={cellRect.height}
                 fill={resolveCellColorValue(colors[0])}
                 stroke={"none"}
                 strokeWidth={0}
@@ -163,12 +158,12 @@ export const CellBackground = observer(function CellBackground<T extends AnyPTM>
                                             [1, index + 0.5],
                                         ]
                                             .map(([y, i]) => [
-                                                y * customCellRadius * 4,
+                                                y * cellRadius * 4,
                                                 Math.PI * ((2 * i) / colors.length - 0.25),
                                             ])
                                             .map(([y, a]) => ({
-                                                left: customCellCenter.left + y * Math.cos(a),
-                                                top: customCellCenter.top + y * Math.sin(a),
+                                                left: cellCenter.left + y * Math.cos(a),
+                                                top: cellCenter.top + y * Math.sin(a),
                                             })),
                                     )}
                                     fill={resolveCellColorValue(color)}

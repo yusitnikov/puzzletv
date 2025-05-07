@@ -45,10 +45,8 @@ export const SingleCellFieldItemPositionFix = observer(function SingleCellFieldI
     }
 
     return (
-        <AutoSvg {...(context.puzzle.customCellBounds ? {} : position)}>
-            <FieldCellUserArea context={context} cellPosition={position}>
-                {children}
-            </FieldCellUserArea>
-        </AutoSvg>
+        <FieldCellUserArea context={context} cellPosition={position}>
+            {children}
+        </FieldCellUserArea>
     );
 }) as <T extends AnyPTM>(props: SingleCellFieldItemPositionFixProps<T>) => ReactElement;

@@ -43,11 +43,13 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
 
     const clip = noClip ? undefined : <FieldCellShape context={context} cellPosition={cellPosition} />;
 
+    // Note: the actual condition here is just `if (!customCellBounds)`.
+    // Everything else is just a hint for typescript.
     if (!context || !cellPosition || !customCellBounds) {
         return (
             <rect
-                x={left}
-                y={top}
+                x={(cellPosition?.left ?? 0) + left}
+                y={(cellPosition?.top ?? 0) + top}
                 width={width}
                 height={height}
                 fill={"none"}
