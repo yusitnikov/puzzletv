@@ -2,27 +2,27 @@ import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
-} from "../../types/sudoku/PuzzleDefinition";
-import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+} from "../../types/puzzle/PuzzleDefinition";
+import { RotatableCluesPTM } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesPTM";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
-import { ImportedRotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
+import { ImportedRotatableCluesTypeManager } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import {
     DecorativeShapeComponent,
     DecorativeShapeConstraint,
     EllipseConstraint,
-} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+} from "../../components/puzzle/constraints/decorative-shape/DecorativeShape";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { PositionLiteral } from "../../types/layout/Position";
-import { GridLayer } from "../../types/sudoku/GridLayer";
+import { GridLayer } from "../../types/puzzle/GridLayer";
 import { textColor } from "../../components/app/globals";
-import { Constraint } from "../../types/sudoku/Constraint";
-import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
-import { CellColor } from "../../types/sudoku/CellColor";
+import { Constraint } from "../../types/puzzle/Constraint";
+import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { CellColor } from "../../types/puzzle/CellColor";
 
 const ArrowComponent = DecorativeShapeComponent(
     observer(function ArrowFc(props) {
@@ -63,7 +63,7 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Astronavigation",
     },
-    typeManager: ImportedRotatableCluesSudokuTypeManager({ baseTypeManager: DigitSudokuTypeManager() }),
+    typeManager: ImportedRotatableCluesTypeManager({ baseTypeManager: DigitPuzzleTypeManager() }),
     gridSize: GridSize9,
     regions: Regions9,
     rules: () => (

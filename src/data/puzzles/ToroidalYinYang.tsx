@@ -1,20 +1,20 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularGridSize } from "../../types/sudoku/GridSize";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { createRegularGridSize } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { Chameleon } from "../authors";
-import { CellColor } from "../../types/sudoku/CellColor";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { CellColor } from "../../types/puzzle/CellColor";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     moveButtonTip,
     normalYinYangRulesApply,
     normalYinYangRulesExplained,
     toroidalRulesApply,
 } from "../ruleSnippets";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
-import { errorResultCheck, notFinishedResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
+import { errorResultCheck, notFinishedResultCheck, successResultCheck } from "../../types/puzzle/PuzzleResultCheck";
 
 const S = CellColor.shaded;
 const U = CellColor.unshaded;
@@ -52,7 +52,7 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
     },
     slug: "toroidal-yin-yang",
     saveStateKey: "toroidal-yin-yang-v2",
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: createRegularGridSize(10),
     digitsCount: 0,
     loopHorizontally: true,

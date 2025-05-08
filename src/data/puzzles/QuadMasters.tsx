@@ -1,11 +1,11 @@
-import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
+import { PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { createRegularGridSize, createRegularRegions } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { generateRandomPuzzleDigits, getDailyRandomGeneratorSeed } from "../../utils/random";
-import { QuadMastersSudokuTypeManager } from "../../sudokuTypes/quad-masters/types/QuadMastersSudokuTypeManager";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { QuadMastersTypeManager } from "../../puzzleTypes/quad-masters/types/QuadMastersTypeManager";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import { getAutoRegionWidth } from "../../utils/regions";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { normalSudokuRulesApply } from "../ruleSnippets";
 import {
     correctGuessRules,
@@ -24,10 +24,10 @@ import {
     quadYellowDigits,
     singlePlayerScoreRules,
     twoPhasesGame,
-} from "../../sudokuTypes/quad-masters/data/ruleSnippets";
-import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+} from "../../puzzleTypes/quad-masters/data/ruleSnippets";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import { PartiallyTranslatable } from "../../types/translations/Translatable";
-import { QuadMastersPTM } from "../../sudokuTypes/quad-masters/types/QuadMastersPTM";
+import { QuadMastersPTM } from "../../puzzleTypes/quad-masters/types/QuadMastersPTM";
 import { translate } from "../../utils/translate";
 
 export const getQuadMastersTitle = (
@@ -77,7 +77,7 @@ export const generateQuadMasters = (
                 ...otherParams,
             }),
             solution: generateRandomPuzzleDigits(gridSize, regionWidth, randomSeed),
-            typeManager: QuadMastersSudokuTypeManager(isQuadle),
+            typeManager: QuadMastersTypeManager(isQuadle),
             gridSize: createRegularGridSize(gridSize, regionWidth),
             regions: createRegularRegions(gridSize, gridSize, regionWidth),
             resultChecker: isValidFinishedPuzzleByConstraints,

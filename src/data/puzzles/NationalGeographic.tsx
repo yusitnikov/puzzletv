@@ -1,19 +1,19 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { GridSize6, Regions6 } from "../../types/sudoku/GridSize";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { GridSize6, Regions6 } from "../../types/puzzle/GridSize";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { Chameleon } from "../authors";
 import { observer } from "mobx-react-lite";
 import { textColor } from "../../components/app/globals";
 import { profiler } from "../../utils/profiler";
 import { AutoSvg } from "../../components/svg/auto-svg/AutoSvg";
-import { DigitProps } from "../../components/sudoku/digit/DigitProps";
-import { DigitComponentType } from "../../components/sudoku/digit/DigitComponentType";
+import { DigitProps } from "../../components/puzzle/digit/DigitProps";
+import { DigitComponentType } from "../../components/puzzle/digit/DigitComponentType";
 import { ReactNode } from "react";
-import { BaseNeighborsConstraint } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { BaseNeighborsConstraint } from "../../components/puzzle/constraints/consecutive-neighbors/ConsecutiveNeighbors";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 
 // region Custom digit
 const AnimalDigit = observer(function AnimalDigit({
@@ -414,7 +414,7 @@ export const NationalGeographic: PuzzleDefinition<NumberPTM> = {
         [LanguageCode.en]: "National Geographic",
     },
     typeManager: {
-        ...DigitSudokuTypeManager(AnimalDigitComponentType),
+        ...DigitPuzzleTypeManager(AnimalDigitComponentType),
         digitShortcuts: [["H", "O"], ["D"], ["C"], ["M"], ["E"], ["P", "U"]],
         disableArrowLetterShortcuts: true,
         disableCellModeLetterShortcuts: true,

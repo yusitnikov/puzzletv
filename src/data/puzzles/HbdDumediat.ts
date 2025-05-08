@@ -1,10 +1,10 @@
 import { FPuzzles } from "./Import";
-import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { JigsawPTM } from "../../sudokuTypes/jigsaw/types/JigsawPTM";
-import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/sudoku/PuzzleImportOptions";
-import { JigsawGridState } from "../../sudokuTypes/jigsaw/types/JigsawGridState";
+import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { JigsawPTM } from "../../puzzleTypes/jigsaw/types/JigsawPTM";
+import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/puzzle/PuzzleImportOptions";
+import { JigsawGridState } from "../../puzzleTypes/jigsaw/types/JigsawGridState";
 import { stringifyPosition } from "../../types/layout/Position";
-import { JigsawPieceInfo } from "../../sudokuTypes/jigsaw/types/JigsawPieceInfo";
+import { JigsawPieceInfo } from "../../puzzleTypes/jigsaw/types/JigsawPieceInfo";
 
 export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
     loadPuzzle: () => {

@@ -1,17 +1,17 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { RotatableCluesPTM } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesPTM";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
-import { RotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
+import { RotatableCluesTypeManager } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { blueColor, darkPurpleColor, greenColor, pinkColor, purpleColor } from "../../components/app/globals";
-import { createRotatableClue } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPuzzleExtension";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+import { createRotatableClue } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesPuzzleExtension";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
 import { rgba } from "../../utils/color";
-import { toDecorativeConstraint } from "../../types/sudoku/Constraint";
+import { toDecorativeConstraint } from "../../types/puzzle/Constraint";
 import { loop } from "../../utils/math";
 
 const lighten = (color: string) => rgba(color, 0.5);
@@ -25,8 +25,8 @@ export const Gears: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Gears test",
     },
-    typeManager: RotatableCluesSudokuTypeManager({
-        baseTypeManager: DigitSudokuTypeManager(),
+    typeManager: RotatableCluesTypeManager({
+        baseTypeManager: DigitPuzzleTypeManager(),
         isEquivalentLoop: false,
     }),
     gridSize: GridSize9,

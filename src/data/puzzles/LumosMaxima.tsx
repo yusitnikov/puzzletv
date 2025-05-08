@@ -1,10 +1,10 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import { Chameleon } from "../authors";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     arrowsExplained,
     cannotRepeatInCage,
@@ -14,11 +14,11 @@ import {
     normalSudokuRulesApply,
 } from "../ruleSnippets";
 import React from "react";
-import { KillerCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
-import { FogConstraint } from "../../components/sudoku/constraints/fog/Fog";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
+import { KillerCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
+import { FogConstraint } from "../../components/puzzle/constraints/fog/Fog";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
 import { indexes } from "../../utils/indexes";
 import { translate } from "../../utils/translate";
 
@@ -27,7 +27,7 @@ export const LumosMaximaNoFog: PuzzleDefinition<NumberPTM> = {
     title: { [LanguageCode.en]: "Lumos Maxima" },
     author: Chameleon,
     slug: "lumos-maxima-no-fog",
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     rules: () => (

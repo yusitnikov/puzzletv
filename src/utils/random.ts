@@ -1,4 +1,4 @@
-import { GivenDigitsMap } from "../types/sudoku/GivenDigitsMap";
+import { GivenDigitsMap } from "../types/puzzle/GivenDigitsMap";
 import { indexes, indexesFromTo } from "./indexes";
 import { Position } from "../types/layout/Position";
 

@@ -1,18 +1,18 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { CustomCellBounds } from "../../types/sudoku/CustomCellBounds";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { CustomCellBounds } from "../../types/puzzle/CustomCellBounds";
 import { Rect } from "../../types/layout/Rect";
 import { indexes } from "../../utils/indexes";
 import { Position } from "../../types/layout/Position";
-import { LoopLineConstraint } from "../../components/sudoku/constraints/loop-line/LoopLine";
-import { TapaCellConstraint } from "../../components/sudoku/constraints/tapa-cell/TapaCell";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { LoopLineConstraint } from "../../components/puzzle/constraints/loop-line/LoopLine";
+import { TapaCellConstraint } from "../../components/puzzle/constraints/tapa-cell/TapaCell";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { loopRulesApply, tapCluesApply } from "../ruleSnippets";
-import { AnyNumberPTM, NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { AnyNumberPTM, NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { roundToStep } from "../../utils/math";
-import { CellPart } from "../../types/sudoku/CellPart";
+import { CellPart } from "../../types/puzzle/CellPart";
 import { translate } from "../../utils/translate";
 
 export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
@@ -193,7 +193,7 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
             </>
         ),
         typeManager: {
-            ...DigitSudokuTypeManager(),
+            ...DigitPuzzleTypeManager(),
             ignoreRowsColumnCountInTheWrapper: true,
         },
         gridSize: {

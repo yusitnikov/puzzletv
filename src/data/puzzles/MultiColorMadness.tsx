@@ -1,8 +1,8 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     antiBishopFromCenterRulesExplained,
     antiKnightRulesExplained,
@@ -12,12 +12,12 @@ import {
     normalSudokuRulesApply,
     toroidalRulesApply,
 } from "../ruleSnippets";
-import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
-import { AntiBishopFromCenterConstraint } from "../../types/sudoku/constraints/AntiBishopFromCenter";
-import { GreaterConstraint } from "../../components/sudoku/constraints/greater/Greater";
-import { KillerCageConstraintByRect } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { AntiKnightConstraint } from "../../types/puzzle/constraints/AntiKnight";
+import { AntiBishopFromCenterConstraint } from "../../types/puzzle/constraints/AntiBishopFromCenter";
+import { GreaterConstraint } from "../../components/puzzle/constraints/greater/Greater";
+import { KillerCageConstraintByRect } from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { indexes } from "../../utils/indexes";
 import { translate } from "../../utils/translate";
 
@@ -41,7 +41,7 @@ export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
             </RulesParagraph>
         </>
     ),
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     items: [

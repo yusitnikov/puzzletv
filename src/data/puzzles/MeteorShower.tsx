@@ -1,14 +1,14 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { createRegularGridSize, createRegularRegions } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { moveButtonTip, normalSudokuRulesApply, thermometersExplained, toroidalRulesApply } from "../ruleSnippets";
 import { darkGreyColor } from "../../components/app/globals";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import { Position } from "../../types/layout/Position";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
 
 export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => ({
@@ -30,7 +30,7 @@ export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => 
             </RulesParagraph>
         </>
     ),
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     borderColor: darkGreyColor,
     gridSize: createRegularGridSize(8, 2),
     regions: createRegularRegions(8, 8, 2).map((region, index) =>

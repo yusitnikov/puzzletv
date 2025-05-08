@@ -1,19 +1,19 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { CubedokuTypeManager } from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { CubedokuTypeManager } from "../../puzzleTypes/cubedoku/types/CubedokuTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     cubedokuIndexingDetails,
     cubedokuIndexingRules,
     cubedokuNormalSudokuRules,
-} from "../../sudokuTypes/cubedoku/data/ruleSnippets";
-import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
+} from "../../puzzleTypes/cubedoku/data/ruleSnippets";
+import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
 import { thermometersExplained } from "../ruleSnippets";
 import { parsePositionLiterals2 } from "../../types/layout/Position";
-import { CubedokuIndexingConstraint } from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { createCubeGridSize, createCubeRegions } from "../../sudokuTypes/cube/types/CubeTypeManager";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { CubedokuIndexingConstraint } from "../../puzzleTypes/cubedoku/constraints/CubedokuIndexing";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { createCubeGridSize, createCubeRegions } from "../../puzzleTypes/cube/types/CubeTypeManager";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
 
 const Andrewsarchus = {

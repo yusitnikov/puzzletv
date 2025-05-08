@@ -1,17 +1,17 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { PartiallyTranslatable } from "../../types/translations/Translatable";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import {
     createMonumentValleyGridSize,
     createMonumentValleyRegions,
     MonumentValleyTypeManager,
     parseMonumentValleyDigitsMap,
-} from "../../sudokuTypes/monument-valley/types/MonumentValleyTypeManager";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+} from "../../puzzleTypes/monument-valley/types/MonumentValleyTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import React from "react";
-import { MonumentValleyGridBordersConstraint } from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
-import { MonumentValleyPTM } from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
+import { MonumentValleyGridBordersConstraint } from "../../puzzleTypes/monument-valley/components/MonumentValleyGridBorders";
+import { MonumentValleyPTM } from "../../puzzleTypes/monument-valley/types/MonumentValleyPTM";
 import { translate } from "../../utils/translate";
 
 const author: PartiallyTranslatable = {

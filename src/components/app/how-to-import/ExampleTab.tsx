@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
+import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { profiler } from "../../../utils/profiler";
 import { headerPadding } from "../globals";
-import { GridPreview } from "../../sudoku/grid/GridPreview";
-import { loadPuzzle, PuzzleDefinitionOrLoader } from "../../../types/sudoku/PuzzleDefinition";
+import { GridPreview } from "../../puzzle/grid/GridPreview";
+import { loadPuzzle, PuzzleDefinitionOrLoader } from "../../../types/puzzle/PuzzleDefinition";
 import { useMemo } from "react";
 
 export interface ExampleTabProps<T extends AnyPTM> {

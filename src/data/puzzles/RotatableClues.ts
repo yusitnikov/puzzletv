@@ -1,8 +1,8 @@
 import { FPuzzles } from "./Import";
-import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
-import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
+import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
+import { PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { RotatableCluesPTM } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesPTM";
 
 export const Revolutionary: PuzzleDefinitionLoader<RotatableCluesPTM<NumberPTM>> = {
     loadPuzzle: () =>

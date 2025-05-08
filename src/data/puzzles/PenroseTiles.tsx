@@ -1,16 +1,16 @@
-import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { CustomCellBounds } from "../../types/sudoku/CustomCellBounds";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { CustomCellBounds } from "../../types/puzzle/CustomCellBounds";
 import { Rect } from "../../types/layout/Rect";
 import { Position } from "../../types/layout/Position";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
-import { NonRepeatingNeighborsConstraint } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { NonRepeatingNeighborsConstraint } from "../../components/puzzle/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import { lighterBlueColor } from "../../components/app/globals";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { roundToStep } from "../../utils/math";
-import { CellTypeProps } from "../../types/sudoku/CellTypeProps";
+import { CellTypeProps } from "../../types/puzzle/CellTypeProps";
 import { translate } from "../../utils/translate";
 
 const coeff = Math.sqrt(3) / 2;
@@ -167,7 +167,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
         </>
     ),
     typeManager: {
-        ...DigitSudokuTypeManager(),
+        ...DigitPuzzleTypeManager(),
         ignoreRowsColumnCountInTheWrapper: true,
         getCellTypeProps: ({ left }): CellTypeProps<NumberPTM> => ({ noInteraction: left >= 64 }),
     },

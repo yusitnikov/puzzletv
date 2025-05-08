@@ -1,6 +1,6 @@
 import { Position } from "../types/layout/Position";
-import { PuzzleContext } from "../types/sudoku/PuzzleContext";
-import { AnyPTM } from "../types/sudoku/PuzzleTypeMap";
+import { PuzzleContext } from "../types/puzzle/PuzzleContext";
+import { AnyPTM } from "../types/puzzle/PuzzleTypeMap";
 
 export const getMainDigitDataHash = ({ top, left }: Position) => `main-digit-${top}-${left}`;
 

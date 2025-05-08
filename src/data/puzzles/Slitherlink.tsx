@@ -1,21 +1,21 @@
 import { observer } from "mobx-react-lite";
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { CustomCellBounds } from "../../types/sudoku/CustomCellBounds";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { CustomCellBounds } from "../../types/puzzle/CustomCellBounds";
 import { getPointsBoundingBox } from "../../types/layout/Rect";
 import { isSamePosition, Line, Position } from "../../types/layout/Position";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { CellWriteMode } from "../../types/sudoku/CellWriteMode";
-import { LoopLineConstraint } from "../../components/sudoku/constraints/loop-line/LoopLine";
-import { CellPart } from "../../types/sudoku/CellPart";
-import { CellBorderLinesCountConstraint } from "../../components/sudoku/constraints/cell-border-lines-count/CellBorderLinesCount";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { CellWriteMode } from "../../types/puzzle/CellWriteMode";
+import { LoopLineConstraint } from "../../components/puzzle/constraints/loop-line/LoopLine";
+import { CellPart } from "../../types/puzzle/CellPart";
+import { CellBorderLinesCountConstraint } from "../../components/puzzle/constraints/cell-border-lines-count/CellBorderLinesCount";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import { PropsWithChildren } from "react";
-import { PuzzleContextProps } from "../../types/sudoku/PuzzleContext";
-import { ZoomInButtonItem, ZoomOutButtonItem } from "../../components/sudoku/controls/ZoomButton";
-import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { PuzzleContextProps } from "../../types/puzzle/PuzzleContext";
+import { ZoomInButtonItem, ZoomOutButtonItem } from "../../components/puzzle/controls/ZoomButton";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import { translate } from "../../utils/translate";
 
 const scale = 0.01;
@@ -608,7 +608,7 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
         </>
     ),
     typeManager: {
-        ...DigitSudokuTypeManager(),
+        ...DigitPuzzleTypeManager(),
         initialCellWriteMode: CellWriteMode.lines,
         allowMove: true,
         allowScale: true,

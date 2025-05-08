@@ -1,6 +1,6 @@
 import { FPuzzles } from "./Import";
-import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 
 export const TheAngelIslington: PuzzleDefinitionLoader<NumberPTM> = {
     loadPuzzle: () =>

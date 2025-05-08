@@ -1,20 +1,20 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { createRegularGridSize, createRegularRegions } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { littleKillerExplained, normalSudokuRulesApply } from "../ruleSnippets";
-import { LittleKillerConstraint } from "../../components/sudoku/constraints/little-killer/LittleKiller";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { LittleKillerConstraint } from "../../components/puzzle/constraints/little-killer/LittleKiller";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
-import { GridLayer } from "../../types/sudoku/GridLayer";
-import { CellColor } from "../../types/sudoku/CellColor";
+import { GridLayer } from "../../types/puzzle/GridLayer";
+import { CellColor } from "../../types/puzzle/CellColor";
 import { CenteredText } from "../../components/svg/centered-text/CenteredText";
-import { QuadInputSudokuTypeManager } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
+import { QuadInputTypeManager } from "../../components/puzzle/constraints/quad/QuadInput/QuadInputTypeManager";
 import { CSSProperties, useState } from "react";
 import { Modal } from "../../components/layout/modal/Modal";
 import { headerHeight } from "../../components/app/globals";
-import { QuadInputPTM } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputPTM";
+import { QuadInputPTM } from "../../components/puzzle/constraints/quad/QuadInput/QuadInputPTM";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { translate } from "../../utils/translate";
@@ -206,8 +206,8 @@ export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
     author: {
         [LanguageCode.en]: "rockratzero",
     },
-    typeManager: QuadInputSudokuTypeManager({
-        parent: DigitSudokuTypeManager(),
+    typeManager: QuadInputTypeManager({
+        parent: DigitPuzzleTypeManager(),
         allowRepeat: true,
         allowOverflow: false,
         radius: noteRadius + noteLineWidth / 2,

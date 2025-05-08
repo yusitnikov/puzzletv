@@ -13,9 +13,9 @@ import {
     getPuzzleImportLoader,
 } from "../../data/puzzles/Import";
 import { darkGreyColor, headerPadding } from "./globals";
-import { allowedRulesHtmlTags } from "../sudoku/rules/ParsedRulesHtml";
+import { allowedRulesHtmlTags } from "../puzzle/rules/ParsedRulesHtml";
 import { usePureMemo } from "../../hooks/usePureMemo";
-import { GridPreview } from "../sudoku/grid/GridPreview";
+import { GridPreview } from "../puzzle/grid/GridPreview";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { PageTitle } from "../layout/page-layout/PageLayout";
 import {
@@ -25,11 +25,11 @@ import {
     PuzzleImportOptions,
     PuzzleImportPuzzleType,
     PuzzleImportSource,
-} from "../../types/sudoku/PuzzleImportOptions";
-import { loadPuzzle } from "../../types/sudoku/PuzzleDefinition";
+} from "../../types/puzzle/PuzzleImportOptions";
+import { loadPuzzle } from "../../types/puzzle/PuzzleDefinition";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { OpenInNew } from "@emotion-icons/material";
 
 let autoIncrement = 0;
@@ -306,7 +306,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         try {
             return detectTypeManagerByImportOptions(importOptionsPreview, gridParsers);
         } catch (e: unknown) {
-            return DigitSudokuTypeManager();
+            return DigitPuzzleTypeManager();
         }
     }, [importOptionsPreview, gridParsers]);
 

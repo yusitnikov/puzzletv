@@ -1,11 +1,11 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { GridSize9 } from "../../types/sudoku/GridSize";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { GridSize9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { CellColor, CellColorValue } from "../../types/sudoku/CellColor";
-import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { CellColor, CellColorValue } from "../../types/puzzle/CellColor";
+import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     blackKropkiDotsExplained,
     chaosConstructionRulesApply,
@@ -15,11 +15,11 @@ import {
     thermometersExplained,
     toroidalRulesApply,
 } from "../ruleSnippets";
-import { AutoRegionConstraint } from "../../components/sudoku/constraints/auto-region/AutoRegion";
-import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
-import { ConsecutiveNeighborsConstraint } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { AutoRegionConstraint } from "../../components/puzzle/constraints/auto-region/AutoRegion";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { ConsecutiveNeighborsConstraint } from "../../components/puzzle/constraints/consecutive-neighbors/ConsecutiveNeighbors";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
 
 const initialColors: GivenDigitsMap<CellColorValue> = {
@@ -115,7 +115,7 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
             <RulesParagraph>{translate(thermometersExplained)}.</RulesParagraph>
         </>
     ),
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     initialColors: processGivenDigitsMaps((colors) => colors, [initialColors]),
     items: [

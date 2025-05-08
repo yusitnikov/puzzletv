@@ -1,15 +1,15 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { GridSize8, Regions6, Regions8 } from "../../types/sudoku/GridSize";
-import { ChessSudokuTypeManager } from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
-import { chessInitialPiecesByCellNames } from "../../sudokuTypes/chess/utils/chessCoords";
-import { ChessPieceType } from "../../sudokuTypes/chess/types/ChessPieceType";
-import { ChessColor } from "../../sudokuTypes/chess/types/ChessColor";
-import { ChessBoardCellsBackgroundConstraint } from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { GridSize8, Regions6, Regions8 } from "../../types/puzzle/GridSize";
+import { ChessTypeManager } from "../../puzzleTypes/chess/types/ChessTypeManager";
+import { chessInitialPiecesByCellNames } from "../../puzzleTypes/chess/utils/chessCoords";
+import { ChessPieceType } from "../../puzzleTypes/chess/types/ChessPieceType";
+import { ChessColor } from "../../puzzleTypes/chess/types/ChessColor";
+import { ChessBoardCellsBackgroundConstraint } from "../../puzzleTypes/chess/components/ChessBoardCellsBackground";
 import {
     ChessBoardIndexesConstraint,
     chessBoardIndexesMargin,
-} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
+} from "../../puzzleTypes/chess/components/ChessBoardIndexes";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { Chameleon } from "../authors";
 import { almostNormalSudokuRulesApply } from "../ruleSnippets";
@@ -20,22 +20,22 @@ import {
     noPastPromotions,
     normalSudokuRulesForChessPieces,
     optionalChessPiecesRules,
-} from "../../sudokuTypes/chess/data/ruleSnippets";
-import { RulesSpoiler } from "../../components/sudoku/rules/RulesSpoiler";
+} from "../../puzzleTypes/chess/data/ruleSnippets";
+import { RulesSpoiler } from "../../components/puzzle/rules/RulesSpoiler";
 import {
     areSameGivenDigitsMapsByContext,
     GivenDigitsMap,
     mergeGivenDigitsMaps,
-} from "../../types/sudoku/GivenDigitsMap";
-import { ValidChessPositionConstraint } from "../../sudokuTypes/chess/constraints/ValidChessPosition";
-import { ChessPTM } from "../../sudokuTypes/chess/types/ChessPTM";
-import { PuzzleContext } from "../../types/sudoku/PuzzleContext";
-import { ChessPiece } from "../../sudokuTypes/chess/types/ChessPiece";
+} from "../../types/puzzle/GivenDigitsMap";
+import { ValidChessPositionConstraint } from "../../puzzleTypes/chess/constraints/ValidChessPosition";
+import { ChessPTM } from "../../puzzleTypes/chess/types/ChessPTM";
+import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
+import { ChessPiece } from "../../puzzleTypes/chess/types/ChessPiece";
 import { indexes, indexesFromTo } from "../../utils/indexes";
-import { AntiBishopConstraint } from "../../types/sudoku/constraints/AntiBishop";
-import { TextConstraint } from "../../components/sudoku/constraints/text/Text";
+import { AntiBishopConstraint } from "../../types/puzzle/constraints/AntiBishop";
+import { TextConstraint } from "../../components/puzzle/constraints/text/Text";
 import { translate } from "../../utils/translate";
-import { errorResultCheck, PuzzleResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
+import { errorResultCheck, PuzzleResultCheck, successResultCheck } from "../../types/puzzle/PuzzleResultCheck";
 
 const mandatorySolutionPieces = chessInitialPiecesByCellNames({
     g8: { color: ChessColor.black, type: ChessPieceType.knight },
@@ -115,7 +115,7 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
             </RulesParagraph>
         </>
     ),
-    typeManager: ChessSudokuTypeManager,
+    typeManager: ChessTypeManager,
     gridSize: GridSize8,
     regions: Regions8,
     gridMargin: chessBoardIndexesMargin,
@@ -228,7 +228,7 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
             </RulesParagraph>
         </>
     ),
-    typeManager: ChessSudokuTypeManager,
+    typeManager: ChessTypeManager,
     gridSize: GridSize8,
     regions: Regions6.map((region) =>
         region.map(({ top, left }) => ({
@@ -313,7 +313,7 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
             <RulesParagraph>{translate(noPastPromotions)}.</RulesParagraph>
         </>
     ),
-    typeManager: ChessSudokuTypeManager,
+    typeManager: ChessTypeManager,
     gridSize: GridSize8,
     regions: Regions8,
     gridMargin: chessBoardIndexesMargin,

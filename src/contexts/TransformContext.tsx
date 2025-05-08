@@ -7,7 +7,7 @@ import {
 } from "../types/layout/Rect";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../utils/profiler";
-import { PuzzleContext } from "../types/sudoku/PuzzleContext";
+import { PuzzleContext } from "../types/puzzle/PuzzleContext";
 
 // region Scale
 const TransformScaleContext = createContext(1);

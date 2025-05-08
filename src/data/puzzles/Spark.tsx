@@ -1,7 +1,7 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { isValidFinishedPuzzleByConstraints, toDecorativeConstraint } from "../../types/sudoku/Constraint";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { isValidFinishedPuzzleByConstraints, toDecorativeConstraint } from "../../types/puzzle/Constraint";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     blackKropkiDotsExplained,
     kropkiDotsTitle,
@@ -18,17 +18,17 @@ import {
     createSparkGridSize,
     createSparkRegions,
     SparkTypeManager,
-} from "../../sudokuTypes/spark/types/SparkTypeManager";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import { VMarkConstraint, XMarkConstraint } from "../../components/sudoku/constraints/xv/XV";
-import { RegionConstraint } from "../../components/sudoku/constraints/region/Region";
-import { RectConstraint } from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
+} from "../../puzzleTypes/spark/types/SparkTypeManager";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { VMarkConstraint, XMarkConstraint } from "../../components/puzzle/constraints/xv/XV";
+import { RegionConstraint } from "../../components/puzzle/constraints/region/Region";
+import { RectConstraint } from "../../components/puzzle/constraints/decorative-shape/DecorativeShape";
 import { darkGreyColor } from "../../components/app/globals";
-import { GridLayer } from "../../types/sudoku/GridLayer";
+import { GridLayer } from "../../types/puzzle/GridLayer";
 import { rgba } from "../../utils/color";
-import { SparkGridArrowsConstraint } from "../../sudokuTypes/spark/components/SparkGridArrows";
-import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
+import { SparkGridArrowsConstraint } from "../../puzzleTypes/spark/components/SparkGridArrows";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
 import { translate } from "../../utils/translate";
 import { Chameleon } from "../authors";
 

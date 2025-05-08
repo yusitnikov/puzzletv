@@ -1,9 +1,9 @@
 import { headerPadding, lighterGreyColor } from "./globals";
 import React, { ReactElement } from "react";
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { buildLink } from "../../utils/link";
-import { GridPreview } from "../sudoku/grid/GridPreview";
-import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { GridPreview } from "../puzzle/grid/GridPreview";
+import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { translate } from "../../utils/translate";

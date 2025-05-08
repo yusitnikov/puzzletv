@@ -1,4 +1,4 @@
-import { loadPuzzle, PuzzleDefinitionOrLoader } from "../../types/sudoku/PuzzleDefinition";
+import { loadPuzzle, PuzzleDefinitionOrLoader } from "../../types/puzzle/PuzzleDefinition";
 import { NorthOrSouth, NorthOrSouth2, NorthOrSouth2ShortRules } from "./NorthOrSouth";
 import { NewDiscovery, RealChessPuzzle, RealChessPuzzle2, RealChessPuzzleCompatibilitySlug } from "./RealChessPuzzle";
 import {
@@ -35,7 +35,7 @@ import { TheAngelIslington } from "./TheAngelIslington";
 import { Embark, EmbarkWeirdSlug } from "./Embark";
 import { ToroidalRenbanmometers } from "./ToroidalRenbanmometers";
 import { PenroseTiles } from "./PenroseTiles";
-import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { RushHour } from "./RushHour";
 import { InfinityLoopIntro1, InfinityLoopIntro2, MisterFantastic, WalkingOnTheEdge } from "./InfinityLoop";
 import { ReservedParking } from "./ReservedParking";

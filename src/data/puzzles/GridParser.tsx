@@ -1,9 +1,9 @@
-import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { PuzzleImporter } from "./PuzzleImporter";
 import { parsePositionLiteral, Position, PositionLiteral } from "../../types/layout/Position";
-import { CellColor } from "../../types/sudoku/CellColor";
-import { GridSize } from "../../types/sudoku/GridSize";
-import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
+import { CellColor } from "../../types/puzzle/CellColor";
+import { GridSize } from "../../types/puzzle/GridSize";
+import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
 import { Rect } from "../../types/layout/Rect";
 
 export abstract class GridParser<T extends AnyPTM, JsonT> {

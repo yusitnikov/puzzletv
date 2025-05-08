@@ -4,8 +4,8 @@ import { compileGrids } from "./compileGrids";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { normalizeSclMetadata, puzzleIdToScl, Scl } from "../../../utils/sudokuPad";
 import { Modal } from "../../layout/modal/Modal";
-import { SettingsItem } from "../../sudoku/controls/settings/SettingsItem";
-import { SettingsButton } from "../../sudoku/controls/settings/SettingsButton";
+import { SettingsItem } from "../../puzzle/controls/settings/SettingsItem";
+import { SettingsButton } from "../../puzzle/controls/settings/SettingsButton";
 import { CaterpillarGrid } from "./types";
 import { parseSolutionString } from "./utils";
 

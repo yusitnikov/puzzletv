@@ -1,7 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import { localStorageManager } from "../../utils/localStorage";
-import { PencilmarksCheckerMode } from "../sudoku/PencilmarksCheckerMode";
-import { AnimationSpeed } from "../sudoku/AnimationSpeed";
+import { PencilmarksCheckerMode } from "../puzzle/PencilmarksCheckerMode";
+import { AnimationSpeed } from "../puzzle/AnimationSpeed";
 import { UAParser } from "ua-parser-js";
 import { LanguageCode } from "../translations/LanguageCode";
 

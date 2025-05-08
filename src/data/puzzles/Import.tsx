@@ -1,51 +1,51 @@
-import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { sha1 } from "hash.js";
 import { arrayContainsPosition } from "../../types/layout/Position";
 import {
     CenteredCalculatorDigitComponentType,
     RegularCalculatorDigitComponentType,
-} from "../../components/sudoku/digit/CalculatorDigit";
-import { RegularDigitComponentType } from "../../components/sudoku/digit/RegularDigit";
-import { SudokuTypeManager } from "../../types/sudoku/SudokuTypeManager";
-import { LatinDigitSudokuTypeManager } from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
-import { CubedokuTypeManager } from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
-import { SafeCrackerSudokuTypeManager } from "../../sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager";
-import { RotatableDigitSudokuTypeManager } from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import { InfiniteSudokuTypeManager } from "../../sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager";
-import { TesseractSudokuTypeManager } from "../../sudokuTypes/tesseract/types/TesseractSudokuTypeManager";
-import { YajilinFogSudokuTypeManager } from "../../sudokuTypes/yajilin-fog/types/YajilinFogSudokuTypeManager";
-import { FogStarsSudokuTypeManager } from "../../sudokuTypes/fog-stars/types/FogStarsSudokuTypeManager";
-import { JigsawSudokuTypeManager } from "../../sudokuTypes/jigsaw/types/JigsawSudokuTypeManager";
+} from "../../components/puzzle/digit/CalculatorDigit";
+import { RegularDigitComponentType } from "../../components/puzzle/digit/RegularDigit";
+import { PuzzleTypeManager } from "../../types/puzzle/PuzzleTypeManager";
+import { LatinDigitTypeManager } from "../../puzzleTypes/latin/types/LatinDigitTypeManager";
+import { CubedokuTypeManager } from "../../puzzleTypes/cubedoku/types/CubedokuTypeManager";
+import { SafeCrackerTypeManager } from "../../puzzleTypes/safe-cracker/types/SafeCrackerTypeManager";
+import { RotatableDigitTypeManager } from "../../puzzleTypes/rotatable/types/RotatableDigitTypeManager";
+import { InfiniteRingsTypeManager } from "../../puzzleTypes/infinite-rings/types/InfiniteRingsTypeManager";
+import { TesseractTypeManager } from "../../puzzleTypes/tesseract/types/TesseractTypeManager";
+import { YajilinFogTypeManager } from "../../puzzleTypes/yajilin-fog/types/YajilinFogTypeManager";
+import { FogStarsTypeManager } from "../../puzzleTypes/fog-stars/types/FogStarsTypeManager";
+import { JigsawTypeManager } from "../../puzzleTypes/jigsaw/types/JigsawTypeManager";
 import {
     PuzzleImportDigitType,
     PuzzleImportOptions,
     PuzzleImportPuzzleType,
     PuzzleImportSource,
     sanitizeImportOptions,
-} from "../../types/sudoku/PuzzleImportOptions";
-import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { JssSudokuTypeManager } from "../../sudokuTypes/jss/types/JssSudokuTypeManager";
-import { RushHourSudokuTypeManager } from "../../sudokuTypes/rush-hour/types/RushHourSudokuTypeManager";
-import { ImportedRotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
-import { SokobanSudokuTypeManager } from "../../sudokuTypes/sokoban/types/SokobanSudokuTypeManager";
-import { TetrisSudokuTypeManager } from "../../sudokuTypes/tetris/types/TetrisSudokuTypeManager";
-import { QuadInputSudokuTypeManager } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
-import { Find3SudokuTypeManager } from "../../sudokuTypes/find3/types/Find3SudokuTypeManager";
-import { FullCubeTypeManager } from "../../sudokuTypes/cube/types/FullCubeTypeManager";
-import { FullCubeJssConstraint } from "../../sudokuTypes/cube/constraints/FullCubeJss";
-import { ShuffledSudokuTypeManager } from "../../sudokuTypes/shuffled/types/ShuffledSudokuTypeManager";
-import { ImportedScrewsSudokuTypeManager } from "../../sudokuTypes/screws/types/ScrewsSudokuTypeManager";
+} from "../../types/puzzle/PuzzleImportOptions";
+import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { JssTypeManager } from "../../puzzleTypes/jss/types/JssTypeManager";
+import { RushHourTypeManager } from "../../puzzleTypes/rush-hour/types/RushHourTypeManager";
+import { ImportedRotatableCluesTypeManager } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesTypeManager";
+import { SokobanTypeManager } from "../../puzzleTypes/sokoban/types/SokobanTypeManager";
+import { TetrisTypeManager } from "../../puzzleTypes/tetris/types/TetrisTypeManager";
+import { QuadInputTypeManager } from "../../components/puzzle/constraints/quad/QuadInput/QuadInputTypeManager";
+import { Find3TypeManager } from "../../puzzleTypes/find3/types/Find3TypeManager";
+import { FullCubeTypeManager } from "../../puzzleTypes/cube/types/FullCubeTypeManager";
+import { FullCubeJssConstraint } from "../../puzzleTypes/cube/constraints/FullCubeJss";
+import { ShuffledTypeManager } from "../../puzzleTypes/shuffled/types/ShuffledTypeManager";
+import { ImportedScrewsTypeManager } from "../../puzzleTypes/screws/types/ScrewsTypeManager";
 import { PuzzleImporter } from "./PuzzleImporter";
 import { GridParser, GridParserFactory } from "./GridParser";
-import { FullCubePTM } from "../../sudokuTypes/cube/types/FullCubePTM";
-import { EggSokobanSudokuTypeManager } from "../../sudokuTypes/sokoban/egg/types/EggSokobanSudokuTypeManager";
-import { RuleBoxSudokuTypeManager } from "../../sudokuTypes/rule-box/types/RuleBoxSudokuTypeManager";
-import { CaterpillarSudokuTypeManager } from "../../sudokuTypes/caterpillar/types/CaterpillarSudokuTypeManager";
+import { FullCubePTM } from "../../puzzleTypes/cube/types/FullCubePTM";
+import { EggSokobanTypeManager } from "../../puzzleTypes/sokoban/egg/types/EggSokobanTypeManager";
+import { RuleBoxTypeManager } from "../../puzzleTypes/rule-box/types/RuleBoxTypeManager";
+import { CaterpillarTypeManager } from "../../puzzleTypes/caterpillar/types/CaterpillarTypeManager";
 import { FPuzzlesGridParserFactory } from "./FPuzzles";
 import { SudokuMakerGridParserFactory } from "./SudokuMaker";
-import { SlideAndSeekTypeManager } from "../../sudokuTypes/slide-and-seek/types/SlideAndSeekTypeManager";
-import { MergedCellsTypeManager } from "../../sudokuTypes/merged-cells/types/MergedCellsTypeManager";
+import { SlideAndSeekTypeManager } from "../../puzzleTypes/slide-and-seek/types/SlideAndSeekTypeManager";
+import { MergedCellsTypeManager } from "../../puzzleTypes/merged-cells/types/MergedCellsTypeManager";
 
 const getGridParsersByImportOptions = <T extends AnyPTM>(
     importOptions: PuzzleImportOptions,
@@ -71,7 +71,7 @@ const getGridParsersByImportOptions = <T extends AnyPTM>(
 export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
     importOptions: PuzzleImportOptions,
     allGridParsers: GridParser<T, JsonT>[],
-): SudokuTypeManager<AnyPTM> => {
+): PuzzleTypeManager<AnyPTM> => {
     let { type = PuzzleImportPuzzleType.Regular, digitType = PuzzleImportDigitType.Regular } = importOptions;
 
     const mainGridParser = allGridParsers[0];
@@ -113,65 +113,65 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
 
     const digitsCount = mainGridParser.maxDigit ?? importOptions.digitsCount ?? mainGridParser.size;
 
-    const regularTypeManager = DigitSudokuTypeManager();
-    const typesMap: Record<PuzzleImportPuzzleType, SudokuTypeManager<AnyPTM>> = {
+    const regularTypeManager = DigitPuzzleTypeManager();
+    const typesMap: Record<PuzzleImportPuzzleType, PuzzleTypeManager<AnyPTM>> = {
         [PuzzleImportPuzzleType.Regular]: regularTypeManager,
         [PuzzleImportPuzzleType.Latin]: regularTypeManager,
         [PuzzleImportPuzzleType.Calculator]: regularTypeManager,
         [PuzzleImportPuzzleType.Cubedoku]: CubedokuTypeManager,
         [PuzzleImportPuzzleType.RotatableCube]: FullCubeTypeManager(),
-        [PuzzleImportPuzzleType.Rotatable]: RotatableDigitSudokuTypeManager(importOptions),
-        [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerSudokuTypeManager({
+        [PuzzleImportPuzzleType.Rotatable]: RotatableDigitTypeManager(importOptions),
+        [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerTypeManager({
             size: digitsCount,
             circleRegionsCount: Math.ceil((mainGridParser.size - 2) / 2),
             codeCellsCount: Math.min(mainGridParser.size, safeCrackerCodeLength),
         }),
-        [PuzzleImportPuzzleType.InfiniteRings]: InfiniteSudokuTypeManager(
+        [PuzzleImportPuzzleType.InfiniteRings]: InfiniteRingsTypeManager(
             regularTypeManager,
             visibleRingsCount,
             startOffset,
         ),
-        [PuzzleImportPuzzleType.Jigsaw]: JigsawSudokuTypeManager(importOptions),
-        [PuzzleImportPuzzleType.Tetris]: TetrisSudokuTypeManager(importOptions),
-        [PuzzleImportPuzzleType.Shuffled]: ShuffledSudokuTypeManager(importOptions),
-        [PuzzleImportPuzzleType.RushHour]: RushHourSudokuTypeManager,
+        [PuzzleImportPuzzleType.Jigsaw]: JigsawTypeManager(importOptions),
+        [PuzzleImportPuzzleType.Tetris]: TetrisTypeManager(importOptions),
+        [PuzzleImportPuzzleType.Shuffled]: ShuffledTypeManager(importOptions),
+        [PuzzleImportPuzzleType.RushHour]: RushHourTypeManager,
         [PuzzleImportPuzzleType.MergedCells]: MergedCellsTypeManager(importOptions),
     };
 
     let typeManager = typesMap[type] ?? regularTypeManager;
     if (sokoban) {
-        typeManager = eggs ? EggSokobanSudokuTypeManager : SokobanSudokuTypeManager();
+        typeManager = eggs ? EggSokobanTypeManager : SokobanTypeManager();
     }
     if (tesseract) {
-        typeManager = TesseractSudokuTypeManager(typeManager);
+        typeManager = TesseractTypeManager(typeManager);
     }
     if (slideAndSeek) {
         typeManager = SlideAndSeekTypeManager(typeManager, slideAndSeekDigits);
     }
     if (yajilinFog) {
-        typeManager = YajilinFogSudokuTypeManager(typeManager);
+        typeManager = YajilinFogTypeManager(typeManager);
     }
     if (fogStars) {
-        typeManager = FogStarsSudokuTypeManager(typeManager);
+        typeManager = FogStarsTypeManager(typeManager);
     }
     if (jss && type !== PuzzleImportPuzzleType.RotatableCube) {
         const hasZeroRegion = allGridParsers.some(({ hasZeroRegion }) => hasZeroRegion);
-        typeManager = JssSudokuTypeManager(typeManager, hasZeroRegion);
+        typeManager = JssTypeManager(typeManager, hasZeroRegion);
     }
     if (rotatableClues) {
-        typeManager = ImportedRotatableCluesSudokuTypeManager({
+        typeManager = ImportedRotatableCluesTypeManager({
             baseTypeManager: typeManager,
             compensateConstraintDigitAngle: !stickyConstraintDigitAngle,
             angleStep: freeRotation ? angleStep || 90 : 90,
         });
     }
     if (screws) {
-        typeManager = ImportedScrewsSudokuTypeManager(typeManager);
+        typeManager = ImportedScrewsTypeManager(typeManager);
     }
     if (fillableQuads) {
         const givenQuads = allGridParsers.flatMap(({ quadruplePositions = [] }) => quadruplePositions);
 
-        typeManager = QuadInputSudokuTypeManager({
+        typeManager = QuadInputTypeManager({
             parent: typeManager,
             allowRepeat: true,
             allowOverflow: true,
@@ -185,13 +185,13 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         });
     }
     if (find3) {
-        typeManager = Find3SudokuTypeManager(typeManager, giftsInSight);
+        typeManager = Find3TypeManager(typeManager, giftsInSight);
     }
     if (caterpillar) {
-        typeManager = CaterpillarSudokuTypeManager(typeManager);
+        typeManager = CaterpillarTypeManager(typeManager);
     }
 
-    typeManager = RuleBoxSudokuTypeManager(typeManager);
+    typeManager = RuleBoxTypeManager(typeManager);
 
     switch (digitType) {
         case PuzzleImportDigitType.Regular:
@@ -209,7 +209,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
             };
             break;
         case PuzzleImportDigitType.Latin:
-            typeManager = LatinDigitSudokuTypeManager(typeManager);
+            typeManager = LatinDigitTypeManager(typeManager);
             break;
     }
 
@@ -232,7 +232,7 @@ const loadByImportOptions = <T extends AnyPTM>(
 
     const typeManager = detectTypeManagerByImportOptions(importOptions, allGridParsers);
 
-    const importer = new PuzzleImporter<T>(slug, importOptions, typeManager as unknown as SudokuTypeManager<T>, {
+    const importer = new PuzzleImporter<T>(slug, importOptions, typeManager as unknown as PuzzleTypeManager<T>, {
         gridSize: Math.max(rowsCount, columnsCount),
         rowsCount,
         columnsCount,

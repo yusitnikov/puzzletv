@@ -1,20 +1,20 @@
-import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { GridParser } from "./GridParser";
 import { FPuzzlesGridCell, FPuzzlesPuzzle, FPuzzlesText } from "fpuzzles-data";
 import { PuzzleImporter } from "./PuzzleImporter";
 import { parsePositionLiteral, Position, stringifyCellCoords } from "../../types/layout/Position";
-import { CellColor } from "../../types/sudoku/CellColor";
+import { CellColor } from "../../types/puzzle/CellColor";
 import { ObjectParser } from "../../types/struct/ObjectParser";
-import { regionSumLineColor } from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
+import { regionSumLineColor } from "../../components/puzzle/constraints/region-sum-line/RegionSumLine";
 import {
     lockoutLineDiamondBackgroundColor,
     lockoutLineDiamondLineColor,
     lockoutLineLineColor,
-} from "../../components/sudoku/constraints/lockout-line/LockoutLine";
+} from "../../components/puzzle/constraints/lockout-line/LockoutLine";
 import { greenColor, purpleColor } from "../../components/app/globals";
 import { splitArrayIntoChunks } from "../../utils/array";
 import { decompressFromBase64 } from "lz-string";
-import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
+import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
 
 export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzlesPuzzle> {
     constructor(

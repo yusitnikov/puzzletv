@@ -1,7 +1,7 @@
 import { FPuzzles } from "./Import";
-import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/sudoku/PuzzleImportOptions";
-import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { JigsawPTM } from "../../sudokuTypes/jigsaw/types/JigsawPTM";
+import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/puzzle/PuzzleImportOptions";
+import { PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { JigsawPTM } from "../../puzzleTypes/jigsaw/types/JigsawPTM";
 
 export const MakeAPicture: PuzzleDefinitionLoader<JigsawPTM> = {
     loadPuzzle: () =>

@@ -1,7 +1,7 @@
 import { SudokuMaker } from "./Import";
-import { ColorsImportMode, PuzzleImportOptions, PuzzleImportSource } from "../../types/sudoku/PuzzleImportOptions";
-import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { ColorsImportMode, PuzzleImportOptions, PuzzleImportSource } from "../../types/puzzle/PuzzleImportOptions";
+import { PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 
 const emptyGrid = "N4IgzglgXgpiBcA2ANCA5gJwgEwQbT2AF9ljSSzKiBdZQih8p42+5xq1q99rj/8nx7cW1IkA";
 

@@ -1,7 +1,7 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     arrowsExplained,
     arrowsTitle,
@@ -18,23 +18,23 @@ import {
     renbanTitle,
     ruleWithTitle,
 } from "../ruleSnippets";
-import { KillerCageConstraintByRect } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
-import { BetweenLineConstraint } from "../../components/sudoku/constraints/between-line/BetweenLine";
-import { EvenConstraint } from "../../components/sudoku/constraints/even/Even";
-import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
-import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { KillerCageConstraintByRect } from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
+import { BetweenLineConstraint } from "../../components/puzzle/constraints/between-line/BetweenLine";
+import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
+import { GivenDigitsMap } from "../../types/puzzle/GivenDigitsMap";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import React from "react";
-import { CellSelectionColor, CellSelectionByDataProps } from "../../components/sudoku/cell/CellSelection";
+import { CellSelectionColor, CellSelectionByDataProps } from "../../components/puzzle/cell/CellSelection";
 import { Raumplaner } from "../authors";
 import {
     isValidFinishedPuzzleByStageConstraints,
-    MultiStageSudokuTypeManager,
-} from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
-import { PuzzleContext } from "../../types/sudoku/PuzzleContext";
-import { Constraint } from "../../types/sudoku/Constraint";
-import { MultiStagePTM } from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
+    MultiStageTypeManager,
+} from "../../puzzleTypes/multi-stage/types/MultiStageTypeManager";
+import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
+import { Constraint } from "../../types/puzzle/Constraint";
+import { MultiStagePTM } from "../../puzzleTypes/multi-stage/types/MultiStagePTM";
 import { translate } from "../../utils/translate";
 
 const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
@@ -156,7 +156,7 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
     slug: "hidden-setup",
     saveStateKey: "hidden-setup-v2",
     typeManager: {
-        ...MultiStageSudokuTypeManager({ getStage }),
+        ...MultiStageTypeManager({ getStage }),
         getCellSelectionType(
             { top, left },
             { stateExtension: { stage } },

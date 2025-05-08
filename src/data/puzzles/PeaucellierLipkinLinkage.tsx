@@ -1,20 +1,20 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { GridLayer } from "../../types/sudoku/GridLayer";
+import { GridLayer } from "../../types/puzzle/GridLayer";
 import { observer } from "mobx-react-lite";
 import { RoundedPolyLine } from "../../components/svg/rounded-poly-line/RoundedPolyLine";
 import { darkGreyColor, greenColor, purpleColor, veryDarkGreyColor } from "../../components/app/globals";
 import { AutoSvg } from "../../components/svg/auto-svg/AutoSvg";
 import { rafTime } from "../../hooks/useRaf";
-import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
-import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
-import { AddGameStateEx, addGameStateExToSudokuManager } from "../../types/sudoku/SudokuTypeManagerPlugin";
-import { SudokuTypeManager } from "../../types/sudoku/SudokuTypeManager";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
+import { AddGameStateEx, addGameStateExToPuzzleTypeManager } from "../../types/puzzle/PuzzleTypeManagerPlugin";
+import { PuzzleTypeManager } from "../../types/puzzle/PuzzleTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     germanWhispersExplained,
     germanWhispersTitle,
@@ -108,8 +108,8 @@ interface IsReadyGameStateEx {
 
 type IsReadyPTM = AddGameStateEx<NumberPTM, IsReadyGameStateEx, {}>;
 
-const IsReadyTypeManager: SudokuTypeManager<IsReadyPTM> = {
-    ...addGameStateExToSudokuManager(DigitSudokuTypeManager(), {
+const IsReadyTypeManager: PuzzleTypeManager<IsReadyPTM> = {
+    ...addGameStateExToPuzzleTypeManager(DigitPuzzleTypeManager(), {
         initialGameStateExtension: { isReady: false },
     }),
     isReady({ stateExtension: { isReady } }) {

@@ -1,7 +1,7 @@
 import { SudokuMaker } from "./Import";
-import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
-import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
+import { PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 
 export const EndlessChristmas: PuzzleDefinitionLoader<NumberPTM> = {
     loadPuzzle: () =>

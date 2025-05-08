@@ -1,32 +1,32 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { RotatableDigitSudokuTypeManager } from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import { GridSize8, GridSize9, Regions8, Regions9 } from "../../types/sudoku/GridSize";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { RotatableDigitTypeManager } from "../../puzzleTypes/rotatable/types/RotatableDigitTypeManager";
+import { GridSize8, GridSize9, Regions8, Regions9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { PartiallyTranslatable } from "../../types/translations/Translatable";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { ChessSudokuTypeManager } from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
-import { ChessGameSudokuTypeManager } from "../../sudokuTypes/chess/types/ChessGameSudokuTypeManager";
-import { createCubeGridSize, createCubeRegions, CubeTypeManager } from "../../sudokuTypes/cube/types/CubeTypeManager";
-import { CubedokuTypeManager } from "../../sudokuTypes/cubedoku/types/CubedokuTypeManager";
-import { AutoRegionConstraint } from "../../components/sudoku/constraints/auto-region/AutoRegion";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { LatinDigitSudokuTypeManager } from "../../sudokuTypes/latin/types/LatinDigitSudokuTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { ChessTypeManager } from "../../puzzleTypes/chess/types/ChessTypeManager";
+import { ChessGameTypeManager } from "../../puzzleTypes/chess/types/ChessGameTypeManager";
+import { createCubeGridSize, createCubeRegions, CubeTypeManager } from "../../puzzleTypes/cube/types/CubeTypeManager";
+import { CubedokuTypeManager } from "../../puzzleTypes/cubedoku/types/CubedokuTypeManager";
+import { AutoRegionConstraint } from "../../components/puzzle/constraints/auto-region/AutoRegion";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { LatinDigitTypeManager } from "../../puzzleTypes/latin/types/LatinDigitTypeManager";
 import {
     createMonumentValleyGridSize,
     createMonumentValleyRegions,
     MonumentValleyTypeManager,
-} from "../../sudokuTypes/monument-valley/types/MonumentValleyTypeManager";
-import { MonumentValleyGridBordersConstraint } from "../../sudokuTypes/monument-valley/components/MonumentValleyGridBorders";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { RotatableDigitPTM } from "../../sudokuTypes/rotatable/types/RotatablePTM";
-import { ChessPTM } from "../../sudokuTypes/chess/types/ChessPTM";
-import { MonumentValleyPTM } from "../../sudokuTypes/monument-valley/types/MonumentValleyPTM";
-import { ValidChessPositionConstraint } from "../../sudokuTypes/chess/constraints/ValidChessPosition";
-import { ChessBoardCellsBackgroundConstraint } from "../../sudokuTypes/chess/components/ChessBoardCellsBackground";
+} from "../../puzzleTypes/monument-valley/types/MonumentValleyTypeManager";
+import { MonumentValleyGridBordersConstraint } from "../../puzzleTypes/monument-valley/components/MonumentValleyGridBorders";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { RotatableDigitPTM } from "../../puzzleTypes/rotatable/types/RotatablePTM";
+import { ChessPTM } from "../../puzzleTypes/chess/types/ChessPTM";
+import { MonumentValleyPTM } from "../../puzzleTypes/monument-valley/types/MonumentValleyPTM";
+import { ValidChessPositionConstraint } from "../../puzzleTypes/chess/constraints/ValidChessPosition";
+import { ChessBoardCellsBackgroundConstraint } from "../../puzzleTypes/chess/components/ChessBoardCellsBackground";
 import {
     ChessBoardIndexesConstraint,
     chessBoardIndexesMargin,
-} from "../../sudokuTypes/chess/components/ChessBoardIndexes";
+} from "../../puzzleTypes/chess/components/ChessBoardIndexes";
 
 const title: PartiallyTranslatable = {
     [LanguageCode.en]: "Empty",
@@ -37,7 +37,7 @@ export const EmptyRegular: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-regular",
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,
@@ -48,7 +48,7 @@ export const EmptyChaosConstruction: PuzzleDefinition<NumberPTM> = {
     title,
     slug: "empty-chaos-construction",
     saveStateKey: "empty-chaos-construction-v2",
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     items: [AutoRegionConstraint()],
     allowDrawing: allDrawingModes,
@@ -69,7 +69,7 @@ export const EmptyRotatable: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
     title,
     slug: "empty-rotatable",
-    typeManager: RotatableDigitSudokuTypeManager(),
+    typeManager: RotatableDigitTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,
@@ -79,7 +79,7 @@ export const EmptyChess: PuzzleDefinition<ChessPTM> = {
     noIndex: true,
     title,
     slug: "empty-chess",
-    typeManager: ChessSudokuTypeManager,
+    typeManager: ChessTypeManager,
     gridSize: GridSize8,
     regions: Regions8,
     gridMargin: chessBoardIndexesMargin,
@@ -91,7 +91,7 @@ export const EmptyChessGame: PuzzleDefinition<ChessPTM> = {
     noIndex: true,
     title,
     slug: "chess",
-    typeManager: ChessGameSudokuTypeManager,
+    typeManager: ChessGameTypeManager,
     gridSize: GridSize8,
     regions: Regions8,
     gridMargin: chessBoardIndexesMargin,
@@ -150,7 +150,7 @@ export const EmptyToroidal: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-toroidal",
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     loopHorizontally: true,
@@ -163,7 +163,7 @@ export const EmptyLatin: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title,
     slug: "empty-latin",
-    typeManager: LatinDigitSudokuTypeManager(DigitSudokuTypeManager()),
+    typeManager: LatinDigitTypeManager(DigitPuzzleTypeManager()),
     gridSize: GridSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,

@@ -1,19 +1,19 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { Chameleon } from "../authors";
 import { AfricaCountriesAreas, AfricaCountriesBounds, AfricaCountriesEnum } from "./africa-data/AfricaCountries";
-import { isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/sudoku/Constraint";
-import { processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
-import { latLngLiteralToPosition } from "../../sudokuTypes/google-maps/utils/googleMapsCoords";
-import { CustomCellBounds } from "../../types/sudoku/CustomCellBounds";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
-import { OddConstraint } from "../../components/sudoku/constraints/odd/Odd";
-import { GoogleMapsTypeManager } from "../../sudokuTypes/google-maps/types/GoogleMapsTypeManager";
-import { GoogleMapsPTM } from "../../sudokuTypes/google-maps/types/GoogleMapsPTM";
+import { isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/puzzle/Constraint";
+import { processGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { latLngLiteralToPosition } from "../../puzzleTypes/google-maps/utils/googleMapsCoords";
+import { CustomCellBounds } from "../../types/puzzle/CustomCellBounds";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
+import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
+import { GoogleMapsTypeManager } from "../../puzzleTypes/google-maps/types/GoogleMapsTypeManager";
+import { GoogleMapsPTM } from "../../puzzleTypes/google-maps/types/GoogleMapsPTM";
 import { indexes } from "../../utils/indexes";
-import { errorResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
+import { errorResultCheck, successResultCheck } from "../../types/puzzle/PuzzleResultCheck";
 
 export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
     noIndex: true,
@@ -49,7 +49,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             </RulesUnorderedList>
         </>
     ),
-    typeManager: GoogleMapsTypeManager(DigitSudokuTypeManager(), {
+    typeManager: GoogleMapsTypeManager(DigitPuzzleTypeManager(), {
         west: -7.5,
         east: 41.5,
         south: -25,

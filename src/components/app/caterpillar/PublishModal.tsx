@@ -5,11 +5,11 @@ import { useWindowSize } from "../../../hooks/useWindowSize";
 import { publishToSudokuPad, Scl, sclToPuzzleId, sudokuPadBaseUrl } from "../../../utils/sudokuPad";
 import { useState } from "react";
 import { Modal } from "../../layout/modal/Modal";
-import { SettingsItem } from "../../sudoku/controls/settings/SettingsItem";
-import { SettingsTextBox } from "../../sudoku/controls/settings/SettingsTextBox";
+import { SettingsItem } from "../../puzzle/controls/settings/SettingsItem";
+import { SettingsTextBox } from "../../puzzle/controls/settings/SettingsTextBox";
 import { apiKey, baseShortId, baseSmallShortId } from "./globals";
 import { greenColor, lighterGreyColor, lightGreyColor, lightRedColor } from "../globals";
-import { SettingsButton } from "../../sudoku/controls/settings/SettingsButton";
+import { SettingsButton } from "../../puzzle/controls/settings/SettingsButton";
 import { CaterpillarGrid } from "./types";
 import { splitArrayIntoChunks } from "../../../utils/array";
 

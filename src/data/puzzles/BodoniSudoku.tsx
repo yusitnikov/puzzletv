@@ -1,24 +1,24 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { observer } from "mobx-react-lite";
 import { darkGreyColor, textColor } from "../../components/app/globals";
 import { profiler } from "../../utils/profiler";
 import { AutoSvg } from "../../components/svg/auto-svg/AutoSvg";
-import { DigitProps } from "../../components/sudoku/digit/DigitProps";
-import { DigitComponentType } from "../../components/sudoku/digit/DigitComponentType";
+import { DigitProps } from "../../components/puzzle/digit/DigitProps";
+import { DigitComponentType } from "../../components/puzzle/digit/DigitComponentType";
 import { ReactNode } from "react";
-import { Constraint, ConstraintProps, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { Constraint, ConstraintProps, isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
-import { GridLayer } from "../../types/sudoku/GridLayer";
-import { CellColor, cellColors } from "../../types/sudoku/CellColor";
+import { GridLayer } from "../../types/puzzle/GridLayer";
+import { CellColor, cellColors } from "../../types/puzzle/CellColor";
 import { localStorageManager } from "../../utils/localStorage";
-import { SettingsContentProps } from "../../components/sudoku/controls/settings/SettingsContent";
-import { SettingsItem } from "../../components/sudoku/controls/settings/SettingsItem";
-import { SettingsCheckbox } from "../../components/sudoku/controls/settings/SettingsCheckbox";
+import { SettingsContentProps } from "../../components/puzzle/controls/settings/SettingsContent";
+import { SettingsItem } from "../../components/puzzle/controls/settings/SettingsItem";
+import { SettingsCheckbox } from "../../components/puzzle/controls/settings/SettingsCheckbox";
 
 // region Settings
 const withColorsSetting = localStorageManager.getBoolManager("bodoniWithColors");
@@ -278,7 +278,7 @@ export const BodoniSudoku: PuzzleDefinition<NumberPTM> = {
         [LanguageCode.en]: "Bodoni Sudoku",
     },
     typeManager: {
-        ...DigitSudokuTypeManager(BodoniDigitComponentType, 1),
+        ...DigitPuzzleTypeManager(BodoniDigitComponentType, 1),
         settingsComponents: [BodoniSettings],
     },
     gridSize: GridSize9,

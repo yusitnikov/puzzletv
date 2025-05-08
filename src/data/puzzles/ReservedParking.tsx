@@ -1,26 +1,26 @@
-import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
 import React from "react";
-import { MultiStageSudokuTypeManager } from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
-import { PuzzleContext } from "../../types/sudoku/PuzzleContext";
-import { ToMultiStagePTM } from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
+import { MultiStageTypeManager } from "../../puzzleTypes/multi-stage/types/MultiStageTypeManager";
+import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
+import { ToMultiStagePTM } from "../../puzzleTypes/multi-stage/types/MultiStagePTM";
 import { FPuzzles } from "./Import";
-import { RushHourPTM } from "../../sudokuTypes/rush-hour/types/RushHourPTM";
-import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/sudoku/PuzzleImportOptions";
-import { isCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
+import { RushHourPTM } from "../../puzzleTypes/rush-hour/types/RushHourPTM";
+import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/puzzle/PuzzleImportOptions";
+import { isCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
 import { Rect } from "../../types/layout/Rect";
 import { getRegionBoundingBox } from "../../utils/regions";
 import { AutoSvg } from "../../components/svg/auto-svg/AutoSvg";
-import { RushHourMoveCellWriteModeInfo } from "../../sudokuTypes/rush-hour/types/RushHourMoveCellWriteModeInfo";
-import { CellWriteModeInfo } from "../../types/sudoku/CellWriteModeInfo";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { MultiStageGameState } from "../../sudokuTypes/multi-stage/types/MultiStageGameState";
-import { carMargin } from "../../sudokuTypes/rush-hour/components/RushHourCar";
-import { isTextConstraint } from "../../components/sudoku/constraints/text/Text";
-import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
+import { RushHourMoveCellWriteModeInfo } from "../../puzzleTypes/rush-hour/types/RushHourMoveCellWriteModeInfo";
+import { CellWriteModeInfo } from "../../types/puzzle/CellWriteModeInfo";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { MultiStageGameState } from "../../puzzleTypes/multi-stage/types/MultiStageGameState";
+import { carMargin } from "../../puzzleTypes/rush-hour/components/RushHourCar";
+import { isTextConstraint } from "../../components/puzzle/constraints/text/Text";
+import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
 import { Position } from "../../types/layout/Position";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { comparer, IReactionDisposer, reaction } from "mobx";
-import { notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "../../types/sudoku/PuzzleResultCheck";
+import { notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "../../types/puzzle/PuzzleResultCheck";
 
 // TODO: accessibility for color-blind
 
@@ -58,7 +58,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
         return {
             ...base,
             typeManager: {
-                ...MultiStageSudokuTypeManager<ReservedParkingPTM>({
+                ...MultiStageTypeManager<ReservedParkingPTM>({
                     baseTypeManager: typeManager,
                     getStage: (context) => (hasParkedCar(context, { top: 2, left: 7, width: 2, height: 1 }) ? 2 : 1),
                     getStageCompletionText: () => ({

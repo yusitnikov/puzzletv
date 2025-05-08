@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { SudokuMaker } from "./Import";
-import { ColorsImportMode, PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/sudoku/PuzzleImportOptions";
-import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { ColorsImportMode, PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/puzzle/PuzzleImportOptions";
+import { PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { buildLink } from "../../utils/link";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 

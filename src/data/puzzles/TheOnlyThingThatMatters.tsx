@@ -1,9 +1,9 @@
-import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { Chameleon } from "../authors";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     antiKnightRulesExplained,
     cannotRepeatInCage,
@@ -11,16 +11,16 @@ import {
     normalSudokuRulesApply,
 } from "../ruleSnippets";
 import React from "react";
-import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
+import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import {
     KillerCageConstraint,
     KillerCageConstraintByRect,
-} from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
+} from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { AntiKnightConstraint } from "../../types/puzzle/constraints/AntiKnight";
 import { SetInterface } from "../../types/struct/Set";
-import { CellColor } from "../../types/sudoku/CellColor";
+import { CellColor } from "../../types/puzzle/CellColor";
 import { indexes } from "../../utils/indexes";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
 
 const correctAnswer: number[][] = [
@@ -60,7 +60,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     },
     author: Chameleon,
     slug: "the-only-thing-that-matters",
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     rules: () => (

@@ -2,9 +2,9 @@
 import styled from "@emotion/styled";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
-import { GridPreview } from "../../sudoku/grid/GridPreview";
+import { GridPreview } from "../../puzzle/grid/GridPreview";
 import { ArrowRight } from "@emotion-icons/fluentui-system-filled";
-import { loadPuzzle, PuzzleDefinition, PuzzleDefinitionLoader } from "../../../types/sudoku/PuzzleDefinition";
+import { loadPuzzle, PuzzleDefinition, PuzzleDefinitionLoader } from "../../../types/puzzle/PuzzleDefinition";
 import { useMemo } from "react";
 import { headerPadding } from "../globals";
 

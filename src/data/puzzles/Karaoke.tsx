@@ -4,15 +4,15 @@ import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
-} from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+} from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { Regions9 } from "../../types/sudoku/GridSize";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { Regions9 } from "../../types/puzzle/GridSize";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { Chameleon } from "../authors";
 import { normalSudokuRulesApply } from "../ruleSnippets";
-import { CellTypeProps } from "../../types/sudoku/CellTypeProps";
+import { CellTypeProps } from "../../types/puzzle/CellTypeProps";
 import { observer } from "mobx-react-lite";
 import {
     parsePositionLiteral,
@@ -21,8 +21,8 @@ import {
     PositionLiteral,
     stringifyPosition,
 } from "../../types/layout/Position";
-import { Constraint, ConstraintProps, toDecorativeConstraint } from "../../types/sudoku/Constraint";
-import { GridLayer } from "../../types/sudoku/GridLayer";
+import { Constraint, ConstraintProps, toDecorativeConstraint } from "../../types/puzzle/Constraint";
+import { GridLayer } from "../../types/puzzle/GridLayer";
 import { usePuzzleContainer } from "../../contexts/PuzzleContainerContext";
 import { createPortal } from "react-dom";
 import {
@@ -46,15 +46,15 @@ import PlayerStates from "youtube-player/dist/constants/PlayerStates";
 import {
     EllipseConstraint,
     RectConstraint,
-} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
+} from "../../components/puzzle/constraints/decorative-shape/DecorativeShape";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
 import InputSlider from "react-input-slider";
 import { useRaf } from "../../hooks/useRaf";
 import { useDiffEffect } from "../../hooks/useDiffEffect";
 import { VolumeUp } from "@emotion-icons/material";
-import { DecorativeCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
-import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
+import { DecorativeCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
+import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
 import { translate } from "../../utils/translate";
 
 (window as any).player = [];
@@ -321,7 +321,7 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
         [LanguageCode.en]: "Sudoke Karaoke",
     },
     typeManager: {
-        ...DigitSudokuTypeManager(),
+        ...DigitPuzzleTypeManager(),
         getCellTypeProps({ top }): CellTypeProps<NumberPTM> {
             return { isVisible: top < 9 };
         },

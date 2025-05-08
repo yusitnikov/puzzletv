@@ -2,9 +2,9 @@ import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
-} from "../../types/sudoku/PuzzleDefinition";
+} from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     blackKropkiDotsExplained,
     cannotRepeatInCage,
@@ -15,23 +15,23 @@ import {
     renbanExplained,
     whiteKropkiDotsExplained,
 } from "../ruleSnippets";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
-import { KillerCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { Constraint, toDecorativeConstraint } from "../../types/sudoku/Constraint";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
+import { KillerCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { Constraint, toDecorativeConstraint } from "../../types/puzzle/Constraint";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import { OddConstraint } from "../../components/sudoku/constraints/odd/Odd";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
-import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
-import { EvenConstraint } from "../../components/sudoku/constraints/even/Even";
-import { GreaterConstraint } from "../../components/sudoku/constraints/greater/Greater";
-import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
-import { PuzzleContext } from "../../types/sudoku/PuzzleContext";
-import { createGivenDigitsMapFromArray, GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
-import { CellColorValue } from "../../types/sudoku/CellColor";
-import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
+import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
+import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
+import { GreaterConstraint } from "../../components/puzzle/constraints/greater/Greater";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
+import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
+import { createGivenDigitsMapFromArray, GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { CellColorValue } from "../../types/puzzle/CellColor";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import { buildLink } from "../../utils/link";
 import { translate } from "../../utils/translate";
 
@@ -277,7 +277,7 @@ export const base: PuzzleDefinition<NumberPTM> = {
     title: { [LanguageCode.en]: "Buy Somethin' Will Ya!" },
     author: { [LanguageCode.en]: "ViKingPrime" },
     slug,
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     supportZero: true,

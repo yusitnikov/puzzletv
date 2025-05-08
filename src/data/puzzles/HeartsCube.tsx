@@ -1,13 +1,13 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { createCubeGridSize, createCubeRegions, CubeTypeManager } from "../../sudokuTypes/cube/types/CubeTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { createCubeGridSize, createCubeRegions, CubeTypeManager } from "../../puzzleTypes/cube/types/CubeTypeManager";
 import { Chameleon } from "../authors";
-import { HeartConstraint, KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import { NonRatioNeighborsConstraint } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
+import { HeartConstraint, KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { NonRatioNeighborsConstraint } from "../../components/puzzle/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import { blackKropkiDotsExplained, ratioDotsExplained } from "../ruleSnippets";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { greenColor } from "../../components/app/globals";
 import { translate } from "../../utils/translate";
 

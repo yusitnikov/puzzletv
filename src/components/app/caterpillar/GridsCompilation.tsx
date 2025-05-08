@@ -3,7 +3,7 @@ import { WindowSize } from "../../../hooks/useWindowSize";
 import { getDimensions, getGridRect, parseSolutionString } from "./utils";
 import { Absolute } from "../../layout/absolute/Absolute";
 import { Fragment, MouseEvent, useMemo } from "react";
-import { CellSelectionColor } from "../../sudoku/cell/CellSelection";
+import { CellSelectionColor } from "../../puzzle/cell/CellSelection";
 import { SudokuPad } from "./SudokuPad";
 import { normalizeSclMetadata, puzzleIdToScl } from "../../../utils/sudokuPad";
 import { errorColor, mutedBlueColor } from "../globals";

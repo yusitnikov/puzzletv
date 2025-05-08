@@ -1,7 +1,7 @@
-import { mergePuzzleItems, PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { mergePuzzleItems, PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { SudokuMaker } from "./Import";
-import { FogConstraint, FogRendererProps } from "../../components/sudoku/constraints/fog/Fog";
+import { FogConstraint, FogRendererProps } from "../../components/puzzle/constraints/fog/Fog";
 import { observer } from "mobx-react-lite";
 import { AutoSvg } from "../../components/svg/auto-svg/AutoSvg";
 import { indexes } from "../../utils/indexes";

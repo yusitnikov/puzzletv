@@ -2,15 +2,15 @@ import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
-} from "../../types/sudoku/PuzzleDefinition";
-import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
+} from "../../types/puzzle/PuzzleDefinition";
+import { createRegularGridSize, createRegularRegions } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
-import { DecorativeCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { DecorativeCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
 import {
     darkBlueColor,
     lightOrangeColor,
@@ -20,8 +20,8 @@ import {
     textColor,
     blueColor,
 } from "../../components/app/globals";
-import { Constraint, ConstraintProps } from "../../types/sudoku/Constraint";
-import { GridLayer } from "../../types/sudoku/GridLayer";
+import { Constraint, ConstraintProps } from "../../types/puzzle/Constraint";
+import { GridLayer } from "../../types/puzzle/GridLayer";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
@@ -161,7 +161,7 @@ export const Pacman: PuzzleDefinition<NumberPTM> = {
             </RulesParagraph>
         </>
     ),
-    typeManager: DigitSudokuTypeManager(),
+    typeManager: DigitPuzzleTypeManager(),
     gridSize,
     regions: createRegularRegions(gridSize),
     initialDigits: { 0: { 8: 3 }, 3: { 4: 8 } },

@@ -1,14 +1,14 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { TenInOneSudokuTypeManager } from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
-import { createRegularGridSize } from "../../types/sudoku/GridSize";
+import { TenInOneTypeManager } from "../../puzzleTypes/ten-in-one/types/TenInOneTypeManager";
+import { createRegularGridSize } from "../../types/puzzle/GridSize";
 import {
     KillerCageConstraint,
     KillerCageConstraintByRect,
-} from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+} from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
 import { AnalyticalNinja, Raumplaner } from "../authors";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import {
     arrowsExplained,
     arrowsTitle,
@@ -32,21 +32,21 @@ import {
     twoDigitArrowCirclesExplained,
     whiteKropkiDotsExplained,
 } from "../ruleSnippets";
-import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import React from "react";
-import { tenInOneMultiBoxLineRules, tenInOneStage1Rules } from "../../sudokuTypes/ten-in-one/data/ruleSnippets";
-import { isValidFinishedPuzzleByStageConstraints } from "../../sudokuTypes/multi-stage/types/MultiStageSudokuTypeManager";
-import { RulesIndentedBlock } from "../../components/sudoku/rules/RulesIndentedBlock";
+import { tenInOneMultiBoxLineRules, tenInOneStage1Rules } from "../../puzzleTypes/ten-in-one/data/ruleSnippets";
+import { isValidFinishedPuzzleByStageConstraints } from "../../puzzleTypes/multi-stage/types/MultiStageTypeManager";
+import { RulesIndentedBlock } from "../../components/puzzle/rules/RulesIndentedBlock";
 import { processTranslations, translate } from "../../utils/translate";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
-import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
-import { Constraint, toDecorativeConstraint, toInvisibleConstraint } from "../../types/sudoku/Constraint";
-import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
+import { Constraint, toDecorativeConstraint, toInvisibleConstraint } from "../../types/puzzle/Constraint";
+import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
 import { Position, PositionLiteral } from "../../types/layout/Position";
-import { AmbiguousLineConstraint } from "../../components/sudoku/constraints/ambiguous-line/AmbiguousLine";
-import { SameParityLineConstraint } from "../../components/sudoku/constraints/same-parity-line/SameParityLine";
+import { AmbiguousLineConstraint } from "../../components/puzzle/constraints/ambiguous-line/AmbiguousLine";
+import { SameParityLineConstraint } from "../../components/puzzle/constraints/same-parity-line/SameParityLine";
 import { peachColor } from "../../components/app/globals";
-import { MultiStagePTM } from "../../sudokuTypes/multi-stage/types/MultiStagePTM";
+import { MultiStagePTM } from "../../puzzleTypes/multi-stage/types/MultiStagePTM";
 
 const remainingBoxPositionIndexes = [0, 4, 8];
 const keepDigitsAccordingBoxPositionText = {
@@ -74,7 +74,7 @@ export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
         [LanguageCode.de]: "Abstrakte Killerpunkte",
     },
     slug: "abstract-killer-dots",
-    typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
+    typeManager: TenInOneTypeManager(keepDigitsAccordingBoxPositionCallback),
     gridSize,
     rules: () => (
         <>
@@ -179,7 +179,7 @@ export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
     slug: "lego-house",
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AO9",
     getLmdSolutionCode: () => "716571791716983254",
-    typeManager: TenInOneSudokuTypeManager(({ top, left }) => {
+    typeManager: TenInOneTypeManager(({ top, left }) => {
         const topBoxIndex = Math.floor(top / 3);
         const leftBoxIndex = Math.floor(left / 3);
         const boxIndex = topBoxIndex * 3 + leftBoxIndex;
@@ -272,7 +272,7 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
     slug: "doll-house",
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AQX",
     getLmdSolutionCode: () => "936261819318276945",
-    typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
+    typeManager: TenInOneTypeManager(keepDigitsAccordingBoxPositionCallback),
     gridSize,
     rules: () => (
         <>
@@ -367,7 +367,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
         [LanguageCode.de]: "Stimmungsvolle Linien",
     },
     slug: "moody-lines",
-    typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
+    typeManager: TenInOneTypeManager(keepDigitsAccordingBoxPositionCallback),
     gridSize,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000ASD",
     getLmdSolutionCode: () => "592648736742839615",

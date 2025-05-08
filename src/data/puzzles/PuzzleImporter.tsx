@@ -1,86 +1,86 @@
 import { Position, PositionLiteral, PositionSet } from "../../types/layout/Position";
-import { GivenDigitsMap } from "../../types/sudoku/GivenDigitsMap";
-import { CellColorValue } from "../../types/sudoku/CellColor";
-import { Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/sudoku/Constraint";
+import { GivenDigitsMap } from "../../types/puzzle/GivenDigitsMap";
+import { CellColorValue } from "../../types/puzzle/CellColor";
+import { Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/puzzle/Constraint";
 import {
     allDrawingModes,
     importGivenColorsAsSolution,
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
-} from "../../types/sudoku/PuzzleDefinition";
-import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
-import { ColorsImportMode, PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
-import { SudokuTypeManager } from "../../types/sudoku/SudokuTypeManager";
-import { GridSize } from "../../types/sudoku/GridSize";
+} from "../../types/puzzle/PuzzleDefinition";
+import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { ColorsImportMode, PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
+import { PuzzleTypeManager } from "../../types/puzzle/PuzzleTypeManager";
+import { GridSize } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { indexes } from "../../utils/indexes";
-import { SudokuCellsIndex } from "../../types/sudoku/SudokuCellsIndex";
-import { isVisibleCell } from "../../types/sudoku/CellTypeProps";
-import { createEmptyContextForPuzzle, PuzzleContext } from "../../types/sudoku/PuzzleContext";
-import { doesGridRegionContainCell } from "../../types/sudoku/GridRegion";
-import { FillableCalculatorDigitConstraint } from "../../components/sudoku/constraints/fillable-calculator-digit/FillableCalculatorDigit";
+import { PuzzleCellsIndex } from "../../types/puzzle/PuzzleCellsIndex";
+import { isVisibleCell } from "../../types/puzzle/CellTypeProps";
+import { createEmptyContextForPuzzle, PuzzleContext } from "../../types/puzzle/PuzzleContext";
+import { doesGridRegionContainCell } from "../../types/puzzle/GridRegion";
+import { FillableCalculatorDigitConstraint } from "../../components/puzzle/constraints/fillable-calculator-digit/FillableCalculatorDigit";
 import { ReactNode } from "react";
-import { ParsedRulesHtml } from "../../components/sudoku/rules/ParsedRulesHtml";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
+import { ParsedRulesHtml } from "../../components/puzzle/rules/ParsedRulesHtml";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { GridParser } from "./GridParser";
-import { LittleKillerConstraintByCells } from "../../components/sudoku/constraints/little-killer/LittleKiller";
+import { LittleKillerConstraintByCells } from "../../components/puzzle/constraints/little-killer/LittleKiller";
 import {
     detectOutsideClueDirection,
     getLineCellsByOutsideCell,
     OutsideClueLineDirectionLiteral,
     OutsideClueLineDirectionType,
-} from "../../components/sudoku/constraints/outside-clue/OutsideClue";
-import { XSumConstraint } from "../../components/sudoku/constraints/x-sum/XSum";
-import { SkyscraperConstraint } from "../../components/sudoku/constraints/skyscraper/Skyscraper";
-import { SandwichSumConstraint } from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
-import { NumberedRoomConstraint } from "../../components/sudoku/constraints/numbered-room/NumberedRoom";
+} from "../../components/puzzle/constraints/outside-clue/OutsideClue";
+import { XSumConstraint } from "../../components/puzzle/constraints/x-sum/XSum";
+import { SkyscraperConstraint } from "../../components/puzzle/constraints/skyscraper/Skyscraper";
+import { SandwichSumConstraint } from "../../components/puzzle/constraints/sandwich-sum/SandwichSum";
+import { NumberedRoomConstraint } from "../../components/puzzle/constraints/numbered-room/NumberedRoom";
 import {
     NegativeDiagonalConstraint,
     PositiveDiagonalConstraint,
-} from "../../components/sudoku/constraints/main-diagonal/MainDiagonal";
-import { RegionSumLineConstraint } from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
-import { PalindromeConstraint } from "../../components/sudoku/constraints/palindrome/Palindrome";
-import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
-import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
-import { GridLayer } from "../../types/sudoku/GridLayer";
+} from "../../components/puzzle/constraints/main-diagonal/MainDiagonal";
+import { RegionSumLineConstraint } from "../../components/puzzle/constraints/region-sum-line/RegionSumLine";
+import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
+import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
+import { GridLayer } from "../../types/puzzle/GridLayer";
 import {
     DecorativeCageConstraint,
     KillerCageConstraint,
-} from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
-import { AntiKingConstraint } from "../../types/sudoku/constraints/AntiKing";
-import { NonConsecutiveNeighborsConstraint } from "../../components/sudoku/constraints/consecutive-neighbors/ConsecutiveNeighbors";
-import { DisjointGroupsConstraint } from "../../types/sudoku/constraints/DisjointGroups";
-import { QuadConstraint } from "../../components/sudoku/constraints/quad/Quad";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
-import { VMarkConstraint, XMarkConstraint } from "../../components/sudoku/constraints/xv/XV";
-import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
-import { EvenConstraint } from "../../components/sudoku/constraints/even/Even";
-import { OddConstraint } from "../../components/sudoku/constraints/odd/Odd";
-import { MaxConstraint, MinConstraint } from "../../components/sudoku/constraints/min-max/MinMax";
+} from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { AntiKnightConstraint } from "../../types/puzzle/constraints/AntiKnight";
+import { AntiKingConstraint } from "../../types/puzzle/constraints/AntiKing";
+import { NonConsecutiveNeighborsConstraint } from "../../components/puzzle/constraints/consecutive-neighbors/ConsecutiveNeighbors";
+import { DisjointGroupsConstraint } from "../../types/puzzle/constraints/DisjointGroups";
+import { QuadConstraint } from "../../components/puzzle/constraints/quad/Quad";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { VMarkConstraint, XMarkConstraint } from "../../components/puzzle/constraints/xv/XV";
+import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
+import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
+import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
+import { MaxConstraint, MinConstraint } from "../../components/puzzle/constraints/min-max/MinMax";
 import {
     BoxIndexerConstraint,
     ColumnIndexerConstraint,
     RowIndexerConstraint,
-} from "../../components/sudoku/constraints/indexer/Indexer";
-import { CloneConstraint } from "../../components/sudoku/constraints/clone/Clone";
-import { BetweenLineConstraint } from "../../components/sudoku/constraints/between-line/BetweenLine";
-import { LockoutLineConstraint } from "../../components/sudoku/constraints/lockout-line/LockoutLine";
-import { LineConstraint } from "../../components/sudoku/constraints/line/Line";
+} from "../../components/puzzle/constraints/indexer/Indexer";
+import { CloneConstraint } from "../../components/puzzle/constraints/clone/Clone";
+import { BetweenLineConstraint } from "../../components/puzzle/constraints/between-line/BetweenLine";
+import { LockoutLineConstraint } from "../../components/puzzle/constraints/lockout-line/LockoutLine";
+import { LineConstraint } from "../../components/puzzle/constraints/line/Line";
 import {
     CosmeticArrowConstraint,
     EllipseConstraint,
     RectConstraint,
-} from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import { TextConstraint } from "../../components/sudoku/constraints/text/Text";
-import { FogConstraint, FogProps } from "../../components/sudoku/constraints/fog/Fog";
-import { DoubleArrowConstraint } from "../../components/sudoku/constraints/double-arrow/DoubleArrow";
+} from "../../components/puzzle/constraints/decorative-shape/DecorativeShape";
+import { TextConstraint } from "../../components/puzzle/constraints/text/Text";
+import { FogConstraint, FogProps } from "../../components/puzzle/constraints/fog/Fog";
+import { DoubleArrowConstraint } from "../../components/puzzle/constraints/double-arrow/DoubleArrow";
 import {
     EntropicLineConstraint,
     ModularLineConstraint,
     ParityLineConstraint,
-} from "../../components/sudoku/constraints/entropy-line/EntropicLine";
+} from "../../components/puzzle/constraints/entropy-line/EntropicLine";
 
 export class PuzzleImporter<T extends AnyPTM> {
     private readonly regions: Position[][] = [];
@@ -97,7 +97,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     constructor(
         slug: string,
         private readonly importOptions: PuzzleImportOptions,
-        private readonly typeManager: SudokuTypeManager<T>,
+        private readonly typeManager: PuzzleTypeManager<T>,
         gridSize: GridSize,
     ) {
         const {
@@ -1030,7 +1030,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     private splitUnconnectedRegions() {
-        const cellsIndex = new SudokuCellsIndex(
+        const cellsIndex = new PuzzleCellsIndex(
             this.puzzle.typeManager.postProcessPuzzle?.(this.puzzle) ?? this.puzzle,
         );
 

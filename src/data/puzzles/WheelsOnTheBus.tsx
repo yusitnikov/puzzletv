@@ -2,20 +2,20 @@ import {
     allDrawingModes,
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
-} from "../../types/sudoku/PuzzleDefinition";
-import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesPTM";
-import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
+} from "../../types/puzzle/PuzzleDefinition";
+import { RotatableCluesPTM } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesPTM";
+import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
-import { RotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
-import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { createWheel } from "../../components/sudoku/constraints/wheel/Wheel";
-import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
+import { RotatableCluesTypeManager } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesTypeManager";
+import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
+import { createWheel } from "../../components/puzzle/constraints/wheel/Wheel";
+import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
 import { indexes } from "../../utils/indexes";
-import { DisjointGroupsConstraint } from "../../types/sudoku/constraints/DisjointGroups";
+import { DisjointGroupsConstraint } from "../../types/puzzle/constraints/DisjointGroups";
 import { translate } from "../../utils/translate";
-import { errorResultCheck } from "../../types/sudoku/PuzzleResultCheck";
+import { errorResultCheck } from "../../types/puzzle/PuzzleResultCheck";
 
 const U = undefined;
 
@@ -29,7 +29,7 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     title: {
         [LanguageCode.en]: "Wheels on the Bus",
     },
-    typeManager: RotatableCluesSudokuTypeManager({ baseTypeManager: DigitSudokuTypeManager(), isEquivalentLoop: true }),
+    typeManager: RotatableCluesTypeManager({ baseTypeManager: DigitPuzzleTypeManager(), isEquivalentLoop: true }),
     gridSize: GridSize9,
     regions: Regions9,
     extension: {

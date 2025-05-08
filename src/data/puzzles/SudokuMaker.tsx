@@ -1,4 +1,4 @@
-import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
+import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { GridParser } from "./GridParser";
 import {
     AntikingConstraintConfig,
@@ -79,25 +79,25 @@ import {
 } from "../../types/SudokuMaker";
 import { PuzzleImporter } from "./PuzzleImporter";
 import { Position, PositionSet, stringifyCellCoords } from "../../types/layout/Position";
-import { CellColor } from "../../types/sudoku/CellColor";
+import { CellColor } from "../../types/puzzle/CellColor";
 import { ObjectParser, ObjectParserFieldMap } from "../../types/struct/ObjectParser";
 import { splitArrayIntoChunks } from "../../utils/array";
 import { decompressFromEncodedURIComponent } from "lz-string";
-import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
-import { Constraint } from "../../types/sudoku/Constraint";
-import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
-import { PalindromeConstraint } from "../../components/sudoku/constraints/palindrome/Palindrome";
-import { RegionSumLineConstraint } from "../../components/sudoku/constraints/region-sum-line/RegionSumLine";
-import { SandwichSumConstraint } from "../../components/sudoku/constraints/sandwich-sum/SandwichSum";
-import { OutsideClueLineDirectionType } from "../../components/sudoku/constraints/outside-clue/OutsideClue";
-import { XSumConstraint } from "../../components/sudoku/constraints/x-sum/XSum";
-import { NumberedRoomConstraint } from "../../components/sudoku/constraints/numbered-room/NumberedRoom";
-import { SkyscraperConstraint } from "../../components/sudoku/constraints/skyscraper/Skyscraper";
-import { BaseEntropicLineConstraint } from "../../components/sudoku/constraints/entropy-line/EntropicLine";
-import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
-import { SequenceLineConstraint } from "../../components/sudoku/constraints/sequence-line/SequenceLine";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
+import { Constraint } from "../../types/puzzle/Constraint";
+import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
+import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
+import { RegionSumLineConstraint } from "../../components/puzzle/constraints/region-sum-line/RegionSumLine";
+import { SandwichSumConstraint } from "../../components/puzzle/constraints/sandwich-sum/SandwichSum";
+import { OutsideClueLineDirectionType } from "../../components/puzzle/constraints/outside-clue/OutsideClue";
+import { XSumConstraint } from "../../components/puzzle/constraints/x-sum/XSum";
+import { NumberedRoomConstraint } from "../../components/puzzle/constraints/numbered-room/NumberedRoom";
+import { SkyscraperConstraint } from "../../components/puzzle/constraints/skyscraper/Skyscraper";
+import { BaseEntropicLineConstraint } from "../../components/puzzle/constraints/entropy-line/EntropicLine";
+import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
+import { SequenceLineConstraint } from "../../components/puzzle/constraints/sequence-line/SequenceLine";
 import { loop } from "../../utils/math";
-import { FogEffect, FogEffectPattern } from "../../components/sudoku/constraints/fog/Fog";
+import { FogEffect, FogEffectPattern } from "../../components/puzzle/constraints/fog/Fog";
 import { indexes } from "../../utils/indexes";
 
 export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, CompressedPuzzle> {

@@ -6,11 +6,11 @@ writing data into them (usually digits, but not necessarily), coloring them, dra
 
 The puzzle solving page's layout consist of puzzle grid area and a sidebar with rules and tool buttons.
 
-The [`Puzzle`](../src/components/sudoku/puzzle/Puzzle.tsx) component initializes the "puzzle context" (controls the solving state),
+The [`Puzzle`](../src/components/puzzle/puzzle/Puzzle.tsx) component initializes the "puzzle context" (controls the solving state),
 calculates the position of the grid area and of the sidebar area,
 and renders the relevant components there.
-The [`Grid`](../src/components/sudoku/grid/Grid.tsx) component renders the puzzle grid,
-and the [`SidePanel`](../src/components/sudoku/side-panel/SidePanel.tsx) component renders the side panel.
+The [`Grid`](../src/components/puzzle/grid/Grid.tsx) component renders the puzzle grid,
+and the [`SidePanel`](../src/components/puzzle/side-panel/SidePanel.tsx) component renders the side panel.
 This article covers rendering the grid, including:
 
 - Cell borders.
@@ -45,8 +45,8 @@ Next to the `GridWrapper`, there's an additional optional component that could b
 The purpose of this component is to render puzzle-specific control buttons that are not related to specific cells, but to the whole grid.
 Examples:
 
-- [Rotatable cube](../src/sudokuTypes/cube/components/FullCubeControls.tsx) puzzles uses it to render cube rotation buttons outside the grid.
-- [Infinite ring](../src/sudokuTypes/infinite-rings/components/InfiniteRingsGridControls.tsx) type manager uses it to
+- [Rotatable cube](../src/puzzleTypes/cube/components/FullCubeControls.tsx) puzzles uses it to render cube rotation buttons outside the grid.
+- [Infinite ring](../src/puzzleTypes/infinite-rings/components/InfiniteRingsGridControls.tsx) type manager uses it to
   draw thick grid borders and render zoom buttons in the center of grid.
 
 The next layer inside the grid wrapper is the absolutely positioned and possibly rotated and scaled div
@@ -57,9 +57,9 @@ to implement panning and scaling manually in the grid wrapper component (see abo
 or by applying custom transformations to the grid from `getRegionsWithSameCoordsTransformation()` and `transformCoords()` methods.
 For instance:
 
-- [Google Maps type manager](../src/sudokuTypes/google-maps/types/GoogleMapsTypeManager.ts)
+- [Google Maps type manager](../src/puzzleTypes/google-maps/types/GoogleMapsTypeManager.ts)
   enables `gridFitsWrapper` because panning and zooming is handled by the Google Maps widget.
-- [Infinite rings type manager](../src/sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager.ts)
+- [Infinite rings type manager](../src/puzzleTypes/infinite-rings/types/InfiniteRingsTypeManager.ts)
   enables `gridWrapperHandlesScale` because zooming is handled by custom transformations of the ring regions.
 
 ### SVG layers
@@ -69,14 +69,14 @@ that contains most of the grid shapes and handles interactions with the cells.
 
 #### Main SVG tag
 
-The main SVG tag is rendered by the [`GridSvg`](../src/components/sudoku/grid/GridSvg.tsx) component.
+The main SVG tag is rendered by the [`GridSvg`](../src/components/puzzle/grid/GridSvg.tsx) component.
 
 By default, it's positioned and transformed in a way that
 the coordinate system inside SVG begins in the top-left corner of the grid not counting the margins
 (i.e. the top-left corner of the top-left cell of the grid),
 and the cell is a 1x1 square (unless custom cell bounds are applied).
 Re-defining the SVG coordinate system this way can be cancelled
-by enabling the `SudokuTypeManager.gridFitsWrapper` flag.
+by enabling the `PuzzleTypeManager.gridFitsWrapper` flag.
 
 Also, by default the puzzle is positioned in the center of the grid's square
 according to the `PuzzleDefinition.gridSize` values.
@@ -88,7 +88,7 @@ However, grids with custom cell bounds and/or grid transformations usually mean
 that cell's indexes in the array are not directly related to the cell's coordinates,
 so centering the puzzle automatically based on the array's dimensions doesn't make much sense.
 In these cases, automatic centering could be cancelled
-by enabling the `SudokuTypeManager.ignoreRowsColumnCountInTheWrapper` flag,
+by enabling the `PuzzleTypeManager.ignoreRowsColumnCountInTheWrapper` flag,
 and the base of the SVG coordinates system will be located in the top-left corner of the grid's area.
 
 #### Coordinate transformation regions
@@ -108,7 +108,7 @@ It's also possible to define the `transformCoords()` prop on each region returne
 and then use `transformCoordsByRegions()` helper to implement the `transformCoords()` method on the type manager.
 
 The component that renders these regions is
-[`GridRegionsWithSameCoordsTransformation`](../src/components/sudoku/grid/GridRegionsWithSameCoordsTransformation.tsx),
+[`GridRegionsWithSameCoordsTransformation`](../src/components/puzzle/grid/GridRegionsWithSameCoordsTransformation.tsx),
 and it's a direct child of `GridSvg` in the DOM structure.
 The component goes over all regions, and renders the whole grid into each of them,
 using SVG clipping to hide the parts that go outside the region.
@@ -118,7 +118,7 @@ e.g. JSS clues related to the region.
 In this case, the constraint could use special `noClip` layer that is being rendered with no clipping by region.
 But constraints that do that are responsible to check what's the context region when they get rendered,
 and render only graphics related to this specific region.
-See [`Jss`](../src/sudokuTypes/jss/constraints/Jss.tsx) for usage example.
+See [`Jss`](../src/puzzleTypes/jss/constraints/Jss.tsx) for usage example.
 
 The `GridRegionsWithSameCoordsTransformation` component applies two coordinate transformations to the contents:
 
@@ -134,15 +134,15 @@ they can act like there's no transformation at all and just do their job as usua
 #### Grid layers
 
 Inside each transformation region, the grid contents are rendered in several layers -
-see [`GridLayer`](../src/types/sudoku/GridLayer.ts) enum.
+see [`GridLayer`](../src/types/puzzle/GridLayer.ts) enum.
 These layers are used to control what would be rendered behind, and what would be rendered on top
 (SVG doesn't support `z-index` CSS property, unfortunately).
 
 The best way to learn which layers are supported and in which order they go
-is to just look in the source code of the [`Grid`](../src/components/sudoku/grid/Grid.tsx) component.
+is to just look in the source code of the [`Grid`](../src/components/puzzle/grid/Grid.tsx) component.
 
 Most of the layers are rendering constraints' visual clues that are defined on
-[`Constraint.component`](../src/types/sudoku/Constraint.ts).
+[`Constraint.component`](../src/types/puzzle/Constraint.ts).
 Other are rendering cells and their contents: background, digits, selection indication, pen tool's marks.
 The topmost layers are rendering interactive elements that could be clicked/dragged with the mouse.
 
@@ -150,11 +150,11 @@ Let's look at each of above in more details.
 
 ##### Rendering constraints
 
-Each visual constraint defines the [`component`](../src/types/sudoku/Constraint.ts) field,
-which is a set of React components mapped by [grid layers](../src/types/sudoku/GridLayer.ts).
+Each visual constraint defines the [`component`](../src/types/puzzle/Constraint.ts) field,
+which is a set of React components mapped by [grid layers](../src/types/puzzle/GridLayer.ts).
 For each layer, the `Grid` component collects all constraints that have a mapping for the layer, and render all of them one by one.
 
-The properties being passed to each component are defined in [`ConstraintProps`](../src/types/sudoku/Constraint.ts) and include:
+The properties being passed to each component are defined in [`ConstraintProps`](../src/types/puzzle/Constraint.ts) and include:
 
 - All fields of the constraint object that is being rendered.
 - [Puzzle context](./Data%20structures%20and%20types.md) object.
@@ -164,14 +164,14 @@ So, usually the component will get the coordinates and styles of the constraint 
 and get the puzzle's solving state for rendering dynamic elements.
 
 Most of the grid layers ignore all pointer events, so constraints with interactive elements should render them
-in the [`interactive` grid layer](../src/types/sudoku/GridLayer.ts).
+in the [`interactive` grid layer](../src/types/puzzle/GridLayer.ts).
 
 By default, the constraint's React component is responsible for supporting custom cell bounds (non-square cells in random positions).
 However, if the constraint is designed to render something only in the center of a single cell, or on the border between two adjacent cells,
 it could enable the `renderSingleCellInUserArea` flag to indicate that.
 When enabled, single cell constraints will be automatically rendered in the cell's user area
 (the main area of the cell where the user can write the digit and pencilmarks, see the "Rendering grid cells" section below)
-by applying the [`SingleCellGridItemPositionFix`](../src/components/sudoku/grid/SingleCellGridItemPositionFix.tsx) wrapper,
+by applying the [`SingleCellGridItemPositionFix`](../src/components/puzzle/grid/SingleCellGridItemPositionFix.tsx) wrapper,
 and two-cell ("domino") constraints are being rendered between the two cells.
 Both for single-cell and for two-cell constraints, the platform takes care of applying all coordinate transformations (translating, scaling, rotating),
 and for the React component that renders the constraint everything looks like it's getting a regular 1x1 cell.
@@ -184,34 +184,34 @@ There are two supported cell types in Puzzle TV:
    That's the default mode.
 2. Cells with custom bounds - each cell is a polygon with coordinates defined in the `customCellBounds` field
    on the [puzzle definition](./Data%20structures%20and%20types.md) object.
-   The [`CustomCellBounds`](../src/types/sudoku/CustomCellBounds.ts) object defines not only the polygon of cell's borders,
+   The [`CustomCellBounds`](../src/types/puzzle/CustomCellBounds.ts) object defines not only the polygon of cell's borders,
    but also the "user area" - a rectangle (usually, a square) inside the cell to place digits and pencilmarks in.
    User area rectangle must be fully inside the cell's polygon.
    The same rectangle will be used as the area for rendering single-cell constraint clues.
 
 Note: the user area of a regular cell is the whole cell.
 
-The `Grid` component uses the [`GridCellsLayer`](../src/components/sudoku/grid/GridCellsLayer.tsx) component
+The `Grid` component uses the [`GridCellsLayer`](../src/components/puzzle/grid/GridCellsLayer.tsx) component
 to go over all cells in the grid/region and render each of them.
 The component has several conditions for skipping cells that don't have to be rendered:
 cells that don't belong to the currently rendered region, cells that out of the view box because of panning, etc.
 
-The cell content renderers mostly use the [`GridCellShape`](../src/components/sudoku/grid/GridCellShape.tsx) component
+The cell content renderers mostly use the [`GridCellShape`](../src/components/puzzle/grid/GridCellShape.tsx) component
 to render the cell's polygon (either to draw the cell's border or to clip some graphics by the cell's shape),
-and the [`GridCellUserArea`](../src/components/sudoku/grid/GridCellUserArea.tsx) component
+and the [`GridCellUserArea`](../src/components/puzzle/grid/GridCellUserArea.tsx) component
 to draw something in the cell's user area rectangle.
 
 In order to support rotated and skewed grids and cells, [type manager](./Data%20structures%20and%20types.md)
 may define the `processCellDataPosition` function that can re-arrange positions and angles
 of the main digits and pencilmarks, for instance:
 
-- [Cube](../src/sudokuTypes/cube/types/CubeTypeManager.ts),
-  [monument valley](../src/sudokuTypes/monument-valley/types/MonumentValleyTypeManager.ts),
-  [safe cracker](../src/sudokuTypes/safe-cracker/types/SafeCrackerSudokuTypeManager.ts) and other type managers
+- [Cube](../src/puzzleTypes/cube/types/CubeTypeManager.ts),
+  [monument valley](../src/puzzleTypes/monument-valley/types/MonumentValleyTypeManager.ts),
+  [safe cracker](../src/puzzleTypes/safe-cracker/types/SafeCrackerTypeManager.ts) and other type managers
   use `processCellDataPosition()` to compensate for the rotation transformation that was applied to the cells
   and make the digits look vertical again.
-- [rotatable digit](../src/sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager.ts) and
-  [jigsaw](../src/sudokuTypes/jigsaw/types/JigsawSudokuTypeManager.ts) type managers
+- [rotatable digit](../src/puzzleTypes/rotatable/types/RotatableDigitTypeManager.ts) and
+  [jigsaw](../src/puzzleTypes/jigsaw/types/JigsawTypeManager.ts) type managers
   use the function to re-arrange the pencilmarks when the grid or region is rotated,
   because the digit's value may change after rotation (e.g. 6 becomes a 9 after turning it upside-down),
   and the pencilmarks should be re-sorted according to the changed values.
@@ -230,8 +230,8 @@ See the "Rendering interactive elements" section below to learn how Puzzle TV ha
 ##### Rendering pen tool's lines and marks
 
 Pen tool lines and marks are being rendered by the
-[`UserLines` constraint](../src/components/sudoku/constraints/user-lines/UserLines.tsx)
-in the dedicated [grid layers](../src/types/sudoku/GridLayer.ts):
+[`UserLines` constraint](../src/components/puzzle/constraints/user-lines/UserLines.tsx)
+in the dedicated [grid layers](../src/types/puzzle/GridLayer.ts):
 
 - Lines and marks that were already added to the grid are rendered in the `givenUserLines` layer.
 - The line that the user is drawing right now (started drawing, but still holds the mouse down)
@@ -243,15 +243,15 @@ that the current user's action indication is never covered by existing lines.
 ##### Rendering interactive elements
 
 Custom interactive elements that belong to certain cells are being rendered by constraints by implementing a component
-in the [`interactive` grid layer](../src/types/sudoku/GridLayer.ts) - see the "Rendering constraints" section.
+in the [`interactive` grid layer](../src/types/puzzle/GridLayer.ts) - see the "Rendering constraints" section.
 
 Custom interactive elements that do not belong to any cells are being rendered outside the SVG tag
-by implementing `SudokuTypeManager.gridControlsComponent`.
+by implementing `PuzzleTypeManager.gridControlsComponent`.
 
 Core interactions with the cells (selecting the cells, drawing lines and marks over them etc.)
 are implemented in the "mouse handler" grid layer that goes right before the `interactive` layer
 (see the "Rendering grid cells" section),
-and it's handled by the [`GridCellMouseHandler`](../src/components/sudoku/grid/GridCellMouseHandler.tsx) component.
+and it's handled by the [`GridCellMouseHandler`](../src/components/puzzle/grid/GridCellMouseHandler.tsx) component.
 The component renders multiple SVG shapes for different parts of the cell that handle pointer events independently,
 in order to know which part of the cell was clicked by the user (center, border or corner).
 
@@ -265,19 +265,19 @@ Doing so shouldn't select the cells that were touched by accident.
 For the cells with custom bounds, it renders one handler for the whole cell
 and separate handlers for every border segment and corner.
 Most of the cell interaction shapes are being clipped by the cell's shape
-(using the [`GridCellShape`](../src/components/sudoku/grid/GridCellShape.tsx) component),
+(using the [`GridCellShape`](../src/components/puzzle/grid/GridCellShape.tsx) component),
 but there's an additional layer of mouse handlers with no clipping for the cells on the grid's border
 to support user gestures a little bit outside the grid.
 
 ##### Rendering toroidal grid
 
-Each grid layer is using the [`GridLoop`](../src/components/sudoku/grid/GridLoop.tsx) component
+Each grid layer is using the [`GridLoop`](../src/components/puzzle/grid/GridLoop.tsx) component
 to support looping (toroidal) grids by rendering all items of the layer multiple times with different offset.
 
 ##### Rendering the fog
 
-The fog and the light bulbs are being rendered by the [`Fog`](../src/components/sudoku/constraints/fog/Fog.tsx) constraint
-in the [`regular` grid layer](../src/types/sudoku/GridLayer.ts).
+The fog and the light bulbs are being rendered by the [`Fog`](../src/components/puzzle/constraints/fog/Fog.tsx) constraint
+in the [`regular` grid layer](../src/types/puzzle/GridLayer.ts).
 
 The way it renders the fog is to draw a grey rectangle over the whole grid
 and apply an SVG mask that filters only fog cells.

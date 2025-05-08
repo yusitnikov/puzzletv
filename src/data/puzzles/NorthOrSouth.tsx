@@ -1,15 +1,15 @@
-import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { XMarkConstraint } from "../../components/sudoku/constraints/xv/XV";
-import { KropkiDotConstraint } from "../../components/sudoku/constraints/kropki-dot/KropkiDot";
+import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { XMarkConstraint } from "../../components/puzzle/constraints/xv/XV";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
 import React from "react";
-import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
-import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
-import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
-import { KillerCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
-import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
-import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { RotatableDigitSudokuTypeManager } from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
+import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
+import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
+import { KillerCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { RotatableDigitTypeManager } from "../../puzzleTypes/rotatable/types/RotatableDigitTypeManager";
+import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { Chameleon } from "../authors";
 import {
@@ -33,10 +33,10 @@ import {
     germanWhispersExplained,
     antiKnight,
 } from "../ruleSnippets";
-import { rotatableSudokuRules } from "../../sudokuTypes/rotatable/data/ruleSnippets";
-import { AntiKnightConstraint } from "../../types/sudoku/constraints/AntiKnight";
-import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { RotatableDigitPTM } from "../../sudokuTypes/rotatable/types/RotatablePTM";
+import { rotatableSudokuRules } from "../../puzzleTypes/rotatable/data/ruleSnippets";
+import { AntiKnightConstraint } from "../../types/puzzle/constraints/AntiKnight";
+import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
+import { RotatableDigitPTM } from "../../puzzleTypes/rotatable/types/RotatablePTM";
 import { indexes } from "../../utils/indexes";
 import { translate } from "../../utils/translate";
 
@@ -74,7 +74,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
             <RulesParagraph>{translate(noBifurcation)}</RulesParagraph>
         </>
     ),
-    typeManager: RotatableDigitSudokuTypeManager(),
+    typeManager: RotatableDigitTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
     initialDigits: {
