@@ -22,7 +22,7 @@ import { ControlButtonItem } from "../../components/puzzle/controls/ControlButto
 import { AnyPTM } from "./PuzzleTypeMap";
 import { CellTypeProps, isSelectableCell } from "./CellTypeProps";
 import { IReactionDisposer } from "mobx";
-import { GivenDigitsMap } from "./GivenDigitsMap";
+import { CellsMap } from "./CellsMap";
 import { ColorsImportMode, PuzzleImportOptions } from "./PuzzleImportOptions";
 import { PuzzleImporter } from "../../data/puzzles/PuzzleImporter";
 import { GridParser } from "../../data/puzzles/GridParser";
@@ -283,7 +283,7 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
 
     gridControlsComponent?: ComponentType<PuzzleContextProps<T>>;
 
-    getInitialDigits?: (context: PuzzleContext<T>) => GivenDigitsMap<T["cell"]>;
+    getInitialDigits?: (context: PuzzleContext<T>) => CellsMap<T["cell"]>;
 
     disableFogDemo?: boolean | ((context: PuzzleContext<T>) => boolean);
 

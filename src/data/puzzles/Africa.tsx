@@ -4,7 +4,7 @@ import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuz
 import { Chameleon } from "../authors";
 import { AfricaCountriesAreas, AfricaCountriesBounds, AfricaCountriesEnum } from "./africa-data/AfricaCountries";
 import { isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/puzzle/Constraint";
-import { processGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { processCellsMaps } from "../../types/puzzle/CellsMap";
 import { latLngLiteralToPosition } from "../../puzzleTypes/google-maps/utils/googleMapsCoords";
 import { CustomCellBounds } from "../../types/puzzle/CustomCellBounds";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
@@ -61,7 +61,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         columnsCount: 49,
     },
     digitsCount: 5,
-    customCellBounds: processGivenDigitsMaps(
+    customCellBounds: processCellsMaps(
         ([bordersLatLng], { left: index }): CustomCellBounds => ({
             borders: bordersLatLng.map((border) => border.map(latLngLiteralToPosition)),
             userArea: AfricaCountriesAreas[index as AfricaCountriesEnum],

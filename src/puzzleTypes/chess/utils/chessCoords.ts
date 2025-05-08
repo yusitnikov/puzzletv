@@ -1,6 +1,6 @@
 import { Position } from "../../../types/layout/Position";
 import { ChessPiece } from "../types/ChessPiece";
-import { GivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../types/puzzle/CellsMap";
 
 export const chessColumnNameFromIndex = (column: number) => String.fromCharCode("a".charCodeAt(0) + column);
 
@@ -15,8 +15,8 @@ export const chessCellNameToCoords = (cell: string): Position => ({
     top: chessRowNameToIndex(cell[1]),
 });
 
-export const chessInitialPiecesByCellNames = (pieces: Record<string, ChessPiece>): GivenDigitsMap<ChessPiece> => {
-    const result: GivenDigitsMap<ChessPiece> = {};
+export const chessInitialPiecesByCellNames = (pieces: Record<string, ChessPiece>): CellsMap<ChessPiece> => {
+    const result: CellsMap<ChessPiece> = {};
 
     for (const [cell, piece] of Object.entries(pieces)) {
         const { top, left } = chessCellNameToCoords(cell);

@@ -56,7 +56,7 @@ import { JigsawJss } from "../constraints/JigsawJss";
 import { ControlButtonRegion } from "../../../components/puzzle/controls/ControlButtonsManager";
 import { JigsawGluePiecesButton } from "../components/JigsawGluePiecesButton";
 import { emptyGestureMetrics, GestureMetrics } from "../../../utils/gestures";
-import { GivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { RegionConstraint } from "../../../components/puzzle/constraints/region/Region";
 import { JigsawGluedPiecesConstraint } from "../constraints/JigsawGluedPieces";
 import { jigsawPieceStateChangeAction } from "./JigsawGamePieceState";
@@ -381,8 +381,8 @@ export const JigsawTypeManager = (
                         .regions!.filter(({ noInteraction }) => !noInteraction)
                         .sort((a, b) => (a.zIndex ?? -1) - (b.zIndex ?? -1));
 
-                    const cellsMap: GivenDigitsMap<Position> = {};
-                    const flippedCellsMap: GivenDigitsMap<Position> = {};
+                    const cellsMap: CellsMap<Position> = {};
+                    const flippedCellsMap: CellsMap<Position> = {};
                     for (const region of regions) {
                         for (const cell of getGridRegionCells(region)) {
                             const { top, left } = getJigsawCellCenterAbsolutePosition(region, cell, true);

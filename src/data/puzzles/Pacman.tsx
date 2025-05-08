@@ -8,7 +8,7 @@ import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
-import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { DecorativeCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
 import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
 import {
@@ -186,7 +186,7 @@ export const Pacman: PuzzleDefinition<NumberPTM> = {
         GhostConstraint("R7C1", orangeColor),
         GhostConstraint("R9C6", blueColor),
     ],
-    solution: createGivenDigitsMapFromArray([
+    solution: createCellsMapFromArray([
         [5, 8, 7, 1, 2, 6, 9, 4, 3],
         [1, 3, 9, 4, 5, 7, 8, 6, 2],
         [6, 4, 2, 8, 9, 3, 5, 1, 7],

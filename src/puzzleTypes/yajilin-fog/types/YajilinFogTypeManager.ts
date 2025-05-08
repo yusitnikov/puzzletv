@@ -2,7 +2,7 @@ import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { CellColor } from "../../../types/puzzle/CellColor";
 import { isLine } from "../../../components/puzzle/constraints/line/Line";
 import { PuzzleLineSet } from "../../../types/puzzle/PuzzleLineSet";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, processCellsMaps } from "../../../types/puzzle/CellsMap";
 import { indexes } from "../../../utils/indexes";
 import { FogConstraint, FogProps, fogTag } from "../../../components/puzzle/constraints/fog/Fog";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
@@ -31,14 +31,11 @@ export const YajilinFogTypeManager = <T extends AnyPTM>(
             }
 
             if (puzzle.solution) {
-                puzzle.solution = processGivenDigitsMaps(
-                    ([value]) => (value === 0 ? undefined : value),
-                    [puzzle.solution],
-                );
+                puzzle.solution = processCellsMaps(([value]) => (value === 0 ? undefined : value), [puzzle.solution]);
             }
 
             let yajilinFogLineSolution = new PuzzleLineSet(puzzle);
-            const yajilinFogShadeSolution: GivenDigitsMap<CellColor> = {};
+            const yajilinFogShadeSolution: CellsMap<CellColor> = {};
 
             const { initialColors } = puzzle;
             if (typeof initialColors === "object") {

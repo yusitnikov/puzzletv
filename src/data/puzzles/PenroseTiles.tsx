@@ -5,7 +5,7 @@ import { CustomCellBounds } from "../../types/puzzle/CustomCellBounds";
 import { Rect } from "../../types/layout/Rect";
 import { Position } from "../../types/layout/Position";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
-import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { NonRepeatingNeighborsConstraint } from "../../components/puzzle/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import { lighterBlueColor } from "../../components/app/globals";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
@@ -180,7 +180,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
     initialDigits: {
         0: Object.fromEntries(cells.map(({ digit }, index) => [index, digit]).filter(([, digit]) => digit > 0)),
     },
-    solution: createGivenDigitsMapFromArray([cells.slice(0, 64).map(({ digit }) => Math.abs(digit))]),
+    solution: createCellsMapFromArray([cells.slice(0, 64).map(({ digit }) => Math.abs(digit))]),
     initialColors: {
         0: {
             64: [exampleColor],
@@ -193,7 +193,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
             71: [exampleColor],
         },
     },
-    customCellBounds: createGivenDigitsMapFromArray([cells]),
+    customCellBounds: createCellsMapFromArray([cells]),
     allowDrawing: ["center-mark", "center-line"],
     items: [NonRepeatingNeighborsConstraint()],
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,

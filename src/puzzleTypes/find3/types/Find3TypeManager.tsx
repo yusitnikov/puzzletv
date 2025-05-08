@@ -20,7 +20,7 @@ import { gridFireworksController } from "../../../components/puzzle/grid/GridFir
 import { gridStateHistoryAddState } from "../../../types/puzzle/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { getNextActionId } from "../../../types/puzzle/GameStateAction";
-import { GivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { addGridStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { translate } from "../../../utils/translate";
 
@@ -287,7 +287,7 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
     },
 
     getInitialDigits(context) {
-        const result: GivenDigitsMap<T["cell"]> = {};
+        const result: CellsMap<T["cell"]> = {};
 
         const {
             puzzle: {

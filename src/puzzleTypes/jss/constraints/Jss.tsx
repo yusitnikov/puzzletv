@@ -6,7 +6,7 @@ import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { emptyPosition } from "../../../types/layout/Position";
 import { SingleCellGridItemPositionFix } from "../../../components/puzzle/grid/SingleCellGridItemPositionFix";
 import { CenteredText } from "../../../components/svg/centered-text/CenteredText";
-import { GivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
@@ -28,7 +28,7 @@ export const Jss: ConstraintPropsGenericFc<JssProps> = observer(function Jss<T e
             return null;
         }
 
-        const cellsMap: GivenDigitsMap<JssCell> = {};
+        const cellsMap: CellsMap<JssCell> = {};
         for (const cell of cells) {
             cellsMap[cell.top] = cellsMap[cell.top] ?? {};
             cellsMap[cell.top][cell.left] = cell;

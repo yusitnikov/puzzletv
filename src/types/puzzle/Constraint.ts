@@ -1,7 +1,7 @@
 import { ComponentType, ReactElement } from "react";
 import { arrayContainsPosition, Line, Position } from "../layout/Position";
 import { normalizePuzzlePosition, PuzzleDefinition } from "./PuzzleDefinition";
-import { GivenDigitsMap } from "./GivenDigitsMap";
+import { CellsMap } from "./CellsMap";
 import { PuzzleContext } from "./PuzzleContext";
 import { SetInterface } from "../struct/Set";
 import { LineWithColor } from "./LineWithColor";
@@ -29,7 +29,7 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
     noPencilmarkCheck?: boolean;
     isValidCell?(
         cell: Position,
-        digits: GivenDigitsMap<T["cell"]>,
+        digits: CellsMap<T["cell"]>,
         regionCells: Position[],
         context: PuzzleContext<T>,
         constraints: Constraint<T, any>[],
@@ -39,13 +39,13 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
     ): boolean;
     isValidPuzzle?(
         lines: SetInterface<Line>,
-        digits: GivenDigitsMap<T["cell"]>,
+        digits: CellsMap<T["cell"]>,
         regionCells: Position[],
         context: PuzzleContext<T>,
     ): PuzzleResultCheck;
     getInvalidUserLines?(
         lines: SetInterface<Line>,
-        digits: GivenDigitsMap<T["cell"]>,
+        digits: CellsMap<T["cell"]>,
         regionCells: Position[],
         context: PuzzleContext<T>,
         isFinalCheck?: boolean,
@@ -74,7 +74,7 @@ export const normalizeConstraintCells = <T extends AnyPTM>(positions: Position[]
 
 export const isValidUserDigit = <T extends AnyPTM>(
     cell: Position,
-    userDigits: GivenDigitsMap<T["cell"]>,
+    userDigits: CellsMap<T["cell"]>,
     context: PuzzleContext<T>,
     isFinalCheck = false,
     isPencilmark = false,

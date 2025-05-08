@@ -3,11 +3,7 @@ import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { CellTypeProps } from "../../../types/puzzle/CellTypeProps";
 import { getRegionCells, mergePuzzleItems, PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
-import {
-    createRegionsByGivenDigitsMap,
-    GivenDigitsMap,
-    processGivenDigitsMaps,
-} from "../../../types/puzzle/GivenDigitsMap";
+import { createRegionsByCellsMap, CellsMap, processCellsMaps } from "../../../types/puzzle/CellsMap";
 import { CustomCellBounds } from "../../../types/puzzle/CustomCellBounds";
 import { getRegionBorders } from "../../../utils/regions";
 import { getAverageModePosition, Position, PositionSet } from "../../../types/layout/Position";
@@ -49,14 +45,14 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>({
             const {
                 gridSize: { rowsCount, columnsCount },
             } = puzzle;
-            const cellRegions = createRegionsByGivenDigitsMap(
-                processGivenDigitsMaps((colors) => colors.join(), [initialColors]),
+            const cellRegions = createRegionsByCellsMap(
+                processCellsMaps((colors) => colors.join(), [initialColors]),
                 columnsCount,
                 rowsCount,
             );
 
             let { initialDigits, solution } = puzzle;
-            const customCellBounds: GivenDigitsMap<CustomCellBounds> = {};
+            const customCellBounds: CellsMap<CustomCellBounds> = {};
             for (const cells of cellRegions) {
                 const mainCell = cells[0];
 

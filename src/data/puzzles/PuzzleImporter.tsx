@@ -1,5 +1,5 @@
 import { Position, PositionLiteral, PositionSet } from "../../types/layout/Position";
-import { GivenDigitsMap } from "../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../types/puzzle/CellsMap";
 import { CellColorValue } from "../../types/puzzle/CellColor";
 import { Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/puzzle/Constraint";
 import {
@@ -84,10 +84,10 @@ import {
 
 export class PuzzleImporter<T extends AnyPTM> {
     private readonly regions: Position[][] = [];
-    private readonly initialDigits: GivenDigitsMap<T["cell"]> = {};
-    private readonly initialLetters: GivenDigitsMap<string> = {};
-    private readonly initialColors: GivenDigitsMap<CellColorValue[]> = {};
-    private readonly solutionColors: GivenDigitsMap<CellColorValue[]> = {};
+    private readonly initialDigits: CellsMap<T["cell"]> = {};
+    private readonly initialLetters: CellsMap<string> = {};
+    private readonly initialColors: CellsMap<CellColorValue[]> = {};
+    private readonly solutionColors: CellsMap<CellColorValue[]> = {};
     private readonly items: Constraint<T, any>[] = [];
     private readonly puzzle: PuzzleDefinition<T>;
     private emptyContextCache?: PuzzleContext<T>;

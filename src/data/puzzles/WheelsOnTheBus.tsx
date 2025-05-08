@@ -11,7 +11,7 @@ import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { RotatableCluesTypeManager } from "../../puzzleTypes/rotatable-clues/types/RotatableCluesTypeManager";
 import { DigitPuzzleTypeManager } from "../../puzzleTypes/default/types/DigitPuzzleTypeManager";
 import { createWheel } from "../../components/puzzle/constraints/wheel/Wheel";
-import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { indexes } from "../../utils/indexes";
 import { DisjointGroupsConstraint } from "../../types/puzzle/constraints/DisjointGroups";
 import { translate } from "../../utils/translate";
@@ -60,7 +60,7 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     ),
     items: [DisjointGroupsConstraint(3)],
     allowDrawing: allDrawingModes,
-    solution: createGivenDigitsMapFromArray([
+    solution: createCellsMapFromArray([
         [8, 1, 5, 7, 6, 3, 9, 4, 2],
         [7, 6, 3, 2, 4, 9, 8, 5, 1],
         [2, 9, 4, 5, 1, 8, 6, 3, 7],

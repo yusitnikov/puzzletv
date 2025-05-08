@@ -4,7 +4,7 @@ import { isSamePosition, parsePositionLiterals, Position, PositionLiteral } from
 import { GridLayer } from "../../../../types/puzzle/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/puzzle/Constraint";
 import { getRegionBorders } from "../../../../utils/regions";
-import { GivenDigitsMap } from "../../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../../types/puzzle/CellsMap";
 import { RoundedPolyLine } from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import { AnyPTM } from "../../../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
@@ -36,7 +36,7 @@ export const Region: ConstraintPropsGenericFcMap = {
 export const isValidCellForRegion = <T extends AnyPTM>(
     region: Position[],
     cell: Position,
-    digits: GivenDigitsMap<T["cell"]>,
+    digits: CellsMap<T["cell"]>,
     context: PuzzleContext<T>,
 ) => {
     const digit = digits[cell.top][cell.left]!;

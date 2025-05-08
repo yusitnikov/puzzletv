@@ -11,7 +11,7 @@ import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
 import { Rect } from "../../../types/layout/Rect";
 import { carMargin } from "../components/RushHourCar";
-import { processGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { processCellsMaps } from "../../../types/puzzle/CellsMap";
 
 const base = MoveCellWriteModeInfo<RushHourPTM>();
 
@@ -67,7 +67,7 @@ export const RushHourMoveCellWriteModeInfo = (
                     offsetRects.splice(carIndex, 1);
 
                     if (givenDigitsBlockCars) {
-                        processGivenDigitsMaps(
+                        processCellsMaps(
                             ([digit], position) => {
                                 offsetRects.push({
                                     ...position,

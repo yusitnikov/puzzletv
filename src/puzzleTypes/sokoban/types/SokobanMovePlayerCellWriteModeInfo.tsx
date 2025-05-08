@@ -11,7 +11,7 @@ import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp } from "@emotion-icons/fluent
 import { gridStateHistoryAddState } from "../../../types/puzzle/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { GameStateActionCallback, getNextActionId } from "../../../types/puzzle/GameStateAction";
-import { GivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { Absolute } from "../../../components/layout/absolute/Absolute";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
@@ -59,7 +59,7 @@ export const moveSokobanPlayer =
                     cells: Position[];
                 }
                 let offsetClueCells: OffsetClueInfo[] = [];
-                let cellsMap: GivenDigitsMap<OffsetClueInfo> = {};
+                let cellsMap: CellsMap<OffsetClueInfo> = {};
                 const updateCellsMap = () => {
                     offsetClueCells = clues
                         .map((clue, index): OffsetClueInfo | undefined => {

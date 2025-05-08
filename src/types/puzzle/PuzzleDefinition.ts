@@ -1,4 +1,4 @@
-import { GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps } from "./GivenDigitsMap";
+import { CellsMap, mergeCellsMaps, processCellsMaps } from "./CellsMap";
 import { ReactNode } from "react";
 import { PuzzleTypeManager } from "./PuzzleTypeManager";
 import { GridSize } from "./GridSize";
@@ -52,14 +52,12 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     regions?: (Position[] | Constraint<T, any>)[];
     disableSudokuRules?: boolean;
     gridMargin?: number;
-    customCellBounds?: GivenDigitsMap<CustomCellBounds>;
+    customCellBounds?: CellsMap<CustomCellBounds>;
     digitsCount?: number;
     supportZero?: boolean;
-    initialDigits?: GivenDigitsMap<T["cell"]>;
-    initialLetters?: GivenDigitsMap<string>;
-    initialColors?:
-        | GivenDigitsMap<CellColorValue[]>
-        | ((context: PuzzleContext<T>) => GivenDigitsMap<CellColorValue[]>);
+    initialDigits?: CellsMap<T["cell"]>;
+    initialLetters?: CellsMap<string>;
+    initialColors?: CellsMap<CellColorValue[]> | ((context: PuzzleContext<T>) => CellsMap<CellColorValue[]>);
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
     disableBackgroundColorOpacity?: boolean;
@@ -86,8 +84,8 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     prioritizeSelection?: boolean;
     initialLives?: number;
     decreaseOnlyOneLive?: boolean;
-    solution?: GivenDigitsMap<string | number>;
-    solutionColors?: GivenDigitsMap<CellColorValue[]>;
+    solution?: CellsMap<string | number>;
+    solutionColors?: CellsMap<CellColorValue[]>;
     allowMappingSolutionColors?: boolean;
     ignoreEmptySolutionColors?: boolean;
     importOptions?: Partial<PuzzleImportOptions>;
@@ -404,11 +402,11 @@ export const importGivenColorsAsSolution = <T extends AnyPTM>(
         throw new Error("puzzle.initialColors and puzzle.solutionColors are expected to be objects");
     }
 
-    puzzle.solutionColors = mergeGivenDigitsMaps(
+    puzzle.solutionColors = mergeCellsMaps(
         solutionColors,
-        processGivenDigitsMaps(([colors], position) => (isRegionCell(position) ? colors : undefined), [initialColors]),
+        processCellsMaps(([colors], position) => (isRegionCell(position) ? colors : undefined), [initialColors]),
     );
-    puzzle.initialColors = processGivenDigitsMaps(
+    puzzle.initialColors = processCellsMaps(
         ([colors], position) => (isRegionCell(position) ? undefined : colors),
         [initialColors],
     );
@@ -423,14 +421,14 @@ export const importSolutionColorsAsGiven = <T extends AnyPTM>(
         throw new Error("puzzle.initialColors and puzzle.solutionColors are expected to be objects");
     }
 
-    puzzle.initialColors = mergeGivenDigitsMaps(
+    puzzle.initialColors = mergeCellsMaps(
         initialColors,
-        processGivenDigitsMaps(
+        processCellsMaps(
             ([colors], position) => (isRegionCell(position) && colors.length ? colors : undefined),
             [solutionColors],
         ),
     );
-    puzzle.solutionColors = processGivenDigitsMaps(
+    puzzle.solutionColors = processCellsMaps(
         ([colors], position) => (isRegionCell(position) ? undefined : colors),
         [solutionColors],
     );

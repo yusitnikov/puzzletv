@@ -11,7 +11,7 @@ import {
     normalYinYangRulesExplained,
     toroidalRulesApply,
 } from "../ruleSnippets";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { CellsMap, processCellsMaps } from "../../types/puzzle/CellsMap";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
 import { errorResultCheck, notFinishedResultCheck, successResultCheck } from "../../types/puzzle/PuzzleResultCheck";
@@ -19,7 +19,7 @@ import { errorResultCheck, notFinishedResultCheck, successResultCheck } from "..
 const S = CellColor.shaded;
 const U = CellColor.unshaded;
 
-const givenColors: GivenDigitsMap<CellColor> = {
+const givenColors: CellsMap<CellColor> = {
     0: { 4: S, 6: S, 8: S },
     1: { 0: S, 3: S, 4: S, 8: S, 9: S },
     2: { 0: S, 4: S, 6: S },
@@ -68,7 +68,7 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
             </RulesParagraph>
         </>
     ),
-    initialColors: processGivenDigitsMaps((values) => values, [givenColors]),
+    initialColors: processCellsMaps((values) => values, [givenColors]),
     allowOverridingInitialColors: false,
     enableShading: true,
     allowDrawing: ["center-line", "border-line", "border-mark"],

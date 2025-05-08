@@ -18,7 +18,7 @@ import { KillerCageConstraint } from "../../components/puzzle/constraints/killer
 import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
 import { FogConstraint } from "../../components/puzzle/constraints/fog/Fog";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
-import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { indexes } from "../../utils/indexes";
 import { translate } from "../../utils/translate";
 
@@ -71,7 +71,7 @@ export const LumosMaxima: PuzzleDefinition<NumberPTM> = {
     noIndex: false,
     slug: "lumos-maxima",
     saveStateKey: "lumos-maxima-v5",
-    solution: createGivenDigitsMapFromArray([
+    solution: createCellsMapFromArray([
         [2, 1, 7, 6, 4, 8, 9, 3, 5],
         [5, 8, 9, 1, 3, 7, 4, 2, 6],
         [4, 3, 6, 2, 5, 9, 1, 8, 7],

@@ -19,7 +19,7 @@ import { CellColor } from "../../../../types/puzzle/CellColor";
 import { PuzzlePositionSet } from "../../../../types/puzzle/PuzzlePositionSet";
 import { indexes, indexesFromTo } from "../../../../utils/indexes";
 import { PuzzleContext } from "../../../../types/puzzle/PuzzleContext";
-import { GivenDigitsMap } from "../../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../../types/puzzle/CellsMap";
 import { PuzzleLineSet } from "../../../../types/puzzle/PuzzleLineSet";
 import { AnyPTM } from "../../../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
@@ -38,7 +38,7 @@ export interface FogProps<T extends AnyPTM, PositionT = Position> {
     startCells3x3?: PositionT[];
     bulbCells?: PositionT[];
     revealByCenterLines?: boolean | PuzzleLineSet<T>;
-    revealByColors?: CellColor[] | GivenDigitsMap<CellColor>;
+    revealByColors?: CellColor[] | CellsMap<CellColor>;
     effects?: FogEffect<PositionT>[];
     defaultEffect?: FogEffectPattern<T>;
     defaultEffectExceptions?: PositionT[];

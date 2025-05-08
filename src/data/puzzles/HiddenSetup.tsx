@@ -22,7 +22,7 @@ import { KillerCageConstraintByRect } from "../../components/puzzle/constraints/
 import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
 import { BetweenLineConstraint } from "../../components/puzzle/constraints/between-line/BetweenLine";
 import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
-import { GivenDigitsMap } from "../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../types/puzzle/CellsMap";
 import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
 import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import React from "react";
@@ -37,7 +37,7 @@ import { Constraint } from "../../types/puzzle/Constraint";
 import { MultiStagePTM } from "../../puzzleTypes/multi-stage/types/MultiStagePTM";
 import { translate } from "../../utils/translate";
 
-const getStageCellsMap = (stage: number): GivenDigitsMap<boolean> => {
+const getStageCellsMap = (stage: number): CellsMap<boolean> => {
     switch (stage) {
         case 1:
             return {

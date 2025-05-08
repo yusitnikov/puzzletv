@@ -9,7 +9,7 @@ import {
 import { PositionSet } from "../../../types/layout/Position";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { JssCell } from "./JssCell";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, processCellsMaps } from "../../../types/puzzle/CellsMap";
 import { CellColorValue, resolveCellColorValue } from "../../../types/puzzle/CellColor";
 import { JssConstraint } from "../constraints/Jss";
 import { isTextConstraint, TextProps } from "../../../components/puzzle/constraints/text/Text";
@@ -55,7 +55,7 @@ export const JssTypeManager = <T extends AnyPTM>(
             importSolutionColorsAsGiven(puzzle, (position) => !allRegionCells.contains(position));
 
             // Treat given colors outside active regions as JSS clues
-            let jssCellsMap: GivenDigitsMap<JssCell> = processGivenDigitsMaps(
+            let jssCellsMap: CellsMap<JssCell> = processCellsMaps(
                 ([[color]], position): JssCell | undefined =>
                     color && !allRegionCells.contains(position)
                         ? {
@@ -63,7 +63,7 @@ export const JssTypeManager = <T extends AnyPTM>(
                               backgroundColor: resolveCellColorValue(color),
                           }
                         : undefined,
-                [puzzle.initialColors as GivenDigitsMap<CellColorValue[]>],
+                [puzzle.initialColors as CellsMap<CellColorValue[]>],
             );
             puzzle.initialColors = undefined;
 

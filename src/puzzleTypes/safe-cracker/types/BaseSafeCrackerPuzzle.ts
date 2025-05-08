@@ -3,7 +3,7 @@ import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { Position } from "../../../types/layout/Position";
 import { RegionConstraint } from "../../../components/puzzle/constraints/region/Region";
 import { indexes } from "../../../utils/indexes";
-import { createGivenDigitsMapFromArray } from "../../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray } from "../../../types/puzzle/CellsMap";
 import { CustomCellBounds } from "../../../types/puzzle/CustomCellBounds";
 import { SafeCrackerTypeManager } from "./SafeCrackerTypeManager";
 import { AnyNumberPTM } from "../../../types/puzzle/PuzzleTypeMap";
@@ -52,7 +52,7 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(
             ),
         ],
         digitsCount: size,
-        customCellBounds: createGivenDigitsMapFromArray<CustomCellBounds>([
+        customCellBounds: createCellsMapFromArray<CustomCellBounds>([
             ...indexes(circleRegionsCount).flatMap((regionIndex) => [
                 indexes(size).map((cellIndexInRegion) => {
                     const cellIndex = regionIndex * size + cellIndexInRegion;

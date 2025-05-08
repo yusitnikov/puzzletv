@@ -1,5 +1,5 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
-import { GivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { CustomCellBounds } from "../../../types/puzzle/CustomCellBounds";
 import { getRectPoints, Rect } from "../../../types/layout/Rect";
 import { GridRegion } from "../../../types/puzzle/GridRegion";
@@ -233,7 +233,7 @@ export const InfiniteRingsTypeManager = <T extends AnyPTM>(
             const gridSize = puzzle.gridSize.rowsCount;
             const quadSize = gridSize / 2;
             const ringsCount = quadSize - 1;
-            const customCellBounds: GivenDigitsMap<CustomCellBounds> = {};
+            const customCellBounds: CellsMap<CustomCellBounds> = {};
             for (let ring = 0; ring < ringsCount; ring++) {
                 const scale = Math.pow(0.5, ring);
                 const offset = 2 * (1 - scale);

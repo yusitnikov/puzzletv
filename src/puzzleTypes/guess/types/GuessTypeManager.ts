@@ -1,7 +1,7 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { CellStateEx } from "../../../types/puzzle/CellState";
-import { serializeGivenDigitsMap, unserializeGivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { serializeCellsMap, unserializeCellsMap } from "../../../types/puzzle/CellsMap";
 import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
 import { GameStateEx, mergeGameStateWithUpdates } from "../../../types/puzzle/GameState";
 import { CellOwnershipConstraint } from "../components/CellOwnership";
@@ -77,15 +77,15 @@ export const GuessTypeManager = <T extends AnyNumberPTM>(): PuzzleTypeManager<T>
 
     getSharedState({ typeManager: { serializeCellData } }, { initialDigits, excludedDigits }): any {
         return {
-            initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
-            excludedDigits: serializeGivenDigitsMap(excludedDigits, (item) => item.serialize()),
+            initialDigits: serializeCellsMap(initialDigits, serializeCellData),
+            excludedDigits: serializeCellsMap(excludedDigits, (item) => item.serialize()),
         };
     },
 
     setSharedState({ puzzle, myGameState }, { initialDigits, excludedDigits }): GameStateEx<T> {
         return mergeGameStateWithUpdates(myGameState, {
-            initialDigits: unserializeGivenDigitsMap(initialDigits, puzzle.typeManager.unserializeCellData),
-            excludedDigits: unserializeGivenDigitsMap(excludedDigits, (item) => CellDataSet.unserialize(puzzle, item)),
+            initialDigits: unserializeCellsMap(initialDigits, puzzle.typeManager.unserializeCellData),
+            excludedDigits: unserializeCellsMap(excludedDigits, (item) => CellDataSet.unserialize(puzzle, item)),
         });
     },
 

@@ -6,7 +6,7 @@ import { RegionConstraint } from "../../../components/puzzle/constraints/region/
 import { indexes } from "../../../utils/indexes";
 import { TenInOneRegionConstraint } from "../constraints/TenInOneRegion";
 import { Position } from "../../../types/layout/Position";
-import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { gridStateHistoryAddState } from "../../../types/puzzle/GridStateHistory";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { MultiStagePTM } from "../../multi-stage/types/MultiStagePTM";
@@ -34,14 +34,14 @@ export const TenInOneTypeManager = (
                 );
                 const remainingCells = allCells.filter(isRemainingCell);
 
-                const initialDigits: GivenDigitsMap<number> = {};
+                const initialDigits: CellsMap<number> = {};
                 for (const { top, left } of remainingCells) {
                     initialDigits[top] = initialDigits[top] || {};
                     initialDigits[top][left] = context.getCellDigit(top, left)!;
                 }
 
                 return {
-                    initialDigits: mergeGivenDigitsMaps(stateInitialDigits, initialDigits),
+                    initialDigits: mergeCellsMaps(stateInitialDigits, initialDigits),
                 };
             }
 

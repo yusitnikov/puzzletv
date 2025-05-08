@@ -21,7 +21,7 @@ import { PositionLiteral } from "../../types/layout/Position";
 import { GridLayer } from "../../types/puzzle/GridLayer";
 import { textColor } from "../../components/app/globals";
 import { Constraint } from "../../types/puzzle/Constraint";
-import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { CellColor } from "../../types/puzzle/CellColor";
 
 const ArrowComponent = DecorativeShapeComponent(
@@ -106,7 +106,7 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         ...DecorativeArrowConstraint("R9C3", -90),
     ],
     allowDrawing: allDrawingModes,
-    solution: createGivenDigitsMapFromArray([
+    solution: createCellsMapFromArray([
         [6, 5, 1, 4, 3, 2, 9, 8, 7],
         [7, 8, 2, 9, 1, 5, 4, 6, 3],
         [3, 9, 4, 7, 6, 8, 5, 2, 1],
@@ -117,7 +117,7 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         [9, 1, 3, 6, 8, 7, 2, 4, 5],
         [8, 2, 6, 1, 5, 4, 3, 7, 9],
     ]),
-    solutionColors: createGivenDigitsMapFromArray([
+    solutionColors: createCellsMapFromArray([
         [F, T, T, T, T, F, T, T, F],
         [T, F, T, F, T, T, F, T, T],
         [T, T, F, T, T, F, T, T, F],

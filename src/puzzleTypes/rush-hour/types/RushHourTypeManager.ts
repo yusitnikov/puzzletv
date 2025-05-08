@@ -18,7 +18,7 @@ import { ControlButtonRegion } from "../../../components/puzzle/controls/Control
 import { RushHourHideCarsButton } from "../components/RushHourHideCarsButton";
 import { RushHourCarsConstraint } from "../components/RushHourCar";
 import { getDefaultRegionsForRowsAndColumns } from "../../../types/puzzle/GridSize";
-import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { CellTypeProps } from "../../../types/puzzle/CellTypeProps";
 import { createRandomGenerator } from "../../../utils/random";
 import { cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
@@ -292,7 +292,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                         } = context;
                         const { initialDigits = {} } = puzzle;
 
-                        const carInitialDigits: GivenDigitsMap<number> = {};
+                        const carInitialDigits: CellsMap<number> = {};
                         for (const [index, { cells }] of cars.entries()) {
                             let { top, left } = carPositions[index];
                             top = Math.round(top);
@@ -311,7 +311,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                         const fixedContext = context.cloneWith({
                             puzzle: {
                                 ...puzzle,
-                                initialDigits: mergeGivenDigitsMaps(carInitialDigits, initialDigits),
+                                initialDigits: mergeCellsMaps(carInitialDigits, initialDigits),
                                 items: processedItems.map(({ carIndex, ...item }) => {
                                     if (carIndex !== undefined) {
                                         const position = carPositions[carIndex];

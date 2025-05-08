@@ -35,7 +35,7 @@ import { getDefaultRegionsForRowsAndColumns } from "./GridSize";
 import { GridLinesConstraint } from "../../components/puzzle/grid/GridLines";
 import { RegionConstraint } from "../../components/puzzle/constraints/region/Region";
 import { UserLinesConstraint } from "../../components/puzzle/constraints/user-lines/UserLines";
-import { GivenDigitsMap, mergeGivenDigitsMaps } from "./GivenDigitsMap";
+import { CellsMap, mergeCellsMaps } from "./CellsMap";
 import { getFogPropsByContext, getFogVisibleCells } from "../../components/puzzle/constraints/fog/Fog";
 import { setComparer, SetInterface } from "../struct/Set";
 import { PuzzleLine } from "./PuzzleLine";
@@ -96,7 +96,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     private get regionsByCellsMap() {
         profiler.trace();
 
-        const result: GivenDigitsMap<GridRegion> = {};
+        const result: CellsMap<GridRegion> = {};
         for (const region of this.regions ?? []) {
             for (const { top, left } of getGridRegionCells(region)) {
                 result[top] ??= {};
@@ -463,10 +463,10 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.currentGridState.extension;
     }
 
-    get userDigits(): GivenDigitsMap<T["cell"]> {
+    get userDigits(): CellsMap<T["cell"]> {
         profiler.trace();
 
-        return mergeGivenDigitsMaps(this.allInitialDigits, gameStateGetCurrentGivenDigitsByCells(this.cells));
+        return mergeCellsMaps(this.allInitialDigits, gameStateGetCurrentGivenDigitsByCells(this.cells));
     }
     readonly getUserDigit = computedFn(
         function getUserDigit(this: PuzzleContext<T>, top: number, left: number): T["cell"] | undefined {
@@ -496,9 +496,9 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.state.initialDigits ?? {};
     }
 
-    get allInitialDigits(): GivenDigitsMap<T["cell"]> {
+    get allInitialDigits(): CellsMap<T["cell"]> {
         profiler.trace();
-        return mergeGivenDigitsMaps(
+        return mergeCellsMaps(
             this.puzzle.initialDigits ?? {},
             this.stateInitialDigits,
             this.puzzle.typeManager.getInitialDigits?.(this) ?? {},
@@ -710,7 +710,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     private get regionCellsIndex() {
         profiler.trace();
 
-        const map: GivenDigitsMap<{ index: number; cells: Position[] }> = {};
+        const map: CellsMap<{ index: number; cells: Position[] }> = {};
         for (const [index, region] of (this.puzzle.regions ?? []).entries()) {
             const cells = getRegionCells(region);
             for (const { top, left } of cells) {

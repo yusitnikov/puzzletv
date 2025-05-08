@@ -22,11 +22,7 @@ import {
     optionalChessPiecesRules,
 } from "../../puzzleTypes/chess/data/ruleSnippets";
 import { RulesSpoiler } from "../../components/puzzle/rules/RulesSpoiler";
-import {
-    areSameGivenDigitsMapsByContext,
-    GivenDigitsMap,
-    mergeGivenDigitsMaps,
-} from "../../types/puzzle/GivenDigitsMap";
+import { areSameCellsMapsByContext, CellsMap, mergeCellsMaps } from "../../types/puzzle/CellsMap";
 import { ValidChessPositionConstraint } from "../../puzzleTypes/chess/constraints/ValidChessPosition";
 import { ChessPTM } from "../../puzzleTypes/chess/types/ChessPTM";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
@@ -51,18 +47,18 @@ const optionalSolutionPieces = chessInitialPiecesByCellNames({
 
 const isValidSolution = (
     context: PuzzleContext<ChessPTM>,
-    mandatorySolutionPieces: GivenDigitsMap<ChessPiece>,
-    optionalSolutionPieces: GivenDigitsMap<ChessPiece> = {},
+    mandatorySolutionPieces: CellsMap<ChessPiece>,
+    optionalSolutionPieces: CellsMap<ChessPiece> = {},
 ): PuzzleResultCheck => {
-    const currentFinalDigits = mergeGivenDigitsMaps(context.userDigits, optionalSolutionPieces);
+    const currentFinalDigits = mergeCellsMaps(context.userDigits, optionalSolutionPieces);
 
-    const correctFinalDigits = mergeGivenDigitsMaps(
+    const correctFinalDigits = mergeCellsMaps(
         context.allInitialDigits || {},
         mandatorySolutionPieces,
         optionalSolutionPieces,
     );
 
-    return areSameGivenDigitsMapsByContext(context, currentFinalDigits, correctFinalDigits)
+    return areSameCellsMapsByContext(context, currentFinalDigits, correctFinalDigits)
         ? successResultCheck(context.puzzle)
         : errorResultCheck();
 };

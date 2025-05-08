@@ -16,7 +16,7 @@ import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { regionHighlightColor, textColor } from "../../../components/app/globals";
 import { formatSvgPointsArray, Position } from "../../../types/layout/Position";
 import { useTransformScale } from "../../../contexts/TransformContext";
-import { mergeGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { comparer } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useComputed, useComputedValue } from "../../../hooks/useComputed";
@@ -67,7 +67,7 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton({
             const activePieceZIndex = getActiveJigsawPieceZIndex(getPiecePositions());
 
             const groupsToGlue = groupCells.filter(({ zIndex }) => zIndex === activePieceZIndex);
-            let cellsMapToGlue = mergeGivenDigitsMaps(...groupsToGlue.map(({ cellsMap }) => cellsMap));
+            let cellsMapToGlue = mergeCellsMaps(...groupsToGlue.map(({ cellsMap }) => cellsMap));
             const isGroupCell = ({ top, left }: Position) => !!cellsMapToGlue[top]?.[left];
             let remainingGroups = groupCells.filter(({ zIndex }) => zIndex !== activePieceZIndex);
 
@@ -97,7 +97,7 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton({
                 const nextGroup = remainingGroups[nextGroupIndex];
                 remainingGroups.splice(nextGroupIndex, 1);
                 groupsToGlue.push(nextGroup);
-                cellsMapToGlue = mergeGivenDigitsMaps(cellsMapToGlue, nextGroup.cellsMap);
+                cellsMapToGlue = mergeCellsMaps(cellsMapToGlue, nextGroup.cellsMap);
             }
 
             return groupsToGlue.flatMap(({ pieceIndexes }) => pieceIndexes);

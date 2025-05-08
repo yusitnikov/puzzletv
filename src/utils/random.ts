@@ -1,4 +1,4 @@
-import { GivenDigitsMap } from "../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../types/puzzle/CellsMap";
 import { indexes, indexesFromTo } from "./indexes";
 import { Position } from "../types/layout/Position";
 
@@ -24,7 +24,7 @@ export const generateRandomPuzzleDigits = (
     gridSize: number,
     regionWidth: number,
     randomOrSeed: number,
-): GivenDigitsMap<number> => {
+): CellsMap<number> => {
     const random = createRandomGenerator(randomOrSeed);
 
     while (true) {
@@ -57,11 +57,11 @@ const tryGenerateRandomPuzzleDigits = (
     gridSize: number,
     regionWidth: number,
     random: RandomGenerator,
-): GivenDigitsMap<number> | undefined => {
+): CellsMap<number> | undefined => {
     const regionHeight = gridSize / regionWidth;
 
-    const initialDigits: GivenDigitsMap<number> = {};
-    const digitOptions: GivenDigitsMap<Set<number>> = {};
+    const initialDigits: CellsMap<number> = {};
+    const digitOptions: CellsMap<Set<number>> = {};
     for (const rowIndex of indexes(gridSize)) {
         initialDigits[rowIndex] = {};
         digitOptions[rowIndex] = {};

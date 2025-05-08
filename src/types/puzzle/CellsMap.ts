@@ -3,13 +3,13 @@ import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
 import { indexes } from "../../utils/indexes";
 
-export type GivenDigitsMap<CellType> = Record<number, Record<number, CellType>>;
+export type CellsMap<CellType> = Record<number, Record<number, CellType>>;
 
-export const processGivenDigitsMaps = <CellType, ResultType = CellType>(
+export const processCellsMaps = <CellType, ResultType = CellType>(
     processor: (cells: CellType[], position: Position) => ResultType | undefined,
-    maps: GivenDigitsMap<CellType>[],
+    maps: CellsMap<CellType>[],
 ) => {
-    const arrayMap: GivenDigitsMap<CellType[]> = {};
+    const arrayMap: CellsMap<CellType[]> = {};
 
     for (const map of maps) {
         for (const [rowIndexStr, row] of Object.entries(map)) {
@@ -23,7 +23,7 @@ export const processGivenDigitsMaps = <CellType, ResultType = CellType>(
         }
     }
 
-    const result: GivenDigitsMap<ResultType> = {};
+    const result: CellsMap<ResultType> = {};
 
     for (const [rowIndexStr, row] of Object.entries(arrayMap)) {
         const rowIndex = Number(rowIndexStr);
@@ -40,7 +40,7 @@ export const processGivenDigitsMaps = <CellType, ResultType = CellType>(
     return result;
 };
 
-export const givenDigitsMapToArray = <CellType>(map: GivenDigitsMap<CellType>) =>
+export const cellsMapToArray = <CellType>(map: CellsMap<CellType>) =>
     Object.entries(map).flatMap(([top, rowMap]) =>
         Object.entries(rowMap).map(([left, data]) => ({
             data,
@@ -51,15 +51,10 @@ export const givenDigitsMapToArray = <CellType>(map: GivenDigitsMap<CellType>) =
         })),
     );
 
-export const mergeGivenDigitsMaps = <CellType>(...maps: GivenDigitsMap<CellType>[]) =>
-    processGivenDigitsMaps(([first]) => first, maps);
+export const mergeCellsMaps = <CellType>(...maps: CellsMap<CellType>[]) => processCellsMaps(([first]) => first, maps);
 
-export const areSameGivenDigitsMaps = <T>(
-    map1: GivenDigitsMap<T>,
-    map2: GivenDigitsMap<T>,
-    isEqual: (a: T, b: T) => boolean,
-) => {
-    const mergedMap = mergeGivenDigitsMaps(map1, map2);
+export const areSameCellsMaps = <T>(map1: CellsMap<T>, map2: CellsMap<T>, isEqual: (a: T, b: T) => boolean) => {
+    const mergedMap = mergeCellsMaps(map1, map2);
 
     for (const [rowIndexStr, mergedRow] of Object.entries(mergedMap)) {
         const rowIndex = Number(rowIndexStr);
@@ -85,16 +80,14 @@ export const areSameGivenDigitsMaps = <T>(
     return true;
 };
 
-export const areSameGivenDigitsMapsByContext = <T extends AnyPTM>(
+export const areSameCellsMapsByContext = <T extends AnyPTM>(
     context: PuzzleContext<T>,
-    map1: GivenDigitsMap<T["cell"]>,
-    map2: GivenDigitsMap<T["cell"]>,
-) => areSameGivenDigitsMaps(map1, map2, (a, b) => context.puzzle.typeManager.areSameCellData(a, b, context));
+    map1: CellsMap<T["cell"]>,
+    map2: CellsMap<T["cell"]>,
+) => areSameCellsMaps(map1, map2, (a, b) => context.puzzle.typeManager.areSameCellData(a, b, context));
 
-export const createGivenDigitsMapFromArray = <CellType>(
-    array: (CellType | undefined)[][],
-): GivenDigitsMap<CellType> => {
-    const map: GivenDigitsMap<CellType> = {};
+export const createCellsMapFromArray = <CellType>(array: (CellType | undefined)[][]): CellsMap<CellType> => {
+    const map: CellsMap<CellType> = {};
 
     array.forEach((row, rowIndex) => {
         map[rowIndex] = {};
@@ -109,18 +102,14 @@ export const createGivenDigitsMapFromArray = <CellType>(
     return map;
 };
 
-export const serializeGivenDigitsMap = <CellType>(
-    map: GivenDigitsMap<CellType>,
-    serializer: (item: CellType) => any,
-): any => processGivenDigitsMaps(([cell]) => serializer(cell), [map]);
+export const serializeCellsMap = <CellType>(map: CellsMap<CellType>, serializer: (item: CellType) => any): any =>
+    processCellsMaps(([cell]) => serializer(cell), [map]);
 
-export const unserializeGivenDigitsMap = <CellType>(
-    map: any,
-    unserializer: (item: any) => CellType,
-): GivenDigitsMap<CellType> => processGivenDigitsMaps(([cell]) => unserializer(cell), [map]);
+export const unserializeCellsMap = <CellType>(map: any, unserializer: (item: any) => CellType): CellsMap<CellType> =>
+    processCellsMaps(([cell]) => unserializer(cell), [map]);
 
-export const createRegionsByGivenDigitsMap = <CellType>(
-    map: GivenDigitsMap<CellType>,
+export const createRegionsByCellsMap = <CellType>(
+    map: CellsMap<CellType>,
     width: number,
     height: number,
 ): Position[][] => {

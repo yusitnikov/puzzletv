@@ -1,7 +1,7 @@
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { SlideAndSeekPTM } from "../types/SlideAndSeekPTM";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, processCellsMaps } from "../../../types/puzzle/CellsMap";
 import { SlideAndSeekShape } from "../types/SlideAndSeekShape";
 import { indexes } from "../../../utils/indexes";
 import { Line, PositionSet } from "../../../types/layout/Position";
@@ -24,7 +24,7 @@ interface PathInfo {
 }
 
 export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
-    givenShapes: GivenDigitsMap<SlideAndSeekShape>,
+    givenShapes: CellsMap<SlideAndSeekShape>,
     givenBorders: PositionSet,
     emptyCells: PositionSet,
 ): Constraint<SlideAndSeekPTM<T>> => ({
@@ -34,7 +34,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
     isValidPuzzle(_lines, _digits, _regionCells, context) {
         const { rowsCount, columnsCount } = context.puzzle.gridSize;
 
-        const finalShapes = processGivenDigitsMaps<SlideAndSeekShape, ShapeInfo | PathInfo>(
+        const finalShapes = processCellsMaps<SlideAndSeekShape, ShapeInfo | PathInfo>(
             ([constraint]) => ({ type: "shape", ...constraint, actualLength: 0 }),
             [givenShapes],
         );

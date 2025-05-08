@@ -12,7 +12,7 @@ import { indexes } from "../../../utils/indexes";
 import { GridRegion } from "../../../types/puzzle/GridRegion";
 import { applyMetricsDiff, emptyGestureMetrics, GestureMetrics } from "../../../utils/gestures";
 import { JigsawGridPieceState } from "./JigsawGridState";
-import { GivenDigitsMap } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { JigsawPieceRegion } from "./JigsawPieceRegion";
 
@@ -258,7 +258,7 @@ export const getJigsawCellCenterAbsolutePositionsIndex = (groups: JigsawPiecesGr
             })),
         );
 
-        const cellsMap: GivenDigitsMap<(typeof cells)[0]> = {};
+        const cellsMap: CellsMap<(typeof cells)[0]> = {};
         for (const cell of cells) {
             const {
                 position: { top, left },

@@ -54,7 +54,7 @@ import { useDiffEffect } from "../../hooks/useDiffEffect";
 import { VolumeUp } from "@emotion-icons/material";
 import { DecorativeCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
 import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
-import { createGivenDigitsMapFromArray } from "../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { translate } from "../../utils/translate";
 
 (window as any).player = [];
@@ -396,7 +396,7 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
         AudioConstraint("X7JKdpsCxKs", "R10C8", "Rise above this"),
         toDecorativeConstraint(ThermometerConstraint(["R9C8", "R7C8"])),
     ],
-    solution: createGivenDigitsMapFromArray([
+    solution: createCellsMapFromArray([
         [6, 3, 4, 1, 7, 5, 9, 8, 2],
         [7, 9, 8, 3, 4, 2, 1, 5, 6],
         [2, 5, 1, 9, 8, 6, 7, 4, 3],

@@ -29,7 +29,7 @@ import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
 import { GreaterConstraint } from "../../components/puzzle/constraints/greater/Greater";
 import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
-import { createGivenDigitsMapFromArray, GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { createCellsMapFromArray, CellsMap, mergeCellsMaps } from "../../types/puzzle/CellsMap";
 import { CellColorValue } from "../../types/puzzle/CellColor";
 import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import { buildLink } from "../../utils/link";
@@ -47,7 +47,7 @@ const greenColor = "#afa";
 
 interface ShopItems {
     constraints: Constraint<NumberPTM, any>[];
-    colors: GivenDigitsMap<CellColorValue[]>;
+    colors: CellsMap<CellColorValue[]>;
 }
 
 const getShopItems = (item: number | undefined, offset: number): ShopItems => {
@@ -57,7 +57,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
     };
     const offsetCells = (...cells: PositionLiteral[]) => cells.map(offsetCell);
     const colorsMap = (color: CellColorValue, ...cells: PositionLiteral[]) => {
-        const result: GivenDigitsMap<CellColorValue[]> = {};
+        const result: CellsMap<CellColorValue[]> = {};
         for (const { top, left } of offsetCells(...cells)) {
             result[top] = result[top] ?? {};
             result[top][left] = [color];
@@ -119,7 +119,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     KropkiDotConstraint(offsetCell("R4C2"), offsetCell("R5C2"), false),
                     OddConstraint(offsetCell("R5C3")),
                 ],
-                colors: mergeGivenDigitsMaps(
+                colors: mergeCellsMaps(
                     colorsMap(redColor, "R1C2"),
                     colorsMap(goldColor, "R6C1", "R6C2", "R6C3", "R5C3"),
                 ),
@@ -150,7 +150,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     KropkiDotConstraint(offsetCell("R5C1"), offsetCell("R6C1"), false),
                     KropkiDotConstraint(offsetCell("R5C3"), offsetCell("R6C3"), false),
                 ],
-                colors: mergeGivenDigitsMaps(
+                colors: mergeCellsMaps(
                     colorsMap(goldColor, "R5C1", "R4C1", "R4C2", "R4C3", "R5C3"),
                     colorsMap(lightBlueColor, "R5C2", "R6C2"),
                 ),
@@ -166,7 +166,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     EvenConstraint(offsetCell("R5C2")),
                     OddConstraint(offsetCell("R6C2")),
                 ],
-                colors: mergeGivenDigitsMaps(
+                colors: mergeCellsMaps(
                     colorsMap(yellowColor, "R1C2", "R2C2", "R3C2", "R4C2", "R5C2"),
                     colorsMap(goldColor, "R6C2"),
                 ),
@@ -204,7 +204,7 @@ const getShopItems = (item: number | undefined, offset: number): ShopItems => {
                     KropkiDotConstraint(offsetCell("R6C1"), offsetCell("R6C2"), false),
                     KropkiDotConstraint(offsetCell("R6C2"), offsetCell("R6C3"), false),
                 ],
-                colors: mergeGivenDigitsMaps(
+                colors: mergeCellsMaps(
                     colorsMap(
                         lightRedColor,
                         "R1C1",
@@ -266,7 +266,7 @@ const getShopItemsByContext = (context: PuzzleContext<NumberPTM>): ShopItems => 
 
     return {
         constraints: result.flatMap(({ constraints }) => constraints),
-        colors: mergeGivenDigitsMaps(...result.map(({ colors }) => colors)),
+        colors: mergeCellsMaps(...result.map(({ colors }) => colors)),
     };
 };
 
@@ -470,7 +470,7 @@ export const BuySomethinWillYa: PuzzleDefinition<NumberPTM> = {
             8: [lightRedColor],
         },
     }),
-    solution: createGivenDigitsMapFromArray([
+    solution: createCellsMapFromArray([
         [0, 8, 5, 1, 9, 7, 4, 3, S],
         [S, 9, 6, 4, 5, 2, 1, 0, 8],
         [1, 2, 4, 3, 0, S, 5, 7, 9],

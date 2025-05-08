@@ -2,7 +2,7 @@ import { Position } from "../layout/Position";
 import { getPuzzlePositionHasher, PuzzleDefinition } from "./PuzzleDefinition";
 import { HashSet } from "../struct/Set";
 import { CellColorValue } from "./CellColor";
-import { GivenDigitsMap } from "./GivenDigitsMap";
+import { CellsMap } from "./CellsMap";
 import { PuzzleCellsIndex } from "./PuzzleCellsIndex";
 import { CellPart } from "./CellPart";
 import { AnyPTM } from "./PuzzleTypeMap";
@@ -47,8 +47,8 @@ export class CellMarkSet<T extends AnyPTM> extends HashSet<CellMark> {
 export const getCenterMarksMap = <T extends AnyPTM>(
     marks: CellMark[],
     cellsIndex: PuzzleCellsIndex<T>,
-): GivenDigitsMap<CellMark> => {
-    const map: GivenDigitsMap<CellMark> = {};
+): CellsMap<CellMark> => {
+    const map: CellsMap<CellMark> = {};
 
     for (const mark of marks) {
         const cellInfo = cellsIndex.getPointInfo(mark.position);

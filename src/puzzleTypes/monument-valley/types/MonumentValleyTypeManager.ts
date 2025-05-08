@@ -9,7 +9,7 @@ import { indexes } from "../../../utils/indexes";
 import { DigitCellDataComponentType } from "../../default/components/DigitCellData";
 import { MonumentValleyDigitComponentType } from "../components/MonumentValleyDigit";
 import { Constraint } from "../../../types/puzzle/Constraint";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, processCellsMaps } from "../../../types/puzzle/CellsMap";
 import { RotatableDigitTypeManagerBase } from "../../rotatable/types/RotatableDigitTypeManager";
 import { loop, roundToStep } from "../../../utils/math";
 import { MonumentValleyPTM } from "./MonumentValleyPTM";
@@ -379,10 +379,10 @@ const processCellCoords = (
         : position;
 };
 
-const rotateDigitsMap = (map: GivenDigitsMap<number>, puzzle: PuzzleDefinition<MonumentValleyPTM>) => {
+const rotateDigitsMap = (map: CellsMap<number>, puzzle: PuzzleDefinition<MonumentValleyPTM>) => {
     const { gridSize, intersectionSize } = parseMonumentValleyGridSize(puzzle.gridSize);
 
-    return processGivenDigitsMaps(
+    return processCellsMaps(
         ([digit], { top, left }) =>
             left >= gridSize - intersectionSize && left < gridSize && top < intersectionSize
                 ? rotateDigit(puzzle, digit, 90)
@@ -507,5 +507,5 @@ const digitLiteralsMap: Record<number, number> = {
     9: 9,
 };
 export const parseMonumentValleyDigitLiteral = (literal: number) => digitLiteralsMap[literal] ?? literal;
-export const parseMonumentValleyDigitsMap = (map: GivenDigitsMap<number>) =>
-    processGivenDigitsMaps(([digit]) => parseMonumentValleyDigitLiteral(digit), [map]);
+export const parseMonumentValleyDigitsMap = (map: CellsMap<number>) =>
+    processCellsMaps(([digit]) => parseMonumentValleyDigitLiteral(digit), [map]);

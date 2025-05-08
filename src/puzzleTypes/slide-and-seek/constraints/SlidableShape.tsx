@@ -4,12 +4,12 @@ import { Constraint, ConstraintProps } from "../../../types/puzzle/Constraint";
 import { observer } from "mobx-react-lite";
 import { ComponentType, useMemo } from "react";
 import { isSamePosition } from "../../../types/layout/Position";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, processCellsMaps } from "../../../types/puzzle/CellsMap";
 import { SlideAndSeekShape } from "../types/SlideAndSeekShape";
 
 const SlidableShapeComponent = <T extends AnyPTM>(
     BaseComponent: ComponentType<ConstraintProps<T, DecorativeShapeProps>>,
-    allGivenShapes: GivenDigitsMap<SlideAndSeekShape>,
+    allGivenShapes: CellsMap<SlideAndSeekShape>,
 ) =>
     observer(function SlidableShapeComponent({ cells: [cell], ...props }: ConstraintProps<T, DecorativeShapeProps>) {
         const {
@@ -25,7 +25,7 @@ const SlidableShapeComponent = <T extends AnyPTM>(
             () =>
                 fogVisibleCells === undefined
                     ? allGivenShapes
-                    : processGivenDigitsMaps(
+                    : processCellsMaps(
                           ([shape], { top, left }) => (fogVisibleCells[top]?.[left] ? shape : undefined),
                           [allGivenShapes],
                       ),
@@ -76,7 +76,7 @@ const SlidableShapeComponent = <T extends AnyPTM>(
 
 export const SlidableShapeConstraint = <T extends AnyPTM>(
     baseConstraint: Constraint<T, DecorativeShapeProps>,
-    allGivenShapes: GivenDigitsMap<SlideAndSeekShape>,
+    allGivenShapes: CellsMap<SlideAndSeekShape>,
 ): Constraint<T, DecorativeShapeProps> => ({
     ...baseConstraint,
     component: Object.fromEntries(

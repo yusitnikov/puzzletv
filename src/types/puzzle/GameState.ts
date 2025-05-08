@@ -15,14 +15,15 @@ import { emptyPosition, isSameLine, isSamePosition, Position, PositionSet } from
 import { defaultProcessArrowDirection } from "./PuzzleTypeManager";
 import { normalizePuzzlePosition, PuzzleDefinition } from "./PuzzleDefinition";
 import {
-    areSameGivenDigitsMaps,
-    areSameGivenDigitsMapsByContext,
-    GivenDigitsMap,
-    givenDigitsMapToArray,
-    processGivenDigitsMaps,
-    serializeGivenDigitsMap,
-    unserializeGivenDigitsMap,
-} from "./GivenDigitsMap";
+    areSameCellsMaps,
+    areSameCellsMapsByContext,
+    CellsMap,
+    cellsMapToArray,
+    createCellsMapFromArray,
+    processCellsMaps,
+    serializeCellsMap,
+    unserializeCellsMap,
+} from "./CellsMap";
 import { PuzzleContext } from "./PuzzleContext";
 import { SetInterface } from "../struct/Set";
 import { getExcludedDigitDataHash, getMainDigitDataHash } from "../../utils/playerDataHash";
@@ -55,8 +56,8 @@ export interface GameState<T extends AnyPTM> {
     persistentCellWriteMode: CellWriteMode;
     gestureCellWriteMode?: CellWriteMode;
 
-    initialDigits: GivenDigitsMap<T["cell"]>;
-    excludedDigits: GivenDigitsMap<SetInterface<T["cell"]>>;
+    initialDigits: CellsMap<T["cell"]>;
+    excludedDigits: CellsMap<SetInterface<T["cell"]>>;
 
     isMultiSelection: boolean;
     selectedCells: SetInterface<Position>;
@@ -193,9 +194,9 @@ export const getEmptyGameState = <T extends AnyPTM>(
         selectedCells: new PositionSet(),
         isMultiSelection: false,
         selectedColor: savedGameState?.[10] ?? CellColor.green,
-        initialDigits: unserializeGivenDigitsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
+        initialDigits: unserializeCellsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
         excludedDigits: savedGameState?.[4]
-            ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) =>
+            ? unserializeCellsMap(savedGameState[4], (excludedDigits: any) =>
                   CellDataSet.unserialize(puzzle, excludedDigits),
               )
             : indexes(puzzle.gridSize.rowsCount).map(() =>
@@ -260,8 +261,8 @@ export const saveGameState = <T extends AnyPTM>(context: PuzzleContext<T>): void
                     fullSaveStateKey,
                     serializeGridState(currentGridStateWithFogDemo, puzzle),
                     puzzle.typeManager.serializeGameState?.(stateExtension) ?? stateExtension,
-                    serializeGivenDigitsMap(stateInitialDigits, puzzle.typeManager.serializeCellData),
-                    serializeGivenDigitsMap(excludedDigits, (excludedDigits) => excludedDigits.serialize()),
+                    serializeCellsMap(stateInitialDigits, puzzle.typeManager.serializeCellData),
+                    serializeCellsMap(excludedDigits, (excludedDigits) => excludedDigits.serialize()),
                     persistentCellWriteMode,
                     currentPlayer || "",
                     "",
@@ -287,8 +288,8 @@ export const getAllShareState = <T extends AnyPTM>({ puzzle, myGameState }: Puzz
     return {
         grid: serializeGridState(gridStateHistory.current, puzzle),
         extension: typeManager.serializeGameState?.(extension) ?? extension,
-        initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
-        excludedDigits: serializeGivenDigitsMap(excludedDigits, (item) => item.serialize()),
+        initialDigits: serializeCellsMap(initialDigits, serializeCellData),
+        excludedDigits: serializeCellsMap(excludedDigits, (item) => item.serialize()),
         lives,
         ...getSharedState?.(puzzle, myGameState),
     };
@@ -306,10 +307,8 @@ export const setAllShareState = <T extends AnyPTM>(context: PuzzleContext<T>, ne
             unserializedGridState.actionId,
             unserializedGridState,
         ),
-        initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
-        excludedDigits: unserializeGivenDigitsMap(excludedDigits, (item) =>
-            CellDataSet.unserialize(context.puzzle, item),
-        ),
+        initialDigits: unserializeCellsMap(initialDigits, unserializeCellData),
+        excludedDigits: unserializeCellsMap(excludedDigits, (item) => CellDataSet.unserialize(context.puzzle, item)),
         lives,
         extension: unserializeGameState?.(extension) ?? extension,
     });
@@ -342,11 +341,11 @@ export const areSameGameStates = <T extends AnyPTM>(
         return false;
     }
 
-    if (!areSameGivenDigitsMapsByContext(context, state1.initialDigits, state2.initialDigits)) {
+    if (!areSameCellsMapsByContext(context, state1.initialDigits, state2.initialDigits)) {
         return false;
     }
 
-    if (!areSameGivenDigitsMaps(state1.excludedDigits ?? {}, state2.excludedDigits ?? {}, (a, b) => a.equals(b))) {
+    if (!areSameCellsMaps(state1.excludedDigits ?? {}, state2.excludedDigits ?? {}, (a, b) => a.equals(b))) {
         return false;
     }
 
@@ -435,18 +434,7 @@ export const areSameGameStates = <T extends AnyPTM>(
 
 // region History
 export const gameStateGetCurrentGivenDigitsByCells = <T extends AnyPTM>(cells: CellState<T>[][]) => {
-    const result: GivenDigitsMap<T["cell"]> = {};
-
-    cells.forEach((row, rowIndex) =>
-        row.forEach(({ usersDigit }, columnIndex) => {
-            if (usersDigit !== undefined) {
-                result[rowIndex] = result[rowIndex] || {};
-                result[rowIndex][columnIndex] = usersDigit;
-            }
-        }),
-    );
-
-    return result;
+    return createCellsMapFromArray(cells.map((row) => row.map(({ usersDigit }) => usersDigit)));
 };
 
 export const gameStateUndo = <T extends AnyPTM>({ gridStateHistory }: PuzzleContext<T>): PartialGameStateEx<T> => ({
@@ -873,8 +861,8 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
         const digits = context.userDigits;
         const newDigits = newContext.userDigits;
 
-        const failedDigits = givenDigitsMapToArray(
-            processGivenDigitsMaps(
+        const failedDigits = cellsMapToArray(
+            processCellsMaps(
                 (digits, position) => {
                     const digit = digits[digits.length - 2];
                     const newDigit = digits[digits.length - 1];

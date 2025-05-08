@@ -16,7 +16,7 @@ import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constrain
 import { MultiStageGameState } from "../../puzzleTypes/multi-stage/types/MultiStageGameState";
 import { carMargin } from "../../puzzleTypes/rush-hour/components/RushHourCar";
 import { isTextConstraint } from "../../components/puzzle/constraints/text/Text";
-import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { CellsMap, mergeCellsMaps } from "../../types/puzzle/CellsMap";
 import { Position } from "../../types/layout/Position";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { comparer, IReactionDisposer, reaction } from "mobx";
@@ -109,7 +109,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                                 const {
                                     gridExtension: { cars: carPositions },
                                 } = context;
-                                const newInitialDigits: GivenDigitsMap<number> = {};
+                                const newInitialDigits: CellsMap<number> = {};
                                 for (const [
                                     index,
                                     {
@@ -142,10 +142,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                             (newInitialDigits) => {
                                 if (Object.keys(newInitialDigits).length !== 0) {
                                     context.onStateChange({
-                                        initialDigits: mergeGivenDigitsMaps(
-                                            context.stateInitialDigits,
-                                            newInitialDigits,
-                                        ),
+                                        initialDigits: mergeCellsMaps(context.stateInitialDigits, newInitialDigits),
                                     });
                                 }
                             },

@@ -12,7 +12,7 @@ import React, { ReactElement, useCallback, useMemo } from "react";
 import { settings } from "../../../types/layout/Settings";
 import { PencilmarksCheckerMode } from "../../../types/puzzle/PencilmarksCheckerMode";
 import { isValidUserDigit } from "../../../types/puzzle/Constraint";
-import { mergeGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { profiler } from "../../../utils/profiler";
 import { useComputedValue } from "../../../hooks/useComputed";
 import { comparer } from "mobx";
@@ -62,7 +62,7 @@ export const GridCellDigits = observer(function GridCellDigitsFc<T extends AnyPT
                 cellPosition,
                 digit === undefined
                     ? context.userDigits
-                    : mergeGivenDigitsMaps(context.userDigits, { [top]: { [left]: digit } }),
+                    : mergeCellsMaps(context.userDigits, { [top]: { [left]: digit } }),
                 context,
                 false,
                 digit !== undefined,

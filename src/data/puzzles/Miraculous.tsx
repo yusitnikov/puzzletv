@@ -17,12 +17,12 @@ import {
 } from "../ruleSnippets";
 import { AutoRegionConstraint } from "../../components/puzzle/constraints/auto-region/AutoRegion";
 import { Constraint, isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
-import { GivenDigitsMap, processGivenDigitsMaps } from "../../types/puzzle/GivenDigitsMap";
+import { CellsMap, processCellsMaps } from "../../types/puzzle/CellsMap";
 import { ConsecutiveNeighborsConstraint } from "../../components/puzzle/constraints/consecutive-neighbors/ConsecutiveNeighbors";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
 
-const initialColors: GivenDigitsMap<CellColorValue> = {
+const initialColors: CellsMap<CellColorValue> = {
     1: {
         8: CellColor.darkGrey,
     },
@@ -117,7 +117,7 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
     ),
     typeManager: DigitPuzzleTypeManager(),
     gridSize: GridSize9,
-    initialColors: processGivenDigitsMaps((colors) => colors, [initialColors]),
+    initialColors: processCellsMaps((colors) => colors, [initialColors]),
     items: [
         ThermometerConstraint(["R5C2", "R4C1"]),
         KropkiDotConstraint("R1C7", "R1C8", true),

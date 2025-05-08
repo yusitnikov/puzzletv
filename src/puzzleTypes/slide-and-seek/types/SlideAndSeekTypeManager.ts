@@ -9,7 +9,7 @@ import {
 import { SlidableShapeConstraint } from "../constraints/SlidableShape";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { SlideAndSeekPTM } from "./SlideAndSeekPTM";
-import { GivenDigitsMap, givenDigitsMapToArray, processGivenDigitsMaps } from "../../../types/puzzle/GivenDigitsMap";
+import { CellsMap, cellsMapToArray, processCellsMaps } from "../../../types/puzzle/CellsMap";
 import { TextConstraint } from "../../../components/puzzle/constraints/text/Text";
 import { SlideAndSeekDigit, SlideAndSeekDigitSvgContent } from "../components/SlideAndSeekDigit";
 import { DigitCellDataComponentType } from "../../default/components/DigitCellData";
@@ -50,7 +50,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
             }
 
             type ShapeConstraint = Constraint<SlideAndSeekPTM<T>, DecorativeShapeProps>;
-            const givenShapes: GivenDigitsMap<SlideAndSeekShape> = {};
+            const givenShapes: CellsMap<SlideAndSeekShape> = {};
             let givenBorders = new PositionSet();
             const shapesMap: Record<string, ShapeConstraint> = {};
 
@@ -97,7 +97,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                 return item;
             });
 
-            for (const { data, position } of givenDigitsMapToArray(puzzle.initialDigits ?? {})) {
+            for (const { data, position } of cellsMapToArray(puzzle.initialDigits ?? {})) {
                 newItems.push(TextConstraint([position], String(data)));
 
                 const constraint = givenShapes[position.top]?.[position.left];
@@ -106,13 +106,13 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                 }
             }
 
-            const portalsByPosition = processGivenDigitsMaps(
+            const portalsByPosition = processCellsMaps(
                 ([colors]) => (colors.length === 1 ? resolveCellColorValue(colors[0]) : undefined),
                 [initialColors],
             );
             let letterChar = "A".charCodeAt(0);
             const portalsByColor: Record<string, { cells: Position[]; letter: string }> = {};
-            for (const { data: color, position } of givenDigitsMapToArray(portalsByPosition)) {
+            for (const { data: color, position } of cellsMapToArray(portalsByPosition)) {
                 const portals = (portalsByColor[color] ??= { cells: [], letter: String.fromCharCode(letterChar++) });
                 portals.cells.push({ top: position.top + 0.5, left: position.left + 0.5 });
                 if (portals.cells.length === 2) {
