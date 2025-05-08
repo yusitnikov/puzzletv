@@ -5,6 +5,12 @@ import { DigitRotationInfo } from "./DigitRotationInfo";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { loop } from "../../../utils/math";
 
+/**
+ * Information about how to render and how to rotate digits.
+ *
+ * @see PuzzleTypeManager.digitComponentType
+ * @see PuzzleTypeManager.cellDataDigitComponentType
+ */
 export interface DigitComponentType<T extends AnyPTM> {
     component: ComponentType<DigitProps<T>>;
     svgContentComponent: ComponentType<DigitProps<T>>;

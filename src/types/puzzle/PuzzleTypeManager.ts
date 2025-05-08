@@ -126,11 +126,21 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     disabledCellWriteModes?: CellWriteMode[];
 
     initialCellWriteMode?: CellWriteMode;
-
+    /**
+     * Component for rendering single digit in a constraint clue (e.g. in a killer cage sum).
+     * Also contains info about digit's average rendered width and about what would happen if rotating the digit.
+     */
     digitComponentType: DigitComponentType<T>;
-
+    /**
+     * Component for rendering single digit in the cell (e.g. given digit, cornermark) - for digit-like cell data types only.
+     * Optional, defaults to digitComponentType's value.
+     */
     cellDataDigitComponentType?: DigitComponentType<T>;
-
+    /**
+     * Component for rendering cell data based on the full cell data object
+     * (rather than cellDataDigitComponentType that can render only digits).
+     * Also contains info about cell data's average rendered width.
+     */
     cellDataComponentType: CellDataComponentType<T>;
 
     initialGameStateExtension?: T["stateEx"] | ((puzzle: PuzzleDefinition<T>) => T["stateEx"]);
