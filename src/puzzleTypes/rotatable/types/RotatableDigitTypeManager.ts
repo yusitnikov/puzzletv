@@ -195,7 +195,7 @@ export const RotatableDigitTypeManager = ({
 
             digitComponentType: CenteredCalculatorDigitComponentType(),
 
-            cellDataComponentType: RotatableDigitCellDataComponentType(),
+            cellDataComponentType: RotatableDigitCellDataComponentType,
 
             processArrowDirection(currentCell, xDirection, yDirection, context, isMainKeyboard) {
                 if (!isMainKeyboard) {

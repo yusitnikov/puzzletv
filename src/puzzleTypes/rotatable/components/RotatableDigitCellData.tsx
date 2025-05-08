@@ -1,13 +1,12 @@
 import { CellDataProps, getDefaultCellDataColor } from "../../../components/puzzle/cell/CellDataProps";
 import { userDigitColor } from "../../../components/app/globals";
 import { CellDataComponentType } from "../../../components/puzzle/cell/CellDataComponentType";
-import { AnyRotatablePTM } from "../types/RotatablePTM";
+import { RotatableDigitPTM } from "../types/RotatablePTM";
 import { profiler } from "../../../utils/profiler";
 import { observer } from "mobx-react-lite";
-import { ReactElement } from "react";
 
-export const RotatableDigitCellData = observer(function RotatableDigitCellData<T extends AnyRotatablePTM>(
-    props: CellDataProps<T>,
+export const RotatableDigitCellData = observer(function RotatableDigitCellDataFc(
+    props: CellDataProps<RotatableDigitPTM>,
 ) {
     profiler.trace();
 
@@ -32,8 +31,8 @@ export const RotatableDigitCellData = observer(function RotatableDigitCellData<T
             )}
         />
     );
-}) as <T extends AnyRotatablePTM>(props: CellDataProps<T>) => ReactElement;
-
-export const RotatableDigitCellDataComponentType = <T extends AnyRotatablePTM>(): CellDataComponentType<T> => ({
-    component: RotatableDigitCellData,
 });
+
+export const RotatableDigitCellDataComponentType: CellDataComponentType<RotatableDigitPTM> = {
+    component: RotatableDigitCellData,
+};
