@@ -1,6 +1,6 @@
 import { CellWriteMode } from "../CellWriteMode";
 import type { CellWriteModeInfo } from "../CellWriteModeInfo";
-import { gameStateApplyFieldDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx } from "../GameState";
+import { gameStateApplyGridDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx } from "../GameState";
 import { GestureMetrics } from "../../../utils/gestures";
 import { getRectCenter } from "../../layout/Rect";
 import { isCellGestureExtraData } from "../CellGestureExtraData";
@@ -19,7 +19,7 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
         },
         includeHidden,
     ) => loopHorizontally || loopVertically || allowMove || (includeHidden && (allowRotation || allowScale)),
-    applyToWholeField: true,
+    applyToWholeGrid: true,
     disableCellHandlers: true,
     hotKeyStr: ["Alt+Shift"],
     isNoSelectionMode: true,
@@ -35,7 +35,7 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
             rotation,
             scale,
         });
-        gameStateApplyFieldDragGesture(
+        gameStateApplyGridDragGesture(
             context,
             startContext,
             screenToField(startMetrics),

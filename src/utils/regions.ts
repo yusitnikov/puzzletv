@@ -110,12 +110,12 @@ export const getRegionBorders = (
     return borderPoints;
 };
 
-export const getAutoRegionWidth = (fieldSize: number) => {
-    let result = fieldSize;
+export const getAutoRegionWidth = (gridSize: number) => {
+    let result = gridSize;
 
-    for (let i = 2; i * i <= fieldSize; i++) {
-        if (fieldSize % i === 0) {
-            result = fieldSize / i;
+    for (let i = 2; i * i <= gridSize; i++) {
+        if (gridSize % i === 0) {
+            result = gridSize / i;
         }
     }
 

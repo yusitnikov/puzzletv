@@ -3,7 +3,7 @@ import {
     isValidFinishedPuzzleByEmbeddedSolution,
     PuzzleDefinition,
 } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularFieldSize, createRegularRegions } from "../../types/sudoku/FieldSize";
+import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
@@ -21,12 +21,12 @@ import {
     blueColor,
 } from "../../components/app/globals";
 import { Constraint, ConstraintProps } from "../../types/sudoku/Constraint";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
 
-const fieldSize = createRegularFieldSize(9, 3);
+const gridSize = createRegularGridSize(9, 3);
 
 const CageSumConstraint = (cellLiteral: string, sum: number) =>
     DecorativeCageConstraint([cellLiteral], sum, false, undefined, "transparent", undefined, true);
@@ -36,7 +36,7 @@ interface BitmapProps {
 }
 
 const Bitmap = {
-    [FieldLayer.regular]: observer(function Bitmap({ props: { image } }: ConstraintProps<NumberPTM, BitmapProps>) {
+    [GridLayer.regular]: observer(function Bitmap({ props: { image } }: ConstraintProps<NumberPTM, BitmapProps>) {
         profiler.trace();
 
         const size = 1 / (image.length + 2);
@@ -162,8 +162,8 @@ export const Pacman: PuzzleDefinition<NumberPTM> = {
         </>
     ),
     typeManager: DigitSudokuTypeManager(),
-    fieldSize,
-    regions: createRegularRegions(fieldSize),
+    gridSize,
+    regions: createRegularRegions(gridSize),
     initialDigits: { 0: { 8: 3 }, 3: { 4: 8 } },
     items: [
         CageSumConstraint("R1C3", 16),
@@ -199,6 +199,6 @@ export const Pacman: PuzzleDefinition<NumberPTM> = {
     ]),
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
     loopHorizontally: true,
-    fieldMargin: 0.99,
+    gridMargin: 0.99,
     allowDrawing: allDrawingModes,
 };

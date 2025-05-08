@@ -2,26 +2,26 @@ import { Position } from "../../../types/layout/Position";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { HashSet } from "../../../types/struct/Set";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
-import { FieldCellUserArea } from "./FieldCellUserArea";
+import { GridCellUserArea } from "./GridCellUserArea";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { ReactElement, ReactNode } from "react";
 import { GridRegion } from "../../../types/sudoku/GridRegion";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-export interface SingleCellFieldItemPositionFixProps<T extends AnyPTM> {
+export interface SingleCellGridItemPositionFixProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     position: Position;
     region?: GridRegion;
     children: ReactNode;
 }
 
-export const SingleCellFieldItemPositionFix = observer(function SingleCellFieldItemPositionFix<T extends AnyPTM>({
+export const SingleCellGridItemPositionFix = observer(function SingleCellGridItemPositionFixFn<T extends AnyPTM>({
     context,
     position,
     region,
     children,
-}: SingleCellFieldItemPositionFixProps<T>) {
+}: SingleCellGridItemPositionFixProps<T>) {
     profiler.trace();
 
     const processedPosition = context.puzzle.typeManager.processCellDataPosition?.(
@@ -45,8 +45,8 @@ export const SingleCellFieldItemPositionFix = observer(function SingleCellFieldI
     }
 
     return (
-        <FieldCellUserArea context={context} cellPosition={position}>
+        <GridCellUserArea context={context} cellPosition={position}>
             {children}
-        </FieldCellUserArea>
+        </GridCellUserArea>
     );
-}) as <T extends AnyPTM>(props: SingleCellFieldItemPositionFixProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: SingleCellGridItemPositionFixProps<T>) => ReactElement;

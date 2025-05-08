@@ -4,15 +4,15 @@ import { mergeGameStateUpdates, PartialGameStateEx } from "../../../types/sudoku
 import { positionToLatLngLiteral } from "../utils/googleMapsCoords";
 import { MoveCellWriteModeInfo } from "../../../types/sudoku/cellWriteModes/move";
 import { AnyGoogleMapsPTM } from "./GoogleMapsPTM";
-import { GoogleMapsFieldWrapper } from "../components/GoogleMapsFieldWrapper";
+import { GoogleMapsGridWrapper } from "../components/GoogleMapsGridWrapper";
 
 export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
     baseTypeManager: SudokuTypeManager<T>,
     initialBounds: google.maps.LatLngBoundsLiteral,
 ): SudokuTypeManager<T> => ({
     ...baseTypeManager,
-    fieldWrapperComponent: GoogleMapsFieldWrapper(initialBounds),
-    fieldFitsWrapper: true,
+    gridWrapperComponent: GoogleMapsGridWrapper(initialBounds),
+    gridFitsWrapper: true,
     extraCellWriteModes: [
         ...(baseTypeManager.extraCellWriteModes ?? []),
         {

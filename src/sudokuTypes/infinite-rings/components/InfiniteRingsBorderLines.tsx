@@ -1,4 +1,4 @@
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
 import { blackColor, getRegionBorderWidth } from "../../../components/app/globals";
 import { RoundedPolyLine } from "../../../components/svg/rounded-poly-line/RoundedPolyLine";
@@ -16,7 +16,7 @@ interface InfiniteRingsBorderLinesProps {
 }
 
 export const InfiniteRingsBorderLines: ConstraintPropsGenericFcMap<InfiniteRingsBorderLinesProps> = {
-    [FieldLayer.lines]: observer(function InfiniteRingsBorderLines<T extends AnyPTM>({
+    [GridLayer.lines]: observer(function InfiniteRingsBorderLines<T extends AnyPTM>({
         context,
         props: { visibleRingsCount: visibleRingsCountArg },
     }: ConstraintProps<T, InfiniteRingsBorderLinesProps>) {
@@ -24,12 +24,12 @@ export const InfiniteRingsBorderLines: ConstraintPropsGenericFcMap<InfiniteRings
 
         const {
             puzzle: {
-                fieldSize: { rowsCount: fieldSize },
+                gridSize: { rowsCount: gridSize },
             },
             cellSize,
         } = context;
         const scale = useTransformScale();
-        const ringsCount = fieldSize / 2 - 1;
+        const ringsCount = gridSize / 2 - 1;
         const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg)
             ? ringsCount
             : visibleRingsCountArg;

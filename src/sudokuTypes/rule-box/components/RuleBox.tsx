@@ -1,5 +1,5 @@
 import { globalPaddingCoeff, lightRedColor } from "../../../components/app/globals";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
@@ -22,7 +22,7 @@ export interface RuleBoxProps {
 }
 
 export const RuleBox: ConstraintPropsGenericFcMap<RuleBoxProps, AnyRuleBoxPTM> = {
-    [FieldLayer.regular]: observer(function RuleBoxUi<T extends AnyRuleBoxPTM>({
+    [GridLayer.regular]: observer(function RuleBoxUi<T extends AnyRuleBoxPTM>({
         cells,
         props: { rulesText },
         color = lightRedColor,
@@ -42,7 +42,7 @@ export const RuleBox: ConstraintPropsGenericFcMap<RuleBoxProps, AnyRuleBoxPTM> =
             </AutoSvg>
         );
     }),
-    [FieldLayer.interactive]: observer(function RuleBoxClicker<T extends AnyRuleBoxPTM>({
+    [GridLayer.interactive]: observer(function RuleBoxClicker<T extends AnyRuleBoxPTM>({
         cells,
         props: { rulesText, rulesNode },
         context,

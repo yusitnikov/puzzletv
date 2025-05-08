@@ -5,16 +5,16 @@ export type MultiStagePTM<
     CellType = number,
     GameStateExType extends MultiStageGameState = MultiStageGameState,
     ProcessedGameStateExType = {},
-    FieldStateEx = {},
+    GridStateEx = {},
     PuzzleExType = {},
-> = PTM<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx, PuzzleExType>;
+> = PTM<CellType, GameStateExType, ProcessedGameStateExType, GridStateEx, PuzzleExType>;
 
 export type AnyMultiStagePTM<
     CellType = any,
     GameStateExType extends MultiStageGameState = any,
     ProcessedGameStateExType = any,
-    FieldStateEx = any,
+    GridStateEx = any,
     PuzzleExType = any,
-> = AnyPTM<CellType, GameStateExType, ProcessedGameStateExType, FieldStateEx, PuzzleExType>;
+> = AnyPTM<CellType, GameStateExType, ProcessedGameStateExType, GridStateEx, PuzzleExType>;
 
 export type ToMultiStagePTM<T extends AnyPTM> = Omit<T, "stateEx"> & { stateEx: T["stateEx"] & MultiStageGameState };

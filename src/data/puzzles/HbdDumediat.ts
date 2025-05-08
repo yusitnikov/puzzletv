@@ -2,7 +2,7 @@ import { FPuzzles } from "./Import";
 import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
 import { JigsawPTM } from "../../sudokuTypes/jigsaw/types/JigsawPTM";
 import { PuzzleImportOptions, PuzzleImportPuzzleType } from "../../types/sudoku/PuzzleImportOptions";
-import { JigsawFieldState } from "../../sudokuTypes/jigsaw/types/JigsawFieldState";
+import { JigsawGridState } from "../../sudokuTypes/jigsaw/types/JigsawGridState";
 import { stringifyPosition } from "../../types/layout/Position";
 import { JigsawPieceInfo } from "../../sudokuTypes/jigsaw/types/JigsawPieceInfo";
 
@@ -30,9 +30,9 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
             ],
         } as PuzzleImportOptions);
 
-        const baseInitialStateFn = puzzle.typeManager.initialFieldStateExtension as (
+        const baseInitialStateFn = puzzle.typeManager.initialGridStateExtension as (
             puzzle: PuzzleDefinition<JigsawPTM>,
-        ) => JigsawFieldState;
+        ) => JigsawGridState;
 
         const initialScale = 0.85;
         return {
@@ -44,7 +44,7 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
                     left: -1.25 * initialScale,
                 },
                 initialScale,
-                initialFieldStateExtension: (puzzle) => {
+                initialGridStateExtension: (puzzle) => {
                     const pieces: JigsawPieceInfo[] = puzzle.extension!.pieces;
                     const pieceIndexByCell: Record<string, number> = {};
                     for (const [index, { cells }] of pieces.entries()) {

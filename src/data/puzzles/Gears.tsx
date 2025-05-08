@@ -3,7 +3,7 @@ import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/Rotat
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { RotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { blueColor, darkPurpleColor, greenColor, pinkColor, purpleColor } from "../../components/app/globals";
@@ -29,7 +29,7 @@ export const Gears: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         baseTypeManager: DigitSudokuTypeManager(),
         isEquivalentLoop: false,
     }),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     extension: {
         clues: [

@@ -5,7 +5,7 @@ import { GivenDigitsMap } from "./GivenDigitsMap";
 import { PuzzleContext } from "./PuzzleContext";
 import { SetInterface } from "../struct/Set";
 import { LineWithColor } from "./LineWithColor";
-import { FieldLayer } from "./FieldLayer";
+import { GridLayer } from "./GridLayer";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { isSelectableCell, isSolutionCheckCell } from "./CellTypeProps";
 import { GridRegion } from "./GridRegion";
@@ -20,8 +20,8 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
     tags?: string[];
     cells: Position[];
     renderSingleCellInUserArea?: boolean;
-    layer?: FieldLayer;
-    component?: Partial<Record<FieldLayer, ComponentType<ConstraintProps<T, DataT>>>>;
+    layer?: GridLayer;
+    component?: Partial<Record<GridLayer, ComponentType<ConstraintProps<T, DataT>>>>;
     color?: string;
     angle?: number;
     isObvious?: boolean;
@@ -65,7 +65,7 @@ export type ConstraintPropsGenericFc<DataT = undefined, BaseT extends AnyPTM = A
 ) => ReactElement | null;
 
 export type ConstraintPropsGenericFcMap<DataT = undefined, BaseT extends AnyPTM = AnyPTM> = Partial<
-    Record<FieldLayer, ConstraintPropsGenericFc<DataT, BaseT>>
+    Record<GridLayer, ConstraintPropsGenericFc<DataT, BaseT>>
 >;
 
 // region Helper methods
@@ -163,7 +163,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
     const { puzzleIndex, puzzle, lines, userDigits } = context;
     const {
         digitsCount,
-        fieldSize: { rowsCount, columnsCount },
+        gridSize: { rowsCount, columnsCount },
         importOptions: { stickyRegion, noStickyRegionValidation } = {},
         allowEmptyCells,
     } = puzzle;

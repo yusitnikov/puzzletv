@@ -12,7 +12,7 @@ import {
     DecorativeShapeProps,
     isEllipse,
 } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { RotatableClueConstraint } from "../constraints/RotatableClue";
 import { RotateClueButton } from "../components/RotateClueButton";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
@@ -23,10 +23,10 @@ import { settings } from "../../../types/layout/Settings";
 import { createWheel } from "../../../components/sudoku/constraints/wheel/Wheel";
 import { isTextConstraint } from "../../../components/sudoku/constraints/text/Text";
 import {
-    addFieldStateExToSudokuManager,
+    addGridStateExToSudokuManager,
     addGameStateExToSudokuManager,
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
-import { RotatableCluesFieldState } from "./RotatableCluesFieldState";
+import { RotatableCluesGridState } from "./RotatableCluesGridState";
 import { rotateNumber } from "../../../components/sudoku/digit/DigitComponentType";
 
 interface CluesImporterResult<T extends AnyPTM> {
@@ -51,8 +51,8 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>({
     angleStep = 90,
 }: RotatableCluesOptions<T>): SudokuTypeManager<RotatableCluesPTM<T>> => ({
     ...addGameStateExToSudokuManager(
-        addFieldStateExToSudokuManager(baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>, {
-            initialFieldStateExtension(puzzle): RotatableCluesFieldState {
+        addGridStateExToSudokuManager(baseTypeManager as unknown as SudokuTypeManager<RotatableCluesPTM<T>>, {
+            initialGridStateExtension(puzzle): RotatableCluesGridState {
                 return {
                     clueAngles: puzzle?.extension?.clues.map(() => 0) ?? [],
                 };
@@ -66,7 +66,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>({
             },
             useProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
                 const {
-                    fieldExtension: { clueAngles },
+                    gridExtension: { clueAngles },
                     stateExtension: { clues: clueAnimations },
                 } = context;
 
@@ -80,7 +80,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>({
                     ),
                 };
             },
-            getProcessedGameStateExtension({ fieldExtension: { clueAngles } }): RotatableCluesProcessedGameState {
+            getProcessedGameStateExtension({ gridExtension: { clueAngles } }): RotatableCluesProcessedGameState {
                 return { clueAngles };
             },
         },
@@ -99,7 +99,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>({
                 () => {
                     const {
                         puzzle,
-                        fieldExtension: { clueAngles },
+                        gridExtension: { clueAngles },
                     } = context;
                     const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
 
@@ -119,22 +119,22 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>({
                 },
                 (processedClueAngles) => {
                     const {
-                        fieldExtension: { clueAngles },
+                        gridExtension: { clueAngles },
                     } = context;
 
                     if (processedClueAngles.some((value, index) => value !== clueAngles[index])) {
-                        const { clientId, actionId } = context.currentFieldState;
+                        const { clientId, actionId } = context.currentGridState;
 
                         context.onStateChange({
-                            fieldStateHistory: fieldStateHistoryAddState(
+                            gridStateHistory: gridStateHistoryAddState(
                                 context,
                                 // repeat clientId and actionId of the action that caused this change
                                 clientId,
                                 actionId,
-                                (fieldState) => ({
-                                    ...fieldState,
+                                (gridState) => ({
+                                    ...gridState,
                                     extension: {
-                                        ...fieldState.extension,
+                                        ...gridState.extension,
                                         clueAngles: processedClueAngles,
                                     },
                                 }),
@@ -179,7 +179,7 @@ export const RotatableCluesSudokuTypeManager = <T extends AnyPTM>({
             ...puzzle,
             items: (context) => {
                 const {
-                    fieldExtension: { clueAngles },
+                    gridExtension: { clueAngles },
                     processedGameStateExtension: { clueAngles: animatedClueAngles },
                 } = context;
 

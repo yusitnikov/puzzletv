@@ -10,33 +10,33 @@ export const CubedokuIndexingConstraint = <T extends AnyPTM>(): Constraint<T> =>
     isValidCell(cell, digits, _, context): boolean {
         const {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
                 typeManager: { getDigitByCellData },
             },
         } = context;
-        const realFieldSize = fieldSize / 2;
+        const realGridSize = gridSize / 2;
 
         // x and y are like in the left face of the cube
         const getIndexedCell = ({ left, top }: Position, data: T["cell"]): Position3D => {
             const digit = getDigitByCellData(data, context, { top, left });
 
-            if (top < realFieldSize) {
+            if (top < realGridSize) {
                 return {
                     x: left,
                     y: digit - 1,
-                    z: realFieldSize - 1 - top,
+                    z: realGridSize - 1 - top,
                 };
-            } else if (left < realFieldSize) {
+            } else if (left < realGridSize) {
                 return {
                     x: left,
-                    y: top - realFieldSize,
+                    y: top - realGridSize,
                     z: digit - 1,
                 };
             } else {
                 return {
-                    x: realFieldSize - digit,
-                    y: top - realFieldSize,
-                    z: left - realFieldSize,
+                    x: realGridSize - digit,
+                    y: top - realGridSize,
+                    z: left - realGridSize,
                 };
             }
         };

@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import { FieldRect } from "./FieldRect";
+import { GridRect } from "./GridRect";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { GridRegion } from "../../../types/sudoku/GridRegion";
@@ -8,7 +8,7 @@ import { regionHighlightColor } from "../../app/globals";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
+interface GridRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     children: ReactNode | ((region?: GridRegion, index?: number) => ReactNode);
     regionNoClipChildren?: ReactNode | ((region?: GridRegion, index?: number) => ReactNode);
@@ -17,9 +17,9 @@ interface FieldRegionsWithSameCoordsTransformationProps<T extends AnyPTM> {
 /**
  * Render transformed regions returned from `SudokuTypeManager.getRegionsWithSameCoordsTransformation()`.
  */
-export const FieldRegionsWithSameCoordsTransformation = observer(function FieldRegionsWithSameCoordsTransformation<
+export const GridRegionsWithSameCoordsTransformation = observer(function GridRegionsWithSameCoordsTransformationFn<
     T extends AnyPTM,
->({ context, children, regionNoClipChildren }: FieldRegionsWithSameCoordsTransformationProps<T>) {
+>({ context, children, regionNoClipChildren }: GridRegionsWithSameCoordsTransformationProps<T>) {
     profiler.trace();
 
     const { regions } = context;
@@ -38,7 +38,7 @@ export const FieldRegionsWithSameCoordsTransformation = observer(function FieldR
                 .sort(({ zIndex }, { zIndex: zIndex2 }) => zIndex - zIndex2)
                 .flatMap(({ regions }) => [
                     ...regions.map(({ region, index }) => (
-                        <FieldRect key={`region-no-clip-${index}`} context={context} {...region}>
+                        <GridRect key={`region-no-clip-${index}`} context={context} {...region}>
                             <AutoSvg
                                 left={-region.left}
                                 top={-region.top}
@@ -50,12 +50,12 @@ export const FieldRegionsWithSameCoordsTransformation = observer(function FieldR
                                     ? regionNoClipChildren(region, index)
                                     : regionNoClipChildren}
                             </AutoSvg>
-                        </FieldRect>
+                        </GridRect>
                     )),
                     ...regions.map(
                         ({ region, index }) =>
                             region.highlighted && (
-                                <FieldRect key={`region-highlight-${index}`} context={context} {...region}>
+                                <GridRect key={`region-highlight-${index}`} context={context} {...region}>
                                     <AutoSvg
                                         left={-region.left}
                                         top={-region.top}
@@ -76,11 +76,11 @@ export const FieldRegionsWithSameCoordsTransformation = observer(function FieldR
                                             />
                                         ))}
                                     </AutoSvg>
-                                </FieldRect>
+                                </GridRect>
                             ),
                     ),
                     ...regions.map(({ region, index }) => (
-                        <FieldRect key={`region-clip-${index}`} context={context} clip={!region.noClip} {...region}>
+                        <GridRect key={`region-clip-${index}`} context={context} clip={!region.noClip} {...region}>
                             <AutoSvg
                                 left={-region.left}
                                 top={-region.top}
@@ -90,16 +90,16 @@ export const FieldRegionsWithSameCoordsTransformation = observer(function FieldR
                             >
                                 {typeof children === "function" ? children(region, index) : children}
                             </AutoSvg>
-                        </FieldRect>
+                        </GridRect>
                     )),
                 ])}
 
             {!regions && (
-                <FieldRect context={context} top={0} left={0}>
+                <GridRect context={context} top={0} left={0}>
                     {typeof regionNoClipChildren === "function" ? regionNoClipChildren() : regionNoClipChildren}
                     {typeof children === "function" ? children() : children}
-                </FieldRect>
+                </GridRect>
             )}
         </>
     );
-}) as <T extends AnyPTM>(props: FieldRegionsWithSameCoordsTransformationProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridRegionsWithSameCoordsTransformationProps<T>) => ReactElement;

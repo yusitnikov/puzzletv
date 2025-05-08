@@ -10,7 +10,7 @@ export const AntiBishopConstraint = <T extends AnyPTM>(): Constraint<T> => ({
         const { top, left } = cell;
         const digit = digits[top][left]!;
 
-        for (let left2 = 0; left2 < context.puzzle.fieldSize.rowsCount; left2++) {
+        for (let left2 = 0; left2 < context.puzzle.gridSize.rowsCount; left2++) {
             const dx = left2 - left;
             if (dx === 0) {
                 continue;

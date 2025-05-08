@@ -7,17 +7,17 @@ import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 
-interface FieldCellUserAreaProps<T extends AnyPTM> {
+interface GridCellUserAreaProps<T extends AnyPTM> {
     context?: PuzzleContext<T>;
     cellPosition?: Position;
     children: ReactNode;
 }
 
-export const FieldCellUserArea = observer(function FieldCellUserArea<T extends AnyPTM>({
+export const GridCellUserArea = observer(function GridCellUserAreaFc<T extends AnyPTM>({
     context,
     cellPosition,
     children,
-}: FieldCellUserAreaProps<T>) {
+}: GridCellUserAreaProps<T>) {
     profiler.trace();
 
     const customRect =
@@ -32,4 +32,4 @@ export const FieldCellUserArea = observer(function FieldCellUserArea<T extends A
     ) : (
         <>{children}</>
     );
-}) as <T extends AnyPTM>(props: FieldCellUserAreaProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridCellUserAreaProps<T>) => ReactElement;

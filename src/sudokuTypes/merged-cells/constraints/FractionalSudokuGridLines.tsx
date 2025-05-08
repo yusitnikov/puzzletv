@@ -1,5 +1,5 @@
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { profiler } from "../../../utils/profiler";
@@ -10,10 +10,10 @@ import { indexes } from "../../../utils/indexes";
 const borderColor = textColor;
 
 export const FractionalSudokuGridLines: ConstraintPropsGenericFcMap = {
-    [FieldLayer.lines]: observer(function FieldLines<T extends AnyPTM>({
+    [GridLayer.lines]: observer(function FieldLines<T extends AnyPTM>({
         context: {
             puzzle: {
-                fieldSize: { columnsCount, rowsCount },
+                gridSize: { columnsCount, rowsCount },
                 importOptions: { cellPieceWidth = 2, cellPieceHeight = 2 } = {},
             },
         },

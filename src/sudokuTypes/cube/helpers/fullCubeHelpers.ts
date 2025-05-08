@@ -11,7 +11,7 @@ export const transformFullCubeCoords3D = (
 ) => {
     const {
         puzzle: {
-            fieldSize: { columnsCount },
+            gridSize: { columnsCount },
         },
     } = context;
 

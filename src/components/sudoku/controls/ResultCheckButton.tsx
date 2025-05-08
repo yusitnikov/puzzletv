@@ -24,7 +24,7 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
         lmdSolutionCode,
         openedLmdOnce,
         lives,
-        fogDemoFieldStateHistory,
+        fogDemoGridStateHistory,
     } = context;
 
     const { params, typeManager, resultChecker, forceAutoCheckOnFinish = false } = puzzle;
@@ -61,7 +61,7 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
     const bestScore = playerScores[0]?.score || 0;
     const worstScore = playerScores[playerScores.length - 1]?.score || 0;
 
-    if (fogDemoFieldStateHistory) {
+    if (fogDemoGridStateHistory) {
         return null;
     }
 

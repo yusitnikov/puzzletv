@@ -100,7 +100,7 @@ export const GuessSudokuTypeManager = <T extends AnyNumberPTM>(): SudokuTypeMana
         const {
             params = {},
             typeManager: { createCellDataByDisplayDigit },
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
         } = puzzle;
 
         const isCompetitive = isEnabled && !params.share;

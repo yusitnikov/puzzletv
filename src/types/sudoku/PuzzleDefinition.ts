@@ -1,11 +1,11 @@
 import { GivenDigitsMap, mergeGivenDigitsMaps, processGivenDigitsMaps } from "./GivenDigitsMap";
-import { ComponentType, ReactNode } from "react";
+import { ReactNode } from "react";
 import { SudokuTypeManager } from "./SudokuTypeManager";
-import { FieldSize } from "./FieldSize";
+import { GridSize } from "./GridSize";
 import { PartiallyTranslatable } from "../translations/Translatable";
 import { Constraint } from "./Constraint";
 import { CellColorValue } from "./CellColor";
-import { PuzzleContext, PuzzleContextProps } from "./PuzzleContext";
+import { PuzzleContext } from "./PuzzleContext";
 import { CustomCellBounds } from "./CustomCellBounds";
 import {
     getLineVector,
@@ -48,10 +48,10 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     aboveRules?: (context: PuzzleContext<T>, isPortrait: boolean) => ReactNode;
     successMessage?: ReactNode;
     typeManager: SudokuTypeManager<T>;
-    fieldSize: FieldSize;
+    gridSize: GridSize;
     regions?: (Position[] | Constraint<T, any>)[];
     disableSudokuRules?: boolean;
-    fieldMargin?: number;
+    gridMargin?: number;
     customCellBounds?: GivenDigitsMap<CustomCellBounds>;
     digitsCount?: number;
     supportZero?: boolean;
@@ -145,19 +145,19 @@ export const loadPuzzle = <T extends AnyPTM>(
 
 export const getDefaultDigitsCount = <T extends AnyPTM>({
     typeManager: { maxDigitsCount },
-    fieldSize: { fieldSize },
+    gridSize: { gridSize },
     importOptions: { stickyRegion } = {},
 }: PuzzleDefinition<T>) => {
     if (stickyRegion) {
-        fieldSize = Math.min(fieldSize, Math.max(stickyRegion.width, stickyRegion.height));
+        gridSize = Math.min(gridSize, Math.max(stickyRegion.width, stickyRegion.height));
     }
 
-    return Math.min(maxDigitsCount || fieldSize, fieldSize);
+    return Math.min(maxDigitsCount || gridSize, gridSize);
 };
 
 export const normalizePuzzlePosition = <T extends AnyPTM>(
     { top, left }: Position,
-    { fieldSize: { rowsCount, columnsCount }, loopHorizontally, loopVertically }: PuzzleDefinition<T>,
+    { gridSize: { rowsCount, columnsCount }, loopHorizontally, loopVertically }: PuzzleDefinition<T>,
 ): Position => ({
     top: loopVertically ? loop(top, rowsCount) : top,
     left: loopHorizontally ? loop(left, columnsCount) : left,
@@ -175,7 +175,7 @@ export const getPuzzlePositionHasher =
 
 export const normalizePuzzleVector = <T extends AnyPTM>(vector: Position, puzzle: PuzzleDefinition<T>): Position => {
     const {
-        fieldSize: { rowsCount, columnsCount },
+        gridSize: { rowsCount, columnsCount },
         loopHorizontally,
         loopVertically,
     } = puzzle;
@@ -230,7 +230,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         puzzle,
         puzzleIndex,
         userDigits,
-        currentFieldStateWithFogDemo: { cells, marks },
+        currentGridStateWithFogDemo: { cells, marks },
     } = context;
     const {
         typeManager: { getDigitByCellData },

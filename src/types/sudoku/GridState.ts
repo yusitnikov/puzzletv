@@ -18,53 +18,53 @@ import { myClientId } from "../../hooks/useMultiPlayer";
 import { PuzzleLine } from "./PuzzleLine";
 import { PuzzleContext } from "./PuzzleContext";
 
-export interface FieldState<T extends AnyPTM> {
+export interface GridState<T extends AnyPTM> {
     cells: CellState<T>[][];
     lines: SetInterface<PuzzleLine>;
     marks: SetInterface<CellMark>;
-    extension: T["fieldStateEx"];
+    extension: T["gridStateEx"];
     clientId: string;
     actionId: string;
 }
 
-export const createEmptyFieldState = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>): FieldState<T> => {
+export const createEmptyGridState = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>): GridState<T> => {
     const {
-        typeManager: { initialFieldStateExtension },
+        typeManager: { initialGridStateExtension },
     } = puzzle;
 
-    const result: FieldState<T> = {
-        cells: indexes(puzzle.fieldSize.rowsCount).map(() =>
-            indexes(puzzle.fieldSize.columnsCount).map(() => createEmptyCellState(puzzle)),
+    const result: GridState<T> = {
+        cells: indexes(puzzle.gridSize.rowsCount).map(() =>
+            indexes(puzzle.gridSize.columnsCount).map(() => createEmptyCellState(puzzle)),
         ),
         lines: new PuzzleLineSet(puzzle),
         marks: new CellMarkSet(puzzle).bulkAdd(puzzle.initialCellMarks ?? []),
         extension:
-            typeof initialFieldStateExtension === "function"
-                ? (initialFieldStateExtension as (puzzle: PuzzleDefinition<T>) => T["fieldStateEx"])(puzzle)
-                : (initialFieldStateExtension ?? ({} as T["fieldStateEx"])),
+            typeof initialGridStateExtension === "function"
+                ? (initialGridStateExtension as (puzzle: PuzzleDefinition<T>) => T["gridStateEx"])(puzzle)
+                : (initialGridStateExtension ?? ({} as T["gridStateEx"])),
         clientId: myClientId,
         actionId: "",
     };
 
-    return puzzle.typeManager.modifyInitialFieldState?.(result) ?? result;
+    return puzzle.typeManager.modifyInitialGridState?.(result) ?? result;
 };
 
-export const serializeFieldState = <T extends AnyPTM>(
-    { cells, lines, marks, extension, clientId, actionId }: FieldState<T>,
+export const serializeGridState = <T extends AnyPTM>(
+    { cells, lines, marks, extension, clientId, actionId }: GridState<T>,
     puzzle: PuzzleDefinition<T>,
 ): any => ({
     cells: cells.map((row) => row.map((cell) => serializeCellState(cell, puzzle.typeManager))),
     lines: lines.serialize(),
     marks: marks.bulkRemove(puzzle.initialCellMarks ?? []).serialize(),
-    extension: puzzle.typeManager.serializeFieldStateExtension?.(extension) ?? extension,
+    extension: puzzle.typeManager.serializeGridStateExtension?.(extension) ?? extension,
     clientId,
     actionId,
 });
 
-export const unserializeFieldState = <T extends AnyPTM>(
+export const unserializeGridState = <T extends AnyPTM>(
     { cells = [], lines = [], marks = [], extension = {}, clientId = myClientId, actionId = "" }: any,
     puzzle: PuzzleDefinition<T>,
-): FieldState<T> => ({
+): GridState<T> => ({
     cells: (cells as any[][]).map((row) => row.map((cell) => unserializeCellState(cell, puzzle))),
     lines: PuzzleLineSet.unserialize(puzzle, lines),
     marks: CellMarkSet.unserialize(
@@ -74,57 +74,57 @@ export const unserializeFieldState = <T extends AnyPTM>(
             type: type ?? (isCircle ? CellMarkType.O : CellMarkType.X),
         })),
     ).bulkAdd(puzzle.initialCellMarks ?? []),
-    extension: puzzle.typeManager.unserializeFieldStateExtension?.(extension) ?? (extension as T["fieldStateEx"]),
+    extension: puzzle.typeManager.unserializeGridStateExtension?.(extension) ?? (extension as T["gridStateEx"]),
     clientId,
     actionId,
 });
 
-export const cloneFieldState = <T extends AnyPTM>(
+export const cloneGridState = <T extends AnyPTM>(
     typeManager: SudokuTypeManager<T>,
-    { cells, lines, marks, extension }: FieldState<T>,
+    { cells, lines, marks, extension }: GridState<T>,
     clientId: string,
     actionId: string,
-): FieldState<T> => ({
+): GridState<T> => ({
     cells: cells.map((row) => row.map((cellState) => cloneCellState(typeManager, cellState))),
     lines: lines.clone(),
     marks: marks.clone(),
-    extension: typeManager.cloneFieldStateExtension?.(extension) ?? JSON.parse(JSON.stringify(extension)),
+    extension: typeManager.cloneGridStateExtension?.(extension) ?? JSON.parse(JSON.stringify(extension)),
     clientId,
     actionId,
 });
 
-export const processFieldStateCells = <T extends AnyPTM>(
-    fieldState: FieldState<T>,
+export const processGridStateCells = <T extends AnyPTM>(
+    gridState: GridState<T>,
     affectedCells: Position[],
     processor: (cellState: CellState<T>, position: Position) => CellState<T>,
 ) => {
     for (const position of affectedCells) {
         const { left: columnIndex, top: rowIndex } = position;
-        fieldState.cells[rowIndex][columnIndex] = processor(fieldState.cells[rowIndex][columnIndex], position);
+        gridState.cells[rowIndex][columnIndex] = processor(gridState.cells[rowIndex][columnIndex], position);
     }
 
-    return fieldState;
+    return gridState;
 };
 
-export const areAllFieldStateCells = <T extends AnyPTM>(
-    fieldState: FieldState<T>,
+export const areAllGridStateCells = <T extends AnyPTM>(
+    gridState: GridState<T>,
     affectedCells: Position[],
     predicate: (cellState: CellState<T>, position: Position) => boolean,
-) => affectedCells.every((position) => predicate(fieldState.cells[position.top][position.left], position));
+) => affectedCells.every((position) => predicate(gridState.cells[position.top][position.left], position));
 
-export const isAnyFieldStateCell = <T extends AnyPTM>(
-    fieldState: FieldState<T>,
+export const isAnyGridStateCell = <T extends AnyPTM>(
+    gridState: GridState<T>,
     affectedCells: Position[],
     predicate: (cellState: CellState<T>, position: Position) => boolean,
-) => affectedCells.some((position) => predicate(fieldState.cells[position.top][position.left], position));
+) => affectedCells.some((position) => predicate(gridState.cells[position.top][position.left], position));
 
-export const areFieldStatesEqual = <T extends AnyPTM>(
+export const areGridStatesEqual = <T extends AnyPTM>(
     context: PuzzleContext<T>,
-    { cells, lines, marks, extension }: FieldState<T>,
-    { cells: cells2, lines: lines2, marks: marks2, extension: extension2 }: FieldState<T>,
+    { cells, lines, marks, extension }: GridState<T>,
+    { cells: cells2, lines: lines2, marks: marks2, extension: extension2 }: GridState<T>,
 ) => {
     const {
-        typeManager: { areFieldStateExtensionsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b) },
+        typeManager: { areGridStateExtensionsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b) },
     } = context.puzzle;
 
     return (
@@ -133,6 +133,6 @@ export const areFieldStatesEqual = <T extends AnyPTM>(
         ) &&
         lines.equals(lines2) &&
         marks.equals(marks2) &&
-        areFieldStateExtensionsEqual(extension, extension2)
+        areGridStateExtensionsEqual(extension, extension2)
     );
 };

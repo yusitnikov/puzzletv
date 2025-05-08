@@ -17,7 +17,7 @@ import {
 } from "../ruleSnippets";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { KillerCageConstraint } from "../../components/sudoku/constraints/killer-cage/KillerCage";
 import { Constraint, toDecorativeConstraint } from "../../types/sudoku/Constraint";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
@@ -278,7 +278,7 @@ export const base: PuzzleDefinition<NumberPTM> = {
     author: { [LanguageCode.en]: "ViKingPrime" },
     slug,
     typeManager: DigitSudokuTypeManager(),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     supportZero: true,
     allowOverridingInitialColors: true,

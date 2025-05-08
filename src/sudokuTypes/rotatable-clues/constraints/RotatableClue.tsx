@@ -5,7 +5,7 @@ import { RotatableClueItemConstraint, RotatableClue } from "../types/RotatableCl
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { getLineVector, Position, rotateVectorClockwise } from "../../../types/layout/Position";
 import { loop } from "../../../utils/math";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { lightGreyColor, veryDarkGreyColor } from "../../../components/app/globals";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
@@ -96,10 +96,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
             cells: [pivot],
             props: undefined,
             component: {
-                [FieldLayer.top]: observer(function RotatableCluePivot({
-                    cells: [{ top, left }],
-                    context: { puzzle },
-                }) {
+                [GridLayer.top]: observer(function RotatableCluePivot({ cells: [{ top, left }], context: { puzzle } }) {
                     profiler.trace();
 
                     if (puzzle.importOptions?.freeRotation && puzzle.importOptions?.wheels) {
@@ -139,7 +136,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                         </AutoSvg>
                     );
                 }),
-                [FieldLayer.interactive]: observer(function RotatableCluePivotSelection({ cells: [cell], context }) {
+                [GridLayer.interactive]: observer(function RotatableCluePivotSelection({ cells: [cell], context }) {
                     profiler.trace();
 
                     const { top, left } = cell;

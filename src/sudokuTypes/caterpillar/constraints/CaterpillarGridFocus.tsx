@@ -1,6 +1,6 @@
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { isCellInRect, Rect } from "../../../types/layout/Rect";
 import { CellSelectionColor } from "../../../components/sudoku/cell/CellSelection";
@@ -8,12 +8,12 @@ import { CellSelectionColor } from "../../../components/sudoku/cell/CellSelectio
 const borderWidth = 0.1;
 
 const CaterpillarGridFocus: ConstraintPropsGenericFcMap<Rect> = {
-    [FieldLayer.beforeBackground]: observer(function CaterpillarGridBacckground<T extends AnyPTM>({
+    [GridLayer.beforeBackground]: observer(function CaterpillarGridBacckground<T extends AnyPTM>({
         props: { top, left, width, height },
     }: ConstraintProps<T, Rect>) {
         return <rect x={left} y={top} width={width} height={height} fill={"#fff"} stroke={"none"} strokeWidth={0} />;
     }),
-    [FieldLayer.beforeSelection]: observer(function CaterpillarGridFocus<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function CaterpillarGridFocus<T extends AnyPTM>({
         context: { selectedCells },
         props: bounds,
     }: ConstraintProps<T, Rect>) {

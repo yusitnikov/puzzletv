@@ -1,9 +1,9 @@
 import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { RoundedPolyLine } from "../../components/svg/rounded-poly-line/RoundedPolyLine";
 import { darkGreyColor, greenColor, purpleColor, veryDarkGreyColor } from "../../components/app/globals";
@@ -128,7 +128,7 @@ const LinkageConstraint: Constraint<IsReadyPTM> = {
     cells: [],
     props: undefined,
     component: {
-        [FieldLayer.regular]: observer(function Linkage({
+        [GridLayer.regular]: observer(function Linkage({
             context: {
                 stateExtension: { isReady },
             },
@@ -196,7 +196,7 @@ export const PeaucellierLipkinLinkage: PuzzleDefinition<IsReadyPTM> = {
     author: { [LanguageCode.en]: "Palfly Kampling" },
     slug: "peaucellier-lipkin-linkage",
     typeManager: IsReadyTypeManager,
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     allowDrawing: allDrawingModes,
     rules: (context) => {

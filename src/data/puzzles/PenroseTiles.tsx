@@ -15,14 +15,14 @@ import { translate } from "../../utils/translate";
 
 const coeff = Math.sqrt(3) / 2;
 const areaRadius = 1 / 3;
-const fieldSize = Math.ceil(11 * coeff);
+const gridSize = Math.ceil(11 * coeff);
 const exampleColor = lighterBlueColor;
 
 const round = (value: number) => roundToStep(value, 0.001);
 
 const point = (x: number, y: number): Position => ({
-    left: round(fieldSize / 2 + (x + 0.5) * coeff),
-    top: round(fieldSize / 2 + y - 1.75),
+    left: round(gridSize / 2 + (x + 0.5) * coeff),
+    top: round(gridSize / 2 + y - 1.75),
 });
 
 const area = ({ top, left }: Position): Rect => ({
@@ -171,8 +171,8 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
         ignoreRowsColumnCountInTheWrapper: true,
         getCellTypeProps: ({ left }): CellTypeProps<NumberPTM> => ({ noInteraction: left >= 64 }),
     },
-    fieldSize: {
-        fieldSize,
+    gridSize: {
+        gridSize,
         rowsCount: 1,
         columnsCount: 72,
     },

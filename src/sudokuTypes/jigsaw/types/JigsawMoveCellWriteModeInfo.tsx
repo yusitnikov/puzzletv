@@ -56,28 +56,28 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
     onOutsideClick(context) {
         context.onStateChange({ extension: { highlightCurrentPiece: false } });
     },
-    onMove(props, context, fieldRect) {
+    onMove(props, context, gridRect) {
         const { gesture, startMetrics, currentMetrics } = props;
         const { id, state: startContext } = gesture;
         const { puzzle, cellSize } = context;
         const { loopOffset, scale } = startContext;
         const {
-            fieldSize: { fieldSize },
+            gridSize: { gridSize },
             importOptions: { angleStep } = {},
         } = puzzle;
 
         const piecesGroup = getJigsawPiecesByGesture(startContext, gesture);
         if (!piecesGroup) {
-            base.onMove?.(props, context, fieldRect);
+            base.onMove?.(props, context, gridRect);
             return;
         }
 
         const { center: groupCenter } = piecesGroup;
-        const fieldCenter = getRectCenter(fieldRect);
+        const gridCenter = getRectCenter(gridRect);
 
         const screenToGroup = ({ x, y, rotation }: GestureMetrics): GestureMetrics => ({
-            x: ((x - fieldCenter.left) / cellSize - loopOffset.left) / scale + fieldSize / 2 - groupCenter.left,
-            y: ((y - fieldCenter.top) / cellSize - loopOffset.top) / scale + fieldSize / 2 - groupCenter.top,
+            x: ((x - gridCenter.left) / cellSize - loopOffset.left) / scale + gridSize / 2 - groupCenter.left,
+            y: ((y - gridCenter.top) / cellSize - loopOffset.top) / scale + gridSize / 2 - groupCenter.top,
             rotation: angleStep ? rotation : 0,
             scale: 1,
         });
@@ -137,7 +137,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawSudokuPhrases): CellW
 
         const {
             stateExtension: { highlightCurrentPiece: prevHighlightCurrentPiece },
-            fieldExtension: { pieces: prevPiecePositions },
+            gridExtension: { pieces: prevPiecePositions },
         } = gesture.state;
 
         const rotate =

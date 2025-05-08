@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { profiler } from "../../../utils/profiler";
 import { headerPadding } from "../globals";
-import { FieldPreview } from "../../sudoku/field/FieldPreview";
+import { GridPreview } from "../../sudoku/grid/GridPreview";
 import { loadPuzzle, PuzzleDefinitionOrLoader } from "../../../types/sudoku/PuzzleDefinition";
 import { useMemo } from "react";
 
@@ -20,7 +20,7 @@ export const ExampleTab = observer(function ExampleTab<T extends AnyPTM>({ title
         <>
             <div style={{ marginBottom: headerPadding }}>{title}</div>
             <div style={{ background: "#fff", padding: headerPadding / 2, borderRadius: headerPadding / 2 }}>
-                <FieldPreview puzzle={loadedPuzzle} width={100} />
+                <GridPreview puzzle={loadedPuzzle} width={100} />
             </div>
         </>
     );

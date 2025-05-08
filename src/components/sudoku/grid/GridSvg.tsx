@@ -3,11 +3,11 @@ import { PropsWithChildren, ReactElement } from "react";
 import { PuzzleContextProps } from "../../../types/sudoku/PuzzleContext";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { getPointsBoundingBox, getRectByBounds, getRectPoints } from "../../../types/layout/Rect";
-import { getFieldRectTransform } from "./FieldRect";
+import { getGridRectTransform } from "./GridRect";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-export const FieldSvg = observer(function FieldSvg<T extends AnyPTM>({
+export const GridSvg = observer(function FieldSvg<T extends AnyPTM>({
     context,
     children,
 }: PropsWithChildren<PuzzleContextProps<T>>) {
@@ -15,28 +15,28 @@ export const FieldSvg = observer(function FieldSvg<T extends AnyPTM>({
 
     const { puzzle, cellSize, regions } = context;
     let {
-        fieldSize: { fieldSize, rowsCount, columnsCount },
-        typeManager: { fieldFitsWrapper, ignoreRowsColumnCountInTheWrapper },
-        fieldMargin = 0,
+        gridSize: { gridSize, rowsCount, columnsCount },
+        typeManager: { gridFitsWrapper, ignoreRowsColumnCountInTheWrapper },
+        gridMargin = 0,
     } = puzzle;
 
     if (ignoreRowsColumnCountInTheWrapper) {
-        rowsCount = fieldSize;
-        columnsCount = fieldSize;
+        rowsCount = gridSize;
+        columnsCount = gridSize;
     }
 
     let viewBox = {
-        left: -fieldMargin,
-        top: -fieldMargin,
-        width: columnsCount + 2 * fieldMargin,
-        height: rowsCount + 2 * fieldMargin,
+        left: -gridMargin,
+        top: -gridMargin,
+        width: columnsCount + 2 * gridMargin,
+        height: rowsCount + 2 * gridMargin,
     };
 
     if (regions) {
         viewBox = getPointsBoundingBox(
             ...getRectPoints(viewBox),
             ...regions.flatMap((region) => {
-                const { base, rightVector, bottomVector } = getFieldRectTransform(context, region);
+                const { base, rightVector, bottomVector } = getGridRectTransform(context, region);
 
                 return [0, region.width].flatMap((right) =>
                     [0, region.height].map((bottom) => ({
@@ -48,7 +48,7 @@ export const FieldSvg = observer(function FieldSvg<T extends AnyPTM>({
         );
     }
 
-    const extraMargin = fieldSize;
+    const extraMargin = gridSize;
     viewBox = getRectByBounds(
         {
             top: Math.floor(viewBox.top - extraMargin),
@@ -62,12 +62,12 @@ export const FieldSvg = observer(function FieldSvg<T extends AnyPTM>({
 
     return (
         <AutoSvg
-            left={cellSize * (fieldMargin + (fieldSize - columnsCount) / 2 + viewBox.left)}
-            top={cellSize * (fieldMargin + (fieldSize - rowsCount) / 2 + viewBox.top)}
+            left={cellSize * (gridMargin + (gridSize - columnsCount) / 2 + viewBox.left)}
+            top={cellSize * (gridMargin + (gridSize - rowsCount) / 2 + viewBox.top)}
             width={cellSize * viewBox.width}
             height={cellSize * viewBox.height}
-            fitParent={fieldFitsWrapper}
-            viewBox={fieldFitsWrapper ? undefined : viewBox}
+            fitParent={gridFitsWrapper}
+            viewBox={gridFitsWrapper ? undefined : viewBox}
         >
             {children}
         </AutoSvg>

@@ -1,7 +1,7 @@
 import { indexes } from "../../../utils/indexes";
 import { textColor } from "../../../components/app/globals";
 import { chessColumnNameFromIndex, chessRowNameFromIndex } from "../utils/chessCoords";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { CenteredText } from "../../../components/svg/centered-text/CenteredText";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
@@ -12,16 +12,16 @@ export const chessBoardIndexesMargin = 0.5;
 const chessBoardIndexesFontSize = chessBoardIndexesMargin * 0.8;
 
 export const ChessBoardIndexes: ConstraintPropsGenericFcMap = {
-    [FieldLayer.regular]: observer(function ChessBoardIndexes<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function ChessBoardIndexes<T extends AnyPTM>({
         context: {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
             },
         },
     }: ConstraintProps<T>) {
         profiler.trace();
 
-        const offset = fieldSize / 2 - 4;
+        const offset = gridSize / 2 - 4;
 
         return (
             <>

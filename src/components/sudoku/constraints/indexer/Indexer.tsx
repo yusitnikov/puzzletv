@@ -1,4 +1,4 @@
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import {
     isSamePosition,
     parsePositionLiteral,
@@ -10,12 +10,12 @@ import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../../utils/profiler";
 import { blueColor, greenColor, lightRedColor } from "../../../app/globals";
-import { FieldSize } from "../../../../types/sudoku/FieldSize";
+import { GridSize } from "../../../../types/sudoku/GridSize";
 import { indexes } from "../../../../utils/indexes";
 import { parseColorWithOpacity, rgba } from "../../../../utils/color";
 
 const Indexer: ConstraintPropsGenericFcMap = {
-    [FieldLayer.beforeSelection]: observer(function Indexer<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function Indexer<T extends AnyPTM>({
         cells: [{ left, top }],
         color,
     }: ConstraintProps<T>) {
@@ -73,7 +73,7 @@ export const IndexerConstraint = <T extends AnyPTM>(
 
 export const RowIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    { columnsCount }: FieldSize,
+    { columnsCount }: GridSize,
     color = rgba(greenColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
@@ -89,7 +89,7 @@ export const RowIndexerConstraint = <T extends AnyPTM>(
 
 export const ColumnIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    { rowsCount }: FieldSize,
+    { rowsCount }: GridSize,
     color = rgba(lightRedColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);
@@ -105,7 +105,7 @@ export const ColumnIndexerConstraint = <T extends AnyPTM>(
 
 export const BoxIndexerConstraint = <T extends AnyPTM>(
     cellLiteral: PositionLiteral,
-    { columnsCount, regionWidth = columnsCount, regionHeight = 1 }: FieldSize,
+    { columnsCount, regionWidth = columnsCount, regionHeight = 1 }: GridSize,
     color = rgba(blueColor, 0.6),
 ) => {
     const cell = parsePositionLiteral(cellLiteral);

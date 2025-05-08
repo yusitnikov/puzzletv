@@ -1,5 +1,5 @@
 import { indexes } from "../../../utils/indexes";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { darkGreyColor, textColor } from "../../app/globals";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
 import { formatSvgPointsArray, Line, Position } from "../../../types/layout/Position";
@@ -13,7 +13,7 @@ import { observer } from "mobx-react-lite";
 import { comparer } from "mobx";
 import { useComputed } from "../../../hooks/useComputed";
 
-interface FieldLinesByDataProps {
+interface GridLinesByDataProps {
     borderColor: string;
     borderWidth: number;
     customCellBorders: Position[][];
@@ -21,48 +21,52 @@ interface FieldLinesByDataProps {
     dashedGrid?: boolean;
 }
 
-const FieldLinesByData = observer(
-    ({ borderColor, borderWidth, customCellBorders, regularBorders, dashedGrid }: FieldLinesByDataProps) => {
-        profiler.trace();
+const GridLinesByData = observer(function GridLinesByDataFc({
+    borderColor,
+    borderWidth,
+    customCellBorders,
+    regularBorders,
+    dashedGrid,
+}: GridLinesByDataProps) {
+    profiler.trace();
 
-        return (
-            <>
-                {customCellBorders.map((border, index) => (
-                    <polygon
-                        key={`custom-${index}`}
-                        points={formatSvgPointsArray(border)}
-                        fill={"none"}
-                        stroke={borderColor}
-                        strokeWidth={borderWidth}
-                    />
-                ))}
+    return (
+        <>
+            {customCellBorders.map((border, index) => (
+                <polygon
+                    key={`custom-${index}`}
+                    points={formatSvgPointsArray(border)}
+                    fill={"none"}
+                    stroke={borderColor}
+                    strokeWidth={borderWidth}
+                />
+            ))}
 
-                {regularBorders.map(({ start, end }) => (
-                    <line
-                        key={`regular-${start.top}-${start.left}-${end.top}-${end.left}`}
-                        x1={start.left}
-                        y1={start.top}
-                        x2={end.left}
-                        y2={end.top}
-                        stroke={borderColor}
-                        strokeWidth={borderWidth}
-                        strokeDasharray={dashedGrid ? 0.125 : undefined}
-                    />
-                ))}
-            </>
-        );
-    },
-);
+            {regularBorders.map(({ start, end }) => (
+                <line
+                    key={`regular-${start.top}-${start.left}-${end.top}-${end.left}`}
+                    x1={start.left}
+                    y1={start.top}
+                    x2={end.left}
+                    y2={end.top}
+                    stroke={borderColor}
+                    strokeWidth={borderWidth}
+                    strokeDasharray={dashedGrid ? 0.125 : undefined}
+                />
+            ))}
+        </>
+    );
+});
 
-export const FieldLines: ConstraintPropsGenericFcMap = {
-    [FieldLayer.lines]: observer(function FieldLines<T extends AnyPTM>({ context, region }: ConstraintProps<T>) {
+export const GridLines: ConstraintPropsGenericFcMap = {
+    [GridLayer.lines]: observer(function GridLinesFc<T extends AnyPTM>({ context, region }: ConstraintProps<T>) {
         profiler.trace();
 
         const { puzzle, puzzleIndex, isMyTurn } = context;
 
         const {
             typeManager: { borderColor: typeBorderColor },
-            fieldSize: { columnsCount, rowsCount },
+            gridSize: { columnsCount, rowsCount },
             borderColor: puzzleBorderColor,
             customCellBounds,
             dashedGrid,
@@ -136,7 +140,7 @@ export const FieldLines: ConstraintPropsGenericFcMap = {
         timer.stop();
 
         return (
-            <FieldLinesByData
+            <GridLinesByData
                 borderWidth={borderWidth}
                 borderColor={borderColor}
                 customCellBorders={customCellBorders}
@@ -147,9 +151,9 @@ export const FieldLines: ConstraintPropsGenericFcMap = {
     }),
 };
 
-export const FieldLinesConstraint = <T extends AnyPTM>(): Constraint<T, any> => ({
-    name: "field lines",
+export const GridLinesConstraint = <T extends AnyPTM>(): Constraint<T, any> => ({
+    name: "grid lines",
     cells: [],
-    component: FieldLines,
+    component: GridLines,
     props: undefined,
 });

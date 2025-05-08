@@ -1,5 +1,5 @@
 import { textColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { getAveragePosition, parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../../types/sudoku/Constraint";
 import { CenteredText } from "../../../svg/centered-text/CenteredText";
@@ -111,7 +111,7 @@ const ArrowComponent = DecorativeShapeComponent(
 
 export const DecorativeShapeConstraint = <T extends AnyPTM>(
     name: string,
-    layer: FieldLayer,
+    layer: GridLayer,
     component: ComponentType<ConstraintProps<T, DecorativeShapeProps>>,
     cellLiterals: PositionLiteral[],
     size: Size | number,
@@ -164,7 +164,7 @@ export const RectConstraint = <T extends AnyPTM>(
     text?: string,
     textColor?: string,
     angle?: number,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ) =>
     DecorativeShapeConstraint<T>(
         rectTag,
@@ -190,7 +190,7 @@ export const EllipseConstraint = <T extends AnyPTM>(
     text?: string,
     textColor?: string,
     angle?: number,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ) =>
     DecorativeShapeConstraint<T>(
         ellipseTag,
@@ -216,7 +216,7 @@ export const CosmeticArrowConstraint = <T extends AnyPTM>(
     text?: string,
     textColor?: string,
     angle?: number,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ) =>
     DecorativeShapeConstraint<T>(
         cosmeticArrowTag,

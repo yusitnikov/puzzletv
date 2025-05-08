@@ -1,4 +1,4 @@
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
 import { indexes } from "../../../utils/indexes";
 import { currentPlayerColor, otherPlayerColor } from "../../../components/app/globals";
@@ -10,10 +10,10 @@ import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
 export const CellOwnership: ConstraintPropsGenericFcMap = {
-    [FieldLayer.beforeSelection]: observer(function CellOwnership<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function CellOwnership<T extends AnyPTM>({
         context: {
             puzzle: {
-                fieldSize: { rowsCount, columnsCount },
+                gridSize: { rowsCount, columnsCount },
             },
             playerObjects,
             multiPlayer: { isEnabled },

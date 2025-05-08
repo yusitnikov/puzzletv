@@ -3,7 +3,7 @@ import { Rect } from "../../../types/layout/Rect";
 import { globalPaddingCoeff } from "../../app/globals";
 import { indexes } from "../../../utils/indexes";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
-import { FieldCellShape } from "./FieldCellShape";
+import { GridCellShape } from "./GridCellShape";
 import { CellExactPosition } from "../../../types/sudoku/CellExactPosition";
 import { CellPart } from "../../../types/sudoku/CellPart";
 import { mergeEventHandlerProps } from "../../../utils/mergeEventHandlerProps";
@@ -17,7 +17,7 @@ import { profiler } from "../../../utils/profiler";
 
 const borderPaddingCoeff = Math.max(0.25, globalPaddingCoeff);
 
-export interface FieldCellMouseHandlerProps<T extends AnyPTM> extends Position {
+export interface GridCellMouseHandlerProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
     regionIndex?: number;
     handlers: GestureHandler<any>[];
@@ -25,8 +25,8 @@ export interface FieldCellMouseHandlerProps<T extends AnyPTM> extends Position {
     outsideHandlers?: boolean;
 }
 
-export const FieldCellMouseHandler = observer(function FieldCellMouseHandler<T extends AnyPTM>(
-    props: FieldCellMouseHandlerProps<T>,
+export const GridCellMouseHandler = observer(function GridCellMouseHandlerFc<T extends AnyPTM>(
+    props: GridCellMouseHandlerProps<T>,
 ) {
     profiler.trace();
 
@@ -59,13 +59,13 @@ export const FieldCellMouseHandler = observer(function FieldCellMouseHandler<T e
         return null;
     }
 
-    return <FieldCellMouseHandlerInner {...props} hasCellHandlers={hasCellHandlers} />;
-}) as <T extends AnyPTM>(props: FieldCellMouseHandlerProps<T>) => ReactElement | null;
+    return <GridCellMouseHandlerInner {...props} hasCellHandlers={hasCellHandlers} />;
+}) as <T extends AnyPTM>(props: GridCellMouseHandlerProps<T>) => ReactElement | null;
 
-interface FieldCellMouseHandlerInnerProps<T extends AnyPTM> extends FieldCellMouseHandlerProps<T> {
+interface GridCellMouseHandlerInnerProps<T extends AnyPTM> extends GridCellMouseHandlerProps<T> {
     hasCellHandlers: boolean;
 }
-const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<T extends AnyPTM>({
+const GridCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<T extends AnyPTM>({
     context,
     top,
     left,
@@ -73,7 +73,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
     handlers,
     hasCellHandlers,
     outsideHandlers,
-}: FieldCellMouseHandlerInnerProps<T>) {
+}: GridCellMouseHandlerInnerProps<T>) {
     profiler.trace();
 
     const { puzzleIndex } = context;
@@ -277,7 +277,7 @@ const FieldCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<
             )}
         </>
     );
-}) as <T extends AnyPTM>(props: FieldCellMouseHandlerInnerProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridCellMouseHandlerInnerProps<T>) => ReactElement;
 
 interface MouseHandlerRectProps<T extends AnyPTM> extends Partial<Rect> {
     context: PuzzleContext<T>;
@@ -305,7 +305,7 @@ const MouseHandlerRect = observer(function MouseHandlerRect<T extends AnyPTM>({
     profiler.trace();
 
     return (
-        <FieldCellShape
+        <GridCellShape
             context={context}
             cellPosition={cellPosition}
             noClip={outsideHandlers}

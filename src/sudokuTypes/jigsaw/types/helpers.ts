@@ -11,7 +11,7 @@ import { getPointsBoundingBox, getRectCenter, getRectPoints, Rect } from "../../
 import { indexes } from "../../../utils/indexes";
 import { GridRegion } from "../../../types/sudoku/GridRegion";
 import { applyMetricsDiff, emptyGestureMetrics, GestureMetrics } from "../../../utils/gestures";
-import { JigsawFieldPieceState } from "./JigsawFieldState";
+import { JigsawGridPieceState } from "./JigsawGridState";
 import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { JigsawPieceRegion } from "./JigsawPieceRegion";
@@ -23,7 +23,7 @@ export const getJigsawPieces = (
     const { puzzle } = cellsIndex;
     const {
         regions = [],
-        fieldSize: { rowsCount, columnsCount },
+        gridSize: { rowsCount, columnsCount },
         importOptions,
     } = puzzle;
 
@@ -77,7 +77,7 @@ export const getJigsawPieceIndexByCell = (puzzle: PuzzleDefinition<JigsawPTM>, c
 
 export const getJigsawPieceIndexesByCell = (
     puzzle: PuzzleDefinition<JigsawPTM>,
-    piecePositions: JigsawFieldPieceState[],
+    piecePositions: JigsawGridPieceState[],
     cell: Position,
 ) => {
     const index = getJigsawPieceIndexByCell(puzzle, cell);
@@ -100,7 +100,7 @@ export const normalizeJigsawDigit = (
 };
 
 export const rotateJigsawDigitByPiece = (
-    { puzzle, fieldExtension: { pieces } }: PuzzleContext<JigsawPTM>,
+    { puzzle, gridExtension: { pieces } }: PuzzleContext<JigsawPTM>,
     data: JigsawDigit,
     cell: Position,
 ): JigsawDigit => {
@@ -113,7 +113,7 @@ export const rotateJigsawDigitByPiece = (
         : data;
 };
 
-export const getActiveJigsawPieceZIndex = (pieces: JigsawFieldPieceState[]) => {
+export const getActiveJigsawPieceZIndex = (pieces: JigsawGridPieceState[]) => {
     if (pieces.length === 0) {
         return 0;
     }
@@ -123,7 +123,7 @@ export const getActiveJigsawPieceZIndex = (pieces: JigsawFieldPieceState[]) => {
 
 interface JigsawPiecesGroupItem {
     info: JigsawPieceInfo;
-    position: JigsawFieldPieceState;
+    position: JigsawGridPieceState;
     region: GridRegion;
     index: number;
 }
@@ -143,7 +143,7 @@ export const groupJigsawPiecesByZIndex = (context: PuzzleContext<JigsawPTM>): Ji
 
     for (const index of indexes(pieces.length)) {
         const info = pieces[index];
-        const position = context.fieldExtension.pieces[index];
+        const position = context.gridExtension.pieces[index];
         const { zIndex } = position;
 
         piecesByZIndex[zIndex] = piecesByZIndex[zIndex] ?? [];
@@ -214,13 +214,13 @@ export const moveJigsawPieceByGroupGesture = (
     };
 };
 
-export const getJigsawPieceIndexesByZIndex = (pieces: JigsawFieldPieceState[], zIndex?: number): number[] =>
+export const getJigsawPieceIndexesByZIndex = (pieces: JigsawGridPieceState[], zIndex?: number): number[] =>
     pieces
         .map((piece, index) => ({ piece, index }))
         .filter(({ piece }) => piece.zIndex === zIndex)
         .map(({ index }) => index);
 
-export const getActiveJigsawPieceIndexes = (piecePositions: JigsawFieldPieceState[]): number[] =>
+export const getActiveJigsawPieceIndexes = (piecePositions: JigsawGridPieceState[]): number[] =>
     getJigsawPieceIndexesByZIndex(piecePositions, getActiveJigsawPieceZIndex(piecePositions));
 
 export const sortJigsawPiecesByPosition = (pieces: JigsawPieceInfo[], piecePositions: Position[]) =>

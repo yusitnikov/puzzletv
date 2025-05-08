@@ -13,7 +13,7 @@ export const DisjointGroupsConstraint = <T extends AnyPTM>(
     isObvious: true,
     isValidCell(cell, digits, _, context) {
         const {
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
             typeManager: { areSameCellData },
         } = context.puzzle;
 

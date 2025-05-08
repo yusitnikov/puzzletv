@@ -1,6 +1,6 @@
 import { RoundedPolyLine } from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import { darkGreyColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { isSamePosition, parsePositionLiterals, Position, PositionLiteral } from "../../../../types/layout/Position";
 import { splitMultiLine } from "../../../../utils/lines";
@@ -15,7 +15,7 @@ export interface ThermometerProps extends LineProps {
 }
 
 export const Thermometer: ConstraintPropsGenericFcMap<ThermometerProps> = {
-    [FieldLayer.regular]: observer(function Thermometer<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function Thermometer<T extends AnyPTM>({
         cells: points,
         color = rgba(darkGreyColor, 0.5),
         props: { width = 0.35, bulbRadius = 0.4 },

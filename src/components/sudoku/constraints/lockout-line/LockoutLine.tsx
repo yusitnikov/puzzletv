@@ -9,7 +9,7 @@ import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../
 import { splitMultiLine } from "../../../../utils/lines";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { darkBlueColor, lighterMutedBlueColor, mutedBlueColor, purpleColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../../utils/profiler";
 import { RoundedPolyLine } from "../../../svg/rounded-poly-line/RoundedPolyLine";
@@ -43,7 +43,7 @@ const LockoutLineDiamond = observer(function LockoutLineDiamond(center: Position
 });
 
 export const LockoutLine: ConstraintPropsGenericFcMap<LineProps> = {
-    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({
         cells,
         color = lockoutLineLineColor,
         props: { width = 0.1 },

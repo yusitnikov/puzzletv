@@ -21,14 +21,14 @@ export const getDailyRandomGeneratorSeed = (typeSeed: number) => {
 };
 
 export const generateRandomPuzzleDigits = (
-    fieldSize: number,
+    gridSize: number,
     regionWidth: number,
     randomOrSeed: number,
 ): GivenDigitsMap<number> => {
     const random = createRandomGenerator(randomOrSeed);
 
     while (true) {
-        const initialDigits = tryGenerateRandomPuzzleDigits(fieldSize, regionWidth, random);
+        const initialDigits = tryGenerateRandomPuzzleDigits(gridSize, regionWidth, random);
 
         if (initialDigits !== undefined) {
             return initialDigits;
@@ -54,20 +54,20 @@ export const shuffleArray = <T>(array: T[], random: RandomGenerator): T[] => {
 };
 
 const tryGenerateRandomPuzzleDigits = (
-    fieldSize: number,
+    gridSize: number,
     regionWidth: number,
     random: RandomGenerator,
 ): GivenDigitsMap<number> | undefined => {
-    const regionHeight = fieldSize / regionWidth;
+    const regionHeight = gridSize / regionWidth;
 
     const initialDigits: GivenDigitsMap<number> = {};
     const digitOptions: GivenDigitsMap<Set<number>> = {};
-    for (const rowIndex of indexes(fieldSize)) {
+    for (const rowIndex of indexes(gridSize)) {
         initialDigits[rowIndex] = {};
         digitOptions[rowIndex] = {};
 
-        for (const columnIndex of indexes(fieldSize)) {
-            digitOptions[rowIndex][columnIndex] = new Set(shuffleArray(indexesFromTo(1, fieldSize, true), random));
+        for (const columnIndex of indexes(gridSize)) {
+            digitOptions[rowIndex][columnIndex] = new Set(shuffleArray(indexesFromTo(1, gridSize, true), random));
         }
     }
 
@@ -86,7 +86,7 @@ const tryGenerateRandomPuzzleDigits = (
         const boxRowIndex = rowIndex - (rowIndex % regionHeight);
         const boxColumnIndex = columnIndex - (columnIndex % regionWidth);
 
-        const candidatesToRemove: Position[] = indexes(fieldSize).flatMap((index) => [
+        const candidatesToRemove: Position[] = indexes(gridSize).flatMap((index) => [
             {
                 top: rowIndex,
                 left: index,
@@ -114,13 +114,13 @@ const tryGenerateRandomPuzzleDigits = (
         return true;
     };
 
-    for (const boxLeft of indexes(fieldSize / regionHeight)) {
+    for (const boxLeft of indexes(gridSize / regionHeight)) {
         const boxRowOffset = boxLeft * regionHeight;
 
-        for (const boxTop of indexes(fieldSize / regionWidth)) {
-            const boxColumnOffset = ((boxTop + boxLeft) * regionWidth) % fieldSize;
+        for (const boxTop of indexes(gridSize / regionWidth)) {
+            const boxColumnOffset = ((boxTop + boxLeft) * regionWidth) % gridSize;
 
-            for (const index of indexes(fieldSize)) {
+            for (const index of indexes(gridSize)) {
                 if (
                     !putRandomDigit(
                         boxRowOffset + (index % regionHeight),

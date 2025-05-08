@@ -3,7 +3,7 @@ import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { formatSvgPointsArray, Position } from "../../../types/layout/Position";
 import { CellColorValue, resolveCellColorValue } from "../../../types/sudoku/CellColor";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
-import { FieldCellShape } from "../field/FieldCellShape";
+import { GridCellShape } from "../grid/GridCellShape";
 import { getRegionBoundingBox } from "../../../utils/regions";
 import { getRectCenter, getTransformedRectCenter, Rect } from "../../../types/layout/Rect";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
@@ -13,17 +13,17 @@ import { settings } from "../../../types/layout/Settings";
 import { useComputed, useComputedValue } from "../../../hooks/useComputed";
 import { profiler } from "../../../utils/profiler";
 
-export interface FieldCellBackgroundProps<T extends AnyPTM> extends Position {
+export interface GridCellBackgroundProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
     noGivenColors?: boolean;
 }
 
-export const FieldCellBackground = observer(function FieldCellBackground<T extends AnyPTM>({
+export const GridCellBackground = observer(function GridCellBackgroundFc<T extends AnyPTM>({
     context,
     noGivenColors,
     top,
     left,
-}: FieldCellBackgroundProps<T>) {
+}: GridCellBackgroundProps<T>) {
     profiler.trace();
 
     const cellPosition = useMemo((): Position => ({ top, left }), [top, left]);
@@ -32,7 +32,7 @@ export const FieldCellBackground = observer(function FieldCellBackground<T exten
     const initialCellColors = useComputedValue(
         () => (noGivenColors ? undefined : context.puzzleInitialColors[top]?.[left]),
         {
-            name: `FieldCellBackground:initialCellColors[${top}][${left}]`,
+            name: `GridCellBackground:initialCellColors[${top}][${left}]`,
             equals: comparer.structural,
         },
         [noGivenColors, top, left],
@@ -55,7 +55,7 @@ export const FieldCellBackground = observer(function FieldCellBackground<T exten
             noOpacity={!!initialCellColors?.length}
         />
     );
-}) as <T extends AnyPTM>(props: FieldCellBackgroundProps<T>) => ReactElement | null;
+}) as <T extends AnyPTM>(props: GridCellBackgroundProps<T>) => ReactElement | null;
 
 export interface CellBackgroundProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -130,7 +130,7 @@ export const CellBackground = observer(function CellBackground<T extends AnyPTM>
         <AutoSvg
             width={size}
             height={size}
-            clip={clip && <FieldCellShape context={context} cellPosition={cellPosition} />}
+            clip={clip && <GridCellShape context={context} cellPosition={cellPosition} />}
             style={{ opacity }}
         >
             <rect

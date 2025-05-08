@@ -2,7 +2,7 @@ import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../
 import { Line, parsePositionLiteral, Position, PositionLiteral } from "../../../../types/layout/Position";
 import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
 import { getIsSamePuzzlePosition } from "../../../../types/sudoku/PuzzleDefinition";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { CenteredText } from "../../../svg/centered-text/CenteredText";
 import { textColor } from "../../../app/globals";
 import { PuzzleLineSet } from "../../../../types/sudoku/PuzzleLineSet";
@@ -16,7 +16,7 @@ export interface TapaCellProps {
 }
 
 export const TapaCell: ConstraintPropsGenericFcMap<TapaCellProps> = {
-    [FieldLayer.regular]: observer(function TapaCell<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function TapaCell<T extends AnyPTM>({
         props: { clues },
     }: ConstraintProps<T, TapaCellProps>) {
         profiler.trace();

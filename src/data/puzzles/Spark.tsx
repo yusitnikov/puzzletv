@@ -15,7 +15,7 @@ import {
     xExplained,
 } from "../ruleSnippets";
 import {
-    createSparkFieldSize,
+    createSparkGridSize,
     createSparkRegions,
     SparkTypeManager,
 } from "../../sudokuTypes/spark/types/SparkTypeManager";
@@ -25,7 +25,7 @@ import { VMarkConstraint, XMarkConstraint } from "../../components/sudoku/constr
 import { RegionConstraint } from "../../components/sudoku/constraints/region/Region";
 import { RectConstraint } from "../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { darkGreyColor } from "../../components/app/globals";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import { rgba } from "../../utils/color";
 import { SparkGridArrowsConstraint } from "../../sudokuTypes/spark/components/SparkGridArrows";
 import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
@@ -33,7 +33,7 @@ import { translate } from "../../utils/translate";
 import { Chameleon } from "../authors";
 
 const extraRegion = ["R1C1", "R3C1", "R1C8", "R2C7", "R8C1", "R1C13", "R3C13", "R8C13"];
-const fieldSize = createSparkFieldSize(4, 2);
+const gridSize = createSparkGridSize(4, 2);
 export const SparkKropki: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title: {
@@ -44,8 +44,8 @@ export const SparkKropki: PuzzleDefinition<NumberPTM> = {
     },
     slug: "spark-kropki-xv",
     typeManager: SparkTypeManager,
-    fieldSize,
-    regions: createSparkRegions(fieldSize),
+    gridSize,
+    regions: createSparkRegions(gridSize),
     digitsCount: 8,
     rules: () => (
         <>
@@ -81,7 +81,7 @@ export const SparkKropki: PuzzleDefinition<NumberPTM> = {
         </>
     ),
     items: [
-        ...SparkGridArrowsConstraint(fieldSize),
+        ...SparkGridArrowsConstraint(gridSize),
 
         KropkiDotConstraint("R1C1", "R2C1", true),
         KropkiDotConstraint("R2C2", "R2C3", true),
@@ -154,7 +154,7 @@ export const SparkKropki: PuzzleDefinition<NumberPTM> = {
                 undefined,
                 undefined,
                 0,
-                FieldLayer.beforeSelection,
+                GridLayer.beforeSelection,
             ),
         ),
 
@@ -179,8 +179,8 @@ export const EmptySpark: PuzzleDefinition<NumberPTM> = {
     },
     slug: "empty-spark",
     typeManager: SparkTypeManager,
-    fieldSize,
-    regions: createSparkRegions(fieldSize),
+    gridSize,
+    regions: createSparkRegions(gridSize),
     digitsCount: 8,
     rules: () => (
         <>
@@ -196,11 +196,11 @@ export const EmptySpark: PuzzleDefinition<NumberPTM> = {
             </RulesParagraph>
         </>
     ),
-    items: [...SparkGridArrowsConstraint(fieldSize)],
+    items: [...SparkGridArrowsConstraint(gridSize)],
     allowDrawing: allDrawingModes,
 };
 
-const fieldSize6x6 = createSparkFieldSize(3, 3, 3);
+const gridSize6x6 = createSparkGridSize(3, 3, 3);
 export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     title: {
@@ -208,8 +208,8 @@ export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
     },
     slug: "empty-spark-6x6",
     typeManager: SparkTypeManager,
-    fieldSize: fieldSize6x6,
-    regions: createSparkRegions(fieldSize6x6),
+    gridSize: gridSize6x6,
+    regions: createSparkRegions(gridSize6x6),
     digitsCount: 9,
     rules: () => (
         <>
@@ -225,11 +225,11 @@ export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
             </RulesParagraph>
         </>
     ),
-    items: [...SparkGridArrowsConstraint(fieldSize6x6)],
+    items: [...SparkGridArrowsConstraint(gridSize6x6)],
     allowDrawing: allDrawingModes,
 };
 
-const fieldSizeWithNote = createSparkFieldSize(4, 2, 4, true);
+const gridSizeWithNote = createSparkGridSize(4, 2, 4, true);
 
 export const Sparkster: PuzzleDefinition<NumberPTM> = {
     title: {
@@ -239,8 +239,8 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
     slug: "sparkster",
     saveStateKey: "sparkster-notes",
     typeManager: SparkTypeManager,
-    fieldSize: fieldSizeWithNote,
-    regions: createSparkRegions(fieldSizeWithNote),
+    gridSize: gridSizeWithNote,
+    regions: createSparkRegions(gridSizeWithNote),
     digitsCount: 8,
     rules: () => (
         <>
@@ -269,7 +269,7 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
         </>
     ),
     items: [
-        ...SparkGridArrowsConstraint(fieldSizeWithNote),
+        ...SparkGridArrowsConstraint(gridSizeWithNote),
         RenbanConstraint(["R2C4", "R2C3", "R3C2", "R6C2", "R7C3", "R7C4"]),
         RenbanConstraint(["R2C10", "R2C11", "R3C12", "R6C12", "R7C11", "R7C10"]),
         RenbanConstraint(["R1C7", "R2C8"]),

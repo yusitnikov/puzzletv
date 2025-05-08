@@ -2,7 +2,7 @@ import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefi
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { observer } from "mobx-react-lite";
 import { darkGreyColor, textColor } from "../../components/app/globals";
@@ -13,7 +13,7 @@ import { DigitComponentType } from "../../components/sudoku/digit/DigitComponent
 import { ReactNode } from "react";
 import { Constraint, ConstraintProps, isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import { CellColor, cellColors } from "../../types/sudoku/CellColor";
 import { localStorageManager } from "../../utils/localStorage";
 import { SettingsContentProps } from "../../components/sudoku/controls/settings/SettingsContent";
@@ -242,7 +242,7 @@ interface GlyphsProps {
 }
 
 const GlyphsComponent = {
-    [FieldLayer.regular]: ({
+    [GridLayer.regular]: ({
         cells: [{ top, left }],
         color = darkGreyColor,
         props: { glyphs },
@@ -281,7 +281,7 @@ export const BodoniSudoku: PuzzleDefinition<NumberPTM> = {
         ...DigitSudokuTypeManager(BodoniDigitComponentType, 1),
         settingsComponents: [BodoniSettings],
     },
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     rules: () => (
         <>

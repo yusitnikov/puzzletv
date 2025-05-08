@@ -18,6 +18,6 @@ export const TenInOneRegionConstraint = <T extends AnyPTM>(cellLiterals: Positio
 
         const uniqueCellData = new CellDataSet(puzzle, cellData);
 
-        return uniqueCellData.size <= puzzle.fieldSize.regionWidth!;
+        return uniqueCellData.size <= puzzle.gridSize.regionWidth!;
     },
 });

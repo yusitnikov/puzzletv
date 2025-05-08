@@ -32,7 +32,7 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton({
 
     const getPiecePositions = useComputed(
         function getPiecePositions() {
-            return context.fieldExtension.pieces;
+            return context.gridExtension.pieces;
         },
         { equals: comparer.structural },
     );

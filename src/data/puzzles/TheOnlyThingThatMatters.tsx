@@ -1,5 +1,5 @@
 import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { Chameleon } from "../authors";
@@ -61,7 +61,7 @@ export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
     author: Chameleon,
     slug: "the-only-thing-that-matters",
     typeManager: DigitSudokuTypeManager(),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     rules: () => (
         <>

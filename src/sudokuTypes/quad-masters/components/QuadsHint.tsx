@@ -1,4 +1,4 @@
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
 import { indexesFromTo } from "../../../utils/indexes";
 import { lightGreyColor } from "../../../components/app/globals";
@@ -7,10 +7,10 @@ import { profiler } from "../../../utils/profiler";
 import { observer } from "mobx-react-lite";
 
 export const QuadsHint = {
-    [FieldLayer.afterLines]: observer(function QuadsHint({
+    [GridLayer.afterLines]: observer(function QuadsHint({
         context: {
             puzzle: {
-                fieldSize: { rowsCount, columnsCount },
+                gridSize: { rowsCount, columnsCount },
             },
             stateExtension: { isQuadTurn },
             isMyTurn,

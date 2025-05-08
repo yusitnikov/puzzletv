@@ -1,5 +1,5 @@
 import { RoundedPolyLine } from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import {
     arrayContainsPosition,
     getCircleConnectionPoint,
@@ -23,7 +23,7 @@ export interface BetweenLineProps {
 }
 
 export const BetweenLine: ConstraintPropsGenericFcMap<BetweenLineProps> = {
-    [FieldLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function InBetweenLine<T extends AnyPTM>({
         cells,
         props: {
             lineColor = darkGreyColor,

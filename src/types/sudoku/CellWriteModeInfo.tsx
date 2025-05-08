@@ -48,7 +48,7 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     isDigitMode?: boolean;
     isNoSelectionMode?: boolean;
     disableCellHandlers?: boolean;
-    applyToWholeField?: boolean;
+    applyToWholeGrid?: boolean;
     digitsCount?: number | ((context: PuzzleContext<T>) => number);
     handlesRightMouseClick?: boolean;
     mainButtonContent?: ComponentType<ControlButtonItemProps<T>>;
@@ -81,7 +81,7 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
         context: PuzzleContext<T>,
         isRightButton: boolean,
     ): void;
-    onMove?(props: GestureOnContinueProps<PuzzleContext<T>>, context: PuzzleContext<T>, fieldRect: Rect): void;
+    onMove?(props: GestureOnContinueProps<PuzzleContext<T>>, context: PuzzleContext<T>, gridRect: Rect): void;
     onGestureEnd?(props: GestureOnEndProps<PuzzleContext<T>>, context: PuzzleContext<T>): void;
     onOutsideClick?(context: PuzzleContext<T>): void;
 }
@@ -219,7 +219,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
     }: CellWriteModeInfo<T>,
     isDeleteSelectedCellsStroke: boolean,
     setIsDeleteSelectedCellsStroke: (value: boolean) => void,
-    fieldRect: Rect,
+    gridRect: Rect,
 ): GestureHandler<PuzzleContext<T>> => {
     const { readOnlySafeContext } = context;
 
@@ -318,7 +318,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
                 onCornerEnter?.(props, context, currentData);
             }
 
-            onMove?.(props, context, fieldRect);
+            onMove?.(props, context, gridRect);
         },
         onEnd: (props) => {
             onGestureEnd?.(props, context);

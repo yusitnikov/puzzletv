@@ -1,5 +1,5 @@
 import { blackColor, textColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../../types/sudoku/Constraint";
 import { CenteredText } from "../../../svg/centered-text/CenteredText";
@@ -51,7 +51,7 @@ export const KropkiDotConstraint = <T extends AnyPTM>(
     value?: number | [number, number],
     color = isRatio ? blackColor : "white",
     showValue = true,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ): Constraint<T, KropkiDotProps> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);

@@ -1,5 +1,5 @@
 import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularFieldSize, createRegularRegions } from "../../types/sudoku/FieldSize";
+import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
@@ -7,7 +7,7 @@ import { littleKillerExplained, normalSudokuRulesApply } from "../ruleSnippets";
 import { LittleKillerConstraint } from "../../components/sudoku/constraints/little-killer/LittleKiller";
 import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import { parsePositionLiteral, PositionLiteral } from "../../types/layout/Position";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import { CellColor } from "../../types/sudoku/CellColor";
 import { CenteredText } from "../../components/svg/centered-text/CenteredText";
 import { QuadInputSudokuTypeManager } from "../../components/sudoku/constraints/quad/QuadInput/QuadInputSudokuTypeManager";
@@ -105,7 +105,7 @@ const KClue = observer(function KClueFc({ cell }: CellProps) {
 });
 
 const Extras = {
-    [FieldLayer.afterLines]: observer(function Extras() {
+    [GridLayer.afterLines]: observer(function Extras() {
         profiler.trace();
 
         return (
@@ -195,7 +195,7 @@ const shadedRow = {
     6: [CellColor.lightGrey],
 };
 
-const fieldSize = createRegularFieldSize(7, 7);
+const gridSize = createRegularGridSize(7, 7);
 
 export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
     noIndex: true,
@@ -212,9 +212,9 @@ export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
         allowOverflow: false,
         radius: noteRadius + noteLineWidth / 2,
     }),
-    fieldSize,
-    regions: createRegularRegions(fieldSize),
-    fieldMargin: 1,
+    gridSize,
+    regions: createRegularRegions(gridSize),
+    gridMargin: 1,
     initialDigits: {
         0: {
             0: 1,
@@ -246,13 +246,13 @@ export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
             component: Extras,
             props: undefined,
         },
-        LittleKillerConstraint("R1C3", "DL", fieldSize, 7),
-        LittleKillerConstraint("R1C6", "DR", fieldSize, 7),
-        LittleKillerConstraint("R1C6", "DL", fieldSize, 16),
-        LittleKillerConstraint("R4C7", "DL", fieldSize, 16),
-        LittleKillerConstraint("R5C7", "DL", fieldSize, 7),
-        LittleKillerConstraint("R7C3", "UL", fieldSize, 16),
-        LittleKillerConstraint("R7C5", "UL", fieldSize, 16),
+        LittleKillerConstraint("R1C3", "DL", gridSize, 7),
+        LittleKillerConstraint("R1C6", "DR", gridSize, 7),
+        LittleKillerConstraint("R1C6", "DL", gridSize, 16),
+        LittleKillerConstraint("R4C7", "DL", gridSize, 16),
+        LittleKillerConstraint("R5C7", "DL", gridSize, 7),
+        LittleKillerConstraint("R7C3", "UL", gridSize, 16),
+        LittleKillerConstraint("R7C5", "UL", gridSize, 16),
     ],
     rules: ({ cellSizeForSidePanel }) => (
         <>

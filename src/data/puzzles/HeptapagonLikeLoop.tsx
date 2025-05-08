@@ -16,7 +16,7 @@ import { CellPart } from "../../types/sudoku/CellPart";
 import { translate } from "../../utils/translate";
 
 export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
-    fieldSize: number,
+    gridSize: number,
     layersCount: number,
     constraints: Constraint<T, any>[],
 ): Omit<PuzzleDefinition<T>, "slug" | "title"> => {
@@ -28,8 +28,8 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
         angle *= (2 * Math.PI) / 7;
 
         return {
-            top: round(fieldSize / 2 - scale * y * Math.cos(angle)),
-            left: round(fieldSize / 2 + scale * y * Math.sin(angle)),
+            top: round(gridSize / 2 - scale * y * Math.cos(angle)),
+            left: round(gridSize / 2 + scale * y * Math.sin(angle)),
         };
     };
 
@@ -196,8 +196,8 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
             ...DigitSudokuTypeManager(),
             ignoreRowsColumnCountInTheWrapper: true,
         },
-        fieldSize: {
-            fieldSize,
+        gridSize: {
+            gridSize,
             rowsCount: 1,
             columnsCount: bounds.length,
         },

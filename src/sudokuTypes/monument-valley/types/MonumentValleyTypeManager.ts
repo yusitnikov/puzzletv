@@ -1,6 +1,6 @@
 import { defaultProcessArrowDirection, SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
-import { createRegularRegions, FieldSize } from "../../../types/sudoku/FieldSize";
+import { createRegularRegions, GridSize } from "../../../types/sudoku/GridSize";
 import { isSamePosition, Position, PositionWithAngle } from "../../../types/layout/Position";
 import { Rect } from "../../../types/layout/Rect";
 import { darkGreyColor, getRegionBorderWidth } from "../../../components/app/globals";
@@ -41,9 +41,9 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
             return digit;
         }
 
-        const processedFieldSize = parseMonumentValleyFieldSize(puzzle.fieldSize);
-        const { gridSize, intersectionSize } = processedFieldSize;
-        const { top, left } = rotateCellCoords(position, processedFieldSize, 120 - angle);
+        const processedGridSize = parseMonumentValleyGridSize(puzzle.gridSize);
+        const { gridSize, intersectionSize } = processedGridSize;
+        const { top, left } = rotateCellCoords(position, processedGridSize, 120 - angle);
         const isTopLeftGrid =
             top < gridSize &&
             left < gridSize &&
@@ -59,8 +59,8 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         }
     },
 
-    getCellTypeProps({ top, left }, { fieldSize }): CellTypeProps<MonumentValleyPTM> {
-        const { gridSize, intersectionSize, columnsCount } = parseMonumentValleyFieldSize(fieldSize);
+    getCellTypeProps({ top, left }, puzzle): CellTypeProps<MonumentValleyPTM> {
+        const { gridSize, intersectionSize, columnsCount } = parseMonumentValleyGridSize(puzzle.gridSize);
 
         if (
             top >= gridSize &&
@@ -88,9 +88,9 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     processCellDataPosition(
         context,
         { left, top, angle },
-        dataSet,
-        dataIndex,
-        positionFunction,
+        _dataSet,
+        _dataIndex,
+        _positionFunction,
         cellPosition,
     ): PositionWithAngle | undefined {
         const angleDelta = (roundToStep(cellPosition ? context.animatedAngle : 0, 90) * Math.PI) / 180;
@@ -105,8 +105,8 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
     },
 
     processArrowDirection(cell, xDirection, yDirection, context) {
-        const processedFieldSize = parseMonumentValleyFieldSize(context.puzzle.fieldSize);
-        const { gridSize, intersectionSize, columnsCount, rowsCount } = processedFieldSize;
+        const processedGridSize = parseMonumentValleyGridSize(context.puzzle.gridSize);
+        const { gridSize, intersectionSize, columnsCount, rowsCount } = processedGridSize;
 
         const process = (xDirection: number, yDirection: number): Position => {
             const defaultPosition = defaultProcessArrowDirection(cell, xDirection, yDirection, context).cell!;
@@ -119,7 +119,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
                 return defaultPosition;
             }
 
-            const naiveTransformed = processCellCoords(naive, processedFieldSize);
+            const naiveTransformed = processCellCoords(naive, processedGridSize);
             if (!isSamePosition(naive, naiveTransformed)) {
                 return naiveTransformed;
             }
@@ -130,7 +130,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
                         left: naive.left,
                         top: 0,
                     },
-                    processedFieldSize,
+                    processedGridSize,
                 );
             }
 
@@ -140,7 +140,7 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
                         left: columnsCount - gridSize,
                         top: naive.top,
                     },
-                    processedFieldSize,
+                    processedGridSize,
                 );
             }
 
@@ -158,15 +158,15 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
             return defaultPosition;
         };
 
-        cell = rotateCellCoords(cell, processedFieldSize, context.angle);
+        cell = rotateCellCoords(cell, processedGridSize, context.angle);
         cell = process(xDirection, yDirection);
-        cell = rotateCellCoords(cell, processedFieldSize, -context.angle);
+        cell = rotateCellCoords(cell, processedGridSize, -context.angle);
 
         return { cell };
     },
 
-    transformCoords({ top, left }, { puzzle: { fieldSize } }) {
-        const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyFieldSize(fieldSize);
+    transformCoords({ top, left }, { puzzle }) {
+        const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyGridSize(puzzle.gridSize);
 
         const coeff = Math.sqrt(0.75);
         const centerX = columnsCount / 2;
@@ -224,10 +224,13 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         }
     },
 
-    getRegionsWithSameCoordsTransformation({ puzzle: { regions, fieldSize, fieldMargin = 0 }, cellSize }): Rect[] {
-        const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyFieldSize(fieldSize);
+    getRegionsWithSameCoordsTransformation({
+        puzzle: { regions, gridSize: originalGridSize, gridMargin = 0 },
+        cellSize,
+    }): Rect[] {
+        const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyGridSize(originalGridSize);
 
-        const fullMargin = fieldMargin + 1;
+        const fullMargin = gridMargin + 1;
         const borderWidth = regions?.length ? getRegionBorderWidth(cellSize) : 1 / cellSize;
 
         return [
@@ -282,9 +285,9 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         ];
     },
 
-    getRegionsForRowsAndColumns({ puzzle: { fieldSize } }): Constraint<MonumentValleyPTM, any>[] {
-        const processedFieldSize = parseMonumentValleyFieldSize(fieldSize);
-        const { gridSize, intersectionSize, columnsCount } = processedFieldSize;
+    getRegionsForRowsAndColumns({ puzzle }): Constraint<MonumentValleyPTM, any>[] {
+        const processedGridSize = parseMonumentValleyGridSize(puzzle.gridSize);
+        const { gridSize, intersectionSize, columnsCount } = processedGridSize;
 
         const cubeFaces = [
             { left: 0, top: 0 },
@@ -296,14 +299,14 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
             const constraints: Constraint<MonumentValleyPTM, any>[] = indexes(gridSize).flatMap((i) => [
                 RegionConstraint(
                     indexes(gridSize).map((j) =>
-                        processCellCoords({ left: left + i, top: top + j }, processedFieldSize),
+                        processCellCoords({ left: left + i, top: top + j }, processedGridSize),
                     ),
                     false,
                     "column",
                 ),
                 RegionConstraint(
                     indexes(gridSize).map((j) =>
-                        processCellCoords({ left: left + j, top: top + i }, processedFieldSize),
+                        processCellCoords({ left: left + j, top: top + i }, processedGridSize),
                     ),
                     false,
                     "row",
@@ -314,8 +317,8 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
         });
     },
 
-    getAdditionalNeighbors({ top, left }, { fieldSize }) {
-        const { gridSize, intersectionSize, columnsCount } = parseMonumentValleyFieldSize(fieldSize);
+    getAdditionalNeighbors({ top, left }, puzzle) {
+        const { gridSize, intersectionSize, columnsCount } = parseMonumentValleyGridSize(puzzle.gridSize);
 
         const results: Position[] = [];
 
@@ -361,11 +364,11 @@ export const MonumentValleyTypeManager: SudokuTypeManager<MonumentValleyPTM> = {
 
 const processCellCoords = (
     position: Position,
-    fieldSize: FieldSize | ReturnType<typeof parseMonumentValleyFieldSize>,
+    originalGridSize: GridSize | ReturnType<typeof parseMonumentValleyGridSize>,
 ): Position => {
     const { top, left } = position;
     const { gridSize, intersectionSize, columnsCount } =
-        "intersectionSize" in fieldSize ? fieldSize : parseMonumentValleyFieldSize(fieldSize);
+        "intersectionSize" in originalGridSize ? originalGridSize : parseMonumentValleyGridSize(originalGridSize);
     const leftOffset = left - (columnsCount - gridSize);
 
     return leftOffset >= 0 && leftOffset < intersectionSize && top < intersectionSize
@@ -377,7 +380,7 @@ const processCellCoords = (
 };
 
 const rotateDigitsMap = (map: GivenDigitsMap<number>, puzzle: PuzzleDefinition<MonumentValleyPTM>) => {
-    const { gridSize, intersectionSize } = parseMonumentValleyFieldSize(puzzle.fieldSize);
+    const { gridSize, intersectionSize } = parseMonumentValleyGridSize(puzzle.gridSize);
 
     return processGivenDigitsMaps(
         ([digit], { top, left }) =>
@@ -407,7 +410,7 @@ export const fixMonumentValleyDigitForConstraint = <DataT>({
 
 export const rotateCellCoords = (
     position: Position,
-    { gridSize, intersectionSize, columnsCount }: ReturnType<typeof parseMonumentValleyFieldSize>,
+    { gridSize, intersectionSize, columnsCount }: ReturnType<typeof parseMonumentValleyGridSize>,
     angle: number,
 ) => {
     const times = loop(angle, 360) / 120;
@@ -432,15 +435,15 @@ export const rotateCellCoords = (
     return position;
 };
 
-export const createMonumentValleyFieldSize = (
+export const createMonumentValleyGridSize = (
     gridSize: number,
     regionSize: number,
     intersectionSize = regionSize,
-): FieldSize => {
+): GridSize => {
     const columnsCount = gridSize * 3 - intersectionSize * 2;
 
     return {
-        fieldSize: columnsCount,
+        gridSize: columnsCount,
         columnsCount,
         rowsCount: gridSize * 2 - intersectionSize,
     };
@@ -485,7 +488,7 @@ export const createMonumentValleyRegions = (
           ];
 };
 
-export const parseMonumentValleyFieldSize = ({ columnsCount, rowsCount }: FieldSize) => ({
+export const parseMonumentValleyGridSize = ({ columnsCount, rowsCount }: GridSize) => ({
     columnsCount,
     rowsCount,
     gridSize: rowsCount * 2 - columnsCount,

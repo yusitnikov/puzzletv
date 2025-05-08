@@ -1,6 +1,6 @@
 import { RoundedPolyLine } from "../../../svg/rounded-poly-line/RoundedPolyLine";
 import { darkGreyColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import {
     getCircleConnectionPoint,
     getLineVector,
@@ -41,7 +41,7 @@ const getPointInfo = <T extends AnyPTM>(context: PuzzleContext<T>, { top, left }
 };
 
 export const Arrow: ConstraintPropsGenericFcMap<ArrowProps> = {
-    [FieldLayer.regular]: observer(function Arrow<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function Arrow<T extends AnyPTM>({
         props: { circleCells, arrowCells, transparentCircle },
         context,
     }: ConstraintProps<T, ArrowProps>) {

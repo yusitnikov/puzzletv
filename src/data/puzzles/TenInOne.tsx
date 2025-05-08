@@ -1,7 +1,7 @@
 import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { TenInOneSudokuTypeManager } from "../../sudokuTypes/ten-in-one/types/TenInOneSudokuTypeManager";
-import { createRegularFieldSize } from "../../types/sudoku/FieldSize";
+import { createRegularGridSize } from "../../types/sudoku/GridSize";
 import {
     KillerCageConstraint,
     KillerCageConstraintByRect,
@@ -63,7 +63,7 @@ const keepDigitsAccordingBoxPositionText = {
 const keepDigitsAccordingBoxPositionCallback = ({ top, left }: Position) =>
     remainingBoxPositionIndexes.includes(top) && remainingBoxPositionIndexes.includes(left);
 
-const fieldSize = createRegularFieldSize(9, 3);
+const gridSize = createRegularGridSize(9, 3);
 const resultChecker = isValidFinishedPuzzleByStageConstraints<MultiStagePTM>(2);
 
 export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
@@ -75,7 +75,7 @@ export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
     },
     slug: "abstract-killer-dots",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
-    fieldSize,
+    gridSize,
     rules: () => (
         <>
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
@@ -186,7 +186,7 @@ export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
 
         return boxIndex === top;
     }),
-    fieldSize,
+    gridSize,
     rules: () => (
         <>
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
@@ -273,7 +273,7 @@ export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AQX",
     getLmdSolutionCode: () => "936261819318276945",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
-    fieldSize,
+    gridSize,
     rules: () => (
         <>
             <RulesParagraph>{translate(conventionalNotationsApply)}:</RulesParagraph>
@@ -368,7 +368,7 @@ export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
     },
     slug: "moody-lines",
     typeManager: TenInOneSudokuTypeManager(keepDigitsAccordingBoxPositionCallback),
-    fieldSize,
+    gridSize,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000ASD",
     getLmdSolutionCode: () => "592648736742839615",
     rules: () => (

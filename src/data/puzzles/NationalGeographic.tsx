@@ -2,7 +2,7 @@ import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefi
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { FieldSize6, Regions6 } from "../../types/sudoku/FieldSize";
+import { GridSize6, Regions6 } from "../../types/sudoku/GridSize";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { Chameleon } from "../authors";
 import { observer } from "mobx-react-lite";
@@ -419,7 +419,7 @@ export const NationalGeographic: PuzzleDefinition<NumberPTM> = {
         disableArrowLetterShortcuts: true,
         disableCellModeLetterShortcuts: true,
     },
-    fieldSize: FieldSize6,
+    gridSize: GridSize6,
     regions: Regions6,
     rules: () => (
         <>

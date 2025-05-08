@@ -10,12 +10,12 @@ const CustomFogRenderer = observer(function CustomFogRenderer({ context }: FogRe
     // Get the current state of the puzzle
     const {
         puzzle,
-        currentFieldStateWithFogDemo: { cells },
+        currentGridStateWithFogDemo: { cells },
     } = context;
 
     const {
         solution,
-        fieldSize: { rowsCount, columnsCount },
+        gridSize: { rowsCount, columnsCount },
         typeManager: {
             getDigitByCellData,
             cellDataComponentType: { component: CellData },

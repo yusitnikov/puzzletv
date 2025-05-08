@@ -233,7 +233,7 @@ const loadByImportOptions = <T extends AnyPTM>(
     const typeManager = detectTypeManagerByImportOptions(importOptions, allGridParsers);
 
     const importer = new PuzzleImporter<T>(slug, importOptions, typeManager as unknown as SudokuTypeManager<T>, {
-        fieldSize: Math.max(rowsCount, columnsCount),
+        gridSize: Math.max(rowsCount, columnsCount),
         rowsCount,
         columnsCount,
     });

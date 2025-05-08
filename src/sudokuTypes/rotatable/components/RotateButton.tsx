@@ -9,13 +9,14 @@ import { Absolute } from "../../../components/layout/absolute/Absolute";
 import { ArrowCurveDownLeft } from "@emotion-icons/fluentui-system-filled";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { loop } from "../../../utils/math";
-import { gameStateApplyFieldDragGesture } from "../../../types/sudoku/GameState";
+import { gameStateApplyGridDragGesture } from "../../../types/sudoku/GameState";
 import { emptyGestureMetrics } from "../../../utils/gestures";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
 import { translate } from "../../../utils/translate";
+import { LanguageCode } from "../../../types/translations/LanguageCode";
 
 const handleRotate = <T extends AnyPTM>(context: PuzzleContext<T>, direction: number) => {
     const {
@@ -33,7 +34,7 @@ const handleRotate = <T extends AnyPTM>(context: PuzzleContext<T>, direction: nu
         }
     }
 
-    gameStateApplyFieldDragGesture(
+    gameStateApplyGridDragGesture(
         context,
         undefined,
         emptyGestureMetrics,
@@ -79,7 +80,15 @@ export const RotateRightButton: ControlButtonItemPropsGenericFc = observer(funct
                         fontSize: cellSize * 0.4,
                     }}
                 >
-                    <div>{translate("Please rotate the field once to start solving the puzzle")}!</div>
+                    <div>
+                        {translate({
+                            [LanguageCode.en]: "Please rotate the grid once to start solving the puzzle",
+                            [LanguageCode.ru]: "Поверните поле один раз, чтобы начать решать судоку",
+                            [LanguageCode.de]:
+                                "Bitte drehen Sie das Gitter einmal, um mit der Lösung des Rätsels zu beginnen",
+                        })}
+                        !
+                    </div>
 
                     <Absolute
                         width={cellSize * 1.5}

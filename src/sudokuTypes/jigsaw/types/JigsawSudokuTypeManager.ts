@@ -38,7 +38,7 @@ import { RegularDigitComponentType } from "../../../components/sudoku/digit/Regu
 import { rotateNumber } from "../../../components/sudoku/digit/DigitComponentType";
 import { JigsawPieceHighlightHandlerControlButtonItem } from "../components/JigsawPieceHighlightHandler";
 import { getCellDataSortIndexes } from "../../../components/sudoku/cell/CellDigits";
-import { JigsawFieldPieceState, JigsawFieldState } from "./JigsawFieldState";
+import { JigsawGridPieceState, JigsawGridState } from "./JigsawGridState";
 import { getReverseIndexMap } from "../../../utils/array";
 import { createRandomGenerator } from "../../../utils/random";
 import { PuzzleImportOptions } from "../../../types/sudoku/PuzzleImportOptions";
@@ -51,7 +51,7 @@ import {
     PuzzleDefinition,
 } from "../../../types/sudoku/PuzzleDefinition";
 import { jssTag } from "../../jss/constraints/Jss";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { JigsawJss } from "../constraints/JigsawJss";
 import { ControlButtonRegion } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { JigsawGluePiecesButton } from "../components/JigsawGluePiecesButton";
@@ -67,7 +67,7 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { JigsawSudokuPhrases } from "./JigsawSudokuPhrases";
 import { JigsawPieceInfo } from "./JigsawPieceInfo";
 import {
-    addFieldStateExToSudokuManager,
+    addGridStateExToSudokuManager,
     addGameStateExToSudokuManager,
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import { createEmptyContextForPuzzle } from "../../../types/sudoku/PuzzleContext";
@@ -109,7 +109,7 @@ export const JigsawSudokuTypeManager = (
     }: JigsawSudokuTypeManagerOptions = {},
 ): SudokuTypeManager<JigsawPTM> =>
     addGameStateExToSudokuManager<JigsawPTM, JigsawGameState, JigsawProcessedGameState>(
-        addFieldStateExToSudokuManager<JigsawPTM, JigsawFieldState>(
+        addGridStateExToSudokuManager<JigsawPTM, JigsawGridState>(
             {
                 areSameCellData(data1, data2, context, cell1, cell2): boolean {
                     if (!stickyDigits && cell1 !== undefined && cell2 !== undefined) {
@@ -147,7 +147,7 @@ export const JigsawSudokuTypeManager = (
                     return { digit, angle: 0 };
                 },
 
-                createCellDataByTypedDigit(digit, { puzzle, fieldExtension: { pieces } }, position): JigsawDigit {
+                createCellDataByTypedDigit(digit, { puzzle, gridExtension: { pieces } }, position): JigsawDigit {
                     if (position) {
                         const regionIndex = getJigsawPieceIndexByCell(puzzle, position);
                         if (regionIndex !== undefined) {
@@ -165,7 +165,7 @@ export const JigsawSudokuTypeManager = (
                     return { digit, angle: 0 };
                 },
 
-                getDigitByCellData(data, { puzzle, fieldExtension: { pieces } }, cellPosition): number {
+                getDigitByCellData(data, { puzzle, gridExtension: { pieces } }, cellPosition): number {
                     const regionIndex = getJigsawPieceIndexByCell(puzzle, cellPosition);
                     if (regionIndex) {
                         // TODO: return NaN if it's not a valid digit
@@ -178,7 +178,7 @@ export const JigsawSudokuTypeManager = (
                     return data.digit;
                 },
 
-                transformNumber(num, { puzzle, fieldExtension: { pieces } }, cellPosition): number {
+                transformNumber(num, { puzzle, gridExtension: { pieces } }, cellPosition): number {
                     const regionIndex = getJigsawPieceIndexByCell(puzzle, cellPosition);
                     if (regionIndex) {
                         const { importOptions: { angleStep = 0 } = {} } = puzzle;
@@ -321,7 +321,7 @@ export const JigsawSudokuTypeManager = (
                 transformCoords: transformCoordsByRegions,
 
                 getRegionsWithSameCoordsTransformation(context, isImportingPuzzle): GridRegion[] {
-                    const { rowsCount, columnsCount } = context.puzzle.fieldSize;
+                    const { rowsCount, columnsCount } = context.puzzle.gridSize;
 
                     if (isImportingPuzzle) {
                         return [
@@ -459,8 +459,8 @@ export const JigsawSudokuTypeManager = (
                     // Mark all cells that don't belong to a region as inactive
                     let newInactiveCells = new PositionSet(inactiveCells);
                     const contextDraft = createEmptyContextForPuzzle(puzzle);
-                    for (let top = 0; top < puzzle.fieldSize.rowsCount; top++) {
-                        for (let left = 0; left < puzzle.fieldSize.columnsCount; left++) {
+                    for (let top = 0; top < puzzle.gridSize.rowsCount; top++) {
+                        for (let left = 0; left < puzzle.gridSize.columnsCount; left++) {
                             const region = contextDraft.getCellRegion(top, left);
                             if (!region || region.noInteraction) {
                                 newInactiveCells = newInactiveCells.add({ top, left });
@@ -474,7 +474,7 @@ export const JigsawSudokuTypeManager = (
                             (items) => [
                                 ...items.map((constraint) =>
                                     constraint.tags?.includes(jssTag)
-                                        ? { ...constraint, component: { [FieldLayer.noClip]: JigsawJss } }
+                                        ? { ...constraint, component: { [GridLayer.noClip]: JigsawJss } }
                                         : constraint,
                                 ),
                                 JigsawGluedPiecesConstraint,
@@ -523,7 +523,7 @@ export const JigsawSudokuTypeManager = (
                         (context) => {
                             const {
                                 puzzle,
-                                fieldExtension: { pieces: piecePositions },
+                                gridExtension: { pieces: piecePositions },
                             } = context;
                             const { pieces } = puzzle.extension!;
                             const [group] = groupJigsawPiecesByZIndex(context);
@@ -557,7 +557,7 @@ export const JigsawSudokuTypeManager = (
                 // TODO: support shared games
             },
             {
-                initialFieldStateExtension(puzzle): JigsawFieldState {
+                initialGridStateExtension(puzzle): JigsawGridState {
                     if (!puzzle) {
                         return { pieces: [] };
                     }
@@ -567,8 +567,8 @@ export const JigsawSudokuTypeManager = (
                         typeManager: { initialScale = 1 },
                     } = puzzle;
                     const randomizer = createRandomGenerator(0);
-                    const centerTop = puzzle.fieldSize.rowsCount / 2;
-                    const centerLeft = puzzle.fieldSize.columnsCount / 2;
+                    const centerTop = puzzle.gridSize.rowsCount / 2;
+                    const centerLeft = puzzle.gridSize.columnsCount / 2;
                     const pieces = puzzle.extension?.pieces ?? [];
 
                     const piecePositions = pieces.map(({ boundingRect }): PositionWithAngle => {
@@ -601,10 +601,10 @@ export const JigsawSudokuTypeManager = (
                         }),
                     };
                 },
-                unserializeFieldStateExtension({ pieces }: any): Partial<JigsawFieldState> {
+                unserializeGridStateExtension({ pieces }: any): Partial<JigsawGridState> {
                     return {
                         pieces: pieces?.map(
-                            ({ top, left, angle, zIndex }: any, index: number): JigsawFieldPieceState => ({
+                            ({ top, left, angle, zIndex }: any, index: number): JigsawGridPieceState => ({
                                 top,
                                 left,
                                 angle,
@@ -626,7 +626,7 @@ export const JigsawSudokuTypeManager = (
             useProcessedGameStateExtension(context): JigsawProcessedGameState {
                 const {
                     puzzle,
-                    fieldExtension: { pieces: piecePositions },
+                    gridExtension: { pieces: piecePositions },
                     stateExtension: { pieces: pieceAnimations },
                 } = context;
                 const pieces = puzzle.extension?.pieces ?? [];
@@ -672,7 +672,7 @@ export const JigsawSudokuTypeManager = (
                     ),
                 };
             },
-            getProcessedGameStateExtension({ fieldExtension: { pieces } }): JigsawProcessedGameState {
+            getProcessedGameStateExtension({ gridExtension: { pieces } }): JigsawProcessedGameState {
                 return { pieces };
             },
         },

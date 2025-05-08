@@ -1,5 +1,5 @@
 import { RoundedPolyLine } from "../../../svg/rounded-poly-line/RoundedPolyLine";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
 import {
     Constraint,
@@ -43,7 +43,7 @@ const LineComponentInLayer: ConstraintPropsGenericFc<LineProps> = observer(funct
 });
 
 export const LineComponent: ConstraintPropsGenericFcMap<LineProps> = {
-    [FieldLayer.regular]: LineComponentInLayer,
+    [GridLayer.regular]: LineComponentInLayer,
 };
 
 export const LineConstraint = <T extends AnyPTM>(
@@ -51,7 +51,7 @@ export const LineConstraint = <T extends AnyPTM>(
     color?: string,
     width?: number,
     split = true,
-    layer = FieldLayer.regular,
+    layer = GridLayer.regular,
 ): Constraint<T, LineProps> => {
     let cells = parsePositionLiterals(cellLiterals);
     if (split) {

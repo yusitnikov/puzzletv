@@ -1,5 +1,5 @@
 import { lightGreyColor, textColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import {
     formatSvgPointsArray,
     isSamePosition,
@@ -20,7 +20,7 @@ export interface MinMaxProps {
 }
 
 export const MinMax: ConstraintPropsGenericFcMap<MinMaxProps> = {
-    [FieldLayer.beforeSelection]: observer(function MinMaxRect<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function MinMaxRect<T extends AnyPTM>({
         cells: [{ left, top }],
         color = rgba(lightGreyColor, 0.5),
     }: ConstraintProps<T, MinMaxProps>) {
@@ -30,7 +30,7 @@ export const MinMax: ConstraintPropsGenericFcMap<MinMaxProps> = {
 
         return <rect x={left} y={top} width={1} height={1} fill={rgb} fillOpacity={a} />;
     }),
-    [FieldLayer.regular]: observer(function MinMaxArrows<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function MinMaxArrows<T extends AnyPTM>({
         cells: [{ left, top }],
         props: { coeff },
     }: ConstraintProps<T, MinMaxProps>) {

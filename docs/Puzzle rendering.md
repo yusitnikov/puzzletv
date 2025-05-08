@@ -9,7 +9,7 @@ The puzzle solving page's layout consist of puzzle grid area and a sidebar with 
 The [`Puzzle`](../src/components/sudoku/puzzle/Puzzle.tsx) component initializes the "puzzle context" (controls the solving state),
 calculates the position of the grid area and of the sidebar area,
 and renders the relevant components there.
-The [`Field`](../src/components/sudoku/field/Field.tsx) component renders the puzzle grid,
+The [`Grid`](../src/components/sudoku/grid/Grid.tsx) component renders the puzzle grid,
 and the [`SidePanel`](../src/components/sudoku/side-panel/SidePanel.tsx) component renders the side panel.
 This article covers rendering the grid, including:
 
@@ -31,8 +31,8 @@ Note: the grid's container is always a square (even if the puzzle itself is rect
 in order to make the layout consistent, so that content creators don't have to redefine their OBS scenes for each puzzle.
 The topmost wrapper div also captures mouse gestures that are applied to the whole grid (like panning/zooming the puzzle).
 
-The next layer of the grid is an optional `FieldWrapper` component defined on the
-[type manager level](./Data%20structures%20and%20types.md) in the `fieldWrapperComponent` field.
+The next layer of the grid is an optional `GridWrapper` component defined on the
+[type manager level](./Data%20structures%20and%20types.md) in the `gridWrapperComponent` field.
 By default, it's a pass-though component that renders the children without any modifications,
 but puzzles can redefine it to render custom wrapper div for the puzzle and change the DOM structure a bit.
 Examples:
@@ -40,27 +40,27 @@ Examples:
 - [Elephant slitherlink](../src/data/puzzles/Slitherlink.tsx) puzzle uses custom wrapper to add a background image behind the grid.
 - [Africa](../src/data/puzzles/Africa.tsx) puzzle uses it to render the puzzle as a layer in Google Maps.
 
-Next to the `FieldWrapper`, there's an additional optional component that could be rendered by the
-[type manager](./Data%20structures%20and%20types.md) - `FieldControls`, defined on type manager's `fieldControlsComponent` field.
+Next to the `GridWrapper`, there's an additional optional component that could be rendered by the
+[type manager](./Data%20structures%20and%20types.md) - `GridControls`, defined on type manager's `gridControlsComponent` field.
 The purpose of this component is to render puzzle-specific control buttons that are not related to specific cells, but to the whole grid.
 Examples:
 
 - [Rotatable cube](../src/sudokuTypes/cube/components/FullCubeControls.tsx) puzzles uses it to render cube rotation buttons outside the grid.
-- [Infinite ring](../src/sudokuTypes/infinite-rings/components/InfiniteRingsFieldControls.tsx) type manager uses it to
+- [Infinite ring](../src/sudokuTypes/infinite-rings/components/InfiniteRingsGridControls.tsx) type manager uses it to
   draw thick grid borders and render zoom buttons in the center of grid.
 
-The next layer inside the field wrapper is the absolutely positioned and possibly rotated and scaled div
+The next layer inside the grid wrapper is the absolutely positioned and possibly rotated and scaled div
 that applies transformations created by panning, rotating and zooming the grid (if applicable).
 But it's possible to cancel some of these automatic panning and scale (zoom) effects by using the
-`fieldFitsWrapper` and `fieldWrapperHandlesScale` flags on the type manager and
-to implement panning and scaling manually in the field wrapper component (see above)
+`gridFitsWrapper` and `gridWrapperHandlesScale` flags on the type manager and
+to implement panning and scaling manually in the grid wrapper component (see above)
 or by applying custom transformations to the grid from `getRegionsWithSameCoordsTransformation()` and `transformCoords()` methods.
 For instance:
 
 - [Google Maps type manager](../src/sudokuTypes/google-maps/types/GoogleMapsTypeManager.ts)
-  enables `fieldFitsWrapper` because panning and zooming is handled by the Google Maps widget.
+  enables `gridFitsWrapper` because panning and zooming is handled by the Google Maps widget.
 - [Infinite rings type manager](../src/sudokuTypes/infinite-rings/types/InfiniteRingsSudokuTypeManager.ts)
-  enables `fieldWrapperHandlesScale` because zooming is handled by custom transformations of the ring regions.
+  enables `gridWrapperHandlesScale` because zooming is handled by custom transformations of the ring regions.
 
 ### SVG layers
 
@@ -69,20 +69,20 @@ that contains most of the grid shapes and handles interactions with the cells.
 
 #### Main SVG tag
 
-The main SVG tag is rendered by the [`FieldSVG`](../src/components/sudoku/field/FieldSvg.tsx) component.
+The main SVG tag is rendered by the [`GridSvg`](../src/components/sudoku/grid/GridSvg.tsx) component.
 
 By default, it's positioned and transformed in a way that
 the coordinate system inside SVG begins in the top-left corner of the grid not counting the margins
 (i.e. the top-left corner of the top-left cell of the grid),
 and the cell is a 1x1 square (unless custom cell bounds are applied).
 Re-defining the SVG coordinate system this way can be cancelled
-by enabling the `SudokuTypeManager.fieldFitsWrapper` flag.
+by enabling the `SudokuTypeManager.gridFitsWrapper` flag.
 
 Also, by default the puzzle is positioned in the center of the grid's square
-according to the `PuzzleDefinition.fieldSize` values.
+according to the `PuzzleDefinition.gridSize` values.
 It makes sense for puzzles with regular rectangular grid that consists of 1x1 square cells.
-For such puzzles, `PuzzleDefinition.fieldSize.fieldSize` should be the maximum value of
-`PuzzleDefinition.fieldSize.rowsCount` and `PuzzleDefinition.fieldSize.columnsCount`,
+For such puzzles, `PuzzleDefinition.gridSize.gridSize` should be the maximum value of
+`PuzzleDefinition.gridSize.rowsCount` and `PuzzleDefinition.gridSize.columnsCount`,
 and the cell's indexes in the 2-dimensional array directly correspond to the cell's coordinates in the SVG.
 However, grids with custom cell bounds and/or grid transformations usually mean
 that cell's indexes in the array are not directly related to the cell's coordinates,
@@ -108,8 +108,8 @@ It's also possible to define the `transformCoords()` prop on each region returne
 and then use `transformCoordsByRegions()` helper to implement the `transformCoords()` method on the type manager.
 
 The component that renders these regions is
-[`FieldRegionsWithSameCoordsTransformation`](../src/components/sudoku/field/FieldRegionsWithSameCoordsTransformation.tsx),
-and it's a direct child of `FieldSVG` in the DOM structure.
+[`GridRegionsWithSameCoordsTransformation`](../src/components/sudoku/grid/GridRegionsWithSameCoordsTransformation.tsx),
+and it's a direct child of `GridSvg` in the DOM structure.
 The component goes over all regions, and renders the whole grid into each of them,
 using SVG clipping to hide the parts that go outside the region.
 
@@ -120,7 +120,7 @@ But constraints that do that are responsible to check what's the context region 
 and render only graphics related to this specific region.
 See [`Jss`](../src/sudokuTypes/jss/constraints/Jss.tsx) for usage example.
 
-The `FieldRegionsWithSameCoordsTransformation` component applies two coordinate transformations to the contents:
+The `GridRegionsWithSameCoordsTransformation` component applies two coordinate transformations to the contents:
 
 1. First, it applies the transformation defined by the `transformCoords()` method,
    so that the coordinates' base would be moved to the top-left corner of the transformed region.
@@ -131,15 +131,15 @@ The `FieldRegionsWithSameCoordsTransformation` component applies two coordinate 
 This way, the transformation remains transparent to the components that render all the graphics -
 they can act like there's no transformation at all and just do their job as usual.
 
-#### Field layers
+#### Grid layers
 
 Inside each transformation region, the grid contents are rendered in several layers -
-see [`FieldLayer`](../src/types/sudoku/FieldLayer.ts) enum.
+see [`GridLayer`](../src/types/sudoku/GridLayer.ts) enum.
 These layers are used to control what would be rendered behind, and what would be rendered on top
 (SVG doesn't support `z-index` CSS property, unfortunately).
 
 The best way to learn which layers are supported and in which order they go
-is to just look in the source code of the [`Field`](../src/components/sudoku/field/Field.tsx) component.
+is to just look in the source code of the [`Grid`](../src/components/sudoku/grid/Grid.tsx) component.
 
 Most of the layers are rendering constraints' visual clues that are defined on
 [`Constraint.component`](../src/types/sudoku/Constraint.ts).
@@ -151,8 +151,8 @@ Let's look at each of above in more details.
 ##### Rendering constraints
 
 Each visual constraint defines the [`component`](../src/types/sudoku/Constraint.ts) field,
-which is a set of React components mapped by [field layers](../src/types/sudoku/FieldLayer.ts).
-For each layer, the `Field` component collects all constraints that have a mapping for the layer, and render all of them one by one.
+which is a set of React components mapped by [grid layers](../src/types/sudoku/GridLayer.ts).
+For each layer, the `Grid` component collects all constraints that have a mapping for the layer, and render all of them one by one.
 
 The properties being passed to each component are defined in [`ConstraintProps`](../src/types/sudoku/Constraint.ts) and include:
 
@@ -163,15 +163,15 @@ The properties being passed to each component are defined in [`ConstraintProps`]
 So, usually the component will get the coordinates and styles of the constraint from the constraint object's field for rendering static elements,
 and get the puzzle's solving state for rendering dynamic elements.
 
-Most of the field layers ignore all pointer events, so constraints with interactive elements should render them
-in the [`interactive` field layer](../src/types/sudoku/FieldLayer.ts).
+Most of the grid layers ignore all pointer events, so constraints with interactive elements should render them
+in the [`interactive` grid layer](../src/types/sudoku/GridLayer.ts).
 
 By default, the constraint's React component is responsible for supporting custom cell bounds (non-square cells in random positions).
 However, if the constraint is designed to render something only in the center of a single cell, or on the border between two adjacent cells,
 it could enable the `renderSingleCellInUserArea` flag to indicate that.
 When enabled, single cell constraints will be automatically rendered in the cell's user area
 (the main area of the cell where the user can write the digit and pencilmarks, see the "Rendering grid cells" section below)
-by applying the [`SingleCellFieldItemPositionFix`](../src/components/sudoku/field/SingleCellFieldItemPositionFix.tsx) wrapper,
+by applying the [`SingleCellGridItemPositionFix`](../src/components/sudoku/grid/SingleCellGridItemPositionFix.tsx) wrapper,
 and two-cell ("domino") constraints are being rendered between the two cells.
 Both for single-cell and for two-cell constraints, the platform takes care of applying all coordinate transformations (translating, scaling, rotating),
 and for the React component that renders the constraint everything looks like it's getting a regular 1x1 cell.
@@ -191,14 +191,14 @@ There are two supported cell types in Puzzle TV:
 
 Note: the user area of a regular cell is the whole cell.
 
-The `Field` component uses the [`FieldCellsLayer`](../src/components/sudoku/field/FieldCellsLayer.tsx) component
+The `Grid` component uses the [`GridCellsLayer`](../src/components/sudoku/grid/GridCellsLayer.tsx) component
 to go over all cells in the grid/region and render each of them.
 The component has several conditions for skipping cells that don't have to be rendered:
 cells that don't belong to the currently rendered region, cells that out of the view box because of panning, etc.
 
-The cell content renderers mostly use the [`FieldCellShape`](../src/components/sudoku/field/FieldCellShape.tsx) component
+The cell content renderers mostly use the [`GridCellShape`](../src/components/sudoku/grid/GridCellShape.tsx) component
 to render the cell's polygon (either to draw the cell's border or to clip some graphics by the cell's shape),
-and the [`FieldCellUserArea`](../src/components/sudoku/field/FieldCellUserArea.tsx) component
+and the [`GridCellUserArea`](../src/components/sudoku/grid/GridCellUserArea.tsx) component
 to draw something in the cell's user area rectangle.
 
 In order to support rotated and skewed grids and cells, [type manager](./Data%20structures%20and%20types.md)
@@ -231,7 +231,7 @@ See the "Rendering interactive elements" section below to learn how Puzzle TV ha
 
 Pen tool lines and marks are being rendered by the
 [`UserLines` constraint](../src/components/sudoku/constraints/user-lines/UserLines.tsx)
-in the dedicated [field layers](../src/types/sudoku/FieldLayer.ts):
+in the dedicated [grid layers](../src/types/sudoku/GridLayer.ts):
 
 - Lines and marks that were already added to the grid are rendered in the `givenUserLines` layer.
 - The line that the user is drawing right now (started drawing, but still holds the mouse down)
@@ -243,15 +243,15 @@ that the current user's action indication is never covered by existing lines.
 ##### Rendering interactive elements
 
 Custom interactive elements that belong to certain cells are being rendered by constraints by implementing a component
-in the [`interactive` field layer](../src/types/sudoku/FieldLayer.ts) - see the "Rendering constraints" section.
+in the [`interactive` grid layer](../src/types/sudoku/GridLayer.ts) - see the "Rendering constraints" section.
 
 Custom interactive elements that do not belong to any cells are being rendered outside the SVG tag
-by implementing `SudokuTypeManager.fieldControlsComponent`.
+by implementing `SudokuTypeManager.gridControlsComponent`.
 
 Core interactions with the cells (selecting the cells, drawing lines and marks over them etc.)
-are implemented in the "mouse handler" field layer that goes right before the `interactive` layer
+are implemented in the "mouse handler" grid layer that goes right before the `interactive` layer
 (see the "Rendering grid cells" section),
-and it's handled by the [`FieldCellMouseHandler`](../src/components/sudoku/field/FieldCellMouseHandler.tsx) component.
+and it's handled by the [`GridCellMouseHandler`](../src/components/sudoku/grid/GridCellMouseHandler.tsx) component.
 The component renders multiple SVG shapes for different parts of the cell that handle pointer events independently,
 in order to know which part of the cell was clicked by the user (center, border or corner).
 
@@ -265,19 +265,19 @@ Doing so shouldn't select the cells that were touched by accident.
 For the cells with custom bounds, it renders one handler for the whole cell
 and separate handlers for every border segment and corner.
 Most of the cell interaction shapes are being clipped by the cell's shape
-(using the [`FieldCellShape`](../src/components/sudoku/field/FieldCellShape.tsx) component),
+(using the [`GridCellShape`](../src/components/sudoku/grid/GridCellShape.tsx) component),
 but there's an additional layer of mouse handlers with no clipping for the cells on the grid's border
 to support user gestures a little bit outside the grid.
 
 ##### Rendering toroidal grid
 
-Each field layer is using the [`FieldLoop`](../src/components/sudoku/field/FieldLoop.tsx) component
+Each grid layer is using the [`GridLoop`](../src/components/sudoku/grid/GridLoop.tsx) component
 to support looping (toroidal) grids by rendering all items of the layer multiple times with different offset.
 
 ##### Rendering the fog
 
 The fog and the light bulbs are being rendered by the [`Fog`](../src/components/sudoku/constraints/fog/Fog.tsx) constraint
-in the [`regular` field layer](../src/types/sudoku/FieldLayer.ts).
+in the [`regular` grid layer](../src/types/sudoku/GridLayer.ts).
 
 The way it renders the fog is to draw a grey rectangle over the whole grid
 and apply an SVG mask that filters only fog cells.

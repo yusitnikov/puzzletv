@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { darkGreyColor, getRegionBorderWidth, textColor } from "../../../app/globals";
 import { isSamePosition, parsePositionLiterals, Position, PositionLiteral } from "../../../../types/layout/Position";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { getRegionBorders } from "../../../../utils/regions";
 import { GivenDigitsMap } from "../../../../types/sudoku/GivenDigitsMap";
@@ -14,7 +14,7 @@ import { profiler } from "../../../../utils/profiler";
 export const regionTag = "region";
 
 export const Region: ConstraintPropsGenericFcMap = {
-    [FieldLayer.lines]: observer(function Region<T extends AnyPTM>({
+    [GridLayer.lines]: observer(function Region<T extends AnyPTM>({
         cells,
         context: { cellSize, isMyTurn },
     }: ConstraintProps<T>) {

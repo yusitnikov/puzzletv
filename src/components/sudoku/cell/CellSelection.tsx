@@ -2,7 +2,7 @@ import { blueColor, lighterBlueColor, lightOrangeColor } from "../../app/globals
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { Position } from "../../../types/layout/Position";
 import { getTransformedRectAverageSize } from "../../../types/layout/Rect";
-import { FieldCellShape } from "../field/FieldCellShape";
+import { GridCellShape } from "../grid/GridCellShape";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { useTransformScale } from "../../../contexts/TransformContext";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
@@ -85,14 +85,14 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
         selectionBorderWidth = Math.max(selectionBorderWidth * cellTransformedSize, 7 / scale);
 
         return (
-            <AutoSvg clip={<FieldCellShape context={context} cellPosition={cellPosition} />}>
-                <FieldCellShape
+            <AutoSvg clip={<GridCellShape context={context} cellPosition={cellPosition} />}>
+                <GridCellShape
                     context={context}
                     cellPosition={cellPosition}
                     stroke={"#fff"}
                     strokeWidth={selectionBorderWidth + selectionBorderWidth2}
                 />
-                <FieldCellShape
+                <GridCellShape
                     context={context}
                     cellPosition={cellPosition}
                     stroke={color}

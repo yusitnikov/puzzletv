@@ -8,7 +8,7 @@ import {
     positionToArray,
     rotateVectorClockwise,
 } from "../../../types/layout/Position";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { defaultSokobanDirection } from "../types/SokobanGameState";
 import { textColor } from "../../../components/app/globals";
 import { loop } from "../../../utils/math";
@@ -270,5 +270,5 @@ export const SokobanPlayerConstraint = (position: Position): Constraint<SokobanP
     name: "sokoban player",
     cells: [position],
     props: undefined,
-    component: { [FieldLayer.beforeSelection]: SokobanPlayer },
+    component: { [GridLayer.beforeSelection]: SokobanPlayer },
 });

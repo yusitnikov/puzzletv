@@ -1,10 +1,10 @@
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../types/sudoku/Constraint";
 import { JssCell } from "../types/JssCell";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { emptyPosition } from "../../../types/layout/Position";
-import { SingleCellFieldItemPositionFix } from "../../../components/sudoku/field/SingleCellFieldItemPositionFix";
+import { SingleCellGridItemPositionFix } from "../../../components/sudoku/grid/SingleCellGridItemPositionFix";
 import { CenteredText } from "../../../components/svg/centered-text/CenteredText";
 import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
 import { observer } from "mobx-react-lite";
@@ -58,13 +58,13 @@ export const Jss: ConstraintPropsGenericFc<JssProps> = observer(function Jss<T e
                         )}
 
                         {text !== undefined && (
-                            <SingleCellFieldItemPositionFix context={context} position={emptyPosition} region={region}>
+                            <SingleCellGridItemPositionFix context={context} position={emptyPosition} region={region}>
                                 <AutoSvg top={0.5} left={0.5}>
                                     <CenteredText size={textSize} fill={textColor}>
                                         {text}
                                     </CenteredText>
                                 </AutoSvg>
-                            </SingleCellFieldItemPositionFix>
+                            </SingleCellGridItemPositionFix>
                         )}
                     </AutoSvg>
                 );
@@ -78,5 +78,5 @@ export const JssConstraint = <T extends AnyPTM>(cells: JssCell[]): Constraint<T,
     tags: [jssTag],
     cells: cells.map(({ top, left }) => ({ top, left })),
     props: { cells },
-    component: { [FieldLayer.noClip]: Jss },
+    component: { [GridLayer.noClip]: Jss },
 });

@@ -4,7 +4,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { CellColorValue, resolveCellColorValue } from "../../../types/sudoku/CellColor";
 import { EllipseConstraint } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
 import { blackColor } from "../../../components/app/globals";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { ComponentType, ReactNode } from "react";
 
 export interface RotatableClue {
@@ -53,7 +53,7 @@ export const createRotatableClue = (
                 undefined,
                 undefined,
                 undefined,
-                FieldLayer.beforeSelection,
+                GridLayer.beforeSelection,
             ),
             ...clues,
         ];

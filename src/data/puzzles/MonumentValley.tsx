@@ -3,7 +3,7 @@ import { LanguageCode } from "../../types/translations/LanguageCode";
 import { PartiallyTranslatable } from "../../types/translations/Translatable";
 import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
 import {
-    createMonumentValleyFieldSize,
+    createMonumentValleyGridSize,
     createMonumentValleyRegions,
     MonumentValleyTypeManager,
     parseMonumentValleyDigitsMap,
@@ -34,7 +34,7 @@ export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     slug: "monument-valley-sudoku",
     saveStateKey: "monument-valley-sudoku-v2",
     typeManager: MonumentValleyTypeManager,
-    fieldSize: createMonumentValleyFieldSize(9, 3),
+    gridSize: createMonumentValleyGridSize(9, 3),
     regions: createMonumentValleyRegions(9, 3),
     digitsCount: 9,
     rules: () => <RulesParagraph>{rules("0 1 6 8 9")}</RulesParagraph>,
@@ -140,7 +140,7 @@ export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     slug: "monument-valley-mini",
     saveStateKey: "monument-valley-mini-v2",
     typeManager: MonumentValleyTypeManager,
-    fieldSize: createMonumentValleyFieldSize(5, 1, 2),
+    gridSize: createMonumentValleyGridSize(5, 1, 2),
     digitsCount: 5,
     rules: () => <RulesParagraph>{rules("0 1 8")}</RulesParagraph>,
     items: [MonumentValleyGridBordersConstraint()],

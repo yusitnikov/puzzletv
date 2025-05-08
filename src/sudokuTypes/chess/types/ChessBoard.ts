@@ -131,7 +131,7 @@ export class ChessBoard extends ChessBoardBase {
     }
 }
 
-export class FieldStateChessBoard extends ChessBoardBase {
+export class GridStateChessBoard extends ChessBoardBase {
     public readonly cells: CellState<ChessPTM>[][];
 
     constructor(cells: CellState<ChessPTM>[][]) {

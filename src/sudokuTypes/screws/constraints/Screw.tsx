@@ -2,7 +2,7 @@ import { Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { formatSvgPointsArray, isSamePosition, Position } from "../../../types/layout/Position";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { darkGreyColor, lightGreyColor } from "../../../components/app/globals";
 import { observer } from "mobx-react-lite";
 import { ScrewsPTM } from "../types/ScrewsPTM";
@@ -28,7 +28,7 @@ interface ScrewProps {
 }
 
 const Screw = {
-    [FieldLayer.beforeSelection]: observer(function Screw<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function Screw<T extends AnyPTM>({
         context,
         props: { index },
     }: ConstraintProps<ScrewsPTM<T>, ScrewProps>) {

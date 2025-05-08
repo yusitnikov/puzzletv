@@ -1,9 +1,9 @@
 import { textColor } from "../../../components/app/globals";
 import { Position } from "../../../types/layout/Position";
-import { parseSparkFieldSize } from "../types/SparkTypeManager";
+import { parseSparkGridSize } from "../types/SparkTypeManager";
 import { NumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { CosmeticArrowConstraint } from "../../../components/sudoku/constraints/decorative-shape/DecorativeShape";
-import { FieldSize } from "../../../types/sudoku/FieldSize";
+import { GridSize } from "../../../types/sudoku/GridSize";
 
 const length = 1.5;
 const padding = 0.25;
@@ -28,8 +28,8 @@ const SparkGridArrowConstraint = ({ top, left }: Position, angle: number) => {
         angle,
     );
 };
-export const SparkGridArrowsConstraint = (fieldSize: Required<FieldSize>) => {
-    const { gridSize, realRowsCount, columnsCount } = parseSparkFieldSize(fieldSize);
+export const SparkGridArrowsConstraint = (originalGridSize: Required<GridSize>) => {
+    const { gridSize, realRowsCount, columnsCount } = parseSparkGridSize(originalGridSize);
 
     return [
         SparkGridArrowConstraint({ top: gridSize, left: -padding }, -90),

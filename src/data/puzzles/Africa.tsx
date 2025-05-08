@@ -2,7 +2,6 @@ import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { Chameleon } from "../authors";
-import { GoogleMapsFieldWrapper } from "../../sudokuTypes/google-maps/components/GoogleMapsFieldWrapper";
 import { AfricaCountriesAreas, AfricaCountriesBounds, AfricaCountriesEnum } from "./africa-data/AfricaCountries";
 import { isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/sudoku/Constraint";
 import { processGivenDigitsMaps } from "../../types/sudoku/GivenDigitsMap";
@@ -56,8 +55,8 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         south: -25,
         north: 27,
     }),
-    fieldSize: {
-        fieldSize: 9,
+    gridSize: {
+        gridSize: 9,
         rowsCount: 1,
         columnsCount: 49,
     },
@@ -114,7 +113,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
             return result;
         }
 
-        const digits = indexes(context.puzzle.fieldSize.columnsCount).map((left) => context.getCellDigit(0, left)!);
+        const digits = indexes(context.puzzle.gridSize.columnsCount).map((left) => context.getCellDigit(0, left)!);
         const cellInfos = context.puzzleIndex.allCells[0];
 
         let product = 1;

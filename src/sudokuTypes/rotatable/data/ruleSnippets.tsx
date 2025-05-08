@@ -5,7 +5,7 @@ import React, { ReactNode } from "react";
 export const rotatableSudokuRules: Translatable<ReactNode> = {
     [LanguageCode.en]: (
         <>
-            <strong>The sudoku field can be rotated clockwise.</strong> It's up to you to determine the correct
+            <strong>The sudoku grid can be rotated clockwise.</strong> It's up to you to determine the correct
             orientation of the puzzle.
         </>
     ),

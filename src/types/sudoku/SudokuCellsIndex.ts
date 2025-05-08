@@ -37,7 +37,7 @@ export class SudokuCellsIndex<T extends AnyPTM> {
                 isOddTransformCoords,
                 getAdditionalNeighbors = () => [],
             },
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
             customCellBounds = {},
             disableDiagonalCenterLines,
             disableDiagonalBorderLines,

@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { ChessPTM } from "../types/ChessPTM";
-import { unserializeFieldState } from "../../../types/sudoku/FieldState";
+import { unserializeGridState } from "../../../types/sudoku/GridState";
 import { ChessColor } from "../types/ChessColor";
 import { ChessPieceType } from "../types/ChessPieceType";
 import { Line } from "../../../types/layout/Position";
@@ -45,13 +45,13 @@ const Move = observer(function Move({ context, index, ...move }: MoveProps) {
         <span
             onClick={() =>
                 context.onStateChange({
-                    fieldStateHistory: context.fieldStateHistory.seek(index),
+                    gridStateHistory: context.gridStateHistory.seek(index),
                 })
             }
             style={{
                 cursor: "pointer",
                 background:
-                    context.fieldStateHistory.currentIndex === index ? lightenColorStr(purpleColor, 0.7) : undefined,
+                    context.gridStateHistory.currentIndex === index ? lightenColorStr(purpleColor, 0.7) : undefined,
             }}
         >
             {getChessMoveDescription(move, false)}
@@ -70,15 +70,15 @@ export class ChessHistoryManager {
 
     readonly getChessHistory = computedFn(
         function getChessHistory(this: ChessHistoryManager, untilCurrentState: boolean) {
-            const { fieldStateHistory, puzzle } = this.context;
+            const { gridStateHistory, puzzle } = this.context;
 
-            let states = fieldStateHistory.states.map((state) =>
-                unserializeFieldState(JSON.parse(state), puzzle).cells.map((row) =>
+            let states = gridStateHistory.states.map((state) =>
+                unserializeGridState(JSON.parse(state), puzzle).cells.map((row) =>
                     row.map(({ usersDigit }) => usersDigit),
                 ),
             );
             if (untilCurrentState) {
-                states = states.slice(0, fieldStateHistory.currentIndex + 1);
+                states = states.slice(0, gridStateHistory.currentIndex + 1);
             }
 
             const moves: ((ChessMove & { index: number }) | undefined)[] = [];

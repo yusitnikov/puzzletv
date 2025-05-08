@@ -6,29 +6,29 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-export interface FieldLoopProps<T extends AnyPTM> extends PuzzleContextProps<T> {
+export interface GridLoopProps<T extends AnyPTM> extends PuzzleContextProps<T> {
     children: ReactNode | ((topOffset: number, leftOffset: number) => ReactNode);
 }
 
 /**
  * Render the puzzle's grid multiple times with different offset to support looping (toroidal) grids.
  */
-export const FieldLoop = observer(function FieldLoop<T extends AnyPTM>({
+export const GridLoop = observer(function GridLoopFc<T extends AnyPTM>({
     context: { puzzle },
     children,
-}: FieldLoopProps<T>) {
+}: GridLoopProps<T>) {
     profiler.trace();
 
     let {
-        fieldSize: { fieldSize, rowsCount, columnsCount },
+        gridSize: { gridSize, rowsCount, columnsCount },
         typeManager: { ignoreRowsColumnCountInTheWrapper },
         loopHorizontally,
         loopVertically,
     } = puzzle;
 
     if (ignoreRowsColumnCountInTheWrapper) {
-        rowsCount = fieldSize;
-        columnsCount = fieldSize;
+        rowsCount = gridSize;
+        columnsCount = gridSize;
     }
 
     return (
@@ -40,27 +40,27 @@ export const FieldLoop = observer(function FieldLoop<T extends AnyPTM>({
                         left={leftOffset * columnsCount}
                         top={topOffset * rowsCount}
                     >
-                        <FieldLoopItem topOffset={topOffset * rowsCount} leftOffset={leftOffset * rowsCount}>
+                        <GridLoopItem topOffset={topOffset * rowsCount} leftOffset={leftOffset * rowsCount}>
                             {children}
-                        </FieldLoopItem>
+                        </GridLoopItem>
                     </AutoSvg>
                 )),
             )}
         </>
     );
-}) as <T extends AnyPTM>(props: FieldLoopProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridLoopProps<T>) => ReactElement;
 
-interface FieldLoopItemProps<T extends AnyPTM> extends Pick<FieldLoopProps<T>, "children"> {
+interface GridLoopItemProps<T extends AnyPTM> extends Pick<GridLoopProps<T>, "children"> {
     topOffset: number;
     leftOffset: number;
 }
 
-const FieldLoopItem = observer(function FieldLoopItem<T extends AnyPTM>({
+const GridLoopItem = observer(function GridLoopItemFc<T extends AnyPTM>({
     topOffset,
     leftOffset,
     children,
-}: FieldLoopItemProps<T>) {
+}: GridLoopItemProps<T>) {
     profiler.trace();
 
     return <>{typeof children === "function" ? children(topOffset, leftOffset) : children}</>;
-}) as <T extends AnyPTM>(props: FieldLoopItemProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridLoopItemProps<T>) => ReactElement;

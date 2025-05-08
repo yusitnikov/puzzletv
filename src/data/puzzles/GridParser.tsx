@@ -2,7 +2,7 @@ import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { PuzzleImporter } from "./PuzzleImporter";
 import { parsePositionLiteral, Position, PositionLiteral } from "../../types/layout/Position";
 import { CellColor } from "../../types/sudoku/CellColor";
-import { FieldSize } from "../../types/sudoku/FieldSize";
+import { GridSize } from "../../types/sudoku/GridSize";
 import { PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
 import { Rect } from "../../types/layout/Rect";
 
@@ -52,9 +52,9 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     get regionHeight() {
         return this.columnsCount / this.regionWidth;
     }
-    get fieldSize(): FieldSize {
+    get gridSize(): GridSize {
         return {
-            fieldSize: this.size,
+            gridSize: this.size,
             rowsCount: this.rowsCount,
             columnsCount: this.columnsCount,
             regionWidth: this.regionWidth,

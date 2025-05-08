@@ -8,7 +8,7 @@ import {
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { Regions9 } from "../../types/sudoku/FieldSize";
+import { Regions9 } from "../../types/sudoku/GridSize";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { Chameleon } from "../authors";
 import { normalSudokuRulesApply } from "../ruleSnippets";
@@ -22,7 +22,7 @@ import {
     stringifyPosition,
 } from "../../types/layout/Position";
 import { Constraint, ConstraintProps, toDecorativeConstraint } from "../../types/sudoku/Constraint";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import { usePuzzleContainer } from "../../contexts/PuzzleContainerContext";
 import { createPortal } from "react-dom";
 import {
@@ -285,7 +285,7 @@ const AudioConstraint = (
 ): Constraint<NumberPTM, AudioProps> => ({
     name: `audio: ${description}`,
     cells: [],
-    component: { [FieldLayer.interactive]: Audio },
+    component: { [GridLayer.interactive]: Audio },
     props: { id, videoId, startTime, ...parsePositionLiteral(position) },
 });
 
@@ -302,7 +302,7 @@ const BoxConstraint = (cellLiterals: PositionLiteral[], color: string): Constrai
             undefined,
             undefined,
             undefined,
-            FieldLayer.beforeBackground,
+            GridLayer.beforeBackground,
         ),
         AudioConstraint("LM8JhvfoqdA", cells[1], "Little Boxes", 13, "box-" + stringifyPosition(cells[0])),
     ];
@@ -326,8 +326,8 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
             return { isVisible: top < 9 };
         },
     },
-    fieldSize: {
-        fieldSize: 10,
+    gridSize: {
+        gridSize: 10,
         rowsCount: 10,
         columnsCount: 9,
         regionWidth: 3,

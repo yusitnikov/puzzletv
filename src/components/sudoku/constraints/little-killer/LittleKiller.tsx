@@ -1,5 +1,5 @@
 import { textColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import {
     Line,
     parsePositionLiteral,
@@ -9,7 +9,7 @@ import {
 } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { ArrowEnd } from "../../../svg/arrow-end/ArrowEnd";
-import { FieldSize } from "../../../../types/sudoku/FieldSize";
+import { GridSize } from "../../../../types/sudoku/GridSize";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../../utils/profiler";
@@ -24,7 +24,7 @@ export interface LittleKillerProps {
 }
 
 export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
-    [FieldLayer.regular]: observer(function LittleKiller<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function LittleKiller<T extends AnyPTM>({
         context: { puzzle },
         cells: [{ top, left }],
         color: fontColor = textColor,
@@ -91,13 +91,13 @@ export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
 export const LittleKillerConstraint = <T extends AnyPTM>(
     startCell: PositionLiteral,
     direction: PositionLiteral,
-    fieldSize: FieldSize,
+    gridSize: GridSize,
     sum?: number,
     color?: string,
     lineColor = color,
 ) =>
     LittleKillerConstraintByCells<T>(
-        getLineCellsByOutsideCell(startCell, fieldSize, direction),
+        getLineCellsByOutsideCell(startCell, gridSize, direction),
         direction,
         sum,
         color,

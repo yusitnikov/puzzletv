@@ -1,5 +1,5 @@
 import { textColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { getAveragePosition, parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../../types/sudoku/Constraint";
 import { CenteredText } from "../../../svg/centered-text/CenteredText";
@@ -107,7 +107,7 @@ export const TextConstraint = <T extends AnyPTM>(
     color?: string,
     size?: number,
     angle?: number,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ): Constraint<T, TextProps> => {
     return {
         name: `text: ${text}`,

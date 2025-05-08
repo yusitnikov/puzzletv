@@ -1,5 +1,5 @@
 import { Position } from "../../../types/layout/Position";
 
-export interface RushHourFieldState {
+export interface RushHourGridState {
     cars: Position[];
 }

@@ -4,7 +4,7 @@ import { ChessPTM } from "../types/ChessPTM";
 import { useEffect, useMemo } from "react";
 import { ChessHistoryManager } from "./ChessHistory";
 import { ChessEngineResult, VariationChessEngineResult } from "../types/ChessEngineResult";
-import { ChessBoardBase, FieldStateChessBoard, ReadOnlyChessBoard } from "../types/ChessBoard";
+import { ChessBoardBase, GridStateChessBoard, ReadOnlyChessBoard } from "../types/ChessBoard";
 import { parseChessCell } from "../types/utils";
 import { ChessMove, getChessMoveDescription } from "../types/ChessMove";
 import { ChessPieceTypeReverseMap } from "../types/ChessPieceType";
@@ -44,7 +44,7 @@ export class ChessEngineManager {
 
     get board() {
         profiler.trace();
-        return new FieldStateChessBoard(this.context.currentFieldState.cells);
+        return new GridStateChessBoard(this.context.currentGridState.cells);
     }
 
     get fen() {
@@ -81,7 +81,7 @@ export class ChessEngineManager {
         profiler.trace();
 
         return this.engineVariations.filter(Boolean).map(({ depth, multipv, pv, score: { unit, value } }) => {
-            const board = new FieldStateChessBoard(this.context.currentFieldState.cells);
+            const board = new GridStateChessBoard(this.context.currentGridState.cells);
 
             const moves = pv
                 .split(" ")

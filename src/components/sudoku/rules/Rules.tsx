@@ -64,7 +64,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
             initialLives = 0,
         },
         lives,
-        fogDemoFieldStateHistory,
+        fogDemoGridStateHistory,
         fogProps,
         disableFogDemo,
         cellSizeForSidePanel: cellSize,
@@ -234,7 +234,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
                     >
                         ?
                     </span>
-                    : {translate(fogDemoFieldStateHistory ? "ON" : "OFF")}
+                    : {translate(fogDemoGridStateHistory ? "ON" : "OFF")}
                     <Button
                         type={"button"}
                         cellSize={cellSize}
@@ -248,16 +248,16 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
                         }}
                         onClick={() =>
                             context.onStateChange(
-                                fogDemoFieldStateHistory
+                                fogDemoGridStateHistory
                                     ? {
-                                          fieldStateHistory: fogDemoFieldStateHistory,
-                                          fogDemoFieldStateHistory: undefined,
+                                          gridStateHistory: fogDemoGridStateHistory,
+                                          fogDemoGridStateHistory: undefined,
                                       }
-                                    : { fogDemoFieldStateHistory: context.fieldStateHistory },
+                                    : { fogDemoGridStateHistory: context.gridStateHistory },
                             )
                         }
                     >
-                        {translate(fogDemoFieldStateHistory ? "Turn off" : "Turn on")}
+                        {translate(fogDemoGridStateHistory ? "Turn off" : "Turn on")}
                     </Button>
                 </div>
             )}

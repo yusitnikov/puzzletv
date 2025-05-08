@@ -1,7 +1,7 @@
 import { ReactElement, useMemo } from "react";
 import { Size } from "../../../types/layout/Size";
 import { Absolute } from "../../layout/absolute/Absolute";
-import { Field } from "../field/Field";
+import { Grid } from "../grid/Grid";
 import { SidePanel } from "../side-panel/SidePanel";
 import { globalPaddingCoeff } from "../../app/globals";
 import { getControlsSizeCoeff } from "../controls/Controls";
@@ -31,8 +31,8 @@ export const Puzzle = observer(function Puzzle<T extends AnyPTM>({ puzzle }: Puz
     const {
         title,
         author,
-        fieldSize: { fieldSize },
-        fieldMargin = 0,
+        gridSize: { gridSize },
+        gridMargin = 0,
     } = puzzle;
 
     // region Size calculation
@@ -44,15 +44,15 @@ export const Puzzle = observer(function Puzzle<T extends AnyPTM>({ puzzle }: Puz
 
     const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);
 
-    const fieldSizeWithMargin = fieldSize + 2 * fieldMargin;
-    const fieldSizeForSidePanel = 9;
+    const gridSizeWithMargin = gridSize + 2 * gridMargin;
+    const gridSizeForSidePanel = 9;
     const panelCoeff = getControlsSizeCoeff(controlButtonsManager.width);
-    const maxCoeff = fieldSizeForSidePanel + panelCoeff + globalPaddingCoeff * 3;
-    const minCoeff = fieldSizeForSidePanel + globalPaddingCoeff * 2;
+    const maxCoeff = gridSizeForSidePanel + panelCoeff + globalPaddingCoeff * 3;
+    const minCoeff = gridSizeForSidePanel + globalPaddingCoeff * 2;
 
     const cellSizeForSidePanel = Math.min(minWindowSize / minCoeff, maxWindowSize / maxCoeff);
-    const sudokuSize = cellSizeForSidePanel * fieldSizeForSidePanel;
-    const cellSize = sudokuSize / fieldSizeWithMargin;
+    const sudokuSize = cellSizeForSidePanel * gridSizeForSidePanel;
+    const cellSize = sudokuSize / gridSizeWithMargin;
     const padding = cellSizeForSidePanel * globalPaddingCoeff;
     const controlsSize = cellSizeForSidePanel * panelCoeff;
     const maxContainerSize = cellSizeForSidePanel * maxCoeff;
@@ -66,7 +66,7 @@ export const Puzzle = observer(function Puzzle<T extends AnyPTM>({ puzzle }: Puz
     const controlsOffset = sudokuSize + padding * 2;
 
     const containerLeft = (windowSize.width - containerSize.width) / 2;
-    const fieldInnerRect = useMemo<Rect>(
+    const gridInnerRect = useMemo<Rect>(
         () => ({
             left: padding,
             top: padding,
@@ -75,12 +75,12 @@ export const Puzzle = observer(function Puzzle<T extends AnyPTM>({ puzzle }: Puz
         }),
         [padding, sudokuSize],
     );
-    const fieldOuterRect = useMemo<Rect>(
+    const gridOuterRect = useMemo<Rect>(
         () => ({
-            ...fieldInnerRect,
-            left: containerLeft + fieldInnerRect.left,
+            ...gridInnerRect,
+            left: containerLeft + gridInnerRect.left,
         }),
-        [containerLeft, fieldInnerRect],
+        [containerLeft, gridInnerRect],
     );
 
     const sidePanelRect = usePureMemo({
@@ -106,9 +106,9 @@ export const Puzzle = observer(function Puzzle<T extends AnyPTM>({ puzzle }: Puz
                 – Puzzle TV
             </Title>
 
-            <PuzzleContainerContext.Provider value={fieldOuterRect}>
+            <PuzzleContainerContext.Provider value={gridOuterRect}>
                 <Absolute left={containerLeft} top={0} {...containerSize}>
-                    <Field context={context} rect={fieldInnerRect} />
+                    <Grid context={context} rect={gridInnerRect} />
 
                     <SidePanel context={context} rect={sidePanelRect} isHorizontal={isHorizontal} />
                 </Absolute>

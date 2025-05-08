@@ -1,11 +1,11 @@
 import { NumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { RushHourGameState, RushHourProcessedGameState } from "./RushHourGameState";
-import { RushHourFieldState } from "./RushHourFieldState";
+import { RushHourGridState } from "./RushHourGridState";
 import { RushHourPuzzleExtension } from "./RushHourPuzzleExtension";
 
 export type RushHourPTM = NumberPTM<
     RushHourGameState,
     RushHourProcessedGameState,
-    RushHourFieldState,
+    RushHourGridState,
     RushHourPuzzleExtension
 >;

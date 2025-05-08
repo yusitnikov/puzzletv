@@ -1,7 +1,7 @@
 import { parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
 import { SokobanClue } from "../../types/SokobanPuzzleExtension";
 import { sokobanTag } from "../../constraints/SokobanClue";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { ConstraintProps } from "../../../../types/sudoku/Constraint";
 import { SokobanPTM } from "../../types/SokobanPTM";
@@ -21,7 +21,7 @@ const height = 0.8;
 const coeff = 0.4;
 
 export const Egg: SokobanClue["component"] = {
-    [FieldLayer.regular]: observer(function Egg({
+    [GridLayer.regular]: observer(function Egg({
         cells: [{ top, left }],
         color = textColor,
     }: ConstraintProps<SokobanPTM>) {

@@ -1,6 +1,6 @@
 import { formatSvgPointsArray, parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
 import { blackColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFc } from "../../../../types/sudoku/Constraint";
 import { ComponentType } from "react";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
@@ -77,7 +77,7 @@ const XVConstraint = <T extends AnyPTM>(
     name: string,
     component: ComponentType<ConstraintProps<T>>,
     expectedSum: number,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ): Constraint<T> => {
     const cell1 = parsePositionLiteral(cellLiteral1);
     const cell2 = parsePositionLiteral(cellLiteral2);
@@ -111,11 +111,11 @@ const XVConstraint = <T extends AnyPTM>(
 export const XMarkConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,
     cellLiteral2: PositionLiteral,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ) => XVConstraint<T>(cellLiteral1, cellLiteral2, "X", XMark, 10, layer);
 
 export const VMarkConstraint = <T extends AnyPTM>(
     cellLiteral1: PositionLiteral,
     cellLiteral2: PositionLiteral,
-    layer = FieldLayer.afterLines,
+    layer = GridLayer.afterLines,
 ) => XVConstraint<T>(cellLiteral1, cellLiteral2, "V", VMark, 5, layer);

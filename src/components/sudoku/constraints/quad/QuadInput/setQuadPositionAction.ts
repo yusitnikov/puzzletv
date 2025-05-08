@@ -19,7 +19,7 @@ export const setQuadPositionActionType = <T extends AnyQuadInputPTM>({
             let {
                 puzzle: {
                     params = {},
-                    fieldSize: { rowsCount, columnsCount },
+                    gridSize: { rowsCount, columnsCount },
                 },
                 currentPlayer,
                 stateExtension: { currentQuad, allQuads },

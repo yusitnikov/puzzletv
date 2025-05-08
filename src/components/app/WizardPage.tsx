@@ -15,7 +15,7 @@ import {
 import { darkGreyColor, headerPadding } from "./globals";
 import { allowedRulesHtmlTags } from "../sudoku/rules/ParsedRulesHtml";
 import { usePureMemo } from "../../hooks/usePureMemo";
-import { FieldPreview } from "../sudoku/field/FieldPreview";
+import { GridPreview } from "../sudoku/grid/GridPreview";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { PageTitle } from "../layout/page-layout/PageLayout";
 import {
@@ -201,7 +201,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         return result;
     }, [load, globalOffsetX, globalOffsetY, extraGrids, source]);
 
-    const { columnsCount, rowsCount, size: fieldSize, minDigit, maxDigit } = gridParsers[0];
+    const { columnsCount, rowsCount, size: gridSize, minDigit, maxDigit } = gridParsers[0];
     const hasSolution = gridParsers.some((gridParser) => gridParser.hasSolution);
     const hasFog = gridParsers.some((gridParser) => gridParser.hasFog);
     const hasCosmeticElements = gridParsers.some((gridParser) => gridParser.hasCosmeticElements);
@@ -212,7 +212,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     // Transparent arrow circles are always on for the rotatable clues puzzles, so don't allow to change the flag
     const transparentCirclesForced = rotatableClues;
 
-    const [digitsCount, setDigitsCount] = useState(maxDigit ?? Math.min(fieldSize, 9));
+    const [digitsCount, setDigitsCount] = useState(maxDigit ?? Math.min(gridSize, 9));
 
     const [colorsImportModeState, setColorsImportMode] = useStringFromLocalStorage<ColorsImportMode>(
         "fpwColorsImportMode",
@@ -232,7 +232,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         htmlRules: areHtmlRules,
         htmlSuccessMessage,
         digitsCount:
-            maxDigit === undefined && digitsCount === fieldSize && !filteredExtraGrids.length ? undefined : digitsCount,
+            maxDigit === undefined && digitsCount === gridSize && !filteredExtraGrids.length ? undefined : digitsCount,
         supportZero: minDigit === undefined && supportZero,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
@@ -258,7 +258,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         fogStars: hasFog && fogStars,
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
-        visibleRingsCount: isInfiniteRings ? visibleRingsCount || fieldSize / 2 - 1 : undefined,
+        visibleRingsCount: isInfiniteRings ? visibleRingsCount || gridSize / 2 - 1 : undefined,
         startOffset: isInfiniteRings ? startOffset : undefined,
         noSpecialRules: !hasSolution && noSpecialRules,
         allowOverrideColors: getHasInitialColors(colorsImportMode) && allowOverrideColors,
@@ -729,7 +729,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                             type={"number"}
                                             value={cellPieceWidth}
                                             min={1}
-                                            max={fieldSize}
+                                            max={gridSize}
                                             step={1}
                                             onChange={(ev) => setCellPieceWidth(ev.target.valueAsNumber)}
                                             style={{ width: 35, textAlign: "center" }}
@@ -739,7 +739,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                             type={"number"}
                                             value={cellPieceHeight}
                                             min={1}
-                                            max={fieldSize}
+                                            max={gridSize}
                                             step={1}
                                             onChange={(ev) => setCellPieceHeight(ev.target.valueAsNumber)}
                                             style={{ width: 35, textAlign: "center" }}
@@ -779,7 +779,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                     type={"number"}
                                     value={safeCrackerCodeLength}
                                     min={1}
-                                    max={fieldSize}
+                                    max={gridSize}
                                     step={1}
                                     onChange={(ev) => setSafeCrackerCodeLength(ev.target.valueAsNumber)}
                                 />
@@ -807,7 +807,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                     type={"number"}
                                     value={startOffset}
                                     min={0}
-                                    max={fieldSize / 2 - 2}
+                                    max={gridSize / 2 - 2}
                                     step={1}
                                     onChange={(ev) => setStartOffset(ev.target.valueAsNumber)}
                                 />
@@ -1020,7 +1020,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                             type={"number"}
                                             value={digitsCount}
                                             min={1}
-                                            max={Math.min(fieldSize, 9)}
+                                            max={Math.min(gridSize, 9)}
                                             step={1}
                                             onChange={(ev) => setDigitsCount(ev.target.valueAsNumber)}
                                         />
@@ -1316,7 +1316,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                 </form>
             </div>
 
-            <FieldPreview key={importedPuzzle.version} puzzle={importedPuzzle.puzzle} width={previewSize} />
+            <GridPreview key={importedPuzzle.version} puzzle={importedPuzzle.puzzle} width={previewSize} />
         </div>
     );
 });

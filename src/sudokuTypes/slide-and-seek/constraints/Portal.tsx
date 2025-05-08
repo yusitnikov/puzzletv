@@ -1,7 +1,7 @@
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/sudoku/Constraint";
 import { Position } from "../../../types/layout/Position";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { textColor } from "../../../components/app/globals";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
@@ -15,7 +15,7 @@ interface PortalProps {
 }
 
 const Portal: ConstraintPropsGenericFcMap<PortalProps> = {
-    [FieldLayer.beforeSelection]: observer(function Portal<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function Portal<T extends AnyPTM>({
         cells: [{ top, left }],
         color = textColor,
         props: { letter },

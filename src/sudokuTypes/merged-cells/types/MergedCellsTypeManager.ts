@@ -47,7 +47,7 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>({
             }
 
             const {
-                fieldSize: { rowsCount, columnsCount },
+                gridSize: { rowsCount, columnsCount },
             } = puzzle;
             const cellRegions = createRegionsByGivenDigitsMap(
                 processGivenDigitsMaps((colors) => colors.join(), [initialColors]),

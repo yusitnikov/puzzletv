@@ -613,12 +613,12 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
         allowMove: true,
         allowScale: true,
         isFreeScale: true,
-        fieldWrapperComponent: Wrapper,
+        gridWrapperComponent: Wrapper,
         ignoreRowsColumnCountInTheWrapper: true,
         controlButtons: [ZoomInButtonItem(), ZoomOutButtonItem()],
     },
-    fieldSize: {
-        fieldSize: fieldWidth,
+    gridSize: {
+        gridSize: fieldWidth,
         rowsCount: 1,
         columnsCount: bounds.length,
     },

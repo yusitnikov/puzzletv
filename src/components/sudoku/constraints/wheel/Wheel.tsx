@@ -1,5 +1,5 @@
 import { lightGreyColor, textColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { isSamePosition, parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { CenteredText } from "../../../svg/centered-text/CenteredText";
@@ -18,7 +18,7 @@ export interface WheelProps {
 }
 
 export const Wheel: ConstraintPropsGenericFcMap<WheelProps> = {
-    [FieldLayer.afterLines]: observer(function WheelFc<T extends AnyPTM>({
+    [GridLayer.afterLines]: observer(function WheelFc<T extends AnyPTM>({
         cells: [cell, ...digitCells],
         props: { digits },
     }: ConstraintProps<T, WheelProps>) {

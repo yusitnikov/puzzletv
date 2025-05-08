@@ -12,7 +12,7 @@ import { thermometersExplained } from "../ruleSnippets";
 import { parsePositionLiterals2 } from "../../types/layout/Position";
 import { CubedokuIndexingConstraint } from "../../sudokuTypes/cubedoku/constraints/CubedokuIndexing";
 import { isValidFinishedPuzzleByConstraints } from "../../types/sudoku/Constraint";
-import { createCubeFieldSize, createCubeRegions } from "../../sudokuTypes/cube/types/CubeTypeManager";
+import { createCubeGridSize, createCubeRegions } from "../../sudokuTypes/cube/types/CubeTypeManager";
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { translate } from "../../utils/translate";
 
@@ -32,7 +32,7 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
     author: Andrewsarchus,
     slug: "intro-to-cubedoku",
     typeManager: CubedokuTypeManager,
-    fieldSize: createCubeFieldSize(4),
+    gridSize: createCubeGridSize(4),
     regions: [
         ...parsePositionLiterals2([
             ["R1C1", "R2C1", "R3C1", "R4C1"],
@@ -43,7 +43,7 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
         ...createCubeRegions(4, 2).slice(4),
     ],
     digitsCount: 4,
-    fieldMargin: 1,
+    gridMargin: 1,
     rules: () => (
         <>
             <RulesParagraph>{translate(cubedokuNormalSudokuRules(4))}.</RulesParagraph>
@@ -75,7 +75,7 @@ export const CubeIt: PuzzleDefinition<NumberPTM> = {
     author: Chilly,
     slug: "chilly-cbit",
     typeManager: CubedokuTypeManager,
-    fieldSize: createCubeFieldSize(5),
+    gridSize: createCubeGridSize(5),
     regions: parsePositionLiterals2([
         ["R1C1", "R1C2", "R1C3", "R1C4", "R2C4"],
         ["R1C5", "R2C5", "R3C5", "R4C4", "R4C5"],

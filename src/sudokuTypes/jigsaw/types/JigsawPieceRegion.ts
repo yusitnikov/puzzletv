@@ -17,12 +17,12 @@ export class JigsawPieceRegion implements GridRegion {
 
     get zIndex() {
         profiler.trace();
-        return this.context.fieldExtension.pieces[this.index].zIndex;
+        return this.context.gridExtension.pieces[this.index].zIndex;
     }
 
     private get activeZIndex() {
         profiler.trace();
-        return getActiveJigsawPieceZIndex(this.context.fieldExtension.pieces);
+        return getActiveJigsawPieceZIndex(this.context.gridExtension.pieces);
     }
 
     get highlighted() {

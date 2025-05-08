@@ -6,13 +6,13 @@ import {
     mixAnimatedPosition,
 } from "../../../hooks/useAnimatedValue";
 
-export interface SokobanFieldState {
+export interface SokobanGridState {
     cluePositions: Position[];
     clueSmashed: boolean[];
     sokobanPosition: Position;
 }
 
-export const sokobanFieldStateAnimationMixer: AnimatedValueMixer<SokobanFieldState> = (a, b, coeff) => ({
+export const sokobanGridStateAnimationMixer: AnimatedValueMixer<SokobanGridState> = (a, b, coeff) => ({
     cluePositions: mixAnimatedArray(a.cluePositions, b.cluePositions, coeff, (a = emptyPosition, b = emptyPosition) => {
         if (a.top === b.top || a.left === b.left) {
             return mixAnimatedPosition(a, b, coeff);

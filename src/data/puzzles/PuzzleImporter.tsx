@@ -11,7 +11,7 @@ import {
 import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { ColorsImportMode, PuzzleImportOptions } from "../../types/sudoku/PuzzleImportOptions";
 import { SudokuTypeManager } from "../../types/sudoku/SudokuTypeManager";
-import { FieldSize } from "../../types/sudoku/FieldSize";
+import { GridSize } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { indexes } from "../../utils/indexes";
 import { SudokuCellsIndex } from "../../types/sudoku/SudokuCellsIndex";
@@ -43,7 +43,7 @@ import { PalindromeConstraint } from "../../components/sudoku/constraints/palind
 import { RenbanConstraint } from "../../components/sudoku/constraints/renban/Renban";
 import { WhispersConstraint } from "../../components/sudoku/constraints/whispers/Whispers";
 import { ArrowConstraint } from "../../components/sudoku/constraints/arrow/Arrow";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import {
     DecorativeCageConstraint,
     KillerCageConstraint,
@@ -98,7 +98,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         slug: string,
         private readonly importOptions: PuzzleImportOptions,
         private readonly typeManager: SudokuTypeManager<T>,
-        fieldSize: FieldSize,
+        gridSize: GridSize,
     ) {
         const {
             digitsCount,
@@ -115,12 +115,12 @@ export class PuzzleImporter<T extends AnyPTM> {
             slug,
             title: { [LanguageCode.en]: "Untitled" },
             typeManager,
-            fieldSize,
+            gridSize,
             regions: this.regions,
             digitsCount,
             loopHorizontally: loopX,
             loopVertically: loopY,
-            fieldMargin: loopX || loopY ? 0.99 : 0,
+            gridMargin: loopX || loopY ? 0.99 : 0,
             allowDrawing: allDrawingModes,
             initialDigits: this.initialDigits,
             initialLetters: this.initialLetters,
@@ -135,9 +135,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         };
 
         this.inactiveCells = new PositionSet(
-            indexes(fieldSize.rowsCount).flatMap((top) =>
-                indexes(fieldSize.columnsCount).map((left) => ({ top, left })),
-            ),
+            indexes(gridSize.rowsCount).flatMap((top) => indexes(gridSize.columnsCount).map((left) => ({ top, left }))),
         );
 
         this.setTitle(importOptions.title);
@@ -152,8 +150,8 @@ export class PuzzleImporter<T extends AnyPTM> {
         const { rotatableClues, keepCircles, cosmeticsBehindFog } = this.finalImportOptions(gridParser);
 
         return (rotatableClues && keepCircles) || beforeLines || cosmeticsBehindFog
-            ? FieldLayer.beforeSelection
-            : FieldLayer.afterLines;
+            ? GridLayer.beforeSelection
+            : GridLayer.afterLines;
     }
 
     addGrid<JsonT>(gridParser: GridParser<T, JsonT>) {
@@ -375,7 +373,7 @@ export class PuzzleImporter<T extends AnyPTM> {
                 value,
                 undefined,
                 autoShowValue || value !== 1,
-                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+                gridParser.hasFog ? GridLayer.regular : GridLayer.afterLines,
             ),
         );
     }
@@ -394,7 +392,7 @@ export class PuzzleImporter<T extends AnyPTM> {
                 value,
                 undefined,
                 autoShowValue || value !== 2,
-                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+                gridParser.hasFog ? GridLayer.regular : GridLayer.afterLines,
             ),
         );
     }
@@ -403,7 +401,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             XMarkConstraint(
                 this.fixCellPosition(gridParser.offsetCoords(cell1)),
                 this.fixCellPosition(gridParser.offsetCoords(cell2)),
-                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+                gridParser.hasFog ? GridLayer.regular : GridLayer.afterLines,
             ),
         );
     }
@@ -412,7 +410,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             VMarkConstraint(
                 this.fixCellPosition(gridParser.offsetCoords(cell1)),
                 this.fixCellPosition(gridParser.offsetCoords(cell2)),
-                gridParser.hasFog ? FieldLayer.regular : FieldLayer.afterLines,
+                gridParser.hasFog ? GridLayer.regular : GridLayer.afterLines,
             ),
         );
     }
@@ -655,13 +653,13 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.addItems(MinConstraint(gridParser.offsetCoords(cellLiteral), color));
     }
     addRowIndexer(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string) {
-        this.addItems(RowIndexerConstraint(gridParser.offsetCoords(cellLiteral), gridParser.fieldSize, color));
+        this.addItems(RowIndexerConstraint(gridParser.offsetCoords(cellLiteral), gridParser.gridSize, color));
     }
     addColumnIndexer(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string) {
-        this.addItems(ColumnIndexerConstraint(gridParser.offsetCoords(cellLiteral), gridParser.fieldSize, color));
+        this.addItems(ColumnIndexerConstraint(gridParser.offsetCoords(cellLiteral), gridParser.gridSize, color));
     }
     addBoxIndexer(gridParser: GridParser<T, any>, cellLiteral: PositionLiteral, color?: string) {
-        this.addItems(BoxIndexerConstraint(gridParser.offsetCoords(cellLiteral), gridParser.fieldSize, color));
+        this.addItems(BoxIndexerConstraint(gridParser.offsetCoords(cellLiteral), gridParser.gridSize, color));
     }
     // endregion
 
@@ -692,9 +690,9 @@ export class PuzzleImporter<T extends AnyPTM> {
         textColor?: string,
         arrowColor?: string,
     ) {
-        const direction = detectOutsideClueDirection(startCell, gridParser.fieldSize, directionLiteral);
+        const direction = detectOutsideClueDirection(startCell, gridParser.gridSize, directionLiteral);
         const offsetLineCells = gridParser.offsetCoordsArray(
-            getLineCellsByOutsideCell(startCell, gridParser.fieldSize, direction),
+            getLineCellsByOutsideCell(startCell, gridParser.gridSize, direction),
         );
 
         this.checkForOutsideCells(gridParser, [
@@ -722,7 +720,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             factory(
                 offsetClueCell,
                 gridParser.offsetCoordsArray(
-                    getLineCellsByOutsideCell(cellLiteral, gridParser.fieldSize, directionLiteral),
+                    getLineCellsByOutsideCell(cellLiteral, gridParser.gridSize, directionLiteral),
                 ),
                 value,
                 color,
@@ -909,7 +907,7 @@ export class PuzzleImporter<T extends AnyPTM> {
     // endregion
 
     private addMargin(margin = 1) {
-        this.puzzle.fieldMargin = Math.max(this.puzzle.fieldMargin ?? 0, margin);
+        this.puzzle.gridMargin = Math.max(this.puzzle.gridMargin ?? 0, margin);
     }
     checkForOutsideCells(gridParser: GridParser<T, any>, cells: Position[]) {
         gridParser.extendOutsideBoundsByCells(cells);
@@ -919,8 +917,8 @@ export class PuzzleImporter<T extends AnyPTM> {
             ...cells.flatMap(({ top, left }) => [
                 -top,
                 -left,
-                top + 1 - this.puzzle.fieldSize.rowsCount,
-                left + 1 - this.puzzle.fieldSize.columnsCount,
+                top + 1 - this.puzzle.gridSize.rowsCount,
+                left + 1 - this.puzzle.gridSize.columnsCount,
             ]),
         );
 

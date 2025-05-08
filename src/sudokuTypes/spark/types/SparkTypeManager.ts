@@ -1,6 +1,6 @@
 import { defaultProcessArrowDirection, SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
-import { createRegularRegions, FieldSize } from "../../../types/sudoku/FieldSize";
+import { createRegularRegions, GridSize } from "../../../types/sudoku/GridSize";
 import { Position } from "../../../types/layout/Position";
 import { Rect } from "../../../types/layout/Rect";
 import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
@@ -12,8 +12,8 @@ import { NumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
     ...DigitSudokuTypeManager(),
 
-    getCellTypeProps({ top, left }, { fieldSize }): CellTypeProps<NumberPTM> {
-        const { gridSize, realRowsCount } = parseSparkFieldSize(fieldSize);
+    getCellTypeProps({ top, left }, puzzle): CellTypeProps<NumberPTM> {
+        const { gridSize, realRowsCount } = parseSparkGridSize(puzzle.gridSize);
 
         return {
             isVisible:
@@ -25,7 +25,7 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
     },
 
     processArrowDirection(cell, xDirection, yDirection, context, ...args) {
-        const { gridSize, columnsCount, realRowsCount } = parseSparkFieldSize(context.puzzle.fieldSize);
+        const { gridSize, columnsCount, realRowsCount } = parseSparkGridSize(context.puzzle.gridSize);
         const { top, left } = cell;
 
         if (top < realRowsCount) {
@@ -104,8 +104,8 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
         return defaultProcessArrowDirection(cell, xDirection, yDirection, context, ...args);
     },
 
-    transformCoords({ top, left }, { puzzle: { fieldSize }, isReadonlyContext: isPreview }) {
-        const { gridSize, realRowsCount, extraRowsCount } = parseSparkFieldSize(fieldSize);
+    transformCoords({ top, left }, { puzzle, isReadonlyContext: isPreview }) {
+        const { gridSize, realRowsCount, extraRowsCount } = parseSparkGridSize(puzzle.gridSize);
 
         const a10 = Math.PI / 10;
         const s10 = Math.sin(a10);
@@ -145,13 +145,10 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
         }
     },
 
-    getRegionsWithSameCoordsTransformation({
-        puzzle: { fieldSize, fieldMargin = 0 },
-        isReadonlyContext: isPreview,
-    }): Rect[] {
-        const { gridSize, realRowsCount, extraRowsCount } = parseSparkFieldSize(fieldSize);
+    getRegionsWithSameCoordsTransformation({ puzzle, isReadonlyContext: isPreview }): Rect[] {
+        const { gridSize, realRowsCount, extraRowsCount } = parseSparkGridSize(puzzle.gridSize);
 
-        const fullMargin = fieldMargin + 1;
+        const fullMargin = (puzzle.gridMargin ?? 0) + 1;
 
         const result: Rect[] = [
             {
@@ -198,8 +195,8 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
         return result;
     },
 
-    getRegionsForRowsAndColumns({ puzzle: { fieldSize } }): Constraint<NumberPTM, any>[] {
-        const { gridSize, realRowsCount, columnsCount } = parseSparkFieldSize(fieldSize);
+    getRegionsForRowsAndColumns({ puzzle }): Constraint<NumberPTM, any>[] {
+        const { gridSize, realRowsCount, columnsCount } = parseSparkGridSize(puzzle.gridSize);
 
         return [
             ...indexes(gridSize).map((i) =>
@@ -247,17 +244,17 @@ export const SparkTypeManager: SudokuTypeManager<NumberPTM> = {
     },
 };
 
-export const createSparkFieldSize = (
+export const createSparkGridSize = (
     gridSize: number,
     regionWidth: number,
     regionHeight = (gridSize * 2) / regionWidth,
     withNotes = false,
-): Required<FieldSize> => {
+): Required<GridSize> => {
     const columnsCount = gridSize * 3 + 1;
     const notesHeight = withNotes ? 2 : 0;
 
     return {
-        fieldSize: columnsCount + notesHeight,
+        gridSize: columnsCount + notesHeight,
         columnsCount,
         rowsCount: gridSize * 2 + notesHeight,
         regionWidth,
@@ -265,7 +262,7 @@ export const createSparkFieldSize = (
     };
 };
 
-export const parseSparkFieldSize = ({ columnsCount, rowsCount }: FieldSize) => {
+export const parseSparkGridSize = ({ columnsCount, rowsCount }: GridSize) => {
     const gridSize = (columnsCount - 1) / 3;
     const realRowsCount = gridSize * 2;
 
@@ -278,11 +275,11 @@ export const parseSparkFieldSize = ({ columnsCount, rowsCount }: FieldSize) => {
     };
 };
 
-export const createSparkRegions = (fieldSize: Required<FieldSize>): Position[][] => {
-    const { gridSize } = parseSparkFieldSize(fieldSize);
+export const createSparkRegions = (originalGridSize: Required<GridSize>): Position[][] => {
+    const { gridSize } = parseSparkGridSize(originalGridSize);
     const regions = createRegularRegions({
-        ...fieldSize,
-        fieldSize: gridSize,
+        ...originalGridSize,
+        gridSize,
         rowsCount: gridSize,
         columnsCount: gridSize,
     });

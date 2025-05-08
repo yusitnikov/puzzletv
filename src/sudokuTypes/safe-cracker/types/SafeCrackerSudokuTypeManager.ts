@@ -16,7 +16,7 @@ import { CellMarkType, parseCellMark } from "../../../types/sudoku/CellMark";
 import { CellColor } from "../../../types/sudoku/CellColor";
 import { SudokuCellsIndex } from "../../../types/sudoku/SudokuCellsIndex";
 import { Constraint } from "../../../types/sudoku/Constraint";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { AnyNumberPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
 
@@ -113,7 +113,7 @@ export const SafeCrackerSudokuTypeManager = <T extends AnyNumberPTM>(
             const initialCellMarks = [...(puzzle.initialCellMarks ?? [])];
             const cellsIndex = new SudokuCellsIndex(puzzle);
 
-            const processText = (text: string, cells: Position[], layer?: FieldLayer) => {
+            const processText = (text: string, cells: Position[], layer?: GridLayer) => {
                 const [{ top, left }] = cells;
                 const center = cellsIndex.allCells[top]?.[left]?.center;
                 const mark = parseCellMark(text);

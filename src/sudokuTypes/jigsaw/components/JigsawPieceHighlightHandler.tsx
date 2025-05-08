@@ -39,7 +39,7 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
         function getSelectedRegionIndexes() {
             return (
                 context.lastSelectedCell &&
-                getJigsawPieceIndexesByCell(context.puzzle, context.fieldExtension.pieces, context.lastSelectedCell)
+                getJigsawPieceIndexesByCell(context.puzzle, context.gridExtension.pieces, context.lastSelectedCell)
             );
         },
         { equals: comparer.structural },
@@ -62,7 +62,7 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
         const {
             puzzle,
             stateExtension: { highlightCurrentPiece },
-            fieldExtension: { pieces: piecePositions },
+            gridExtension: { pieces: piecePositions },
         } = context;
 
         const { importOptions: { angleStep } = {} } = puzzle;

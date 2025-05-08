@@ -1,13 +1,13 @@
 import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { MultiStageSudokuTypeManager } from "../../multi-stage/types/MultiStageSudokuTypeManager";
 import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/sudoku/Constraint";
-import { createRegularRegions, getDefaultRegionsForRowsAndColumns } from "../../../types/sudoku/FieldSize";
+import { createRegularRegions, getDefaultRegionsForRowsAndColumns } from "../../../types/sudoku/GridSize";
 import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
 import { indexes } from "../../../utils/indexes";
 import { TenInOneRegionConstraint } from "../constraints/TenInOneRegion";
 import { Position } from "../../../types/layout/Position";
 import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../../types/sudoku/GivenDigitsMap";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { MultiStagePTM } from "../../multi-stage/types/MultiStagePTM";
 import { myClientId } from "../../../hooks/useMultiPlayer";
@@ -25,7 +25,7 @@ export const TenInOneSudokuTypeManager = (
         onStageChange: (context, stage) => {
             const { puzzle, stateInitialDigits } = context;
             const {
-                fieldSize: { rowsCount, columnsCount },
+                gridSize: { rowsCount, columnsCount },
             } = puzzle;
 
             if (stage === 2) {
@@ -47,22 +47,17 @@ export const TenInOneSudokuTypeManager = (
 
             return {
                 // TODO support shared games
-                fieldStateHistory: fieldStateHistoryAddState(
-                    context,
-                    myClientId,
-                    "ten-in-one-reset-field",
-                    (state) => ({
-                        ...state,
-                        cells: state.cells.map((cellsRow) =>
-                            cellsRow.map(({ cornerDigits, centerDigits, colors }) => ({
-                                usersDigit: undefined,
-                                cornerDigits: cornerDigits.clear(),
-                                centerDigits: centerDigits.clear(),
-                                colors: colors.clear(),
-                            })),
-                        ),
-                    }),
-                ),
+                gridStateHistory: gridStateHistoryAddState(context, myClientId, "ten-in-one-reset-grid", (state) => ({
+                    ...state,
+                    cells: state.cells.map((cellsRow) =>
+                        cellsRow.map(({ cornerDigits, centerDigits, colors }) => ({
+                            usersDigit: undefined,
+                            cornerDigits: cornerDigits.clear(),
+                            centerDigits: centerDigits.clear(),
+                            colors: colors.clear(),
+                        })),
+                    ),
+                })),
             };
         },
         getStageCompletionText: ({ stateExtension: { stage } }) =>
@@ -88,11 +83,11 @@ export const TenInOneSudokuTypeManager = (
         } = context;
         const individualBoxes = stage === 1;
         const {
-            fieldSize: { rowsCount, columnsCount, regionWidth, regionHeight },
+            gridSize: { rowsCount, columnsCount, regionWidth, regionHeight },
         } = puzzle;
 
         if (!regionWidth || !regionHeight || regionWidth !== regionHeight) {
-            throw new Error("Configuration error: irregular field sizes are not supported by ten-in-one puzzles");
+            throw new Error("Configuration error: irregular grid sizes are not supported by ten-in-one puzzles");
         }
 
         const regions = createRegularRegions(rowsCount, columnsCount, regionWidth, regionHeight);

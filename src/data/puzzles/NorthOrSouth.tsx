@@ -9,7 +9,7 @@ import { KillerCageConstraint } from "../../components/sudoku/constraints/killer
 import { RulesUnorderedList } from "../../components/sudoku/rules/RulesUnorderedList";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
 import { RotatableDigitSudokuTypeManager } from "../../sudokuTypes/rotatable/types/RotatableDigitSudokuTypeManager";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { Chameleon } from "../authors";
 import {
@@ -75,7 +75,7 @@ export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
         </>
     ),
     typeManager: RotatableDigitSudokuTypeManager(),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     initialDigits: {
         0: {

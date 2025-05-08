@@ -2,7 +2,7 @@
 import styled from "@emotion/styled";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
-import { FieldPreview } from "../../sudoku/field/FieldPreview";
+import { GridPreview } from "../../sudoku/grid/GridPreview";
 import { ArrowRight } from "@emotion-icons/fluentui-system-filled";
 import { loadPuzzle, PuzzleDefinition, PuzzleDefinitionLoader } from "../../../types/sudoku/PuzzleDefinition";
 import { useMemo } from "react";
@@ -25,9 +25,9 @@ export const MappingIllustration = observer(function MappingIllustration({ puzzl
 
     return (
         <MappingIllustrationContainer>
-            <FieldPreview puzzle={puzzle1} width={mappingIllustrationPreviewSize} />
+            <GridPreview puzzle={puzzle1} width={mappingIllustrationPreviewSize} />
             <ArrowRight className={mappingIllustrationArrowClassName} size={mappingIllustrationArrowSize} />
-            <FieldPreview puzzle={puzzle2} width={mappingIllustrationPreviewSize} />
+            <GridPreview puzzle={puzzle2} width={mappingIllustrationPreviewSize} />
         </MappingIllustrationContainer>
     );
 });

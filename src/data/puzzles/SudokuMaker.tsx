@@ -1017,7 +1017,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                             { top, left },
                                             {
                                                 puzzle: {
-                                                    fieldSize: { rowsCount, columnsCount },
+                                                    gridSize: { rowsCount, columnsCount },
                                                 },
                                             },
                                         ) => {

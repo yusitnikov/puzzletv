@@ -27,7 +27,7 @@ import { notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from ".
 type ReservedParkingPTM = ToMultiStagePTM<RushHourPTM>;
 
 const hasParkedCar = (
-    { puzzle: { extension }, fieldExtension: { cars: carPositions } }: PuzzleContext<ReservedParkingPTM>,
+    { puzzle: { extension }, gridExtension: { cars: carPositions } }: PuzzleContext<ReservedParkingPTM>,
     expected: Rect,
 ) => {
     const cars = extension?.cars ?? [];
@@ -107,7 +107,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                                 }
 
                                 const {
-                                    fieldExtension: { cars: carPositions },
+                                    gridExtension: { cars: carPositions },
                                 } = context;
                                 const newInitialDigits: GivenDigitsMap<number> = {};
                                 for (const [

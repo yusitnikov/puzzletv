@@ -33,7 +33,7 @@ export const RushHourMoveCellWriteModeInfo = (
         const { id, state: startContext } = gesture;
         const { puzzle, cellSize } = context;
         const {
-            fieldSize: { fieldSize },
+            gridSize: { gridSize },
             importOptions: { givenDigitsBlockCars } = {},
         } = puzzle;
 
@@ -85,7 +85,7 @@ export const RushHourMoveCellWriteModeInfo = (
                     if (isVertical) {
                         let newTop = offsetTop + (currentMetrics.y - startMetrics.y) / cellSize;
                         newTop = Math.max(-carMargin, newTop);
-                        newTop = Math.min(fieldSize + carMargin - carRect.height, newTop);
+                        newTop = Math.min(gridSize + carMargin - carRect.height, newTop);
 
                         if (restrictCarCoords) {
                             newTop = restrictCarCoords(
@@ -119,7 +119,7 @@ export const RushHourMoveCellWriteModeInfo = (
                     } else {
                         let newLeft = offsetLeft + (currentMetrics.x - startMetrics.x) / cellSize;
                         newLeft = Math.max(-carMargin, newLeft);
-                        newLeft = Math.min(fieldSize + carMargin - carRect.width, newLeft);
+                        newLeft = Math.min(gridSize + carMargin - carRect.width, newLeft);
 
                         if (restrictCarCoords) {
                             newLeft = restrictCarCoords(

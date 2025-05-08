@@ -5,15 +5,15 @@ import { RegionConstraint } from "../../components/sudoku/constraints/region/Reg
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
 
-export interface FieldSize {
-    fieldSize: number;
+export interface GridSize {
+    gridSize: number;
     rowsCount: number;
     columnsCount: number;
     regionWidth?: number;
     regionHeight?: number;
 }
 
-export function createRegularRegions(fieldSize: Required<FieldSize>): Position[][];
+export function createRegularRegions(gridSize: Required<GridSize>): Position[][];
 export function createRegularRegions(
     rowsCount: number,
     columnsCount: number,
@@ -21,16 +21,16 @@ export function createRegularRegions(
     regionHeight?: number,
 ): Position[][];
 export function createRegularRegions(
-    rowsCountOrFieldSize: Required<FieldSize> | number,
+    rowsCountOrGridSize: Required<GridSize> | number,
     columnsCountArg?: number,
     regionWidthArg?: number,
     regionHeightArg?: number,
 ): Position[][] {
     let rowsCount: number, columnsCount: number, regionWidth: number, regionHeight: number;
-    if (typeof rowsCountOrFieldSize === "object") {
-        ({ rowsCount, columnsCount, regionWidth, regionHeight } = rowsCountOrFieldSize);
+    if (typeof rowsCountOrGridSize === "object") {
+        ({ rowsCount, columnsCount, regionWidth, regionHeight } = rowsCountOrGridSize);
     } else {
-        rowsCount = rowsCountOrFieldSize;
+        rowsCount = rowsCountOrGridSize;
         columnsCount = columnsCountArg!;
         regionWidth = regionWidthArg!;
         regionHeight = regionHeightArg ?? columnsCount / regionWidth;
@@ -50,53 +50,49 @@ export function createRegularRegions(
     );
 }
 
-export function createRegularFieldSize(
-    fieldSize: number,
-    regionWidth: number,
-    regionHeight?: number,
-): Required<FieldSize>;
-export function createRegularFieldSize(fieldSize: number): FieldSize;
-export function createRegularFieldSize(
-    fieldSize: number,
+export function createRegularGridSize(gridSize: number, regionWidth: number, regionHeight?: number): Required<GridSize>;
+export function createRegularGridSize(gridSize: number): GridSize;
+export function createRegularGridSize(
+    gridSize: number,
     regionWidth?: number,
-    regionHeight = regionWidth && fieldSize / regionWidth,
-): FieldSize {
+    regionHeight = regionWidth && gridSize / regionWidth,
+): GridSize {
     return {
-        fieldSize,
-        rowsCount: fieldSize,
-        columnsCount: fieldSize,
+        gridSize,
+        rowsCount: gridSize,
+        columnsCount: gridSize,
         regionWidth,
         regionHeight,
     };
 }
 
 export const getDefaultRegionsForRowsAndColumns = <T extends AnyPTM>({
-    puzzle: { customCellBounds, fieldSize },
+    puzzle: { customCellBounds, gridSize },
 }: PuzzleContext<T>): Constraint<T>[] =>
     customCellBounds
         ? []
         : [
-              ...indexes(fieldSize.rowsCount).map((top) =>
+              ...indexes(gridSize.rowsCount).map((top) =>
                   RegionConstraint<T>(
-                      indexes(fieldSize.columnsCount).map((left) => ({ left, top })),
+                      indexes(gridSize.columnsCount).map((left) => ({ left, top })),
                       false,
                       "row",
                   ),
               ),
-              ...indexes(fieldSize.columnsCount).map((left) =>
+              ...indexes(gridSize.columnsCount).map((left) =>
                   RegionConstraint<T>(
-                      indexes(fieldSize.rowsCount).map((top) => ({ left, top })),
+                      indexes(gridSize.rowsCount).map((top) => ({ left, top })),
                       false,
                       "column",
                   ),
               ),
           ];
 
-export const FieldSize9 = createRegularFieldSize(9, 3);
-export const Regions9 = createRegularRegions(FieldSize9);
+export const GridSize9 = createRegularGridSize(9, 3);
+export const Regions9 = createRegularRegions(GridSize9);
 
-export const FieldSize8 = createRegularFieldSize(8, 4);
-export const Regions8 = createRegularRegions(FieldSize8);
+export const GridSize8 = createRegularGridSize(8, 4);
+export const Regions8 = createRegularRegions(GridSize8);
 
-export const FieldSize6 = createRegularFieldSize(6, 3);
-export const Regions6 = createRegularRegions(FieldSize6);
+export const GridSize6 = createRegularGridSize(6, 3);
+export const Regions6 = createRegularRegions(GridSize6);

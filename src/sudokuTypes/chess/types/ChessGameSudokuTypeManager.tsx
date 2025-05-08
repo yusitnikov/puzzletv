@@ -2,17 +2,17 @@ import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { ChessColor } from "./ChessColor";
 import { ChessPTM } from "./ChessPTM";
 import { ChessSudokuTypeManager } from "./ChessSudokuTypeManager";
-import { FieldState } from "../../../types/sudoku/FieldState";
+import { GridState } from "../../../types/sudoku/GridState";
 import { ChessPieceType } from "./ChessPieceType";
 import { comparer, IReactionDisposer, reaction } from "mobx";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { getNextActionId } from "../../../types/sudoku/GameStateAction";
 import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { ChessEngine, ChessEngineManager } from "../components/ChessEngine";
 import { ChessHistory } from "../components/ChessHistory";
-import { FieldStateChessBoard } from "./ChessBoard";
+import { GridStateChessBoard } from "./ChessBoard";
 import { CellSelectionByDataProps, CellSelectionColor } from "../../../components/sudoku/cell/CellSelection";
 import { arrayContainsPosition, Position } from "../../../types/layout/Position";
 
@@ -53,7 +53,7 @@ export const ChessGameSudokuTypeManager: SudokuTypeManager<ChessPTM> = {
         return [];
     },
 
-    modifyInitialFieldState({ cells, ...state }: FieldState<ChessPTM>): FieldState<ChessPTM> {
+    modifyInitialGridState({ cells, ...state }: GridState<ChessPTM>): GridState<ChessPTM> {
         return {
             ...state,
             cells: cells.map((row, top) =>
@@ -147,8 +147,8 @@ export const makeChessMove = (context: PuzzleContext<ChessPTM>, from: Position, 
     }
 
     context.onStateChange({
-        fieldStateHistory: fieldStateHistoryAddState(context, myClientId, getNextActionId(), ({ cells, ...state }) => {
-            const board = new FieldStateChessBoard(cells);
+        gridStateHistory: gridStateHistoryAddState(context, myClientId, getNextActionId(), ({ cells, ...state }) => {
+            const board = new GridStateChessBoard(cells);
 
             board.move(from, to);
 

@@ -2,7 +2,7 @@ import { headerPadding, lighterGreyColor } from "./globals";
 import React, { ReactElement } from "react";
 import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
 import { buildLink } from "../../utils/link";
-import { FieldPreview } from "../sudoku/field/FieldPreview";
+import { GridPreview } from "../sudoku/grid/GridPreview";
 import { AnyPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
@@ -46,7 +46,7 @@ export const PuzzlesListItem = observer(function PuzzlesListItem<T extends AnyPT
                     background: "white",
                 }}
             >
-                <FieldPreview puzzle={puzzle} width={thumbnailWidth} hide={hide} />
+                <GridPreview puzzle={puzzle} width={thumbnailWidth} hide={hide} />
             </div>
 
             <div>

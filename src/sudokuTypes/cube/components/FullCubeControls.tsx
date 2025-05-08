@@ -38,7 +38,7 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
 
     const {
         puzzle: {
-            fieldSize: { fieldSize },
+            gridSize: { gridSize },
         },
         cellSize,
         isReadonlyContext,
@@ -98,8 +98,8 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
         >
             <StyledButton
                 style={{
-                    left: cellSize * (fieldSize / 4 - 0.55),
-                    top: cellSize * ((fieldSize * 7) / 8 + 0.6),
+                    left: cellSize * (gridSize / 4 - 0.55),
+                    top: cellSize * ((gridSize * 7) / 8 + 0.6),
                     transform: `skewY(${skewAngle}deg)`,
                 }}
                 onClick={leftUp}
@@ -109,8 +109,8 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
             </StyledButton>
             <StyledButton
                 style={{
-                    left: cellSize * (fieldSize / 4 + 0.55),
-                    top: cellSize * ((fieldSize * 7) / 8 + 1.15),
+                    left: cellSize * (gridSize / 4 + 0.55),
+                    top: cellSize * ((gridSize * 7) / 8 + 1.15),
                     transform: `skewY(${skewAngle}deg)`,
                 }}
                 onClick={leftDown}
@@ -121,8 +121,8 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
 
             <StyledButton
                 style={{
-                    left: cellSize * ((fieldSize * 3) / 4 - 0.55),
-                    top: cellSize * ((fieldSize * 7) / 8 + 1.15),
+                    left: cellSize * ((gridSize * 3) / 4 - 0.55),
+                    top: cellSize * ((gridSize * 7) / 8 + 1.15),
                     transform: `skewY(-${skewAngle}deg)`,
                 }}
                 onClick={rightUp}
@@ -132,8 +132,8 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
             </StyledButton>
             <StyledButton
                 style={{
-                    left: cellSize * ((fieldSize * 3) / 4 + 0.55),
-                    top: cellSize * ((fieldSize * 7) / 8 + 0.6),
+                    left: cellSize * ((gridSize * 3) / 4 + 0.55),
+                    top: cellSize * ((gridSize * 7) / 8 + 0.6),
                     transform: `skewY(-${skewAngle}deg)`,
                 }}
                 onClick={rightDown}
@@ -144,8 +144,8 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
 
             <StyledButton
                 style={{
-                    left: cellSize * (fieldSize + 0.8),
-                    top: cellSize * (fieldSize / 2 - 0.95),
+                    left: cellSize * (gridSize + 0.8),
+                    top: cellSize * (gridSize / 2 - 0.95),
                     transform: `skewY(-${skewAngle}deg)`,
                 }}
                 onClick={right}
@@ -155,8 +155,8 @@ export const FullCubeControls = observer(function FullCubeControlsFc({ context }
             </StyledButton>
             <StyledButton
                 style={{
-                    left: cellSize * (fieldSize + 0.8),
-                    top: cellSize * (fieldSize / 2 + 0.15),
+                    left: cellSize * (gridSize + 0.8),
+                    top: cellSize * (gridSize / 2 + 0.15),
                     transform: `skewY(-${skewAngle}deg)`,
                 }}
                 onClick={left}

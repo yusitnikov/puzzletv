@@ -4,7 +4,7 @@ import { Set, SetInterface } from "../../../types/struct/Set";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { getExcludedDigitDataHash, getMainDigitDataHash } from "../../../utils/playerDataHash";
-import { FieldCellUserArea } from "../field/FieldCellUserArea";
+import { GridCellUserArea } from "../grid/GridCellUserArea";
 import { CellDataSet } from "../../../types/sudoku/CellDataSet";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
@@ -36,15 +36,15 @@ const corners: Position[] = [
 
 const emptyPositionFunction = () => emptyPositionWithAngle;
 
-export interface FieldCellDigitsProps<T extends AnyPTM> extends Position {
+export interface GridCellDigitsProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
 }
 
-export const FieldCellDigits = observer(function FieldCellDigits<T extends AnyPTM>({
+export const GridCellDigits = observer(function GridCellDigitsFc<T extends AnyPTM>({
     context,
     top,
     left,
-}: FieldCellDigitsProps<T>) {
+}: GridCellDigitsProps<T>) {
     profiler.trace();
 
     const cellState = context.getCell(top, left);
@@ -86,7 +86,7 @@ export const FieldCellDigits = observer(function FieldCellDigits<T extends AnyPT
             isValidUserDigit={isValidUserDigitFn}
         />
     );
-}) as <T extends AnyPTM>(props: FieldCellDigitsProps<T>) => ReactElement | null;
+}) as <T extends AnyPTM>(props: GridCellDigitsProps<T>) => ReactElement | null;
 
 export interface CellDigitsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
@@ -182,7 +182,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>({
 
     return (
         <AutoSvg width={size} height={size}>
-            <FieldCellUserArea context={context} cellPosition={cellPosition}>
+            <GridCellUserArea context={context} cellPosition={cellPosition}>
                 <AutoSvg left={size / 2} top={size / 2} width={size} height={size}>
                     {initialDataSet !== undefined && (
                         <AnimatedDigitsSet
@@ -242,7 +242,7 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>({
                         </>
                     )}
                 </AutoSvg>
-            </FieldCellUserArea>
+            </GridCellUserArea>
         </AutoSvg>
     );
 }) as <T extends AnyPTM>(props: CellDigitsProps<T>) => ReactElement | null;

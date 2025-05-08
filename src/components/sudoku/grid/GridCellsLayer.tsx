@@ -8,7 +8,7 @@ import { indexes } from "../../../utils/indexes";
 import { Position } from "../../../types/layout/Position";
 import { isInteractableCell, isVisibleCell } from "../../../types/sudoku/CellTypeProps";
 
-export interface FieldCellsLayerProps<T extends AnyPTM> {
+export interface GridCellsLayerProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     topOffset: number;
     leftOffset: number;
@@ -17,26 +17,26 @@ export interface FieldCellsLayerProps<T extends AnyPTM> {
     children: (top: number, left: number) => ReactNode;
 }
 
-export const FieldCellsLayer = observer(function FieldCellsLayer<T extends AnyPTM>({
+export const GridCellsLayer = observer(function GridCellsLayerFc<T extends AnyPTM>({
     context,
     topOffset,
     leftOffset,
     children,
     region,
     isInteractionMode = false,
-}: FieldCellsLayerProps<T>) {
+}: GridCellsLayerProps<T>) {
     profiler.trace();
 
     const { puzzleIndex, puzzle } = context;
 
-    const { typeManager, fieldSize, fieldMargin = 0, customCellBounds } = puzzle;
+    const { typeManager, gridSize, gridMargin = 0, customCellBounds } = puzzle;
 
-    const { allowRotation, allowScale, transformCoords, fieldFitsWrapper } = typeManager;
+    const { allowRotation, allowScale, transformCoords, gridFitsWrapper } = typeManager;
 
     return (
         <>
-            {indexes(fieldSize.rowsCount).flatMap((rowIndex) =>
-                indexes(fieldSize.columnsCount).map((columnIndex) => {
+            {indexes(gridSize.rowsCount).flatMap((rowIndex) =>
+                indexes(gridSize.columnsCount).map((columnIndex) => {
                     const cellPosition: Position = {
                         left: columnIndex,
                         top: rowIndex,
@@ -48,14 +48,14 @@ export const FieldCellsLayer = observer(function FieldCellsLayer<T extends AnyPT
                     }
 
                     // Skip the cell if it's out of the view because of panning and toroidal grid's looping
-                    if (!fieldFitsWrapper && !customCellBounds && !allowScale && !allowRotation && !transformCoords) {
+                    if (!gridFitsWrapper && !customCellBounds && !allowScale && !allowRotation && !transformCoords) {
                         const finalTop = topOffset + context.animatedNormalizedTop + rowIndex;
-                        if (finalTop <= -1 - fieldMargin || finalTop >= fieldSize.fieldSize + fieldMargin) {
+                        if (finalTop <= -1 - gridMargin || finalTop >= gridSize.gridSize + gridMargin) {
                             return null;
                         }
 
                         const finalLeft = leftOffset + context.animatedNormalizedLeft + columnIndex;
-                        if (finalLeft <= -1 - fieldMargin || finalLeft >= fieldSize.fieldSize + fieldMargin) {
+                        if (finalLeft <= -1 - gridMargin || finalLeft >= gridSize.gridSize + gridMargin) {
                             return null;
                         }
                     }
@@ -77,4 +77,4 @@ export const FieldCellsLayer = observer(function FieldCellsLayer<T extends AnyPT
             )}
         </>
     );
-}) as <T extends AnyPTM>(props: FieldCellsLayerProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridCellsLayerProps<T>) => ReactElement;

@@ -7,7 +7,7 @@ import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/Rotat
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { RotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { createWheel } from "../../components/sudoku/constraints/wheel/Wheel";
@@ -30,7 +30,7 @@ export const WheelsOnTheBus: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         [LanguageCode.en]: "Wheels on the Bus",
     },
     typeManager: RotatableCluesSudokuTypeManager({ baseTypeManager: DigitSudokuTypeManager(), isEquivalentLoop: true }),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     extension: {
         clues: [

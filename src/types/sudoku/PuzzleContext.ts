@@ -30,9 +30,9 @@ import { getAllowedCellWriteModeInfos } from "./CellWriteModeInfo";
 import { getFinalCellWriteMode } from "../../hooks/sudoku/useFinalCellWriteMode";
 import { CellWriteMode } from "./CellWriteMode";
 import { Constraint, toDecorativeConstraint } from "./Constraint";
-import { FieldLayer } from "./FieldLayer";
-import { getDefaultRegionsForRowsAndColumns } from "./FieldSize";
-import { FieldLinesConstraint } from "../../components/sudoku/field/FieldLines";
+import { GridLayer } from "./GridLayer";
+import { getDefaultRegionsForRowsAndColumns } from "./GridSize";
+import { GridLinesConstraint } from "../../components/sudoku/grid/GridLines";
 import { RegionConstraint } from "../../components/sudoku/constraints/region/Region";
 import { UserLinesConstraint } from "../../components/sudoku/constraints/user-lines/UserLines";
 import { GivenDigitsMap, mergeGivenDigitsMaps } from "./GivenDigitsMap";
@@ -176,14 +176,14 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 }),
                 lines: computed<SetInterface<PuzzleLine>>({ equals: setComparer }),
                 marks: computed<SetInterface<CellMark>>({ equals: setComparer }),
-                fieldExtension: computed<T["fieldStateEx"]>({
+                gridExtension: computed<T["gridStateEx"]>({
                     equals: (a, b) => {
                         const {
                             typeManager: {
-                                areFieldStateExtensionsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b),
+                                areGridStateExtensionsEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b),
                             },
                         } = this.puzzle;
-                        return areFieldStateExtensionsEqual(a, b);
+                        return areGridStateExtensionsEqual(a, b);
                     },
                 }),
                 resultCheck: computed({ equals: comparer.structural }),
@@ -395,20 +395,20 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     }
 
     // region State props
-    get fieldStateHistory() {
+    get gridStateHistory() {
         profiler.trace();
-        return this.state.fieldStateHistory;
+        return this.state.gridStateHistory;
     }
 
-    get currentFieldState() {
+    get currentGridState() {
         profiler.trace();
-        return this.state.fieldStateHistory.current;
+        return this.state.gridStateHistory.current;
     }
 
-    // region currentFieldState items
+    // region currentGridState items
     get cells() {
         profiler.trace();
-        return this.currentFieldState.cells;
+        return this.currentGridState.cells;
     }
     readonly getCell = computedFn(
         function getCell(this: PuzzleContext<T>, top: number, left: number) {
@@ -445,7 +445,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     get lines() {
         profiler.trace();
-        return this.currentFieldState.lines;
+        return this.currentGridState.lines;
     }
 
     get linesWithHiddenLines() {
@@ -455,12 +455,12 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     get marks() {
         profiler.trace();
-        return this.currentFieldState.marks;
+        return this.currentGridState.marks;
     }
 
-    get fieldExtension() {
+    get gridExtension() {
         profiler.trace();
-        return this.currentFieldState.extension;
+        return this.currentGridState.extension;
     }
 
     get userDigits(): GivenDigitsMap<T["cell"]> {
@@ -476,9 +476,9 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     );
     // endregion
 
-    get currentFieldStateWithFogDemo() {
+    get currentGridStateWithFogDemo() {
         profiler.trace();
-        return (this.state.fogDemoFieldStateHistory ?? this.state.fieldStateHistory).current;
+        return (this.state.fogDemoGridStateHistory ?? this.state.gridStateHistory).current;
     }
 
     get persistentCellWriteMode() {
@@ -607,9 +607,9 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.state.lives;
     }
 
-    get fogDemoFieldStateHistory() {
+    get fogDemoGridStateHistory() {
         profiler.trace();
-        return this.state.fogDemoFieldStateHistory;
+        return this.state.fogDemoGridStateHistory;
     }
 
     get currentPlayer() {
@@ -691,7 +691,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         } = this.puzzle;
 
         return [
-            ...(noGridLines ? [] : [FieldLinesConstraint<T>()]),
+            ...(noGridLines ? [] : [GridLinesConstraint<T>()]),
             ...regions.map((region) => {
                 if (Array.isArray(region)) {
                     region = RegionConstraint<T>(region);
@@ -737,7 +737,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     }
 
     readonly getVisibleItemsForLayer = computedFn(
-        function getVisibleItemsForLayer(this: PuzzleContext<T>, layer: FieldLayer) {
+        function getVisibleItemsForLayer(this: PuzzleContext<T>, layer: GridLayer) {
             return this.allItems.filter(({ component }) => component?.[layer]);
         },
         { equals: comparer.shallow },

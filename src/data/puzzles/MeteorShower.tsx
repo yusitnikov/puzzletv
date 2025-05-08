@@ -1,5 +1,5 @@
 import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularFieldSize, createRegularRegions } from "../../types/sudoku/FieldSize";
+import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { ThermometerConstraint } from "../../components/sudoku/constraints/thermometer/Thermometer";
@@ -32,7 +32,7 @@ export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => 
     ),
     typeManager: DigitSudokuTypeManager(),
     borderColor: darkGreyColor,
-    fieldSize: createRegularFieldSize(8, 2),
+    gridSize: createRegularGridSize(8, 2),
     regions: createRegularRegions(8, 8, 2).map((region, index) =>
         (region as Position[]).map(({ left, top }) => ({
             left,
@@ -51,5 +51,5 @@ export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => 
     resultChecker: isValidFinishedPuzzleByConstraints,
     loopHorizontally: true,
     loopVertically: true,
-    fieldMargin: 0.99,
+    gridMargin: 0.99,
 });

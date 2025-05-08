@@ -367,10 +367,6 @@ export const translationsExactType = {
     },
     // endregion
     // region RotatableMainControls
-    "Please rotate the field once to start solving the puzzle": {
-        [LanguageCode.ru]: "Поверните поле один раз, чтобы начать решать судоку",
-        [LanguageCode.de]: "Bitte drehen Sie das Gitter einmal, um mit der Lösung des Rätsels zu beginnen",
-    },
     "Rotate the puzzle": {
         [LanguageCode.ru]: "Повернуть поле",
         [LanguageCode.de]: "Drehe das Rätsel",
@@ -378,10 +374,6 @@ export const translationsExactType = {
     "Sticky mode": {
         [LanguageCode.ru]: "Фиксированный режим",
         [LanguageCode.de]: "Klebriger Modus",
-    },
-    "Sticky digits will preserve the orientation when rotating the field": {
-        [LanguageCode.ru]: "Фиксированные цифры сохранят свою ориентацию при повороте поля",
-        [LanguageCode.de]: "Bei klebrigen Ziffern bleibt die Ausrichtung beim Drehen des Rasters erhalten",
     },
     "Sticky digits are highlighted in green": {
         [LanguageCode.ru]: "Фиксированные цифры помечены зелёным",

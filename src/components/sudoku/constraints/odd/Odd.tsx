@@ -1,5 +1,5 @@
 import { darkGreyColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
@@ -12,7 +12,7 @@ export interface OddProps {
 }
 
 export const Odd: ConstraintPropsGenericFcMap<OddProps> = {
-    [FieldLayer.beforeSelection]: observer(function Odd<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function Odd<T extends AnyPTM>({
         cells: [{ left, top }],
         color = rgba(darkGreyColor, 0.6),
         props: { size = 0.8 },

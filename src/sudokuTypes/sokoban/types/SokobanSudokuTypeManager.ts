@@ -15,15 +15,15 @@ import { moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo } from "./Sokoban
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
 import { settings } from "../../../types/layout/Settings";
 import {
-    addFieldStateExToSudokuManager,
+    addGridStateExToSudokuManager,
     addGameStateExToSudokuManager,
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
-import { SokobanFieldState, sokobanFieldStateAnimationMixer } from "./SokobanFieldState";
+import { SokobanGridState, sokobanGridStateAnimationMixer } from "./SokobanGridState";
 import { comparer, IReactionDisposer, reaction } from "mobx";
 import { SokobanOptions } from "./SokobanOptions";
 import { isPointInRect } from "../../../types/layout/Rect";
 
-const initialFieldStateExtension = (puzzle?: PuzzleDefinition<SokobanPTM>): SokobanFieldState => {
+const initialGridStateExtension = (puzzle?: PuzzleDefinition<SokobanPTM>): SokobanGridState => {
     return {
         cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
         clueSmashed: puzzle?.extension?.clues.map(() => false) ?? [],
@@ -33,16 +33,14 @@ const initialFieldStateExtension = (puzzle?: PuzzleDefinition<SokobanPTM>): Soko
 
 export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTypeManager<SokobanPTM> => ({
     ...addGameStateExToSudokuManager(
-        addFieldStateExToSudokuManager(DigitSudokuTypeManager(), {
-            initialFieldStateExtension,
-        }),
+        addGridStateExToSudokuManager(DigitSudokuTypeManager(), { initialGridStateExtension }),
         {
             initialGameStateExtension(puzzle): SokobanGameState {
                 return {
                     animationManager: new AnimatedValue(
-                        initialFieldStateExtension(puzzle),
+                        initialGridStateExtension(puzzle),
                         0,
-                        sokobanFieldStateAnimationMixer,
+                        sokobanGridStateAnimationMixer,
                     ),
                     animating: false,
                     sokobanDirection: defaultSokobanDirection,
@@ -54,11 +52,7 @@ export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTy
             unserializeGameState(state: any): Partial<SokobanGameState> {
                 return {
                     ...state,
-                    animationManager: new AnimatedValue(
-                        initialFieldStateExtension(),
-                        0,
-                        sokobanFieldStateAnimationMixer,
-                    ),
+                    animationManager: new AnimatedValue(initialGridStateExtension(), 0, sokobanGridStateAnimationMixer),
                     animating: false,
                 };
             },
@@ -70,7 +64,7 @@ export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTy
             reaction(
                 () => {
                     return {
-                        value: context.fieldExtension,
+                        value: context.gridExtension,
                         animationTime: context.stateExtension.animating ? settings.animationSpeed.get() / 2 : 0,
                     };
                 },
@@ -152,7 +146,7 @@ export const SokobanSudokuTypeManager = (options: SokobanOptions = {}): SudokuTy
         return {
             ...puzzle,
             items: ({
-                fieldExtension: { cluePositions, clueSmashed },
+                gridExtension: { cluePositions, clueSmashed },
                 stateExtension: {
                     animationManager: { animatedValue },
                 },

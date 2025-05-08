@@ -1,6 +1,6 @@
 import { SudokuTypeManager } from "../../../types/sudoku/SudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../default/types/DigitSudokuTypeManager";
-import { createRegularRegions, FieldSize } from "../../../types/sudoku/FieldSize";
+import { createRegularRegions, GridSize } from "../../../types/sudoku/GridSize";
 import {
     getLineVector,
     Position,
@@ -63,11 +63,11 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     }),
 
     ignoreRowsColumnCountInTheWrapper: true,
-    fieldControlsComponent: FullCubeControls,
+    gridControlsComponent: FullCubeControls,
 
-    getCellTypeProps({ top }, { fieldSize: { columnsCount } }): CellTypeProps<FullCubePTM> {
-        const realFieldSize = columnsCount / 3;
-        return { isSelectable: top < realFieldSize * 2 };
+    getCellTypeProps({ top }, { gridSize: { columnsCount } }): CellTypeProps<FullCubePTM> {
+        const realGridSize = columnsCount / 3;
+        return { isSelectable: top < realGridSize * 2 };
     },
 
     processCellDataPosition(
@@ -125,16 +125,16 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     transformCoords(position, context) {
         const {
             puzzle: {
-                fieldSize: { columnsCount },
+                gridSize: { columnsCount },
             },
         } = context;
-        const realFieldSize = columnsCount / 3;
+        const realGridSize = columnsCount / 3;
 
         const { x, y, z } = transformFullCubeCoords3D(position, context);
 
         return {
-            left: realFieldSize + x - z,
-            top: realFieldSize + y + x / 2 + z / 2,
+            left: realGridSize + x - z,
+            top: realGridSize + y + x / 2 + z / 2,
         };
     },
 
@@ -142,19 +142,19 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         const {
             puzzle: {
                 typeManager: { transformCoords },
-                fieldSize: { columnsCount },
+                gridSize: { columnsCount },
             },
         } = context;
 
-        const realFieldSize = columnsCount / 3;
+        const realGridSize = columnsCount / 3;
 
         return [0, 1, 2].flatMap((left) =>
             [0, 1, 2].map((top): GridRegion => {
                 const rect: Rect = {
-                    left: realFieldSize * left,
-                    top: realFieldSize * top,
-                    width: realFieldSize,
-                    height: realFieldSize,
+                    left: realGridSize * left,
+                    top: realGridSize * top,
+                    width: realGridSize,
+                    height: realGridSize,
                 };
 
                 // Get projections of the rect points onto the screen
@@ -198,26 +198,26 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
 
     getRegionsForRowsAndColumns({
         puzzle: {
-            fieldSize: { columnsCount },
+            gridSize: { columnsCount },
         },
     }): Constraint<FullCubePTM, any>[] {
-        const realFieldSize = columnsCount / 3;
+        const realGridSize = columnsCount / 3;
 
         return [0, 1, 2].flatMap((left) =>
             [0, 1].flatMap((top) =>
-                indexes(realFieldSize).flatMap((i) => [
+                indexes(realGridSize).flatMap((i) => [
                     RegionConstraint(
-                        indexes(realFieldSize).map((j) => ({
-                            left: left * realFieldSize + i,
-                            top: top * realFieldSize + j,
+                        indexes(realGridSize).map((j) => ({
+                            left: left * realGridSize + i,
+                            top: top * realGridSize + j,
                         })),
                         false,
                         "column",
                     ),
                     RegionConstraint(
-                        indexes(realFieldSize).map((j) => ({
-                            left: left * realFieldSize + j,
-                            top: top * realFieldSize + i,
+                        indexes(realGridSize).map((j) => ({
+                            left: left * realGridSize + j,
+                            top: top * realGridSize + i,
                         })),
                         false,
                         "row",
@@ -230,10 +230,10 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     processArrowDirection({ top, left }, xDirection, yDirection, context) {
         const {
             puzzle: {
-                fieldSize: { columnsCount },
+                gridSize: { columnsCount },
             },
         } = context;
-        const realFieldSize = columnsCount / 3;
+        const realGridSize = columnsCount / 3;
 
         const cellCenter: Position = { top: top + 0.5, left: left + 0.5 };
         const cellCenter3D = transformFullCubeCoords3D(cellCenter, context, false);
@@ -271,40 +271,40 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
         let newTop = top + yDirection;
         let newLeft = left + xDirection;
 
-        const faceX = Math.floor(left / realFieldSize);
+        const faceX = Math.floor(left / realGridSize);
 
-        if (top < realFieldSize) {
-            if (newLeft < 0 || newLeft >= realFieldSize * 3) {
-                newTop += realFieldSize;
-                newLeft = (newLeft + realFieldSize) % realFieldSize;
+        if (top < realGridSize) {
+            if (newLeft < 0 || newLeft >= realGridSize * 3) {
+                newTop += realGridSize;
+                newLeft = (newLeft + realGridSize) % realGridSize;
             } else if (newTop < 0) {
                 switch (faceX) {
                     case 0:
-                        newTop = realFieldSize * 2 - 1;
-                        newLeft += realFieldSize;
+                        newTop = realGridSize * 2 - 1;
+                        newLeft += realGridSize;
                         break;
                     case 1:
-                        newTop = realFieldSize * 3 - 1 - newLeft;
-                        newLeft = realFieldSize * 2 - 1;
+                        newTop = realGridSize * 3 - 1 - newLeft;
+                        newLeft = realGridSize * 2 - 1;
                         break;
                     case 2:
-                        newTop = realFieldSize;
-                        newLeft = realFieldSize * 4 - 1 - newLeft;
+                        newTop = realGridSize;
+                        newLeft = realGridSize * 4 - 1 - newLeft;
                         break;
                 }
-            } else if (newTop >= realFieldSize) {
+            } else if (newTop >= realGridSize) {
                 switch (faceX) {
                     case 0:
-                        newLeft += realFieldSize * 2;
+                        newLeft += realGridSize * 2;
                         break;
                     case 1:
                         // noinspection JSSuspiciousNameCombination
                         newTop = newLeft;
-                        newLeft = realFieldSize * 3 - 1;
+                        newLeft = realGridSize * 3 - 1;
                         break;
                     case 2:
-                        newTop = realFieldSize * 2 - 1;
-                        newLeft = realFieldSize * 5 - 1 - newLeft;
+                        newTop = realGridSize * 2 - 1;
+                        newLeft = realGridSize * 5 - 1 - newLeft;
                         break;
                 }
             }
@@ -312,48 +312,48 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
             switch (faceX) {
                 case 0:
                     if (newLeft < 0) {
-                        newTop -= realFieldSize;
-                        newLeft = realFieldSize * 3 - 1;
-                    } else if (newLeft >= realFieldSize) {
-                        newTop -= realFieldSize;
+                        newTop -= realGridSize;
+                        newLeft = realGridSize * 3 - 1;
+                    } else if (newLeft >= realGridSize) {
+                        newTop -= realGridSize;
                         newLeft = 0;
-                    } else if (newTop < realFieldSize) {
-                        newTop = realFieldSize + newLeft;
-                        newLeft = realFieldSize;
-                    } else if (newTop >= realFieldSize * 2) {
-                        newTop = realFieldSize * 2 - 1 - newLeft;
-                        newLeft = realFieldSize * 2;
+                    } else if (newTop < realGridSize) {
+                        newTop = realGridSize + newLeft;
+                        newLeft = realGridSize;
+                    } else if (newTop >= realGridSize * 2) {
+                        newTop = realGridSize * 2 - 1 - newLeft;
+                        newLeft = realGridSize * 2;
                     }
                     break;
                 case 1:
-                    if (newLeft < realFieldSize) {
-                        newLeft = newTop - realFieldSize;
-                        newTop = realFieldSize;
-                    } else if (newLeft >= realFieldSize * 2) {
-                        newLeft = realFieldSize * 3 - 1 - newTop;
+                    if (newLeft < realGridSize) {
+                        newLeft = newTop - realGridSize;
+                        newTop = realGridSize;
+                    } else if (newLeft >= realGridSize * 2) {
+                        newLeft = realGridSize * 3 - 1 - newTop;
                         newTop = 0;
-                    } else if (newTop < realFieldSize) {
+                    } else if (newTop < realGridSize) {
                         newTop = 0;
-                        newLeft = realFieldSize * 4 - 1 - newLeft;
-                    } else if (newTop >= realFieldSize * 2) {
+                        newLeft = realGridSize * 4 - 1 - newLeft;
+                    } else if (newTop >= realGridSize * 2) {
                         newTop = 0;
-                        newLeft -= realFieldSize;
+                        newLeft -= realGridSize;
                     }
                     break;
                 case 2:
-                    if (newLeft < realFieldSize * 2) {
-                        newLeft = realFieldSize * 2 - 1 - newTop;
-                        newTop = realFieldSize * 2 - 1;
-                    } else if (newLeft >= realFieldSize * 3) {
+                    if (newLeft < realGridSize * 2) {
+                        newLeft = realGridSize * 2 - 1 - newTop;
+                        newTop = realGridSize * 2 - 1;
+                    } else if (newLeft >= realGridSize * 3) {
                         // noinspection JSSuspiciousNameCombination
                         newLeft = newTop;
-                        newTop = realFieldSize - 1;
-                    } else if (newTop < realFieldSize) {
-                        newTop = realFieldSize - 1;
-                        newLeft -= realFieldSize * 2;
-                    } else if (newTop >= realFieldSize * 2) {
-                        newTop = realFieldSize - 1;
-                        newLeft = realFieldSize * 5 - 1 - newLeft;
+                        newTop = realGridSize - 1;
+                    } else if (newTop < realGridSize) {
+                        newTop = realGridSize - 1;
+                        newLeft -= realGridSize * 2;
+                    } else if (newTop >= realGridSize * 2) {
+                        newTop = realGridSize - 1;
+                        newLeft = realGridSize * 5 - 1 - newLeft;
                     }
                     break;
             }
@@ -387,24 +387,24 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
 
     postProcessPuzzle(puzzle): PuzzleDefinition<FullCubePTM> {
         const {
-            fieldSize: { rowsCount, columnsCount },
-            fieldMargin = 0,
+            gridSize: { rowsCount, columnsCount },
+            gridMargin = 0,
             allowDrawing,
             items,
         } = puzzle;
 
-        const realFieldSize = columnsCount / 3;
+        const realGridSize = columnsCount / 3;
 
         const isJss = Array.isArray(items) && items.includes(FullCubeJssConstraint);
 
         return {
             ...puzzle,
-            fieldSize: {
-                ...puzzle.fieldSize,
-                fieldSize: realFieldSize * 2,
+            gridSize: {
+                ...puzzle.gridSize,
+                gridSize: realGridSize * 2,
                 rowsCount: isJss ? columnsCount : rowsCount,
             },
-            fieldMargin: Math.max(fieldMargin, realFieldSize),
+            gridMargin: Math.max(gridMargin, realGridSize),
             allowDrawing: allowDrawing?.filter((item) => item === "center-mark"),
         };
     },
@@ -412,24 +412,20 @@ export const FullCubeTypeManager = (): SudokuTypeManager<FullCubePTM> => ({
     saveStateKeySuffix: "v2",
 });
 
-export const createFullCubeFieldSize = (fieldSize: number, withJss = false): FieldSize => ({
-    fieldSize: fieldSize * 2,
-    rowsCount: fieldSize * (withJss ? 3 : 2),
-    columnsCount: fieldSize * 3,
+export const createFullCubeGridSize = (gridSize: number, withJss = false): GridSize => ({
+    gridSize: gridSize * 2,
+    rowsCount: gridSize * (withJss ? 3 : 2),
+    columnsCount: gridSize * 3,
 });
 
-export const createFullCubeRegions = (
-    fieldSize: number,
-    regionWidth: number,
-    regionHeight = fieldSize / regionWidth,
-) => {
-    const regions = createRegularRegions(fieldSize, fieldSize, regionWidth, regionHeight);
+export const createFullCubeRegions = (gridSize: number, regionWidth: number, regionHeight = gridSize / regionWidth) => {
+    const regions = createRegularRegions(gridSize, gridSize, regionWidth, regionHeight);
     return [0, 1, 2].flatMap((leftQuad) =>
         [0, 1].flatMap((topQuad) =>
             regions.map((region) =>
                 region.map(({ top, left }) => ({
-                    top: topQuad * fieldSize + top,
-                    left: leftQuad * fieldSize + left,
+                    top: topQuad * gridSize + top,
+                    left: leftQuad * gridSize + left,
                 })),
             ),
         ),

@@ -1,10 +1,10 @@
 import { Translatable } from "../../../types/translations/Translatable";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 
-export const cubedokuNormalSudokuRules = (fieldSize: number): Translatable => ({
-    [LanguageCode.en]: `Fill the cells with the digits 1-${fieldSize}, so that each face of the cube is a valid sudoku grid`,
-    [LanguageCode.ru]: `Заполните ячейки цифрами от 1 до ${fieldSize}, чтобы каждая грань куба была допустимым полем судоку`,
-    [LanguageCode.de]: `Füllen Sie die Zellen mit den Ziffern 1–${fieldSize}, sodass jede Seite des Würfels ein gültiges Sudoku-Gitter darstellt`,
+export const cubedokuNormalSudokuRules = (gridSize: number): Translatable => ({
+    [LanguageCode.en]: `Fill the cells with the digits 1-${gridSize}, so that each face of the cube is a valid sudoku grid`,
+    [LanguageCode.ru]: `Заполните ячейки цифрами от 1 до ${gridSize}, чтобы каждая грань куба была допустимым полем судоку`,
+    [LanguageCode.de]: `Füllen Sie die Zellen mit den Ziffern 1–${gridSize}, sodass jede Seite des Würfels ein gültiges Sudoku-Gitter darstellt`,
 });
 
 export const cubedokuIndexingRules: Translatable = {

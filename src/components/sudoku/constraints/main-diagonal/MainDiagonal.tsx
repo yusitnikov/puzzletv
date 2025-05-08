@@ -1,4 +1,4 @@
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { getLineVector, normalizeVector, PositionLiteral, scaleVector } from "../../../../types/layout/Position";
 import { RenbanConstraint } from "../renban/Renban";
@@ -10,7 +10,7 @@ import { profiler } from "../../../../utils/profiler";
 const diagonalColor = "#34bbe6";
 
 export const DiagonalComponent: ConstraintPropsGenericFcMap<LineProps> = {
-    [FieldLayer.regular]: observer(function Diagonal<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function Diagonal<T extends AnyPTM>({
         cells,
         color = diagonalColor,
         context: { cellSize },
@@ -72,14 +72,14 @@ const BaseDiagonalConstraint = <T extends AnyPTM>(
 });
 
 export const PositiveDiagonalConstraint = <T extends AnyPTM>(
-    fieldSize: number,
+    gridSize: number,
     color?: string,
     width?: number,
 ): Constraint<T, LineProps> => ({
     ...BaseDiagonalConstraint<T>(
         [
-            { top: fieldSize - 1, left: 0 },
-            { top: 0, left: fieldSize - 1 },
+            { top: gridSize - 1, left: 0 },
+            { top: 0, left: gridSize - 1 },
         ],
         color,
         width,
@@ -88,14 +88,14 @@ export const PositiveDiagonalConstraint = <T extends AnyPTM>(
 });
 
 export const NegativeDiagonalConstraint = <T extends AnyPTM>(
-    fieldSize: number,
+    gridSize: number,
     color?: string,
     width?: number,
 ): Constraint<T, LineProps> => ({
     ...BaseDiagonalConstraint<T>(
         [
             { top: 0, left: 0 },
-            { top: fieldSize - 1, left: fieldSize - 1 },
+            { top: gridSize - 1, left: gridSize - 1 },
         ],
         color,
         width,

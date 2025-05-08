@@ -1,5 +1,5 @@
 import React, { ReactElement, useMemo } from "react";
-import { Field } from "./Field";
+import { Grid } from "./Grid";
 import { PuzzleDefinition } from "../../../types/sudoku/PuzzleDefinition";
 import { ErrorBoundary } from "react-error-boundary";
 import { errorColor } from "../../app/globals";
@@ -9,17 +9,17 @@ import { createEmptyContextForPuzzle } from "../../../types/sudoku/PuzzleContext
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-export interface FieldPreviewProps<T extends AnyPTM> {
+export interface GridPreviewProps<T extends AnyPTM> {
     puzzle?: PuzzleDefinition<T>;
     width: number;
     hide?: boolean;
 }
 
-export const FieldPreview = observer(function FieldPreview<T extends AnyPTM>({
+export const GridPreview = observer(function GridPreviewFc<T extends AnyPTM>({
     puzzle,
     width,
     hide,
-}: FieldPreviewProps<T>) {
+}: GridPreviewProps<T>) {
     profiler.trace();
 
     const loadError = (
@@ -53,31 +53,31 @@ export const FieldPreview = observer(function FieldPreview<T extends AnyPTM>({
                     loadError
                 ) : (
                     <ErrorBoundary fallback={loadError}>
-                        <FieldPreviewInner puzzle={puzzle} width={width} />
+                        <GridPreviewInner puzzle={puzzle} width={width} />
                     </ErrorBoundary>
                 ))}
         </div>
     );
-}) as <T extends AnyPTM>(props: FieldPreviewProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridPreviewProps<T>) => ReactElement;
 
-interface FieldPreviewInnerProps<T extends AnyPTM> {
+interface GridPreviewInnerProps<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
     width: number;
     hide?: boolean;
 }
 
-const FieldPreviewInner = observer(function FieldPreviewInner<T extends AnyPTM>({
+const GridPreviewInner = observer(function GridPreviewInnerFc<T extends AnyPTM>({
     puzzle,
     width,
-}: FieldPreviewInnerProps<T>) {
+}: GridPreviewInnerProps<T>) {
     profiler.trace();
 
-    const cellSize = width / (puzzle.fieldSize.fieldSize + (puzzle.fieldMargin || 0) * 2);
+    const cellSize = width / (puzzle.gridSize.gridSize + (puzzle.gridMargin || 0) * 2);
     const context = useMemo(() => createEmptyContextForPuzzle(puzzle, cellSize), [puzzle, cellSize]);
 
     // noinspection JSSuspiciousNameCombination
     return (
-        <Field
+        <Grid
             rect={{
                 left: 0,
                 top: 0,
@@ -87,4 +87,4 @@ const FieldPreviewInner = observer(function FieldPreviewInner<T extends AnyPTM>(
             context={context}
         />
     );
-}) as <T extends AnyPTM>(props: FieldPreviewInnerProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridPreviewInnerProps<T>) => ReactElement;

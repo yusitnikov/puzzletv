@@ -1,5 +1,5 @@
 import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularFieldSize } from "../../types/sudoku/FieldSize";
+import { createRegularGridSize } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { Chameleon } from "../authors";
@@ -53,11 +53,11 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
     slug: "toroidal-yin-yang",
     saveStateKey: "toroidal-yin-yang-v2",
     typeManager: DigitSudokuTypeManager(),
-    fieldSize: createRegularFieldSize(10),
+    gridSize: createRegularGridSize(10),
     digitsCount: 0,
     loopHorizontally: true,
     loopVertically: true,
-    fieldMargin: 0.99,
+    gridMargin: 0.99,
     rules: () => (
         <>
             <RulesParagraph>

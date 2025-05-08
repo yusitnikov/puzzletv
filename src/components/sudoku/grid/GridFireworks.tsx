@@ -10,7 +10,7 @@ import { settings } from "../../../types/layout/Settings";
 import { AnimationSpeed } from "../../../types/sudoku/AnimationSpeed";
 import { rafTime } from "../../../hooks/useRaf";
 
-class FieldFireworksController {
+class GridFireworksController {
     startTime = 0;
     endTime = 0;
     private promise = Promise.resolve();
@@ -42,9 +42,9 @@ class FieldFireworksController {
     }
 }
 
-export const fieldFireworksController = new FieldFireworksController();
+export const gridFireworksController = new GridFireworksController();
 
-export const FieldFireworks = observer(function FieldFireworksFc() {
+export const GridFireworks = observer(function GridFireworksFc() {
     profiler.trace();
 
     const { width, height } = usePuzzleContainer() ?? emptyRect;
@@ -81,9 +81,9 @@ export const FieldFireworks = observer(function FieldFireworksFc() {
         ref.current?.updateOptions(options);
     }, [ref, options]);
 
-    const isRunning = fieldFireworksController.isRunning;
+    const isRunning = gridFireworksController.isRunning;
     useEffect(() => {
-        fieldFireworksController.then(async () => {
+        gridFireworksController.then(async () => {
             if (isRunning) {
                 ref.current?.start();
             } else {

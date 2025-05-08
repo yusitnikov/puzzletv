@@ -1,5 +1,5 @@
 import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { FieldSize9 } from "../../types/sudoku/FieldSize";
+import { GridSize9 } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { CellColor, CellColorValue } from "../../types/sudoku/CellColor";
@@ -116,7 +116,7 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
         </>
     ),
     typeManager: DigitSudokuTypeManager(),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     initialColors: processGivenDigitsMaps((colors) => colors, [initialColors]),
     items: [
         ThermometerConstraint(["R5C2", "R4C1"]),
@@ -129,6 +129,6 @@ export const Miraculous: PuzzleDefinition<NumberPTM> = {
     disableDiagonalBorderLines: true,
     loopHorizontally: true,
     loopVertically: true,
-    fieldMargin: 0.99,
+    gridMargin: 0.99,
     resultChecker: isValidFinishedPuzzleByConstraints,
 };

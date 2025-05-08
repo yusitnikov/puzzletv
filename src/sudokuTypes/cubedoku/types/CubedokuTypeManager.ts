@@ -12,12 +12,12 @@ export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
         { top, left },
         {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
             },
             selectedCells,
         },
     ) {
-        const realFieldSize = fieldSize / 2;
+        const realGridSize = gridSize / 2;
 
         const tooltipResult: Required<Pick<CellSelectionByDataProps<NumberPTM>, "color" | "strokeWidth">> = {
             color: CellSelectionColor.secondary,
@@ -31,9 +31,9 @@ export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
         let isTrack = false;
 
         for (const { top: selectedTop, left: selectedLeft } of selectedCells.items) {
-            if (selectedTop < realFieldSize) {
+            if (selectedTop < realGridSize) {
                 if (left === selectedLeft && top > selectedTop) {
-                    if (top >= realFieldSize) {
+                    if (top >= realGridSize) {
                         return tooltipResult;
                     }
                     isTrack = true;
@@ -43,12 +43,12 @@ export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
                     isTrack = true;
                 }
 
-                if (left === fieldSize - 1 - selectedTop) {
+                if (left === gridSize - 1 - selectedTop) {
                     return tooltipResult;
                 }
-            } else if (selectedLeft < realFieldSize) {
+            } else if (selectedLeft < realGridSize) {
                 if (left === selectedLeft && top < selectedTop) {
-                    if (top < realFieldSize) {
+                    if (top < realGridSize) {
                         return tooltipResult;
                     }
 
@@ -56,7 +56,7 @@ export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
                 }
 
                 if (top === selectedTop && left > selectedLeft) {
-                    if (left >= realFieldSize) {
+                    if (left >= realGridSize) {
                         return tooltipResult;
                     }
 
@@ -68,14 +68,14 @@ export const CubedokuTypeManager: SudokuTypeManager<NumberPTM> = {
                 }
 
                 if (top === selectedTop && left < selectedLeft) {
-                    if (left < realFieldSize) {
+                    if (left < realGridSize) {
                         return tooltipResult;
                     }
 
                     isTrack = true;
                 }
 
-                if (top === fieldSize - 1 - selectedLeft) {
+                if (top === gridSize - 1 - selectedLeft) {
                     return tooltipResult;
                 }
             }

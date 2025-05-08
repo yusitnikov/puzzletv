@@ -21,7 +21,7 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                 disableBackgroundColorOpacity: true,
             };
 
-            if (puzzle.fieldSize.rowsCount > 9) {
+            if (puzzle.gridSize.rowsCount > 9) {
                 puzzle = {
                     ...puzzle,
                     digitsCount: 9,
@@ -109,7 +109,7 @@ export const YajilinFogSudokuTypeManager = <T extends AnyPTM>(
                 puzzle.resultChecker = (context) => {
                     const {
                         puzzleIndex,
-                        currentFieldStateWithFogDemo: { cells, lines },
+                        currentGridStateWithFogDemo: { cells, lines },
                     } = context;
 
                     let result = originalResultChecker(context);

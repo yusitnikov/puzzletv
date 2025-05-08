@@ -8,7 +8,7 @@ import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { SokobanPlayerByData } from "../constraints/SokobanPlayer";
 import { ControlButton, controlButtonPaddingCoeff } from "../../../components/sudoku/controls/ControlButton";
 import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp } from "@emotion-icons/fluentui-system-filled";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { GameStateActionCallback, getNextActionId } from "../../../types/sudoku/GameStateAction";
 import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
@@ -40,17 +40,17 @@ export const moveSokobanPlayer =
                 sokobanDirection: { top: yDirection, left: xDirection },
                 animating: true,
             },
-            fieldStateHistory: fieldStateHistoryAddState(context, myClientId, getNextActionId(), (fieldState) => {
+            gridStateHistory: gridStateHistoryAddState(context, myClientId, getNextActionId(), (gridState) => {
                 let {
                     extension: { cluePositions, clueSmashed, sokobanPosition },
-                } = fieldState;
+                } = gridState;
 
                 sokobanPosition = {
                     top: sokobanPosition.top + yDirection,
                     left: sokobanPosition.left + xDirection,
                 };
                 if (!allCells[sokobanPosition.top]?.[sokobanPosition.left]) {
-                    return fieldState;
+                    return gridState;
                 }
 
                 interface OffsetClueInfo {
@@ -155,7 +155,7 @@ export const moveSokobanPlayer =
 
                     const { move, smash } = tryMoveClue(movingClue);
                     if (!move.length && !smash.length) {
-                        return fieldState;
+                        return gridState;
                     }
                     updateState(move, smash, xDirection, yDirection);
                 }
@@ -220,7 +220,7 @@ export const moveSokobanPlayer =
                 }
 
                 return {
-                    ...fieldState,
+                    ...gridState,
                     extension: { cluePositions, clueSmashed, sokobanPosition },
                 };
             }),

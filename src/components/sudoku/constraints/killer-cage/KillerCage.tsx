@@ -7,7 +7,7 @@ import {
     Position,
     PositionLiteral,
 } from "../../../../types/layout/Position";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { getRegionBorders, getRegionBoundingBox } from "../../../../utils/regions";
 import { isValidCellForRegion } from "../region/Region";
@@ -35,7 +35,7 @@ export interface KillerCageProps {
 }
 
 export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
-    [FieldLayer.regular]: observer(function KillerCage<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function KillerCage<T extends AnyPTM>({
         context,
         cells,
         props: {

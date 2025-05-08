@@ -7,7 +7,7 @@ import { RotatableCluesPTM } from "../../sudokuTypes/rotatable-clues/types/Rotat
 import { NumberPTM } from "../../types/sudoku/PuzzleTypeMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { ImportedRotatableCluesSudokuTypeManager } from "../../sudokuTypes/rotatable-clues/types/RotatableCluesSudokuTypeManager";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import {
@@ -18,7 +18,7 @@ import {
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../utils/profiler";
 import { PositionLiteral } from "../../types/layout/Position";
-import { FieldLayer } from "../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../types/sudoku/GridLayer";
 import { textColor } from "../../components/app/globals";
 import { Constraint } from "../../types/sudoku/Constraint";
 import { createGivenDigitsMapFromArray } from "../../types/sudoku/GivenDigitsMap";
@@ -38,7 +38,7 @@ const DecorativeArrowConstraint = (
 ): Constraint<RotatableCluesPTM<NumberPTM>, any>[] => [
     DecorativeShapeConstraint(
         "decorative arrow",
-        FieldLayer.regular,
+        GridLayer.regular,
         ArrowComponent,
         [cellLiteral],
         1,
@@ -64,7 +64,7 @@ export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
         [LanguageCode.en]: "Astronavigation",
     },
     typeManager: ImportedRotatableCluesSudokuTypeManager({ baseTypeManager: DigitSudokuTypeManager() }),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     rules: () => (
         <>

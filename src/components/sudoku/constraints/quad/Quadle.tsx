@@ -1,5 +1,5 @@
 import { recentInfoColor, textColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { isSamePosition, parsePositionLiteral, Position, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps } from "../../../../types/sudoku/Constraint";
 import { PuzzleContext } from "../../../../types/sudoku/PuzzleContext";
@@ -29,7 +29,7 @@ export interface QuadleProps<CellType> {
 }
 
 export const Quadle = {
-    [FieldLayer.afterLines]: observer(function Quadle<T extends AnyPTM>({
+    [GridLayer.afterLines]: observer(function Quadle<T extends AnyPTM>({
         context,
         cells,
         props,

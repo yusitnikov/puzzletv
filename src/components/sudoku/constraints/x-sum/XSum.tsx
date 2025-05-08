@@ -1,12 +1,12 @@
 import { PositionLiteral } from "../../../../types/layout/Position";
-import { FieldSize } from "../../../../types/sudoku/FieldSize";
+import { GridSize } from "../../../../types/sudoku/GridSize";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { OutsideClueConstraint } from "../outside-clue/OutsideClue";
 import { sum } from "../../../../utils/math";
 
 export const XSumConstraint = <T extends AnyPTM>(
     clueCellLiteral: PositionLiteral,
-    cellLiteralsOrFieldSize: FieldSize | PositionLiteral[],
+    cellLiteralsOrFieldSize: GridSize | PositionLiteral[],
     value: number,
     color?: string,
 ) =>

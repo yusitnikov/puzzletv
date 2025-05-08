@@ -1,10 +1,4 @@
-import {
-    areFieldStatesEqual,
-    cloneFieldState,
-    FieldState,
-    serializeFieldState,
-    unserializeFieldState,
-} from "./FieldState";
+import { areGridStatesEqual, cloneGridState, GridState, serializeGridState, unserializeGridState } from "./GridState";
 import { SetStateAction } from "react";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
@@ -12,8 +6,8 @@ import { makeAutoObservable } from "mobx";
 import { PuzzleDefinition } from "./PuzzleDefinition";
 import { profiler } from "../../utils/profiler";
 
-export class FieldStateHistory<T extends AnyPTM> {
-    readonly current: FieldState<T>;
+export class GridStateHistory<T extends AnyPTM> {
+    readonly current: GridState<T>;
     readonly statesCount: number;
 
     get canUndo() {
@@ -33,7 +27,7 @@ export class FieldStateHistory<T extends AnyPTM> {
     ) {
         makeAutoObservable(this, { states: false });
 
-        this.current = unserializeFieldState(JSON.parse(states[currentIndex]), puzzle);
+        this.current = unserializeGridState(JSON.parse(states[currentIndex]), puzzle);
         this.statesCount = states.length;
     }
 
@@ -46,10 +40,10 @@ export class FieldStateHistory<T extends AnyPTM> {
     }
 
     seek(index: number) {
-        return new FieldStateHistory(this.puzzle, this.states, index);
+        return new GridStateHistory(this.puzzle, this.states, index);
     }
 
-    equals(other: FieldStateHistory<T>) {
+    equals(other: GridStateHistory<T>) {
         return (
             this.statesCount === other.statesCount &&
             this.currentIndex === other.currentIndex &&
@@ -58,36 +52,36 @@ export class FieldStateHistory<T extends AnyPTM> {
     }
 }
 
-export const fieldStateHistoryAddState = <T extends AnyPTM>(
+export const gridStateHistoryAddState = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     clientId: string,
     actionId: string,
-    state: SetStateAction<FieldState<T>>,
-): FieldStateHistory<T> => {
-    const { puzzle, currentFieldState, fieldStateHistory } = context;
+    state: SetStateAction<GridState<T>>,
+): GridStateHistory<T> => {
+    const { puzzle, currentGridState, gridStateHistory } = context;
 
     if (typeof state === "function") {
-        state = state(cloneFieldState(puzzle.typeManager, currentFieldState, clientId, actionId));
+        state = state(cloneGridState(puzzle.typeManager, currentGridState, clientId, actionId));
     }
 
     state = { ...state, clientId, actionId };
 
     if (
-        currentFieldState.clientId === clientId &&
-        currentFieldState.actionId === actionId &&
-        fieldStateHistory.currentIndex > 0
+        currentGridState.clientId === clientId &&
+        currentGridState.actionId === actionId &&
+        gridStateHistory.currentIndex > 0
     ) {
         // Replace the last state of the same action by the current action
-        return fieldStateHistoryAddState(
+        return gridStateHistoryAddState(
             new PuzzleContext({
                 ...context,
                 applyPendingMessages: false,
                 myGameState: {
                     ...context.state,
-                    fieldStateHistory: new FieldStateHistory(
+                    gridStateHistory: new GridStateHistory(
                         puzzle,
-                        fieldStateHistory.states.slice(0, fieldStateHistory.currentIndex),
-                        fieldStateHistory.currentIndex - 1,
+                        gridStateHistory.states.slice(0, gridStateHistory.currentIndex),
+                        gridStateHistory.currentIndex - 1,
                     ),
                 },
             }),
@@ -97,20 +91,20 @@ export const fieldStateHistoryAddState = <T extends AnyPTM>(
         );
     }
 
-    if (areFieldStatesEqual(context, state, currentFieldState)) {
-        return fieldStateHistory;
+    if (areGridStatesEqual(context, state, currentGridState)) {
+        return gridStateHistory;
     }
 
-    const stateStr = JSON.stringify(serializeFieldState(state, puzzle));
+    const stateStr = JSON.stringify(serializeGridState(state, puzzle));
 
     // No history for multi-player games
     if (context.multiPlayer.isEnabled) {
-        return new FieldStateHistory(puzzle, [stateStr], 0);
+        return new GridStateHistory(puzzle, [stateStr], 0);
     }
 
-    return new FieldStateHistory(
+    return new GridStateHistory(
         puzzle,
-        [...fieldStateHistory.states.slice(0, fieldStateHistory.currentIndex + 1), stateStr],
-        fieldStateHistory.currentIndex + 1,
+        [...gridStateHistory.states.slice(0, gridStateHistory.currentIndex + 1), stateStr],
+        gridStateHistory.currentIndex + 1,
     );
 };

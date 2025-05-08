@@ -2,38 +2,38 @@ import { Rect, transformRect } from "../../../types/layout/Rect";
 import { emptyPosition } from "../../../types/layout/Position";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { TransformedRectGraphics } from "../../../contexts/TransformContext";
-import { FieldLoop } from "./FieldLoop";
+import { GridLoop } from "./GridLoop";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { doesGridRegionContainCell, GridRegion } from "../../../types/sudoku/GridRegion";
-import { SingleCellFieldItemPositionFix } from "./SingleCellFieldItemPositionFix";
+import { SingleCellGridItemPositionFix } from "./SingleCellGridItemPositionFix";
 import { ReactElement } from "react";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-export interface FieldItemsProps<T extends AnyPTM> {
+export interface GridItemsProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
-    layer: FieldLayer;
+    layer: GridLayer;
     region?: GridRegion;
     regionIndex?: number;
 }
 
-export const FieldItems = observer(function FieldItems<T extends AnyPTM>(props: FieldItemsProps<T>) {
+export const GridItems = observer(function GridItemsFc<T extends AnyPTM>(props: GridItemsProps<T>) {
     profiler.trace();
 
     return (
-        <FieldLoop context={props.context}>
-            <FieldItemsInner {...props} />
-        </FieldLoop>
+        <GridLoop context={props.context}>
+            <GridItemsInner {...props} />
+        </GridLoop>
     );
-}) as <T extends AnyPTM>(props: FieldItemsProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridItemsProps<T>) => ReactElement;
 
-const FieldItemsInner = observer(function FieldItemsInner<T extends AnyPTM>({
+const GridItemsInner = observer(function GridItemsInnerFc<T extends AnyPTM>({
     context,
     layer,
     region,
     regionIndex,
-}: FieldItemsProps<T>) {
+}: GridItemsProps<T>) {
     profiler.trace();
 
     return (
@@ -45,7 +45,7 @@ const FieldItemsInner = observer(function FieldItemsInner<T extends AnyPTM>({
 
                     if (
                         region &&
-                        layer !== FieldLayer.noClip &&
+                        layer !== GridLayer.noClip &&
                         (!context.puzzle.customCellBounds || region.cells) &&
                         cells.length &&
                         cells.every(({ top, left }) => top % 1 === 0 && left % 1 === 0) &&
@@ -59,7 +59,7 @@ const FieldItemsInner = observer(function FieldItemsInner<T extends AnyPTM>({
 
                         if (position.top % 1 === 0 && position.left % 1 === 0) {
                             return (
-                                <SingleCellFieldItemPositionFix
+                                <SingleCellGridItemPositionFix
                                     key={index}
                                     context={context}
                                     position={position}
@@ -72,7 +72,7 @@ const FieldItemsInner = observer(function FieldItemsInner<T extends AnyPTM>({
                                         cells={[emptyPosition]}
                                         {...otherData}
                                     />
-                                </SingleCellFieldItemPositionFix>
+                                </SingleCellGridItemPositionFix>
                             );
                         }
                     }
@@ -122,4 +122,4 @@ const FieldItemsInner = observer(function FieldItemsInner<T extends AnyPTM>({
                 })}
         </>
     );
-}) as <T extends AnyPTM>(props: FieldItemsProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridItemsProps<T>) => ReactElement;

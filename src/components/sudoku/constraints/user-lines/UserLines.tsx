@@ -1,5 +1,5 @@
 import { getRegionBorderWidth, lightGreyColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import {
     Constraint,
     ConstraintProps,
@@ -29,7 +29,7 @@ const errorBorderColor = "#e00";
 const removingBorderColor = lightGreyColor;
 
 export const UserLines: ConstraintPropsGenericFcMap = {
-    [FieldLayer.givenUserLines]: observer(function GivenUserLines<T extends AnyPTM>({
+    [GridLayer.givenUserLines]: observer(function GivenUserLines<T extends AnyPTM>({
         context,
         region,
         regionIndex,
@@ -85,7 +85,7 @@ export const UserLines: ConstraintPropsGenericFcMap = {
             </>
         );
     }),
-    [FieldLayer.newUserLines]: observer(function NewUserLines<T extends AnyPTM>({
+    [GridLayer.newUserLines]: observer(function NewUserLines<T extends AnyPTM>({
         context: {
             cellSize,
             puzzle: {
@@ -146,7 +146,7 @@ export const UserMarkByData = observer(function UserMarkByData<T extends AnyPTM>
     if (context) {
         const { puzzle, puzzleIndex } = context;
         const {
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
             loopHorizontally,
             loopVertically,
             typeManager: { processCellDataPosition },

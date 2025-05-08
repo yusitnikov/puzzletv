@@ -1,5 +1,5 @@
 import { SokobanClue } from "../../types/SokobanPuzzleExtension";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { ConstraintProps } from "../../../../types/sudoku/Constraint";
 import { SokobanPTM } from "../../types/SokobanPTM";
@@ -10,9 +10,7 @@ import { lightenColorStr } from "../../../../utils/color";
 import { SplineLoop } from "../../../../components/svg/spline/SplineLoop";
 
 export const SmashedEgg: SokobanClue["component"] = {
-    [FieldLayer.beforeSelection]: observer(function SmashedEgg({
-        cells: [{ top, left }],
-    }: ConstraintProps<SokobanPTM>) {
+    [GridLayer.beforeSelection]: observer(function SmashedEgg({ cells: [{ top, left }] }: ConstraintProps<SokobanPTM>) {
         profiler.trace();
 
         return (

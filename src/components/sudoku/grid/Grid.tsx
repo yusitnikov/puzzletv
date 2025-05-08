@@ -5,37 +5,37 @@ import { Rect } from "../../../types/layout/Rect";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { controlKeysState } from "../../../hooks/useControlKeysState";
 import React, { ReactElement, ReactNode, useState } from "react";
-import { FieldCellBackground } from "../cell/CellBackground";
+import { GridCellBackground } from "../cell/CellBackground";
 import { CellSelectionByCoords } from "../cell/CellSelection";
-import { FieldCellDigits } from "../cell/CellDigits";
-import { FieldSvg } from "./FieldSvg";
+import { GridCellDigits } from "../cell/CellDigits";
+import { GridSvg } from "./GridSvg";
 import {
     gameStateApplyArrowToSelectedCells,
     gameStateClearSelectedCells,
     gameStateSelectAllCells,
 } from "../../../types/sudoku/GameState";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
-import { FieldCellMouseHandler } from "./FieldCellMouseHandler";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
+import { GridCellMouseHandler } from "./GridCellMouseHandler";
 import { getCellWriteModeGestureHandler } from "../../../types/sudoku/CellWriteModeInfo";
 import { PassThrough } from "../../layout/pass-through/PassThrough";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
-import { FieldRegionsWithSameCoordsTransformation } from "./FieldRegionsWithSameCoordsTransformation";
+import { GridRegionsWithSameCoordsTransformation } from "./GridRegionsWithSameCoordsTransformation";
 import { getGestureHandlerProps, useGestureHandlers, useOutsideClick } from "../../../utils/gestures";
 import { usePuzzleContainer } from "../../../contexts/PuzzleContainerContext";
 import { GridRegion } from "../../../types/sudoku/GridRegion";
 import { useAutoIncrementId } from "../../../hooks/useAutoIncrementId";
-import { FieldItems, FieldItemsProps } from "./FieldItems";
-import { FieldLoop } from "./FieldLoop";
+import { GridItems, GridItemsProps } from "./GridItems";
+import { GridLoop } from "./GridLoop";
 import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
-import { FieldCellsLayer } from "./FieldCellsLayer";
-import { FieldFireworks } from "./FieldFireworks";
+import { GridCellsLayer } from "./GridCellsLayer";
+import { GridFireworks } from "./GridFireworks";
 import { translate } from "../../../utils/translate";
 
-export interface FieldProps<T extends AnyPTM> {
+export interface GridProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     rect: Rect;
 }
@@ -45,30 +45,30 @@ export interface FieldProps<T extends AnyPTM> {
  *
  * See the "docs/Puzzle rendering.md" file for more details about how the puzzle grid is rendered.
  */
-export const Field = observer(function Field<T extends AnyPTM>({ context, rect }: FieldProps<T>) {
+export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }: GridProps<T>) {
     profiler.trace();
 
     const {
         readOnlySafeContext,
         puzzle,
-        fogDemoFieldStateHistory,
-        cellWriteModeInfo: { isNoSelectionMode, applyToWholeField },
+        fogDemoGridStateHistory,
+        cellWriteModeInfo: { isNoSelectionMode, applyToWholeGrid },
         cellSize,
         isReady,
     } = context;
 
-    const { typeManager, fieldMargin = 0, loopHorizontally, loopVertically, prioritizeSelection } = puzzle;
+    const { typeManager, gridMargin = 0, loopHorizontally, loopVertically, prioritizeSelection } = puzzle;
 
     const {
         disableArrowLetterShortcuts,
         allowMove,
         allowScale,
-        fieldWrapperHandlesScale,
+        gridWrapperHandlesScale,
         gridBackgroundColor = "#fff",
         regionBackgroundColor,
-        fieldWrapperComponent: FieldWrapper = PassThrough,
-        fieldFitsWrapper,
-        fieldControlsComponent: FieldControls,
+        gridWrapperComponent: GridWrapper = PassThrough,
+        gridFitsWrapper,
+        gridControlsComponent: GridControls,
     } = typeManager;
 
     const autoIncrementId = useAutoIncrementId();
@@ -76,14 +76,14 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
     // region Pointer events
     const [isDeleteSelectedCellsStroke, setIsDeleteSelectedCellsStroke] = useState(false);
 
-    const fieldOuterRect = usePuzzleContainer(true)!;
+    const gridOuterRect = usePuzzleContainer(true)!;
 
-    const createCellWriteModeGestureHandlers = (forField: boolean) =>
+    const createCellWriteModeGestureHandlers = (forGrid: boolean) =>
         !isReady
             ? []
             : context.allCellWriteModeInfos
-                  .filter(({ applyToWholeField, disableCellHandlers }) =>
-                      forField ? applyToWholeField : !disableCellHandlers,
+                  .filter(({ applyToWholeGrid, disableCellHandlers }) =>
+                      forGrid ? applyToWholeGrid : !disableCellHandlers,
                   )
                   .map((cellWriteModeInfo) =>
                       getCellWriteModeGestureHandler(
@@ -91,10 +91,10 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                           cellWriteModeInfo,
                           isDeleteSelectedCellsStroke,
                           setIsDeleteSelectedCellsStroke,
-                          fieldOuterRect,
+                          gridOuterRect,
                       ),
                   );
-    const fieldGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(true));
+    const gridGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(true));
     const cellGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(false));
 
     // Handle outside click
@@ -178,9 +178,9 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
         region?: GridRegion,
         isInteractionMode = false,
     ) => (
-        <FieldLoop context={readOnlySafeContext}>
+        <GridLoop context={readOnlySafeContext}>
             {(topOffset, leftOffset) => (
-                <FieldCellsLayer
+                <GridCellsLayer
                     context={context}
                     topOffset={topOffset}
                     leftOffset={leftOffset}
@@ -188,9 +188,9 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                     isInteractionMode={isInteractionMode}
                 >
                     {renderer}
-                </FieldCellsLayer>
+                </GridCellsLayer>
             )}
-        </FieldLoop>
+        </GridLoop>
     );
 
     const selection = (region?: GridRegion) =>
@@ -206,7 +206,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
         );
 
     const applyShadowFilter = !settings.simplifiedGraphics.get();
-    const shadowFilterId = `field-shadow-${autoIncrementId}`;
+    const shadowFilterId = `grid-shadow-${autoIncrementId}`;
     const shadowFilterStr = applyShadowFilter ? `url(#${shadowFilterId})` : undefined;
 
     return (
@@ -217,16 +217,16 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                 style={{
                     backgroundColor: gridBackgroundColor,
                     overflow:
-                        loopHorizontally || loopVertically || allowMove || (allowScale && !fieldWrapperHandlesScale)
+                        loopHorizontally || loopVertically || allowMove || (allowScale && !gridWrapperHandlesScale)
                             ? "hidden"
                             : undefined,
                     pointerEvents: "all",
-                    cursor: applyToWholeField ? "pointer" : undefined,
+                    cursor: applyToWholeGrid ? "pointer" : undefined,
                 }}
-                {...getGestureHandlerProps(fieldGestureHandlers)}
+                {...getGestureHandlerProps(gridGestureHandlers)}
             >
                 {/* custom wrapper defined by the type manager - implement it to modify the DOM structure */}
-                <FieldWrapper context={context}>
+                <GridWrapper context={context}>
                     {/* apply panning, rotating and zooming transformations to the grid */}
                     <Absolute
                         left={context.animatedNormalizedLeft * cellSize}
@@ -234,11 +234,11 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                         width={rect.width}
                         height={rect.height}
                         angle={context.animatedAngle}
-                        scale={fieldWrapperHandlesScale ? 1 : context.animatedScale}
-                        fitParent={fieldFitsWrapper}
+                        scale={gridWrapperHandlesScale ? 1 : context.animatedScale}
+                        fitParent={gridFitsWrapper}
                     >
                         {/* The main SVG element that contains all drawings and interactions of the grid */}
-                        <FieldSvg context={readOnlySafeContext}>
+                        <GridSvg context={readOnlySafeContext}>
                             {applyShadowFilter && (
                                 <filter id={shadowFilterId} colorInterpolationFilters={"sRGB"}>
                                     <feDropShadow
@@ -252,12 +252,12 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                             )}
 
                             {/* transformed regions returned from SudokuTypeManager.getRegionsWithSameCoordsTransformation() */}
-                            <FieldRegionsWithSameCoordsTransformation
+                            <GridRegionsWithSameCoordsTransformation
                                 context={readOnlySafeContext}
                                 regionNoClipChildren={(region, regionIndex) => (
                                     <g data-layer="items-no-clip">
-                                        <FieldItems
-                                            layer={FieldLayer.noClip}
+                                        <GridItems
+                                            layer={GridLayer.noClip}
                                             context={readOnlySafeContext}
                                             region={region}
                                             regionIndex={regionIndex}
@@ -266,7 +266,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                                 )}
                             >
                                 {(region, regionIndex) => {
-                                    const itemsProps: Omit<FieldItemsProps<T>, "layer"> = {
+                                    const itemsProps: Omit<GridItemsProps<T>, "layer"> = {
                                         context,
                                         region,
                                         regionIndex,
@@ -289,54 +289,54 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                                             )}
 
                                             <g data-layer="items-before-background" filter={shadowFilterStr}>
-                                                <FieldItems layer={FieldLayer.beforeBackground} {...itemsProps} />
+                                                <GridItems layer={GridLayer.beforeBackground} {...itemsProps} />
                                             </g>
 
                                             <g data-layer="background">
                                                 {renderCellsLayer(
                                                     (top, left) => (
-                                                        <FieldCellBackground context={context} top={top} left={left} />
+                                                        <GridCellBackground context={context} top={top} left={left} />
                                                     ),
                                                     region,
                                                 )}
                                             </g>
 
                                             <g data-layer="items-before-selection" filter={shadowFilterStr}>
-                                                <FieldItems layer={FieldLayer.beforeSelection} {...itemsProps} />
+                                                <GridItems layer={GridLayer.beforeSelection} {...itemsProps} />
                                             </g>
 
                                             {!prioritizeSelection && selection(region)}
 
                                             <g data-layer="items-regular" filter={shadowFilterStr}>
-                                                <FieldItems layer={FieldLayer.regular} {...itemsProps} />
+                                                <GridItems layer={GridLayer.regular} {...itemsProps} />
                                             </g>
 
                                             {prioritizeSelection && selection(region)}
 
                                             <g data-layer="items-lines">
-                                                <FieldItems layer={FieldLayer.lines} {...itemsProps} />
+                                                <GridItems layer={GridLayer.lines} {...itemsProps} />
                                             </g>
 
                                             <g data-layer="items-after-lines">
-                                                <FieldItems layer={FieldLayer.afterLines} {...itemsProps} />
+                                                <GridItems layer={GridLayer.afterLines} {...itemsProps} />
                                             </g>
 
                                             <g data-layer="items-given-user-lines">
-                                                <FieldItems layer={FieldLayer.givenUserLines} {...itemsProps} />
+                                                <GridItems layer={GridLayer.givenUserLines} {...itemsProps} />
                                             </g>
 
                                             <g data-layer="items-new-user-lines">
-                                                <FieldItems layer={FieldLayer.newUserLines} {...itemsProps} />
+                                                <GridItems layer={GridLayer.newUserLines} {...itemsProps} />
                                             </g>
 
                                             <g data-layer="items-top">
-                                                <FieldItems layer={FieldLayer.top} {...itemsProps} />
+                                                <GridItems layer={GridLayer.top} {...itemsProps} />
                                             </g>
 
                                             <g data-layer="digits" filter={shadowFilterStr}>
                                                 {renderCellsLayer(
                                                     (top, left) => (
-                                                        <FieldCellDigits context={context} top={top} left={left} />
+                                                        <GridCellDigits context={context} top={top} left={left} />
                                                     ),
                                                     region,
                                                 )}
@@ -347,7 +347,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                                                     {/* Render mouse handlers for outside cells with no clipping first */}
                                                     {renderCellsLayer(
                                                         (top, left) => (
-                                                            <FieldCellMouseHandler
+                                                            <GridCellMouseHandler
                                                                 context={readOnlySafeContext}
                                                                 top={top}
                                                                 left={left}
@@ -363,7 +363,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                                                     {/* Then render accurate mouse handlers for all cells over them */}
                                                     {renderCellsLayer(
                                                         (top, left) => (
-                                                            <FieldCellMouseHandler
+                                                            <GridCellMouseHandler
                                                                 context={readOnlySafeContext}
                                                                 top={top}
                                                                 left={left}
@@ -378,20 +378,20 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                                             )}
 
                                             <g data-layer="items-interactive">
-                                                <FieldItems layer={FieldLayer.interactive} {...itemsProps} />
+                                                <GridItems layer={GridLayer.interactive} {...itemsProps} />
                                             </g>
                                         </>
                                     );
                                 }}
-                            </FieldRegionsWithSameCoordsTransformation>
-                        </FieldSvg>
+                            </GridRegionsWithSameCoordsTransformation>
+                        </GridSvg>
                     </Absolute>
 
                     {/* toroidal grid's "shade out" effect */}
-                    {loopHorizontally && fieldMargin && (
+                    {loopHorizontally && gridMargin && (
                         <>
                             <Absolute
-                                width={fieldMargin * cellSize}
+                                width={gridMargin * cellSize}
                                 height={rect.height}
                                 style={{
                                     background: "linear-gradient(to right, white, transparent)",
@@ -399,8 +399,8 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                             />
 
                             <Absolute
-                                left={rect.width - fieldMargin * cellSize}
-                                width={fieldMargin * cellSize}
+                                left={rect.width - gridMargin * cellSize}
+                                width={gridMargin * cellSize}
                                 height={rect.height}
                                 style={{
                                     background: "linear-gradient(to left, white, transparent)",
@@ -410,43 +410,43 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
                     )}
 
                     {/* toroidal grid's "shade out" effect */}
-                    {loopVertically && fieldMargin && (
+                    {loopVertically && gridMargin && (
                         <>
                             <Absolute
                                 width={rect.width}
-                                height={fieldMargin * cellSize}
+                                height={gridMargin * cellSize}
                                 style={{
                                     background: "linear-gradient(to bottom, white, transparent)",
                                 }}
                             />
 
                             <Absolute
-                                top={rect.height - fieldMargin * cellSize}
+                                top={rect.height - gridMargin * cellSize}
                                 width={rect.width}
-                                height={fieldMargin * cellSize}
+                                height={gridMargin * cellSize}
                                 style={{
                                     background: "linear-gradient(to top, white, transparent)",
                                 }}
                             />
                         </>
                     )}
-                </FieldWrapper>
+                </GridWrapper>
 
                 {/* custom controls that are not related to specific cells, defined by the type manager */}
                 <Absolute
-                    top={fieldMargin * cellSize}
-                    left={fieldMargin * cellSize}
-                    width={rect.width - 2 * fieldMargin * cellSize}
-                    height={rect.width - 2 * fieldMargin * cellSize}
+                    top={gridMargin * cellSize}
+                    left={gridMargin * cellSize}
+                    width={rect.width - 2 * gridMargin * cellSize}
+                    height={rect.width - 2 * gridMargin * cellSize}
                 >
-                    {FieldControls && <FieldControls context={context} />}
+                    {GridControls && <GridControls context={context} />}
 
-                    <FieldFireworks />
+                    <GridFireworks />
                 </Absolute>
             </StyledWrapper>
 
             {/* "no fog reveal mode" warning layer */}
-            {fogDemoFieldStateHistory && (
+            {fogDemoGridStateHistory && (
                 <Absolute
                     {...rect}
                     style={{
@@ -468,7 +468,7 @@ export const Field = observer(function Field<T extends AnyPTM>({ context, rect }
             )}
         </>
     );
-}) as <T extends AnyPTM>(props: FieldProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridProps<T>) => ReactElement;
 
 const StyledWrapper = styled(Absolute)`
     touch-action: none;

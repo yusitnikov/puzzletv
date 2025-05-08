@@ -1,6 +1,6 @@
 import { getLineVector, parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
 import { blackColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
@@ -10,7 +10,7 @@ const radius = 0.15;
 const lineWidth = 0.03;
 
 export const Greater: ConstraintPropsGenericFcMap = {
-    [FieldLayer.afterLines]: observer(function Greater<T extends AnyPTM>({
+    [GridLayer.afterLines]: observer(function Greater<T extends AnyPTM>({
         cells: [greaterCell, lessCell],
     }: ConstraintProps<T>) {
         profiler.trace();

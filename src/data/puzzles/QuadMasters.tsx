@@ -1,5 +1,5 @@
 import { PuzzleDefinitionLoader } from "../../types/sudoku/PuzzleDefinition";
-import { createRegularFieldSize, createRegularRegions } from "../../types/sudoku/FieldSize";
+import { createRegularGridSize, createRegularRegions } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { generateRandomPuzzleDigits, getDailyRandomGeneratorSeed } from "../../utils/random";
 import { QuadMastersSudokuTypeManager } from "../../sudokuTypes/quad-masters/types/QuadMastersSudokuTypeManager";
@@ -57,7 +57,7 @@ export const generateQuadMasters = (
         ...other,
     }),
     loadPuzzle: ({ size: sizeStr, regionWidth: regionWidthStr, seed: seedStr, isRandom, host, ...otherParams }) => {
-        const fieldSize = Number(sizeStr);
+        const gridSize = Number(sizeStr);
         const regionWidth = Number(regionWidthStr);
         const randomSeed = daily ? getDailyRandomGeneratorSeed(isQuadle ? 1 : 0) : Number(seedStr);
 
@@ -69,20 +69,20 @@ export const generateQuadMasters = (
                 [LanguageCode.ru]: isQuadle ? "Maff и Хамелеона" : "Maff",
             },
             saveState: !isRandom,
-            saveStateKey: `${slug}-${fieldSize}-${regionWidth}-${randomSeed}`,
+            saveStateKey: `${slug}-${gridSize}-${regionWidth}-${randomSeed}`,
             getNewHostedGameParams: () => ({
-                size: fieldSize === 9 ? undefined : fieldSize,
-                regionWidth: regionWidth === getAutoRegionWidth(fieldSize) ? undefined : regionWidth,
+                size: gridSize === 9 ? undefined : gridSize,
+                regionWidth: regionWidth === getAutoRegionWidth(gridSize) ? undefined : regionWidth,
                 seed: daily ? undefined : randomSeed,
                 ...otherParams,
             }),
-            solution: generateRandomPuzzleDigits(fieldSize, regionWidth, randomSeed),
+            solution: generateRandomPuzzleDigits(gridSize, regionWidth, randomSeed),
             typeManager: QuadMastersSudokuTypeManager(isQuadle),
-            fieldSize: createRegularFieldSize(fieldSize, regionWidth),
-            regions: createRegularRegions(fieldSize, fieldSize, regionWidth),
+            gridSize: createRegularGridSize(gridSize, regionWidth),
+            regions: createRegularRegions(gridSize, gridSize, regionWidth),
             resultChecker: isValidFinishedPuzzleByConstraints,
             forceAutoCheckOnFinish: true,
-            fieldMargin: Math.max(0, (7 - fieldSize) / 2),
+            gridMargin: Math.max(0, (7 - gridSize) / 2),
             rules: () => (
                 <>
                     <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>

@@ -1,6 +1,6 @@
 import { Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
 import { FullCubePTM } from "../types/FullCubePTM";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
@@ -15,7 +15,7 @@ import { CenteredText } from "../../../components/svg/centered-text/CenteredText
 import { textColor } from "../../../components/app/globals";
 
 const FullCubeJss = {
-    [FieldLayer.regular]: observer(function FullCubeJssFc({ context, region }: ConstraintProps<FullCubePTM>) {
+    [GridLayer.regular]: observer(function FullCubeJssFc({ context, region }: ConstraintProps<FullCubePTM>) {
         profiler.trace();
 
         if (!region?.noInteraction) {
@@ -24,14 +24,14 @@ const FullCubeJss = {
 
         const {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
                 solution,
                 solutionColors,
             },
             regions = [],
         } = context;
 
-        const realFieldSize = fieldSize / 2;
+        const realFieldSize = gridSize / 2;
         const radius = realFieldSize / 2;
 
         const regionsWithPositions = regions

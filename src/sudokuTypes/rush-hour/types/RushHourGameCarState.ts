@@ -1,6 +1,6 @@
 import { GameStateActionCallback } from "../../../types/sudoku/GameStateAction";
 import { RushHourPTM } from "./RushHourPTM";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { Position } from "../../../types/layout/Position";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 
@@ -22,15 +22,15 @@ export const rushHourCarStateChangeAction =
             stateExtension: { cars: carStates },
         } = context;
 
-        const startCarPositions = startContext?.fieldExtension.cars;
+        const startCarPositions = startContext?.gridExtension.cars;
 
         return {
-            fieldStateHistory: fieldStateHistoryAddState(
+            gridStateHistory: gridStateHistoryAddState(
                 context,
                 clientId,
                 actionId,
-                ({ extension: { cars }, ...fieldState }) => ({
-                    ...fieldState,
+                ({ extension: { cars }, ...gridState }) => ({
+                    ...gridState,
                     extension: {
                         cars: [
                             ...cars.slice(0, carIndex),

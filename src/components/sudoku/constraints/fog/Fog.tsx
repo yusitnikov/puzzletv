@@ -7,12 +7,12 @@ import {
     PositionLiteral,
     PositionSet,
 } from "../../../../types/layout/Position";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { Constraint, ConstraintProps } from "../../../../types/sudoku/Constraint";
 import { ComponentType, Fragment, ReactElement } from "react";
 import { gameStateGetCurrentGivenDigitsByCells } from "../../../../types/sudoku/GameState";
 import { darkGreyColor } from "../../../app/globals";
-import { FieldCellBackground } from "../../cell/CellBackground";
+import { GridCellBackground } from "../../cell/CellBackground";
 import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
 import { useAutoIncrementId } from "../../../../hooks/useAutoIncrementId";
 import { CellColor } from "../../../../types/sudoku/CellColor";
@@ -68,7 +68,7 @@ export const getFogVisibleCells = <T extends AnyPTM>(
             { top, left },
             {
                 puzzle: {
-                    fieldSize: { rowsCount, columnsCount },
+                    gridSize: { rowsCount, columnsCount },
                 },
             },
         ) =>
@@ -84,12 +84,12 @@ export const getFogVisibleCells = <T extends AnyPTM>(
     const {
         puzzle,
         puzzleIndex,
-        currentFieldStateWithFogDemo: { cells, lines },
+        currentGridStateWithFogDemo: { cells, lines },
     } = context;
 
     const {
         solution,
-        fieldSize: { rowsCount, columnsCount },
+        gridSize: { rowsCount, columnsCount },
         typeManager: { getDigitByCellData },
     } = puzzle;
 
@@ -170,14 +170,14 @@ export const getFogVisibleCells = <T extends AnyPTM>(
 };
 
 export const Fog = {
-    [FieldLayer.regular]: observer(function Fog<T extends AnyPTM>({ context, props }: ConstraintProps<T, FogProps<T>>) {
+    [GridLayer.regular]: observer(function Fog<T extends AnyPTM>({ context, props }: ConstraintProps<T, FogProps<T>>) {
         profiler.trace();
 
         const { bulbCells, fogRenderer: FogRenderer } = props;
 
         const {
             puzzle: {
-                fieldSize: { rowsCount, columnsCount },
+                gridSize: { rowsCount, columnsCount },
                 disableFancyFog,
             },
         } = context;
@@ -300,7 +300,7 @@ const FogCellsBackground = observer(function FogCellsBackground<T extends AnyPTM
 
     const {
         puzzle: {
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
         },
     } = context;
 
@@ -310,7 +310,7 @@ const FogCellsBackground = observer(function FogCellsBackground<T extends AnyPTM
                 indexes(columnsCount).map((left) => {
                     return (
                         <AutoSvg key={`${top}-${left}`} top={top} left={left}>
-                            <FieldCellBackground context={context} noGivenColors={true} top={top} left={left} />
+                            <GridCellBackground context={context} noGivenColors={true} top={top} left={left} />
                         </AutoSvg>
                     );
                 }),
@@ -354,11 +354,11 @@ export const FogConstraint = <T extends AnyPTM>({
                 solution,
                 typeManager: { getDigitByCellData },
             },
-            fogDemoFieldStateHistory,
+            fogDemoGridStateHistory,
         } = context;
 
         return (
-            !!fogDemoFieldStateHistory ||
+            !!fogDemoGridStateHistory ||
             typeof solution?.[top][left] !== "number" ||
             getDigitByCellData(digits[top][left], context, { top, left }) === solution[top][left]
         );

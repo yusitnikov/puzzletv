@@ -4,11 +4,11 @@ import { profiler } from "../../../utils/profiler";
 import { observer } from "mobx-react-lite";
 
 export interface GoogleMapsOverlayProps {
-    fieldSize: number;
+    gridSize: number;
 }
 
 export const GoogleMapsOverlay: FC<GoogleMapsOverlayProps> = observer(function GoogleMapsOverlay({
-    fieldSize,
+    gridSize,
     children,
 }) {
     profiler.trace();
@@ -28,11 +28,11 @@ export const GoogleMapsOverlay: FC<GoogleMapsOverlayProps> = observer(function G
                 position: "absolute",
                 left: x,
                 top: y,
-                width: fieldSize,
-                height: fieldSize,
+                width: gridSize,
+                height: gridSize,
                 textAlign: "center",
-                lineHeight: `${fieldSize}px`,
-                fontSize: `${fieldSize}px`,
+                lineHeight: `${gridSize}px`,
+                fontSize: `${gridSize}px`,
             }}
         >
             {children}

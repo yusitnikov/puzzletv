@@ -14,10 +14,10 @@ import { ScrewConstraint } from "../constraints/Screw";
 import { ScrewsMoveCellWriteModeInfo } from "./ScrewsMoveCellWriteModeInfo";
 import { CellWriteModeInfo } from "../../../types/sudoku/CellWriteModeInfo";
 import {
-    addFieldStateExToSudokuManager,
+    addGridStateExToSudokuManager,
     addGameStateExToSudokuManager,
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
-import { ScrewsFieldState } from "./ScrewsFieldState";
+import { ScrewsGridState } from "./ScrewsGridState";
 import { ScrewsGameClueState } from "./ScrewsGameClueState";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 import { comparer, IReactionDisposer, reaction } from "mobx";
@@ -32,8 +32,8 @@ export const ScrewsSudokuTypeManager = <T extends AnyPTM>(
     screwsImporter?: (puzzle: PuzzleDefinition<ScrewsPTM<T>>) => ScrewsImporterResult<T>,
 ): SudokuTypeManager<ScrewsPTM<T>> => ({
     ...addGameStateExToSudokuManager(
-        addFieldStateExToSudokuManager(baseTypeManager as unknown as SudokuTypeManager<ScrewsPTM<T>>, {
-            initialFieldStateExtension(puzzle): ScrewsFieldState {
+        addGridStateExToSudokuManager(baseTypeManager as unknown as SudokuTypeManager<ScrewsPTM<T>>, {
+            initialGridStateExtension(puzzle): ScrewsGridState {
                 return {
                     screwOffsets: puzzle?.extension?.screws.map(() => 0) ?? [],
                 };
@@ -77,7 +77,7 @@ export const ScrewsSudokuTypeManager = <T extends AnyPTM>(
                 reaction(
                     () => {
                         const {
-                            fieldExtension: { screwOffsets },
+                            gridExtension: { screwOffsets },
                             stateExtension: { screws: screwsAnimations },
                         } = context;
 

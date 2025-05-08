@@ -5,9 +5,9 @@ import {
     Position,
     PositionLiteral,
 } from "../../../../types/layout/Position";
-import { FieldSize } from "../../../../types/sudoku/FieldSize";
+import { GridSize } from "../../../../types/sudoku/GridSize";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { observer } from "mobx-react-lite";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
 import { profiler } from "../../../../utils/profiler";
@@ -23,7 +23,7 @@ export type OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType | Pos
 
 export const detectOutsideClueDirection = (
     startCellLiteral: PositionLiteral,
-    { rowsCount, columnsCount }: FieldSize,
+    { rowsCount, columnsCount }: GridSize,
     directionType: OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType.straight,
 ) => {
     let startCell = parsePositionLiteral(startCellLiteral);
@@ -61,13 +61,13 @@ export const detectOutsideClueDirection = (
 
 export const getLineCellsByOutsideCell = (
     startCellLiteral: PositionLiteral,
-    fieldSize: FieldSize,
+    gridSize: GridSize,
     directionLiteral: OutsideClueLineDirectionLiteral = OutsideClueLineDirectionType.straight,
 ) => {
-    const { rowsCount, columnsCount } = fieldSize;
+    const { rowsCount, columnsCount } = gridSize;
 
     let startCell = parsePositionLiteral(startCellLiteral);
-    const direction = detectOutsideClueDirection(startCellLiteral, fieldSize, directionLiteral);
+    const direction = detectOutsideClueDirection(startCellLiteral, gridSize, directionLiteral);
 
     const isInnerCell = (top: number, left: number) => top >= 0 && top < rowsCount && left >= 0 && left < columnsCount;
     if (!isInnerCell(startCell.top, startCell.left)) {
@@ -91,7 +91,7 @@ export interface OutsideClueProps {
 }
 
 export const OutsideClue: ConstraintPropsGenericFcMap<OutsideClueProps> = {
-    [FieldLayer.regular]: observer(function OutsideClue<T extends AnyPTM>({
+    [GridLayer.regular]: observer(function OutsideClue<T extends AnyPTM>({
         context: { puzzle },
         color,
         props: {
@@ -130,7 +130,7 @@ export const OutsideClue: ConstraintPropsGenericFcMap<OutsideClueProps> = {
 export const OutsideClueConstraint = <T extends AnyPTM>(
     name: string,
     clueCellLiteral: PositionLiteral,
-    cellLiteralsOrFieldSize: FieldSize | PositionLiteral[],
+    cellLiteralsOrFieldSize: GridSize | PositionLiteral[],
     value: number,
     color: string | undefined,
     isValidCell: (

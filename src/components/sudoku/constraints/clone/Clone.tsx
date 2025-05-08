@@ -1,5 +1,5 @@
 import { lightGreyColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { isSamePosition, parsePositionLiterals, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { AnyPTM } from "../../../../types/sudoku/PuzzleTypeMap";
@@ -8,7 +8,7 @@ import { profiler } from "../../../../utils/profiler";
 import { incrementArrayItem } from "../../../../utils/array";
 
 export const Clone: ConstraintPropsGenericFcMap = {
-    [FieldLayer.beforeSelection]: observer(function Clone<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function Clone<T extends AnyPTM>({
         cells,
         color = lightGreyColor,
     }: ConstraintProps<T>) {

@@ -1,5 +1,5 @@
 import { darkGreyColor } from "../../../app/globals";
-import { FieldLayer } from "../../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../../types/sudoku/GridLayer";
 import { parsePositionLiteral, PositionLiteral } from "../../../../types/layout/Position";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../../types/sudoku/Constraint";
 import { RegularCalculatorDigit } from "../../digit/CalculatorDigit";
@@ -13,7 +13,7 @@ interface FillableCalculatorDigitProps {
 }
 
 export const FillableCalculatorDigit: ConstraintPropsGenericFcMap<FillableCalculatorDigitProps> = {
-    [FieldLayer.beforeSelection]: observer(function FillableCalculatorDigit<T extends AnyPTM>({
+    [GridLayer.beforeSelection]: observer(function FillableCalculatorDigit<T extends AnyPTM>({
         context: { puzzle },
         cells: [{ left, top }],
         props: { digit },

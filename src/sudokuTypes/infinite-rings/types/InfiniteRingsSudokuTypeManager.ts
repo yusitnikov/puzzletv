@@ -7,7 +7,7 @@ import { Position } from "../../../types/layout/Position";
 import { Constraint } from "../../../types/sudoku/Constraint";
 import { indexes } from "../../../utils/indexes";
 import { RegionConstraint } from "../../../components/sudoku/constraints/region/Region";
-import { InfiniteRingsFieldControls } from "../components/InfiniteRingsFieldControls";
+import { InfiniteRingsGridControls } from "../components/InfiniteRingsGridControls";
 import { gameStateSetScaleLog, PartialGameStateEx } from "../../../types/sudoku/GameState";
 import { loop } from "../../../utils/math";
 import { InfiniteRingsBorderLinesConstraint } from "../components/InfiniteRingsBorderLines";
@@ -24,10 +24,10 @@ import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
  * - support killer cages
  */
 
-const coordsRingToPlain = (fieldSize: number, ring: number, index: number) =>
-    [ring, fieldSize / 2 - 1, fieldSize / 2, fieldSize - 1 - ring][index];
-const coordsPlainToRing = (fieldSize: number, { top, left }: Position) => {
-    const quadSize = fieldSize / 2;
+const coordsRingToPlain = (gridSize: number, ring: number, index: number) =>
+    [ring, gridSize / 2 - 1, gridSize / 2, gridSize - 1 - ring][index];
+const coordsPlainToRing = (gridSize: number, { top, left }: Position) => {
+    const quadSize = gridSize / 2;
     const getIndex = (x: number) => {
         if (x === quadSize - 1) {
             return 1;
@@ -38,7 +38,7 @@ const coordsPlainToRing = (fieldSize: number, { top, left }: Position) => {
         return x < quadSize ? 0 : 3;
     };
     return {
-        ring: Math.min(top, left, fieldSize - 1 - top, fieldSize - 1 - left),
+        ring: Math.min(top, left, gridSize - 1 - top, gridSize - 1 - left),
         top: getIndex(top),
         left: getIndex(left),
     };
@@ -56,19 +56,19 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         allowScale: true,
         isFreeScale: false,
         ignoreRowsColumnCountInTheWrapper: true,
-        fieldWrapperHandlesScale: true,
-        fieldControlsComponent: InfiniteRingsFieldControls(visibleRingsCountArg),
+        gridWrapperHandlesScale: true,
+        gridControlsComponent: InfiniteRingsGridControls(visibleRingsCountArg),
         controlButtons: [ZoomInButtonItem(), ZoomOutButtonItem()],
-        getCellTypeProps({ top, left }, { fieldSize: { rowsCount: fieldSize } }): CellTypeProps<T> {
-            const quadSize = fieldSize / 2;
+        getCellTypeProps({ top, left }, { gridSize: { rowsCount: gridSize } }): CellTypeProps<T> {
+            const quadSize = gridSize / 2;
             const ringsCount = quadSize - 1;
-            const { ring } = coordsPlainToRing(fieldSize, { top, left });
+            const { ring } = coordsPlainToRing(gridSize, { top, left });
             const isCenterTop = top === quadSize - 1 || top === quadSize;
             const isCenterLeft = left === quadSize - 1 || left === quadSize;
 
             return {
                 isVisible:
-                    (top === left || top + left === fieldSize - 1 || isCenterTop || isCenterLeft) &&
+                    (top === left || top + left === gridSize - 1 || isCenterTop || isCenterLeft) &&
                     !(isCenterTop && isCenterLeft),
                 isVisibleForState: (context) => {
                     const { animatedScaleLog: ringOffset } = context;
@@ -82,7 +82,7 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         processArrowDirection({ top, left }, xDirection, yDirection, context) {
             const {
                 puzzle: {
-                    fieldSize: { rowsCount: fieldSize },
+                    gridSize: { rowsCount: gridSize },
                 },
                 scaleLog,
             } = context;
@@ -90,12 +90,12 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
             const ringOffset = Math.round(scaleLog);
 
             const processRightArrow = (position: Position): { cell: Position; state?: PartialGameStateEx<T> } => {
-                const ringsCount = fieldSize / 2 - 1;
+                const ringsCount = gridSize / 2 - 1;
                 const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg)
                     ? ringsCount
                     : visibleRingsCountArg;
 
-                let { ring, top, left } = coordsPlainToRing(fieldSize, position);
+                let { ring, top, left } = coordsPlainToRing(gridSize, position);
 
                 let newRingOffset = ringOffset;
                 ring = loop(ring - ringOffset, ringsCount);
@@ -120,8 +120,8 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
 
                 return {
                     cell: {
-                        top: coordsRingToPlain(fieldSize, ring, top),
-                        left: coordsRingToPlain(fieldSize, ring, left),
+                        top: coordsRingToPlain(gridSize, ring, top),
+                        left: coordsRingToPlain(gridSize, ring, left),
                     },
                     state: gameStateSetScaleLog<T>(newRingOffset, false)(context),
                 };
@@ -136,8 +136,8 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                     const {
                         cell: { top: newTop, left: newLeft },
                         state,
-                    } = processRightArrow({ top, left: fieldSize - 1 - left });
-                    return { cell: { top: newTop, left: fieldSize - 1 - newLeft }, state };
+                    } = processRightArrow({ top, left: gridSize - 1 - left });
+                    return { cell: { top: newTop, left: gridSize - 1 - newLeft }, state };
                 }
             } else {
                 const processDownArrow = ({ top, left }: Position) => {
@@ -158,19 +158,19 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
                     const {
                         cell: { top: newTop, left: newLeft },
                         state,
-                    } = processDownArrow({ top: fieldSize - 1 - top, left });
-                    return { cell: { top: fieldSize - 1 - newTop, left: newLeft }, state };
+                    } = processDownArrow({ top: gridSize - 1 - top, left });
+                    return { cell: { top: gridSize - 1 - newTop, left: newLeft }, state };
                 }
             }
         },
         transformCoords({ top, left }, context): Position {
             const {
                 puzzle: {
-                    fieldSize: { rowsCount: fieldSize },
+                    gridSize: { rowsCount: gridSize },
                 },
                 animatedScaleLog: ringOffset,
             } = context;
-            const ringsCount = fieldSize / 2 - 1;
+            const ringsCount = gridSize / 2 - 1;
             const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg)
                 ? ringsCount
                 : visibleRingsCountArg;
@@ -197,11 +197,11 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
         },
         getRegionsWithSameCoordsTransformation({
             puzzle: {
-                fieldSize: { rowsCount: fieldSize },
+                gridSize: { rowsCount: gridSize },
             },
             animatedScaleLog: ringOffset,
         }): GridRegion[] {
-            const ringsCount = fieldSize / 2 - 1;
+            const ringsCount = gridSize / 2 - 1;
             const loopedRingOffset = loop(ringOffset, ringsCount);
             const scaleCoeff = Math.pow(2, loopedRingOffset);
             const unscaleCoeff = Math.pow(2, ringsCount);
@@ -230,17 +230,17 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
             ];
         },
         postProcessPuzzle(puzzle): PuzzleDefinition<T> {
-            const fieldSize = puzzle.fieldSize.rowsCount;
-            const quadSize = fieldSize / 2;
+            const gridSize = puzzle.gridSize.rowsCount;
+            const quadSize = gridSize / 2;
             const ringsCount = quadSize - 1;
             const customCellBounds: GivenDigitsMap<CustomCellBounds> = {};
             for (let ring = 0; ring < ringsCount; ring++) {
                 const scale = Math.pow(0.5, ring);
                 const offset = 2 * (1 - scale);
                 for (let top = 0; top < 4; top++) {
-                    const topIndex = coordsRingToPlain(fieldSize, ring, top);
+                    const topIndex = coordsRingToPlain(gridSize, ring, top);
                     for (let left = 0; left < 4; left++) {
-                        const leftIndex = coordsRingToPlain(fieldSize, ring, left);
+                        const leftIndex = coordsRingToPlain(gridSize, ring, left);
                         if ([0, 3].includes(top) || [0, 3].includes(left)) {
                             const cellRect: Rect = {
                                 top: offset + top * scale,
@@ -261,36 +261,36 @@ export const InfiniteSudokuTypeManager = <T extends AnyPTM>(
             return {
                 ...puzzle,
                 digitsCount: visibleRingsCountArg * 3,
-                fieldSize: {
-                    ...puzzle.fieldSize,
-                    fieldSize: 4,
+                gridSize: {
+                    ...puzzle.gridSize,
+                    gridSize: 4,
                 },
                 regions: [],
                 customCellBounds,
                 allowDrawing: puzzle.allowDrawing?.filter((type) => ["center-mark"].includes(type)),
             };
         },
-        fixCellPosition(position, { fieldSize: { rowsCount: fieldSize } }): Position | undefined {
-            const { ring, top, left } = coordsPlainToRing(fieldSize, position);
+        fixCellPosition(position, { gridSize: { rowsCount: gridSize } }): Position | undefined {
+            const { ring, top, left } = coordsPlainToRing(gridSize, position);
             return {
-                top: coordsRingToPlain(fieldSize, ring, top),
-                left: coordsRingToPlain(fieldSize, ring, left),
+                top: coordsRingToPlain(gridSize, ring, top),
+                left: coordsRingToPlain(gridSize, ring, left),
             };
         },
         getRegionsForRowsAndColumns({
             puzzle: {
-                fieldSize: { rowsCount: fieldSize },
+                gridSize: { rowsCount: gridSize },
             },
         }): Constraint<T, any>[] {
-            const quadsCount = fieldSize / 2 - 1;
+            const quadsCount = gridSize / 2 - 1;
             return indexes(quadsCount).flatMap((outerRing) => {
                 const createRegion = (cells: (Position & { ring: number })[]) =>
                     RegionConstraint<T>(
                         cells.map(({ ring: ringOffset, top, left }) => {
                             const ring = loop(outerRing + ringOffset, quadsCount);
                             return {
-                                top: coordsRingToPlain(fieldSize, ring, top),
-                                left: coordsRingToPlain(fieldSize, ring, left),
+                                top: coordsRingToPlain(gridSize, ring, top),
+                                left: coordsRingToPlain(gridSize, ring, left),
                             };
                         }),
                         false,

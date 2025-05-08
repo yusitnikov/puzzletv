@@ -11,7 +11,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { ScrewsPTM } from "./ScrewsPTM";
 import { Screw } from "./ScrewsPuzzleExtension";
 import { GameStateActionCallback } from "../../../types/sudoku/GameStateAction";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import {
     ControlButtonItemProps,
     ControlButtonItemPropsGenericFc,
@@ -90,7 +90,7 @@ export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeIn
             const { id, state: startContext } = gesture;
             const { puzzle, cellSize } = context;
             const {
-                fieldSize: { rowsCount },
+                gridSize: { rowsCount },
             } = puzzle;
 
             if (!puzzle.extension) {
@@ -170,15 +170,15 @@ export const screwStateChangeAction =
             stateExtension: { screws: screwStates },
         } = context;
 
-        const startScrewOffset = startContext?.fieldExtension.screwOffsets;
+        const startScrewOffset = startContext?.gridExtension.screwOffsets;
 
         return {
-            fieldStateHistory: fieldStateHistoryAddState(
+            gridStateHistory: gridStateHistoryAddState(
                 context,
                 clientId,
                 actionId,
-                ({ extension: { screwOffsets, ...fieldExtension }, ...fieldState }) => ({
-                    ...fieldState,
+                ({ extension: { screwOffsets, ...fieldExtension }, ...gridState }) => ({
+                    ...gridState,
                     extension: {
                         ...fieldExtension,
                         screwOffsets: [

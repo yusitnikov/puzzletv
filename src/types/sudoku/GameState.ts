@@ -1,15 +1,15 @@
-import { FieldStateHistory, fieldStateHistoryAddState } from "./FieldStateHistory";
+import { GridStateHistory, gridStateHistoryAddState } from "./GridStateHistory";
 import { CellWriteMode } from "./CellWriteMode";
 import { getAllowedCellWriteModeInfos } from "./CellWriteModeInfo";
 import { CellState, CellStateEx } from "./CellState";
 import {
-    areAllFieldStateCells,
-    createEmptyFieldState,
-    isAnyFieldStateCell,
-    processFieldStateCells,
-    serializeFieldState,
-    unserializeFieldState,
-} from "./FieldState";
+    areAllGridStateCells,
+    createEmptyGridState,
+    isAnyGridStateCell,
+    processGridStateCells,
+    serializeGridState,
+    unserializeGridState,
+} from "./GridState";
 import { indexes } from "../../utils/indexes";
 import { emptyPosition, isSameLine, isSamePosition, Position, PositionSet } from "../layout/Position";
 import { defaultProcessArrowDirection } from "./SudokuTypeManager";
@@ -51,7 +51,7 @@ import { GameStateActionCallback, GameStateActionOrCallback } from "./GameStateA
 import { getRectCenter, Rect } from "../layout/Rect";
 
 export interface GameState<T extends AnyPTM> {
-    fieldStateHistory: FieldStateHistory<T>;
+    gridStateHistory: GridStateHistory<T>;
     persistentCellWriteMode: CellWriteMode;
     gestureCellWriteMode?: CellWriteMode;
 
@@ -77,7 +77,7 @@ export interface GameState<T extends AnyPTM> {
 
     lives: number;
 
-    fogDemoFieldStateHistory?: FieldStateHistory<T>;
+    fogDemoGridStateHistory?: GridStateHistory<T>;
 
     currentPlayer?: string;
     playerObjects: Record<string, PlayerObjectInfo>;
@@ -120,7 +120,7 @@ export const mergeGameStateWithUpdates = <T extends AnyPTM>(
 // region Serialization & empty state
 type SavedGameStates = [
     key: string,
-    field: any,
+    grid: any,
     state: any,
     initialDigits: any,
     excludedDigits: any,
@@ -173,14 +173,14 @@ export const getEmptyGameState = <T extends AnyPTM>(
             : getSavedGameStates().find(([key]) => key === fullSaveStateKey);
 
     return {
-        fieldStateHistory: new FieldStateHistory(
+        gridStateHistory: new GridStateHistory(
             puzzle,
             [
                 JSON.stringify(
-                    serializeFieldState(
+                    serializeGridState(
                         savedGameState
-                            ? { ...unserializeFieldState(savedGameState[1], puzzle), actionId: "" }
-                            : createEmptyFieldState(puzzle),
+                            ? { ...unserializeGridState(savedGameState[1], puzzle), actionId: "" }
+                            : createEmptyGridState(puzzle),
                         puzzle,
                     ),
                 ),
@@ -198,8 +198,8 @@ export const getEmptyGameState = <T extends AnyPTM>(
             ? unserializeGivenDigitsMap(savedGameState[4], (excludedDigits: any) =>
                   CellDataSet.unserialize(puzzle, excludedDigits),
               )
-            : indexes(puzzle.fieldSize.rowsCount).map(() =>
-                  indexes(puzzle.fieldSize.columnsCount).map(() => new CellDataSet(puzzle)),
+            : indexes(puzzle.gridSize.rowsCount).map(() =>
+                  indexes(puzzle.gridSize.columnsCount).map(() => new CellDataSet(puzzle)),
               ),
 
         currentMultiLine: [],
@@ -215,7 +215,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
 
         lives: savedGameState?.[9] ?? initialLives,
 
-        fogDemoFieldStateHistory: undefined,
+        fogDemoGridStateHistory: undefined,
 
         currentPlayer: savedGameState?.[6] || params.host,
         playerObjects: savedGameState?.[8] || {},
@@ -236,7 +236,7 @@ export const saveGameState = <T extends AnyPTM>(context: PuzzleContext<T>): void
 
     const {
         puzzle,
-        currentFieldStateWithFogDemo,
+        currentGridStateWithFogDemo,
         stateExtension,
         stateInitialDigits,
         excludedDigits,
@@ -258,7 +258,7 @@ export const saveGameState = <T extends AnyPTM>(context: PuzzleContext<T>): void
             [
                 [
                     fullSaveStateKey,
-                    serializeFieldState(currentFieldStateWithFogDemo, puzzle),
+                    serializeGridState(currentGridStateWithFogDemo, puzzle),
                     puzzle.typeManager.serializeGameState?.(stateExtension) ?? stateExtension,
                     serializeGivenDigitsMap(stateInitialDigits, puzzle.typeManager.serializeCellData),
                     serializeGivenDigitsMap(excludedDigits, (excludedDigits) => excludedDigits.serialize()),
@@ -282,10 +282,10 @@ export const saveGameState = <T extends AnyPTM>(context: PuzzleContext<T>): void
 export const getAllShareState = <T extends AnyPTM>({ puzzle, myGameState }: PuzzleContext<T>): any => {
     const { typeManager } = puzzle;
     const { getSharedState, serializeCellData } = typeManager;
-    const { fieldStateHistory, initialDigits, excludedDigits, lives, extension } = myGameState;
+    const { gridStateHistory, initialDigits, excludedDigits, lives, extension } = myGameState;
 
     return {
-        field: serializeFieldState(fieldStateHistory.current, puzzle),
+        grid: serializeGridState(gridStateHistory.current, puzzle),
         extension: typeManager.serializeGameState?.(extension) ?? extension,
         initialDigits: serializeGivenDigitsMap(initialDigits, serializeCellData),
         excludedDigits: serializeGivenDigitsMap(excludedDigits, (item) => item.serialize()),
@@ -296,15 +296,15 @@ export const getAllShareState = <T extends AnyPTM>({ puzzle, myGameState }: Puzz
 export const setAllShareState = <T extends AnyPTM>(context: PuzzleContext<T>, newState: any): GameStateEx<T> => {
     const { typeManager } = context.puzzle;
     const { setSharedState, unserializeGameState, unserializeCellData } = typeManager;
-    const { field, extension, initialDigits, excludedDigits, lives } = newState;
-    const unserializedFieldState = unserializeFieldState(field, context.puzzle);
+    const { grid, extension, initialDigits, excludedDigits, lives } = newState;
+    const unserializedGridState = unserializeGridState(grid, context.puzzle);
 
     const result: GameStateEx<T> = mergeGameStateWithUpdates(context.state, {
-        fieldStateHistory: fieldStateHistoryAddState(
+        gridStateHistory: gridStateHistoryAddState(
             context,
-            unserializedFieldState.clientId,
-            unserializedFieldState.actionId,
-            unserializedFieldState,
+            unserializedGridState.clientId,
+            unserializedGridState.actionId,
+            unserializedGridState,
         ),
         initialDigits: unserializeGivenDigitsMap(initialDigits, unserializeCellData),
         excludedDigits: unserializeGivenDigitsMap(excludedDigits, (item) =>
@@ -322,15 +322,14 @@ export const areSameGameStates = <T extends AnyPTM>(
     state1: GameStateEx<T>,
     state2: GameStateEx<T>,
 ) => {
-    if (!state1.fieldStateHistory.equals(state2.fieldStateHistory)) {
+    if (!state1.gridStateHistory.equals(state2.gridStateHistory)) {
         return false;
     }
 
     if (
-        state1.fogDemoFieldStateHistory
-            ? !state2.fogDemoFieldStateHistory ||
-              !state1.fogDemoFieldStateHistory.equals(state2.fogDemoFieldStateHistory)
-            : state2.fogDemoFieldStateHistory
+        state1.fogDemoGridStateHistory
+            ? !state2.fogDemoGridStateHistory || !state1.fogDemoGridStateHistory.equals(state2.fogDemoGridStateHistory)
+            : state2.fogDemoGridStateHistory
     ) {
         return false;
     }
@@ -450,32 +449,32 @@ export const gameStateGetCurrentGivenDigitsByCells = <T extends AnyPTM>(cells: C
     return result;
 };
 
-export const gameStateUndo = <T extends AnyPTM>({ fieldStateHistory }: PuzzleContext<T>): PartialGameStateEx<T> => ({
-    fieldStateHistory: fieldStateHistory.undo(),
+export const gameStateUndo = <T extends AnyPTM>({ gridStateHistory }: PuzzleContext<T>): PartialGameStateEx<T> => ({
+    gridStateHistory: gridStateHistory.undo(),
 });
 
-export const gameStateRedo = <T extends AnyPTM>({ fieldStateHistory }: PuzzleContext<T>): PartialGameStateEx<T> => ({
-    fieldStateHistory: fieldStateHistory.redo(),
+export const gameStateRedo = <T extends AnyPTM>({ gridStateHistory }: PuzzleContext<T>): PartialGameStateEx<T> => ({
+    gridStateHistory: gridStateHistory.redo(),
 });
 
 export const gameStateSeekHistory = <T extends AnyPTM>(
-    { fieldStateHistory }: PuzzleContext<T>,
+    { gridStateHistory }: PuzzleContext<T>,
     index: number,
 ): PartialGameStateEx<T> => ({
-    fieldStateHistory: fieldStateHistory.seek(index),
+    gridStateHistory: gridStateHistory.seek(index),
 });
 // endregion
 
 // region Selected cells
 export const gameStateAreAllSelectedCells = <T extends AnyPTM>(
-    { allSelectedCells, currentFieldState }: PuzzleContext<T>,
+    { allSelectedCells, currentGridState }: PuzzleContext<T>,
     predicate: (cellState: CellState<T>, position: Position) => boolean,
-) => areAllFieldStateCells(currentFieldState, allSelectedCells.items, predicate);
+) => areAllGridStateCells(currentGridState, allSelectedCells.items, predicate);
 
 export const gameStateIsAnySelectedCell = <T extends AnyPTM>(
-    { allSelectedCells, currentFieldState }: PuzzleContext<T>,
+    { allSelectedCells, currentGridState }: PuzzleContext<T>,
     predicate: (cellState: CellState<T>, position: Position) => boolean,
-) => isAnyFieldStateCell(currentFieldState, allSelectedCells.items, predicate);
+) => isAnyGridStateCell(currentGridState, allSelectedCells.items, predicate);
 
 export const gameStateAddSelectedCell = <T extends AnyPTM>(
     context: PuzzleContext<T>,
@@ -515,7 +514,7 @@ export const gameStateHandleCellDoubleClick = <T extends AnyPTM>(
 ): GameStateActionOrCallback<any, T> => {
     const { puzzle, allInitialDigits } = context;
     const {
-        fieldSize: { rowsCount, columnsCount },
+        gridSize: { rowsCount, columnsCount },
         typeManager: { areSameCellData },
     } = puzzle;
 
@@ -556,7 +555,7 @@ export const gameStateSelectAllCells = <T extends AnyPTM>(context: PuzzleContext
     const {
         puzzleIndex,
         puzzle: {
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
         },
     } = context;
 
@@ -588,7 +587,7 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
 
     const {
         typeManager: { processArrowDirection = defaultProcessArrowDirection, applyArrowProcessorToNoCell },
-        fieldSize,
+        gridSize,
         loopHorizontally,
         loopVertically,
     } = puzzle;
@@ -622,9 +621,9 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
 
     // TODO: support moving and scaling for non-looping puzzles
     if (loopHorizontally) {
-        const left = loop(newCell.left + loopOffset.left + 0.5, fieldSize.columnsCount) - 0.5;
+        const left = loop(newCell.left + loopOffset.left + 0.5, gridSize.columnsCount) - 0.5;
         const min = 1;
-        const max = fieldSize.columnsCount - 1 - min;
+        const max = gridSize.columnsCount - 1 - min;
         if (left < min) {
             loopOffset = {
                 ...loopOffset,
@@ -639,9 +638,9 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
     }
 
     if (loopVertically) {
-        const top = loop(newCell.top + loopOffset.top + 0.5, fieldSize.rowsCount) - 0.5;
+        const top = loop(newCell.top + loopOffset.top + 0.5, gridSize.rowsCount) - 0.5;
         const min = 1;
-        const max = fieldSize.rowsCount - 1 - min;
+        const max = gridSize.rowsCount - 1 - min;
         if (top < min) {
             loopOffset = {
                 ...loopOffset,
@@ -667,16 +666,16 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     clientId: string,
     actionId: string,
-    fieldStateProcessor: (cellState: CellStateEx<T>, position: Position) => Partial<CellStateEx<T>>,
+    gridStateProcessor: (cellState: CellStateEx<T>, position: Position) => Partial<CellStateEx<T>>,
 ): PartialGameStateEx<T> => {
     const selectedCells = context.selectedCells.items;
 
-    let { fieldStateHistory, stateInitialDigits = {}, excludedDigits = {}, playerObjects } = context;
+    let { gridStateHistory, stateInitialDigits = {}, excludedDigits = {}, playerObjects } = context;
 
     for (const position of selectedCells) {
         const { top, left } = position;
 
-        const newState = fieldStateProcessor(
+        const newState = gridStateProcessor(
             {
                 ...context.getCell(top, left),
                 initialDigit: stateInitialDigits?.[top]?.[left],
@@ -731,9 +730,9 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
     }
 
     if (!context.cellWriteModeInfo.isNoSelectionMode) {
-        fieldStateHistory = fieldStateHistoryAddState(context, clientId, actionId, (fieldState) =>
-            processFieldStateCells(fieldState, selectedCells, (cellState, position) => {
-                const { initialDigit, excludedDigits, ...cellStateUpdates } = fieldStateProcessor(
+        gridStateHistory = gridStateHistoryAddState(context, clientId, actionId, (gridState) =>
+            processGridStateCells(gridState, selectedCells, (cellState, position) => {
+                const { initialDigit, excludedDigits, ...cellStateUpdates } = gridStateProcessor(
                     {
                         ...cellState,
                         initialDigit: context.stateInitialDigits?.[position.top]?.[position.left],
@@ -751,7 +750,7 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
     }
 
     return {
-        fieldStateHistory,
+        gridStateHistory: gridStateHistory,
         initialDigits: stateInitialDigits,
         excludedDigits,
         playerObjects,
@@ -982,11 +981,11 @@ export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
 
 // region Drawing
 export const gameStateNormalizeLoopOffset = <T extends AnyPTM>(
-    { fieldSize: { rowsCount, columnsCount }, fieldMargin = 0, loopHorizontally, loopVertically }: PuzzleDefinition<T>,
+    { gridSize: { rowsCount, columnsCount }, gridMargin = 0, loopHorizontally, loopVertically }: PuzzleDefinition<T>,
     { left, top }: Position,
 ): Position => ({
-    left: loopHorizontally ? loop(left + fieldMargin, columnsCount) - fieldMargin : left,
-    top: loopVertically ? loop(top + fieldMargin, rowsCount) - fieldMargin : top,
+    left: loopHorizontally ? loop(left + gridMargin, columnsCount) - gridMargin : left,
+    top: loopVertically ? loop(top + gridMargin, rowsCount) - gridMargin : top,
 });
 
 export const gameStateResetCurrentMultiLine = <T extends AnyPTM>(): PartialGameStateEx<T> => ({
@@ -1012,8 +1011,8 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
 
     if (isGlobal) {
         return {
-            fieldStateHistory: fieldStateHistoryAddState(context, clientId, actionId, (fieldState) => {
-                let { marks } = fieldState;
+            gridStateHistory: gridStateHistoryAddState(context, clientId, actionId, (gridState) => {
+                let { marks } = gridState;
 
                 if (isClick && context.dragStartPoint) {
                     const { type, round } = context.dragStartPoint;
@@ -1050,8 +1049,8 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
                 }
 
                 return {
-                    ...fieldState,
-                    lines: fieldState.lines.toggleAll(
+                    ...gridState,
+                    lines: gridState.lines.toggleAll(
                         context.currentMultiLine,
                         context.dragAction === DragAction.SetTrue,
                     ),
@@ -1073,10 +1072,10 @@ export const gameStateDeleteAllLines = <T extends AnyPTM>(
     clientId: string,
     actionId: string,
 ): PartialGameStateEx<T> => ({
-    fieldStateHistory: fieldStateHistoryAddState(context, clientId, actionId, (fieldState) => ({
-        ...fieldState,
-        lines: fieldState.lines.clear(),
-        marks: fieldState.marks.clear().bulkAdd(context.puzzle.initialCellMarks ?? []),
+    gridStateHistory: gridStateHistoryAddState(context, clientId, actionId, (gridState) => ({
+        ...gridState,
+        lines: gridState.lines.clear(),
+        marks: gridState.marks.clear().bulkAdd(context.puzzle.initialCellMarks ?? []),
     })),
 });
 
@@ -1158,8 +1157,8 @@ export const gameStateSetCellMark = <T extends AnyPTM>(
     color: CellColorValue = CellColor.black,
 ): PartialGameStateEx<T> => {
     return {
-        fieldStateHistory: fieldStateHistoryAddState(context, clientId, actionId, (fieldState) => {
-            const { marks } = fieldState;
+        gridStateHistory: gridStateHistoryAddState(context, clientId, actionId, (gridState) => {
+            const { marks } = gridState;
 
             const mark: CellMark = {
                 type: cellMarkType ?? CellMarkType.Any,
@@ -1169,7 +1168,7 @@ export const gameStateSetCellMark = <T extends AnyPTM>(
             };
 
             return {
-                ...fieldState,
+                ...gridState,
                 marks: (cellMarkType ? marks.add(mark) : marks.remove(mark)).bulkAdd(
                     context.puzzle.initialCellMarks ?? [],
                 ),
@@ -1204,8 +1203,8 @@ export const gameStateApplyShading = <T extends AnyPTM>(
     }
 
     return {
-        fieldStateHistory: fieldStateHistoryAddState(context, clientId, actionId, (fieldState) =>
-            processFieldStateCells(fieldState, [position], (cellState) => {
+        gridStateHistory: gridStateHistoryAddState(context, clientId, actionId, (gridState) =>
+            processGridStateCells(gridState, [position], (cellState) => {
                 return {
                     ...cellState,
                     colors: cellState.colors
@@ -1237,7 +1236,7 @@ export const gameStateSetScaleLog =
     });
 // endregion
 
-export const gameStateApplyFieldDragGesture = <T extends AnyPTM>(
+export const gameStateApplyGridDragGesture = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     startContext: PuzzleContext<T> | undefined,
     prevMetrics: GestureMetrics,
@@ -1303,7 +1302,7 @@ export const gameStateHandleZoomClick = <T extends AnyPTM>(context: PuzzleContex
         },
     } = context;
 
-    return gameStateApplyFieldDragGesture(
+    return gameStateApplyGridDragGesture(
         context,
         undefined,
         emptyGestureMetrics,
@@ -1313,17 +1312,17 @@ export const gameStateHandleZoomClick = <T extends AnyPTM>(context: PuzzleContex
     );
 };
 
-export const gameStateFocusRect = <T extends AnyPTM>(context: PuzzleContext<T>, rect: Rect, fieldRect: Rect) => {
+export const gameStateFocusRect = <T extends AnyPTM>(context: PuzzleContext<T>, rect: Rect, gridRect: Rect) => {
     const {
         puzzle: {
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
         },
         cellSize,
     } = context;
 
     const center = getRectCenter(rect);
 
-    gameStateApplyFieldDragGesture(
+    gameStateApplyGridDragGesture(
         context,
         undefined,
         // Drag from the desired rect's corners
@@ -1343,10 +1342,10 @@ export const gameStateFocusRect = <T extends AnyPTM>(context: PuzzleContext<T>, 
             ),
             scale: (Math.max(rect.width, rect.height) * Math.SQRT2 + 1) * context.scale,
         },
-        // Drag to the field rect corners
+        // Drag to the grid rect corners
         {
             ...emptyGestureMetrics,
-            scale: Math.hypot(fieldRect.width, fieldRect.height) / cellSize,
+            scale: Math.hypot(gridRect.width, gridRect.height) / cellSize,
         },
         true,
         true,

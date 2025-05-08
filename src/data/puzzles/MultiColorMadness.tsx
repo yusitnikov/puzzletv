@@ -1,5 +1,5 @@
 import { PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
-import { FieldSize9, Regions9 } from "../../types/sudoku/FieldSize";
+import { GridSize9, Regions9 } from "../../types/sudoku/GridSize";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { DigitSudokuTypeManager } from "../../sudokuTypes/default/types/DigitSudokuTypeManager";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
@@ -42,7 +42,7 @@ export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
         </>
     ),
     typeManager: DigitSudokuTypeManager(),
-    fieldSize: FieldSize9,
+    gridSize: GridSize9,
     regions: Regions9,
     items: [
         AntiKnightConstraint(),
@@ -62,7 +62,7 @@ export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     ],
     loopHorizontally: true,
     loopVertically: true,
-    fieldMargin: 0.99,
+    gridMargin: 0.99,
     resultChecker: isValidFinishedPuzzleByConstraints,
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=0008A2",
     getLmdSolutionCode: (context) =>

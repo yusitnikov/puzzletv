@@ -1,6 +1,6 @@
 import { allDrawingModes, PuzzleDefinition } from "../../types/sudoku/PuzzleDefinition";
 import { RulesParagraph } from "../../components/sudoku/rules/RulesParagraph";
-import { FieldSize8, Regions6, Regions8 } from "../../types/sudoku/FieldSize";
+import { GridSize8, Regions6, Regions8 } from "../../types/sudoku/GridSize";
 import { ChessSudokuTypeManager } from "../../sudokuTypes/chess/types/ChessSudokuTypeManager";
 import { chessInitialPiecesByCellNames } from "../../sudokuTypes/chess/utils/chessCoords";
 import { ChessPieceType } from "../../sudokuTypes/chess/types/ChessPieceType";
@@ -116,9 +116,9 @@ export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
         </>
     ),
     typeManager: ChessSudokuTypeManager,
-    fieldSize: FieldSize8,
+    gridSize: GridSize8,
     regions: Regions8,
-    fieldMargin: chessBoardIndexesMargin,
+    gridMargin: chessBoardIndexesMargin,
     initialDigits: chessInitialPiecesByCellNames({
         h8: { color: ChessColor.black, type: ChessPieceType.rook },
         b1: { color: ChessColor.black, type: ChessPieceType.rook },
@@ -229,14 +229,14 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
         </>
     ),
     typeManager: ChessSudokuTypeManager,
-    fieldSize: FieldSize8,
+    gridSize: GridSize8,
     regions: Regions6.map((region) =>
         region.map(({ top, left }) => ({
             top: top + 1,
             left: left + 1,
         })),
     ),
-    fieldMargin: chessBoardIndexesMargin,
+    gridMargin: chessBoardIndexesMargin,
     initialDigits: chessInitialPiecesByCellNames({
         g7: { color: ChessColor.black, type: ChessPieceType.king },
         c5: { color: ChessColor.white, type: ChessPieceType.king },
@@ -314,9 +314,9 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
         </>
     ),
     typeManager: ChessSudokuTypeManager,
-    fieldSize: FieldSize8,
+    gridSize: GridSize8,
     regions: Regions8,
-    fieldMargin: chessBoardIndexesMargin,
+    gridMargin: chessBoardIndexesMargin,
     initialDigits: chessInitialPiecesByCellNames({
         a8: { color: ChessColor.black, type: ChessPieceType.rook },
         a7: { color: ChessColor.black, type: ChessPieceType.king },

@@ -26,7 +26,7 @@ import { GivenDigitsMap } from "./GivenDigitsMap";
 import { ColorsImportMode, PuzzleImportOptions } from "./PuzzleImportOptions";
 import { PuzzleImporter } from "../../data/puzzles/PuzzleImporter";
 import { GridParser } from "../../data/puzzles/GridParser";
-import { FieldState } from "./FieldState";
+import { GridState } from "./GridState";
 import { PuzzleLine } from "./PuzzleLine";
 
 export interface SudokuTypeManager<T extends AnyPTM> {
@@ -66,13 +66,13 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     unserializeGameState?(data: any): Partial<T["stateEx"]>;
 
-    serializeFieldStateExtension?(data: Partial<T["fieldStateEx"]>): any;
+    serializeGridStateExtension?(data: Partial<T["gridStateEx"]>): any;
 
-    unserializeFieldStateExtension?(data: any): Partial<T["fieldStateEx"]>;
+    unserializeGridStateExtension?(data: any): Partial<T["gridStateEx"]>;
 
-    cloneFieldStateExtension?(data: T["fieldStateEx"]): T["fieldStateEx"];
+    cloneGridStateExtension?(data: T["gridStateEx"]): T["gridStateEx"];
 
-    areFieldStateExtensionsEqual?(a: T["fieldStateEx"], b: T["fieldStateEx"]): boolean;
+    areGridStateExtensionsEqual?(a: T["gridStateEx"], b: T["gridStateEx"]): boolean;
 
     createCellDataByDisplayDigit(digit: number, context: PuzzleContext<T>): T["cell"];
 
@@ -135,7 +135,7 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     initialGameStateExtension?: T["stateEx"] | ((puzzle: PuzzleDefinition<T>) => T["stateEx"]);
 
-    initialFieldStateExtension?: T["fieldStateEx"] | ((puzzle: PuzzleDefinition<T>) => T["fieldStateEx"]);
+    initialGridStateExtension?: T["gridStateEx"] | ((puzzle: PuzzleDefinition<T>) => T["gridStateEx"]);
 
     allowMove?: boolean;
     initialPosition?: Position;
@@ -150,12 +150,12 @@ export interface SudokuTypeManager<T extends AnyPTM> {
     scaleStep?: number;
     allowScale?: boolean;
     isFreeScale?: boolean;
-    fieldWrapperHandlesScale?: boolean;
+    gridWrapperHandlesScale?: boolean;
 
     gridBackgroundColor?: string;
     regionBackgroundColor?: string;
 
-    modifyInitialFieldState?(fieldState: FieldState<T>): FieldState<T>;
+    modifyInitialGridState?(gridState: GridState<T>): GridState<T>;
     keepStateOnRestart?(context: PuzzleContext<T>): PartialGameStateEx<T>;
 
     saveStateKeySuffix?: string;
@@ -275,13 +275,13 @@ export interface SudokuTypeManager<T extends AnyPTM> {
 
     onCloseCorrectResultPopup?(context: PuzzleContext<T>): void;
 
-    fieldWrapperComponent?: ComponentType<PuzzleContextProps<T>>;
+    gridWrapperComponent?: ComponentType<PuzzleContextProps<T>>;
 
-    fieldFitsWrapper?: boolean;
+    gridFitsWrapper?: boolean;
 
     ignoreRowsColumnCountInTheWrapper?: boolean;
 
-    fieldControlsComponent?: ComponentType<PuzzleContextProps<T>>;
+    gridControlsComponent?: ComponentType<PuzzleContextProps<T>>;
 
     getInitialDigits?: (context: PuzzleContext<T>) => GivenDigitsMap<T["cell"]>;
 
@@ -301,7 +301,7 @@ export const defaultProcessArrowDirectionForRegularCellBounds = <T extends AnyPT
     {
         puzzleIndex,
         puzzle: {
-            fieldSize: { rowsCount, columnsCount },
+            gridSize: { rowsCount, columnsCount },
         },
     }: PuzzleContext<T>,
 ): { cell?: Position; state?: undefined } => {

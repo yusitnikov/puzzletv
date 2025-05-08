@@ -16,20 +16,20 @@ import { Gift } from "@emotion-icons/fluentui-system-filled";
 import { Modal } from "../../../components/layout/modal/Modal";
 import { arrayContainsPosition, Position } from "../../../types/layout/Position";
 import { cancelOutsideClickProps } from "../../../utils/gestures";
-import { fieldFireworksController } from "../../../components/sudoku/field/FieldFireworks";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridFireworksController } from "../../../components/sudoku/grid/GridFireworks";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { getNextActionId } from "../../../types/sudoku/GameStateAction";
 import { GivenDigitsMap } from "../../../types/sudoku/GivenDigitsMap";
-import { addFieldStateExToSudokuManager } from "../../../types/sudoku/SudokuTypeManagerPlugin";
+import { addGridStateExToSudokuManager } from "../../../types/sudoku/SudokuTypeManagerPlugin";
 import { translate } from "../../../utils/translate";
 
 export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
     baseTypeManager: SudokuTypeManager<any> = DigitSudokuTypeManager(),
     giftsInSight = false,
 ): SudokuTypeManager<T> => ({
-    ...addFieldStateExToSudokuManager(baseTypeManager, {
-        initialFieldStateExtension: {
+    ...addGridStateExToSudokuManager(baseTypeManager, {
+        initialGridStateExtension: {
             giftsCount: 0,
             giftedCells: [],
         },
@@ -42,11 +42,11 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
 
         const {
             puzzle: {
-                fieldSize: { rowsCount, columnsCount },
+                gridSize: { rowsCount, columnsCount },
                 typeManager: { getDigitByCellData },
             },
             cellSizeForSidePanel: cellSize,
-            currentFieldState: {
+            currentGridState: {
                 extension: { giftsCount },
             },
         } = context;
@@ -192,7 +192,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                                 cellSize={cellSize}
                                 onClick={() => {
                                     context.onStateChange((prev) => ({
-                                        fieldStateHistory: fieldStateHistoryAddState(
+                                        gridStateHistory: gridStateHistoryAddState(
                                             prev,
                                             myClientId,
                                             getNextActionId(),
@@ -233,7 +233,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
     getReactions(context): IReactionDisposer[] {
         const {
             puzzle: {
-                fieldSize: { rowsCount, columnsCount },
+                gridSize: { rowsCount, columnsCount },
                 solution,
             },
         } = context;
@@ -255,14 +255,14 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
 
         return [
             reaction(
-                () => getThreesCount.get() - context.currentFieldState.extension.giftedCells.length,
+                () => getThreesCount.get() - context.currentGridState.extension.giftedCells.length,
                 (giftsCount) => {
-                    if (context.currentFieldState.extension.giftsCount !== giftsCount) {
+                    if (context.currentGridState.extension.giftsCount !== giftsCount) {
                         context.onStateChange((prev) => ({
-                            fieldStateHistory: fieldStateHistoryAddState(
+                            gridStateHistory: gridStateHistoryAddState(
                                 prev,
-                                prev.currentFieldState.clientId,
-                                prev.currentFieldState.actionId,
+                                prev.currentGridState.clientId,
+                                prev.currentGridState.actionId,
                                 (prevState) => ({
                                     ...prevState,
                                     extension: {
@@ -279,7 +279,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                 () => getThreesCount.get(),
                 (threesCount, prevThreesCount) => {
                     if (threesCount > prevThreesCount) {
-                        fieldFireworksController.launch();
+                        gridFireworksController.launch();
                     }
                 },
             ),
@@ -294,7 +294,7 @@ export const Find3SudokuTypeManager = <T extends AnyFind3PTM>(
                 solution,
                 typeManager: { createCellDataByTypedDigit, getDigitByCellData },
             },
-            currentFieldState: {
+            currentGridState: {
                 cells,
                 extension: { giftedCells },
             },

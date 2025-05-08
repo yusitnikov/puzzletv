@@ -8,7 +8,7 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-interface FieldCellShapeProps<T extends AnyPTM>
+interface GridCellShapeProps<T extends AnyPTM>
     extends Partial<Rect>,
         Omit<SVGAttributes<SVGRectElement | SVGPolygonElement | SVGPolylineElement | SVGEllipseElement>, keyof Rect> {
     context?: PuzzleContext<T>;
@@ -19,7 +19,7 @@ interface FieldCellShapeProps<T extends AnyPTM>
     noClip?: boolean;
 }
 
-export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPTM>({
+export const GridCellShape = observer(function GridCellShapeFc<T extends AnyPTM>({
     context,
     cellPosition,
     line,
@@ -31,7 +31,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
     width = 1,
     height = 1,
     ...props
-}: FieldCellShapeProps<T>) {
+}: GridCellShapeProps<T>) {
     profiler.trace();
 
     cellPosition = usePureMemo(cellPosition);
@@ -41,7 +41,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
             ? context.getCellTransformedBounds(cellPosition.top, cellPosition.left)
             : undefined;
 
-    const clip = noClip ? undefined : <FieldCellShape context={context} cellPosition={cellPosition} />;
+    const clip = noClip ? undefined : <GridCellShape context={context} cellPosition={cellPosition} />;
 
     // Note: the actual condition here is just `if (!customCellBounds)`.
     // Everything else is just a hint for typescript.
@@ -63,7 +63,7 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
     if (line) {
         const cellTransformedSize = getTransformedRectAverageSize(customCellBounds.userArea);
 
-        const sizeCoeff = context.puzzle.typeManager.fieldFitsWrapper ? 1 : 1 / context.cellSize;
+        const sizeCoeff = context.puzzle.typeManager.gridFitsWrapper ? 1 : 1 / context.cellSize;
 
         return (
             <AutoSvg clip={clip}>
@@ -131,4 +131,4 @@ export const FieldCellShape = observer(function FieldCellShapeFc<T extends AnyPT
             ))}
         </>
     );
-}) as <T extends AnyPTM>(props: FieldCellShapeProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridCellShapeProps<T>) => ReactElement;

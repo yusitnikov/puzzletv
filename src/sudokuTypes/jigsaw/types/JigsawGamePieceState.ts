@@ -1,9 +1,9 @@
 import { GameStateActionCallback } from "../../../types/sudoku/GameStateAction";
 import { JigsawPTM } from "./JigsawPTM";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { getActiveJigsawPieceZIndex } from "./helpers";
-import { JigsawFieldPieceState } from "./JigsawFieldState";
+import { JigsawGridPieceState } from "./JigsawGridState";
 import { indexes } from "../../../utils/indexes";
 import { PuzzleContext } from "../../../types/sudoku/PuzzleContext";
 
@@ -12,7 +12,7 @@ export interface JigsawGamePieceState {
 }
 
 interface JigsawPieceStateUpdate {
-    position?: Partial<JigsawFieldPieceState>;
+    position?: Partial<JigsawGridPieceState>;
     state?: Partial<JigsawGamePieceState>;
 }
 
@@ -26,9 +26,9 @@ export const jigsawPieceStateChangeAction =
             | JigsawPieceStateUpdate
             | ((
                   prevPieceData: {
-                      position: JigsawFieldPieceState;
+                      position: JigsawGridPieceState;
                       state: JigsawGamePieceState;
-                      allPositions: JigsawFieldPieceState[];
+                      allPositions: JigsawGridPieceState[];
                       allStates: JigsawGamePieceState[];
                   },
                   index: number,
@@ -54,13 +54,13 @@ export const jigsawPieceStateChangeAction =
         let updatesPerIndex: JigsawPieceStateUpdate[];
         if (typeof updates === "function") {
             let {
-                fieldExtension: { pieces: piecePositions },
+                gridExtension: { pieces: piecePositions },
             } = context;
             if (startContext) {
                 // Take the position from the start state, but z-index from the current state
                 // (because "bring on top" action could be executed in the middle of the gesture)
                 const {
-                    fieldExtension: { pieces: startPiecePositions },
+                    gridExtension: { pieces: startPiecePositions },
                 } = startContext;
                 piecePositions = startPiecePositions.map((startPosition, index) => ({
                     ...startPosition,
@@ -85,12 +85,12 @@ export const jigsawPieceStateChangeAction =
 
         return {
             ...(updatesPerIndex.some(({ position }) => position) && {
-                fieldStateHistory: fieldStateHistoryAddState(
+                gridStateHistory: gridStateHistoryAddState(
                     context,
                     clientId,
                     actionId,
-                    ({ extension: { pieces: piecePositions }, ...fieldState }) => ({
-                        ...fieldState,
+                    ({ extension: { pieces: piecePositions }, ...gridState }) => ({
+                        ...gridState,
                         extension: {
                             // TODO: re-index all pieces to avoid meaningless history slots?
                             pieces: piecePositions.map((position, index) =>

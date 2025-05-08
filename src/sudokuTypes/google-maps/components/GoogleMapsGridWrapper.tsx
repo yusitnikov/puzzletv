@@ -12,8 +12,8 @@ import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
 
-export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLiteral) =>
-    observer(function GoogleMapsFieldWrapperComponent<T extends AnyGoogleMapsPTM>({
+export const GoogleMapsGridWrapper = (initialBounds: google.maps.LatLngBoundsLiteral) =>
+    observer(function GoogleMapsGridWrapperFc<T extends AnyGoogleMapsPTM>({
         context,
         children,
     }: PropsWithChildren<PuzzleContextProps<T>>) {
@@ -21,7 +21,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
 
         const {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
             },
             cellWriteMode,
             stateExtension: { map },
@@ -93,7 +93,7 @@ export const GoogleMapsFieldWrapper = (initialBounds: google.maps.LatLngBoundsLi
                     >
                         <GoogleMapsPanePortal pane={"overlayMouseTarget"}>
                             <div style={{ pointerEvents: "none" }}>
-                                <GoogleMapsOverlay fieldSize={fieldSize * cellSize}>{children}</GoogleMapsOverlay>
+                                <GoogleMapsOverlay gridSize={gridSize * cellSize}>{children}</GoogleMapsOverlay>
                             </div>
                         </GoogleMapsPanePortal>
                     </GoogleMap>

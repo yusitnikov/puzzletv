@@ -63,7 +63,7 @@ export const QuadMastersSudokuTypeManager = (isQuadle: boolean): SudokuTypeManag
 
             const {
                 puzzle: {
-                    fieldSize: { rowsCount, columnsCount },
+                    gridSize: { rowsCount, columnsCount },
                 },
                 cellWriteMode,
                 selectedCells,

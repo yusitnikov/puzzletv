@@ -32,7 +32,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
     cells: [],
     props: undefined,
     isValidPuzzle(_lines, _digits, _regionCells, context) {
-        const { rowsCount, columnsCount } = context.puzzle.fieldSize;
+        const { rowsCount, columnsCount } = context.puzzle.gridSize;
 
         const finalShapes = processGivenDigitsMaps<SlideAndSeekShape, ShapeInfo | PathInfo>(
             ([constraint]) => ({ type: "shape", ...constraint, actualLength: 0 }),

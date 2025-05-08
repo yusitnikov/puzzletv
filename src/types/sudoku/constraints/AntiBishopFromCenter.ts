@@ -13,7 +13,7 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
             typeManager: { areSameCellData },
             loopHorizontally,
             loopVertically,
-            fieldSize: { rowsCount, columnsCount, fieldSize },
+            gridSize: { rowsCount, columnsCount, gridSize },
         } = context.puzzle;
 
         const digit = digits[cell.top][cell.left]!;
@@ -21,7 +21,7 @@ export const AntiBishopFromCenterConstraint = <T extends AnyPTM>(regionSize: num
         const isCenterIndex = (index: number) => (index % regionSize) * 2 + 1 === regionSize;
         const isCurrentCellCenter = isCenterIndex(cell.top) && isCenterIndex(cell.left);
 
-        for (let offset = -fieldSize; offset <= fieldSize; offset++) {
+        for (let offset = -gridSize; offset <= gridSize; offset++) {
             if (offset === 0) {
                 continue;
             }

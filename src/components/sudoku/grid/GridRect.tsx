@@ -10,13 +10,13 @@ import { AnyPTM } from "../../../types/sudoku/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-interface FieldRectProps<T extends AnyPTM> extends Omit<GridRegion, keyof Size>, Partial<Size> {
+interface GridRectProps<T extends AnyPTM> extends Omit<GridRegion, keyof Size>, Partial<Size> {
     context: PuzzleContext<T>;
     clip?: boolean;
     children: ReactNode;
 }
 
-export const FieldRect = observer(function FieldRect<T extends AnyPTM>({
+export const GridRect = observer(function GridRectFc<T extends AnyPTM>({
     context,
     clip,
     cells,
@@ -24,10 +24,10 @@ export const FieldRect = observer(function FieldRect<T extends AnyPTM>({
     height = 1,
     children,
     ...position
-}: FieldRectProps<T>) {
+}: GridRectProps<T>) {
     profiler.trace();
 
-    const transformedRect = getFieldRectTransform(context, position);
+    const transformedRect = getGridRectTransform(context, position);
 
     return (
         <TransformedRectGraphics rect={transformedRect}>
@@ -58,9 +58,9 @@ export const FieldRect = observer(function FieldRect<T extends AnyPTM>({
             </AutoSvg>
         </TransformedRectGraphics>
     );
-}) as <T extends AnyPTM>(props: FieldRectProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: GridRectProps<T>) => ReactElement;
 
-export const getFieldRectTransform = <T extends AnyPTM>(
+export const getGridRectTransform = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     { top, left, transformCoords: transformCoordsArg }: Omit<GridRegion, keyof Size>,
 ): TransformedRect => {

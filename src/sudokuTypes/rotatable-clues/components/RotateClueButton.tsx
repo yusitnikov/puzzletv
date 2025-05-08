@@ -5,7 +5,7 @@ import { ControlButton } from "../../../components/sudoku/controls/ControlButton
 import { RotateLeft, RotateRight } from "@emotion-icons/material";
 import { RotatableCluesPTM } from "../types/RotatableCluesPTM";
 import { RotatableClue } from "../types/RotatableCluesPuzzleExtension";
-import { fieldStateHistoryAddState } from "../../../types/sudoku/FieldStateHistory";
+import { gridStateHistoryAddState } from "../../../types/sudoku/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { getNextActionId } from "../../../types/sudoku/GameStateAction";
 import { RotatableCluesGameState } from "../types/RotatableCluesGameState";
@@ -40,11 +40,11 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) =>
 
         const handleRotate = () =>
             context.onStateChange((context) => ({
-                fieldStateHistory: fieldStateHistoryAddState(context, myClientId, getNextActionId(), (fieldState) => ({
-                    ...fieldState,
+                gridStateHistory: gridStateHistoryAddState(context, myClientId, getNextActionId(), (gridState) => ({
+                    ...gridState,
                     extension: {
-                        ...fieldState.extension,
-                        clueAngles: fieldState.extension.clueAngles?.map((angle: number, index: number) => {
+                        ...gridState.extension,
+                        clueAngles: gridState.extension.clueAngles?.map((angle: number, index: number) => {
                             if (!selectedClueIndexes.includes(index)) {
                                 return angle;
                             }

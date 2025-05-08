@@ -2,7 +2,7 @@ import { Rect } from "../../../types/layout/Rect";
 import { TransformedRectGraphics } from "../../../contexts/TransformContext";
 import { Constraint, ConstraintProps } from "../../../types/sudoku/Constraint";
 import { RushHourPTM } from "../types/RushHourPTM";
-import { FieldLayer } from "../../../types/sudoku/FieldLayer";
+import { GridLayer } from "../../../types/sudoku/GridLayer";
 import { textColor } from "../../../components/app/globals";
 import { mixColorsStr } from "../../../utils/color";
 import { CellWriteMode } from "../../../types/sudoku/CellWriteMode";
@@ -328,7 +328,7 @@ export const RushHourCarsConstraint: Constraint<RushHourPTM> = {
     name: "rush hour cars",
     cells: [],
     component: {
-        [FieldLayer.beforeSelection]: RushHourCars,
+        [GridLayer.beforeSelection]: RushHourCars,
     },
     props: undefined,
 };

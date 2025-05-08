@@ -54,13 +54,13 @@ const StyledCircle = styled("div")({
     background: "#fff",
 });
 
-export const InfiniteRingsFieldControls = <T extends AnyPTM>(visibleRingsCountArg = 2) =>
-    observer(function InfiniteRingsFieldControlsFc({ context }: PuzzleContextProps<T>) {
+export const InfiniteRingsGridControls = <T extends AnyPTM>(visibleRingsCountArg = 2) =>
+    observer(function InfiniteRingsGridControlsFc({ context }: PuzzleContextProps<T>) {
         profiler.trace();
 
         const {
             puzzle: {
-                fieldSize: { rowsCount: fieldSize },
+                gridSize: { rowsCount: gridSize },
             },
             scaleLog,
             cellSize,
@@ -69,7 +69,7 @@ export const InfiniteRingsFieldControls = <T extends AnyPTM>(visibleRingsCountAr
 
         const ringOffset = Math.round(scaleLog);
         const showingAllInfiniteRings = isShowingAllInfiniteRings(context, visibleRingsCountArg);
-        const ringsCount = fieldSize / 2 - 1;
+        const ringsCount = gridSize / 2 - 1;
         const visibleRingsCount = showingAllInfiniteRings ? ringsCount : visibleRingsCountArg;
         const loopedRingOffset = loop(ringOffset, ringsCount);
 

@@ -17,7 +17,7 @@ import { loop } from "../../../utils/math";
 import { ControlButtonRegion } from "../../../components/sudoku/controls/ControlButtonsManager";
 import { RushHourHideCarsButton } from "../components/RushHourHideCarsButton";
 import { RushHourCarsConstraint } from "../components/RushHourCar";
-import { getDefaultRegionsForRowsAndColumns } from "../../../types/sudoku/FieldSize";
+import { getDefaultRegionsForRowsAndColumns } from "../../../types/sudoku/GridSize";
 import { GivenDigitsMap, mergeGivenDigitsMaps } from "../../../types/sudoku/GivenDigitsMap";
 import { CellTypeProps } from "../../../types/sudoku/CellTypeProps";
 import { createRandomGenerator } from "../../../utils/random";
@@ -25,20 +25,20 @@ import { cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints } from 
 import { settings } from "../../../types/layout/Settings";
 import { ColorsImportMode } from "../../../types/sudoku/PuzzleImportOptions";
 import {
-    addFieldStateExToSudokuManager,
+    addGridStateExToSudokuManager,
     addGameStateExToSudokuManager,
 } from "../../../types/sudoku/SudokuTypeManagerPlugin";
-import { RushHourFieldState } from "./RushHourFieldState";
+import { RushHourGridState } from "./RushHourGridState";
 
 export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     ...addGameStateExToSudokuManager(
-        addFieldStateExToSudokuManager(DigitSudokuTypeManager(), {
-            initialFieldStateExtension(puzzle): RushHourFieldState {
+        addGridStateExToSudokuManager(DigitSudokuTypeManager(), {
+            initialGridStateExtension(puzzle): RushHourGridState {
                 return {
                     cars:
                         puzzle?.extension?.cars.map(() => ({
                             top: 0,
-                            left: -puzzle.fieldSize.rowsCount,
+                            left: -puzzle.gridSize.rowsCount,
                         })) ?? [],
                 };
             },
@@ -51,11 +51,11 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                 };
             },
             useProcessedGameStateExtension({
-                fieldExtension: { cars: carPositions },
+                gridExtension: { cars: carPositions },
                 stateExtension: { cars: carAnimations },
             }): RushHourProcessedGameState {
                 return {
-                    cars: (carPositions as RushHourFieldState["cars"]).map((position, index) =>
+                    cars: (carPositions as RushHourGridState["cars"]).map((position, index) =>
                         // eslint-disable-next-line react-hooks/rules-of-hooks
                         useAnimatedValue(
                             position,
@@ -70,7 +70,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                     ),
                 };
             },
-            getProcessedGameStateExtension({ fieldExtension: { cars } }): RushHourProcessedGameState {
+            getProcessedGameStateExtension({ gridExtension: { cars } }): RushHourProcessedGameState {
                 return { cars };
             },
         },
@@ -84,14 +84,14 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         yDirection,
         {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
             },
         },
     ): { cell?: Position } {
         return {
             cell: {
-                top: loop(top + yDirection, fieldSize),
-                left: loop(left + xDirection, fieldSize),
+                top: loop(top + yDirection, gridSize),
+                left: loop(left + xDirection, gridSize),
             },
         };
     },
@@ -101,7 +101,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     getRegionsWithSameCoordsTransformation({
         puzzle: {
             extension: carsInfo,
-            fieldSize: { fieldSize },
+            gridSize: { gridSize },
         },
         cellWriteMode,
         stateExtension: { hideCars: hideCarsState },
@@ -114,8 +114,8 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
             {
                 top: 0,
                 left: 0,
-                width: fieldSize,
-                height: fieldSize,
+                width: gridSize,
+                height: gridSize,
                 zIndex: 0,
             },
             ...(carsInfo?.cars ?? []).map(({ cells, boundingRect }, index): GridRegion => {
@@ -138,8 +138,8 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
         ];
     },
 
-    getCellTypeProps({ left }, { fieldSize: { fieldSize } }): CellTypeProps<RushHourPTM> {
-        if (left >= fieldSize) {
+    getCellTypeProps({ left }, { gridSize: { gridSize } }): CellTypeProps<RushHourPTM> {
+        if (left >= gridSize) {
             return { isSelectable: false, isCheckingSolution: false };
         }
         return {};
@@ -148,7 +148,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     getRegionsForRowsAndColumns(context) {
         const {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
                 ...puzzle
             },
         } = context;
@@ -156,10 +156,10 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
             context.cloneWith({
                 puzzle: {
                     ...puzzle,
-                    fieldSize: {
-                        fieldSize,
-                        rowsCount: fieldSize,
-                        columnsCount: fieldSize,
+                    gridSize: {
+                        gridSize,
+                        rowsCount: gridSize,
+                        columnsCount: gridSize,
                     },
                 },
             }),
@@ -175,16 +175,16 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
     postProcessPuzzle(puzzle): PuzzleDefinition<RushHourPTM> {
         let {
             initialColors,
-            fieldSize: { fieldSize },
+            gridSize: { gridSize },
             resultChecker,
             items = [],
         } = puzzle;
 
         puzzle = {
             ...puzzle,
-            fieldSize: {
-                ...puzzle.fieldSize,
-                columnsCount: fieldSize * 2,
+            gridSize: {
+                ...puzzle.gridSize,
+                columnsCount: gridSize * 2,
             },
             allowDrawing: undefined,
         };
@@ -198,7 +198,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                 puzzle.initialColors[top] = {};
                 for (const [leftStr, colors] of Object.entries(row)) {
                     const left = Number(leftStr);
-                    const offsetLeft = left + fieldSize;
+                    const offsetLeft = left + gridSize;
                     if (colors.length === 0) {
                         continue;
                     }
@@ -260,7 +260,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                                 boundingRect: { top, left: offsetLeft, width, height },
                             },
                         ] of cars.entries()) {
-                            const left = offsetLeft - fieldSize;
+                            const left = offsetLeft - gridSize;
                             if (
                                 itemTop >= top &&
                                 itemLeft >= left &&
@@ -269,7 +269,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                             ) {
                                 return {
                                     ...cloneConstraint(item, {
-                                        processCellCoords: ({ top, left }) => ({ top, left: left + fieldSize }),
+                                        processCellCoords: ({ top, left }) => ({ top, left: left + gridSize }),
                                     }),
                                     carIndex,
                                 };
@@ -288,7 +288,7 @@ export const RushHourSudokuTypeManager: SudokuTypeManager<RushHourPTM> = {
                     puzzle.resultChecker = (context) => {
                         const {
                             puzzle,
-                            fieldExtension: { cars: carPositions },
+                            gridExtension: { cars: carPositions },
                         } = context;
                         const { initialDigits = {} } = puzzle;
 

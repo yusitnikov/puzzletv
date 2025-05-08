@@ -43,8 +43,8 @@ export const RedoButton: ControlButtonItemPropsGenericFc = observer(function Red
         }
 
         if (applyArrowsToHistory && code === "ArrowRight") {
-            if (ctrlKey && context.fieldStateHistory.statesCount) {
-                context.onStateChange(seekHistoryAction(context.fieldStateHistory.statesCount - 1, getNextActionId()));
+            if (ctrlKey && context.gridStateHistory.statesCount) {
+                context.onStateChange(seekHistoryAction(context.gridStateHistory.statesCount - 1, getNextActionId()));
             } else {
                 handleRedo();
             }

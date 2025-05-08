@@ -14,7 +14,7 @@ export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
         regionCells,
         {
             puzzle: {
-                fieldSize: { fieldSize },
+                gridSize: { gridSize },
             },
         },
     ): boolean {
@@ -46,7 +46,7 @@ export const ValidChessPositionConstraint: Constraint<ChessPTM> = {
         switch (type) {
             case ChessPieceType.pawn:
                 // Pawn can't be on line 1 or 8
-                return samePiecesCount <= 8 && (fieldSize !== 8 || ![0, 7].includes(top));
+                return samePiecesCount <= 8 && (gridSize !== 8 || ![0, 7].includes(top));
             case ChessPieceType.knight:
                 return samePiecesCount <= 2;
             case ChessPieceType.bishop:

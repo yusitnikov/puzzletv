@@ -126,7 +126,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
             }
 
             // Find regions isolated by given borders
-            const { rowsCount, columnsCount } = puzzle.fieldSize;
+            const { rowsCount, columnsCount } = puzzle.gridSize;
             const graph = indexes(rowsCount).map((top) =>
                 indexes(columnsCount).map((left) => ({
                     top,
