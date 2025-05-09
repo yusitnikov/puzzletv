@@ -16,7 +16,6 @@ const isImportedEgg = (item: Constraint<SokobanPTM, any>): item is Constraint<So
     (!item.props.sum || item.props.sum.toString().toLowerCase() === "egg");
 
 const baseTypeManager = SokobanTypeManager({
-    // distinctMovementSteps: true,
     isLightClue: isEgg,
     isSmashableClue: isEgg,
     isFallingClue: isEgg,

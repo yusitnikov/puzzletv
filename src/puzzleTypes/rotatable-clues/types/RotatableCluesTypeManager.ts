@@ -28,6 +28,7 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { RotatableCluesGridState } from "./RotatableCluesGridState";
 import { rotateNumber } from "../../../components/puzzle/digit/DigitComponentType";
+import { indexes } from "../../../utils/indexes";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -65,17 +66,13 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
                 };
             },
             useProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
-                const {
-                    gridExtension: { clueAngles },
-                    stateExtension: { clues: clueAnimations },
-                } = context;
-
                 return {
-                    clueAngles: (clueAngles as number[]).map((angle, index) =>
+                    clueAngles: indexes(context.gridExtension.clueAngles.length).map((index) =>
                         // eslint-disable-next-line react-hooks/rules-of-hooks
                         useAnimatedValue(
-                            angle,
-                            clueAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
+                            () => (context.gridExtension.clueAngles as number[])[index],
+                            () =>
+                                context.stateExtension.clues[index].animating ? settings.animationSpeed.get() / 2 : 0,
                         ),
                     ),
                 };

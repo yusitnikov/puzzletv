@@ -50,12 +50,12 @@ export const useGame = <T extends AnyPTM>(
 
     // TODO: make it not update the state?
     const animated = useAnimatedValue<ProcessedGameStateAnimatedValues>(
-        {
+        () => ({
             loopOffset: context.loopOffset,
             angle: context.angle,
             scale: context.scale,
-        },
-        context.animating ? settings.animationSpeed.get() : 0,
+        }),
+        () => (context.animating ? settings.animationSpeed.get() : 0),
         (a, b, coeff) => ({
             loopOffset: {
                 top: mixAnimatedValue(a.loopOffset.top, b.loopOffset.top, coeff * 2),

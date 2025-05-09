@@ -71,6 +71,7 @@ import {
     addGameStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { createEmptyContextForPuzzle } from "../../../types/puzzle/PuzzleContext";
+import { useComputed } from "../../../hooks/useComputed";
 
 interface JigsawTypeManagerOptions {
     supportGluePieces?: boolean;
@@ -624,23 +625,19 @@ export const JigsawTypeManager = (
                 };
             },
             useProcessedGameStateExtension(context): JigsawProcessedGameState {
-                const {
-                    puzzle,
-                    gridExtension: { pieces: piecePositions },
-                    stateExtension: { pieces: pieceAnimations },
-                } = context;
-                const pieces = puzzle.extension?.pieces ?? [];
-                const groups = groupJigsawPiecesByZIndex(context);
+                const pieces = context.puzzle.extension?.pieces ?? [];
+                const getGroups = useComputed(() => groupJigsawPiecesByZIndex(context), { name: "jigsawGroups" });
 
                 return {
-                    pieces: piecePositions.map((position, index) =>
+                    pieces: pieces.map((piece, index) =>
                         // eslint-disable-next-line react-hooks/rules-of-hooks
                         useAnimatedValue<PositionWithAngle>(
-                            position,
-                            pieceAnimations[index].animating ? settings.animationSpeed.get() / 2 : 1,
+                            () => context.gridExtension.pieces[index],
+                            () =>
+                                context.stateExtension.pieces[index].animating ? settings.animationSpeed.get() / 2 : 1,
                             (a, b, coeff) => {
+                                const groups = getGroups();
                                 const group = groups.find(({ indexes }) => indexes.includes(index))!;
-                                const piece = pieces[index];
 
                                 const angleDiff = b.angle - a.angle;
                                 const { top: topDiff, left: leftDiff } = getLineVector({

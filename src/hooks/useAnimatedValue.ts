@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { rafTime } from "./useRaf";
-import { comparer, computed, makeAutoObservable } from "mobx";
-import { useLastValueRef } from "./useLastValueRef";
+import { comparer, computed, IReactionDisposer, makeAutoObservable, reaction } from "mobx";
 import { profiler } from "../utils/profiler";
 import { Position } from "../types/layout/Position";
 
@@ -31,21 +30,37 @@ export class AnimatedValue<T> {
     private startTime: number;
     private animationTime: number;
 
+    readonly dispose?: IReactionDisposer;
+
     constructor(
-        targetValue: T,
-        animationTime: number,
+        targetValueFn: () => T,
+        animationTimeFn: () => number,
         private valueMixer: AnimatedValueMixer<T> = mixAnimatedValue as any,
     ) {
         makeAutoObservable<this, "valueMixer">(this, {
             valueMixer: false,
             finalValue: false,
+            dispose: false,
             animatedValue: computed({ equals: comparer.structural }),
         });
+
+        const targetValue = targetValueFn();
 
         this.startValue = targetValue;
         this.targetValue = targetValue;
         this.startTime = rafTime();
-        this.animationTime = animationTime;
+        this.animationTime = animationTimeFn();
+
+        this.dispose = reaction(
+            () => ({
+                targetValue: targetValueFn(),
+                animationTime: animationTimeFn(),
+            }),
+            ({ targetValue, animationTime }) => {
+                this.update(targetValue, animationTime);
+            },
+            { equals: comparer.structural },
+        );
     }
 
     private get coeff() {
@@ -76,25 +91,24 @@ export class AnimatedValue<T> {
     }
 }
 
-export function useAnimatedValue(targetValue: number, animationTime: number): number;
-export function useAnimatedValue<T>(targetValue: T, animationTime: number, valueMixer: AnimatedValueMixer<T>): T;
+export function useAnimatedValue(targetValueFn: () => number, animationTimeFn: () => number): number;
 export function useAnimatedValue<T>(
-    targetValue: T,
-    animationTime: number,
+    targetValueFn: () => T,
+    animationTimeFn: () => number,
+    valueMixer: AnimatedValueMixer<T>,
+): T;
+export function useAnimatedValue<T>(
+    targetValueFn: () => T,
+    animationTimeFn: () => number,
     valueMixer: AnimatedValueMixer<T> = mixAnimatedValue as any,
 ): T {
-    const valueMixerRef = useLastValueRef(valueMixer);
+    const [manager] = useState(() => new AnimatedValue<T>(targetValueFn, animationTimeFn, valueMixer));
 
-    const [manager] = useState(
-        () => new AnimatedValue(targetValue, animationTime, (...args) => valueMixerRef.current(...args)),
-    );
-
-    // TODO: targetValue in the class should be updated immediately, not when React calls useEffect next time!
-    useEffect(
-        () => manager.update(targetValue, animationTime),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [JSON.stringify(targetValue), animationTime],
-    );
+    useEffect(() => {
+        return () => {
+            manager.dispose?.();
+        };
+    }, [manager]);
 
     return manager.animatedValue;
 }

@@ -29,6 +29,7 @@ import {
     addGameStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { RushHourGridState } from "./RushHourGridState";
+import { indexes } from "../../../utils/indexes";
 
 export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
     ...addGameStateExToPuzzleTypeManager(
@@ -50,16 +51,14 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                     hideCars: false,
                 };
             },
-            useProcessedGameStateExtension({
-                gridExtension: { cars: carPositions },
-                stateExtension: { cars: carAnimations },
-            }): RushHourProcessedGameState {
+            useProcessedGameStateExtension(context): RushHourProcessedGameState {
                 return {
-                    cars: (carPositions as RushHourGridState["cars"]).map((position, index) =>
+                    cars: indexes(context.gridExtension.cars.length).map((index) =>
                         // eslint-disable-next-line react-hooks/rules-of-hooks
                         useAnimatedValue(
-                            position,
-                            carAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
+                            () => (context.gridExtension.cars as RushHourGridState["cars"])[index],
+                            () =>
+                                context.stateExtension.cars[index].animating ? settings.animationSpeed.get() / 2 : 0,
                             (a, b, coeff) => {
                                 return {
                                     top: mixAnimatedValue(a.top, b.top, coeff),

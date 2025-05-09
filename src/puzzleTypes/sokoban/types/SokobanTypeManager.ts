@@ -1,6 +1,6 @@
 import { defaultProcessArrowDirection, PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { defaultSokobanDirection, SokobanGameState } from "./SokobanGameState";
-import { AnimatedValue } from "../../../hooks/useAnimatedValue";
+import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
 import { SokobanPTM } from "./SokobanPTM";
 import { PartialGameStateEx } from "../../../types/puzzle/GameState";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
@@ -19,66 +19,43 @@ import {
     addGameStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { SokobanGridState, sokobanGridStateAnimationMixer } from "./SokobanGridState";
-import { comparer, IReactionDisposer, reaction } from "mobx";
 import { SokobanOptions } from "./SokobanOptions";
 import { isPointInRect } from "../../../types/layout/Rect";
 
-const initialGridStateExtension = (puzzle?: PuzzleDefinition<SokobanPTM>): SokobanGridState => {
-    return {
-        cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
-        clueSmashed: puzzle?.extension?.clues.map(() => false) ?? [],
-        sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
-    };
-};
-
 export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeManager<SokobanPTM> => ({
     ...addGameStateExToPuzzleTypeManager(
-        addGridStateExToPuzzleTypeManager(DigitPuzzleTypeManager(), { initialGridStateExtension }),
-        {
-            initialGameStateExtension(puzzle): SokobanGameState {
+        addGridStateExToPuzzleTypeManager(DigitPuzzleTypeManager(), {
+            initialGridStateExtension: (puzzle): SokobanGridState => {
                 return {
-                    animationManager: new AnimatedValue(
-                        initialGridStateExtension(puzzle),
-                        0,
-                        sokobanGridStateAnimationMixer,
-                    ),
-                    animating: false,
-                    sokobanDirection: defaultSokobanDirection,
+                    cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
+                    clueSmashed: puzzle?.extension?.clues.map(() => false) ?? [],
+                    sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
                 };
             },
-            serializeGameState({ animationManager, ...state }: Partial<SokobanGameState>): any {
-                return state;
-            },
+        }),
+        {
+            initialGameStateExtension: {
+                animating: false,
+                sokobanDirection: defaultSokobanDirection,
+            } as SokobanGameState,
             unserializeGameState(state: any): Partial<SokobanGameState> {
                 return {
                     ...state,
-                    animationManager: new AnimatedValue(initialGridStateExtension(), 0, sokobanGridStateAnimationMixer),
                     animating: false,
                 };
             },
+            useProcessedGameStateExtension(context): SokobanGridState {
+                return useAnimatedValue<SokobanGridState>(
+                    () => context.gridExtension,
+                    () => (context.stateExtension.animating ? settings.animationSpeed.get() / 2 : 0),
+                    sokobanGridStateAnimationMixer,
+                );
+            },
+            getProcessedGameStateExtension(context): SokobanGridState {
+                return context.gridExtension;
+            },
         },
     ),
-
-    getReactions(context): IReactionDisposer[] {
-        return [
-            reaction(
-                () => {
-                    return {
-                        value: context.gridExtension,
-                        animationTime: context.stateExtension.animating ? settings.animationSpeed.get() / 2 : 0,
-                    };
-                },
-                ({ value, animationTime }) => {
-                    context.stateExtension.animationManager.update(value, animationTime);
-                },
-                {
-                    name: "update sokoban animation",
-                    equals: comparer.structural,
-                    fireImmediately: true,
-                },
-            ),
-        ];
-    },
 
     processArrowDirection(
         currentCell,
@@ -147,21 +124,19 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
             ...puzzle,
             items: ({
                 gridExtension: { cluePositions, clueSmashed },
-                stateExtension: {
-                    animationManager: { animatedValue },
-                },
+                processedGameStateExtension,
             }): Constraint<SokobanPTM, any>[] => [
                 ...draggedClues.map(({ clue, index, isCrate }) =>
                     SokobanClueConstraint(
                         clue,
                         cluePositions[index],
-                        animatedValue.cluePositions[index] ?? emptyPosition,
+                        processedGameStateExtension.cluePositions[index] ?? emptyPosition,
                         clueSmashed[index],
-                        animatedValue.clueSmashed[index] ?? false,
+                        processedGameStateExtension.clueSmashed[index] ?? false,
                         isCrate ? options.smashedComponent : {},
                     ),
                 ),
-                SokobanPlayerConstraint(animatedValue.sokobanPosition),
+                SokobanPlayerConstraint(processedGameStateExtension.sokobanPosition),
                 ...otherItems,
             ],
             extension: {

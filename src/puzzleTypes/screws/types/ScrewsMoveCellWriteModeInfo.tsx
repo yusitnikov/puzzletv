@@ -22,7 +22,6 @@ import { CellWriteModeButton } from "../../../components/puzzle/controls/CellWri
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { textColor } from "../../../components/app/globals";
 import { ScrewByData } from "../constraints/Screw";
-import { ScrewsGameState } from "./ScrewsGameState";
 import { translate } from "../../../utils/translate";
 
 const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function ScrewsMoveButton<T extends AnyPTM>({
@@ -147,8 +146,7 @@ const getScrewIndexByGesture = <T extends AnyPTM>(
                     return false;
                 }
                 const { top, left } = extraData.cell;
-                const offset = (startContext.stateExtension as ScrewsGameState).screws[index].animationManager
-                    .animatedValue;
+                const offset = startContext.processedGameStateExtension.screwOffsets[index];
                 const offsetCell = { top: top + 0.5 - offset, left: left + 0.5 };
                 return isPointInRect(rect, offsetCell);
             }),

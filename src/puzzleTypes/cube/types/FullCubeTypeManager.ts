@@ -47,14 +47,18 @@ export const FullCubeTypeManager = (): PuzzleTypeManager<FullCubePTM> => ({
         initialGameStateExtension: {
             coordsBase: initialCoordsBase3D,
         },
-        useProcessedGameStateExtension({ stateExtension: { coordsBase } }): ProcessedFullCubeGameState {
+        useProcessedGameStateExtension(context): ProcessedFullCubeGameState {
             return {
-                animatedCoordsBase: useAnimatedValue(coordsBase, settings.animationSpeed.get(), (a, b, coeff) => {
-                    // See https://en.wikipedia.org/wiki/Slerp
-                    const result = vector4.RotationSlerp(a, b, coeff);
-                    // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
-                    return Number.isFinite(result.w) ? result : b;
-                }),
+                animatedCoordsBase: useAnimatedValue(
+                    () => context.stateExtension.coordsBase,
+                    () => settings.animationSpeed.get(),
+                    (a, b, coeff) => {
+                        // See https://en.wikipedia.org/wiki/Slerp
+                        const result = vector4.RotationSlerp(a, b, coeff);
+                        // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
+                        return Number.isFinite(result.w) ? result : b;
+                    },
+                ),
             };
         },
         getProcessedGameStateExtension({ stateExtension: { coordsBase } }): ProcessedFullCubeGameState {

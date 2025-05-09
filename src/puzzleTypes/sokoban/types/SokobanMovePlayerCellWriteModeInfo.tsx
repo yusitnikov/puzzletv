@@ -28,12 +28,8 @@ export const moveSokobanPlayer =
             puzzleIndex: { allCells },
             puzzle,
         } = context;
-        const { distinctMovementSteps, isLightClue, isSmashableClue, isFallingClue } = puzzle.extension?.options ?? {};
+        const { isLightClue, isSmashableClue, isFallingClue } = puzzle.extension?.options ?? {};
         const clues = puzzle.extension?.clues ?? [];
-
-        if (distinctMovementSteps && context.stateExtension.animationManager.isAnimating) {
-            return {};
-        }
 
         return {
             extension: {

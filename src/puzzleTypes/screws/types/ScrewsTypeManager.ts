@@ -1,11 +1,11 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { ScrewsGameState } from "./ScrewsGameState";
 import { getAveragePosition } from "../../../types/layout/Position";
-import { AnimatedValue } from "../../../hooks/useAnimatedValue";
+import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
 import { ScrewsPTM } from "./ScrewsPTM";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
-import { Screw, ScrewsPuzzleExtension } from "./ScrewsPuzzleExtension";
+import { Screw } from "./ScrewsPuzzleExtension";
 import { isRect } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
 import { settings } from "../../../types/layout/Settings";
 import { Rect } from "../../../types/layout/Rect";
@@ -19,8 +19,6 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { ScrewsGridState } from "./ScrewsGridState";
 import { ScrewsGameClueState } from "./ScrewsGameClueState";
-import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
-import { comparer, IReactionDisposer, reaction } from "mobx";
 
 interface ScrewsImporterResult<T extends AnyPTM> {
     screws: Rect[];
@@ -42,13 +40,7 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
         {
             initialGameStateExtension(puzzle): ScrewsGameState {
                 return {
-                    screws:
-                        puzzle?.extension?.screws.map(
-                            (): ScrewsGameClueState => ({
-                                animationManager: new AnimatedValue(0, 0),
-                                animating: false,
-                            }),
-                        ) ?? [],
+                    screws: puzzle?.extension?.screws.map((): ScrewsGameClueState => ({ animating: false })) ?? [],
                 };
             },
             serializeGameState({ screws = [] }: Partial<ScrewsGameState>): any {
@@ -58,49 +50,28 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
             },
             unserializeGameState({ screws }: any): Partial<ScrewsGameState> {
                 return {
-                    screws:
-                        screws?.map(
-                            (): ScrewsGameClueState => ({
-                                animationManager: new AnimatedValue(0, 0),
-                                animating: false,
-                            }),
-                        ) ?? [],
+                    screws: screws?.map((): ScrewsGameClueState => ({ animating: false })) ?? [],
+                };
+            },
+            useProcessedGameStateExtension(context): ScrewsGridState {
+                return {
+                    screwOffsets: indexes(context.puzzle.extension?.screws.length ?? 0).map((index) =>
+                        // eslint-disable-next-line react-hooks/rules-of-hooks
+                        useAnimatedValue(
+                            () => context.gridExtension.screwOffsets[index],
+                            () =>
+                                context.stateExtension.screws[index].animating ? settings.animationSpeed.get() / 2 : 0,
+                        ),
+                    ),
+                };
+            },
+            getProcessedGameStateExtension(context): ScrewsGridState {
+                return {
+                    screwOffsets: context.gridExtension.screwOffsets,
                 };
             },
         },
     ),
-
-    getReactions(context): IReactionDisposer[] {
-        return [
-            ...(baseTypeManager.getReactions?.(context as unknown as PuzzleContext<T>) ?? []),
-            ...((context.puzzle.extension as ScrewsPuzzleExtension<T>)?.screws?.map((_, index) =>
-                reaction(
-                    () => {
-                        const {
-                            gridExtension: { screwOffsets },
-                            stateExtension: { screws: screwsAnimations },
-                        } = context;
-
-                        return {
-                            value: screwOffsets[index],
-                            animationTime: screwsAnimations[index].animating ? settings.animationSpeed.get() / 2 : 0,
-                        };
-                    },
-                    ({ value, animationTime }) => {
-                        (context.stateExtension as ScrewsGameState).screws[index].animationManager.update(
-                            value,
-                            animationTime,
-                        );
-                    },
-                    {
-                        name: `update screw[${index}] animation manager`,
-                        equals: comparer.structural,
-                        fireImmediately: true,
-                    },
-                ),
-            ) ?? []),
-        ];
-    },
 
     postProcessPuzzle(puzzle): PuzzleDefinition<ScrewsPTM<T>> {
         if (postProcessPuzzle) {
