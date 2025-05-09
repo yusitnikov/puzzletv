@@ -82,10 +82,11 @@ export const GuessTypeManager = <T extends AnyNumberPTM>(): PuzzleTypeManager<T>
         };
     },
 
-    setSharedState({ puzzle, myGameState }, { initialDigits, excludedDigits }): GameStateEx<T> {
+    setSharedState(context, { initialDigits, excludedDigits }): GameStateEx<T> {
+        const { puzzle, myGameState } = context;
         return mergeGameStateWithUpdates(myGameState, {
             initialDigits: unserializeCellsMap(initialDigits, puzzle.typeManager.unserializeCellData),
-            excludedDigits: unserializeCellsMap(excludedDigits, (item) => CellDataSet.unserialize(puzzle, item)),
+            excludedDigits: unserializeCellsMap(excludedDigits, (item) => CellDataSet.unserialize(context, item)),
         });
     },
 

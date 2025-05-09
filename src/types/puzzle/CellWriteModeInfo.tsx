@@ -100,7 +100,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         secondaryButtonContent: (context, cellData, cellSize) => (
             <CellDigits
                 context={context}
-                data={{ cornerDigits: new CellDataSet(context.puzzle, [cellData]) }}
+                data={{ cornerDigits: new CellDataSet(context, [cellData]) }}
                 size={cellSize}
             />
         ),
@@ -113,7 +113,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         secondaryButtonContent: (context, cellData, cellSize) => (
             <CellDigits
                 context={context}
-                data={{ centerDigits: new CellDataSet(context.puzzle, [cellData]) }}
+                data={{ centerDigits: new CellDataSet(context, [cellData]) }}
                 size={cellSize}
             />
         ),

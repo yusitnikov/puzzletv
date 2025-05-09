@@ -10,14 +10,14 @@ export const TenInOneRegionConstraint = <T extends AnyPTM>(cellLiterals: Positio
     component: Region,
     props: undefined,
     isObvious: true,
-    isValidCell(cell, digits, cells, { puzzle }) {
+    isValidCell(cell, digits, cells, context) {
         const cellData = cells
             .map(({ top, left }) => digits[top]?.[left])
             .filter((data) => data !== undefined)
             .map((data) => data!);
 
-        const uniqueCellData = new CellDataSet(puzzle, cellData);
+        const uniqueCellData = new CellDataSet(context, cellData);
 
-        return uniqueCellData.size <= puzzle.gridSize.regionWidth!;
+        return uniqueCellData.size <= context.puzzle.gridSize.regionWidth!;
     },
 });

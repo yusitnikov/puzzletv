@@ -12,8 +12,6 @@ export const CornerDigitModeButton: ControlButtonItemPropsGenericFc = observer(f
 >({ context, top, left }: ControlButtonItemProps<T>) {
     profiler.trace();
 
-    const { puzzle } = context;
-
     return (
         <CellWriteModeButton
             top={top}
@@ -21,8 +19,8 @@ export const CornerDigitModeButton: ControlButtonItemPropsGenericFc = observer(f
             cellWriteMode={CellWriteMode.corner}
             data={{
                 cornerDigits: new CellDataSet(
-                    puzzle,
-                    [1, 2, 3].map((digit) => puzzle.typeManager.createCellDataByDisplayDigit(digit, context)),
+                    context,
+                    [1, 2, 3].map((digit) => context.puzzle.typeManager.createCellDataByDisplayDigit(digit, context)),
                 ),
             }}
             title={`${translate("Corner")} (${translate("shortcut")}: Shift)`}

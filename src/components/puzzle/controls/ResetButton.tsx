@@ -39,7 +39,7 @@ export const ResetButton: ControlButtonItemPropsGenericFc = observer(function Re
         handleCloseRestart();
         context.onStateChange((context) =>
             mergeGameStateWithUpdates(
-                getEmptyGameState(context.puzzle, false),
+                getEmptyGameState(context, false),
                 context.puzzle.typeManager.keepStateOnRestart?.(context) ?? {},
             ),
         );

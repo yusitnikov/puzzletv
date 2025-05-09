@@ -27,14 +27,15 @@ export interface GridState<T extends AnyPTM> {
     actionId: string;
 }
 
-export const createEmptyGridState = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>): GridState<T> => {
+export const createEmptyGridState = <T extends AnyPTM>(context: PuzzleContext<T>): GridState<T> => {
+    const { puzzle } = context;
     const {
         typeManager: { initialGridStateExtension },
     } = puzzle;
 
     const result: GridState<T> = {
         cells: indexes(puzzle.gridSize.rowsCount).map(() =>
-            indexes(puzzle.gridSize.columnsCount).map(() => createEmptyCellState(puzzle)),
+            indexes(puzzle.gridSize.columnsCount).map(() => createEmptyCellState(context)),
         ),
         lines: new PuzzleLineSet(puzzle),
         marks: new CellMarkSet(puzzle).bulkAdd(puzzle.initialCellMarks ?? []),
@@ -63,18 +64,18 @@ export const serializeGridState = <T extends AnyPTM>(
 
 export const unserializeGridState = <T extends AnyPTM>(
     { cells = [], lines = [], marks = [], extension = {}, clientId = myClientId, actionId = "" }: any,
-    puzzle: PuzzleDefinition<T>,
+    context: PuzzleContext<T>,
 ): GridState<T> => ({
-    cells: (cells as any[][]).map((row) => row.map((cell) => unserializeCellState(cell, puzzle))),
-    lines: PuzzleLineSet.unserialize(puzzle, lines),
+    cells: (cells as any[][]).map((row) => row.map((cell) => unserializeCellState(cell, context))),
+    lines: PuzzleLineSet.unserialize(context.puzzle, lines),
     marks: CellMarkSet.unserialize(
-        puzzle,
+        context.puzzle,
         marks.map(({ type, isCircle, ...mark }: any) => ({
             ...mark,
             type: type ?? (isCircle ? CellMarkType.O : CellMarkType.X),
         })),
-    ).bulkAdd(puzzle.initialCellMarks ?? []),
-    extension: puzzle.typeManager.unserializeGridStateExtension?.(extension) ?? (extension as T["gridStateEx"]),
+    ).bulkAdd(context.puzzle.initialCellMarks ?? []),
+    extension: context.puzzle.typeManager.unserializeGridStateExtension?.(extension) ?? (extension as T["gridStateEx"]),
     clientId,
     actionId,
 });

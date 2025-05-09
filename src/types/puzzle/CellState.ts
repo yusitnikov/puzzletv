@@ -1,7 +1,6 @@
 import { PlainValueSet, SetInterface } from "../struct/Set";
 import { PuzzleTypeManager } from "./PuzzleTypeManager";
 import { CellColor } from "./CellColor";
-import { PuzzleDefinition } from "./PuzzleDefinition";
 import { CellDataSet } from "./CellDataSet";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
@@ -19,9 +18,9 @@ export interface CellStateEx<T extends AnyPTM> extends CellState<T> {
     isInvalid?: boolean;
 }
 
-export const createEmptyCellState = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>): CellState<T> => ({
-    centerDigits: new CellDataSet(puzzle),
-    cornerDigits: new CellDataSet(puzzle),
+export const createEmptyCellState = <T extends AnyPTM>(context: PuzzleContext<T>): CellState<T> => ({
+    centerDigits: new CellDataSet(context),
+    cornerDigits: new CellDataSet(context),
     colors: new PlainValueSet<CellColor>(),
 });
 
@@ -37,11 +36,11 @@ export const serializeCellState = <T extends AnyPTM>(
 
 export const unserializeCellState = <T extends AnyPTM>(
     { usersDigit, centerDigits, cornerDigits, colors }: any,
-    puzzle: PuzzleDefinition<T>,
+    context: PuzzleContext<T>,
 ): CellState<T> => ({
-    usersDigit: usersDigit !== undefined ? puzzle.typeManager.unserializeCellData(usersDigit) : undefined,
-    centerDigits: CellDataSet.unserialize(puzzle, centerDigits),
-    cornerDigits: CellDataSet.unserialize(puzzle, cornerDigits),
+    usersDigit: usersDigit !== undefined ? context.puzzle.typeManager.unserializeCellData(usersDigit) : undefined,
+    centerDigits: CellDataSet.unserialize(context, centerDigits),
+    cornerDigits: CellDataSet.unserialize(context, cornerDigits),
     colors: PlainValueSet.unserialize<CellColor>(colors),
 });
 

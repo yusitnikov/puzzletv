@@ -16,8 +16,6 @@ export const CenterDigitModeButton = observer(function CenterDigitModeButton<T e
 }: ControlButtonItemProps<T>) {
     profiler.trace();
 
-    const { puzzle } = context;
-
     return (
         <CellWriteModeButton
             top={top}
@@ -25,8 +23,8 @@ export const CenterDigitModeButton = observer(function CenterDigitModeButton<T e
             cellWriteMode={CellWriteMode.center}
             data={{
                 centerDigits: new CellDataSet(
-                    puzzle,
-                    [1, 2].map((digit) => puzzle.typeManager.createCellDataByDisplayDigit(digit, context)),
+                    context,
+                    [1, 2].map((digit) => context.puzzle.typeManager.createCellDataByDisplayDigit(digit, context)),
                 ),
             }}
             title={`${translate("Center")} (${translate("shortcut")}: ${ctrlKeyText})`}

@@ -3,7 +3,6 @@ import { SetStateAction } from "react";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
 import { makeAutoObservable } from "mobx";
-import { PuzzleDefinition } from "./PuzzleDefinition";
 import { profiler } from "../../utils/profiler";
 
 export class GridStateHistory<T extends AnyPTM> {
@@ -21,13 +20,13 @@ export class GridStateHistory<T extends AnyPTM> {
     }
 
     constructor(
-        private puzzle: PuzzleDefinition<T>,
+        private context: PuzzleContext<T>,
         public states: string[],
         public currentIndex: number,
     ) {
         makeAutoObservable(this, { states: false });
 
-        this.current = unserializeGridState(JSON.parse(states[currentIndex]), puzzle);
+        this.current = unserializeGridState(JSON.parse(states[currentIndex]), context);
         this.statesCount = states.length;
     }
 
@@ -40,7 +39,7 @@ export class GridStateHistory<T extends AnyPTM> {
     }
 
     seek(index: number) {
-        return new GridStateHistory(this.puzzle, this.states, index);
+        return new GridStateHistory(this.context, this.states, index);
     }
 
     equals(other: GridStateHistory<T>) {
@@ -76,14 +75,14 @@ export const gridStateHistoryAddState = <T extends AnyPTM>(
             new PuzzleContext({
                 ...context,
                 applyPendingMessages: false,
-                myGameState: {
+                myGameState: (newContext) => ({
                     ...context.state,
                     gridStateHistory: new GridStateHistory(
-                        puzzle,
+                        newContext,
                         gridStateHistory.states.slice(0, gridStateHistory.currentIndex),
                         gridStateHistory.currentIndex - 1,
                     ),
-                },
+                }),
             }),
             clientId,
             actionId,
@@ -99,11 +98,11 @@ export const gridStateHistoryAddState = <T extends AnyPTM>(
 
     // No history for multi-player games
     if (context.multiPlayer.isEnabled) {
-        return new GridStateHistory(puzzle, [stateStr], 0);
+        return new GridStateHistory(context, [stateStr], 0);
     }
 
     return new GridStateHistory(
-        puzzle,
+        context,
         [...gridStateHistory.states.slice(0, gridStateHistory.currentIndex + 1), stateStr],
         gridStateHistory.currentIndex + 1,
     );

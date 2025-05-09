@@ -151,10 +151,11 @@ const getPuzzleFullSaveStateKey = <T extends AnyPTM>({
     `${saveStateKey}-${params.host || ""}-${params.room || ""}${saveStateKeySuffix ? "-" + saveStateKeySuffix : ""}`;
 
 export const getEmptyGameState = <T extends AnyPTM>(
-    puzzle: PuzzleDefinition<T>,
+    context: PuzzleContext<T>,
     useLocalStorage: boolean,
     readOnly = false,
 ): GameStateEx<T> => {
+    const { puzzle } = context;
     const { params = {}, typeManager, saveState = true, initialLives = 1 } = puzzle;
 
     const {
@@ -175,13 +176,13 @@ export const getEmptyGameState = <T extends AnyPTM>(
 
     return {
         gridStateHistory: new GridStateHistory(
-            puzzle,
+            context,
             [
                 JSON.stringify(
                     serializeGridState(
                         savedGameState
-                            ? { ...unserializeGridState(savedGameState[1], puzzle), actionId: "" }
-                            : createEmptyGridState(puzzle),
+                            ? { ...unserializeGridState(savedGameState[1], context), actionId: "" }
+                            : createEmptyGridState(context),
                         puzzle,
                     ),
                 ),
@@ -197,10 +198,10 @@ export const getEmptyGameState = <T extends AnyPTM>(
         initialDigits: unserializeCellsMap(savedGameState?.[3] || {}, puzzle.typeManager.unserializeCellData),
         excludedDigits: savedGameState?.[4]
             ? unserializeCellsMap(savedGameState[4], (excludedDigits: any) =>
-                  CellDataSet.unserialize(puzzle, excludedDigits),
+                  CellDataSet.unserialize(context, excludedDigits),
               )
             : indexes(puzzle.gridSize.rowsCount).map(() =>
-                  indexes(puzzle.gridSize.columnsCount).map(() => new CellDataSet(puzzle)),
+                  indexes(puzzle.gridSize.columnsCount).map(() => new CellDataSet(context)),
               ),
 
         currentMultiLine: [],
@@ -298,7 +299,7 @@ export const setAllShareState = <T extends AnyPTM>(context: PuzzleContext<T>, ne
     const { typeManager } = context.puzzle;
     const { setSharedState, unserializeGameState, unserializeCellData } = typeManager;
     const { grid, extension, initialDigits, excludedDigits, lives } = newState;
-    const unserializedGridState = unserializeGridState(grid, context.puzzle);
+    const unserializedGridState = unserializeGridState(grid, context);
 
     const result: GameStateEx<T> = mergeGameStateWithUpdates(context.state, {
         gridStateHistory: gridStateHistoryAddState(
@@ -308,7 +309,7 @@ export const setAllShareState = <T extends AnyPTM>(context: PuzzleContext<T>, ne
             unserializedGridState,
         ),
         initialDigits: unserializeCellsMap(initialDigits, unserializeCellData),
-        excludedDigits: unserializeCellsMap(excludedDigits, (item) => CellDataSet.unserialize(context.puzzle, item)),
+        excludedDigits: unserializeCellsMap(excludedDigits, (item) => CellDataSet.unserialize(context, item)),
         lives,
         extension: unserializeGameState?.(extension) ?? extension,
     });

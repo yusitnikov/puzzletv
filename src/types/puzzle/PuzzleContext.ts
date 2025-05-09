@@ -64,6 +64,10 @@ export interface PuzzleContextOptions<T extends AnyPTM> {
     applyPendingMessages: boolean;
 }
 
+export interface PuzzleContextCreationOptions<T extends AnyPTM> extends Omit<PuzzleContextOptions<T>, "myGameState"> {
+    myGameState: GameStateEx<T> | ((context: PuzzleContext<T>) => GameStateEx<T>);
+}
+
 // It's not a React context! Just a regular class.
 export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> {
     puzzle: PuzzleDefinition<T>;
@@ -165,7 +169,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         isReadonlyContext,
         applyKeys,
         applyPendingMessages,
-    }: PuzzleContextOptions<T>) {
+    }: PuzzleContextCreationOptions<T>) {
         makeAutoObservable(
             this,
             {
@@ -193,10 +197,9 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         );
 
         this.puzzle = puzzle;
-        this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(this.puzzle);
+        this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(puzzle);
         this._processedGameStateExtension = processedGameStateExtension;
         this._animated = animated;
-        this.myGameState = myGameState;
         this._onStateChange = onStateChange;
         this.cellSize = cellSize;
         this.cellSizeForSidePanel = cellSizeForSidePanel;
@@ -204,6 +207,8 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         this.applyKeys = applyKeys;
         this.applyPendingMessages = applyPendingMessages;
 
+        // Fields that depend on `this` are the last to initialize
+        this.myGameState = typeof myGameState === "function" ? myGameState(this) : myGameState;
         this.multiPlayer = new UseMultiPlayerResult(this);
     }
 
@@ -982,7 +987,7 @@ export const createEmptyContextForPuzzle = <T extends AnyPTM>(
         puzzle,
         myGameState: emptyGameState
             ? (emptyObject as unknown as GameStateEx<T>)
-            : getEmptyGameState(puzzle, false, true),
+            : (context) => getEmptyGameState(context, false, true),
         cellSize,
         cellSizeForSidePanel: cellSize,
         isReadonlyContext: true,

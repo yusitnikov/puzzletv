@@ -27,7 +27,7 @@ export const useGame = <T extends AnyPTM>(
         () =>
             new PuzzleContext({
                 puzzle,
-                myGameState: getEmptyGameState(puzzle, true, isReadonlyContext),
+                myGameState: (context) => getEmptyGameState(context, true, isReadonlyContext),
                 cellSize,
                 cellSizeForSidePanel,
                 isReadonlyContext,

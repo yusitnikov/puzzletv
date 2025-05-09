@@ -70,10 +70,10 @@ export class ChessHistoryManager {
 
     readonly getChessHistory = computedFn(
         function getChessHistory(this: ChessHistoryManager, untilCurrentState: boolean) {
-            const { gridStateHistory, puzzle } = this.context;
+            const { gridStateHistory } = this.context;
 
             let states = gridStateHistory.states.map((state) =>
-                unserializeGridState(JSON.parse(state), puzzle).cells.map((row) =>
+                unserializeGridState(JSON.parse(state), this.context).cells.map((row) =>
                     row.map(({ usersDigit }) => usersDigit),
                 ),
             );

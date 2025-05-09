@@ -130,8 +130,8 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>({
     const { usersDigit, centerDigits, cornerDigits } = data;
 
     const initialDataSet = useMemo(
-        () => (initialData === undefined ? undefined : new CellDataSet(puzzle, [initialData])),
-        [puzzle, initialData],
+        () => (initialData === undefined ? undefined : new CellDataSet(context, [initialData])),
+        [context, initialData],
     );
 
     const isRecentInitialData = useCallback(
@@ -140,8 +140,8 @@ export const CellDigits = observer(function CellDigits<T extends AnyPTM>({
     );
 
     const usersDigitSet = useMemo(
-        () => (usersDigit === undefined ? undefined : new CellDataSet(puzzle, [usersDigit])),
-        [puzzle, usersDigit],
+        () => (usersDigit === undefined ? undefined : new CellDataSet(context, [usersDigit])),
+        [context, usersDigit],
     );
 
     const isValidMainDigit = useCallback(() => isValidUserDigit(), [isValidUserDigit]);
