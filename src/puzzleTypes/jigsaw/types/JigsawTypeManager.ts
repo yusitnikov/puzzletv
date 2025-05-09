@@ -468,6 +468,8 @@ export const JigsawTypeManager = (
                             }
                         }
                     }
+                    contextDraft.dispose();
+
                     puzzle = {
                         ...puzzle,
                         inactiveCells: newInactiveCells.items,

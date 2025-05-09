@@ -247,7 +247,11 @@ const loadByImportOptions = <T extends AnyPTM>(
         importer.importGivenColorsAsSolution();
     }
 
-    return importer.finalize();
+    const result = importer.finalize();
+
+    importer.dispose();
+
+    return result;
 };
 
 const gridParserFactoryMap = {

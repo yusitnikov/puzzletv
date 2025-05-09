@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo } from "react";
+import React, { ReactElement, useEffect, useMemo } from "react";
 import { Grid } from "./Grid";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { ErrorBoundary } from "react-error-boundary";
@@ -74,6 +74,11 @@ const GridPreviewInner = observer(function GridPreviewInnerFc<T extends AnyPTM>(
 
     const cellSize = width / (puzzle.gridSize.gridSize + (puzzle.gridMargin || 0) * 2);
     const context = useMemo(() => createEmptyContextForPuzzle(puzzle, cellSize), [puzzle, cellSize]);
+    useEffect(() => {
+        return () => {
+            context.dispose();
+        };
+    }, [context]);
 
     // noinspection JSSuspiciousNameCombination
     return (

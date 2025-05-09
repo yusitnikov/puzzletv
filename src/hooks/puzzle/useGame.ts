@@ -92,6 +92,12 @@ export const useGame = <T extends AnyPTM>(
         };
     }, [disposers]);
 
+    useEffect(() => {
+        return () => {
+            context.dispose();
+        };
+    }, [context]);
+
     timer.stop();
 
     return context;

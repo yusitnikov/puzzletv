@@ -71,23 +71,24 @@ export const gridStateHistoryAddState = <T extends AnyPTM>(
         gridStateHistory.currentIndex > 0
     ) {
         // Replace the last state of the same action by the current action
-        return gridStateHistoryAddState(
-            new PuzzleContext({
-                ...context,
-                applyPendingMessages: false,
-                myGameState: {
-                    ...context.state,
-                    gridStateHistory: new GridStateHistory(
-                        context,
-                        gridStateHistory.states.slice(0, gridStateHistory.currentIndex),
-                        gridStateHistory.currentIndex - 1,
-                    ),
-                },
-            }),
-            clientId,
-            actionId,
-            state,
-        );
+        const tmpContext = new PuzzleContext({
+            ...context,
+            applyPendingMessages: false,
+            myGameState: {
+                ...context.state,
+                gridStateHistory: new GridStateHistory(
+                    context,
+                    gridStateHistory.states.slice(0, gridStateHistory.currentIndex),
+                    gridStateHistory.currentIndex - 1,
+                ),
+            },
+        });
+
+        const result = gridStateHistoryAddState(tmpContext, clientId, actionId, state);
+
+        tmpContext.dispose();
+
+        return result;
     }
 
     if (areGridStatesEqual(context, state, currentGridState)) {

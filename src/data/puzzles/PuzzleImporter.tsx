@@ -142,6 +142,11 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.setAuthor(importOptions.author);
     }
 
+    dispose() {
+        this.emptyContextCache?.dispose();
+        this.emptyContextCache = undefined;
+    }
+
     private finalImportOptions(gridParser: GridParser<T, any>): PuzzleImportOptions {
         return { ...this.importOptions, ...gridParser.importOptionOverrides };
     }

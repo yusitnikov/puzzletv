@@ -212,6 +212,10 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         this.multiPlayer = new UseMultiPlayerResult(this);
     }
 
+    dispose(): void {
+        // TODO: implement disposing context
+    }
+
     update(updates: Partial<PuzzleContextOptions<T>>) {
         runInAction(() => {
             const {
@@ -381,6 +385,8 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                     typeof callback === "function" ? callback(processedContext) : callback,
                 );
             }
+
+            processedContext.dispose();
         }
 
         return myGameState;

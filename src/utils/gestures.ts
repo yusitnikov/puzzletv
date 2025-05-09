@@ -228,6 +228,10 @@ const finalizeGesture = (reason: GestureFinishReason) => {
         pointer.start = pointer.current;
         pointer.length = 0;
     }
+
+    if (typeof currentGesture.state === "object" && typeof currentGesture.state.dispose === "function") {
+        currentGesture.state.dispose();
+    }
 };
 
 const releasePointer = (pointerId: number, reason: GestureFinishReason) => {
