@@ -75,14 +75,14 @@ export const gridStateHistoryAddState = <T extends AnyPTM>(
             new PuzzleContext({
                 ...context,
                 applyPendingMessages: false,
-                myGameState: (newContext) => ({
+                myGameState: {
                     ...context.state,
                     gridStateHistory: new GridStateHistory(
-                        newContext,
+                        context,
                         gridStateHistory.states.slice(0, gridStateHistory.currentIndex),
                         gridStateHistory.currentIndex - 1,
                     ),
-                }),
+                },
             }),
             clientId,
             actionId,
