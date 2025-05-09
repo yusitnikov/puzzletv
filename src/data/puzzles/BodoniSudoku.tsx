@@ -185,7 +185,7 @@ const glyphsMap: Record<number, ReactNode[]> = {
 const colorsMap = cellColors;
 
 const BodoniDigit = observer(function BodoniDigit({
-    puzzle,
+    context,
     digit,
     size,
     color = textColor,
@@ -195,7 +195,7 @@ const BodoniDigit = observer(function BodoniDigit({
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <BodoniDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <BodoniDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 });

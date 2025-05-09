@@ -53,7 +53,7 @@ const CustomFogRenderer = observer(function CustomFogRenderer({ context }: FogRe
                                 <rect width={1} height={1} fill={"#000"} strokeWidth={0} />
                                 {/* Just an example - clear the fog in the shape of the correct digit to the left from the cell */}
                                 <CellData
-                                    puzzle={puzzle}
+                                    context={context}
                                     data={cells[top][left].usersDigit!}
                                     size={2}
                                     top={0.5}

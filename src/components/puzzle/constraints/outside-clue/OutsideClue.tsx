@@ -92,7 +92,7 @@ export interface OutsideClueProps {
 
 export const OutsideClue: ConstraintPropsGenericFcMap<OutsideClueProps> = {
     [GridLayer.regular]: observer(function OutsideClue<T extends AnyPTM>({
-        context: { puzzle },
+        context,
         color,
         props: {
             clueCell: { top, left },
@@ -102,10 +102,12 @@ export const OutsideClue: ConstraintPropsGenericFcMap<OutsideClueProps> = {
         profiler.trace();
 
         const {
-            typeManager: {
-                digitComponentType: { svgContentComponent: DigitSvgContent, widthCoeff },
+            puzzle: {
+                typeManager: {
+                    digitComponentType: { svgContentComponent: DigitSvgContent, widthCoeff },
+                },
             },
-        } = puzzle;
+        } = context;
 
         const valueArr = value.toString().split("").map(Number);
 
@@ -114,7 +116,7 @@ export const OutsideClue: ConstraintPropsGenericFcMap<OutsideClueProps> = {
                 {valueArr.map((num, index) => (
                     <DigitSvgContent
                         key={index}
-                        puzzle={puzzle}
+                        context={context}
                         color={color}
                         digit={num}
                         size={0.5}

@@ -7,20 +7,22 @@ import { observer } from "mobx-react-lite";
 export const JigsawDigitCellData = observer(function JigsawDigitCellDataFc(props: CellDataProps<JigsawPTM>) {
     profiler.trace();
 
-    const { puzzle, data, size, isInitial, isValid, angle = 0, ...absoluteProps } = props;
+    const { context, data, size, isInitial, isValid, angle = 0, ...absoluteProps } = props;
     const {
-        typeManager: {
-            digitComponentType,
-            cellDataDigitComponentType: { component: DigitComponent } = digitComponentType,
+        puzzle: {
+            typeManager: {
+                digitComponentType,
+                cellDataDigitComponentType: { component: DigitComponent } = digitComponentType,
+            },
         },
-    } = puzzle;
+    } = context;
 
     return (
         <DigitComponent
             {...absoluteProps}
             digit={data.digit}
             angle={data.angle + angle}
-            puzzle={puzzle}
+            context={context}
             size={size}
             color={getDefaultCellDataColor(props)}
         />

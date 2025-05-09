@@ -103,7 +103,7 @@ const squareSizeCoeff = (1 - lineWidthCoeff) / 2;
 const digitWidthCoeff = squareSizeCoeff + lineWidthCoeff;
 
 export const CenteredCalculatorDigit = observer(function CenteredCalculatorDigit<T extends AnyPTM>({
-    puzzle,
+    context,
     digit,
     size,
     color = textColor,
@@ -113,12 +113,12 @@ export const CenteredCalculatorDigit = observer(function CenteredCalculatorDigit
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <CenteredCalculatorDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <CenteredCalculatorDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 }) as DigitPropsGenericFc;
 export const RegularCalculatorDigit = observer(function RegularCalculatorDigit<T extends AnyPTM>({
-    puzzle,
+    context,
     digit,
     size,
     color = textColor,
@@ -128,7 +128,7 @@ export const RegularCalculatorDigit = observer(function RegularCalculatorDigit<T
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <RegularCalculatorDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <RegularCalculatorDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 }) as DigitPropsGenericFc;

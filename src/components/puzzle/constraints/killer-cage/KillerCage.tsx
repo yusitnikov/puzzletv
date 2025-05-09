@@ -15,12 +15,12 @@ import { indexes } from "../../../../utils/indexes";
 import { CenteredText } from "../../../svg/centered-text/CenteredText";
 import { incrementArrayItemByIndex } from "../../../../utils/array";
 import { AnyPTM } from "../../../../types/puzzle/PuzzleTypeMap";
-import { PuzzleDefinition } from "../../../../types/puzzle/PuzzleDefinition";
 import { useCompensationAngle } from "../../../../contexts/TransformContext";
 import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../../utils/profiler";
 import { cosmeticTag } from "../decorative-shape/DecorativeShape";
+import { PuzzleContext } from "../../../../types/puzzle/PuzzleContext";
 
 export const cageTag = "cage";
 
@@ -95,7 +95,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
                 {sum && (
                     <>
                         <KillerCageSum
-                            puzzle={puzzle}
+                            context={context}
                             sum={sum}
                             size={sumDigitSize}
                             left={points[sumPointIndex].left + sumPadding}
@@ -106,7 +106,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
 
                         {showBottomSum && (
                             <KillerCageSum
-                                puzzle={puzzle}
+                                context={context}
                                 sum={sum}
                                 size={sumDigitSize}
                                 left={right - sumPadding}
@@ -124,7 +124,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
 };
 
 interface KillerCageSumProps<T extends AnyPTM> extends Position {
-    puzzle: PuzzleDefinition<T>;
+    context: PuzzleContext<T>;
     sum: string | number;
     size: number;
     color?: string;
@@ -133,7 +133,7 @@ interface KillerCageSumProps<T extends AnyPTM> extends Position {
 }
 
 const KillerCageSum = observer(function KillerCageSum<T extends AnyPTM>({
-    puzzle,
+    context,
     sum,
     size,
     color = blackColor,
@@ -145,10 +145,12 @@ const KillerCageSum = observer(function KillerCageSum<T extends AnyPTM>({
     profiler.trace();
 
     const {
-        typeManager: {
-            digitComponentType: { svgContentComponent: DigitSvgContent, widthCoeff },
+        puzzle: {
+            typeManager: {
+                digitComponentType: { svgContentComponent: DigitSvgContent, widthCoeff },
+            },
         },
-    } = puzzle;
+    } = context;
 
     const width = size * widthCoeff * sum.toString().length;
 
@@ -177,7 +179,7 @@ const KillerCageSum = observer(function KillerCageSum<T extends AnyPTM>({
                         .map((digit, index) => (
                             <DigitSvgContent
                                 key={`digit-${index}`}
-                                puzzle={puzzle}
+                                context={context}
                                 digit={Number(digit)}
                                 size={size}
                                 left={size * widthCoeff * (index + 0.5)}
@@ -250,7 +252,7 @@ export const KillerCageConstraint = <T extends AnyPTM>(
     ),
     name: "killer cage",
     isObvious: true,
-    isValidCell(cell, digits, cells, context, constraints, constraint, isFinalCheck, onlyObvious) {
+    isValidCell(cell, digits, cells, context, _constraints, constraint, _isFinalCheck, onlyObvious) {
         const { puzzle } = context;
 
         const expectedSum = puzzle.typeManager.transformNumber

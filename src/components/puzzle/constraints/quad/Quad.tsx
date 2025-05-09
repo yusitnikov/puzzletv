@@ -77,7 +77,7 @@ export const QuadByData = observer(function QuadByData<T extends AnyPTM>({
                 return (
                     <CellData
                         key={`digit-${index}`}
-                        puzzle={puzzle}
+                        context={context}
                         data={digit}
                         size={fontSize}
                         top={offset * Math.cos(angle)}

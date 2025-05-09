@@ -25,7 +25,7 @@ export interface LittleKillerProps {
 
 export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
     [GridLayer.regular]: observer(function LittleKiller<T extends AnyPTM>({
-        context: { puzzle },
+        context,
         cells: [{ top, left }],
         color: fontColor = textColor,
         props: { direction, sum, lineColor = textColor },
@@ -33,10 +33,12 @@ export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
         profiler.trace();
 
         const {
-            typeManager: {
-                digitComponentType: { svgContentComponent: DigitSvgContent },
+            puzzle: {
+                typeManager: {
+                    digitComponentType: { svgContentComponent: DigitSvgContent },
+                },
             },
-        } = puzzle;
+        } = context;
 
         top += 0.5;
         left += 0.5;
@@ -75,7 +77,7 @@ export const LittleKiller: ConstraintPropsGenericFcMap<LittleKillerProps> = {
 
                 {sum !== undefined && (
                     <DigitSvgContent
-                        puzzle={puzzle}
+                        context={context}
                         color={fontColor}
                         digit={sum}
                         size={0.5}

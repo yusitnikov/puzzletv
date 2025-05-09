@@ -2,10 +2,10 @@ import { AutoSvgProps } from "../../svg/auto-svg/AutoSvg";
 import { Size } from "../../../types/layout/Size";
 import { errorColor, recentInfoColor, textColor, userDigitColor } from "../../app/globals";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
-import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 export interface CellDataProps<T extends AnyPTM> extends Omit<AutoSvgProps, keyof Size> {
-    puzzle: PuzzleDefinition<T>;
+    context: PuzzleContext<T>;
     data: T["cell"];
     size: number;
     isInitial?: boolean;

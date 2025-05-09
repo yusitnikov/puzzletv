@@ -172,7 +172,7 @@ const svgMap: Record<number, ReactElement> = {
 };
 
 export const LatinDigit: DigitPropsGenericFc = observer(function LatinDigitFc<T extends AnyPTM>({
-    puzzle,
+    context,
     digit,
     size,
     color = textColor,
@@ -182,7 +182,7 @@ export const LatinDigit: DigitPropsGenericFc = observer(function LatinDigitFc<T 
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <LatinDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <LatinDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 });

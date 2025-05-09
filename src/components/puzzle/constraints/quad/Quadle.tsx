@@ -45,17 +45,19 @@ type QuadleByDataProps<T extends AnyPTM> = Pick<
     "context" | "cells" | "props"
 >;
 export const QuadleByData = observer(function QuadleByData<T extends AnyPTM>({
-    context: { puzzle },
+    context,
     cells,
     props: { digits, isRecent },
 }: QuadleByDataProps<T>) {
     profiler.trace();
 
     const {
-        typeManager: {
-            cellDataComponentType: { component: CellData },
+        puzzle: {
+            typeManager: {
+                cellDataComponentType: { component: CellData },
+            },
         },
-    } = puzzle;
+    } = context;
 
     const id = "clipPath" + useAutoIncrementId();
 
@@ -102,7 +104,7 @@ export const QuadleByData = observer(function QuadleByData<T extends AnyPTM>({
                             />
 
                             <CellData
-                                puzzle={puzzle}
+                                context={context}
                                 data={digit}
                                 size={fontSize}
                                 top={top + offset * topOffset}

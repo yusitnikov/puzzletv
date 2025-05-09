@@ -14,21 +14,23 @@ interface FillableCalculatorDigitProps {
 
 export const FillableCalculatorDigit: ConstraintPropsGenericFcMap<FillableCalculatorDigitProps> = {
     [GridLayer.beforeSelection]: observer(function FillableCalculatorDigit<T extends AnyPTM>({
-        context: { puzzle },
+        context,
         cells: [{ left, top }],
         props: { digit },
     }: ConstraintProps<T, FillableCalculatorDigitProps>) {
         profiler.trace();
 
         const {
-            typeManager: {
-                cellDataComponentType: { cellSizeCoeff = mainDigitCoeff },
+            puzzle: {
+                typeManager: {
+                    cellDataComponentType: { cellSizeCoeff = mainDigitCoeff },
+                },
             },
-        } = puzzle;
+        } = context;
 
         return (
             <RegularCalculatorDigit
-                puzzle={puzzle}
+                context={context}
                 left={left + 0.5}
                 top={top + 0.5}
                 size={cellSizeCoeff}

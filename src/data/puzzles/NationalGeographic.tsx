@@ -17,7 +17,7 @@ import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constrain
 
 // region Custom digit
 const AnimalDigit = observer(function AnimalDigit({
-    puzzle,
+    context,
     digit,
     size,
     color = textColor,
@@ -27,7 +27,7 @@ const AnimalDigit = observer(function AnimalDigit({
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <AnimalDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <AnimalDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 });

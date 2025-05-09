@@ -9,7 +9,7 @@ import { DigitRotationInfo } from "./DigitRotationInfo";
 import { observer } from "mobx-react-lite";
 
 export const RegularDigit: DigitPropsGenericFc = observer(function RegularDigitFc<T extends AnyPTM>({
-    puzzle,
+    context,
     digit,
     size,
     color = textColor,
@@ -19,7 +19,7 @@ export const RegularDigit: DigitPropsGenericFc = observer(function RegularDigitF
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <RegularDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <RegularDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 });
@@ -27,8 +27,10 @@ export const RegularDigit: DigitPropsGenericFc = observer(function RegularDigitF
 export const RegularDigitSvgContent: DigitPropsGenericFc = observer(function RegularDigitSvgContentFc<
     T extends AnyPTM,
 >({
-    puzzle: {
-        typeManager: { rotationallySymmetricDigits },
+    context: {
+        puzzle: {
+            typeManager: { rotationallySymmetricDigits },
+        },
     },
     digit,
     size,

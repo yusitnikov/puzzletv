@@ -10,19 +10,21 @@ export const RotatableDigitCellData = observer(function RotatableDigitCellDataFc
 ) {
     profiler.trace();
 
-    const { puzzle, data, size, isInitial, isValid, ...absoluteProps } = props;
+    const { context, data, size, isInitial, isValid, ...absoluteProps } = props;
     const {
-        typeManager: {
-            digitComponentType,
-            cellDataDigitComponentType: { component: DigitComponent } = digitComponentType,
+        puzzle: {
+            typeManager: {
+                digitComponentType,
+                cellDataDigitComponentType: { component: DigitComponent } = digitComponentType,
+            },
+            importOptions,
         },
-        importOptions,
-    } = puzzle;
+    } = context;
 
     return (
         <DigitComponent
             {...absoluteProps}
-            puzzle={puzzle}
+            context={context}
             digit={data.digit}
             size={size}
             color={getDefaultCellDataColor(

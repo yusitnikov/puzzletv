@@ -332,7 +332,7 @@ const AnimatedDigitsSet = observer(function AnimatedDigitsSet<T extends AnyPTM>(
                 return (
                     <CellData
                         key={context.puzzle.typeManager.getCellDataHash(cellData, puzzle)}
-                        puzzle={puzzle}
+                        context={context}
                         data={cellData}
                         size={digitSize}
                         {...position}
@@ -358,7 +358,7 @@ export const getCellDataSortIndexes = <CellType,>(
 
         itemsWithIndexes
             .sort(({ value: a }, { value: b }) => compareFn(a, b))
-            .forEach(({ value, index: initialIndex }, sortedIndex) => (indexes[initialIndex] = sortedIndex));
+            .forEach(({ index: initialIndex }, sortedIndex) => (indexes[initialIndex] = sortedIndex));
 
         return indexes;
     });

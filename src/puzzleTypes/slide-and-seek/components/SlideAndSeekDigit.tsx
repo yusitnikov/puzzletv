@@ -5,11 +5,11 @@ import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { SlideAndSeekPTM } from "../types/SlideAndSeekPTM";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { SlideAndSeekPuzzleExtension } from "../types/SlideAndSeekPuzzleExtension";
-import { createEmptyContextForPuzzle, PuzzleContext } from "../../../types/puzzle/PuzzleContext";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { defaultCosmeticShapeBorderWidth } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
 
 export const SlideAndSeekDigit = observer(function SlideAndSeekDigit<T extends AnyPTM>({
-    puzzle,
+    context,
     digit,
     size,
     color,
@@ -19,13 +19,13 @@ export const SlideAndSeekDigit = observer(function SlideAndSeekDigit<T extends A
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <SlideAndSeekDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <SlideAndSeekDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 });
 
-export const SlideAndSeekDigitSvgContent = observer(function SlideAndSeekDigitSvgContent<T extends AnyPTM>({
-    puzzle,
+export const SlideAndSeekDigitSvgContent = observer(function SlideAndSeekDigitSvgContentFc<T extends AnyPTM>({
+    context,
     digit,
     size,
     color,
@@ -60,7 +60,7 @@ export const SlideAndSeekDigitSvgContent = observer(function SlideAndSeekDigitSv
         );
     }
 
-    const constraint = (puzzle.extension as SlideAndSeekPuzzleExtension).shapes[digit - 1];
+    const constraint = (context.puzzle.extension as SlideAndSeekPuzzleExtension).shapes[digit - 1];
     if (!constraint) {
         return null;
     }
@@ -70,14 +70,12 @@ export const SlideAndSeekDigitSvgContent = observer(function SlideAndSeekDigitSv
         props: { width, height, borderWidth = defaultCosmeticShapeBorderWidth },
     } = constraint;
 
-    const context = createEmptyContextForPuzzle(puzzle) as unknown as PuzzleContext<AnyPTM>;
-
     return (
         <>
             {Object.entries(component).map(([layer, Component]) => (
                 <Component
                     key={layer}
-                    context={context}
+                    context={context as unknown as PuzzleContext<AnyPTM>}
                     {...constraint}
                     cells={[{ top: top * size - 0.5, left: left * size - 0.5 }]}
                     color={constraint.color?.match(/^#000/i) ? color : "transparent"}

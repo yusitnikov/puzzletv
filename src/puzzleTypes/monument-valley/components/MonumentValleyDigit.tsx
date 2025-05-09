@@ -1,5 +1,4 @@
 import { profiler } from "../../../utils/profiler";
-import { Record } from "@emotion-icons/fluentui-system-filled";
 import { ReactElement } from "react";
 import { DigitProps } from "../../../components/puzzle/digit/DigitProps";
 import { textColor } from "../../../components/app/globals";
@@ -162,7 +161,7 @@ const svgMap: Record<number, ReactElement> = {
 };
 
 export const MonumentValleyDigit = observer(function MonumentValleyDigit({
-    puzzle,
+    context,
     digit,
     size,
     color = textColor,
@@ -172,7 +171,7 @@ export const MonumentValleyDigit = observer(function MonumentValleyDigit({
 
     return (
         <AutoSvg width={size} height={size} {...containerProps}>
-            <MonumentValleyDigitSvgContent puzzle={puzzle} digit={digit} size={size} color={color} />
+            <MonumentValleyDigitSvgContent context={context} digit={digit} size={size} color={color} />
         </AutoSvg>
     );
 });
