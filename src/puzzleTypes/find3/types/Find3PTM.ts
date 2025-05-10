@@ -1,5 +1,6 @@
 import { AnyPTM, PTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { Find3GridState } from "./Find3GridState";
+import { AddGridStateEx } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 
 export type Find3PTM<
     CellType = number,
@@ -15,6 +16,4 @@ export type AnyFind3PTM<
     PuzzleExType = any,
 > = AnyPTM<CellType, GameStateExType, GridStateEx, PuzzleExType>;
 
-export type ToFind3PTM<T extends AnyPTM> = Omit<T, "gridStateEx"> & {
-    gridStateEx: T["gridStateEx"] & Find3GridState;
-};
+export type ToFind3PTM<T extends AnyPTM> = AddGridStateEx<T, Find3GridState>;

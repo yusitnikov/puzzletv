@@ -1,5 +1,6 @@
 import { AnyPTM, PTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { MultiStageGameState } from "./MultiStageGameState";
+import { AddGameStateEx } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 
 export type MultiStagePTM<
     CellType = number,
@@ -15,4 +16,4 @@ export type AnyMultiStagePTM<
     PuzzleExType = any,
 > = AnyPTM<CellType, GameStateExType, GridStateEx, PuzzleExType>;
 
-export type ToMultiStagePTM<T extends AnyPTM> = Omit<T, "stateEx"> & { stateEx: T["stateEx"] & MultiStageGameState };
+export type ToMultiStagePTM<T extends AnyPTM> = AddGameStateEx<T, MultiStageGameState>;
