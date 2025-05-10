@@ -41,10 +41,6 @@ export const JigsawNoShuffle = Template.bind({});
 JigsawNoShuffle.args = {
     _hash: "f-puzzles:type=jigsaw:digitType=calculator:angleStep=90:load=N4IgzglgXgpiBcBOANCA5gJwgEwQbT1ADcBDAGwFc54BGVNCImAOwQBcMqBfZYHv3vyGCRfALrJC/EKUrUATPUYt2nGMIGaNQiVNEzyVBAGYlTVvA7dR2m7q37ZR+ABYzKy2tsPxknxoM5BABWdwsrdRs7P28Ap2oANjDVa397WKjiQ2oAdmTPVJ0YzIysoPgADnyIor1/EsdshBR0ZXCvMTEuIA",
 };
-export const JigsawShuffled = Template.bind({});
-JigsawShuffled.args = {
-    _hash: "f-puzzles:type=jigsaw:angleStep=90:shuffle:load=N4IgzglgXgpiBcBOANCA5gJwgEwQbT1ADcBDAGwFc54BGVNCImAOwQBcMrUBjBEAYgBiggIIAGcSB4iMGEgE98A4eMkBdAL7JQveMtESxUkNxlzF8PPtVHN2k3yEHJ02QqVObIOzscrDxqZuFlaeAT4OemEuJmbultbhWr5R/jFB5h5ptsmRielxIfk59rrFgYVZziUp5a6ZCdE5asiEuaSU1ABM9Iws7JwwycPaI8BjGi1to/YdVAgAzL1MrPAcVBMz41uTrbX8AEJiwkcVwR5HJzV5h8eCp/XxoZf312W3V2cNz3enEXPUAAsy36a0GPEcLwesXOjShb0hvyMjyKH1e3ly73hXyeAmxESxSJxqPxmMRnxRFyJBPJ6MpcOpu2m2xZ7XI83gAFYQat1kMdjspqyBSyQACEAA2HkDDYipn7AAcYiVgmRMO+AiVKoRUS1xzVGVx/D1qoxpUcJoNlUalrNiuV+uJHltNN1DtN9NCLrJbu1Tpt7uu4vgAHZpWCuDdbZ7NYG7VG4zHjXHXbG/UnvULNsKc2L2dQFeG+cMs3Ky6Lgyh0H1eYNJpogA",
-};
 export const JigsawWithRegionZero = Template.bind({});
 JigsawWithRegionZero.args = {
     _hash: "f-puzzles:type=jigsaw:angleStep=90:stickyDigits:load=N4IgzglgXgpiBcBOANCA5gJwgEwQbT2AF9ljSSzQMY0IB7AOwQFoBGCka2xl90zmvSbw2HLkN5jBPEewC6yQhWXlVlFVWnDRCpWo0G1A7tvmL1+yxc0nJumxNmHrz4453m3M0VecH7XqZ+vvoB4t58LiHqYVqS/OFBCXFOybapDhHBxHJyREA===",

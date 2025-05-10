@@ -114,7 +114,6 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [angleStep, setAngleStep] = useNumberFromLocalStorage("fpwAngleStep", 90);
     const [hasStickyJigsawPiece, setHasStickyJigsawPiece] = useBoolFromLocalStorage("fpwHasStickyJigsawPiece", false);
     const [stickyJigsawPiece, setStickyJigsawPiece] = useNumberFromLocalStorage("fpwStickyJigsawPiece", 1);
-    const [shuffle, setShuffle] = useBoolFromLocalStorage("fpwShuffle", false);
     const [hideZeroRegion, setHideZeroRegion] = useBoolFromLocalStorage("fpwHideZeroRegion", false);
     const [noPieceRegions, setNoPieceRegions] = useBoolFromLocalStorage("fpwNoPieceRegions", false);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
@@ -264,7 +263,6 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         allowOverrideColors: getHasInitialColors(colorsImportMode) && allowOverrideColors,
         colorsImportMode: hasColors ? colorsImportMode : undefined,
         angleStep: finalAngleStep,
-        shuffle: isJigsaw && filteredExtraGrids.length === 0 && shuffle,
         noSudoku: isJigsawLike && noSudoku,
         hideZeroRegion: isJigsaw && hideZeroRegion,
         noPieceRegions: (isJigsawLike && noPieceRegions) || isShuffled,
@@ -902,19 +900,6 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                         </Paragraph>
                                     )}
                                 </>
-                            )}
-
-                            {isJigsaw && filteredExtraGrids.length === 0 && (
-                                <Paragraph>
-                                    <label>
-                                        Shuffle:&nbsp;
-                                        <input
-                                            type={"checkbox"}
-                                            checked={shuffle}
-                                            onChange={(ev) => setShuffle(ev.target.checked)}
-                                        />
-                                    </label>
-                                </Paragraph>
                             )}
 
                             {isJigsaw && (

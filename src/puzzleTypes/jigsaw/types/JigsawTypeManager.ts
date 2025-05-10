@@ -40,7 +40,6 @@ import { JigsawPieceHighlightHandlerControlButtonItem } from "../components/Jigs
 import { getCellDataSortIndexes } from "../../../components/puzzle/cell/CellDigits";
 import { JigsawGridPieceState, JigsawGridState } from "./JigsawGridState";
 import { getReverseIndexMap } from "../../../utils/array";
-import { createRandomGenerator } from "../../../utils/random";
 import { PuzzleImportOptions } from "../../../types/puzzle/PuzzleImportOptions";
 import { PuzzleCellsIndex } from "../../../types/puzzle/PuzzleCellsIndex";
 import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
@@ -80,7 +79,7 @@ interface JigsawTypeManagerOptions {
 }
 
 export const JigsawTypeManager = (
-    { angleStep, stickyDigits, shuffle, hideZeroRegion }: PuzzleImportOptions,
+    { angleStep, stickyDigits, hideZeroRegion }: PuzzleImportOptions,
     {
         supportGluePieces = true,
         phrases = {
@@ -246,8 +245,6 @@ export const JigsawTypeManager = (
 
                 allowScale: true,
                 isFreeScale: true,
-                // initial scale to contain the shuffled pieces
-                initialScale: shuffle ? 0.7 : 1,
 
                 processArrowDirection(currentCell, xDirection, yDirection, context, ...args): { cell?: Position } {
                     const regions = context
@@ -565,40 +562,19 @@ export const JigsawTypeManager = (
                         return { pieces: [] };
                     }
 
-                    const {
-                        importOptions: { shuffle, angleStep } = {},
-                        typeManager: { initialScale = 1 },
-                    } = puzzle;
-                    const randomizer = createRandomGenerator(0);
-                    const centerTop = puzzle.gridSize.rowsCount / 2;
-                    const centerLeft = puzzle.gridSize.columnsCount / 2;
                     const pieces = puzzle.extension?.pieces ?? [];
 
-                    const piecePositions = pieces.map(({ boundingRect }): PositionWithAngle => {
-                        const { top, left } = getRectCenter(boundingRect);
-
-                        return {
-                            top: shuffle
-                                ? centerTop -
-                                  top +
-                                  (centerTop / initialScale - boundingRect.height / 2) * (randomizer() * 2 - 1)
-                                : 0,
-                            left: shuffle
-                                ? centerLeft -
-                                  left +
-                                  (centerLeft / initialScale - boundingRect.width / 2) * (randomizer() * 2 - 1)
-                                : 0,
-                            angle: shuffle && angleStep ? roundToStep(randomizer() * 360, angleStep) : 0,
-                        };
-                    });
                     const pieceSortIndexesByPosition = getReverseIndexMap(
-                        sortJigsawPiecesByPosition(pieces, piecePositions),
+                        sortJigsawPiecesByPosition(
+                            pieces,
+                            pieces.map(() => emptyPositionWithAngle),
+                        ),
                     );
 
                     return {
-                        pieces: piecePositions.map((position, index) => {
+                        pieces: pieces.map((piece, index) => {
                             return {
-                                ...position,
+                                ...emptyPositionWithAngle,
                                 zIndex: pieces.length - pieceSortIndexesByPosition[index],
                             };
                         }),

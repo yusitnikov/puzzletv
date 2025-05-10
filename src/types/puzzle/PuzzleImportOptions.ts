@@ -81,7 +81,6 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     allowOverrideColors?: boolean;
     colorsImportMode?: ColorsImportMode;
     angleStep?: number;
-    shuffle?: boolean;
     noPieceRegions?: boolean;
     stickyJigsawPiece?: number;
     stickyRegion?: Rect;
@@ -159,7 +158,6 @@ export const sanitizeImportOptions = (
         colorsImportMode,
         digitsCount,
         angleStep = 0,
-        shuffle,
         noPieceRegions,
         stickyJigsawPiece,
         stickyRegion,
@@ -226,7 +224,6 @@ export const sanitizeImportOptions = (
             colorsImportMode === ColorsImportMode.Auto ? (undefined as unknown as ColorsImportMode) : colorsImportMode,
         digitsCount: digitsCount === undefined ? (undefined as unknown as number) : Number(digitsCount),
         angleStep: Number(angleStep),
-        shuffle,
         noPieceRegions,
         stickyJigsawPiece: stickyJigsawPiece && Number(stickyJigsawPiece),
         stickyRegion: stickyRegion && {
