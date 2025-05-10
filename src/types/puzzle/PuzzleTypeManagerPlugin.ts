@@ -1,7 +1,6 @@
 import { PuzzleTypeManager } from "./PuzzleTypeManager";
 import { PuzzleDefinition } from "./PuzzleDefinition";
 import { AnyPTM } from "./PuzzleTypeMap";
-import { PuzzleContext } from "./PuzzleContext";
 
 const splitEx = <T1, T2>(value: T1 & T2, defaults: T2, useDefaults = false): { base: T1; ex: T2 } => {
     const base = { ...value };
@@ -129,47 +128,25 @@ export const addGridStateExToPuzzleTypeManager = <T extends AnyPTM, GridStateEx>
 // endregion
 
 // region Game state
-export type ReplaceGameStateEx<T extends AnyPTM, GameStateEx, ProcessedGameStateEx> = Omit<
-    T,
-    "stateEx" | "processedStateEx"
-> & { stateEx: GameStateEx; processedStateEx: ProcessedGameStateEx };
-export type AddGameStateEx<T extends AnyPTM, GameStateEx, ProcessedGameStateEx> = ReplaceGameStateEx<
-    T,
-    T["stateEx"] & GameStateEx,
-    T["processedStateEx"] & ProcessedGameStateEx
->;
+export type ReplaceGameStateEx<T extends AnyPTM, GameStateEx> = Omit<T, "stateEx"> & { stateEx: GameStateEx };
+export type AddGameStateEx<T extends AnyPTM, GameStateEx> = ReplaceGameStateEx<T, T["stateEx"] & GameStateEx>;
 
-export const addGameStateExToPuzzleTypeManager = <T extends AnyPTM, GameStateEx, ProcessedGameStateEx>(
-    {
-        initialGameStateExtension,
-        serializeGameState,
-        unserializeGameState,
-        useProcessedGameStateExtension,
-        getProcessedGameStateExtension,
-        ...baseTypeManager
-    }: PuzzleTypeManager<T>,
+export const addGameStateExToPuzzleTypeManager = <T extends AnyPTM, GameStateEx>(
+    { initialGameStateExtension, serializeGameState, unserializeGameState, ...baseTypeManager }: PuzzleTypeManager<T>,
     {
         initialGameStateExtension: initialGameStateExtension2,
         serializeGameState: serializeGameState2,
         unserializeGameState: unserializeGameState2,
-        useProcessedGameStateExtension: useProcessedGameStateExtension2,
-        getProcessedGameStateExtension: getProcessedGameStateExtension2,
     }: {
         initialGameStateExtension:
             | GameStateEx
-            | ((puzzle?: PuzzleDefinition<ReplaceGameStateEx<T, GameStateEx, ProcessedGameStateEx>>) => GameStateEx);
+            | ((puzzle?: PuzzleDefinition<ReplaceGameStateEx<T, GameStateEx>>) => GameStateEx);
     } & Partial<
-        Pick<
-            PuzzleTypeManager<ReplaceGameStateEx<T, GameStateEx, ProcessedGameStateEx>>,
-            | "serializeGameState"
-            | "unserializeGameState"
-            | "useProcessedGameStateExtension"
-            | "getProcessedGameStateExtension"
-        >
+        Pick<PuzzleTypeManager<ReplaceGameStateEx<T, GameStateEx>>, "serializeGameState" | "unserializeGameState">
     >,
-): PuzzleTypeManager<AddGameStateEx<T, GameStateEx, ProcessedGameStateEx>> => {
-    type ExT = ReplaceGameStateEx<T, GameStateEx, ProcessedGameStateEx>;
-    type T2 = AddGameStateEx<T, GameStateEx, ProcessedGameStateEx>;
+): PuzzleTypeManager<AddGameStateEx<T, GameStateEx>> => {
+    type ExT = ReplaceGameStateEx<T, GameStateEx>;
+    type T2 = AddGameStateEx<T, GameStateEx>;
 
     const simpleInitialGameStateExtension2 =
         typeof initialGameStateExtension2 === "function"
@@ -221,26 +198,6 @@ export const addGameStateExToPuzzleTypeManager = <T extends AnyPTM, GameStateEx,
             return {
                 ...(unserializeGameState?.(base) ?? base),
                 ...(unserializeGameState2?.(ex) ?? ex),
-            };
-        },
-
-        useProcessedGameStateExtension(context: PuzzleContext<T2>): T2["processedStateEx"] {
-            return {
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                ...(useProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>) as T["processedStateEx"]),
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                ...(useProcessedGameStateExtension2?.(
-                    context as unknown as PuzzleContext<ExT>,
-                ) as ProcessedGameStateEx),
-            };
-        },
-
-        getProcessedGameStateExtension(context: PuzzleContext<T2>): T2["processedStateEx"] {
-            return {
-                ...(getProcessedGameStateExtension?.(context as unknown as PuzzleContext<T>) as T["processedStateEx"]),
-                ...(getProcessedGameStateExtension2?.(
-                    context as unknown as PuzzleContext<ExT>,
-                ) as ProcessedGameStateEx),
             };
         },
     };

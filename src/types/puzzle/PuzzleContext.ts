@@ -55,7 +55,6 @@ const emptyObject = {};
 export interface PuzzleContextOptions<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
     puzzleIndex?: PuzzleCellsIndex<T>;
-    processedGameStateExtension?: T["processedStateEx"];
     myGameState: GameStateEx<T>;
     onStateChange?: Dispatch<GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[]>;
     cellSize: number;
@@ -84,17 +83,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
     private cache: Record<string, unknown> = {};
     private disposers: (() => void)[] = [];
-
-    private _processedGameStateExtension?: T["processedStateEx"];
-    get processedGameStateExtension() {
-        profiler.trace();
-
-        return (
-            this._processedGameStateExtension ??
-            this.puzzle.typeManager.getProcessedGameStateExtension?.(this) ??
-            (emptyObject as T["processedStateEx"])
-        );
-    }
 
     get regions() {
         profiler.trace();
@@ -180,7 +168,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     constructor({
         puzzle,
         puzzleIndex,
-        processedGameStateExtension,
         myGameState,
         onStateChange,
         cellSize,
@@ -219,7 +206,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
         this.puzzle = puzzle;
         this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(puzzle);
-        this._processedGameStateExtension = processedGameStateExtension;
         this._onStateChange = onStateChange;
         this.cellSize = cellSize;
         this.cellSizeForSidePanel = cellSizeForSidePanel;
@@ -263,7 +249,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         runInAction(() => {
             const {
                 puzzle,
-                processedGameStateExtension,
                 myGameState,
                 onStateChange,
                 cellSize,
@@ -278,9 +263,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 (window as any).context = this;
                 this.puzzle = puzzle;
                 this.puzzleIndex = new PuzzleCellsIndex(this.puzzle);
-            }
-            if ("processedGameStateExtension" in updates) {
-                this._processedGameStateExtension = processedGameStateExtension;
             }
             if (myGameState !== undefined /* && !areSameGameStates(this, myGameState, this.myGameState)*/) {
                 this.myGameState = myGameState;
@@ -364,7 +346,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             ];
 
             const processedContext = this.clone().cloneWith({
-                processedGameStateExtension: undefined,
                 applyKeys: false,
                 // Important: prevents recursive calls to processMessages()!
                 applyPendingMessages: false,

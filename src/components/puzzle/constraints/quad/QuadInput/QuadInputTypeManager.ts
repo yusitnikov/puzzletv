@@ -61,7 +61,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
         onQuadFinish,
         radius = 0.3,
         // Note: default is not supported for quadle!
-        getReadyQuadConstraint = (context, position, digits, isRecent) =>
+        getReadyQuadConstraint = (_context, position, digits, isRecent) =>
             QuadConstraint(position, digits, [], isRecent, radius),
     } = options;
 
@@ -72,7 +72,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
     ) => context.onStateChange(setQuadPositionAction(corner, options, `gesture-${id}`));
 
     return {
-        ...(addGameStateExToPuzzleTypeManager<T, QuadInputGameState<T["cell"]>, {}>(parent, {
+        ...(addGameStateExToPuzzleTypeManager<T, QuadInputGameState<T["cell"]>>(parent, {
             initialGameStateExtension: {
                 currentQuad: undefined,
                 allQuads: [],

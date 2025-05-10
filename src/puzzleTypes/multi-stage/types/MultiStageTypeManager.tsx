@@ -119,6 +119,5 @@ export const isValidFinishedPuzzleByStageConstraints =
                         stage,
                     },
                 },
-                processedGameStateExtension: undefined,
             }),
         );

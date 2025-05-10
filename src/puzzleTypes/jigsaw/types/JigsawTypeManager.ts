@@ -108,7 +108,7 @@ export const JigsawTypeManager = (
         getPieceCenter = ({ boundingRect }) => getRectCenter(boundingRect),
     }: JigsawTypeManagerOptions = {},
 ): PuzzleTypeManager<JigsawPTM> =>
-    addGameStateExToPuzzleTypeManager<JigsawPTM, JigsawGameState, {}>(
+    addGameStateExToPuzzleTypeManager<JigsawPTM, JigsawGameState>(
         addGridStateExToPuzzleTypeManager<JigsawPTM, JigsawGridState>(
             {
                 areSameCellData(data1, data2, context, cell1, cell2): boolean {

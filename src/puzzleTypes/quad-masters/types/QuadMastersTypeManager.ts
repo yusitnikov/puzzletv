@@ -39,8 +39,7 @@ export const QuadMastersTypeManager = (isQuadle: boolean): PuzzleTypeManager<Qua
     return {
         ...addGameStateExToPuzzleTypeManager<
             QuadMastersPTM,
-            Omit<QuadMastersGameState, keyof QuadInputGameState<number>>,
-            {}
+            Omit<QuadMastersGameState, keyof QuadInputGameState<number>>
         >(parent, {
             initialGameStateExtension: { isQuadTurn: true },
         }),

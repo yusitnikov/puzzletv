@@ -106,7 +106,7 @@ interface IsReadyGameStateEx {
     isReady: boolean;
 }
 
-type IsReadyPTM = AddGameStateEx<NumberPTM, IsReadyGameStateEx, {}>;
+type IsReadyPTM = AddGameStateEx<NumberPTM, IsReadyGameStateEx>;
 
 const IsReadyTypeManager: PuzzleTypeManager<IsReadyPTM> = {
     ...addGameStateExToPuzzleTypeManager(DigitPuzzleTypeManager(), {

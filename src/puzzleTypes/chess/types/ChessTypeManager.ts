@@ -14,11 +14,10 @@ import { addGameStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleT
 
 export const ChessTypeManager: PuzzleTypeManager<ChessPTM> = addGameStateExToPuzzleTypeManager<
     ChessPTM,
-    ChessGameState,
-    {}
+    ChessGameState
 >(
     {
-        areSameCellData({ type: type1, color: color1 }, { type: type2, color: color2 }, context, cell1): boolean {
+        areSameCellData({ type: type1, color: color1 }, { type: type2, color: color2 }, _context, cell1): boolean {
             const forConstraints = cell1 !== undefined;
             return type1 === type2 && (forConstraints || color1 === color2);
         },
@@ -26,8 +25,8 @@ export const ChessTypeManager: PuzzleTypeManager<ChessPTM> = addGameStateExToPuz
         compareCellData(
             { type: type1, color: color1 },
             { type: type2, color: color2 },
-            context,
-            useState = true,
+            _context,
+            _useState = true,
             forConstraints = true,
         ): number {
             return (forConstraints ? 0 : color1 - color2) || type1 - type2;
@@ -100,11 +99,11 @@ export const ChessTypeManager: PuzzleTypeManager<ChessPTM> = addGameStateExToPuz
             },
         ],
 
-        getInternalState(puzzle, { extension: { selectedColor } }): any {
+        getInternalState(_puzzle, { extension: { selectedColor } }): any {
             return { selectedColor };
         },
 
-        unserializeInternalState(puzzle, { selectedColor }): PartialGameStateEx<ChessPTM> {
+        unserializeInternalState(_puzzle, { selectedColor }): PartialGameStateEx<ChessPTM> {
             return { extension: { selectedColor } };
         },
     },

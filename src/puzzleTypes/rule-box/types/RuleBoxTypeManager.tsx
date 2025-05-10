@@ -15,7 +15,7 @@ const rulePrefix = "rule:";
 export const RuleBoxTypeManager = <T extends AnyPTM>(
     baseTypeManager: PuzzleTypeManager<T>,
 ): PuzzleTypeManager<ToRuleBoxPTM<T>> => {
-    const extendedTypeManager = addGameStateExToPuzzleTypeManager<T, RuleBoxGameState, {}>(baseTypeManager, {
+    const extendedTypeManager = addGameStateExToPuzzleTypeManager<T, RuleBoxGameState>(baseTypeManager, {
         initialGameStateExtension: {
             ruleBoxes: {},
         },

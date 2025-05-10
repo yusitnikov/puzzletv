@@ -1,43 +1,33 @@
-export interface PuzzleTypeMap<
-    CellType,
-    GameStateExType = {},
-    ProcessedGameStateExType = {},
-    GridStateEx = {},
-    PuzzleExType = {},
-> {
+export interface PuzzleTypeMap<CellType, GameStateExType = {}, GridStateEx = {}, PuzzleExType = {}> {
     cell: CellType;
     stateEx: GameStateExType;
-    processedStateEx: ProcessedGameStateExType;
     gridStateEx: GridStateEx;
     puzzleEx: PuzzleExType;
 }
 
-export type PTM<
+export type PTM<CellType, GameStateExType = {}, GridStateEx = {}, PuzzleExType = {}> = PuzzleTypeMap<
     CellType,
-    GameStateExType = {},
-    ProcessedGameStateExType = {},
-    GridStateEx = {},
-    PuzzleExType = {},
-> = PuzzleTypeMap<CellType, GameStateExType, ProcessedGameStateExType, GridStateEx, PuzzleExType>;
+    GameStateExType,
+    GridStateEx,
+    PuzzleExType
+>;
 
-export type AnyPTM<
-    CellType = any,
-    GameStateExType = any,
-    ProcessedGameStateExType = any,
-    GridStateEx = any,
-    PuzzleExType = any,
-> = PTM<CellType, GameStateExType, ProcessedGameStateExType, GridStateEx, PuzzleExType>;
+export type AnyPTM<CellType = any, GameStateExType = any, GridStateEx = any, PuzzleExType = any> = PTM<
+    CellType,
+    GameStateExType,
+    GridStateEx,
+    PuzzleExType
+>;
 
-export type NumberPTM<
-    GameStateExType = {},
-    ProcessedGameStateExType = {},
-    GridStateEx = {},
-    PuzzleExType = {},
-> = PuzzleTypeMap<number, GameStateExType, ProcessedGameStateExType, GridStateEx, PuzzleExType>;
+export type NumberPTM<GameStateExType = {}, GridStateEx = {}, PuzzleExType = {}> = PTM<
+    number,
+    GameStateExType,
+    GridStateEx,
+    PuzzleExType
+>;
 
-export type AnyNumberPTM<
-    GameStateExType = any,
-    ProcessedGameStateExType = any,
-    GridStateEx = any,
-    PuzzleExType = any,
-> = NumberPTM<GameStateExType, ProcessedGameStateExType, GridStateEx, PuzzleExType>;
+export type AnyNumberPTM<GameStateExType = any, GridStateEx = any, PuzzleExType = any> = NumberPTM<
+    GameStateExType,
+    GridStateEx,
+    PuzzleExType
+>;

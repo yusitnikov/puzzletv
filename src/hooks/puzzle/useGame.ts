@@ -7,8 +7,6 @@ import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { profiler } from "../../utils/profiler";
 import { autorun } from "mobx";
 
-const emptyObject: any = {};
-
 export const useGame = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
     cellSize: number,
@@ -16,10 +14,6 @@ export const useGame = <T extends AnyPTM>(
     isReadonlyContext = false,
 ): PuzzleContext<T> => {
     const timer = profiler.track("useGame");
-
-    const { typeManager } = puzzle;
-
-    const { useProcessedGameStateExtension = () => emptyObject as T["processedStateEx"] } = typeManager;
 
     const [context] = useState(
         () =>
@@ -37,14 +31,6 @@ export const useGame = <T extends AnyPTM>(
     useEffect(() => context.update({ cellSize }), [context, cellSize]);
     useEffect(() => context.update({ cellSizeForSidePanel }), [context, cellSizeForSidePanel]);
     useEffect(() => context.update({ isReadonlyContext }), [context, isReadonlyContext]);
-
-    // TODO: make it not update the state?
-    const processedGameStateExtension = useProcessedGameStateExtension(context);
-    useEffect(
-        () => context.update({ processedGameStateExtension }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [context, JSON.stringify(processedGameStateExtension)],
-    );
 
     useMultiPlayer(context.multiPlayer);
 

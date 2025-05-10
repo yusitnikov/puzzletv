@@ -7,4 +7,4 @@ export type AnyRuleBoxPTM<CellType = any, GameStateExType extends RuleBoxGameSta
     GameStateExType
 >;
 
-export type ToRuleBoxPTM<T extends AnyPTM> = AddGameStateEx<T, RuleBoxGameState, {}>;
+export type ToRuleBoxPTM<T extends AnyPTM> = AddGameStateEx<T, RuleBoxGameState>;

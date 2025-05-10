@@ -31,7 +31,7 @@ export const RotatableDigitTypeManagerBase = <T extends AnyPTM>(
     showBackButton: boolean,
     showStickyMode: boolean,
     compensateConstraintDigitAngle: boolean,
-): PuzzleTypeManager<AddGameStateEx<T, RotatableGameState, {}>> => ({
+): PuzzleTypeManager<AddGameStateEx<T, RotatableGameState>> => ({
     ...addGameStateExToPuzzleTypeManager(baseTypeManager, {
         initialGameStateExtension: {
             isStickyMode: false,

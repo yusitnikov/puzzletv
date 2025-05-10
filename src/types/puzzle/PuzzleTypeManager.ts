@@ -172,11 +172,6 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
 
     isReady?(context: PuzzleContext<T>): boolean;
 
-    useProcessedGameStateExtension?(context: PuzzleContext<T>): T["processedStateEx"];
-
-    // Fallback for useProcessedGameStateExtension() when calling outside a React component
-    getProcessedGameStateExtension?(context: PuzzleContext<T>): T["processedStateEx"];
-
     getCellTypeProps?(cell: Position, puzzle: PuzzleDefinition<T>): CellTypeProps<T>;
 
     processArrowDirection?(

@@ -3,4 +3,4 @@ import { RushHourGameState } from "./RushHourGameState";
 import { RushHourGridState } from "./RushHourGridState";
 import { RushHourPuzzleExtension } from "./RushHourPuzzleExtension";
 
-export type RushHourPTM = NumberPTM<RushHourGameState, {}, RushHourGridState, RushHourPuzzleExtension>;
+export type RushHourPTM = NumberPTM<RushHourGameState, RushHourGridState, RushHourPuzzleExtension>;
