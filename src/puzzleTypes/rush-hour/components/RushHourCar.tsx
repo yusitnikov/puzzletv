@@ -8,6 +8,7 @@ import { mixColorsStr } from "../../../utils/color";
 import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
+import { getAnimatedCarPosition } from "../types/RushHourTypeManager";
 
 export const carMargin = 0.1;
 const frameSize = 0.02;
@@ -292,34 +293,36 @@ export const RushHourCar = observer(function RushHourCarFc({ top, left, width, h
     );
 });
 
-export const RushHourCars = observer(function RushHourCars({
-    region,
-    context: {
-        puzzle: { extension },
-        cellWriteMode,
-        stateExtension: { hideCars },
-        processedGameStateExtension: { cars: carPositions },
-    },
-}: ConstraintProps<RushHourPTM>) {
+export const RushHourCars = observer(function RushHourCars({ region, context }: ConstraintProps<RushHourPTM>) {
     profiler.trace();
 
     if (region?.cells?.length) {
         return null;
     }
 
+    const {
+        puzzle: { extension },
+        cellWriteMode,
+        stateExtension: { hideCars },
+    } = context;
+
     return (
         <g opacity={hideCars && cellWriteMode !== CellWriteMode.move ? 0.3 : undefined}>
-            {extension?.cars.map(({ boundingRect: { top, left, width, height }, color, invert }, index) => (
-                <RushHourCar
-                    key={`car-${index}`}
-                    top={top + carPositions[index].top}
-                    left={left + carPositions[index].left}
-                    width={width}
-                    height={height}
-                    color={color}
-                    invert={invert}
-                />
-            ))}
+            {extension?.cars.map(({ boundingRect: { top, left, width, height }, color, invert }, index) => {
+                const carPosition = getAnimatedCarPosition(context, index);
+
+                return (
+                    <RushHourCar
+                        key={`car-${index}`}
+                        top={top + carPosition.top}
+                        left={left + carPosition.left}
+                        width={width}
+                        height={height}
+                        color={color}
+                        invert={invert}
+                    />
+                );
+            })}
         </g>
     );
 });

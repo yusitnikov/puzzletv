@@ -4,7 +4,7 @@ import {
     mixAnimatedArray,
     mixAnimatedBool,
     mixAnimatedPosition,
-} from "../../../hooks/useAnimatedValue";
+} from "../../../types/struct/AnimatedValue";
 
 export interface SokobanGridState {
     cluePositions: Position[];

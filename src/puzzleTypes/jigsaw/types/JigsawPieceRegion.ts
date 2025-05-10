@@ -3,8 +3,10 @@ import { GridRegion } from "../../../types/puzzle/GridRegion";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { JigsawPTM } from "./JigsawPTM";
 import { getActiveJigsawPieceZIndex } from "./helpers";
-import { Position, rotateVectorClockwise } from "../../../types/layout/Position";
+import { Position, PositionWithAngle, rotateVectorClockwise } from "../../../types/layout/Position";
 import { profiler } from "../../../utils/profiler";
+import { getAnimatedJigsawPiecePosition } from "./JigsawTypeManager";
+import { JigsawGridPieceState } from "./JigsawGridState";
 
 export class JigsawPieceRegion implements GridRegion {
     private readonly center: Position;
@@ -15,14 +17,18 @@ export class JigsawPieceRegion implements GridRegion {
     readonly height: number;
     readonly cells?: Position[];
 
+    private get staticPositions() {
+        return this.positionOverrides ?? this.context.gridExtension.pieces;
+    }
+
     get zIndex() {
         profiler.trace();
-        return this.context.gridExtension.pieces[this.index].zIndex;
+        return this.staticPositions[this.index].zIndex;
     }
 
     private get activeZIndex() {
         profiler.trace();
-        return getActiveJigsawPieceZIndex(this.context.gridExtension.pieces);
+        return getActiveJigsawPieceZIndex(this.staticPositions);
     }
 
     get highlighted() {
@@ -33,6 +39,7 @@ export class JigsawPieceRegion implements GridRegion {
     constructor(
         private readonly context: PuzzleContext<JigsawPTM>,
         private readonly index: number,
+        private readonly positionOverrides?: JigsawGridPieceState[],
     ) {
         makeAutoObservable(this);
 
@@ -52,9 +59,10 @@ export class JigsawPieceRegion implements GridRegion {
         this.transformCoords = this.transformCoords.bind(this);
     }
 
-    private get animatedPosition() {
+    private get animatedPosition(): PositionWithAngle {
         profiler.trace();
-        return this.context.processedGameStateExtension.pieces[this.index];
+
+        return this.positionOverrides?.[this.index] ?? getAnimatedJigsawPiecePosition(this.context, this.index);
     }
 
     private get animatedTop() {

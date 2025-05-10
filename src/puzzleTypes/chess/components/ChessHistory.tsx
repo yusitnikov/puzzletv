@@ -61,7 +61,7 @@ const Move = observer(function Move({ context, index, ...move }: MoveProps) {
 
 export class ChessHistoryManager {
     static getInstance(context: PuzzleContext<ChessPTM>): ChessHistoryManager {
-        return (context.puzzleIndex.cache[ChessHistoryManager.name] ??= new ChessHistoryManager(context));
+        return context.getCachedItem(ChessHistoryManager.name, () => new ChessHistoryManager(context));
     }
 
     private constructor(private context: PuzzleContext<ChessPTM>) {

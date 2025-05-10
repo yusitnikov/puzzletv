@@ -1,6 +1,6 @@
 import { defaultProcessArrowDirection, PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { defaultSokobanDirection, SokobanGameState } from "./SokobanGameState";
-import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { AnimatedValue } from "../../../types/struct/AnimatedValue";
 import { SokobanPTM } from "./SokobanPTM";
 import { PartialGameStateEx } from "../../../types/puzzle/GameState";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
@@ -21,6 +21,7 @@ import {
 import { SokobanGridState, sokobanGridStateAnimationMixer } from "./SokobanGridState";
 import { SokobanOptions } from "./SokobanOptions";
 import { isPointInRect } from "../../../types/layout/Rect";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeManager<SokobanPTM> => ({
     ...addGameStateExToPuzzleTypeManager(
@@ -43,16 +44,6 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
                     ...state,
                     animating: false,
                 };
-            },
-            useProcessedGameStateExtension(context): SokobanGridState {
-                return useAnimatedValue<SokobanGridState>(
-                    () => context.gridExtension,
-                    () => (context.stateExtension.animating ? settings.animationSpeed.get() / 2 : 0),
-                    sokobanGridStateAnimationMixer,
-                );
-            },
-            getProcessedGameStateExtension(context): SokobanGridState {
-                return context.gridExtension;
             },
         },
     ),
@@ -122,23 +113,28 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
 
         return {
             ...puzzle,
-            items: ({
-                gridExtension: { cluePositions, clueSmashed },
-                processedGameStateExtension,
-            }): Constraint<SokobanPTM, any>[] => [
-                ...draggedClues.map(({ clue, index, isCrate }) =>
-                    SokobanClueConstraint(
-                        clue,
-                        cluePositions[index],
-                        processedGameStateExtension.cluePositions[index] ?? emptyPosition,
-                        clueSmashed[index],
-                        processedGameStateExtension.clueSmashed[index] ?? false,
-                        isCrate ? options.smashedComponent : {},
+            items: (context): Constraint<SokobanPTM, any>[] => {
+                const {
+                    gridExtension: { cluePositions, clueSmashed },
+                } = context;
+
+                const animatedGridState = getAnimatedSokobanGridState(context);
+
+                return [
+                    ...draggedClues.map(({ clue, index, isCrate }) =>
+                        SokobanClueConstraint(
+                            clue,
+                            cluePositions[index],
+                            animatedGridState.cluePositions[index] ?? emptyPosition,
+                            clueSmashed[index],
+                            animatedGridState.clueSmashed[index] ?? false,
+                            isCrate ? options.smashedComponent : {},
+                        ),
                     ),
-                ),
-                SokobanPlayerConstraint(processedGameStateExtension.sokobanPosition),
-                ...otherItems,
-            ],
+                    SokobanPlayerConstraint(animatedGridState.sokobanPosition),
+                    ...otherItems,
+                ];
+            },
             extension: {
                 clues,
                 sokobanStartPosition: sokobanPlayer.cells[0],
@@ -153,3 +149,14 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
 
     // TODO: support shared games
 });
+
+export const getAnimatedSokobanGridState = (context: PuzzleContext<SokobanPTM>) =>
+    context.getCachedItem(
+        "animatedSokobanGridState",
+        () =>
+            new AnimatedValue<SokobanGridState>(
+                () => context.gridExtension,
+                () => (context.stateExtension.animating ? settings.animationSpeed.get() / 2 : 0),
+                sokobanGridStateAnimationMixer,
+            ),
+    ).animatedValue;

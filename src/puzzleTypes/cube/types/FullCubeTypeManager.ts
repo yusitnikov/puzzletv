@@ -15,7 +15,7 @@ import { RegionConstraint } from "../../../components/puzzle/constraints/region/
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { CellTypeProps } from "../../../types/puzzle/CellTypeProps";
 import { FullCubePTM } from "./FullCubePTM";
-import { gameStateHandleRotateFullCube, ProcessedFullCubeGameState } from "./FullCubeGameState";
+import { gameStateHandleRotateFullCube } from "./FullCubeGameState";
 import {
     getClosestAxis3D,
     initialCoordsBase3D,
@@ -26,7 +26,7 @@ import {
     subtractVectors3D,
     vectorMultiplication3D,
 } from "../../../types/layout/Position3D";
-import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { AnimatedValue } from "../../../types/struct/AnimatedValue";
 import { settings } from "../../../types/layout/Settings";
 import { GridRegion } from "../../../types/puzzle/GridRegion";
 import { FullCubeControls } from "../components/FullCubeControls";
@@ -35,6 +35,7 @@ import { FullCubeJssConstraint } from "../constraints/FullCubeJss";
 import { transformFullCubeCoords3D } from "../helpers/fullCubeHelpers";
 import { vector4 } from "xyzw";
 import { addGameStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 /*
  * TODO:
@@ -46,23 +47,6 @@ export const FullCubeTypeManager = (): PuzzleTypeManager<FullCubePTM> => ({
     ...addGameStateExToPuzzleTypeManager(DigitPuzzleTypeManager<FullCubePTM>(), {
         initialGameStateExtension: {
             coordsBase: initialCoordsBase3D,
-        },
-        useProcessedGameStateExtension(context): ProcessedFullCubeGameState {
-            return {
-                animatedCoordsBase: useAnimatedValue(
-                    () => context.stateExtension.coordsBase,
-                    () => settings.animationSpeed.get(),
-                    (a, b, coeff) => {
-                        // See https://en.wikipedia.org/wiki/Slerp
-                        const result = vector4.RotationSlerp(a, b, coeff);
-                        // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
-                        return Number.isFinite(result.w) ? result : b;
-                    },
-                ),
-            };
-        },
-        getProcessedGameStateExtension({ stateExtension: { coordsBase } }): ProcessedFullCubeGameState {
-            return { animatedCoordsBase: coordsBase };
         },
     }),
 
@@ -77,9 +61,9 @@ export const FullCubeTypeManager = (): PuzzleTypeManager<FullCubePTM> => ({
     processCellDataPosition(
         context,
         basePosition,
-        dataSet,
-        dataIndex,
-        positionFunction,
+        _dataSet,
+        _dataIndex,
+        _positionFunction,
         cellPosition,
     ): PositionWithAngle | undefined {
         const {
@@ -435,3 +419,19 @@ export const createFullCubeRegions = (gridSize: number, regionWidth: number, reg
         ),
     );
 };
+
+export const getFullCubeAnimatedCoordsBase = (context: PuzzleContext<FullCubePTM>) =>
+    context.getCachedItem(
+        "animatedCoordsBase",
+        () =>
+            new AnimatedValue(
+                () => context.stateExtension.coordsBase,
+                () => settings.animationSpeed.get(),
+                (a, b, coeff) => {
+                    // See https://en.wikipedia.org/wiki/Slerp
+                    const result = vector4.RotationSlerp(a, b, coeff);
+                    // RotationSlerp() may fail on some edge cases, fallback to the end point in this case
+                    return Number.isFinite(result.w) ? result : b;
+                },
+            ),
+    ).animatedValue;

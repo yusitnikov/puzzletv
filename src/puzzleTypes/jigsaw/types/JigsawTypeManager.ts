@@ -1,7 +1,8 @@
 import { defaultProcessArrowDirection, PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
-import { JigsawGameState, JigsawJssCluesVisibility, JigsawProcessedGameState } from "./JigsawGameState";
+import { JigsawGameState, JigsawJssCluesVisibility } from "./JigsawGameState";
 import { JigsawDigit } from "./JigsawDigit";
 import {
+    emptyPositionWithAngle,
     getLineVector,
     Position,
     PositionSet,
@@ -10,7 +11,7 @@ import {
 } from "../../../types/layout/Position";
 import { loop, roundToStep } from "../../../utils/math";
 import { JigsawDigitCellDataComponentType } from "../components/JigsawDigitCellData";
-import { mixAnimatedValue, useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { AnimatedValue, mixAnimatedPosition, mixAnimatedValue } from "../../../types/struct/AnimatedValue";
 import { getRectCenter } from "../../../types/layout/Rect";
 import { ZoomInButtonItem, ZoomOutButtonItem } from "../../../components/puzzle/controls/ZoomButton";
 import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
@@ -69,8 +70,7 @@ import {
     addGridStateExToPuzzleTypeManager,
     addGameStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
-import { createEmptyContextForPuzzle } from "../../../types/puzzle/PuzzleContext";
-import { useComputed } from "../../../hooks/useComputed";
+import { createEmptyContextForPuzzle, PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 interface JigsawTypeManagerOptions {
     supportGluePieces?: boolean;
@@ -108,7 +108,7 @@ export const JigsawTypeManager = (
         getPieceCenter = ({ boundingRect }) => getRectCenter(boundingRect),
     }: JigsawTypeManagerOptions = {},
 ): PuzzleTypeManager<JigsawPTM> =>
-    addGameStateExToPuzzleTypeManager<JigsawPTM, JigsawGameState, JigsawProcessedGameState>(
+    addGameStateExToPuzzleTypeManager<JigsawPTM, JigsawGameState, {}>(
         addGridStateExToPuzzleTypeManager<JigsawPTM, JigsawGridState>(
             {
                 areSameCellData(data1, data2, context, cell1, cell2): boolean {
@@ -213,7 +213,7 @@ export const JigsawTypeManager = (
                         return basePosition;
                     }
 
-                    const { angle: pieceAngle } = context.processedGameStateExtension.pieces[regionIndex];
+                    const { angle: pieceAngle } = getAnimatedJigsawPiecePosition(context, regionIndex);
                     const roundedAngle = loop(roundToStep(pieceAngle, angleStep), 360);
                     const processDigit = ({ digit, angle }: JigsawDigit): JigsawDigit =>
                         normalizeJigsawDigit(puzzle, { digit, angle: stickyDigits ? 0 : angle + roundedAngle });
@@ -539,7 +539,7 @@ export const JigsawTypeManager = (
                                 group.indexes,
                                 ({ position }, pieceIndex) => ({
                                     position: moveJigsawPieceByGroupGesture(
-                                        group,
+                                        group.center,
                                         groupGesture,
                                         pieces[pieceIndex],
                                         position,
@@ -553,6 +553,8 @@ export const JigsawTypeManager = (
                 },
 
                 compensateConstraintDigitAngle: stickyDigits,
+
+                saveStateKeySuffix: "v2",
 
                 // TODO: support shared games
             },
@@ -576,6 +578,7 @@ export const JigsawTypeManager = (
                             return {
                                 ...emptyPositionWithAngle,
                                 zIndex: pieces.length - pieceSortIndexesByPosition[index],
+                                rotationAxis: piece.center,
                             };
                         }),
                     };
@@ -583,11 +586,12 @@ export const JigsawTypeManager = (
                 unserializeGridStateExtension({ pieces }: any): Partial<JigsawGridState> {
                     return {
                         pieces: pieces?.map(
-                            ({ top, left, angle, zIndex }: any, index: number): JigsawGridPieceState => ({
+                            ({ top, left, angle, zIndex, rotationAxis }: any, index: number): JigsawGridPieceState => ({
                                 top,
                                 left,
                                 angle,
                                 zIndex: zIndex ?? pieces.length - index,
+                                rotationAxis,
                             }),
                         ),
                     };
@@ -602,53 +606,51 @@ export const JigsawTypeManager = (
                     jssCluesVisibility: JigsawJssCluesVisibility.All,
                 };
             },
-            useProcessedGameStateExtension(context): JigsawProcessedGameState {
-                const pieces = context.puzzle.extension?.pieces ?? [];
-                const getGroups = useComputed(() => groupJigsawPiecesByZIndex(context), { name: "jigsawGroups" });
-
-                return {
-                    pieces: pieces.map((piece, index) =>
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        useAnimatedValue<PositionWithAngle>(
-                            () => context.gridExtension.pieces[index],
-                            () =>
-                                context.stateExtension.pieces[index].animating ? settings.animationSpeed.get() / 2 : 1,
-                            (a, b, coeff) => {
-                                const groups = getGroups();
-                                const group = groups.find(({ indexes }) => indexes.includes(index))!;
-
-                                const angleDiff = b.angle - a.angle;
-                                const { top: topDiff, left: leftDiff } = getLineVector({
-                                    start: b,
-                                    end: moveJigsawPieceByGroupGesture(
-                                        group,
-                                        {
-                                            ...emptyGestureMetrics,
-                                            rotation: angleDiff,
-                                        },
-                                        piece,
-                                        a,
-                                    ),
-                                });
-
-                                return moveJigsawPieceByGroupGesture(
-                                    group,
-                                    {
-                                        x: mixAnimatedValue(0, -leftDiff, coeff),
-                                        y: mixAnimatedValue(0, -topDiff, coeff),
-                                        rotation: mixAnimatedValue(0, angleDiff, coeff),
-                                        scale: 1,
-                                    },
-                                    piece,
-                                    a,
-                                );
-                            },
-                        ),
-                    ),
-                };
-            },
-            getProcessedGameStateExtension({ gridExtension: { pieces } }): JigsawProcessedGameState {
-                return { pieces };
-            },
         },
     );
+
+export const getAnimatedJigsawPiecePosition = (context: PuzzleContext<JigsawPTM>, index: number): PositionWithAngle => {
+    const piece = context.puzzle.extension?.pieces?.[index];
+    if (!piece) {
+        return emptyPositionWithAngle;
+    }
+
+    return context.getCachedItem(
+        `animatedJigsawPiecePosition[${index}]`,
+        () =>
+            new AnimatedValue<Omit<JigsawGridPieceState, "zIndex">>(
+                () => context.gridExtension.pieces[index],
+                () => (context.stateExtension.pieces[index].animating ? settings.animationSpeed.get() / 2 : 1),
+                (a, b, coeff) => {
+                    const angleDiff = b.angle - a.angle;
+                    const { top: topDiff, left: leftDiff } = getLineVector({
+                        start: b,
+                        end: moveJigsawPieceByGroupGesture(
+                            a.rotationAxis,
+                            {
+                                ...emptyGestureMetrics,
+                                rotation: angleDiff,
+                            },
+                            piece,
+                            a,
+                        ),
+                    });
+
+                    return {
+                        ...moveJigsawPieceByGroupGesture(
+                            a.rotationAxis,
+                            {
+                                x: mixAnimatedValue(0, -leftDiff, coeff),
+                                y: mixAnimatedValue(0, -topDiff, coeff),
+                                rotation: mixAnimatedValue(0, angleDiff, coeff),
+                                scale: 1,
+                            },
+                            piece,
+                            a,
+                        ),
+                        rotationAxis: mixAnimatedPosition(a.rotationAxis, b.rotationAxis, coeff),
+                    };
+                },
+            ),
+    ).animatedValue;
+};

@@ -96,7 +96,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawPuzzlePhrases): CellW
                 ({ position }, pieceIndex) => {
                     return {
                         position: moveJigsawPieceByGroupGesture(
-                            piecesGroup!,
+                            piecesGroup.center,
                             groupGesture,
                             puzzle.extension!.pieces[pieceIndex],
                             position,
@@ -108,16 +108,11 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawPuzzlePhrases): CellW
         );
     },
     onGestureEnd(props, context) {
-        const noAnimationContext = context.cloneWith({
-            animated: undefined,
-            processedGameStateExtension: undefined,
-        });
-
         const { gesture, reason } = props;
         const { puzzle } = context;
         const { importOptions: { angleStep = 0 } = {} } = puzzle;
 
-        const piecesGroup = getJigsawPiecesByGesture(noAnimationContext, gesture);
+        const piecesGroup = getJigsawPiecesByGesture(context, gesture);
         if (!piecesGroup) {
             base.onGestureEnd?.(props, context);
             return;
@@ -163,7 +158,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawPuzzlePhrases): CellW
                 piecesGroup.indexes,
                 ({ position }, pieceIndex) => ({
                     position: moveJigsawPieceByGroupGesture(
-                        piecesGroup,
+                        piecesGroup.center,
                         groupGesture,
                         puzzle.extension!.pieces[pieceIndex],
                         position,

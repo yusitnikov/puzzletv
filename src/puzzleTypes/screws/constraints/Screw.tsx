@@ -13,6 +13,7 @@ import { loop } from "../../../utils/math";
 import { indexes } from "../../../utils/indexes";
 import { Rect } from "../../../types/layout/Rect";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
+import { getAnimatedScrewOffset } from "../types/ScrewsTypeManager";
 
 const lightColor = lightGreyColor;
 const darkColor = darkGreyColor;
@@ -31,7 +32,7 @@ const Screw = {
         context,
         props: { index },
     }: ConstraintProps<ScrewsPTM<T>, ScrewProps>) {
-        const offset = context.processedGameStateExtension.screwOffsets[index];
+        const offset = getAnimatedScrewOffset(context, index);
 
         const { initialPosition, digits } = (context.puzzle.extension as ScrewsPuzzleExtension<T["cell"]>).screws[
             index
@@ -152,7 +153,7 @@ export const ScrewConstraint = <T extends AnyPTM>(index: number): Constraint<Scr
         isValidCell(cell, digits, regionCells, context): boolean {
             const digit = digits[cell.top][cell.left];
 
-            const offset = Math.round(context.processedGameStateExtension.screwOffsets[index]);
+            const offset = Math.round(getAnimatedScrewOffset(context, index));
 
             const {
                 initialPosition: { top, left, width, height },

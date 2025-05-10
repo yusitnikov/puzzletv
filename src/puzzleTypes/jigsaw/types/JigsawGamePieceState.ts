@@ -2,7 +2,7 @@ import { GameStateActionCallback } from "../../../types/puzzle/GameStateAction";
 import { JigsawPTM } from "./JigsawPTM";
 import { gridStateHistoryAddState } from "../../../types/puzzle/GridStateHistory";
 import { myClientId } from "../../../hooks/useMultiPlayer";
-import { getActiveJigsawPieceZIndex } from "./helpers";
+import { getActiveJigsawPieceZIndex, groupJigsawPiecesByZIndex } from "./helpers";
 import { JigsawGridPieceState } from "./JigsawGridState";
 import { indexes } from "../../../utils/indexes";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
@@ -89,17 +89,33 @@ export const jigsawPieceStateChangeAction =
                     context,
                     clientId,
                     actionId,
-                    ({ extension: { pieces: piecePositions }, ...gridState }) => ({
-                        ...gridState,
-                        extension: {
-                            // TODO: re-index all pieces to avoid meaningless history slots?
-                            pieces: piecePositions.map((position, index) =>
-                                indexReverseMap[index] !== undefined
-                                    ? { ...position, ...updatesPerIndex[indexReverseMap[index]].position }
-                                    : position,
-                            ),
-                        },
-                    }),
+                    ({ extension: { pieces: piecePositions }, ...gridState }) => {
+                        // TODO: re-index all pieces to avoid meaningless history slots?
+                        const newPiecePositions = piecePositions.map((position, index) =>
+                            indexReverseMap[index] !== undefined
+                                ? { ...position, ...updatesPerIndex[indexReverseMap[index]].position }
+                                : position,
+                        );
+
+                        const groups = groupJigsawPiecesByZIndex(context, newPiecePositions);
+
+                        return {
+                            ...gridState,
+                            extension: {
+                                // re-calculate rotation axes of all updated pieces
+                                pieces: newPiecePositions.map((position, index) =>
+                                    indexReverseMap[index] !== undefined
+                                        ? {
+                                              ...position,
+                                              rotationAxis:
+                                                  groups.find(({ indexes }) => indexes.includes(index))?.center ??
+                                                  position.rotationAxis,
+                                          }
+                                        : position,
+                                ),
+                            },
+                        };
+                    },
                 ),
             }),
             extension: {

@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { getEmptyGameState, ProcessedGameStateAnimatedValues, saveGameState } from "../../types/puzzle/GameState";
+import { getEmptyGameState, saveGameState } from "../../types/puzzle/GameState";
 import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { useMultiPlayer } from "../useMultiPlayer";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
-import { mixAnimatedValue, useAnimatedValue } from "../useAnimatedValue";
 import { AnyPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { profiler } from "../../utils/profiler";
 import { autorun } from "mobx";
-import { settings } from "../../types/layout/Settings";
 
 const emptyObject: any = {};
 
@@ -47,25 +45,6 @@ export const useGame = <T extends AnyPTM>(
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [context, JSON.stringify(processedGameStateExtension)],
     );
-
-    // TODO: make it not update the state?
-    const animated = useAnimatedValue<ProcessedGameStateAnimatedValues>(
-        () => ({
-            loopOffset: context.loopOffset,
-            angle: context.angle,
-            scale: context.scale,
-        }),
-        () => (context.animating ? settings.animationSpeed.get() : 0),
-        (a, b, coeff) => ({
-            loopOffset: {
-                top: mixAnimatedValue(a.loopOffset.top, b.loopOffset.top, coeff * 2),
-                left: mixAnimatedValue(a.loopOffset.left, b.loopOffset.left, coeff * 2),
-            },
-            angle: mixAnimatedValue(a.angle, b.angle, coeff),
-            scale: mixAnimatedValue(a.scale, b.scale, coeff * 2),
-        }),
-    );
-    useEffect(() => context.update({ animated }), [context, animated]);
 
     useMultiPlayer(context.multiPlayer);
 

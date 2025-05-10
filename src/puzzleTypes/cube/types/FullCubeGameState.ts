@@ -10,10 +10,6 @@ export interface FullCubeGameState {
     // TODO: don't animate on puzzle reset?
 }
 
-export interface ProcessedFullCubeGameState {
-    animatedCoordsBase: vector4.Vector4;
-}
-
 export const gameStateHandleRotateFullCube = (
     context: PuzzleContext<FullCubePTM>,
     axis: Position3D,

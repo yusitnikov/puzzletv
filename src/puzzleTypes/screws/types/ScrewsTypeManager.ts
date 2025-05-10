@@ -1,7 +1,7 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { ScrewsGameState } from "./ScrewsGameState";
 import { getAveragePosition } from "../../../types/layout/Position";
-import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { AnimatedValue } from "../../../types/struct/AnimatedValue";
 import { ScrewsPTM } from "./ScrewsPTM";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
@@ -19,6 +19,7 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { ScrewsGridState } from "./ScrewsGridState";
 import { ScrewsGameClueState } from "./ScrewsGameClueState";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 interface ScrewsImporterResult<T extends AnyPTM> {
     screws: Rect[];
@@ -51,23 +52,6 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
             unserializeGameState({ screws }: any): Partial<ScrewsGameState> {
                 return {
                     screws: screws?.map((): ScrewsGameClueState => ({ animating: false })) ?? [],
-                };
-            },
-            useProcessedGameStateExtension(context): ScrewsGridState {
-                return {
-                    screwOffsets: indexes(context.puzzle.extension?.screws.length ?? 0).map((index) =>
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        useAnimatedValue(
-                            () => context.gridExtension.screwOffsets[index],
-                            () =>
-                                context.stateExtension.screws[index].animating ? settings.animationSpeed.get() / 2 : 0,
-                        ),
-                    ),
-                };
-            },
-            getProcessedGameStateExtension(context): ScrewsGridState {
-                return {
-                    screwOffsets: context.gridExtension.screwOffsets,
                 };
             },
         },
@@ -188,3 +172,13 @@ export const ImportedScrewsTypeManager = <T extends AnyPTM>(baseTypeManager: Puz
 
         return { screws: [] };
     });
+
+export const getAnimatedScrewOffset = <T extends AnyPTM>(context: PuzzleContext<ScrewsPTM<T>>, index: number) =>
+    context.getCachedItem(
+        `animatedScrewOffset[${index}]`,
+        () =>
+            new AnimatedValue(
+                () => context.gridExtension.screwOffsets[index],
+                () => (context.stateExtension.screws[index].animating ? settings.animationSpeed.get() / 2 : 0),
+            ),
+    ).animatedValue;

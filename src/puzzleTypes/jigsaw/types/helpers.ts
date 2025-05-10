@@ -65,9 +65,7 @@ export const getJigsawPieces = (
 };
 
 export const getJigsawRegionWithCache = (context: PuzzleContext<JigsawPTM>, index: number): JigsawPieceRegion => {
-    const { cache } = context.puzzleIndex;
-    const key = `jigsawRegion${index}`;
-    return (cache[key] = cache[key] ?? new JigsawPieceRegion(context, index));
+    return context.getCachedItem(`jigsawRegion[${index}]`, () => new JigsawPieceRegion(context, index));
 };
 
 export const getJigsawPieceIndexByCell = (puzzle: PuzzleDefinition<JigsawPTM>, cell: Position): number | undefined => {
@@ -136,21 +134,26 @@ export interface JigsawPiecesGroup {
     indexes: number[];
 }
 
-export const groupJigsawPiecesByZIndex = (context: PuzzleContext<JigsawPTM>): JigsawPiecesGroup[] => {
+export const groupJigsawPiecesByZIndex = (
+    context: PuzzleContext<JigsawPTM>,
+    positionOverrides?: JigsawGridPieceState[],
+): JigsawPiecesGroup[] => {
     const pieces = context.puzzle.extension?.pieces ?? [];
 
     const piecesByZIndex: Record<number, JigsawPiecesGroupItem[]> = {};
 
     for (const index of indexes(pieces.length)) {
         const info = pieces[index];
-        const position = context.gridExtension.pieces[index];
+        const position = (positionOverrides ?? context.gridExtension.pieces)[index];
         const { zIndex } = position;
 
         piecesByZIndex[zIndex] = piecesByZIndex[zIndex] ?? [];
         piecesByZIndex[zIndex].push({
             info,
             position,
-            region: getJigsawRegionWithCache(context, index),
+            region: positionOverrides
+                ? new JigsawPieceRegion(context, index, positionOverrides)
+                : getJigsawRegionWithCache(context, index),
             index,
         });
     }
@@ -185,15 +188,15 @@ export const groupJigsawPiecesByZIndex = (context: PuzzleContext<JigsawPTM>): Ji
 };
 
 export const moveJigsawPieceByGroupGesture = (
-    group: JigsawPiecesGroup,
+    rotationAxis: Position,
     gesture: GestureMetrics,
     piece: JigsawPieceInfo,
-    prevPosition: PositionWithAngle,
+    prevPosition: Omit<JigsawGridPieceState, "zIndex">,
 ): PositionWithAngle => {
     const groupToPieceGesture = (gesture: GestureMetrics): GestureMetrics => ({
         ...gesture,
-        x: gesture.x + group.center.left - piece.center.left,
-        y: gesture.y + group.center.top - piece.center.top,
+        x: gesture.x + rotationAxis.left - piece.center.left,
+        y: gesture.y + rotationAxis.top - piece.center.top,
     });
 
     const { x, y, rotation } = applyMetricsDiff(

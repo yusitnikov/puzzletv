@@ -3,6 +3,7 @@ import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { FullCubePTM } from "../types/FullCubePTM";
 import { Position3D, rotateVector3D, vectorOx, vectorOy } from "../../../types/layout/Position3D";
 import { matrix3, vector3 } from "xyzw";
+import { getFullCubeAnimatedCoordsBase } from "../types/FullCubeTypeManager";
 
 export const transformFullCubeCoords3D = (
     { top, left }: Position,
@@ -15,9 +16,7 @@ export const transformFullCubeCoords3D = (
         },
     } = context;
 
-    const coordsBase = useAnimatedCoords
-        ? context.processedGameStateExtension.animatedCoordsBase
-        : context.stateExtension.coordsBase;
+    const coordsBase = useAnimatedCoords ? getFullCubeAnimatedCoordsBase(context) : context.stateExtension.coordsBase;
 
     const realFieldSize = columnsCount / 3;
 

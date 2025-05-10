@@ -1,7 +1,7 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
-import { RushHourGameState, RushHourProcessedGameState } from "./RushHourGameState";
+import { RushHourGameState } from "./RushHourGameState";
 import { Position } from "../../../types/layout/Position";
-import { mixAnimatedValue, useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { AnimatedValue, mixAnimatedPosition } from "../../../types/struct/AnimatedValue";
 import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
 import { RushHourMoveCellWriteModeInfo } from "./RushHourMoveCellWriteModeInfo";
 import { GridRegion, transformCoordsByRegions } from "../../../types/puzzle/GridRegion";
@@ -29,7 +29,7 @@ import {
     addGameStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { RushHourGridState } from "./RushHourGridState";
-import { indexes } from "../../../utils/indexes";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
     ...addGameStateExToPuzzleTypeManager(
@@ -50,27 +50,6 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                     cars: puzzle?.extension?.cars.map(() => ({ animating: false })) ?? [],
                     hideCars: false,
                 };
-            },
-            useProcessedGameStateExtension(context): RushHourProcessedGameState {
-                return {
-                    cars: indexes(context.gridExtension.cars.length).map((index) =>
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        useAnimatedValue(
-                            () => (context.gridExtension.cars as RushHourGridState["cars"])[index],
-                            () =>
-                                context.stateExtension.cars[index].animating ? settings.animationSpeed.get() / 2 : 0,
-                            (a, b, coeff) => {
-                                return {
-                                    top: mixAnimatedValue(a.top, b.top, coeff),
-                                    left: mixAnimatedValue(a.left, b.left, coeff),
-                                };
-                            },
-                        ),
-                    ),
-                };
-            },
-            getProcessedGameStateExtension({ gridExtension: { cars } }): RushHourProcessedGameState {
-                return { cars };
             },
         },
     ),
@@ -97,15 +76,16 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
 
     transformCoords: transformCoordsByRegions,
 
-    getRegionsWithSameCoordsTransformation({
-        puzzle: {
-            extension: carsInfo,
-            gridSize: { gridSize },
-        },
-        cellWriteMode,
-        stateExtension: { hideCars: hideCarsState },
-        processedGameStateExtension: { cars: carPositions },
-    }): GridRegion[] {
+    getRegionsWithSameCoordsTransformation(context): GridRegion[] {
+        const {
+            puzzle: {
+                extension: carsInfo,
+                gridSize: { gridSize },
+            },
+            cellWriteMode,
+            stateExtension: { hideCars: hideCarsState },
+        } = context;
+
         const isMoveMode = cellWriteMode === CellWriteMode.move;
         const hideCars = hideCarsState && !isMoveMode;
 
@@ -118,7 +98,8 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                 zIndex: 0,
             },
             ...(carsInfo?.cars ?? []).map(({ cells, boundingRect }, index): GridRegion => {
-                const { top, left } = carPositions[index];
+                const { top, left } = getAnimatedCarPosition(context, index);
+
                 return {
                     ...boundingRect,
                     cells,
@@ -354,3 +335,14 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
 
     // TODO: support shared games
 };
+
+export const getAnimatedCarPosition = (context: PuzzleContext<RushHourPTM>, index: number) =>
+    context.getCachedItem(
+        `animatedRushHourCarPosition[${index}]`,
+        () =>
+            new AnimatedValue(
+                () => (context.gridExtension.cars as RushHourGridState["cars"])[index],
+                () => (context.stateExtension.cars[index].animating ? settings.animationSpeed.get() / 2 : 0),
+                mixAnimatedPosition,
+            ),
+    ).animatedValue;

@@ -1,7 +1,7 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
-import { RotatableCluesGameState, RotatableCluesProcessedGameState } from "./RotatableCluesGameState";
+import { RotatableCluesGameState } from "./RotatableCluesGameState";
 import { getAveragePosition, stringifyPosition } from "../../../types/layout/Position";
-import { useAnimatedValue } from "../../../hooks/useAnimatedValue";
+import { AnimatedValue } from "../../../types/struct/AnimatedValue";
 import { RotatableCluesPTM } from "./RotatableCluesPTM";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
@@ -28,7 +28,6 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { RotatableCluesGridState } from "./RotatableCluesGridState";
 import { rotateNumber } from "../../../components/puzzle/digit/DigitComponentType";
-import { indexes } from "../../../utils/indexes";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -64,21 +63,6 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
                 return {
                     clues: puzzle?.extension?.clues.map(() => ({ animating: false })) ?? [],
                 };
-            },
-            useProcessedGameStateExtension(context): RotatableCluesProcessedGameState {
-                return {
-                    clueAngles: indexes(context.gridExtension.clueAngles.length).map((index) =>
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        useAnimatedValue(
-                            () => (context.gridExtension.clueAngles as number[])[index],
-                            () =>
-                                context.stateExtension.clues[index].animating ? settings.animationSpeed.get() / 2 : 0,
-                        ),
-                    ),
-                };
-            },
-            getProcessedGameStateExtension({ gridExtension: { clueAngles } }): RotatableCluesProcessedGameState {
-                return { clueAngles };
             },
         },
     ),
@@ -177,20 +161,21 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
             items: (context) => {
                 const {
                     gridExtension: { clueAngles },
-                    processedGameStateExtension: { clueAngles: animatedClueAngles },
                 } = context;
 
                 return [
                     ...(typeof prevItems === "function" ? prevItems(context) : prevItems),
-                    ...((puzzle.extension?.clues as RotatableClue[]) ?? []).flatMap((rootClue, index) =>
-                        [rootClue, ...(rootClue.dependentClues ?? [])].flatMap((clue) =>
+                    ...((puzzle.extension?.clues as RotatableClue[]) ?? []).flatMap((rootClue, index) => {
+                        const animatedClueAngle = getAnimatedRotatableClueAngle(context, index);
+
+                        return [rootClue, ...(rootClue.dependentClues ?? [])].flatMap((clue) =>
                             RotatableClueConstraint(
                                 clue,
                                 clueAngles[index] * (clue.coeff ?? 1),
-                                animatedClueAngles[index] * (clue.coeff ?? 1),
+                                animatedClueAngle * (clue.coeff ?? 1),
                             ),
-                        ),
-                    ),
+                        );
+                    }),
                 ];
             },
         };
@@ -371,3 +356,16 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
             return { clues: [] };
         },
     });
+
+export const getAnimatedRotatableClueAngle = <T extends AnyPTM>(
+    context: PuzzleContext<RotatableCluesPTM<T>>,
+    index: number,
+) =>
+    context.getCachedItem(
+        `animatedRotatableClueAngle[${index}]`,
+        () =>
+            new AnimatedValue(
+                () => (context.gridExtension.clueAngles as number[])[index],
+                () => (context.stateExtension.clues[index].animating ? settings.animationSpeed.get() / 2 : 0),
+            ),
+    ).animatedValue;

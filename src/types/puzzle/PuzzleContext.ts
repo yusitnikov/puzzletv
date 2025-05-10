@@ -47,6 +47,8 @@ import { profiler } from "../../utils/profiler";
 import { getGridRegionCells, GridRegion } from "./GridRegion";
 import { PuzzleImportOptions } from "./PuzzleImportOptions";
 import { CellPart } from "./CellPart";
+import { AnimatedValue, mixAnimatedPosition, mixAnimatedValue } from "../struct/AnimatedValue";
+import { settings } from "../layout/Settings";
 
 const emptyObject = {};
 
@@ -54,7 +56,6 @@ export interface PuzzleContextOptions<T extends AnyPTM> {
     puzzle: PuzzleDefinition<T>;
     puzzleIndex?: PuzzleCellsIndex<T>;
     processedGameStateExtension?: T["processedStateEx"];
-    animated?: ProcessedGameStateAnimatedValues;
     myGameState: GameStateEx<T>;
     onStateChange?: Dispatch<GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[]>;
     cellSize: number;
@@ -80,6 +81,9 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     applyPendingMessages: boolean;
 
     readonly multiPlayer: UseMultiPlayerResult<T>;
+
+    private cache: Record<string, unknown> = {};
+    private disposers: (() => void)[] = [];
 
     private _processedGameStateExtension?: T["processedStateEx"];
     get processedGameStateExtension() {
@@ -119,10 +123,26 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.regionsByCellsMap[top]?.[left];
     });
 
-    private _animated?: ProcessedGameStateAnimatedValues;
     get animated(): ProcessedGameStateAnimatedValues {
         profiler.trace();
-        return this._animated ?? this.state;
+
+        return this.getCachedItem(
+            "animatedGridTransform",
+            () =>
+                new AnimatedValue<ProcessedGameStateAnimatedValues>(
+                    () => ({
+                        loopOffset: this.loopOffset,
+                        angle: this.angle,
+                        scale: this.scale,
+                    }),
+                    () => (this.animating ? settings.animationSpeed.get() : 0),
+                    (a, b, coeff) => ({
+                        loopOffset: mixAnimatedPosition(a.loopOffset, b.loopOffset, coeff * 2),
+                        angle: mixAnimatedValue(a.angle, b.angle, coeff),
+                        scale: mixAnimatedValue(a.scale, b.scale, coeff * 2),
+                    }),
+                ),
+        ).animatedValue;
     }
     // noinspection JSUnusedGlobalSymbols
     get animatedTop() {
@@ -161,7 +181,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         puzzle,
         puzzleIndex,
         processedGameStateExtension,
-        animated,
         myGameState,
         onStateChange,
         cellSize,
@@ -170,7 +189,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         applyKeys,
         applyPendingMessages,
     }: PuzzleContextCreationOptions<T>) {
-        makeAutoObservable(
+        makeAutoObservable<typeof this, "cache" | "disposers">(
             this,
             {
                 userDigits: computed({ equals: comparer.structural }),
@@ -192,6 +211,8 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 }),
                 resultCheck: computed({ equals: comparer.structural }),
                 importOptionOverrides: computed({ equals: comparer.structural }),
+                cache: false,
+                disposers: false,
             },
             {},
         );
@@ -199,7 +220,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         this.puzzle = puzzle;
         this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(puzzle);
         this._processedGameStateExtension = processedGameStateExtension;
-        this._animated = animated;
         this._onStateChange = onStateChange;
         this.cellSize = cellSize;
         this.cellSizeForSidePanel = cellSizeForSidePanel;
@@ -213,7 +233,30 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     }
 
     dispose(): void {
-        // TODO: implement disposing context
+        for (const disposer of this.disposers) {
+            disposer();
+        }
+        this.disposers = [];
+        this.cache = {};
+    }
+
+    getCachedItem<ItemT>(
+        key: string,
+        createItem: () => ItemT,
+        disposeItem = (item: ItemT) => {
+            if (typeof (item as any)?.dispose === "function") {
+                (item as any).dispose();
+            }
+        },
+    ): ItemT {
+        if (!(key in this.cache)) {
+            const item = createItem();
+            this.cache[key] = item;
+
+            this.disposers.push(() => disposeItem(item));
+        }
+
+        return this.cache[key] as ItemT;
     }
 
     update(updates: Partial<PuzzleContextOptions<T>>) {
@@ -221,7 +264,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             const {
                 puzzle,
                 processedGameStateExtension,
-                animated,
                 myGameState,
                 onStateChange,
                 cellSize,
@@ -239,9 +281,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             }
             if ("processedGameStateExtension" in updates) {
                 this._processedGameStateExtension = processedGameStateExtension;
-            }
-            if ("animated" in updates) {
-                this._animated = animated;
             }
             if (myGameState !== undefined /* && !areSameGameStates(this, myGameState, this.myGameState)*/) {
                 this.myGameState = myGameState;
@@ -326,7 +365,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
 
             const processedContext = this.clone().cloneWith({
                 processedGameStateExtension: undefined,
-                animated: undefined,
                 applyKeys: false,
                 // Important: prevents recursive calls to processMessages()!
                 applyPendingMessages: false,
@@ -924,7 +962,6 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         actionsOrCallbacks = actionsOrCallbacks instanceof Array ? actionsOrCallbacks : [actionsOrCallbacks];
 
         const processedContext = this.cloneWith({
-            animated: undefined,
             // Important: prevent unnecessary calls to processMessages()
             applyPendingMessages: false,
             onStateChange: () => {},

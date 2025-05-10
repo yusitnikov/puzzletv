@@ -25,7 +25,7 @@ export class ChessEngineManager {
     private engineVariations: VariationChessEngineResult[] = [];
 
     static getInstance(context: PuzzleContext<ChessPTM>): ChessEngineManager {
-        return (context.puzzleIndex.cache[ChessEngineManager.name] ??= new ChessEngineManager(context));
+        return context.getCachedItem(ChessEngineManager.name, () => new ChessEngineManager(context));
     }
 
     private constructor(private context: PuzzleContext<ChessPTM>) {

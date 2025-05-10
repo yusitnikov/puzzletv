@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import { rafTime } from "./useRaf";
+import { rafTime } from "../../hooks/useRaf";
 import { comparer, computed, IReactionDisposer, makeAutoObservable, reaction } from "mobx";
-import { profiler } from "../utils/profiler";
-import { Position } from "../types/layout/Position";
+import { profiler } from "../../utils/profiler";
+import { Position } from "../layout/Position";
 
 export type AnimatedValueMixer<T> = (a: T, b: T, coeff: number) => T;
 
@@ -89,26 +88,4 @@ export class AnimatedValue<T> {
         this.animationTime = animationTime;
         this.startTime = rafTime();
     }
-}
-
-export function useAnimatedValue(targetValueFn: () => number, animationTimeFn: () => number): number;
-export function useAnimatedValue<T>(
-    targetValueFn: () => T,
-    animationTimeFn: () => number,
-    valueMixer: AnimatedValueMixer<T>,
-): T;
-export function useAnimatedValue<T>(
-    targetValueFn: () => T,
-    animationTimeFn: () => number,
-    valueMixer: AnimatedValueMixer<T> = mixAnimatedValue as any,
-): T {
-    const [manager] = useState(() => new AnimatedValue<T>(targetValueFn, animationTimeFn, valueMixer));
-
-    useEffect(() => {
-        return () => {
-            manager.dispose?.();
-        };
-    }, [manager]);
-
-    return manager.animatedValue;
 }
