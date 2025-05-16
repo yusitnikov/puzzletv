@@ -55,7 +55,7 @@ export const GridCellDigits = observer(function GridCellDigitsFc<T extends AnyPT
 
     const isValidUserDigitFn = useCallback(
         (digit: T["cell"] | undefined) =>
-            !(settings.enableConflictChecker.get() || context.puzzle.forceEnableConflictChecker) ||
+            !settings.enableConflictChecker.get() ||
             context.puzzle.typeManager.disableConflictChecker ||
             (digit !== undefined && settings.pencilmarksCheckerMode.get() === PencilmarksCheckerMode.Off) ||
             isValidUserDigit(

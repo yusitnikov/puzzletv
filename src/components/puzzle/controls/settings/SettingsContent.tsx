@@ -41,7 +41,6 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
             getNewHostedGameParams,
             resultChecker,
             forceAutoCheckOnFinish,
-            forceEnableConflictChecker,
             disableBackgroundColorOpacity,
             typeManager: { disableConflictChecker, settingsComponents = [], getCellSelectionType },
         },
@@ -163,7 +162,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                 </SettingsItem>
             )}
 
-            {!disableConflictChecker && !forceEnableConflictChecker && (
+            {!disableConflictChecker && (
                 <>
                     <SettingsItem>
                         {translate("Highlight conflicts")}:

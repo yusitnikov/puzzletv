@@ -79,7 +79,6 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     noIndex?: boolean;
     saveState?: boolean;
     saveStateKey?: string;
-    forceEnableConflictChecker?: boolean;
     prioritizeSelection?: boolean;
     initialLives?: number;
     decreaseOnlyOneLive?: boolean;
