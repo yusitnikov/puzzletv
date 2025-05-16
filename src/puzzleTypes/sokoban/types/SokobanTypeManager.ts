@@ -28,8 +28,8 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
         addGridStateExToPuzzleTypeManager(DigitPuzzleTypeManager(), {
             initialGridStateExtension: (puzzle): SokobanGridState => {
                 return {
-                    cluePositions: puzzle?.extension?.clues.map(() => emptyPosition) ?? [],
-                    clueSmashed: puzzle?.extension?.clues.map(() => false) ?? [],
+                    cluePositions: puzzle?.extension?.clues?.map(() => emptyPosition) ?? [],
+                    clueSmashed: puzzle?.extension?.clues?.map(() => false) ?? [],
                     sokobanPosition: puzzle?.extension?.sokobanStartPosition ?? emptyPosition,
                 };
             },

@@ -13,6 +13,7 @@ import { translate } from "../../utils/translate";
 
 export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: showRatio,
+    extension: {},
     title: {
         [LanguageCode.en]: "Rational Cube",
         [LanguageCode.ru]: "Рациональный куб",

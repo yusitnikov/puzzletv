@@ -25,6 +25,7 @@ const Chilly = {
 
 export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title: {
         [LanguageCode.en]: "Intro to Cubedoku",
         [LanguageCode.ru]: "Введение в кубдоку",
@@ -69,6 +70,7 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
 };
 
 export const CubeIt: PuzzleDefinition<NumberPTM> = {
+    extension: {},
     title: {
         [LanguageCode.en]: "Cube It",
     },

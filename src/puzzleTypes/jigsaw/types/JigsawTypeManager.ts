@@ -333,10 +333,11 @@ export const JigsawTypeManager = (
                     }
 
                     const {
-                        puzzle: { extension, importOptions: { stickyRegion } = {} },
+                        puzzle: {
+                            extension: { pieces, otherCells },
+                            importOptions: { stickyRegion } = {},
+                        },
                     } = context;
-
-                    const { pieces, otherCells } = extension!;
 
                     const regions: GridRegion[] = indexes(pieces.length).map((index) => {
                         return getJigsawRegionWithCache(context, index);
@@ -525,7 +526,7 @@ export const JigsawTypeManager = (
                                 puzzle,
                                 gridExtension: { pieces: piecePositions },
                             } = context;
-                            const { pieces } = puzzle.extension!;
+                            const { pieces } = puzzle.extension;
                             const [group] = groupJigsawPiecesByZIndex(context);
                             const groupGesture: GestureMetrics = {
                                 ...emptyGestureMetrics,
@@ -564,7 +565,7 @@ export const JigsawTypeManager = (
                         return { pieces: [] };
                     }
 
-                    const pieces = puzzle.extension?.pieces ?? [];
+                    const pieces = puzzle.extension.pieces ?? [];
 
                     const pieceSortIndexesByPosition = getReverseIndexMap(
                         sortJigsawPiecesByPosition(
@@ -610,7 +611,7 @@ export const JigsawTypeManager = (
     );
 
 export const getAnimatedJigsawPiecePosition = (context: PuzzleContext<JigsawPTM>, index: number): PositionWithAngle => {
-    const piece = context.puzzle.extension?.pieces?.[index];
+    const piece = context.puzzle.extension.pieces?.[index];
     if (!piece) {
         return emptyPositionWithAngle;
     }

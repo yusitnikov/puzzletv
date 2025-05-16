@@ -36,6 +36,7 @@ const extraRegion = ["R1C1", "R3C1", "R1C8", "R2C7", "R8C1", "R1C13", "R3C13", "
 const gridSize = createSparkGridSize(4, 2);
 export const SparkKropki: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title: {
         [LanguageCode.en]: "Spark Kropki XV",
     },
@@ -174,6 +175,7 @@ export const SparkKropki: PuzzleDefinition<NumberPTM> = {
 
 export const EmptySpark: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title: {
         [LanguageCode.en]: "Empty spark",
     },
@@ -203,6 +205,7 @@ export const EmptySpark: PuzzleDefinition<NumberPTM> = {
 const gridSize6x6 = createSparkGridSize(3, 3, 3);
 export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title: {
         [LanguageCode.en]: "Empty spark 6x6",
     },
@@ -232,6 +235,7 @@ export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
 const gridSizeWithNote = createSparkGridSize(4, 2, 4, true);
 
 export const Sparkster: PuzzleDefinition<NumberPTM> = {
+    extension: {},
     title: {
         [LanguageCode.en]: "Sparkster",
     },

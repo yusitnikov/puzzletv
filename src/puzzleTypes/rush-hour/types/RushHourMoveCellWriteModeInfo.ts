@@ -37,7 +37,7 @@ export const RushHourMoveCellWriteModeInfo = (
             importOptions: { givenDigitsBlockCars } = {},
         } = puzzle;
 
-        if (!puzzle.extension) {
+        if (!puzzle.extension.cars) {
             return;
         }
 
@@ -68,7 +68,7 @@ export const RushHourMoveCellWriteModeInfo = (
 
                     if (givenDigitsBlockCars) {
                         processCellsMaps(
-                            ([digit], position) => {
+                            ([_digit], position) => {
                                 offsetRects.push({
                                     ...position,
                                     width: 1,
@@ -181,10 +181,10 @@ export const RushHourMoveCellWriteModeInfo = (
 });
 
 const getRushHourCarIndexByGesture = (
-    { puzzle, puzzleIndex }: PuzzleContext<RushHourPTM>,
+    { puzzle }: PuzzleContext<RushHourPTM>,
     { pointers }: GestureInfo<PuzzleContext<RushHourPTM>>,
 ) => {
-    const cars = puzzle.extension?.cars ?? [];
+    const cars = puzzle.extension.cars ?? [];
 
     const cells = pointers
         .map(({ start: { extraData } }) => (isCellGestureExtraData(extraData) ? extraData.cell : undefined))

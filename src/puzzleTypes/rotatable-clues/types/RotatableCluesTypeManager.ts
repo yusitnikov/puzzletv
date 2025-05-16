@@ -54,14 +54,14 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
         addGridStateExToPuzzleTypeManager(baseTypeManager as unknown as PuzzleTypeManager<RotatableCluesPTM<T>>, {
             initialGridStateExtension(puzzle): RotatableCluesGridState {
                 return {
-                    clueAngles: puzzle?.extension?.clues.map(() => 0) ?? [],
+                    clueAngles: puzzle?.extension?.clues?.map(() => 0) ?? [],
                 };
             },
         }),
         {
             initialGameStateExtension(puzzle): RotatableCluesGameState {
                 return {
-                    clues: puzzle?.extension?.clues.map(() => ({ animating: false })) ?? [],
+                    clues: puzzle?.extension?.clues?.map(() => ({ animating: false })) ?? [],
                 };
             },
         },
@@ -82,7 +82,7 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
                         puzzle,
                         gridExtension: { clueAngles },
                     } = context;
-                    const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
+                    const clues: RotatableClue[] = puzzle.extension.clues ?? [];
 
                     return (clueAngles as number[]).map((manualAngle, index) => {
                         const {
@@ -142,7 +142,7 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
             >;
         }
 
-        if (!puzzle.extension?.clues) {
+        if (!puzzle.extension.clues) {
             const result = cluesImporter?.(puzzle);
 
             puzzle = {
@@ -165,7 +165,7 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
 
                 return [
                     ...(typeof prevItems === "function" ? prevItems(context) : prevItems),
-                    ...((puzzle.extension?.clues as RotatableClue[]) ?? []).flatMap((rootClue, index) => {
+                    ...((puzzle.extension.clues as RotatableClue[]) ?? []).flatMap((rootClue, index) => {
                         const animatedClueAngle = getAnimatedRotatableClueAngle(context, index);
 
                         return [rootClue, ...(rootClue.dependentClues ?? [])].flatMap((clue) =>

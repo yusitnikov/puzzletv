@@ -274,6 +274,7 @@ const slug = "buy-somethin-will-ya";
 
 export const base: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title: { [LanguageCode.en]: "Buy Somethin' Will Ya!" },
     author: { [LanguageCode.en]: "ViKingPrime" },
     slug,

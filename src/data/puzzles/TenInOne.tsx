@@ -67,6 +67,7 @@ const gridSize = createRegularGridSize(9, 3);
 const resultChecker = isValidFinishedPuzzleByStageConstraints<MultiStagePTM>(2);
 
 export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
+    extension: {},
     author: Raumplaner,
     title: {
         [LanguageCode.en]: "Abstract Killer Dots",
@@ -169,6 +170,7 @@ export const AbstractKillerDots: PuzzleDefinition<MultiStagePTM> = {
 };
 
 export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
+    extension: {},
     noIndex: true,
     author: AnalyticalNinja,
     title: {
@@ -262,6 +264,7 @@ export const LegoHouse: PuzzleDefinition<MultiStagePTM> = {
 };
 
 export const DollHouse: PuzzleDefinition<MultiStagePTM> = {
+    extension: {},
     noIndex: true,
     author: AnalyticalNinja,
     title: {
@@ -359,6 +362,7 @@ const MoodyLineConstraint = (cellLiterals: PositionLiteral[], visible = true) =>
     );
 
 export const MoodyLines: PuzzleDefinition<MultiStagePTM> = {
+    extension: {},
     noIndex: true,
     author: AnalyticalNinja,
     title: {

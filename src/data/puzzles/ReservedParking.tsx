@@ -30,7 +30,7 @@ const hasParkedCar = (
     { puzzle: { extension }, gridExtension: { cars: carPositions } }: PuzzleContext<ReservedParkingPTM>,
     expected: Rect,
 ) => {
-    const cars = extension?.cars ?? [];
+    const cars = extension.cars ?? [];
 
     return cars.some(({ boundingRect: { top, left, width, height } }, index) => {
         const offset = carPositions[index];
@@ -115,7 +115,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                                     {
                                         boundingRect: { top, left, width, height },
                                     },
-                                ] of (extension?.cars ?? []).entries()) {
+                                ] of extension.cars.entries()) {
                                     const offset = carPositions[index];
                                     const offsetTop = top + offset.top;
                                     const offsetLeft = left + offset.left;

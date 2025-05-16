@@ -7,6 +7,9 @@
         "start": "react-scripts start",
         "build": "cross-env CI=false react-scripts build",
         "serve": "http-server ./build",
+        "lint": "eslint ./src",
+        "typecheck": "tsc --noEmit",
+        "typecheck-watch": "tsc --noEmit --watch",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
         "chromatic": "chromatic"

@@ -192,6 +192,7 @@ const LinkageConstraint: Constraint<IsReadyPTM> = {
 
 export const PeaucellierLipkinLinkage: PuzzleDefinition<IsReadyPTM> = {
     noIndex: true,
+    extension: {},
     title: { [LanguageCode.en]: "Peaucellier-Lipkin" },
     author: { [LanguageCode.en]: "Palfly Kampling" },
     slug: "peaucellier-lipkin-linkage",

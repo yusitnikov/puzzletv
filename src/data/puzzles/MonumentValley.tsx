@@ -27,6 +27,7 @@ const rules = (validDigits: string) =>
     });
 
 export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
+    extension: {},
     title: {
         [LanguageCode.en]: "Monument Valley Sudoku",
     },
@@ -133,6 +134,7 @@ export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
 };
 
 export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
+    extension: {},
     title: {
         [LanguageCode.en]: "Monument Valley Mini",
     },

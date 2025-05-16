@@ -125,6 +125,7 @@ const cells = [
 export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "penrose-tiles",
+    extension: {},
     title: {
         [LanguageCode.en]: "A Nightmare On\nThe Penrose Tiles",
         [LanguageCode.ru]: "Кошмар на плитке Пенроуза",

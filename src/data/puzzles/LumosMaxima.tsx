@@ -24,6 +24,7 @@ import { translate } from "../../utils/translate";
 
 export const LumosMaximaNoFog: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title: { [LanguageCode.en]: "Lumos Maxima" },
     author: Chameleon,
     slug: "lumos-maxima-no-fog",

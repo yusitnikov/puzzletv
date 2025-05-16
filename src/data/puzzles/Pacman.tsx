@@ -127,6 +127,7 @@ const GhostConstraint = (cellLiteral: string, c: string) =>
 export const Pacman: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "pacman",
+    extension: {},
     title: {
         [LanguageCode.en]: "Pac-Man Sudoku",
     },

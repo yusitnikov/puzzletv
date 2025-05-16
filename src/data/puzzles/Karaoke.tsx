@@ -316,6 +316,7 @@ const CageConstraint = (cells: PositionLiteral[], sum?: number) =>
 export const Karaoke: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "karaoke-poc",
+    extension: {},
     author: Chameleon,
     title: {
         [LanguageCode.en]: "Sudoke Karaoke",

@@ -37,7 +37,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
             initialGridStateExtension(puzzle): RushHourGridState {
                 return {
                     cars:
-                        puzzle?.extension?.cars.map(() => ({
+                        puzzle?.extension?.cars?.map(() => ({
                             top: 0,
                             left: -puzzle.gridSize.rowsCount,
                         })) ?? [],
@@ -47,7 +47,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
         {
             initialGameStateExtension(puzzle): RushHourGameState {
                 return {
-                    cars: puzzle?.extension?.cars.map(() => ({ animating: false })) ?? [],
+                    cars: puzzle?.extension?.cars?.map(() => ({ animating: false })) ?? [],
                     hideCars: false,
                 };
             },
@@ -97,7 +97,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                 height: gridSize,
                 zIndex: 0,
             },
-            ...(carsInfo?.cars ?? []).map(({ cells, boundingRect }, index): GridRegion => {
+            ...(carsInfo.cars ?? []).map(({ cells, boundingRect }, index): GridRegion => {
                 const { top, left } = getAnimatedCarPosition(context, index);
 
                 return {

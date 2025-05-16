@@ -188,7 +188,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                 disableDiagonalBorderLines: true,
                 items: newItems,
                 extension: {
-                    ...puzzle.extension!,
+                    ...puzzle.extension,
                     shapes,
                 },
             };

@@ -63,6 +63,7 @@ export const generateQuadMasters = (
 
         return {
             noIndex: true,
+            extension: {},
             title: getQuadMastersTitle(daily, isQuadle),
             author: {
                 [LanguageCode.en]: isQuadle ? "Maff and Chameleon" : "Maff",

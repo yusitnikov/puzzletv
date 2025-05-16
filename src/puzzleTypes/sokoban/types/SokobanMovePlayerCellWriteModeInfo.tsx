@@ -28,8 +28,8 @@ export const moveSokobanPlayer =
             puzzleIndex: { allCells },
             puzzle,
         } = context;
-        const { isLightClue, isSmashableClue, isFallingClue } = puzzle.extension?.options ?? {};
-        const clues = puzzle.extension?.clues ?? [];
+        const { isLightClue, isSmashableClue, isFallingClue } = puzzle.extension.options ?? {};
+        const clues = puzzle.extension.clues ?? [];
 
         return {
             extension: {

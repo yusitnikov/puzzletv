@@ -65,6 +65,7 @@ const isValidSolution = (
 
 export const RealChessPuzzle: PuzzleDefinition<ChessPTM> = {
     noIndex: true,
+    extension: {},
     title: {
         [LanguageCode.en]: "Easy-peasy, Mate in One",
         [LanguageCode.ru]: "Мат в 1 ход",
@@ -145,6 +146,7 @@ export const RealChessPuzzleCompatibilitySlug: typeof RealChessPuzzle = {
 };
 
 export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
+    extension: {},
     title: {
         [LanguageCode.en]: "Cross-blunder",
         [LanguageCode.ru]: "Двойной зевок",
@@ -284,6 +286,7 @@ export const RealChessPuzzle2: PuzzleDefinition<ChessPTM> = {
 
 export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
     noIndex: true,
+    extension: {},
     title: {
         [LanguageCode.en]: "A new discovery",
     },

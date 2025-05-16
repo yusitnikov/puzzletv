@@ -409,6 +409,7 @@ export const AnimalDigitComponentType: DigitComponentType<NumberPTM> = {
 export const NationalGeographic: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "national-geographic",
+    extension: {},
     author: Chameleon,
     title: {
         [LanguageCode.en]: "National Geographic",

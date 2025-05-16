@@ -183,6 +183,7 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
     const bounds = boundsLayers.slice(0, layersCount).flat();
 
     return {
+        extension: {},
         author: {
             [LanguageCode.en]: "BenceJoful",
         },

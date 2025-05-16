@@ -147,6 +147,7 @@ const getStage = (context: PuzzleContext<MultiStagePTM>) => {
 };
 
 export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
+    extension: {},
     author: Raumplaner,
     title: {
         [LanguageCode.en]: "Hidden Setup",

@@ -113,6 +113,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.puzzle = {
             noIndex: true,
             slug,
+            extension: {},
             title: { [LanguageCode.en]: "Untitled" },
             typeManager,
             gridSize,

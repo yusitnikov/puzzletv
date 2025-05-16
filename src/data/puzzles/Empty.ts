@@ -35,6 +35,7 @@ const title: PartiallyTranslatable = {
 
 export const EmptyRegular: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-regular",
     typeManager: DigitPuzzleTypeManager(),
@@ -45,6 +46,7 @@ export const EmptyRegular: PuzzleDefinition<NumberPTM> = {
 
 export const EmptyChaosConstruction: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-chaos-construction",
     saveStateKey: "empty-chaos-construction-v2",
@@ -67,6 +69,7 @@ export const EmptyChaosConstructionLoop: PuzzleDefinition<NumberPTM> = {
 
 export const EmptyRotatable: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-rotatable",
     typeManager: RotatableDigitTypeManager(),
@@ -77,6 +80,7 @@ export const EmptyRotatable: PuzzleDefinition<RotatableDigitPTM> = {
 
 export const EmptyChess: PuzzleDefinition<ChessPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-chess",
     typeManager: ChessTypeManager,
@@ -89,6 +93,7 @@ export const EmptyChess: PuzzleDefinition<ChessPTM> = {
 
 export const EmptyChessGame: PuzzleDefinition<ChessPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "chess",
     typeManager: ChessGameTypeManager,
@@ -101,6 +106,7 @@ export const EmptyChessGame: PuzzleDefinition<ChessPTM> = {
 
 export const EmptyCube: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-cube",
     typeManager: CubeTypeManager(true),
@@ -112,6 +118,7 @@ export const EmptyCube: PuzzleDefinition<NumberPTM> = {
 
 export const EmptyCubedoku: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-cubedoku",
     typeManager: CubedokuTypeManager,
@@ -123,6 +130,7 @@ export const EmptyCubedoku: PuzzleDefinition<NumberPTM> = {
 
 export const EmptyMonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-monument-valley",
     saveStateKey: "empty-monument-valley-v2",
@@ -136,6 +144,7 @@ export const EmptyMonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
 
 export const EmptyMonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-monument-valley-mini",
     saveStateKey: "empty-monument-valley-mini-v2",
@@ -148,6 +157,7 @@ export const EmptyMonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
 
 export const EmptyToroidal: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-toroidal",
     typeManager: DigitPuzzleTypeManager(),
@@ -161,6 +171,7 @@ export const EmptyToroidal: PuzzleDefinition<NumberPTM> = {
 
 export const EmptyLatin: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     title,
     slug: "empty-latin",
     typeManager: LatinDigitTypeManager(DigitPuzzleTypeManager()),

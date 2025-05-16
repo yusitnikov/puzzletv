@@ -271,6 +271,7 @@ const GlyphsConstraint = (cellLiteral: PositionLiteral, glyphs: ReactNode[]): Co
 export const BodoniSudoku: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
     slug: "bodoni-sudoku",
+    extension: {},
     author: {
         [LanguageCode.en]: "Wei-Hwa Huang",
     },

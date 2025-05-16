@@ -23,6 +23,7 @@ import { translate } from "../../utils/translate";
 
 export const MultiColorMadness: PuzzleDefinition<NumberPTM> = {
     slug: "multi-color-madness",
+    extension: {},
     title: {
         [LanguageCode.en]: "Multi-color Madness",
     },

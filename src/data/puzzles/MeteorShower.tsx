@@ -14,6 +14,7 @@ import { translate } from "../../utils/translate";
 export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => ({
     noIndex: true,
     slug: colorful ? "meteor-shower" : "meteor-shower-no-colors",
+    extension: {},
     title: {
         [LanguageCode.en]: "Meteor Shower",
         [LanguageCode.ru]: "Метеоритный дождь",

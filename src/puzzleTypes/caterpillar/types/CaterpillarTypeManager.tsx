@@ -44,7 +44,7 @@ export const CaterpillarTypeManager = <T extends AnyPTM>(
             };
             puzzle.extension = {
                 ...puzzle.extension,
-                caterpillarGrids: [...(puzzle.extension?.caterpillarGrids ?? []), newGrid],
+                caterpillarGrids: [...(puzzle.extension.caterpillarGrids ?? []), newGrid],
             };
         },
         postProcessImportGrid(puzzle, importer, gridParser) {
@@ -60,7 +60,7 @@ export const CaterpillarTypeManager = <T extends AnyPTM>(
             value: PuzzleDefinition<CaterpillarPTM<T>>[P],
         ): boolean {
             if (prop === "title" || prop === "author" || prop === "rules") {
-                const grids = (puzzle.extension as CaterpillarPuzzleExtension)?.caterpillarGrids;
+                const grids = (puzzle.extension as CaterpillarPuzzleExtension).caterpillarGrids;
                 if (grids?.length) {
                     const currentGrid = grids[grids.length - 1];
                     currentGrid.props[prop] = value;
@@ -72,7 +72,7 @@ export const CaterpillarTypeManager = <T extends AnyPTM>(
         },
 
         postProcessPuzzle(puzzle): PuzzleDefinition<CaterpillarPTM<T>> {
-            const grids = (puzzle.extension as CaterpillarPuzzleExtension)?.caterpillarGrids ?? [];
+            const grids = (puzzle.extension as CaterpillarPuzzleExtension).caterpillarGrids ?? [];
 
             const extraItems = grids.map((grid) => CaterpillarGridFocusConstraint<CaterpillarPTM<T>>(grid.bounds));
 
@@ -137,7 +137,7 @@ export const CaterpillarTypeManager = <T extends AnyPTM>(
         importOptionOverrides(context) {
             let result = typedBaseTypeManager.importOptionOverrides?.(context) ?? {};
 
-            const grids = (context.puzzle.extension as CaterpillarPuzzleExtension)?.caterpillarGrids ?? [];
+            const grids = (context.puzzle.extension as CaterpillarPuzzleExtension).caterpillarGrids ?? [];
             const selectedCells = context.selectedCells.items;
 
             for (const { bounds, overrides } of grids) {

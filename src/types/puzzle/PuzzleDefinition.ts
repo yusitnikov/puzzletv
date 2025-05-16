@@ -32,8 +32,7 @@ import { settings } from "../layout/Settings";
 import { translate } from "../../utils/translate";
 
 export interface PuzzleDefinition<T extends AnyPTM> {
-    // The field is required. Marking it as optional here only to avoid adding empty object to each puzzle.
-    extension?: T["puzzleEx"];
+    extension: T["puzzleEx"];
     title: PartiallyTranslatable;
     slug: string;
     params?: {

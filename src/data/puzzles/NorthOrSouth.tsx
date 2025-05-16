@@ -42,6 +42,7 @@ import { translate } from "../../utils/translate";
 
 export const NorthOrSouth: PuzzleDefinition<RotatableDigitPTM> = {
     noIndex: true,
+    extension: {},
     title: {
         [LanguageCode.en]: "North or South?",
         [LanguageCode.ru]: "Север или юг?",

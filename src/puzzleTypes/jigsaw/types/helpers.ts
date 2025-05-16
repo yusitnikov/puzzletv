@@ -69,7 +69,7 @@ export const getJigsawRegionWithCache = (context: PuzzleContext<JigsawPTM>, inde
 };
 
 export const getJigsawPieceIndexByCell = (puzzle: PuzzleDefinition<JigsawPTM>, cell: Position): number | undefined => {
-    const index = puzzle.extension!.pieces.findIndex(({ cells }) => arrayContainsPosition(cells, cell));
+    const index = puzzle.extension.pieces.findIndex(({ cells }) => arrayContainsPosition(cells, cell));
     return index >= 0 ? index : undefined;
 };
 
@@ -138,7 +138,7 @@ export const groupJigsawPiecesByZIndex = (
     context: PuzzleContext<JigsawPTM>,
     positionOverrides?: JigsawGridPieceState[],
 ): JigsawPiecesGroup[] => {
-    const pieces = context.puzzle.extension?.pieces ?? [];
+    const pieces = context.puzzle.extension.pieces ?? [];
 
     const piecesByZIndex: Record<number, JigsawPiecesGroupItem[]> = {};
 

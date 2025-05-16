@@ -93,7 +93,7 @@ export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeIn
                 gridSize: { rowsCount },
             } = puzzle;
 
-            if (!puzzle.extension) {
+            if (!puzzle.extension.screws) {
                 return;
             }
 
@@ -139,7 +139,7 @@ const getScrewIndexByGesture = <T extends AnyPTM>(
     context: PuzzleContext<ScrewsPTM<T>>,
     { pointers, state: startContext = context }: GestureInfo<PuzzleContext<ScrewsPTM<T>>>,
 ) => {
-    const index = ((startContext.puzzle.extension?.screws ?? []) as Screw<T["cell"]>[])
+    const index = ((startContext.puzzle.extension.screws ?? []) as Screw<T["cell"]>[])
         .map(({ initialPosition }) => initialPosition)
         .findIndex((rect, index) =>
             pointers.every(({ start: { extraData } }) => {

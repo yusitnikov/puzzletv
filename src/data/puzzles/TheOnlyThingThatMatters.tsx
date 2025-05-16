@@ -54,6 +54,7 @@ const items: Constraint<NumberPTM, any>[] = [
 ];
 
 export const TheOnlyThingThatMatters: PuzzleDefinition<NumberPTM> = {
+    extension: {},
     title: {
         [LanguageCode.en]: "The only thing that matters",
         [LanguageCode.ru]: "Важно лишь это",

@@ -18,6 +18,7 @@ import { errorResultCheck, successResultCheck } from "../../types/puzzle/PuzzleR
 export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
     noIndex: true,
     slug: "africa",
+    extension: {},
     title: {
         [LanguageCode.en]: "Africa",
     },

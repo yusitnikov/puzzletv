@@ -24,7 +24,7 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) =>
         const isClockwise = direction > 0;
         const isShift = !isClockwise;
 
-        const clues: RotatableClue[] = puzzle.extension?.clues ?? [];
+        const clues: RotatableClue[] = puzzle.extension.clues ?? [];
         const freeRotation = puzzle.importOptions?.freeRotation;
         const selectedClueIndexes = clues
             .map(({ pivot }, index) => ({
@@ -49,7 +49,7 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) =>
                                 return angle;
                             }
 
-                            const clueCoeff = context.puzzle.extension?.clues?.[index]?.coeff ?? 1;
+                            const clueCoeff = context.puzzle.extension.clues?.[index]?.coeff ?? 1;
                             return angle + direction * Math.sign(clueCoeff);
                         }),
                     },

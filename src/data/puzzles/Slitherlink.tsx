@@ -567,6 +567,7 @@ const BordersCount = (index: number, count: number) => CellBorderLinesCountConst
 
 export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
     slug: "elephant-slitherlink",
+    extension: {},
     title: {
         [LanguageCode.en]: "Elephant slitherlink",
         [LanguageCode.ru]: "Слон-slitherlink",

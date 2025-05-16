@@ -136,7 +136,7 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
                                     position: moveJigsawPieceByGroupGesture(
                                         activeGroup.center,
                                         groupGesture,
-                                        puzzle.extension!.pieces[pieceIndex],
+                                        puzzle.extension.pieces[pieceIndex],
                                         position,
                                     ),
                                     state: { animating: true },

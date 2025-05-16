@@ -98,7 +98,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawPuzzlePhrases): CellW
                         position: moveJigsawPieceByGroupGesture(
                             piecesGroup.center,
                             groupGesture,
-                            puzzle.extension!.pieces[pieceIndex],
+                            puzzle.extension.pieces[pieceIndex],
                             position,
                         ),
                         state: { animating: false },
@@ -160,7 +160,7 @@ export const JigsawMoveCellWriteModeInfo = (phrases: JigsawPuzzlePhrases): CellW
                     position: moveJigsawPieceByGroupGesture(
                         piecesGroup.center,
                         groupGesture,
-                        puzzle.extension!.pieces[pieceIndex],
+                        puzzle.extension.pieces[pieceIndex],
                         position,
                     ),
                     state: { animating: true },

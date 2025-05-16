@@ -308,7 +308,7 @@ export const RushHourCars = observer(function RushHourCars({ region, context }: 
 
     return (
         <g opacity={hideCars && cellWriteMode !== CellWriteMode.move ? 0.3 : undefined}>
-            {extension?.cars.map(({ boundingRect: { top, left, width, height }, color, invert }, index) => {
+            {extension.cars.map(({ boundingRect: { top, left, width, height }, color, invert }, index) => {
                 const carPosition = getAnimatedCarPosition(context, index);
 
                 return (

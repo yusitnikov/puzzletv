@@ -45,6 +45,7 @@ const correctAnswer = [
 ];
 
 export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
+    extension: {},
     author: Chameleon,
     title: {
         [LanguageCode.en]: "No secret rules today",

@@ -199,6 +199,7 @@ const gridSize = createRegularGridSize(7, 7);
 
 export const SonataSemplice: PuzzleDefinition<QuadInputPTM> = {
     noIndex: true,
+    extension: {},
     slug: "rockratzero-sonata-semplice",
     title: {
         [LanguageCode.en]: "Sonata Semplice",

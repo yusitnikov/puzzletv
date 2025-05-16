@@ -57,6 +57,7 @@ const F = [CellColor.green];
 
 export const Astronavigation: PuzzleDefinition<RotatableCluesPTM<NumberPTM>> = {
     slug: "astronavigation",
+    extension: { clues: [] }, // the type manager will fulfill the extension
     author: {
         [LanguageCode.en]: "fjam",
     },

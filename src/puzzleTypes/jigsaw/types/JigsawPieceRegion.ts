@@ -43,7 +43,7 @@ export class JigsawPieceRegion implements GridRegion {
     ) {
         makeAutoObservable(this);
 
-        const { cells, boundingRect, center } = context.puzzle.extension!.pieces[index];
+        const { cells, boundingRect, center } = context.puzzle.extension.pieces[index];
 
         this.top = boundingRect.top;
         this.left = boundingRect.left;

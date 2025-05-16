@@ -73,6 +73,7 @@ const SameColorRegionConstraint: Constraint<NumberPTM> = {
 
 export const Miraculous: PuzzleDefinition<NumberPTM> = {
     noIndex: true,
+    extension: {},
     slug: "miraculous",
     saveStateKey: "miraculous-v2",
     title: {

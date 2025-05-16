@@ -45,7 +45,7 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
                 },
                 initialScale,
                 initialGridStateExtension: (puzzle) => {
-                    const pieces: JigsawPieceInfo[] = puzzle.extension!.pieces;
+                    const pieces: JigsawPieceInfo[] = puzzle.extension.pieces;
                     const pieceIndexByCell: Record<string, number> = {};
                     for (const [index, { cells }] of pieces.entries()) {
                         for (const cell of cells) {

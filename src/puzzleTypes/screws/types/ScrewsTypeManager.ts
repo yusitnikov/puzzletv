@@ -34,14 +34,14 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
         addGridStateExToPuzzleTypeManager(baseTypeManager as unknown as PuzzleTypeManager<ScrewsPTM<T>>, {
             initialGridStateExtension(puzzle): ScrewsGridState {
                 return {
-                    screwOffsets: puzzle?.extension?.screws.map(() => 0) ?? [],
+                    screwOffsets: puzzle?.extension?.screws?.map(() => 0) ?? [],
                 };
             },
         }),
         {
             initialGameStateExtension(puzzle): ScrewsGameState {
                 return {
-                    screws: puzzle?.extension?.screws.map((): ScrewsGameClueState => ({ animating: false })) ?? [],
+                    screws: puzzle?.extension?.screws?.map((): ScrewsGameClueState => ({ animating: false })) ?? [],
                 };
             },
             serializeGameState({ screws = [] }: Partial<ScrewsGameState>): any {
@@ -65,7 +65,7 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
         }
 
         // Import screw positions
-        if (!puzzle.extension?.screws) {
+        if (!puzzle.extension.screws) {
             const result = screwsImporter?.(puzzle);
 
             puzzle = {
@@ -84,7 +84,7 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
             ...puzzle,
             extension: {
                 ...puzzle.extension,
-                screws: (puzzle.extension?.screws ?? []).map(({ initialPosition, digits }: Screw<T["cell"]>) => {
+                screws: (puzzle.extension.screws ?? []).map(({ initialPosition, digits }: Screw<T["cell"]>) => {
                     const { top, left, width, height } = initialPosition;
                     const bottom = top + height;
                     const right = left + width;
@@ -122,7 +122,7 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
             initialDigits,
         };
 
-        const screwsCount = puzzle.extension?.screws.length ?? 0;
+        const screwsCount = puzzle.extension.screws.length ?? 0;
         const prevItems = puzzle.items ?? [];
         puzzle = {
             ...puzzle,
