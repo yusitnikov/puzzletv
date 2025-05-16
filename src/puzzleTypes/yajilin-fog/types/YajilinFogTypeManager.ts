@@ -15,12 +15,8 @@ export const YajilinFogTypeManager = <T extends AnyPTM>(
     return {
         ...baseTypeManager,
         mapImportedColors: true,
+        disableBackgroundColorOpacity: true,
         postProcessPuzzle(puzzle): PuzzleDefinition<T> {
-            puzzle = {
-                ...puzzle,
-                disableBackgroundColorOpacity: true,
-            };
-
             if (puzzle.gridSize.rowsCount > 9) {
                 puzzle = {
                     ...puzzle,

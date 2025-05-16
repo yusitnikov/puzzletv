@@ -21,12 +21,8 @@ export const JssTypeManager = <T extends AnyPTM>(
     return {
         ...baseTypeManager,
         mapImportedColors: true,
+        disableBackgroundColorOpacity: true,
         postProcessPuzzle(puzzle): PuzzleDefinition<T> {
-            puzzle = {
-                ...puzzle,
-                disableBackgroundColorOpacity: true,
-            };
-
             if (puzzle.regions?.length) {
                 let activeRegions = puzzle.regions;
                 const inactiveCells = puzzle.inactiveCells ?? [];

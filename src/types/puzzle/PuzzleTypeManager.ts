@@ -278,6 +278,12 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
 
     colorsImportMode?: ColorsImportMode;
 
+    /**
+     * Always render the user's cell colors with full opacity
+     * (by default, the user could configure the color's opacity in the settings).
+     */
+    disableBackgroundColorOpacity?: boolean;
+
     onCloseCorrectResultPopup?(context: PuzzleContext<T>): void;
 
     gridWrapperComponent?: ComponentType<PuzzleContextProps<T>>;

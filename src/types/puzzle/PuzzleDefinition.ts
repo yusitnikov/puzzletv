@@ -61,7 +61,6 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     initialColors?: CellsMap<CellColorValue[]> | ((context: PuzzleContext<T>) => CellsMap<CellColorValue[]>);
     initialCellMarks?: CellMark[];
     allowOverridingInitialColors?: boolean;
-    disableBackgroundColorOpacity?: boolean;
     resultChecker?: (context: PuzzleContext<T>) => PuzzleResultCheck;
     allowEmptyCells?: boolean;
     forceAutoCheckOnFinish?: boolean;

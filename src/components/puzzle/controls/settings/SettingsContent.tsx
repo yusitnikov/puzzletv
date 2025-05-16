@@ -41,8 +41,12 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
             getNewHostedGameParams,
             resultChecker,
             forceAutoCheckOnFinish,
-            disableBackgroundColorOpacity,
-            typeManager: { disableConflictChecker, settingsComponents = [], getCellSelectionType },
+            typeManager: {
+                disableBackgroundColorOpacity,
+                disableConflictChecker,
+                settingsComponents = [],
+                getCellSelectionType,
+            },
         },
         multiPlayer: { isEnabled },
     } = context;

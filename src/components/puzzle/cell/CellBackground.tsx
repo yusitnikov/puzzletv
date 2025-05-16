@@ -74,7 +74,7 @@ export const CellBackground = observer(function CellBackground<T extends AnyPTM>
 }: CellBackgroundProps<T>) {
     profiler.trace();
 
-    if (context.puzzle.disableBackgroundColorOpacity) {
+    if (context.puzzle.typeManager.disableBackgroundColorOpacity) {
         noOpacity = true;
     }
 
