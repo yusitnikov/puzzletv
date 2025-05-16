@@ -3,7 +3,6 @@ import { App } from "./App";
 import { WithHashContext } from "../../hooks/useHash";
 import { Deferred } from "../../utils/deferred";
 
-// noinspection JSUnusedGlobalSymbols
 export default {
     title: "Pages/Basic",
     component: App,

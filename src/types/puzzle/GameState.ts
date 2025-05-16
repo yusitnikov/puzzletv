@@ -317,6 +317,7 @@ export const setAllShareState = <T extends AnyPTM>(context: PuzzleContext<T>, ne
     return setSharedState?.(context, newState) ?? result;
 };
 
+// noinspection JSUnusedGlobalSymbols
 export const areSameGameStates = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     state1: GameStateEx<T>,
@@ -828,7 +829,7 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
 
     const {
         handleDigitGlobally,
-        handleDigitInCell = (isGlobal, clientId, cellWriteMode, cell, data, position, context, defaultValue) =>
+        handleDigitInCell = (_isGlobal, _clientId, _cellWriteMode, _cell, _data, _position, _context, defaultValue) =>
             defaultValue,
         areSameCellData,
     } = typeManager;

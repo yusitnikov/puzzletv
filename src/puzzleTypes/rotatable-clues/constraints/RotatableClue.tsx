@@ -120,6 +120,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                                     pivotRadius,
                                     pivotRadius,
                                     roundedAnimatedAngle,
+                                    // eslint-disable-next-line no-mixed-operators
                                     roundedAnimatedAngle < 180 === coeff > 0 ? 0 : 1,
                                     coeff > 0 ? 1 : 0,
                                     pivotDirection.left,

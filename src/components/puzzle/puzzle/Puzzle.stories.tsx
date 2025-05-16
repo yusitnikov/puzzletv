@@ -2,7 +2,6 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { App } from "../../app/App";
 import { WithHashContext } from "../../../hooks/useHash";
 
-// noinspection JSUnusedGlobalSymbols
 export default {
     title: "Pages/Puzzles",
     component: App,

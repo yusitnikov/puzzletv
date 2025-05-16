@@ -177,6 +177,7 @@ export const SudokuPadImage = observer(function SudokuPadImage({
     }
 
     return (
+        // eslint-disable-next-line jsx-a11y/iframe-has-title
         <iframe
             {...props}
             style={{

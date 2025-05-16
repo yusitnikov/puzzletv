@@ -20,7 +20,9 @@ export interface MappingIllustrationProps {
 export const MappingIllustration = observer(function MappingIllustration({ puzzle }: MappingIllustrationProps) {
     profiler.trace();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const puzzle1 = useMemo(() => loadPuzzle({ ...puzzle(true), slug: "" }, undefined, true), []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const puzzle2 = useMemo(() => loadPuzzle({ ...puzzle(false), slug: "" }, undefined, true), []);
 
     return (

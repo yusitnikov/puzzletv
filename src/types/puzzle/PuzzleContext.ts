@@ -794,11 +794,13 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.puzzleIndex.getLineSegmentsByType(this.linesWithHiddenLines.items, CellPart.center);
     }
 
+    // noinspection JSUnusedGlobalSymbols
     get borderLineSegments() {
         profiler.trace();
         return this.puzzleIndex.getLineSegmentsByType(this.linesWithHiddenLines.items, CellPart.border);
     }
 
+    // noinspection JSUnusedGlobalSymbols
     get cornerLineSegments() {
         profiler.trace();
         return this.puzzleIndex.getLineSegmentsByType(this.linesWithHiddenLines.items, CellPart.corner);

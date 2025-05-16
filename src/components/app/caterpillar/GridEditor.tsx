@@ -79,8 +79,10 @@ export const GridEditor = observer(function GridEditor({ grid, onSubmit, onCance
             <div>
                 Use this bookmarklet in the SudokuPad tab to copy the data:
                 <br />
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 <a
                     href={
+                        // eslint-disable-next-line no-script-url
                         "javascript:PuzzleLoader.fetchPuzzle(getPuzzleId()).then(data => navigator.clipboard.writeText(data)).then(() => alert('Copied!'))"
                     }
                 >
