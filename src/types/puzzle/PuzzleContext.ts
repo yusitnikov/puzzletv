@@ -7,7 +7,6 @@ import {
     getScaleLog,
     mergeGameStateWithUpdates,
     PartialGameStateEx,
-    ProcessedGameStateAnimatedValues,
     setAllShareState,
 } from "./GameState";
 import { MessageWithClientId, myClientId, UseMultiPlayerResult } from "../../hooks/useMultiPlayer";
@@ -111,13 +110,13 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.regionsByCellsMap[top]?.[left];
     });
 
-    get animated(): ProcessedGameStateAnimatedValues {
+    get animated() {
         profiler.trace();
 
         return this.getCachedItem(
             "animatedGridTransform",
             () =>
-                new AnimatedValue<ProcessedGameStateAnimatedValues>(
+                new AnimatedValue(
                     () => ({
                         loopOffset: this.loopOffset,
                         angle: this.angle,

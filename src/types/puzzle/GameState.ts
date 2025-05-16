@@ -92,8 +92,6 @@ export type PartialGameStateEx<T extends AnyPTM> = Partial<GameState<T>> & {
     extension?: Partial<T["stateEx"]>;
 };
 
-export type ProcessedGameStateAnimatedValues = Pick<GameState<AnyPTM>, "loopOffset" | "angle" | "scale">;
-
 export const mergeGameStateUpdates = <T extends AnyPTM>(...updatesArray: PartialGameStateEx<T>[]) =>
     updatesArray.reduce(({ extension: ex1, ...state1 }, { extension: ex2, ...state2 }) => ({
         ...state1,
