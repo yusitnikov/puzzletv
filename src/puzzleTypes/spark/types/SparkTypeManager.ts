@@ -8,6 +8,7 @@ import { indexes } from "../../../utils/indexes";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { CellTypeProps } from "../../../types/puzzle/CellTypeProps";
 import { NumberPTM } from "../../../types/puzzle/PuzzleTypeMap";
+import { GridRegion, transformCoordsByRegions } from "../../../types/puzzle/GridRegion";
 
 export const SparkTypeManager: PuzzleTypeManager<NumberPTM> = {
     ...DigitPuzzleTypeManager(),
@@ -104,8 +105,12 @@ export const SparkTypeManager: PuzzleTypeManager<NumberPTM> = {
         return defaultProcessArrowDirection(cell, xDirection, yDirection, context, ...args);
     },
 
-    transformCoords({ top, left }, { puzzle, isReadonlyContext: isPreview }) {
+    transformCoords: transformCoordsByRegions,
+
+    getRegionsWithSameCoordsTransformation({ puzzle, isReadonlyContext: isPreview }): Rect[] {
         const { gridSize, realRowsCount, extraRowsCount } = parseSparkGridSize(puzzle.gridSize);
+
+        const fullMargin = (puzzle.gridMargin ?? 0) + 1;
 
         const a10 = Math.PI / 10;
         const s10 = Math.sin(a10);
@@ -117,69 +122,81 @@ export const SparkTypeManager: PuzzleTypeManager<NumberPTM> = {
         const cx = gridSize * 1.5 + 0.5;
         const cy = gridSize + 0.5 + (isPreview ? extraRowsCount / 2 : 0);
 
-        let dx = left - gridSize;
-        const dy = top - gridSize;
-
-        if (top >= realRowsCount) {
-            return { left: cx + dx, top: cy + dy + 1 };
-        }
-
-        if (dx >= gridSize + 0.75) {
-            dx -= gridSize + 1;
-
-            if (dy < 0) {
-                return { left: cx + dx * c10 - dy * s5, top: cy + dy * c5 + dx * s10 };
-            } else {
-                return { left: cx + dx * c10, top: cy + dy + dx * s10 };
-            }
-        } else {
-            if (dy < 0) {
-                if (dx < 0) {
-                    return { left: cx + dx * c10 + dy * s5, top: cy + dy * c5 - dx * s10 };
-                } else {
-                    return { left: cx + dx * s5 + dy * s5, top: cy + dy * c5 - dx * c5 };
-                }
-            } else {
-                return { left: cx + dx * c10, top: cy + dy - dx * s10 };
-            }
-        }
-    },
-
-    getRegionsWithSameCoordsTransformation({ puzzle, isReadonlyContext: isPreview }): Rect[] {
-        const { gridSize, realRowsCount, extraRowsCount } = parseSparkGridSize(puzzle.gridSize);
-
-        const fullMargin = (puzzle.gridMargin ?? 0) + 1;
-
-        const result: Rect[] = [
+        const result: GridRegion[] = [
             {
                 left: -fullMargin,
                 top: -fullMargin,
                 width: gridSize + fullMargin,
                 height: gridSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    left -= gridSize;
+                    top -= gridSize;
+
+                    return {
+                        left: cx + left * c10 + top * s5,
+                        top: cy + top * c5 - left * s10,
+                    };
+                },
             },
             {
                 left: -fullMargin,
                 top: gridSize,
                 width: gridSize + fullMargin,
                 height: gridSize + 0.5,
+                transformCoords: ({ top, left }) => {
+                    left -= gridSize;
+                    top -= gridSize;
+
+                    return {
+                        left: cx + left * c10,
+                        top: cy + top - left * s10,
+                    };
+                },
             },
             {
                 left: gridSize,
                 top: -fullMargin,
                 width: gridSize + 0.5,
                 height: gridSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    left -= gridSize;
+                    top -= gridSize;
+
+                    return {
+                        left: cx + left * s5 + top * s5,
+                        top: cy + top * c5 - left * c5,
+                    };
+                },
             },
             {
                 left: gridSize * 2 + 1,
                 top: -fullMargin,
                 width: gridSize + fullMargin,
                 height: gridSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    left -= gridSize * 2 + 1;
+                    top -= gridSize;
+
+                    return {
+                        left: cx + left * c10 - top * s5,
+                        top: cy + top * c5 + left * s10,
+                    };
+                },
             },
             {
                 left: gridSize * 2 + 1,
                 top: gridSize,
                 width: gridSize + fullMargin,
                 height: gridSize + 0.5,
+                transformCoords: ({ top, left }) => {
+                    left -= gridSize * 2 + 1;
+                    top -= gridSize;
+
+                    return {
+                        left: cx + left * c10,
+                        top: cy + top + left * s10,
+                    };
+                },
             },
         ];
 
@@ -189,6 +206,15 @@ export const SparkTypeManager: PuzzleTypeManager<NumberPTM> = {
                 top: realRowsCount + 0.5,
                 width: gridSize * 2 + fullMargin * 2,
                 height: extraRowsCount + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    left -= gridSize;
+                    top -= gridSize;
+
+                    return {
+                        left: cx + left,
+                        top: cy + top + 1,
+                    };
+                },
             });
         }
 
