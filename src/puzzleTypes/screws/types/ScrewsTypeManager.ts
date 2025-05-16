@@ -65,7 +65,7 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
         }
 
         // Import screw positions
-        if (!puzzle.extension.screws) {
+        if (!puzzle.extension.screws?.length) {
             const result = screwsImporter?.(puzzle);
 
             puzzle = {

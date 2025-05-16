@@ -142,7 +142,7 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
             >;
         }
 
-        if (!puzzle.extension.clues) {
+        if (!puzzle.extension.clues?.length) {
             const result = cluesImporter?.(puzzle);
 
             puzzle = {

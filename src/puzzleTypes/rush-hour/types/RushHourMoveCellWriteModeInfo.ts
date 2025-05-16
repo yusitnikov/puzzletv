@@ -37,7 +37,7 @@ export const RushHourMoveCellWriteModeInfo = (
             importOptions: { givenDigitsBlockCars } = {},
         } = puzzle;
 
-        if (!puzzle.extension.cars) {
+        if (!puzzle.extension.cars?.length) {
             return;
         }
 

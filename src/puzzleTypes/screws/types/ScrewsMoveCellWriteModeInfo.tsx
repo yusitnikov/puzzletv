@@ -93,7 +93,7 @@ export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeIn
                 gridSize: { rowsCount },
             } = puzzle;
 
-            if (!puzzle.extension.screws) {
+            if (!puzzle.extension.screws?.length) {
                 return;
             }
 
