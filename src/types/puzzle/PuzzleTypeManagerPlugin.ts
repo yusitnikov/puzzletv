@@ -19,13 +19,13 @@ const splitEx = <T1, T2>(value: T1 & T2, defaults: T2, useDefaults = false): { b
     return { base, ex };
 };
 
-// region Field state
+// region Puzzle definition
 export type ReplacePuzzleEx<T extends AnyPTM, PuzzleEx> = Omit<T, "puzzleEx"> & { puzzleEx: PuzzleEx };
 // noinspection JSUnusedGlobalSymbols
 export type AddPuzzleEx<T extends AnyPTM, PuzzleEx> = ReplacePuzzleEx<T, T["puzzleEx"] & PuzzleEx>;
 // endregion
 
-// region Field state
+// region Grid state
 export type ReplaceGridStateEx<T extends AnyPTM, GridStateEx> = Omit<T, "gridStateEx"> & {
     gridStateEx: GridStateEx;
 };
