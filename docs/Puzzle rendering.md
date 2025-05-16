@@ -183,7 +183,7 @@ There are two supported cell types in Puzzle TV:
 1. Regular cells - each cell is a 1x1 square located according to its indexes in the 2-dimensional cells' array.
    That's the default mode.
 2. Cells with custom bounds - each cell is a polygon with coordinates defined in the `customCellBounds` field
-   on the [puzzle definition](./Data%20structures%20and%20types.md) object.
+   on the [puzzle definition](../src/types/puzzle/PuzzleDefinition.ts) object.
    The [`CustomCellBounds`](../src/types/puzzle/CustomCellBounds.ts) object defines not only the polygon of cell's borders,
    but also the "user area" - a rectangle (usually, a square) inside the cell to place digits and pencilmarks in.
    User area rectangle must be fully inside the cell's polygon.
@@ -285,6 +285,6 @@ It also re-draws all user's cell coloring over the fog, with the same SVG mask,
 so the cell coloring is not hidden behind the fog, but it also doesn't reveal any other graphics behind the fog.
 
 Since the fog is being rendered in the `regular` layer, and the cell selection indicators are usually behind it,
-there's a special `prioritizeSelection` flag on the [puzzle definition](./Data%20structures%20and%20types.md) level
+there's a special `prioritizeSelection` flag on the [puzzle definition](../src/types/puzzle/PuzzleDefinition.ts) level
 that moves the cell selection indicators to the front of the `regular` layer.
 Puzzles with fog support should enable this flag (it happens automatically when importing from F-Puzzles and Sudoku Maker).

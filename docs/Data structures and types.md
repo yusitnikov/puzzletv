@@ -22,7 +22,7 @@ All types related to puzzles (`PuzzleDefinition`, `PuzzleContext`, etc.) have ma
   But the platform allows putting anything into a cell: a chess piece, a picture of an animal from a given set,
   a digit that was rotated by a certain angle, and the list goes on.
   See the "`PuzzleTypeManager`" section below for more info about how to support custom cell data type.
-- Puzzle extension type - which additional data is stored on the puzzle definition (see "`PuzzleDefinition`" section below for more info).
+- Puzzle extension type - which additional data is stored on the [puzzle definition](../src/types/puzzle/PuzzleDefinition.ts).
   For instance, [jigsaw puzzles](../src/puzzleTypes/jigsaw/types/JigsawPuzzleEx.ts) store the list of all jigsaw pieces,
   [sokoban puzzles](../src/puzzleTypes/sokoban/types/SokobanPuzzleExtension.ts)
   store the list of cages and the starting position of the sokoban player, etc.
@@ -79,10 +79,6 @@ export type ToMultiStagePTM<T extends AnyPTM> = AddGameStateEx<T, MultiStageGame
 ```
 
 See the "`PuzzleTypeManager`" section below for more information on how to stack extensions on top of each other.
-
-## [`PuzzleDefinition`](../src/types/puzzle/PuzzleDefinition.ts)
-
-TBD...
 
 ## [`PuzzleTypeManager`](../src/types/puzzle/PuzzleTypeManager.ts)
 

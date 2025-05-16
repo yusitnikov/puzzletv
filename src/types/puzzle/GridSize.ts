@@ -5,11 +5,46 @@ import { RegionConstraint } from "../../components/puzzle/constraints/region/Reg
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
 
+/**
+ * Puzzle grid size - defines both the size of virtual cells array and of the rendered grid.
+ *
+ * Internally, the cells of the puzzle are always represented as a 2-dimensional array:
+ * rows first, then columns, e.g. `cells[rowsCount][columnsCount]`.
+ *
+ * But the actual puzzle's grid that is rendered on the page could be anything:
+ * custom cells bounds, coordinate transformations, scattered cells, custom grid wrappers...
+ * So the `gridSize` property defines what is the size of the rendered grid on the page.
+ *
+ * The puzzle type manager is responsible for drawing the cells in the correct place and with the correct shape.
+ * @see PuzzleTypeManager
+ */
 export interface GridSize {
-    gridSize: number;
+    /**
+     * The number of rows in the virtual cells array.
+     */
     rowsCount: number;
+    /**
+     * The number of columns in the virtual cells array.
+     */
     columnsCount: number;
+    /**
+     * The size of the rendered puzzle grid's square.
+     *
+     * For a regular rectangular grid that consists of square cells,
+     * the grid size is supposed to be the maximum of `rowsCount` and `columnsCount`
+     * (to fully cover the puzzle's grid).
+     *
+     * For an irregular grid (custom cell bounds, coordinate transformations, custom grid wrappers),
+     * it must be the size of the square that fully covers the rendered custom grid.
+     */
+    gridSize: number;
+    /**
+     * Sudoku box width, if relevant.
+     */
     regionWidth?: number;
+    /**
+     * Sudoku box height, if relevant.
+     */
     regionHeight?: number;
 }
 
