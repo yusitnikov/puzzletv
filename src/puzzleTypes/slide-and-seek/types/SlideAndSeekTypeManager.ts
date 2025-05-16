@@ -37,7 +37,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
 
         colorsImportMode: ColorsImportMode.Initials,
 
-        postProcessPuzzle(puzzle: PuzzleDefinition<SlideAndSeekPTM<T>>): typeof puzzle {
+        postProcessPuzzle(puzzle: PuzzleDefinition<SlideAndSeekPTM<T>>): PuzzleDefinition<SlideAndSeekPTM<T>> {
             puzzle = baseTypeManagerCast.postProcessPuzzle?.(puzzle) ?? puzzle;
 
             const { items, initialColors = {} } = puzzle;

@@ -251,7 +251,7 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     // TODO: transform into a component
     getAboveRules?(context: PuzzleContext<T>, isPortrait: boolean): ReactNode;
 
-    postProcessPuzzle?(puzzle: PuzzleDefinition<T>): typeof puzzle;
+    postProcessPuzzle?(puzzle: PuzzleDefinition<T>): PuzzleDefinition<T>;
 
     preProcessImportGrid?(
         puzzle: PuzzleDefinition<T>,
