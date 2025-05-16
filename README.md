@@ -16,8 +16,8 @@ but sometimes refreshing the tab is still necessary.
 
 ## Understanding the codebase
 
-The project is a frontend-only JavaScript/TypeScript application
-based on [React](https://react.dev/) for web components,
-[MobX](https://mobx.js.org/) for global state management,
-[Emotion](https://emotion.sh/) for styles,
-and [ably](https://ably.com/) for web sockets.
+- [Tech stack](./docs/Tech%20stack.md)
+- [Puzzle rendering](./docs/Puzzle%20rendering.md)
+- [Data structures and types](./docs/Data%20structures%20and%20types.md)
+- How to:
+    - [Render custom grid](./docs/how-to/How%20to%20render%20custom%20grid.md)
