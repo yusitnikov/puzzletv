@@ -42,7 +42,6 @@ import { getCellDataSortIndexes } from "../../../components/puzzle/cell/CellDigi
 import { JigsawGridPieceState, JigsawGridState } from "./JigsawGridState";
 import { getReverseIndexMap } from "../../../utils/array";
 import { PuzzleImportOptions } from "../../../types/puzzle/PuzzleImportOptions";
-import { PuzzleCellsIndex } from "../../../types/puzzle/PuzzleCellsIndex";
 import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
 import {
     getRegionCells,
@@ -441,7 +440,7 @@ export const JigsawTypeManager = (
                 postProcessPuzzle(puzzle): PuzzleDefinition<JigsawPTM> {
                     puzzle = {
                         ...puzzle,
-                        extension: getJigsawPieces(new PuzzleCellsIndex(puzzle), getPieceCenter),
+                        extension: getJigsawPieces(puzzle, getPieceCenter),
                     };
 
                     if (puzzle.importOptions?.noPieceRegions) {

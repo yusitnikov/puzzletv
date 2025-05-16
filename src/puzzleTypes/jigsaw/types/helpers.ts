@@ -1,6 +1,5 @@
 import { JigsawDigit } from "./JigsawDigit";
 import { arrayContainsPosition, Position, PositionSet, PositionWithAngle } from "../../../types/layout/Position";
-import { PuzzleCellsIndex } from "../../../types/puzzle/PuzzleCellsIndex";
 import { loop, roundToStep } from "../../../utils/math";
 import { getRegionCells, isStickyRegionCell, PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { getRegionBoundingBox } from "../../../utils/regions";
@@ -17,14 +16,14 @@ import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { JigsawPieceRegion } from "./JigsawPieceRegion";
 
 export const getJigsawPieces = (
-    cellsIndex: PuzzleCellsIndex<JigsawPTM>,
+    puzzle: PuzzleDefinition<JigsawPTM>,
     getCenter: (piece: Omit<JigsawPieceInfo, "center">) => Position,
 ): { pieces: JigsawPieceInfo[]; otherCells: Position[] } => {
-    const { puzzle } = cellsIndex;
     const {
         regions = [],
         gridSize: { rowsCount, columnsCount },
         importOptions,
+        inactiveCells = [],
     } = puzzle;
 
     let regionCells = regions.map(getRegionCells);
@@ -34,9 +33,9 @@ export const getJigsawPieces = (
     ).bulkRemove(regionCells.flat());
 
     if (importOptions?.stickyRegion) {
-        const otherActiveCells = otherCells.filter(
-            (cell) => isStickyRegionCell(puzzle, cell) && cellsIndex.allCells[cell.top]?.[cell.left]?.isActive,
-        );
+        const otherActiveCells = otherCells
+            .bulkRemove(inactiveCells)
+            .filter((cell) => isStickyRegionCell(puzzle, cell));
         otherCells = otherCells.bulkRemove(otherActiveCells.items);
 
         if (otherActiveCells.size) {
