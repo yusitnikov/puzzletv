@@ -58,8 +58,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
             title,
             author,
             rules,
-            aboveRules: puzzleAboveRules,
-            typeManager: { getPlayerScore, getAboveRules: typeAboveRules },
+            typeManager: { getPlayerScore, getAboveRules },
             lmdLink,
             initialLives = 0,
         },
@@ -262,8 +261,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
                 </div>
             )}
 
-            {puzzleAboveRules?.(context, isPortrait)}
-            {typeAboveRules?.(context, isPortrait)}
+            {getAboveRules?.(context, isPortrait)}
 
             <div
                 style={{

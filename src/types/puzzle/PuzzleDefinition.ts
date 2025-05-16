@@ -44,7 +44,9 @@ export interface PuzzleDefinition<T extends AnyPTM> {
     getNewHostedGameParams?: () => any;
     author?: PartiallyTranslatable<ReactNode>;
     rules?: (context: PuzzleContext<T>) => ReactNode;
-    aboveRules?: (context: PuzzleContext<T>, isPortrait: boolean) => ReactNode;
+    /**
+     * The message to show to the user when they successfully finish solving the puzzle.
+     */
     successMessage?: ReactNode;
     typeManager: PuzzleTypeManager<T>;
     gridSize: GridSize;
