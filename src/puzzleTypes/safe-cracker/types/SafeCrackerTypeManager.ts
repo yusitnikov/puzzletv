@@ -8,7 +8,7 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManager";
 import { SafeCrackerStarConstraint } from "../constraints/SafeCrackerStarConstraint";
 import { indexes } from "../../../utils/indexes";
-import { safeCrackerArrowsCellWriteModeInfo } from "./LeftRightArrow";
+import { safeCrackerArrowsPuzzleInputModeInfo } from "./LeftRightArrow";
 import { BaseSafeCrackerPuzzle } from "./BaseSafeCrackerPuzzle";
 import { getDefaultDigitsCount, PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { isTextConstraint } from "../../../components/puzzle/constraints/text/Text";
@@ -27,12 +27,12 @@ export const SafeCrackerTypeManager = <T extends AnyNumberPTM>(
 
     const baseTypeManager = DigitPuzzleTypeManager<T>();
 
-    const arrowsCellWriteModeInfo = safeCrackerArrowsCellWriteModeInfo<T>();
+    const arrowsInputModeInfo = safeCrackerArrowsPuzzleInputModeInfo<T>();
 
     return {
         ...baseTypeManager,
         ignoreRowsColumnCountInTheWrapper: true,
-        extraCellWriteModes: [...(baseTypeManager.extraCellWriteModes ?? []), arrowsCellWriteModeInfo],
+        extraInputModes: [...(baseTypeManager.extraInputModes ?? []), arrowsInputModeInfo],
         getCellTypeProps({ top, left }, puzzle): CellTypeProps<T> {
             const { digitsCount = getDefaultDigitsCount(puzzle) } = puzzle;
             if (left >= digitsCount) {
@@ -49,7 +49,7 @@ export const SafeCrackerTypeManager = <T extends AnyNumberPTM>(
                         ? {}
                         : {
                               isSelectable: false,
-                              forceCellWriteMode: arrowsCellWriteModeInfo,
+                              forcedPuzzleInputMode: arrowsInputModeInfo,
                           };
             }
         },

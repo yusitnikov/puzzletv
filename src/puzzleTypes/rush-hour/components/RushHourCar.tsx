@@ -5,7 +5,7 @@ import { RushHourPTM } from "../types/RushHourPTM";
 import { GridLayer } from "../../../types/puzzle/GridLayer";
 import { textColor } from "../../../components/app/globals";
 import { mixColorsStr } from "../../../utils/color";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { getAnimatedCarPosition } from "../types/RushHourTypeManager";
@@ -302,12 +302,12 @@ export const RushHourCars = observer(function RushHourCars({ region, context }: 
 
     const {
         puzzle: { extension },
-        cellWriteMode,
+        inputMode,
         stateExtension: { hideCars },
     } = context;
 
     return (
-        <g opacity={hideCars && cellWriteMode !== CellWriteMode.move ? 0.3 : undefined}>
+        <g opacity={hideCars && inputMode !== PuzzleInputMode.move ? 0.3 : undefined}>
             {extension.cars.map(({ boundingRect: { top, left, width, height }, color, invert }, index) => {
                 const carPosition = getAnimatedCarPosition(context, index);
 

@@ -1,4 +1,4 @@
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { ReactElement, useCallback } from "react";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { ControlButton } from "./ControlButton";
@@ -33,8 +33,8 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
             },
             supportZero,
         },
-        cellWriteMode,
-        cellWriteModeInfo: {
+        inputMode,
+        inputModeInfo: {
             isDigitMode,
             secondaryButtonContent: ButtonContent,
             getCurrentSecondaryButton,
@@ -113,7 +113,7 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
             fullHeight={!selectableButtonContent}
             innerBorderWidth={selectableButtonContent ? 1 : 0}
             checked={currentButton === index}
-            opacityOnHover={cellWriteMode === CellWriteMode.color}
+            opacityOnHover={inputMode === PuzzleInputMode.color}
             onClick={handleDigit}
             title={title}
         >

@@ -5,7 +5,7 @@ import { GoogleMap } from "./GoogleMap";
 import { GoogleMapsPanePortal } from "./GoogleMapsPanePortal";
 import { latLngLiteralToPosition } from "../utils/googleMapsCoords";
 import { GoogleMapsOverlay } from "./GoogleMapsOverlay";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { AnyGoogleMapsPTM } from "../types/GoogleMapsPTM";
 import { observer } from "mobx-react-lite";
@@ -23,12 +23,12 @@ export const GoogleMapsGridWrapper = (initialBounds: google.maps.LatLngBoundsLit
             puzzle: {
                 gridSize: { gridSize },
             },
-            cellWriteMode,
+            inputMode,
             stateExtension: { map },
             cellSize,
         } = context;
 
-        const isDragMode = cellWriteMode === CellWriteMode.move;
+        const isDragMode = inputMode === PuzzleInputMode.move;
 
         useEventListener(window, "keydown", ({ key }) => {
             if (settings.isOpened || !context.isReady) {

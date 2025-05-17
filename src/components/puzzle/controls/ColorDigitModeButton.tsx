@@ -1,6 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "./CellWriteModeButton";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "./PuzzleInputModeButton";
 import { PlainValueSet } from "../../../types/struct/Set";
 import { indexes } from "../../../utils/indexes";
 import { ctrlKeyText } from "../../../utils/os";
@@ -15,10 +15,10 @@ export const ColorDigitModeButton: ControlButtonItemPropsGenericFc = observer(fu
     profiler.trace();
 
     return (
-        <CellWriteModeButton
+        <PuzzleInputModeButton
             top={top}
             left={left}
-            cellWriteMode={CellWriteMode.color}
+            inputMode={PuzzleInputMode.color}
             data={{ colors: new PlainValueSet(indexes(9)) }}
             title={`${translate("Colors")} (${translate("shortcut")}: ${ctrlKeyText}+Shift)`}
             context={context}

@@ -3,8 +3,8 @@ import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { GameStateAction, SetCellMarkActionParams, setCellMarkActionType } from "../../../types/puzzle/GameStateAction";
 import { incrementArrayItem } from "../../../utils/array";
 import { CellMarkType } from "../../../types/puzzle/CellMark";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeInfo } from "../../../types/puzzle/CellWriteModeInfo";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeInfo } from "../../../types/puzzle/PuzzleInputModeInfo";
 import { userDigitColor } from "../../../components/app/globals";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 
@@ -30,8 +30,8 @@ export const safeCrackerArrowsAction = <T extends AnyPTM>(
     };
 };
 
-export const safeCrackerArrowsCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
-    mode: CellWriteMode.custom,
+export const safeCrackerArrowsPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInfo<T> => ({
+    mode: PuzzleInputMode.custom,
     digitsCount: 0,
     handlesRightMouseClick: true,
     isNoSelectionMode: true,

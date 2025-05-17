@@ -1,6 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "./CellWriteModeButton";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "./PuzzleInputModeButton";
 import { PlainValueSet } from "../../../types/struct/Set";
 import { ctrlKeyText } from "../../../utils/os";
 import { CellColor } from "../../../types/puzzle/CellColor";
@@ -15,10 +15,10 @@ export const ShadingDigitModeButton: ControlButtonItemPropsGenericFc = observer(
     profiler.trace();
 
     return (
-        <CellWriteModeButton
+        <PuzzleInputModeButton
             top={top}
             left={left}
-            cellWriteMode={CellWriteMode.shading}
+            inputMode={PuzzleInputMode.shading}
             data={{ colors: new PlainValueSet([CellColor.shaded, CellColor.unshaded]) }}
             title={`${translate("Shading")} (${translate("shortcut")}: ${ctrlKeyText}+Shift)`}
             context={context}

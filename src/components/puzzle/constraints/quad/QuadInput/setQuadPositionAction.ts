@@ -1,6 +1,6 @@
 import { GameStateAction, GameStateActionType } from "../../../../../types/puzzle/GameStateAction";
 import { isSamePosition, Position } from "../../../../../types/layout/Position";
-import { CellWriteMode } from "../../../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../../../types/puzzle/PuzzleInputMode";
 import { QuadInputTypeManagerOptions } from "./QuadInputTypeManager";
 import { QuadInputState } from "./QuadInputState";
 import { PartialGameStateEx } from "../../../../../types/puzzle/GameState";
@@ -34,7 +34,7 @@ export const setQuadPositionActionType = <T extends AnyQuadInputPTM>({
             }
 
             const isMyTurn = !isEnabled || currentPlayer === clientId || params.share;
-            if (!isMyTurn || !isQuadAllowedFn(context, position) || context.cellWriteMode !== CellWriteMode.quads) {
+            if (!isMyTurn || !isQuadAllowedFn(context, position) || context.inputMode !== PuzzleInputMode.quads) {
                 return {};
             }
 

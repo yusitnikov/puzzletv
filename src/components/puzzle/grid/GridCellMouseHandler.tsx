@@ -32,27 +32,27 @@ export const GridCellMouseHandler = observer(function GridCellMouseHandlerFc<T e
 
     const { context, top, left } = props;
 
-    const getCellWriteModeInfo = useComputed(
-        function getCellWriteModeInfo() {
-            return context.puzzleIndex.getCellTypeProps({ top, left }).forceCellWriteMode ?? context.cellWriteModeInfo;
+    const getInputModeInfo = useComputed(
+        function getInputModeInfo() {
+            return context.puzzleIndex.getCellTypeProps({ top, left }).forcedPuzzleInputMode ?? context.inputModeInfo;
         },
         undefined,
         [top, left],
     );
     const disableCellHandlers = useComputedValue(
         function getDisableCellHandlers() {
-            return getCellWriteModeInfo().disableCellHandlers;
+            return getInputModeInfo().disableCellHandlers;
         },
         undefined,
-        [getCellWriteModeInfo],
+        [getInputModeInfo],
     );
     const hasCellHandlers = useComputedValue(
         function getHasCellHandlers() {
-            const { onCornerClick, onCornerEnter } = getCellWriteModeInfo();
+            const { onCornerClick, onCornerEnter } = getInputModeInfo();
             return !!(onCornerClick || onCornerEnter);
         },
         undefined,
-        [getCellWriteModeInfo],
+        [getInputModeInfo],
     );
 
     if (disableCellHandlers) {

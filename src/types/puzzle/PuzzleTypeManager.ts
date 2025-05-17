@@ -12,8 +12,8 @@ import { GridRegion } from "./GridRegion";
 import { Constraint } from "./Constraint";
 import { PuzzleContext, PuzzleContextProps } from "./PuzzleContext";
 import { CellStateEx } from "./CellState";
-import { CellWriteMode } from "./CellWriteMode";
-import { CellWriteModeInfo } from "./CellWriteModeInfo";
+import { PuzzleInputMode } from "./PuzzleInputMode";
+import { PuzzleInputModeInfo } from "./PuzzleInputModeInfo";
 import { GameStateAction, GameStateActionType } from "./GameStateAction";
 import { KeyInfo } from "./KeyInfo";
 import { SettingsContentProps } from "../../components/puzzle/controls/settings/SettingsContent";
@@ -112,7 +112,7 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     handleDigitInCell?(
         isGlobal: boolean,
         clientId: string,
-        cellWriteMode: CellWriteMode,
+        inputMode: PuzzleInputMode,
         cellState: CellStateEx<T>,
         cellData: T["cell"],
         position: Position,
@@ -121,11 +121,11 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
         cache: any,
     ): Partial<CellStateEx<T>>;
 
-    extraCellWriteModes?: CellWriteModeInfo<T>[];
+    extraInputModes?: PuzzleInputModeInfo<T>[];
 
-    disabledCellWriteModes?: CellWriteMode[];
+    disabledInputModes?: PuzzleInputMode[];
 
-    initialCellWriteMode?: CellWriteMode;
+    initialInputMode?: PuzzleInputMode;
     /**
      * Component for rendering single digit in a constraint clue (e.g. in a killer cage sum).
      * Also contains info about digit's average rendered width and about what would happen if rotating the digit.

@@ -1,11 +1,11 @@
-import { CellWriteMode } from "../CellWriteMode";
-import type { CellWriteModeInfo } from "../CellWriteModeInfo";
+import { PuzzleInputMode } from "../PuzzleInputMode";
+import type { PuzzleInputModeInfo } from "../PuzzleInputModeInfo";
 import { shadingAction, shadingStartAction } from "../GameStateAction";
 import { AnyPTM } from "../PuzzleTypeMap";
 import { ShadingDigitModeButton } from "../../../components/puzzle/controls/ShadingDigitModeButton";
 
-export const ShadingCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
-    mode: CellWriteMode.shading,
+export const ShadingPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInfo<T> => ({
+    mode: PuzzleInputMode.shading,
     mainButtonContent: ShadingDigitModeButton,
     isActiveForPuzzle: ({ enableShading = false }) => enableShading,
     // color and shading are never together, so it's ok to have the same hotkey

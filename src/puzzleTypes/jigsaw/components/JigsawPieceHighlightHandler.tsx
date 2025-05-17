@@ -21,7 +21,7 @@ import { comparer } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useComputedValue } from "../../../hooks/useComputed";
 import { profiler } from "../../../utils/profiler";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 
 const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandler({
     context,
@@ -70,7 +70,7 @@ const JigsawPieceHighlightHandler = observer(function JigsawPieceHighlightHandle
         const groups = groupJigsawPiecesByZIndex(context);
 
         const movePiece = (dx: number, dy: number) => {
-            if (highlightCurrentPiece && context.cellWriteMode === CellWriteMode.move) {
+            if (highlightCurrentPiece && context.inputMode === PuzzleInputMode.move) {
                 const activeGroup = groups.find(({ zIndex }) => zIndex === activeZIndex);
                 if (activeGroup) {
                     context.onStateChange(

@@ -1,6 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "./CellWriteModeButton";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "./PuzzleInputModeButton";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { textColor } from "../../app/globals";
 import { ControlButton } from "./ControlButton";
@@ -23,7 +23,7 @@ export const MoveDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
             loopVertically,
         },
         cellSizeForSidePanel: cellSize,
-        cellWriteMode,
+        inputMode,
     } = context;
 
     const handleResetPosition = useCallback(
@@ -39,10 +39,10 @@ export const MoveDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
 
     return (
         <>
-            <CellWriteModeButton
+            <PuzzleInputModeButton
                 top={top}
                 left={left}
-                cellWriteMode={CellWriteMode.move}
+                inputMode={PuzzleInputMode.move}
                 data={(size) => (
                     <AutoSvg
                         width={size}
@@ -67,7 +67,7 @@ export const MoveDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
                 context={context}
             />
 
-            {cellWriteMode === CellWriteMode.move && (loopHorizontally || loopVertically) && (
+            {inputMode === PuzzleInputMode.move && (loopHorizontally || loopVertically) && (
                 <ControlButton
                     cellSize={cellSize}
                     left={0}

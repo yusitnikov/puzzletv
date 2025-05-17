@@ -11,8 +11,8 @@ import { settings } from "../../../types/layout/Settings";
 import { Rect } from "../../../types/layout/Rect";
 import { indexes } from "../../../utils/indexes";
 import { ScrewConstraint } from "../constraints/Screw";
-import { ScrewsMoveCellWriteModeInfo } from "./ScrewsMoveCellWriteModeInfo";
-import { CellWriteModeInfo } from "../../../types/puzzle/CellWriteModeInfo";
+import { ScrewsMovePuzzleInputModeInfo } from "./ScrewsMovePuzzleInputModeInfo";
+import { PuzzleInputModeInfo } from "../../../types/puzzle/PuzzleInputModeInfo";
 import {
     addGridStateExToPuzzleTypeManager,
     addGameStateExToPuzzleTypeManager,
@@ -135,9 +135,9 @@ export const ScrewsTypeManager = <T extends AnyPTM>(
         return puzzle;
     },
 
-    extraCellWriteModes: [
-        ...((baseTypeManager.extraCellWriteModes ?? []) as unknown as CellWriteModeInfo<ScrewsPTM<T>>[]),
-        ScrewsMoveCellWriteModeInfo(),
+    extraInputModes: [
+        ...((baseTypeManager.extraInputModes ?? []) as unknown as PuzzleInputModeInfo<ScrewsPTM<T>>[]),
+        ScrewsMovePuzzleInputModeInfo(),
     ],
 
     // TODO: support shared games

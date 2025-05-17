@@ -8,7 +8,7 @@ import { errorColor, yellowColor } from "../../../components/app/globals";
 import { RushHourCar } from "./RushHourCar";
 import { TransformedRectGraphics } from "../../../contexts/TransformContext";
 import { transformRect } from "../../../types/layout/Rect";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { translate } from "../../../utils/translate";
@@ -24,7 +24,7 @@ export const RushHourHideCarsButton = observer(function RushHourHideCarsButtonFc
 
     const {
         cellSizeForSidePanel: cellSize,
-        cellWriteMode,
+        inputMode,
         stateExtension: { hideCars },
     } = context;
 
@@ -37,7 +37,7 @@ export const RushHourHideCarsButton = observer(function RushHourHideCarsButtonFc
         }
     });
 
-    if (cellWriteMode === CellWriteMode.move) {
+    if (inputMode === PuzzleInputMode.move) {
         return null;
     }
 

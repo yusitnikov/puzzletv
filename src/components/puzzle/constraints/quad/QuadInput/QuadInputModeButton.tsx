@@ -1,5 +1,5 @@
-import { CellWriteMode } from "../../../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "../../../controls/CellWriteModeButton";
+import { PuzzleInputMode } from "../../../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "../../../controls/PuzzleInputModeButton";
 import { quads } from "../../../../../puzzleTypes/quad-masters/data/translations";
 import { AutoSvg } from "../../../../svg/auto-svg/AutoSvg";
 import { QuadByData } from "../Quad";
@@ -28,7 +28,7 @@ export const QuadInputModeButton = <T extends AnyQuadInputPTM>(options: QuadInpu
                 typeManager: { createCellDataByDisplayDigit },
             },
             stateExtension: { currentQuad },
-            cellWriteMode,
+            inputMode,
             isMyTurn,
         } = context;
 
@@ -44,25 +44,27 @@ export const QuadInputModeButton = <T extends AnyQuadInputPTM>(options: QuadInpu
             switch (ev.code) {
                 case "KeyQ":
                 case "Tab":
-                    context.onStateChange(({ persistentCellWriteMode }) => ({
-                        persistentCellWriteMode:
-                            persistentCellWriteMode === CellWriteMode.quads ? CellWriteMode.main : CellWriteMode.quads,
+                    context.onStateChange(({ persistentInputMode }) => ({
+                        persistentInputMode:
+                            persistentInputMode === PuzzleInputMode.quads
+                                ? PuzzleInputMode.mainDigit
+                                : PuzzleInputMode.quads,
                     }));
                     ev.preventDefault();
                     break;
                 case "Home":
-                    context.onStateChange({ persistentCellWriteMode: CellWriteMode.main });
+                    context.onStateChange({ persistentInputMode: PuzzleInputMode.mainDigit });
                     ev.preventDefault();
                     break;
                 case "End":
-                    context.onStateChange({ persistentCellWriteMode: CellWriteMode.quads });
+                    context.onStateChange({ persistentInputMode: PuzzleInputMode.quads });
                     ev.preventDefault();
                     break;
                 case "Escape":
                     if (
                         isMyTurn &&
                         isQuadAllowedFn(context) &&
-                        cellWriteMode === CellWriteMode.quads &&
+                        inputMode === PuzzleInputMode.quads &&
                         currentQuad &&
                         (onQuadFinish || !currentQuad.digits.length)
                     ) {
@@ -76,10 +78,10 @@ export const QuadInputModeButton = <T extends AnyQuadInputPTM>(options: QuadInpu
         const digitExamples = indexesFromTo(1, 4).map((digit) => createCellDataByDisplayDigit(digit, context));
 
         return (
-            <CellWriteModeButton
+            <PuzzleInputModeButton
                 top={top}
                 left={left}
-                cellWriteMode={CellWriteMode.quads}
+                inputMode={PuzzleInputMode.quads}
                 data={(cellSize) => (
                     <AutoSvg width={cellSize} height={cellSize} viewBox={{ top: 0, left: 0, width: 1, height: 1 }}>
                         <line x1={0} y1={0.5} x2={1} y2={0.5} stroke={textColor} strokeWidth={1 / cellSize} />

@@ -12,7 +12,7 @@ import { Constraint } from "../../../../../types/puzzle/Constraint";
 import { QuadInputState } from "./QuadInputState";
 import { QuadleConstraint, QuadleDigitType } from "../Quadle";
 import { QuadConstraint } from "../Quad";
-import { CellWriteMode } from "../../../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../../../types/puzzle/PuzzleInputMode";
 import {
     setQuadPositionAction,
     setQuadPositionActionType,
@@ -81,7 +81,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
 
         items: (context): Constraint<T, any>[] => {
             const {
-                cellWriteMode,
+                inputMode,
                 stateExtension: { allQuads, currentQuad },
                 multiPlayer: { isEnabled },
             } = context;
@@ -100,13 +100,13 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
                             ? QuadleConstraint(
                                   currentQuad.position,
                                   currentQuad.digits.map((digit) => ({ digit, type: QuadleDigitType.unknown })),
-                                  isEnabled || cellWriteMode === CellWriteMode.quads,
+                                  isEnabled || inputMode === PuzzleInputMode.quads,
                               )
                             : QuadConstraint(
                                   currentQuad.position,
                                   currentQuad.digits,
                                   [],
-                                  isEnabled || cellWriteMode === CellWriteMode.quads,
+                                  isEnabled || inputMode === PuzzleInputMode.quads,
                                   radius,
                               )),
                 ] as (Constraint<T, any> | undefined)[]
@@ -125,7 +125,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
 
             const {
                 puzzle: { params = {} },
-                cellWriteMode,
+                inputMode,
                 multiPlayer: { isEnabled },
                 currentPlayer = "",
                 stateExtension: { currentQuad, allQuads },
@@ -135,7 +135,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
             if (
                 !isMyTurn ||
                 !currentQuad ||
-                cellWriteMode !== CellWriteMode.quads ||
+                inputMode !== PuzzleInputMode.quads ||
                 !isQuadAllowedFn(context, currentQuad.position)
             ) {
                 return defaultResult;
@@ -210,10 +210,10 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
             });
         },
 
-        extraCellWriteModes: [
-            ...(parent.extraCellWriteModes || []),
+        extraInputModes: [
+            ...(parent.extraInputModes || []),
             {
-                mode: CellWriteMode.quads,
+                mode: PuzzleInputMode.quads,
                 mainButtonContent: QuadInputModeButton(options),
                 isDigitMode: true,
                 isNoSelectionMode: true,
@@ -228,7 +228,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
             return (
                 parent.isGlobalAction?.(action, context) ||
                 action.type.key === setQuadPositionActionTypeKey ||
-                (context.cellWriteMode === CellWriteMode.quads &&
+                (context.inputMode === PuzzleInputMode.quads &&
                     [enterDigitActionType().key, clearSelectionActionType().key].includes(action.type.key))
             );
         },
@@ -237,7 +237,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
             const {
                 puzzle: { params },
                 stateExtension: { currentQuad },
-                cellWriteMode,
+                inputMode,
                 multiPlayer: { isEnabled },
                 currentPlayer,
             } = context;
@@ -247,7 +247,7 @@ export const QuadInputTypeManager = <T extends AnyQuadInputPTM>(
             if (
                 !isMyTurn ||
                 !currentQuad ||
-                cellWriteMode !== CellWriteMode.quads ||
+                inputMode !== PuzzleInputMode.quads ||
                 !isQuadAllowedFn(context, currentQuad.position)
             ) {
                 return {};

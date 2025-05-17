@@ -2,7 +2,7 @@ import { Absolute } from "../../layout/absolute/Absolute";
 import { Rect } from "../../../types/layout/Rect";
 import { controlButtonPaddingCoeff } from "./ControlButton";
 import { indexes } from "../../../utils/indexes";
-import { useCellWriteModeHotkeys } from "../../../types/puzzle/CellWriteModeInfo";
+import { usePuzzleInputModeHotkeys } from "../../../types/puzzle/PuzzleInputModeInfo";
 import { DigitControlButton } from "./DigitControlButton";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { useControlButtonsManager } from "./ControlButtonsManager";
@@ -30,7 +30,7 @@ export const Controls = observer(function Controls<T extends AnyPTM>({
 
     const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);
 
-    useCellWriteModeHotkeys(context);
+    usePuzzleInputModeHotkeys(context);
 
     return (
         <Absolute {...rect}>

@@ -16,7 +16,7 @@ import {
 } from "../../../types/puzzle/GameState";
 import { GridLayer } from "../../../types/puzzle/GridLayer";
 import { GridCellMouseHandler } from "./GridCellMouseHandler";
-import { getCellWriteModeGestureHandler } from "../../../types/puzzle/CellWriteModeInfo";
+import { getPuzzleInputModeGestureHandler } from "../../../types/puzzle/PuzzleInputModeInfo";
 import { PassThrough } from "../../layout/pass-through/PassThrough";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
@@ -52,7 +52,7 @@ export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }
         readOnlySafeContext,
         puzzle,
         fogDemoGridStateHistory,
-        cellWriteModeInfo: { isNoSelectionMode, applyToWholeGrid },
+        inputModeInfo: { isNoSelectionMode, applyToWholeGrid },
         cellSize,
         isReady,
     } = context;
@@ -78,24 +78,24 @@ export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }
 
     const gridOuterRect = usePuzzleContainer(true)!;
 
-    const createCellWriteModeGestureHandlers = (forGrid: boolean) =>
+    const createInputModeGestureHandlers = (forGrid: boolean) =>
         !isReady
             ? []
-            : context.allCellWriteModeInfos
+            : context.allInputModeInfos
                   .filter(({ applyToWholeGrid, disableCellHandlers }) =>
                       forGrid ? applyToWholeGrid : !disableCellHandlers,
                   )
-                  .map((cellWriteModeInfo) =>
-                      getCellWriteModeGestureHandler(
+                  .map((inputModeInfo) =>
+                      getPuzzleInputModeGestureHandler(
                           context,
-                          cellWriteModeInfo,
+                          inputModeInfo,
                           isDeleteSelectedCellsStroke,
                           setIsDeleteSelectedCellsStroke,
                           gridOuterRect,
                       ),
                   );
-    const gridGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(true));
-    const cellGestureHandlers = useGestureHandlers(createCellWriteModeGestureHandlers(false));
+    const gridGestureHandlers = useGestureHandlers(createInputModeGestureHandlers(true));
+    const cellGestureHandlers = useGestureHandlers(createInputModeGestureHandlers(false));
 
     // Handle outside click
     useOutsideClick(() => {
@@ -103,7 +103,7 @@ export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }
             context.readOnlySafeContext.onStateChange(gameStateClearSelectedCells);
         }
 
-        for (const { onOutsideClick } of context.allCellWriteModeInfos) {
+        for (const { onOutsideClick } of context.allInputModeInfos) {
             onOutsideClick?.(context);
         }
     });

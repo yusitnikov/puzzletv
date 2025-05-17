@@ -25,9 +25,8 @@ import { Position, PositionSet } from "../layout/Position";
 import { isSelectableCell } from "./CellTypeProps";
 import { TransformedCustomCellBounds } from "./CustomCellBounds";
 import { controlKeysState } from "../../hooks/useControlKeysState";
-import { getAllowedCellWriteModeInfos } from "./CellWriteModeInfo";
-import { getFinalCellWriteMode } from "../../hooks/puzzle/useFinalCellWriteMode";
-import { CellWriteMode } from "./CellWriteMode";
+import { getAllowedPuzzleInputModeInfos } from "./PuzzleInputModeInfo";
+import { PuzzleInputMode } from "./PuzzleInputMode";
 import { Constraint, toDecorativeConstraint } from "./Constraint";
 import { GridLayer } from "./GridLayer";
 import { getDefaultRegionsForRowsAndColumns } from "./GridSize";
@@ -379,8 +378,8 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                     myGameState: mergeGameStateWithUpdates(
                         myGameState,
                         {
-                            persistentCellWriteMode: mode,
-                            gestureCellWriteMode: undefined,
+                            persistentInputMode: mode,
+                            gestureInputMode: undefined,
                             selectedCells: PositionSet.unserialize(selected),
                             selectedColor: color,
                             currentMultiLine: line,
@@ -510,14 +509,14 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return (this.state.fogDemoGridStateHistory ?? this.state.gridStateHistory).current;
     }
 
-    get persistentCellWriteMode() {
+    get persistentInputMode() {
         profiler.trace();
-        return this.state.persistentCellWriteMode;
+        return this.state.persistentInputMode;
     }
 
-    get gestureCellWriteMode() {
+    get gestureInputMode() {
         profiler.trace();
-        return this.state.gestureCellWriteMode;
+        return this.state.gestureInputMode;
     }
 
     get stateInitialDigits() {
@@ -854,36 +853,46 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return getScaleLog(this.animatedScale, this.puzzle.typeManager.scaleStep);
     }
 
-    get visibleCellWriteModeInfos() {
+    get visibleInputModeInfos() {
         profiler.trace();
-        return getAllowedCellWriteModeInfos(this.puzzle, false);
+        return getAllowedPuzzleInputModeInfos(this.puzzle, false);
     }
 
-    get allCellWriteModeInfos() {
+    get allInputModeInfos() {
         profiler.trace();
-        return getAllowedCellWriteModeInfos(this.puzzle, true);
+        return getAllowedPuzzleInputModeInfos(this.puzzle, true);
     }
 
-    get cellWriteMode(): CellWriteMode | number {
+    get inputMode(): PuzzleInputMode | number {
         profiler.trace();
 
-        return this.applyKeys
-            ? getFinalCellWriteMode(
-                  controlKeysState,
-                  this.persistentCellWriteMode,
-                  this.gestureCellWriteMode,
-                  this.allCellWriteModeInfos,
-                  this.isReadonlyContext,
-              )
-            : (this.gestureCellWriteMode ?? this.persistentCellWriteMode);
+        const { gestureInputMode, persistentInputMode } = this;
+
+        if (gestureInputMode !== undefined) {
+            return gestureInputMode;
+        }
+
+        if (this.applyKeys && !this.isReadonlyContext) {
+            const { keysStr } = controlKeysState;
+
+            for (const { mode, hotKeyStr } of this.allInputModeInfos) {
+                if (hotKeyStr?.includes(keysStr)) {
+                    return mode;
+                }
+            }
+
+            return persistentInputMode;
+        }
+
+        return persistentInputMode;
     }
 
-    get cellWriteModeInfo() {
+    get inputModeInfo() {
         profiler.trace();
 
-        const { cellWriteMode } = this;
+        const { inputMode } = this;
 
-        return this.allCellWriteModeInfos.find(({ mode }) => mode === cellWriteMode)!;
+        return this.allInputModeInfos.find(({ mode }) => mode === inputMode)!;
     }
 
     get lmdSolutionCode() {
@@ -928,7 +937,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         const { supportZero } = this.puzzle;
 
         const { isDigitMode, digitsCount: digitsCountFunc = this.digitsCount + (isDigitMode && supportZero ? 1 : 0) } =
-            this.cellWriteModeInfo;
+            this.inputModeInfo;
 
         return typeof digitsCountFunc === "function" ? digitsCountFunc(this) : digitsCountFunc;
     }
@@ -978,7 +987,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                     actionId: asAction.actionId,
                     params: asAction.params,
                     state: {
-                        mode: processedContext.cellWriteMode,
+                        mode: processedContext.inputMode,
                         selected: processedContext.myGameState.selectedCells.serialize(),
                         color: processedContext.myGameState.selectedColor,
                         line: processedContext.myGameState.currentMultiLine,

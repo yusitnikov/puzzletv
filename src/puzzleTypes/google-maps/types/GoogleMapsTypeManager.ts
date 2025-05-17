@@ -2,7 +2,7 @@ import { defaultProcessArrowDirection, PuzzleTypeManager } from "../../../types/
 import { emptyPosition, Position } from "../../../types/layout/Position";
 import { mergeGameStateUpdates, PartialGameStateEx } from "../../../types/puzzle/GameState";
 import { positionToLatLngLiteral } from "../utils/googleMapsCoords";
-import { MoveCellWriteModeInfo } from "../../../types/puzzle/cellWriteModes/move";
+import { MovePuzzleInputModeInfo } from "../../../types/puzzle/inputModes/move";
 import { AnyGoogleMapsPTM } from "./GoogleMapsPTM";
 import { GoogleMapsGridWrapper } from "../components/GoogleMapsGridWrapper";
 
@@ -13,10 +13,10 @@ export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
     ...baseTypeManager,
     gridWrapperComponent: GoogleMapsGridWrapper(initialBounds),
     gridFitsWrapper: true,
-    extraCellWriteModes: [
-        ...(baseTypeManager.extraCellWriteModes ?? []),
+    extraInputModes: [
+        ...(baseTypeManager.extraInputModes ?? []),
         {
-            ...MoveCellWriteModeInfo(),
+            ...MovePuzzleInputModeInfo(),
             disableCellHandlers: true,
         },
     ],

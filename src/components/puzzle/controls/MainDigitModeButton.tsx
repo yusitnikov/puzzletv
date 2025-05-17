@@ -1,6 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "./CellWriteModeButton";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "./PuzzleInputModeButton";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
@@ -17,10 +17,10 @@ export const MainDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
     } = puzzle;
 
     return (
-        <CellWriteModeButton
+        <PuzzleInputModeButton
             top={top}
             left={left}
-            cellWriteMode={CellWriteMode.main}
+            inputMode={PuzzleInputMode.mainDigit}
             data={{ usersDigit: createCellDataByDisplayDigit(digitsCount, context) }}
             context={context}
         />

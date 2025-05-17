@@ -2,7 +2,7 @@ import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { CellStateEx } from "../../../types/puzzle/CellState";
 import { serializeCellsMap, unserializeCellsMap } from "../../../types/puzzle/CellsMap";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { GameStateEx, mergeGameStateWithUpdates } from "../../../types/puzzle/GameState";
 import { CellOwnershipConstraint } from "../components/CellOwnership";
 import { indexes, indexesFromTo } from "../../../utils/indexes";
@@ -19,7 +19,7 @@ export const GuessTypeManager = <T extends AnyNumberPTM>(): PuzzleTypeManager<T>
     handleDigitInCell(
         isGlobal,
         clientId,
-        cellWriteMode,
+        inputMode,
         cellState,
         cellData,
         { top, left },
@@ -39,7 +39,7 @@ export const GuessTypeManager = <T extends AnyNumberPTM>(): PuzzleTypeManager<T>
             return defaultResult;
         }
 
-        if (cellWriteMode !== CellWriteMode.main) {
+        if (inputMode !== PuzzleInputMode.mainDigit) {
             return defaultResult;
         }
 

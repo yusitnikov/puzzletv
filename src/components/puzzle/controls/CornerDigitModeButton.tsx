@@ -1,6 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "./CellWriteModeButton";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "./PuzzleInputModeButton";
 import { CellDataSet } from "../../../types/puzzle/CellDataSet";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
@@ -13,10 +13,10 @@ export const CornerDigitModeButton: ControlButtonItemPropsGenericFc = observer(f
     profiler.trace();
 
     return (
-        <CellWriteModeButton
+        <PuzzleInputModeButton
             top={top}
             left={left}
-            cellWriteMode={CellWriteMode.corner}
+            inputMode={PuzzleInputMode.cornerDigit}
             data={{
                 cornerDigits: new CellDataSet(
                     context,

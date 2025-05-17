@@ -1,6 +1,6 @@
 import { GridStateHistory, gridStateHistoryAddState } from "./GridStateHistory";
-import { CellWriteMode } from "./CellWriteMode";
-import { getAllowedCellWriteModeInfos } from "./CellWriteModeInfo";
+import { PuzzleInputMode } from "./PuzzleInputMode";
+import { getAllowedPuzzleInputModeInfos } from "./PuzzleInputModeInfo";
 import { CellState, CellStateEx } from "./CellState";
 import {
     areAllGridStateCells,
@@ -53,8 +53,8 @@ import { getRectCenter, Rect } from "../layout/Rect";
 
 export interface GameState<T extends AnyPTM> {
     gridStateHistory: GridStateHistory<T>;
-    persistentCellWriteMode: CellWriteMode;
-    gestureCellWriteMode?: CellWriteMode;
+    persistentInputMode: PuzzleInputMode;
+    gestureInputMode?: PuzzleInputMode;
 
     initialDigits: CellsMap<T["cell"]>;
     excludedDigits: CellsMap<SetInterface<T["cell"]>>;
@@ -123,7 +123,7 @@ type SavedGameStates = [
     state: any,
     initialDigits: any,
     excludedDigits: any,
-    cellWriteMode: any,
+    inputMode: any,
     currentPlayer: any,
     ignore1: any, // ignore previous format for compatibility
     playerObjects: any,
@@ -159,7 +159,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
     const {
         initialGameStateExtension,
         unserializeGameState,
-        initialCellWriteMode,
+        initialInputMode,
         initialAngle = 0,
         initialScale = 1,
         initialPosition,
@@ -187,9 +187,8 @@ export const getEmptyGameState = <T extends AnyPTM>(
             ],
             0,
         ),
-        persistentCellWriteMode:
-            savedGameState?.[5] ?? initialCellWriteMode ?? getAllowedCellWriteModeInfos(puzzle)[0].mode,
-        gestureCellWriteMode: undefined,
+        persistentInputMode: savedGameState?.[5] ?? initialInputMode ?? getAllowedPuzzleInputModeInfos(puzzle)[0].mode,
+        gestureInputMode: undefined,
         selectedCells: new PositionSet(),
         isMultiSelection: false,
         selectedColor: savedGameState?.[10] ?? CellColor.green,
@@ -240,7 +239,7 @@ export const saveGameState = <T extends AnyPTM>(context: PuzzleContext<T>): void
         stateExtension,
         stateInitialDigits,
         excludedDigits,
-        persistentCellWriteMode,
+        persistentInputMode,
         currentPlayer,
         playerObjects,
         lives,
@@ -262,7 +261,7 @@ export const saveGameState = <T extends AnyPTM>(context: PuzzleContext<T>): void
                     puzzle.typeManager.serializeGameState?.(stateExtension) ?? stateExtension,
                     serializeCellsMap(stateInitialDigits, puzzle.typeManager.serializeCellData),
                     serializeCellsMap(excludedDigits, (excludedDigits) => excludedDigits.serialize()),
-                    persistentCellWriteMode,
+                    persistentInputMode,
                     currentPlayer || "",
                     "",
                     playerObjects,
@@ -333,11 +332,11 @@ export const areSameGameStates = <T extends AnyPTM>(
         return false;
     }
 
-    if (state1.persistentCellWriteMode !== state2.persistentCellWriteMode) {
+    if (state1.persistentInputMode !== state2.persistentInputMode) {
         return false;
     }
 
-    if (state1.gestureCellWriteMode !== state2.gestureCellWriteMode) {
+    if (state1.gestureInputMode !== state2.gestureInputMode) {
         return false;
     }
 
@@ -468,7 +467,7 @@ export const gameStateAddSelectedCell = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     cellPosition: Position,
 ): PartialGameStateEx<T> =>
-    context.cellWriteModeInfo.isNoSelectionMode
+    context.inputModeInfo.isNoSelectionMode
         ? {}
         : {
               selectedCells: context.allSelectedCells.add(cellPosition),
@@ -478,7 +477,7 @@ export const gameStateSetSelectedCells = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     cellPositions: Position[],
 ): PartialGameStateEx<T> =>
-    context.cellWriteModeInfo.isNoSelectionMode
+    context.inputModeInfo.isNoSelectionMode
         ? {}
         : {
               selectedCells: context.allSelectedCells.set(cellPositions),
@@ -489,7 +488,7 @@ export const gameStateToggleSelectedCells = <T extends AnyPTM>(
     cellPositions: Position[],
     forcedEnable?: boolean,
 ): PartialGameStateEx<T> =>
-    context.cellWriteModeInfo.isNoSelectionMode
+    context.inputModeInfo.isNoSelectionMode
         ? {}
         : {
               selectedCells: context.allSelectedCells.toggleAll(cellPositions, forcedEnable),
@@ -589,7 +588,7 @@ export const gameStateApplyArrowToSelectedCells = <T extends AnyPTM>(
     );
 
     // Nothing to do when there's no selection
-    if (context.cellWriteModeInfo.isNoSelectionMode || !currentCell) {
+    if (context.inputModeInfo.isNoSelectionMode || !currentCell) {
         if (!applyArrowProcessorToNoCell) {
             return {};
         }
@@ -717,7 +716,7 @@ export const gameStateProcessSelectedCells = <T extends AnyPTM>(
         }
     }
 
-    if (!context.cellWriteModeInfo.isNoSelectionMode) {
+    if (!context.inputModeInfo.isNoSelectionMode) {
         gridStateHistory = gridStateHistoryAddState(context, clientId, actionId, (gridState) =>
             processGridStateCells(gridState, selectedCells, (cellState, position) => {
                 const { initialDigit, excludedDigits, ...cellStateUpdates } = gridStateProcessor(
@@ -756,8 +755,8 @@ const getDefaultDigitHandler = <T extends AnyPTM>(
 
         const isInitialDigit = ({ top, left }: Position): boolean => allInitialDigits[top]?.[left] !== undefined;
 
-        switch (context.cellWriteMode) {
-            case CellWriteMode.main:
+        switch (context.inputMode) {
+            case PuzzleInputMode.mainDigit:
                 return ({ centerDigits, cornerDigits }, position) =>
                     isInitialDigit(position) || context.puzzleIndex.getCellTypeProps(position).noMainDigit?.(context)
                         ? {}
@@ -767,7 +766,7 @@ const getDefaultDigitHandler = <T extends AnyPTM>(
                               cornerDigits: cornerDigits.clear(),
                           };
 
-            case CellWriteMode.center:
+            case PuzzleInputMode.centerDigit:
                 const areAllCentersEnabled = gameStateAreAllSelectedCells(
                     context,
                     ({ usersDigit, centerDigits }, position) =>
@@ -783,7 +782,7 @@ const getDefaultDigitHandler = <T extends AnyPTM>(
                               centerDigits: centerDigits.toggle(cellData(position), !areAllCentersEnabled),
                           };
 
-            case CellWriteMode.corner:
+            case PuzzleInputMode.cornerDigit:
                 const areAllCornersEnabled = gameStateAreAllSelectedCells(
                     context,
                     ({ usersDigit, cornerDigits }, position) =>
@@ -799,7 +798,7 @@ const getDefaultDigitHandler = <T extends AnyPTM>(
                               cornerDigits: cornerDigits.toggle(cellData(position), !areAllCornersEnabled),
                           };
 
-            case CellWriteMode.color:
+            case PuzzleInputMode.color:
                 const areAllColorsEnabled = gameStateAreAllSelectedCells(context, ({ colors }) =>
                     colors.contains(digit - 1),
                 );
@@ -827,7 +826,7 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
 
     const {
         handleDigitGlobally,
-        handleDigitInCell = (_isGlobal, _clientId, _cellWriteMode, _cell, _data, _position, _context, defaultValue) =>
+        handleDigitInCell = (_isGlobal, _clientId, _inputMode, _cell, _data, _position, _context, defaultValue) =>
             defaultValue,
         areSameCellData,
     } = typeManager;
@@ -839,7 +838,7 @@ export const gameStateHandleDigit = <T extends AnyPTM>(
         handleDigitInCell(
             isGlobal,
             clientId,
-            context.cellWriteMode,
+            context.inputMode,
             cell,
             cellData(position),
             position,
@@ -915,9 +914,9 @@ export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
         }));
     const clearLines = () => gameStateDeleteAllLines(context, clientId, actionId);
 
-    const handlers: { mode: CellWriteMode; check: () => boolean; process: () => PartialGameStateEx<T> }[] = [
+    const handlers: { mode: PuzzleInputMode; check: () => boolean; process: () => PartialGameStateEx<T> }[] = [
         {
-            mode: CellWriteMode.main,
+            mode: PuzzleInputMode.mainDigit,
             check: () =>
                 gameStateIsAnySelectedCell(
                     context,
@@ -930,28 +929,28 @@ export const gameStateClearSelectedCellsContent = <T extends AnyPTM>(
                 ),
         },
         {
-            mode: CellWriteMode.center,
+            mode: PuzzleInputMode.centerDigit,
             check: () => gameStateIsAnySelectedCell(context, (cell) => !!cell.centerDigits.size),
             process: clearCenter,
         },
         {
-            mode: CellWriteMode.corner,
+            mode: PuzzleInputMode.cornerDigit,
             check: () => gameStateIsAnySelectedCell(context, (cell) => !!cell.cornerDigits.size),
             process: clearCorner,
         },
         {
-            mode: CellWriteMode.color,
+            mode: PuzzleInputMode.color,
             check: () => gameStateIsAnySelectedCell(context, (cell) => !!cell.colors.size),
             process: clearColor,
         },
         {
-            mode: CellWriteMode.lines,
+            mode: PuzzleInputMode.lines,
             check: () => true,
             process: clearLines,
         },
     ];
 
-    const currentModeHandler = handlers.find((handler) => handler.mode === context.cellWriteMode);
+    const currentModeHandler = handlers.find((handler) => handler.mode === context.inputMode);
     if (currentModeHandler?.check()) {
         return currentModeHandler.process();
     }

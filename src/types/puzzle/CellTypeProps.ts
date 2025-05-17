@@ -1,13 +1,13 @@
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleContext } from "./PuzzleContext";
-import { CellWriteModeInfo } from "./CellWriteModeInfo";
+import { PuzzleInputModeInfo } from "./PuzzleInputModeInfo";
 
 export interface CellTypeProps<T extends AnyPTM> {
     isVisible?: boolean;
     isVisibleForState?: (context: PuzzleContext<T>) => boolean;
     isSelectable?: boolean;
     isCheckingSolution?: boolean;
-    forceCellWriteMode?: CellWriteModeInfo<T>;
+    forcedPuzzleInputMode?: PuzzleInputModeInfo<T>;
     noInteraction?: boolean;
     noMainDigit?: (context: PuzzleContext<T>) => boolean;
     noBorders?: boolean;

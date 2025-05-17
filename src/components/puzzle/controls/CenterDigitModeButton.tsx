@@ -1,6 +1,6 @@
 import { ControlButtonItemProps } from "./ControlButtonsManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "./CellWriteModeButton";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "./PuzzleInputModeButton";
 import { CellDataSet } from "../../../types/puzzle/CellDataSet";
 import { ctrlKeyText } from "../../../utils/os";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
@@ -17,10 +17,10 @@ export const CenterDigitModeButton = observer(function CenterDigitModeButton<T e
     profiler.trace();
 
     return (
-        <CellWriteModeButton
+        <PuzzleInputModeButton
             top={top}
             left={left}
-            cellWriteMode={CellWriteMode.center}
+            inputMode={PuzzleInputMode.centerDigit}
             data={{
                 centerDigits: new CellDataSet(
                     context,

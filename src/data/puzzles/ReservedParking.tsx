@@ -10,8 +10,8 @@ import { isCageConstraint } from "../../components/puzzle/constraints/killer-cag
 import { Rect } from "../../types/layout/Rect";
 import { getRegionBoundingBox } from "../../utils/regions";
 import { AutoSvg } from "../../components/svg/auto-svg/AutoSvg";
-import { RushHourMoveCellWriteModeInfo } from "../../puzzleTypes/rush-hour/types/RushHourMoveCellWriteModeInfo";
-import { CellWriteModeInfo } from "../../types/puzzle/CellWriteModeInfo";
+import { RushHourMovePuzzleInputModeInfo } from "../../puzzleTypes/rush-hour/types/RushHourMovePuzzleInputModeInfo";
+import { PuzzleInputModeInfo } from "../../types/puzzle/PuzzleInputModeInfo";
 import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
 import { MultiStageGameState } from "../../puzzleTypes/multi-stage/types/MultiStageGameState";
 import { carMargin } from "../../puzzleTypes/rush-hour/components/RushHourCar";
@@ -68,8 +68,8 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                         [LanguageCode.en]: "Release all other cars from the cage",
                     }),
                 }),
-                extraCellWriteModes: [
-                    RushHourMoveCellWriteModeInfo(({ top, left, width, height }, isVertical, { stateExtension }) => {
+                extraInputModes: [
+                    RushHourMovePuzzleInputModeInfo(({ top, left, width, height }, isVertical, { stateExtension }) => {
                         const value = isVertical ? top : left;
                         const size = isVertical ? height : width;
                         if (!isVertical && top === 2) {
@@ -81,7 +81,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                             return value;
                         }
                         return Math.min(value, 6 + carMargin - size);
-                    }) as unknown as CellWriteModeInfo<ReservedParkingPTM>,
+                    }) as unknown as PuzzleInputModeInfo<ReservedParkingPTM>,
                 ],
                 getReactions(context): IReactionDisposer[] {
                     return [

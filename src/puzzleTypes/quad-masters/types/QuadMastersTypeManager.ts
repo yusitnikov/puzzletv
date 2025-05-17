@@ -1,6 +1,6 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { GuessTypeManager } from "../../guess/types/GuessTypeManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import {
     GameStateEx,
     mergeGameStateUpdates,
@@ -30,8 +30,8 @@ export const QuadMastersTypeManager = (isQuadle: boolean): PuzzleTypeManager<Qua
             isQuadle
                 ? QuadleConstraintBySolution(context, position, digits, isRecent)
                 : QuadConstraintBySolution(context, position, digits, isRecent),
-        isQuadAllowedFn: ({ cellWriteMode, stateExtension: { isQuadTurn } }) =>
-            isQuadTurn && cellWriteMode === CellWriteMode.quads,
+        isQuadAllowedFn: ({ inputMode, stateExtension: { isQuadTurn } }) =>
+            isQuadTurn && inputMode === PuzzleInputMode.quads,
         onQuadFinish: (defaultResult) => mergeGameStateUpdates(defaultResult, { extension: { isQuadTurn: false } }),
     });
 
@@ -64,7 +64,7 @@ export const QuadMastersTypeManager = (isQuadle: boolean): PuzzleTypeManager<Qua
                 puzzle: {
                     gridSize: { rowsCount, columnsCount },
                 },
-                cellWriteMode,
+                inputMode,
                 selectedCells,
                 currentPlayer = "",
                 multiPlayer: { allPlayerIds },
@@ -72,7 +72,7 @@ export const QuadMastersTypeManager = (isQuadle: boolean): PuzzleTypeManager<Qua
 
             const newState = mergeGameStateWithUpdates(context.state, defaultResult);
 
-            if (cellWriteMode === CellWriteMode.main && context.selectedCellsCount) {
+            if (inputMode === PuzzleInputMode.mainDigit && context.selectedCellsCount) {
                 if (selectedCells.items.some(({ top, left }) => !newState.initialDigits?.[top]?.[left])) {
                     return mergeGameStateUpdates(defaultResult, {
                         currentPlayer: getNextPlayerId(currentPlayer, allPlayerIds),
@@ -117,12 +117,12 @@ export const QuadMastersTypeManager = (isQuadle: boolean): PuzzleTypeManager<Qua
             });
         },
 
-        initialCellWriteMode: CellWriteMode.quads,
+        initialInputMode: PuzzleInputMode.quads,
 
         isGlobalAction(action, context): boolean {
             return (
                 parent.isGlobalAction?.(action, context) ||
-                (action.type.key === enterDigitActionType().key && context.cellWriteMode === CellWriteMode.main)
+                (action.type.key === enterDigitActionType().key && context.inputMode === PuzzleInputMode.mainDigit)
             );
         },
 
@@ -139,7 +139,7 @@ export const QuadMastersTypeManager = (isQuadle: boolean): PuzzleTypeManager<Qua
                             context.multiPlayer.isEnabled &&
                             !context.puzzle.params?.share
                         ) {
-                            context.onStateChange({ persistentCellWriteMode: CellWriteMode.quads });
+                            context.onStateChange({ persistentInputMode: PuzzleInputMode.quads });
                         }
                     },
                     {
@@ -156,11 +156,11 @@ export const QuadMastersTypeManager = (isQuadle: boolean): PuzzleTypeManager<Qua
 
                         if (isQuadTurn) {
                             if (!context.multiPlayer.isEnabled || context.puzzle.params?.share) {
-                                context.onStateChange({ persistentCellWriteMode: CellWriteMode.quads });
+                                context.onStateChange({ persistentInputMode: PuzzleInputMode.quads });
                             }
                         } else {
-                            if (context.isMyTurn && context.persistentCellWriteMode === CellWriteMode.quads) {
-                                context.onStateChange({ persistentCellWriteMode: CellWriteMode.main });
+                            if (context.isMyTurn && context.persistentInputMode === PuzzleInputMode.quads) {
+                                context.onStateChange({ persistentInputMode: PuzzleInputMode.mainDigit });
                             }
                         }
                     },

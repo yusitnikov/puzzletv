@@ -1,5 +1,5 @@
-import { CellWriteMode } from "../CellWriteMode";
-import type { CellWriteModeInfo } from "../CellWriteModeInfo";
+import { PuzzleInputMode } from "../PuzzleInputMode";
+import type { PuzzleInputModeInfo } from "../PuzzleInputModeInfo";
 import { gameStateApplyGridDragGesture, getAbsoluteScaleByLog, getScaleLog, PartialGameStateEx } from "../GameState";
 import { GestureMetrics } from "../../../utils/gestures";
 import { getRectCenter } from "../../layout/Rect";
@@ -8,8 +8,8 @@ import { AnyPTM } from "../PuzzleTypeMap";
 import { roundToStep } from "../../../utils/math";
 import { MoveDigitModeButton } from "../../../components/puzzle/controls/MoveDigitModeButton";
 
-export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
-    mode: CellWriteMode.move,
+export const MovePuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInfo<T> => ({
+    mode: PuzzleInputMode.move,
     mainButtonContent: MoveDigitModeButton,
     isActiveForPuzzle: (
         {
@@ -24,8 +24,8 @@ export const MoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> 
     hotKeyStr: ["Alt+Shift"],
     isNoSelectionMode: true,
     digitsCount: 0,
-    isValidGesture: (isCurrentCellWriteMode, { gesture: { pointers } }) =>
-        isCurrentCellWriteMode || pointers.length > 1 || !isCellGestureExtraData(pointers[0].start.extraData),
+    isValidGesture: (isCurrentInputMode, { gesture: { pointers } }) =>
+        isCurrentInputMode || pointers.length > 1 || !isCellGestureExtraData(pointers[0].start.extraData),
     onMove: ({ gesture: { state: startContext }, startMetrics, currentMetrics }, context, fieldRect) => {
         const { cellSize } = context;
         const fieldCenter = getRectCenter(fieldRect);

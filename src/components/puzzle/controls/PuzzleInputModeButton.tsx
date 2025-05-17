@@ -1,4 +1,4 @@
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { CellState } from "../../../types/puzzle/CellState";
 import { ReactElement, ReactNode, useCallback } from "react";
 import { ControlButton } from "./ControlButton";
@@ -8,8 +8,8 @@ import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
-export interface CellWriteModeButtonProps<T extends AnyPTM> {
-    cellWriteMode: CellWriteMode;
+export interface PuzzleInputModeButtonProps<T extends AnyPTM> {
+    inputMode: PuzzleInputMode;
     top: number;
     left?: number;
     data: Partial<CellState<T>> | ((contentSize: number) => ReactNode);
@@ -22,8 +22,8 @@ export interface CellWriteModeButtonProps<T extends AnyPTM> {
     fullHeight?: boolean;
 }
 
-export const CellWriteModeButton = observer(function CellWriteModeButtonFc<T extends AnyPTM>({
-    cellWriteMode,
+export const PuzzleInputModeButton = observer(function PuzzleInputModeButtonFc<T extends AnyPTM>({
+    inputMode,
     top,
     left = 3,
     data,
@@ -32,14 +32,14 @@ export const CellWriteModeButton = observer(function CellWriteModeButtonFc<T ext
     noBorders,
     childrenOnTopOfBorders,
     fullHeight,
-}: CellWriteModeButtonProps<T>) {
+}: PuzzleInputModeButtonProps<T>) {
     profiler.trace();
 
     const { cellSizeForSidePanel: cellSize } = context;
 
-    const handleSetCellWriteMode = useCallback(
-        () => context.onStateChange({ persistentCellWriteMode: cellWriteMode }),
-        [context, cellWriteMode],
+    const handleSetInputMode = useCallback(
+        () => context.onStateChange({ persistentInputMode: inputMode }),
+        [context, inputMode],
     );
 
     return (
@@ -48,8 +48,8 @@ export const CellWriteModeButton = observer(function CellWriteModeButtonFc<T ext
             top={top}
             cellSize={cellSize}
             innerBorderWidth={noBorders ? 0 : 1}
-            checked={context.cellWriteMode === cellWriteMode}
-            onClick={handleSetCellWriteMode}
+            checked={context.inputMode === inputMode}
+            onClick={handleSetInputMode}
             title={title}
             childrenOnTopOfBorders={childrenOnTopOfBorders}
             fullHeight={fullHeight}
@@ -59,4 +59,4 @@ export const CellWriteModeButton = observer(function CellWriteModeButtonFc<T ext
                 : (contentSize) => <CellContent context={context} data={data} size={contentSize} mainColor={true} />}
         </ControlButton>
     );
-}) as <T extends AnyPTM>(props: CellWriteModeButtonProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: PuzzleInputModeButtonProps<T>) => ReactElement;

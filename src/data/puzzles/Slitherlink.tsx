@@ -7,7 +7,7 @@ import { getPointsBoundingBox } from "../../types/layout/Rect";
 import { isSamePosition, Line, Position } from "../../types/layout/Position";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
-import { CellWriteMode } from "../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../types/puzzle/PuzzleInputMode";
 import { LoopLineConstraint } from "../../components/puzzle/constraints/loop-line/LoopLine";
 import { CellPart } from "../../types/puzzle/CellPart";
 import { CellBorderLinesCountConstraint } from "../../components/puzzle/constraints/cell-border-lines-count/CellBorderLinesCount";
@@ -610,7 +610,7 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
     ),
     typeManager: {
         ...DigitPuzzleTypeManager(),
-        initialCellWriteMode: CellWriteMode.lines,
+        initialInputMode: PuzzleInputMode.lines,
         allowMove: true,
         allowScale: true,
         isFreeScale: true,

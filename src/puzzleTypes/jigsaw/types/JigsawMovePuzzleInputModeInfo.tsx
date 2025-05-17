@@ -1,5 +1,5 @@
-import { CellWriteModeInfo } from "../../../types/puzzle/CellWriteModeInfo";
-import { MoveCellWriteModeInfo } from "../../../types/puzzle/cellWriteModes/move";
+import { PuzzleInputModeInfo } from "../../../types/puzzle/PuzzleInputModeInfo";
+import { MovePuzzleInputModeInfo } from "../../../types/puzzle/inputModes/move";
 import { getActiveJigsawPieceIndexes, groupJigsawPiecesByZIndex, moveJigsawPieceByGroupGesture } from "./helpers";
 import { jigsawPieceBringOnTopAction, jigsawPieceStateChangeAction } from "./JigsawGamePieceState";
 import {
@@ -24,9 +24,9 @@ import { areSameArrays } from "../../../utils/array";
 
 export const roundStep = 0.5;
 
-const base = MoveCellWriteModeInfo<JigsawPTM>();
+const base = MovePuzzleInputModeInfo<JigsawPTM>();
 
-export const JigsawMoveCellWriteModeInfo = (phrases: JigsawPuzzlePhrases): CellWriteModeInfo<JigsawPTM> => ({
+export const JigsawMovePuzzleInputModeInfo = (phrases: JigsawPuzzlePhrases): PuzzleInputModeInfo<JigsawPTM> => ({
     ...base,
     title: phrases.dragModeTitle,
     mainButtonContent: observer(function JigsawMoveButton(props) {

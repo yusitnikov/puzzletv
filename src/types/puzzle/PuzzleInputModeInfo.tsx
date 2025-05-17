@@ -13,12 +13,12 @@ import type {
     GestureOnEndProps,
     GestureOnStartProps,
 } from "../../utils/gestures";
-import { LinesCellWriteModeInfo } from "./cellWriteModes/lines";
-import { MoveCellWriteModeInfo } from "./cellWriteModes/move";
-import { ShadingCellWriteModeInfo } from "./cellWriteModes/shading";
+import { LinesPuzzleInputModeInfo } from "./inputModes/lines";
+import { MovePuzzleInputModeInfo } from "./inputModes/move";
+import { ShadingPuzzleInputModeInfo } from "./inputModes/shading";
 import {
     CellGestureExtraData,
-    getCurrentCellWriteModeInfoByGestureExtraData,
+    getCurrentPuzzleInputModeInfoByGestureExtraData,
     isCellGestureExtraData,
 } from "./CellGestureExtraData";
 import {
@@ -30,7 +30,7 @@ import {
 import { isSamePosition } from "../layout/Position";
 import { GestureFinishReason } from "../../utils/gestures";
 import { Rect } from "../layout/Rect";
-import { CellWriteMode } from "./CellWriteMode";
+import { PuzzleInputMode } from "./PuzzleInputMode";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { ControlButtonItemProps } from "../../components/puzzle/controls/ControlButtonsManager";
 import { MainDigitModeButton } from "../../components/puzzle/controls/MainDigitModeButton";
@@ -40,8 +40,8 @@ import { ColorDigitModeButton } from "../../components/puzzle/controls/ColorDigi
 import { PartiallyTranslatable } from "../translations/Translatable";
 import { settings } from "../layout/Settings";
 
-export interface CellWriteModeInfo<T extends AnyPTM> {
-    mode: CellWriteMode | number;
+export interface PuzzleInputModeInfo<T extends AnyPTM> {
+    mode: PuzzleInputMode | number;
     title?: PartiallyTranslatable;
     hotKeyStr?: string[];
     isActiveForPuzzle?: (puzzle: PuzzleDefinition<T>, includeHidden: boolean) => boolean;
@@ -61,7 +61,7 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     getCurrentSecondaryButton?: (context: PuzzleContext<T>) => number | undefined;
     setCurrentSecondaryButton?: (context: PuzzleContext<T>, index: number) => void;
     isValidGesture?(
-        isCurrentCellWriteMode: boolean,
+        isCurrentInputMode: boolean,
         props: GestureIsValidProps<PuzzleContext<T>>,
         context: PuzzleContext<T>,
     ): boolean;
@@ -86,14 +86,14 @@ export interface CellWriteModeInfo<T extends AnyPTM> {
     onOutsideClick?(context: PuzzleContext<T>): void;
 }
 
-export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[] => [
+export const allPuzzleInputModeInfos = <T extends AnyPTM>(): PuzzleInputModeInfo<T>[] => [
     {
-        mode: CellWriteMode.main,
+        mode: PuzzleInputMode.mainDigit,
         mainButtonContent: MainDigitModeButton,
         isDigitMode: true,
     },
     {
-        mode: CellWriteMode.corner,
+        mode: PuzzleInputMode.cornerDigit,
         mainButtonContent: CornerDigitModeButton,
         hotKeyStr: ["Shift"],
         isDigitMode: true,
@@ -106,7 +106,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         ),
     },
     {
-        mode: CellWriteMode.center,
+        mode: PuzzleInputMode.centerDigit,
         mainButtonContent: CenterDigitModeButton,
         hotKeyStr: ["Ctrl"],
         isDigitMode: true,
@@ -119,7 +119,7 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
         ),
     },
     {
-        mode: CellWriteMode.color,
+        mode: PuzzleInputMode.color,
         mainButtonContent: ColorDigitModeButton,
         hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
         digitsCount: 10,
@@ -128,45 +128,44 @@ export const allCellWriteModeInfos = <T extends AnyPTM>(): CellWriteModeInfo<T>[
             <CellBackground context={context} colors={[index]} size={cellSize} />
         ),
     },
-    ShadingCellWriteModeInfo(),
-    LinesCellWriteModeInfo(),
-    MoveCellWriteModeInfo(),
+    ShadingPuzzleInputModeInfo(),
+    LinesPuzzleInputModeInfo(),
+    MovePuzzleInputModeInfo(),
 ];
 
-export const getAllowedCellWriteModeInfos = <T extends AnyPTM>(
+export const getAllowedPuzzleInputModeInfos = <T extends AnyPTM>(
     puzzle: PuzzleDefinition<T>,
     includeHidden = false,
-): CellWriteModeInfo<T>[] => {
+): PuzzleInputModeInfo<T>[] => {
     const {
         digitsCount,
-        typeManager: { extraCellWriteModes = [], disabledCellWriteModes = [] },
+        typeManager: { extraInputModes = [], disabledInputModes = [] },
     } = puzzle;
 
     return [
-        ...allCellWriteModeInfos<T>().filter(
+        ...allPuzzleInputModeInfos<T>().filter(
             ({ mode, isDigitMode, isActiveForPuzzle }) =>
-                !disabledCellWriteModes.includes(mode) &&
+                !disabledInputModes.includes(mode) &&
                 (isDigitMode ? digitsCount !== 0 : isActiveForPuzzle?.(puzzle, includeHidden) !== false),
         ),
-        ...extraCellWriteModes.filter(({ mainButtonContent }) => mainButtonContent || includeHidden),
+        ...extraInputModes.filter(({ mainButtonContent }) => mainButtonContent || includeHidden),
     ];
 };
 
-export const incrementCellWriteMode = <T extends AnyPTM>(
-    allowedModes: CellWriteModeInfo<T>[],
-    mode: CellWriteMode,
+export const incrementPuzzleInputMode = <T extends AnyPTM>(
+    allowedModes: PuzzleInputModeInfo<T>[],
+    mode: PuzzleInputMode,
     increment: number,
-): CellWriteMode => incrementArrayItem(allowedModes, (item) => item.mode === mode, increment).mode;
+): PuzzleInputMode => incrementArrayItem(allowedModes, (item) => item.mode === mode, increment).mode;
 
-export const useCellWriteModeHotkeys = <T extends AnyPTM>(context: PuzzleContext<T>) => {
-    const { puzzle, visibleCellWriteModeInfos, persistentCellWriteMode } = context;
+export const usePuzzleInputModeHotkeys = <T extends AnyPTM>(context: PuzzleContext<T>) => {
+    const { puzzle, visibleInputModeInfos, persistentInputMode } = context;
 
     const {
         typeManager: { disableCellModeLetterShortcuts },
     } = puzzle;
 
-    const setCellWriteMode = (persistentCellWriteMode: CellWriteMode) =>
-        context.onStateChange({ persistentCellWriteMode });
+    const setInputMode = (persistentInputMode: PuzzleInputMode) => context.onStateChange({ persistentInputMode });
 
     useEventListener(window, "keydown", (ev) => {
         if (settings.isOpened) {
@@ -177,38 +176,38 @@ export const useCellWriteModeHotkeys = <T extends AnyPTM>(context: PuzzleContext
         const ctrlKey = winCtrlKey || macCtrlKey;
         const anyKey = ctrlKey || shiftKey;
 
-        for (const [index, { mode }] of visibleCellWriteModeInfos.entries()) {
+        for (const [index, { mode }] of visibleInputModeInfos.entries()) {
             if (
                 !disableCellModeLetterShortcuts &&
                 code === ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM"][index] &&
                 !anyKey
             ) {
-                setCellWriteMode(mode);
+                setInputMode(mode);
                 ev.preventDefault();
             }
         }
 
         switch (code) {
             case "PageUp":
-                setCellWriteMode(incrementCellWriteMode(visibleCellWriteModeInfos, persistentCellWriteMode, -1));
+                setInputMode(incrementPuzzleInputMode(visibleInputModeInfos, persistentInputMode, -1));
                 ev.preventDefault();
                 break;
             case "PageDown":
-                setCellWriteMode(incrementCellWriteMode(visibleCellWriteModeInfos, persistentCellWriteMode, +1));
+                setInputMode(incrementPuzzleInputMode(visibleInputModeInfos, persistentInputMode, +1));
                 ev.preventDefault();
                 break;
         }
     });
 };
 
-export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
+export const getPuzzleInputModeGestureHandler = <T extends AnyPTM>(
     context: PuzzleContext<T>,
     {
         mode,
         isValidGesture = (
-            isCurrentCellWriteMode: boolean,
+            isCurrentInputMode: boolean,
             { gesture: { pointers } }: GestureIsValidProps<PuzzleContext<T>>,
-        ) => isCurrentCellWriteMode && pointers.length === 1,
+        ) => isCurrentInputMode && pointers.length === 1,
         isNoSelectionMode,
         onMove,
         onCornerClick,
@@ -216,7 +215,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
         onGestureStart,
         onGestureEnd,
         handlesRightMouseClick,
-    }: CellWriteModeInfo<T>,
+    }: PuzzleInputModeInfo<T>,
     isDeleteSelectedCellsStroke: boolean,
     setIsDeleteSelectedCellsStroke: (value: boolean) => void,
     gridRect: Rect,
@@ -226,7 +225,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
     const common: Pick<GestureHandler<PuzzleContext<T>>, "isValidGesture"> = {
         isValidGesture: (props) =>
             isValidGesture(
-                getCurrentCellWriteModeInfoByGestureExtraData(context, props.extraData).mode === mode,
+                getCurrentPuzzleInputModeInfoByGestureExtraData(context, props.extraData).mode === mode,
                 props,
                 context,
             ),
@@ -275,7 +274,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
             onDoubleClick: ({ extraData, event: { ctrlKey, metaKey, shiftKey } }) => {
                 if (
                     !isCellGestureExtraData(extraData) ||
-                    getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode !== mode
+                    getCurrentPuzzleInputModeInfoByGestureExtraData(context, extraData).mode !== mode
                 ) {
                     return false;
                 }
@@ -289,7 +288,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
     }
 
     return {
-        contextId: `cell-write-mode-${mode}`,
+        contextId: `puzzle-input-mode-${mode}`,
         ...common,
         onStart: (props) => {
             const startContext = context.clone();
@@ -301,7 +300,7 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
             if (isCellGestureExtraData(extraData)) {
                 onCornerClick?.(props, context, extraData, !!button);
             }
-            readOnlySafeContext.onStateChange({ gestureCellWriteMode: mode });
+            readOnlySafeContext.onStateChange({ gestureInputMode: mode });
             return startContext;
         },
         onContinue: (props) => {
@@ -322,12 +321,12 @@ export const getCellWriteModeGestureHandler = <T extends AnyPTM>(
         },
         onEnd: (props) => {
             onGestureEnd?.(props, context);
-            readOnlySafeContext.onStateChange({ gestureCellWriteMode: undefined });
+            readOnlySafeContext.onStateChange({ gestureInputMode: undefined });
         },
         onContextMenu: ({ event, extraData }) => {
             if (
                 handlesRightMouseClick &&
-                getCurrentCellWriteModeInfoByGestureExtraData(context, extraData).mode === mode
+                getCurrentPuzzleInputModeInfoByGestureExtraData(context, extraData).mode === mode
             ) {
                 event.preventDefault();
                 return true;

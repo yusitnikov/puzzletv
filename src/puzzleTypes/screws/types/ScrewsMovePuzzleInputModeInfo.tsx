@@ -1,11 +1,11 @@
-import { CellWriteModeInfo } from "../../../types/puzzle/CellWriteModeInfo";
-import { MoveCellWriteModeInfo } from "../../../types/puzzle/cellWriteModes/move";
+import { PuzzleInputModeInfo } from "../../../types/puzzle/PuzzleInputModeInfo";
+import { MovePuzzleInputModeInfo } from "../../../types/puzzle/inputModes/move";
 import { GestureInfo } from "../../../utils/gestures";
 import { isCellGestureExtraData } from "../../../types/puzzle/CellGestureExtraData";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { isPointInRect } from "../../../types/layout/Rect";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { ScrewsPTM } from "./ScrewsPTM";
@@ -18,7 +18,7 @@ import {
 } from "../../../components/puzzle/controls/ControlButtonsManager";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
-import { CellWriteModeButton } from "../../../components/puzzle/controls/CellWriteModeButton";
+import { PuzzleInputModeButton } from "../../../components/puzzle/controls/PuzzleInputModeButton";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { textColor } from "../../../components/app/globals";
 import { ScrewByData } from "../constraints/Screw";
@@ -35,10 +35,10 @@ const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function Scre
 
     return (
         <>
-            <CellWriteModeButton
+            <PuzzleInputModeButton
                 top={top}
                 left={left}
-                cellWriteMode={CellWriteMode.move}
+                inputMode={PuzzleInputMode.move}
                 data={(size) => (
                     <AutoSvg
                         width={size}
@@ -71,15 +71,15 @@ const ScrewsMoveButton: ControlButtonItemPropsGenericFc = observer(function Scre
     );
 });
 
-export const ScrewsMoveCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<ScrewsPTM<T>> => {
-    const base = MoveCellWriteModeInfo<ScrewsPTM<T>>();
+export const ScrewsMovePuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInfo<ScrewsPTM<T>> => {
+    const base = MovePuzzleInputModeInfo<ScrewsPTM<T>>();
 
     return {
         title: {
             [LanguageCode.en]: "Move the screws",
             [LanguageCode.ru]: "Двигать шурупы",
         },
-        mode: CellWriteMode.move,
+        mode: PuzzleInputMode.move,
         isNoSelectionMode: true,
         digitsCount: 0,
         mainButtonContent: ScrewsMoveButton,

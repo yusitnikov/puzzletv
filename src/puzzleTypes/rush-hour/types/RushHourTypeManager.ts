@@ -2,8 +2,8 @@ import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { RushHourGameState } from "./RushHourGameState";
 import { Position } from "../../../types/layout/Position";
 import { AnimatedValue, mixAnimatedPosition } from "../../../types/struct/AnimatedValue";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { RushHourMoveCellWriteModeInfo } from "./RushHourMoveCellWriteModeInfo";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { RushHourMovePuzzleInputModeInfo } from "./RushHourMovePuzzleInputModeInfo";
 import { GridRegion, transformCoordsByRegions } from "../../../types/puzzle/GridRegion";
 import { RushHourPTM } from "./RushHourPTM";
 import { PuzzleCellsIndex } from "../../../types/puzzle/PuzzleCellsIndex";
@@ -82,11 +82,11 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                 extension: carsInfo,
                 gridSize: { gridSize },
             },
-            cellWriteMode,
+            inputMode,
             stateExtension: { hideCars: hideCarsState },
         } = context;
 
-        const isMoveMode = cellWriteMode === CellWriteMode.move;
+        const isMoveMode = inputMode === PuzzleInputMode.move;
         const hideCars = hideCarsState && !isMoveMode;
 
         return [
@@ -149,8 +149,8 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
     mapImportedColors: true,
     colorsImportMode: ColorsImportMode.Initials,
 
-    disabledCellWriteModes: [CellWriteMode.move],
-    extraCellWriteModes: [RushHourMoveCellWriteModeInfo()],
+    disabledInputModes: [PuzzleInputMode.move],
+    extraInputModes: [RushHourMovePuzzleInputModeInfo()],
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RushHourPTM> {
         let {

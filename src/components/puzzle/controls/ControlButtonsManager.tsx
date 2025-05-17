@@ -2,8 +2,8 @@ import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { Position } from "../../../types/layout/Position";
 import { ComponentType, ReactElement, useMemo } from "react";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeInfo, getAllowedCellWriteModeInfos } from "../../../types/puzzle/CellWriteModeInfo";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeInfo, getAllowedPuzzleInputModeInfos } from "../../../types/puzzle/PuzzleInputModeInfo";
 import { ResetButton } from "./ResetButton";
 import { SettingsButton } from "./SettingsButton";
 import { ResultCheckButton } from "./ResultCheckButton";
@@ -29,7 +29,7 @@ export enum ControlButtonRegion {
 
 export interface ControlButtonItemProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
-    info?: CellWriteModeInfo<T>;
+    info?: PuzzleInputModeInfo<T>;
 }
 
 export type ControlButtonItemPropsGenericFc = <T extends AnyPTM>(
@@ -40,7 +40,7 @@ export interface ControlButtonItem<T extends AnyPTM> {
     key: string;
     region: ControlButtonRegion;
     Component: ComponentType<ControlButtonItemProps<T>>;
-    info?: CellWriteModeInfo<T>;
+    info?: PuzzleInputModeInfo<T>;
 }
 
 export class ControlButtonsManager<T extends AnyPTM> {
@@ -70,11 +70,11 @@ export class ControlButtonsManager<T extends AnyPTM> {
             [ControlButtonRegion.custom]: custom,
         } = this.regions;
 
-        const allowedCellWriteModes = getAllowedCellWriteModeInfos(puzzle);
+        const allowedInputModes = getAllowedPuzzleInputModeInfos(puzzle);
 
-        if (allowedCellWriteModes.length > 1) {
+        if (allowedInputModes.length > 1) {
             modes.push(
-                ...allowedCellWriteModes
+                ...allowedInputModes
                     .filter(({ mode, mainButtonContent }) => mainButtonContent)
                     .map<Omit<ControlButtonItem<T>, "region">>((info) => ({
                         key: `mode-${info.mode}`,
@@ -134,8 +134,8 @@ export class ControlButtonsManager<T extends AnyPTM> {
             }
         }
 
-        this.isCompact = !allowedCellWriteModes.some(
-            ({ mode, isDigitMode }) => isDigitMode || [CellWriteMode.color, CellWriteMode.shading].includes(mode),
+        this.isCompact = !allowedInputModes.some(
+            ({ mode, isDigitMode }) => isDigitMode || [PuzzleInputMode.color, PuzzleInputMode.shading].includes(mode),
         );
 
         const hasBottomRowControls = additional.length !== 0 || modes.length + right.length > 8;

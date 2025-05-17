@@ -1,5 +1,5 @@
-import { CellWriteMode } from "../CellWriteMode";
-import type { CellWriteModeInfo } from "../CellWriteModeInfo";
+import { PuzzleInputMode } from "../PuzzleInputMode";
+import type { PuzzleInputModeInfo } from "../PuzzleInputModeInfo";
 import { gameStateContinueMultiLine, gameStateResetCurrentMultiLine, gameStateStartMultiLine } from "../GameState";
 import { GestureFinishReason } from "../../../utils/gestures";
 import { applyCurrentMultiLineAction } from "../GameStateAction";
@@ -8,8 +8,8 @@ import { AnyPTM } from "../PuzzleTypeMap";
 import { LinesDigitModeButton } from "../../../components/puzzle/controls/LinesDigitModeButton";
 import { isCellGestureExtraData } from "../CellGestureExtraData";
 
-export const LinesCellWriteModeInfo = <T extends AnyPTM>(): CellWriteModeInfo<T> => ({
-    mode: CellWriteMode.lines,
+export const LinesPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInfo<T> => ({
+    mode: PuzzleInputMode.lines,
     mainButtonContent: LinesDigitModeButton,
     isActiveForPuzzle: ({ allowDrawing = [] }) => allowDrawing.length !== 0,
     hotKeyStr: ["Alt"],

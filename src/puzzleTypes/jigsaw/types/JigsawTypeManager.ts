@@ -14,7 +14,7 @@ import { JigsawDigitCellDataComponentType } from "../components/JigsawDigitCellD
 import { AnimatedValue, mixAnimatedPosition, mixAnimatedValue } from "../../../types/struct/AnimatedValue";
 import { getRectCenter } from "../../../types/layout/Rect";
 import { ZoomInButtonItem, ZoomOutButtonItem } from "../../../components/puzzle/controls/ZoomButton";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import {
     getJigsawCellCenterAbsolutePosition,
     getJigsawPieceIndexByCell,
@@ -26,7 +26,7 @@ import {
     rotateJigsawDigitByPiece,
     sortJigsawPiecesByPosition,
 } from "./helpers";
-import { JigsawMoveCellWriteModeInfo } from "./JigsawMoveCellWriteModeInfo";
+import { JigsawMovePuzzleInputModeInfo } from "./JigsawMovePuzzleInputModeInfo";
 import {
     doesGridRegionContainCell,
     getGridRegionCells,
@@ -431,8 +431,8 @@ export const JigsawTypeManager = (
                     JigsawPieceHighlightHandlerControlButtonItem,
                 ],
 
-                disabledCellWriteModes: [CellWriteMode.move],
-                extraCellWriteModes: [JigsawMoveCellWriteModeInfo(phrases)],
+                disabledInputModes: [PuzzleInputMode.move],
+                extraInputModes: [JigsawMovePuzzleInputModeInfo(phrases)],
 
                 gridBackgroundColor: lightGreyColor,
                 regionBackgroundColor: "#fff",

@@ -1,5 +1,5 @@
-import { CellWriteModeInfo } from "../../../types/puzzle/CellWriteModeInfo";
-import { MoveCellWriteModeInfo } from "../../../types/puzzle/cellWriteModes/move";
+import { PuzzleInputModeInfo } from "../../../types/puzzle/PuzzleInputModeInfo";
+import { MovePuzzleInputModeInfo } from "../../../types/puzzle/inputModes/move";
 import { rushHourCarStateChangeAction } from "./RushHourGameCarState";
 import { GestureInfo } from "../../../utils/gestures";
 import { isCellGestureExtraData } from "../../../types/puzzle/CellGestureExtraData";
@@ -8,21 +8,21 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { arrayContainsPosition, Position } from "../../../types/layout/Position";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { Rect } from "../../../types/layout/Rect";
 import { carMargin } from "../components/RushHourCar";
 import { processCellsMaps } from "../../../types/puzzle/CellsMap";
 
-const base = MoveCellWriteModeInfo<RushHourPTM>();
+const base = MovePuzzleInputModeInfo<RushHourPTM>();
 
-export const RushHourMoveCellWriteModeInfo = (
+export const RushHourMovePuzzleInputModeInfo = (
     restrictCarCoords?: (car: Rect, isVertical: boolean, context: PuzzleContext<RushHourPTM>) => number,
-): CellWriteModeInfo<RushHourPTM> => ({
+): PuzzleInputModeInfo<RushHourPTM> => ({
     title: {
         [LanguageCode.en]: "Move the cars",
         [LanguageCode.ru]: "Двигать машины",
     },
-    mode: CellWriteMode.move,
+    mode: PuzzleInputMode.move,
     isNoSelectionMode: true,
     digitsCount: 0,
     mainButtonContent: base.mainButtonContent,

@@ -1,9 +1,9 @@
-import { CellWriteModeInfo } from "../../../types/puzzle/CellWriteModeInfo";
+import { PuzzleInputModeInfo } from "../../../types/puzzle/PuzzleInputModeInfo";
 import { SokobanPTM } from "./SokobanPTM";
-import { MoveCellWriteModeInfo } from "../../../types/puzzle/cellWriteModes/move";
+import { MovePuzzleInputModeInfo } from "../../../types/puzzle/inputModes/move";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { ControlButtonItemProps } from "../../../components/puzzle/controls/ControlButtonsManager";
-import { CellWriteModeButton } from "../../../components/puzzle/controls/CellWriteModeButton";
+import { PuzzleInputModeButton } from "../../../components/puzzle/controls/PuzzleInputModeButton";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { SokobanPlayerByData } from "../constraints/SokobanPlayer";
 import { ControlButton, controlButtonPaddingCoeff } from "../../../components/puzzle/controls/ControlButton";
@@ -19,7 +19,7 @@ import { SokobanClue } from "./SokobanPuzzleExtension";
 import { Position } from "../../../types/layout/Position";
 import { translate } from "../../../utils/translate";
 
-const base = MoveCellWriteModeInfo<SokobanPTM>();
+const base = MovePuzzleInputModeInfo<SokobanPTM>();
 
 export const moveSokobanPlayer =
     (xDirection: number, yDirection: number): GameStateActionCallback<SokobanPTM> =>
@@ -226,15 +226,15 @@ export const moveSokobanPlayer =
 const ButtonComponent = observer(function ButtonFc({ context, top, left }: ControlButtonItemProps<SokobanPTM>) {
     profiler.trace();
 
-    const { cellSizeForSidePanel: cellSize, cellWriteMode } = context;
+    const { cellSizeForSidePanel: cellSize, inputMode } = context;
 
     return (
         <>
-            <CellWriteModeButton
+            <PuzzleInputModeButton
                 context={context}
                 top={top}
                 left={left}
-                cellWriteMode={base.mode}
+                inputMode={base.mode}
                 data={(size) => (
                     <AutoSvg width={size} height={size} viewBox={{ top: 0, left: 0, width: 1, height: 1 }}>
                         <SokobanPlayerByData />
@@ -247,7 +247,7 @@ const ButtonComponent = observer(function ButtonFc({ context, top, left }: Contr
                 })} (${translate("shortcut")}: ${base.hotKeyStr})`}
             />
 
-            {cellWriteMode === base.mode && (
+            {inputMode === base.mode && (
                 <>
                     <ControlButton
                         cellSize={cellSize}
@@ -305,7 +305,7 @@ const ButtonComponent = observer(function ButtonFc({ context, top, left }: Contr
     );
 });
 
-export const SokobanMovePlayerCellWriteModeInfo: CellWriteModeInfo<SokobanPTM> = {
+export const SokobanMovePlayerPuzzleInputModeInfo: PuzzleInputModeInfo<SokobanPTM> = {
     mode: base.mode,
     hotKeyStr: base.hotKeyStr,
     mainButtonContent: ButtonComponent,

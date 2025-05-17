@@ -1,6 +1,6 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
-import { CellWriteModeButton } from "./CellWriteModeButton";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
+import { PuzzleInputModeButton } from "./PuzzleInputModeButton";
 import { AutoSvg } from "../../svg/auto-svg/AutoSvg";
 import { UserLinesByData, UserMarkByData } from "../constraints/user-lines/UserLines";
 import { CellMarkType } from "../../../types/puzzle/CellMark";
@@ -20,10 +20,10 @@ export const LinesDigitModeButton: ControlButtonItemPropsGenericFc = observer(fu
     } = context;
 
     return (
-        <CellWriteModeButton
+        <PuzzleInputModeButton
             top={top}
             left={left}
-            cellWriteMode={CellWriteMode.lines}
+            inputMode={PuzzleInputMode.lines}
             data={(contentSize) => {
                 const offset = (cellSize - contentSize) / 2;
 

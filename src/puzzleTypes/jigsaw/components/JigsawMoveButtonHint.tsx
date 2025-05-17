@@ -2,7 +2,7 @@ import { JigsawPTM } from "../types/JigsawPTM";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { Absolute } from "../../../components/layout/absolute/Absolute";
 import { controlButtonPaddingCoeff } from "../../../components/puzzle/controls/ControlButton";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { ControlButtonItemProps } from "../../../components/puzzle/controls/ControlButtonsManager";
 import { jssTag } from "../../jss/constraints/Jss";
 import { JigsawJssCluesVisibility } from "../types/JigsawGameState";
@@ -26,7 +26,7 @@ export const JigsawMoveButtonHint = observer(function JigsawMoveButtonHint({
         return context.allItems.some(({ tags }) => tags?.includes(jssTag));
     });
 
-    if (context.cellWriteMode !== CellWriteMode.move) {
+    if (context.inputMode !== PuzzleInputMode.move) {
         return null;
     }
 

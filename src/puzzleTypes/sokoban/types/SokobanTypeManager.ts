@@ -11,8 +11,8 @@ import { isCageConstraint } from "../../../components/puzzle/constraints/killer-
 import { cosmeticTag, isEllipse } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
 import { SokobanClueConstraint, sokobanTag } from "../constraints/SokobanClue";
 import { SokobanPlayerConstraint } from "../constraints/SokobanPlayer";
-import { moveSokobanPlayer, SokobanMovePlayerCellWriteModeInfo } from "./SokobanMovePlayerCellWriteModeInfo";
-import { CellWriteMode } from "../../../types/puzzle/CellWriteMode";
+import { moveSokobanPlayer, SokobanMovePlayerPuzzleInputModeInfo } from "./SokobanMovePlayerPuzzleInputModeInfo";
+import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { settings } from "../../../types/layout/Settings";
 import {
     addGridStateExToPuzzleTypeManager,
@@ -55,7 +55,7 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
         context,
         isMainKeyboard,
     ): { cell?: Position; state?: PartialGameStateEx<SokobanPTM> } {
-        return context.cellWriteMode === CellWriteMode.move || !isMainKeyboard
+        return context.inputMode === PuzzleInputMode.move || !isMainKeyboard
             ? {
                   state: moveSokobanPlayer(xDirection, yDirection)(context),
               }
@@ -143,7 +143,7 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
         };
     },
 
-    extraCellWriteModes: [SokobanMovePlayerCellWriteModeInfo],
+    extraInputModes: [SokobanMovePlayerPuzzleInputModeInfo],
 
     controlButtons: [],
 
