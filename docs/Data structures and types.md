@@ -2,16 +2,23 @@
 
 The key types for defining puzzles and managing their state are:
 
-- `PuzzleTypeMap`, a.k.a. `PTM` - type map that fully defines all typings of a puzzle:
+- [`PuzzleTypeMap`](../src/types/puzzle/PuzzleTypeMap.ts), a.k.a. `PTM` -
+  type map that fully defines all typings of a puzzle:
   cell data type, puzzle data extensions, state type extensions.
-- `PuzzleDefinition` - defines one concrete puzzle (but not the puzzle solving state - see `GameState` for that).
-- `PuzzleTypeManager` - defines all aspects of handling puzzles' genre (e.g. infinite loop sudoku):
+- [`PuzzleDefinition`](../src/types/puzzle/PuzzleDefinition.ts) - defines one concrete puzzle
+  (but not the puzzle solving state - see [`GameState`](../src/types/puzzle/GameState.ts) for that).
+- [`PuzzleTypeManager`](../src/types/puzzle/PuzzleTypeManager.ts) -
+  defines all aspects of handling puzzles' genre (e.g. infinite loop sudoku):
   what's the possible contents of a cell, how to render it, how to render a custom grid, how to import the grid from Sudoku Maker,
   what are additional solving states and how to handle them, and many more things.
-- `GameState`, `GridStateHistory`, `GridState`, `CellState` - solving states of the whole puzzle and of its parts.
-- `PuzzleContext` - unified object that holds everything needed for rendering the puzzle solving page:
+- [`GameState`](../src/types/puzzle/GameState.ts), [`GridStateHistory`](../src/types/puzzle/GridStateHistory.ts),
+  [`GridState`](../src/types/puzzle/GridState.ts), [`CellState`](../src/types/puzzle/CellState.ts) -
+  solving states of the whole puzzle and of its parts.
+- [`PuzzleContext`](../src/types/puzzle/PuzzleContext.ts) -
+  unified object that holds everything needed for rendering the puzzle solving page:
   puzzle definition, puzzle solving state, page's UI elements and properties.
-- `Constraint` - defines one constraint (clue) in a puzzle: how to render it on the grid, and how to validate the affected cells.
+- [`Constraint`](../src/types/puzzle/Constraint.ts) - defines one constraint (clue) in a puzzle:
+  how to render it on the grid, and how to validate the affected cells.
 
 ## [`PuzzleTypeMap`](../src/types/puzzle/PuzzleTypeMap.ts) (a.k.a. `PTM`)
 
