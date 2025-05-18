@@ -44,6 +44,7 @@ import { EasterSokoban, Sudokuban } from "./Sudokuban";
 import { Pacman } from "./Pacman";
 import { Astronavigation } from "./Astronavigation";
 import { CherryBlossom, Revolutionary, SumwhereAroundHere } from "./RotatableClues";
+import { Adventure1, Adventure2 } from "./Adventure";
 import { Gears } from "./Gears";
 import { WheelsOnTheBus } from "./WheelsOnTheBus";
 import { HappyBirthdayDumediat } from "./HbdDumediat";
@@ -150,7 +151,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     WheelsOnTheBus,
 
     Gears,
-
+    Adventure1,
+     Adventure2,
     Astronavigation,
     CherryBlossom,
     SumwhereAroundHere,
