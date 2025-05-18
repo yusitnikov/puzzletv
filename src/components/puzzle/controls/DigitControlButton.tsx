@@ -11,6 +11,7 @@ import { observer } from "mobx-react-lite";
 import { settings } from "../../../types/layout/Settings";
 import { profiler } from "../../../utils/profiler";
 import { translate } from "../../../utils/translate";
+import { createSimpleKeyInfo } from "../../../types/puzzle/KeyInfo";
 
 export interface DigitControlButtonProps<T extends AnyPTM> {
     index: number;
@@ -25,12 +26,7 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
 
     const {
         puzzle: {
-            typeManager: {
-                createCellDataByDisplayDigit,
-                disableDigitShortcuts,
-                digitShortcuts = [],
-                digitShortcutTips = [],
-            },
+            typeManager: { createCellDataByDisplayDigit, disableDigitShortcuts, digitShortcuts = [] },
             supportZero,
         },
         inputMode,
@@ -53,24 +49,22 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
     }
     const digitKey = digit === 10 ? 0 : digit;
     const cellData = createCellDataByDisplayDigit(digit, context);
-    let shortcuts = (isDigitMode && digitShortcuts[index]) || [];
-    const shortcutTip = isDigitMode && digitShortcutTips[index];
+    let shortcuts = ((isDigitMode && digitShortcuts[index]) || []).map((shortcut) =>
+        typeof shortcut === "string" ? createSimpleKeyInfo(shortcut) : shortcut,
+    );
 
     if (!isDigitMode || !disableDigitShortcuts) {
-        shortcuts = [digitKey.toString(), ...shortcuts];
+        shortcuts = [createSimpleKeyInfo(digitKey.toString()), ...shortcuts];
     }
 
-    const shortcutTitles = shortcuts.map((shortcut) => (typeof shortcut === "string" ? shortcut : shortcut.title));
-    const shortcutCodes = shortcuts.flatMap((shortcut) =>
-        typeof shortcut === "string" ? [`Key${shortcut}`, `Digit${shortcut}`, `Numpad${shortcut}`] : shortcut.codes,
-    );
+    const shortcutCodes = shortcuts.flatMap((shortcut) => shortcut.codes);
 
     let title = "";
     if (shortcuts.length) {
-        title = `${translate("Shortcut")}: ${joinListSemantically(shortcutTitles, translate("or"))}`;
-        if (shortcutTip) {
-            title += ` (${translate(shortcutTip)})`;
-        }
+        title = `${translate("Shortcut")}: ${joinListSemantically(
+            shortcuts.map(({ title }) => (typeof title === "string" ? title : translate(title))),
+            translate("or"),
+        )}`;
     }
 
     const handleDigit = useCallback(() => {

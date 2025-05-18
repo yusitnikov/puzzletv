@@ -11,6 +11,7 @@ import { ChessMainControls } from "../components/ChessMainControls";
 import { ChessPTM } from "./ChessPTM";
 import { RegularDigitComponentType } from "../../../components/puzzle/digit/RegularDigit";
 import { addGameStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
+import { createSimpleKeyInfo } from "../../../types/puzzle/KeyInfo";
 
 export const ChessTypeManager: PuzzleTypeManager<ChessPTM> = addGameStateExToPuzzleTypeManager<
     ChessPTM,
@@ -88,15 +89,19 @@ export const ChessTypeManager: PuzzleTypeManager<ChessPTM> = addGameStateExToPuz
 
         maxDigitsCount: 6,
 
-        digitShortcuts: [["P"], ["N"], ["B"], ["R"], ["Q"], ["K"]],
-
-        digitShortcutTips: [
-            undefined,
-            {
-                [LanguageCode.en]: `please note that ${ctrlKeyText}+N may not work`,
-                [LanguageCode.ru]: `${ctrlKeyText}+N может не работать`,
-                [LanguageCode.de]: `bitte beachten Sie, dass ${ctrlKeyText}+N möglicherweise nicht funktioniert`,
-            },
+        digitShortcuts: [
+            ["P"],
+            [
+                createSimpleKeyInfo("N", {
+                    [LanguageCode.en]: `please note that ${ctrlKeyText}+N may not work`,
+                    [LanguageCode.ru]: `${ctrlKeyText}+N может не работать`,
+                    [LanguageCode.de]: `bitte beachten Sie, dass ${ctrlKeyText}+N möglicherweise nicht funktioniert`,
+                }),
+            ],
+            ["B"],
+            ["R"],
+            ["Q"],
+            ["K"],
         ],
 
         getInternalState(_puzzle, { extension: { selectedColor } }): any {

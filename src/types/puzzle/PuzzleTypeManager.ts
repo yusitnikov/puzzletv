@@ -5,7 +5,6 @@ import { SetInterface } from "../struct/Set";
 import { GameStateEx, PartialGameStateEx } from "./GameState";
 import { ComponentType, ReactNode } from "react";
 import { ControlsProps } from "../../components/puzzle/controls/Controls";
-import { Translatable } from "../translations/Translatable";
 import { getIsSamePuzzlePosition, PuzzleDefinition } from "./PuzzleDefinition";
 import { CellSelectionColor, CellSelectionByDataProps } from "../../components/puzzle/cell/CellSelection";
 import { GridRegion } from "./GridRegion";
@@ -225,8 +224,6 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     disableDigitShortcuts?: boolean;
 
     digitShortcuts?: (string | KeyInfo)[][];
-
-    digitShortcutTips?: (Translatable | undefined)[];
 
     disableConflictChecker?: boolean;
 
