@@ -3,7 +3,7 @@ import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
 import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { AdventurePTM } from "../../puzzleTypes/adventure/types/AdventurePTM";
-import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
+import { CellsMap, createCellsMapFromArray, mergeCellsMaps } from "../../types/puzzle/CellsMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { AdventureTypeManager } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
 import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
@@ -49,63 +49,137 @@ export const Adventure2: PuzzleDefinition<AdventurePTM<number>> = {
     ]),
     items: (context) => {
         return [
-            ...getShopItemsByContext(context),
+            ...getAdventureConstraints(context),
         ].map(toDecorativeConstraint);
     },
 }
 
-const getShopItemsByContext = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
+type choiceDefinitions = {
+    solveCells: [number, number][]
+    topMessage: string,
+    option1ChoiceMessage: string
+    option1TakenMessage: string
+    option2ChoiceMessage: string
+    option2TakenMessage: string
+    option1: choiceTaken
+    option2: choiceTaken
+}
+
+type choiceTaken = {
+    initialDigits: CellsMap<number>
+    constraints: Constraint<AdventurePTM, any>[]
+    rules: string[]
+    choices: choiceDefinitions | undefined
+}
+
+const adventure2Def: choiceTaken = {
+    initialDigits: { 8: { 4: 1 } },
+    constraints: [],
+    rules: [],
+    choices: {
+        solveCells: [[7, 7]],
+        topMessage: "FirstChoice",
+        option1ChoiceMessage: "FirstChoice option 1",
+        option1TakenMessage: "FirstChoice option 1 Taken",
+        option2ChoiceMessage: "FirstChoice option 2",
+        option2TakenMessage: "FirstChoice option 2 Taken",
+        option1: {
+            initialDigits: {},
+            constraints: [KropkiDotConstraint("R1C1", "R1C2", true)],
+            rules: [translate(blackKropkiDotsExplained)],
+            choices: {
+                solveCells: [[6, 6]],
+                topMessage: "SecondChoice 1",
+                option1ChoiceMessage: "SecondChoice 1 option 1",
+                option1TakenMessage: "SecondChoice 1 option 1 Taken",
+                option2ChoiceMessage: "SecondChoice 1 option 2",
+                option2TakenMessage: "SecondChoice 1 option 2 Taken",
+                option1: {
+                    initialDigits: {},
+                    constraints: [KropkiDotConstraint("R2C1", "R2C2", true)],
+                    rules: [translate(blackKropkiDotsExplained)],
+                    choices: undefined
+                },
+                option2: {
+                    initialDigits: {},
+                    constraints: [KropkiDotConstraint("R2C1", "R2C2", false)],
+                    rules: [translate(whiteKropkiDotsExplained)],
+                    choices: undefined
+                }
+            }
+        },
+        option2: {
+            initialDigits: {},
+            constraints: [KropkiDotConstraint("R1C1", "R1C2", false)],
+            rules: [translate(whiteKropkiDotsExplained)],
+            choices: {
+                solveCells: [[6, 8]],
+                topMessage: "SecondChoice 2",
+                option1ChoiceMessage: "SecondChoice 2 option 1",
+                option1TakenMessage: "SecondChoice 2 option 1 Taken",
+                option2ChoiceMessage: "SecondChoice 2 option 2",
+                option2TakenMessage: "SecondChoice 2 option 2 Taken",
+                option1: {
+                    initialDigits: {},
+                    constraints: [KropkiDotConstraint("R2C2", "R2C3", true)],
+                    rules: [translate(blackKropkiDotsExplained)],
+                    choices: undefined
+                },
+                option2: {
+                    initialDigits: {},
+                    constraints: [KropkiDotConstraint("R2C2", "R2C3", false)],
+                    rules: [translate(whiteKropkiDotsExplained)],
+                    choices: undefined
+                }
+            }
+        }
+    }
+}
+
+const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
     let constraints: Constraint<AdventurePTM, any>[] = [];
-    var value = context.getCell(8, 8)?.usersDigit;
-    if (value !== undefined)
+    let digits: CellsMap<number> = {};
+    let rules: string[] = [];
+    let currentChoice: choiceTaken | undefined = adventure2Def;
+    var depth = 0;
+    while (currentChoice !== undefined)
     {
-        context.puzzle.initialDigits = { 8: { 4: value } }
+        mergeCellsMaps(digits, currentChoice.initialDigits);
+        constraints = constraints.concat(currentChoice.constraints);
+        rules = rules.concat(currentChoice.rules);
+        if (currentChoice.choices !== undefined && (context.stateExtension.choicesMade.length === depth || context.stateExtension.choicesMade.length === depth + 1))
+        {
+            var solved = checkSolved(context, currentChoice.choices.solveCells)
+            if (context.stateExtension.choicesMade.length === depth + 1 && !solved)
+            {
+                context.stateExtension.choicesMade.pop();
+                currentChoice = undefined;
+            }
+            else if (context.stateExtension.choicesMade.length === depth + 1 && solved)
+            {
+                currentChoice = context.stateExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+            }
+            else if (context.stateExtension.choicesMade.length === depth && solved)
+            {
+                context.stateExtension.message = currentChoice.choices.topMessage;
+                currentChoice = undefined;
+            }
+            else
+            {
+                currentChoice = undefined;
+            }
+        }
+        else if (currentChoice.choices !== undefined)
+        {
+            currentChoice = context.stateExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+        }
+        else
+        {
+            currentChoice = undefined;
+        }
+        depth++;
     }
-    else
-    {
-        context.puzzle.initialDigits = { 8: { 4: 1 } }
-    }
-    if (context.stateExtension.choicesMade.length == 0 && Check1Passed(context))
-    {
-        context.stateExtension.message = "Option1"
-    }
-    if (context.stateExtension.choicesMade.length == 1 && !Check1Passed(context))
-    {
-        context.stateExtension.choicesMade.pop();
-    }
-    if (context.stateExtension.choicesMade.length == 1 && context.stateExtension.choicesMade[0] === 1 && Check2PassedOption1(context))
-    {
-        context.stateExtension.message = "Option2First1"
-    }
-    if (context.stateExtension.choicesMade.length == 2 && context.stateExtension.choicesMade[0] === 1 && !Check2PassedOption1(context))
-    {
-        context.stateExtension.choicesMade.pop();
-    }
-    if (context.stateExtension.choicesMade.length == 1 && context.stateExtension.choicesMade[0] === 2 && Check2PassedOption2(context))
-    {
-        context.stateExtension.message = "Option2First2"
-    }
-    if (context.stateExtension.choicesMade.length == 2 && context.stateExtension.choicesMade[0] === 2 && !Check2PassedOption2(context))
-    {
-        context.stateExtension.choicesMade.pop();
-    }
-    let rules: string[] = []
-    if (context.stateExtension.choicesMade.length >= 1)
-    {
-        constraints.push(KropkiDotConstraint("R1C1", "R1C2", context.stateExtension.choicesMade[0] === 1));
-        rules = [...rules,
-            translate(whiteKropkiDotsExplained),
-            translate(blackKropkiDotsExplained)
-        ]
-    }
-    if (context.stateExtension.choicesMade.length >= 2)
-    {
-        constraints.push(KropkiDotConstraint("R2C1", "R2C2", context.stateExtension.choicesMade[1] === 1));
-        rules = [...rules,
-            translate(whiteKropkiDotsExplained),
-            translate(blackKropkiDotsExplained)
-        ]
-    }
+    context.puzzle.initialDigits = digits;
     context.puzzle.rules = () => (
         <>
             <RulesParagraph>
@@ -122,16 +196,17 @@ const getShopItemsByContext = (context: PuzzleContext<AdventurePTM>): Constraint
         </>
     )
     return constraints;
-};
-
-const Check1Passed = (context: PuzzleContext<AdventurePTM>): boolean => {
-    return context.getCell(7,7)?.usersDigit !== undefined && context.puzzle.solution![7][7] === context.getCell(7,7).usersDigit;
 }
 
-const Check2PassedOption1 = (context: PuzzleContext<AdventurePTM>): boolean => {
-    return context.getCell(6,6)?.usersDigit !== undefined && context.puzzle.solution![6][6] === context.getCell(6,6).usersDigit;
-}
-
-const Check2PassedOption2 = (context: PuzzleContext<AdventurePTM>): boolean => {
-    return context.getCell(6,8)?.usersDigit !== undefined && context.puzzle.solution![6][8] === context.getCell(6,8).usersDigit;
+const checkSolved = (context: PuzzleContext<AdventurePTM>, solveCells: [number, number][]): boolean => {
+    var solved = true;
+    solveCells.forEach((cell: [number, number]) => {
+        var userDigit = context.getCell(cell[0], cell[1])?.usersDigit;
+        if (userDigit === undefined || userDigit !== context.puzzle.solution![cell[0]][cell[1]])
+        {
+            solved = false;
+            return;
+        }
+    });
+    return solved;
 }
