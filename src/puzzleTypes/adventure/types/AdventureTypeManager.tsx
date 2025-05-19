@@ -48,7 +48,7 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>
-                                        <div>{"Congratulations"}!</div>
+                                        <div>{"Congratulations "}{context.stateExtension.message}!</div>
                                     </>
                         </div>
     

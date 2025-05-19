@@ -9,6 +9,14 @@ import { AdventureTypeManager } from "../../puzzleTypes/adventure/types/Adventur
 import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { Constraint, toDecorativeConstraint } from "../../types/puzzle/Constraint";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
+import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { translate } from "../../utils/translate";
+import {
+    blackKropkiDotsExplained,
+    whiteKropkiDotsExplained,
+} from "../ruleSnippets";
+import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
+import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 
 export const Adventure1: PuzzleDefinitionLoader<AdventurePTM<NumberPTM>> = {
     loadPuzzle: () =>
@@ -47,6 +55,7 @@ export const Adventure2: PuzzleDefinition<AdventurePTM<number>> = {
 }
 
 const getShopItemsByContext = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
+    let constraints: Constraint<AdventurePTM, any>[] = [];
     var value = context.getCell(8, 8)?.usersDigit;
     if (value !== undefined)
     {
@@ -56,21 +65,73 @@ const getShopItemsByContext = (context: PuzzleContext<AdventurePTM>): Constraint
     {
         context.puzzle.initialDigits = { 8: { 4: 1 } }
     }
-    if (context.stateExtension.choicesMade.length == 0)
+    if (context.stateExtension.choicesMade.length == 0 && Check1Passed(context))
     {
-        var value2 = context.getCell(7,7)?.usersDigit;
-        if (value2 !== undefined)
-        {
-            context.stateExtension.message = "test"
-        }
+        context.stateExtension.message = "Option1"
     }
-    if (context.stateExtension.choicesMade.length == 1)
+    if (context.stateExtension.choicesMade.length == 1 && !Check1Passed(context))
     {
-        var value2 = context.getCell(6,6)?.usersDigit;
-        if (value2 !== undefined)
-        {
-            context.stateExtension.message = "test"
-        }
+        context.stateExtension.choicesMade.pop();
     }
-    return [];
+    if (context.stateExtension.choicesMade.length == 1 && context.stateExtension.choicesMade[0] === 1 && Check2PassedOption1(context))
+    {
+        context.stateExtension.message = "Option2First1"
+    }
+    if (context.stateExtension.choicesMade.length == 2 && context.stateExtension.choicesMade[0] === 1 && !Check2PassedOption1(context))
+    {
+        context.stateExtension.choicesMade.pop();
+    }
+    if (context.stateExtension.choicesMade.length == 1 && context.stateExtension.choicesMade[0] === 2 && Check2PassedOption2(context))
+    {
+        context.stateExtension.message = "Option2First2"
+    }
+    if (context.stateExtension.choicesMade.length == 2 && context.stateExtension.choicesMade[0] === 2 && !Check2PassedOption2(context))
+    {
+        context.stateExtension.choicesMade.pop();
+    }
+    let rules: string[] = []
+    if (context.stateExtension.choicesMade.length >= 1)
+    {
+        constraints.push(KropkiDotConstraint("R1C1", "R1C2", context.stateExtension.choicesMade[0] === 1));
+        rules = [...rules,
+            translate(whiteKropkiDotsExplained),
+            translate(blackKropkiDotsExplained)
+        ]
+    }
+    if (context.stateExtension.choicesMade.length >= 2)
+    {
+        constraints.push(KropkiDotConstraint("R2C1", "R2C2", context.stateExtension.choicesMade[1] === 1));
+        rules = [...rules,
+            translate(whiteKropkiDotsExplained),
+            translate(blackKropkiDotsExplained)
+        ]
+    }
+    context.puzzle.rules = () => (
+        <>
+            <RulesParagraph>
+                <summary>
+                    Normal sudoku rules apply.
+                </summary>
+            </RulesParagraph>
+            
+            <RulesParagraph>
+                <RulesUnorderedList>
+                    {rules.map(item => <li>{item}</li>)}
+                </RulesUnorderedList>
+            </RulesParagraph>
+        </>
+    )
+    return constraints;
 };
+
+const Check1Passed = (context: PuzzleContext<AdventurePTM>): boolean => {
+    return context.getCell(7,7)?.usersDigit !== undefined && context.puzzle.solution![7][7] === context.getCell(7,7).usersDigit;
+}
+
+const Check2PassedOption1 = (context: PuzzleContext<AdventurePTM>): boolean => {
+    return context.getCell(6,6)?.usersDigit !== undefined && context.puzzle.solution![6][6] === context.getCell(6,6).usersDigit;
+}
+
+const Check2PassedOption2 = (context: PuzzleContext<AdventurePTM>): boolean => {
+    return context.getCell(6,8)?.usersDigit !== undefined && context.puzzle.solution![6][8] === context.getCell(6,8).usersDigit;
+}
