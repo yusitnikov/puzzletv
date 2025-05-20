@@ -147,21 +147,21 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
         mergeCellsMaps(digits, currentChoice.initialDigits);
         constraints = constraints.concat(currentChoice.constraints);
         rules = rules.concat(currentChoice.rules);
-        if (currentChoice.choices !== undefined && (context.stateExtension.choicesMade.length === depth || context.stateExtension.choicesMade.length === depth + 1))
+        if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
         {
             var solved = checkSolved(context, currentChoice.choices.solveCells)
-            if (context.stateExtension.choicesMade.length === depth + 1 && !solved)
+            if (context.gridExtension.choicesMade.length === depth + 1 && !solved)
             {
-                context.stateExtension.choicesMade.pop();
+                context.gridExtension.choicesMade.pop();
                 currentChoice = undefined;
             }
-            else if (context.stateExtension.choicesMade.length === depth + 1 && solved)
+            else if (context.gridExtension.choicesMade.length === depth + 1 && solved)
             {
-                currentChoice = context.stateExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+                currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
             }
-            else if (context.stateExtension.choicesMade.length === depth && solved)
+            else if (context.gridExtension.choicesMade.length === depth && solved)
             {
-                context.stateExtension.message = currentChoice.choices.topMessage;
+                context.gridExtension.message = currentChoice.choices.topMessage;
                 currentChoice = undefined;
             }
             else
@@ -171,7 +171,7 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
         }
         else if (currentChoice.choices !== undefined)
         {
-            currentChoice = context.stateExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+            currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
         }
         else
         {

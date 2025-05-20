@@ -4,4 +4,4 @@ import { AdventureGameState } from "./AdventureGameState";
 export type AdventurePTM<
     CellType = number,
     GameStateExType extends AdventureGameState = AdventureGameState
-> = PTM<CellType, GameStateExType>;
+> = PTM<CellType, {}, GameStateExType>;

@@ -1,28 +1,28 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { globalPaddingCoeff, textColor } from "../../../components/app/globals";
-import React, { useState } from "react";
-import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
+import { myClientId } from "../../../hooks/useMultiPlayer";
 import { AdventurePTM} from "./AdventurePTM";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import {
     addGridStateExToPuzzleTypeManager,
-    addGameStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { Modal } from "../../../components/layout/modal/Modal";
 import { Button } from "../../../components/layout/button/Button";
-import { AdventureGameState } from "./AdventureGameState";
+import { AdventureGameState, choicesMadeStateChangeAction } from "./AdventureGameState";
+import { getNextActionId } from "../../../types/puzzle/GameStateAction";
 
-export const AdventureTypeManager = <T extends AdventurePTM>(
+export const AdventureTypeManager = (
     baseTypeManager: PuzzleTypeManager<any> = DigitPuzzleTypeManager(),
-): PuzzleTypeManager<T> => {
+): PuzzleTypeManager<AdventurePTM> => {
     return {
         
-                ...(addGameStateExToPuzzleTypeManager<T, AdventureGameState>(baseTypeManager, {
-                    initialGameStateExtension: {
+                ...(addGridStateExToPuzzleTypeManager<AdventurePTM, AdventureGameState>(baseTypeManager, {
+                    initialGridStateExtension: {
                         choicesMade: [],
                         message: ""
                     },
-                }) as unknown as PuzzleTypeManager<T>),
+                }) as unknown as PuzzleTypeManager<AdventurePTM>),
     getAboveRules: function AdventureAboveRules(context, isPortrait) {
 
         const {
@@ -30,13 +30,27 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             } = context;
         
             const handleOption1 = () => {
-                context.stateExtension.choicesMade = [...context.stateExtension.choicesMade, 1]
-                context.stateExtension.message = ""
+                context.gridExtension.choicesMade = [...context.gridExtension.choicesMade, 1]
+                context.gridExtension.message = "",
+                context.onStateChange(
+                    choicesMadeStateChangeAction(
+                        context,
+                        myClientId,
+                        context.gridStateHistory.current.actionId
+                    ),
+                );
             };
 
             const handleOption2 = () => {
-                context.stateExtension.choicesMade = [...context.stateExtension.choicesMade, 2]
-                context.stateExtension.message = ""
+                context.gridExtension.choicesMade = [...context.gridExtension.choicesMade, 2]
+                context.gridExtension.message = "",
+                context.onStateChange(
+                    choicesMadeStateChangeAction(
+                        context,
+                        myClientId,
+                        context.gridStateHistory.current.actionId
+                    ),
+                );
             };
         
             return (
@@ -44,11 +58,11 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                 
                 {baseTypeManager.getAboveRules?.(context, isPortrait)}
 
-                {context.stateExtension.message !== "" && (
+                {context.gridExtension.message !== "" && (
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>
-                                        <div>{"Congratulations "}{context.stateExtension.message}!</div>
+                                        <div>{"Congratulations "}{context.gridExtension.message}!</div>
                                     </>
                         </div>
     
