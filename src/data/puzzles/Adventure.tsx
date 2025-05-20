@@ -161,7 +161,11 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
             }
             else if (context.gridExtension.choicesMade.length === depth && solved)
             {
-                context.gridExtension.message = currentChoice.choices.topMessage;
+                context.stateExtension.messageChoice1 = currentChoice.choices.option1ChoiceMessage;
+                context.stateExtension.messageChoice2 = currentChoice.choices.option2ChoiceMessage;
+                context.stateExtension.messageChoice1Taken = currentChoice.choices.option1TakenMessage;
+                context.stateExtension.messageChoice2Taken = currentChoice.choices.option2TakenMessage;
+                context.stateExtension.message = currentChoice.choices.topMessage;
                 currentChoice = undefined;
             }
             else
