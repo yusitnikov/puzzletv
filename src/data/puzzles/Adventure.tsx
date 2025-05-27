@@ -10,13 +10,18 @@ import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { Constraint, toDecorativeConstraint } from "../../types/puzzle/Constraint";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
 import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
+import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
 import { translate } from "../../utils/translate";
 import {
     blackKropkiDotsExplained,
     whiteKropkiDotsExplained,
+    germanWhispersTitle,
+    germanWhispersExplained,
+    thermometersExplained
 } from "../ruleSnippets";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
+import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
 
 export const Adventure1: PuzzleDefinitionLoader<AdventurePTM<NumberPTM>> = {
     loadPuzzle: () =>
@@ -27,6 +32,7 @@ export const Adventure1: PuzzleDefinitionLoader<AdventurePTM<NumberPTM>> = {
     slug: "adventure1",
 };
 
+const S = undefined;
 export const Adventure2: PuzzleDefinition<AdventurePTM<number>> = {
     
     title: { [LanguageCode.en]: "Adventure is out there!" },
@@ -37,15 +43,15 @@ export const Adventure2: PuzzleDefinition<AdventurePTM<number>> = {
     gridSize: GridSize9,
     regions: Regions9,
     solution: createCellsMapFromArray([
-        [5, 8, 7, 1, 2, 6, 9, 4, 3],
-        [1, 3, 9, 4, 5, 7, 8, 6, 2],
-        [6, 4, 2, 8, 9, 3, 5, 1, 7],
-        [7, 9, 6, 5, 8, 4, 2, 3, 1],
-        [8, 1, 3, 6, 7, 2, 4, 9, 5],
-        [2, 5, 4, 3, 1, 9, 7, 8, 6],
-        [9, 6, 5, 7, 4, 1, 3, 2, 8],
-        [4, 7, 1, 2, 3, 8, 6, 5, 9],
-        [3, 2, 8, 9, 6, 5, 1, 7, 4],
+        [S, S, S, S, S, S, 6, 5, 3],
+        [S, S, S, S, S, S, S, 8, 2],
+        [S, S, S, S, S, S, S, 1, 7],
+        [S, S, 9, 7, S, S, 8, 6, S],
+        [S, S, S, S, S, S, S, 7, S],
+        [S, S, S, S, S, S, S, 9, S],
+        [1, S, S, 4, 2, 9, 5, 3, 6],
+        [S, S, S, 5, 1, 3, 7, 4, 8],
+        [S, S, S, 6, 7, 8, 1, 2, 9],
     ]),
     items: (context) => {
         return [
@@ -73,22 +79,24 @@ type choiceTaken = {
 }
 
 const adventure2Def: choiceTaken = {
-    initialDigits: { 8: { 4: 1 } },
+    initialDigits: { 6: { 0: 1 }, 7: { 4: 1}, 8: { 7: 2, 8: 9}},
     constraints: [],
     rules: [],
     choices: {
-        solveCells: [[7, 7]],
+        solveCells: [[8, 6]],
         topMessage: "FirstChoice",
         option1ChoiceMessage: "FirstChoice option 1",
         option1TakenMessage: "FirstChoice option 1 Taken",
         option2ChoiceMessage: "FirstChoice option 2",
         option2TakenMessage: "FirstChoice option 2 Taken",
         option1: {
-            initialDigits: {},
-            constraints: [KropkiDotConstraint("R1C1", "R1C2", true)],
-            rules: [translate(blackKropkiDotsExplained)],
+            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATjIA2AL41V6rToR6CRgBznLm7bv2PnINa5t3DZE4W3lZuth4mXj7W7vaBXgDmmABuKHj4CFCMKHTJcGzZBGbB0WH%2BACxBLjHhBABM5VGhfvpElETF1WWt7VUhvrH4bUR9pS0Ew6PNg8Od-TX%2Bk00DtfgODcsL%2BgDsxn15Bfx1m90EDgbHJdOr55dd42sXJw%2B3z4OvVyv%2BH-fvG8EHQpDLyA-jbN6rNp1SgQxaUOp3eanIbwxFjGao2E9aFYiaYz5bM51KZffQNGEE5FEBG4lE4ykPKFo65wmkMjFs36Q%2BEUrms5mkokkwn4cm06kCkVQ3lIxn4vnYyVU%2BWyjky9Hczmqm7E2m7YVUrVJVLpTLZXL5IFEcXtJVy6k2h3s7lOhV413air7S38ADM4o9Gv8xl9cyD%2BhDYZZEdDtMjiRSaQIZpyIFBEzjsYBPoI4Odiw96bWtLIlEa%2Bf0pfLbvwVZLZfr1c9lYb2cOGeCxqTGSyqaLiK7pt7FvbhlMAF06NJcOhMnBMDgEPoVCAEABPej8GXrzcTOhQFBJGfKSg0U%2Bnog0S%2BXuo0W%2B389nq-Pm93t%2BPi8vt-3mi%2B3--8oaEAwCyBoUDQL-SCgOgkCwLgqC-2A6DwLg4waDQtDthoLCsIcGg8LwjD0OwkjcPw8iiMw0jyII8cvB3fhynaOg2AXfwlCUYwDGw7jtkvYxLzIOpJyUOpQLqNCiCwjp8PHScQBgBcABFMDAMA0DSWQCFAkBZzXDguG8CA2AkQgAGJjG2MBKEswQxEwaQAGscD0fRKBIIgyFMCdvKAA
+            initialDigits: { 0: {6: 6}},
+            constraints: [WhispersConstraint(["R8C7", "R9C8", "R8C9", "R7C8", "R6C8"]),
+                        WhispersConstraint(["R3C8", "R3C9", "R2C9", "R2C8", "R1C9"])],
+            rules: [`${translate(germanWhispersTitle)}: ${translate(germanWhispersExplained())}`],
             choices: {
-                solveCells: [[6, 6]],
+                solveCells: [[1, 8], [2, 7], [2, 8], [6, 7], [7, 6], [7, 8]],
                 topMessage: "SecondChoice 1",
                 option1ChoiceMessage: "SecondChoice 1 option 1",
                 option1TakenMessage: "SecondChoice 1 option 1 Taken",
@@ -109,11 +117,13 @@ const adventure2Def: choiceTaken = {
             }
         },
         option2: {
-            initialDigits: {},
-            constraints: [KropkiDotConstraint("R1C1", "R1C2", false)],
-            rules: [translate(whiteKropkiDotsExplained)],
+            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8RSgCZKAXxqr1WnQj0FDRo%2Bcubtu-WUPOQa1zbv4AOwAHE4WPlZutvrBsd6%2B1u4ERgAsAGzxkf76gWkpmX5JBpRe4QlRAZ5mZVlFDtUuidH2xmGNFR6l7dkEIW0Rhc34scEFTQGpGTWDAbn50%2BP6hl0DiwRVYx0tJps9xY67RRsLW0Ghh0MjFxPp1zl5dy0r5XvH3XWpjwZGU6AAbnA2Ix%2BABObwAoH8QJfIg7E57IhEUbhADmmD%2BKDw%2BAQUGBdAhwIIyPeQ0R8xJAVhv1WpzIlGJNNez1qQzejKKfS%2BV3hR3J7KGcy%2BgTIfJeRSMIq%2BdIZYtZzJmnQa-Nm5x5lziaspSKFD01OUleuSBtAaIxWJxeJABP4RC%2BKRSMpZAXtDOtBD5bvw-U9YMNXs%2BqPRmIIFpQ%2BMBhPwAGY7cElbKAiDdRT9EnRU79CkyN6I-wyN5TcHsbiw1bc-ZweXo18TI6Fe7k8rM42Ex5qa31u2M53K5CCNTPdDwp6GYXzSXw32DAWg%2BPLZ7%2BmOQxOy1OwQBdOjSXDoHFwTA4BD6FQgBAAT3o-CV58v9joUBQaJ3ykoNFfr6INE-n6MNF-v-fN8v2An8-zAwCPxAsD-xoKNYPglIaEQxCyBoVDULgzCkOwlC0LwrC4OQ7D0LwtIaDIsjAhoKiqOCGg6LoijyOoljaPo9imMo1j2IY9dvBvfgo0oV8QHQNgIAAdwIMBAXQUsxDQGAID4WwMGUJQUk-KMtNfIwQU3JQ0iosg6LIKi0ko1DcmowJ103UTzw4LgfAgcSoEkABiaRvJ8wQxEwaQAGscD0fRKBIOCQAAI0YNgooAJTgLRGDCkh8lMPjTCAA
+            initialDigits: { 3: {6: 8}, 6: {7: 3}},
+            constraints: [ThermometerConstraint(["R8C5", "R7C5", "R7C4", "R9C4", "R9C6"]),
+                ThermometerConstraint(["R5C6", "R4C5", "R4C3"])],
+            rules: [translate(thermometersExplained)],
             choices: {
-                solveCells: [[6, 8]],
+                solveCells: [[3, 2], [3, 3], [6, 3], [6, 4], [6, 5], [7, 3], [7, 5], [8, 3], [8, 4], [8, 5]],
                 topMessage: "SecondChoice 2",
                 option1ChoiceMessage: "SecondChoice 2 option 1",
                 option1TakenMessage: "SecondChoice 2 option 1 Taken",
@@ -144,7 +154,7 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
     var depth = 0;
     while (currentChoice !== undefined)
     {
-        mergeCellsMaps(digits, currentChoice.initialDigits);
+        digits = mergeCellsMaps(digits, currentChoice.initialDigits);
         constraints = constraints.concat(currentChoice.constraints);
         rules = rules.concat(currentChoice.rules);
         if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
