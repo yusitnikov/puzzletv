@@ -50,7 +50,7 @@ export const GoogleMapsTypeManager = <T extends AnyGoogleMapsPTM>(
             top: y,
         };
     },
-    isOddTransformCoords: true,
+    isNonLinearTransformCoords: true,
     processArrowDirection(cell, xDirection, yDirection, context, isMainKeyboard) {
         return (baseTypeManager.processArrowDirection || defaultProcessArrowDirection)(
             cell,

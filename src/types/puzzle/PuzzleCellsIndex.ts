@@ -34,7 +34,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
         const {
             typeManager: {
                 transformCoords = (coords: Position) => coords,
-                isOddTransformCoords,
+                isNonLinearTransformCoords,
                 getAdditionalNeighbors = () => [],
             },
             gridSize: { rowsCount, columnsCount },
@@ -74,7 +74,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     bounds,
                     getTransformedBounds: (context) => {
                         const transformCoordsBound = (point: Position) =>
-                            isOddTransformCoords ? transformCoords(point, context) : point;
+                            isNonLinearTransformCoords ? transformCoords(point, context) : point;
 
                         return {
                             borders: bounds.borders.map((border) => border.map(transformCoordsBound)),

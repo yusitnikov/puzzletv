@@ -66,11 +66,11 @@ export const getGridRectTransform = <T extends AnyPTM>(
 ): TransformedRect => {
     const {
         puzzle: {
-            typeManager: { transformCoords: typeManagerTransformCoords, isOddTransformCoords },
+            typeManager: { transformCoords: typeManagerTransformCoords, isNonLinearTransformCoords },
         },
     } = context;
 
-    if (isOddTransformCoords) {
+    if (isNonLinearTransformCoords) {
         return {
             base: emptyPosition,
             rightVector: { top: 0, left: 1 },

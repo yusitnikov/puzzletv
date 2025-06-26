@@ -189,7 +189,7 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     transformCoords?(coords: Position, context: PuzzleContext<T>): Position;
 
     // true if transformCoords() doesn't distribute the coords evenly (if it has distortion)
-    isOddTransformCoords?: boolean;
+    isNonLinearTransformCoords?: boolean;
 
     // Get rectangles of non-modified coords that get the same transformation matrix by transformCoords
     getRegionsWithSameCoordsTransformation?(context: PuzzleContext<T>, isImportingPuzzle?: boolean): GridRegion[];
