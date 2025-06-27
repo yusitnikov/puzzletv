@@ -176,13 +176,15 @@ export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
                                 const fullValue: CellInfo = { ...value, distance };
                                 cellsInfo[cell.top] ??= {};
                                 cellsInfo[cell.top][cell.left] = fullValue;
-                                if (distance < bestDistance) {
-                                    bestDistance = distance;
-                                    bestStep = value.step;
-                                    bestCells = [];
-                                }
-                                if (distance === bestDistance && value.step === bestStep && value.step !== 0) {
-                                    bestCells.push(cell);
+                                if (value.step !== 0) {
+                                    if (distance < bestDistance) {
+                                        bestDistance = distance;
+                                        bestStep = value.step;
+                                        bestCells = [];
+                                    }
+                                    if (distance === bestDistance && value.step === bestStep) {
+                                        bestCells.push(cell);
+                                    }
                                 }
                                 return fullValue;
                             };
