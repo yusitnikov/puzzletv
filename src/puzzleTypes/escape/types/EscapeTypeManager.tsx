@@ -33,6 +33,7 @@ export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
 
             disableMouseHandlers: true,
             disableSelectAllCells: true,
+            disableFogDemo: true,
 
             processArrowDirection(currentCell, xDirection, yDirection, context) {
                 const newCell = {

@@ -74,6 +74,11 @@ export const RuleBoxTypeManager = <T extends AnyPTM>(
         },
 
         disableFogDemo: (context) => {
+            const { disableFogDemo } = extendedTypeManager;
+            if (disableFogDemo === true || (typeof disableFogDemo === "function" && disableFogDemo(context))) {
+                return true;
+            }
+
             if (!context.resolvedPuzzleItems.some(isRuleBoxConstraint)) {
                 return false;
             }
