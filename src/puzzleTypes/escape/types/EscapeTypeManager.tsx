@@ -249,7 +249,7 @@ export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
 
                             const monsterPosition = getEscapeMonsterAnimatedPosition(context).animatedValue;
                             return context.selectedCells.items.some(
-                                (cell) => getVectorLength(getLineVector({ start: monsterPosition, end: cell })) < 0.8,
+                                (cell) => getVectorLength(getLineVector({ start: monsterPosition, end: cell })) < 0.65,
                             );
                         },
                         (isDead) => {
