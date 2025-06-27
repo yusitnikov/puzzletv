@@ -14,6 +14,7 @@ export enum PuzzleImportPuzzleType {
     Shuffled = "shuffled",
     RushHour = "rush-hour",
     MergedCells = "merged-cells",
+    Escape = "escape",
 }
 
 export enum PuzzleImportDigitType {

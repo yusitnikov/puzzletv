@@ -298,6 +298,10 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     importOptionOverrides?: (context: PuzzleContext<T>) => Partial<PuzzleImportOptions>;
 
     getHiddenLines?: (context: PuzzleContext<T>) => PuzzleLine[];
+
+    disableMouseHandlers?: boolean;
+
+    disableSelectAllCells?: boolean;
 }
 
 // region Helper functions

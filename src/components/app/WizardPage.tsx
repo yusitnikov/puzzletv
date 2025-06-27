@@ -157,6 +157,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
             PuzzleImportPuzzleType.RushHour,
             PuzzleImportPuzzleType.Shuffled,
             PuzzleImportPuzzleType.MergedCells,
+            PuzzleImportPuzzleType.Escape,
         ].includes(type);
     const supportsExtraGrids =
         isJigsawLike || [PuzzleImportPuzzleType.Regular, PuzzleImportPuzzleType.RotatableCube].includes(type);
@@ -409,6 +410,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                     <option value={PuzzleImportPuzzleType.Shuffled}>Shuffled</option>
                                     <option value={PuzzleImportPuzzleType.RushHour}>Rush hour</option>
                                     <option value={PuzzleImportPuzzleType.MergedCells}>Merged cells</option>
+                                    <option value={PuzzleImportPuzzleType.Escape}>Narrow escape</option>
                                 </Select>
                             </label>
                         </Paragraph>

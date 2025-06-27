@@ -543,19 +543,22 @@ export const gameStateSelectAllCells = <T extends AnyPTM>(context: PuzzleContext
         puzzleIndex,
         puzzle: {
             gridSize: { rowsCount, columnsCount },
+            typeManager: { disableSelectAllCells },
         },
     } = context;
 
-    return gameStateSetSelectedCells(
-        context,
-        indexes(rowsCount)
-            .flatMap((top) => indexes(columnsCount).map((left) => ({ left, top })))
-            .filter((cell) => isSelectableCell(puzzleIndex.getCellTypeProps(cell))),
-    );
+    return disableSelectAllCells
+        ? {}
+        : gameStateSetSelectedCells(
+              context,
+              indexes(rowsCount)
+                  .flatMap((top) => indexes(columnsCount).map((left) => ({ left, top })))
+                  .filter((cell) => isSelectableCell(puzzleIndex.getCellTypeProps(cell))),
+          );
 };
 
 export const gameStateClearSelectedCells = <T extends AnyPTM>(context: PuzzleContext<T>): PartialGameStateEx<T> =>
-    context.selectedCellsCount
+    context.selectedCellsCount && !context.puzzle.typeManager.disableMouseHandlers
         ? {
               selectedCells: context.allSelectedCells.clear(),
           }

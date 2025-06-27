@@ -69,6 +69,7 @@ export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }
         gridWrapperComponent: GridWrapper = PassThrough,
         gridFitsWrapper,
         gridControlsComponent: GridControls,
+        disableMouseHandlers,
     } = typeManager;
 
     const autoIncrementId = useAutoIncrementId();
@@ -342,7 +343,7 @@ export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }
                                                 )}
                                             </g>
 
-                                            {isReady && !region?.noInteraction && (
+                                            {isReady && !disableMouseHandlers && !region?.noInteraction && (
                                                 <g data-layer="mouse-handler">
                                                     {/* Render mouse handlers for outside cells with no clipping first */}
                                                     {renderCellsLayer(
