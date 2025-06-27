@@ -108,18 +108,19 @@ const EscapeMonster = observer(function EscapeMonsterFc({ context }: ConstraintP
 
                 return (
                     <g key={`eye${index}`}>
-                        <circle
+                        <ellipse
                             cx={eyePosition.left}
                             cy={eyePosition.top}
-                            r={0.08}
+                            rx={0.08}
+                            ry={0.06}
                             strokeWidth={lineWidth}
                             stroke={lineColor}
                             fill={"#fff"}
                         />
 
                         <circle
-                            cx={eyePosition.left + direction.left * 0.05}
-                            cy={eyePosition.top + direction.top * 0.05}
+                            cx={eyePosition.left + direction.left * 0.04}
+                            cy={eyePosition.top + direction.top * 0.04}
                             r={lineWidth}
                             strokeWidth={0}
                             stroke={"none"}
