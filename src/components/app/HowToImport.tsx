@@ -42,6 +42,7 @@ import {
     RandomFractional3x3Source,
 } from "../../data/puzzles/FractionalSudoku";
 import { translate } from "../../utils/translate";
+import { NarrowEscapeBoss, NarrowEscapeBossSource } from "../../data/puzzles/NarrowEscape";
 
 export const HowToImport = observer(function HowToImport() {
     profiler.trace();
@@ -825,6 +826,43 @@ export const HowToImport = observer(function HowToImport() {
                                     })}
                                     .
                                 </p>
+                            </>
+                        ),
+                    },
+                    {
+                        id: "narrow-escape",
+                        title: (
+                            <ExampleTab
+                                title={translate({ [LanguageCode.en]: "Narrow escape" })}
+                                puzzle={NarrowEscapeBoss}
+                            />
+                        ),
+                        contents: (
+                            <>
+                                <p>{translate(selectGridTypeTranslation("Narrow escape"))}.</p>
+                                <p>
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            "Use cosmetic rectangle to mark the initial position of the player",
+                                        [LanguageCode.ru]:
+                                            "Используйте косметический квадрат, чтобы отметить начальную позицию игрока",
+                                        [LanguageCode.de]:
+                                            "Verwenden Sie einen kosmetischen Rechteck, um die Anfangsposition des Spielers zu markieren",
+                                    })}
+                                    .{" "}
+                                    {translate({
+                                        [LanguageCode.en]:
+                                            "Use cosmetic circle to mark the initial position of the monster",
+                                        [LanguageCode.ru]:
+                                            "Используйте косметический круг, чтобы отметить начальную позицию монстра",
+                                        [LanguageCode.de]:
+                                            "Verwenden Sie einen kosmetischen Kreis, um die Anfangsposition des Monster zu markieren",
+                                    })}
+                                    . {translate(seeIllustration)}:
+                                </p>
+                                <MappingIllustration
+                                    puzzle={(plain) => (plain ? NarrowEscapeBossSource : NarrowEscapeBoss)}
+                                />
                             </>
                         ),
                     },
