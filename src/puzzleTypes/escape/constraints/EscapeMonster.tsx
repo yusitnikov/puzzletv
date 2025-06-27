@@ -66,7 +66,7 @@ const EscapeMonster = observer(function EscapeMonsterFc({ context }: ConstraintP
     const monsterPosition = getEscapeMonsterAnimatedPosition(context).animatedValue;
     const playerPosition = context.lastSelectedCell ?? context.puzzle.extension.playerStartPosition;
 
-    const teethOffset = 1 + Math.cos(rafTime() * 0.015);
+    const teethOffset = context.isReadonlyContext ? 0 : 1 + Math.cos(rafTime() * 0.015);
 
     return (
         <AutoSvg top={monsterPosition.top + 0.5} left={monsterPosition.left + 0.5}>
