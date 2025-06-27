@@ -18,6 +18,7 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { EscapeKeyboardListenerConstraint } from "../constraints/EscapeKeyboardListener";
 import { escapeMonsterAnimationSpeed } from "./EscapeMonsterAnimationSpeed";
 import { RulesParagraph } from "../../../components/puzzle/rules/RulesParagraph";
+import { isFog } from "../../../components/puzzle/constraints/fog/Fog";
 
 export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
     addGameStateExToPuzzleTypeManager(
@@ -60,6 +61,8 @@ export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
                     throw new Error("Didn't find the narrow escape monster's start position");
                 }
 
+                const fogConstraints = items.filter(isFog);
+
                 return {
                     ...puzzle,
                     saveState: false,
@@ -67,10 +70,12 @@ export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
                         playerStartPosition: player.cells[0],
                         monsterStartPosition: monster.cells[0],
                     },
+                    prioritizeSelection: false,
                     items: [
-                        ...items.filter((item) => item !== player && item !== monster),
+                        ...items.filter((item) => item !== player && item !== monster && !isFog(item)),
                         EscapeMonsterConstraint,
                         EscapeKeyboardListenerConstraint,
+                        ...fogConstraints,
                     ],
                     rules: (context) => (
                         <>

@@ -365,5 +365,8 @@ export const FogConstraint = <T extends AnyPTM>({
     },
 });
 
+export const isFog = <T extends AnyPTM>(item: Constraint<T, any>): item is Constraint<T, FogProps<T>> =>
+    item.tags?.includes(fogTag) ?? false;
+
 export const getFogPropsByContext = <T extends AnyPTM>(context: PuzzleContext<T>): FogProps<T> | undefined =>
-    context.allItems.find(({ tags }) => tags?.includes(fogTag))?.props;
+    context.allItems.find(isFog)?.props;

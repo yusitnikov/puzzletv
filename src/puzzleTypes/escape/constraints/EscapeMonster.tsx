@@ -178,5 +178,5 @@ export const EscapeMonsterConstraint: Constraint<EscapePTM> = {
     name: "monster",
     cells: [],
     props: undefined,
-    component: { [GridLayer.top]: EscapeMonster },
+    component: { [GridLayer.regular]: EscapeMonster },
 };
