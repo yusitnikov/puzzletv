@@ -8,6 +8,7 @@ import { normalizeVector, Position } from "../../../types/layout/Position";
 import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import { rafTime } from "../../../hooks/useRaf";
 import { getEscapeMonsterAnimatedPosition } from "../types/EscapeTypeManager";
+import { escapeMonsterAnimationSpeed } from "../types/EscapeMonsterAnimationSpeed";
 
 const lineWidth = 0.03;
 const lineColor = blackColor;
@@ -66,7 +67,9 @@ const EscapeMonster = observer(function EscapeMonsterFc({ context }: ConstraintP
     const monsterPosition = getEscapeMonsterAnimatedPosition(context).animatedValue;
     const playerPosition = context.lastSelectedCell ?? context.puzzle.extension.playerStartPosition;
 
-    const teethOffset = context.isReadonlyContext ? 0 : 1 + Math.cos(rafTime() * 0.015);
+    const teethOffset = context.isReadonlyContext
+        ? 0
+        : 1 + Math.cos((rafTime() * 8) / escapeMonsterAnimationSpeed.get());
 
     return (
         <AutoSvg top={monsterPosition.top + 0.5} left={monsterPosition.left + 0.5}>
