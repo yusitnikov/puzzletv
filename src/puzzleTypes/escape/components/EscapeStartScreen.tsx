@@ -12,6 +12,8 @@ export const EscapeStartScreen = observer(function EscapeStartScreenFc({ context
         return null;
     }
 
+    const cellSize = context.cellSizeForSidePanel;
+
     const startGame = () => {
         context.onStateChange({
             extension: {
@@ -31,7 +33,7 @@ export const EscapeStartScreen = observer(function EscapeStartScreenFc({ context
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                fontSize: `${context.cellSize / 3}px`,
+                fontSize: `${cellSize / 3}px`,
             }}
         >
             <div
@@ -39,16 +41,16 @@ export const EscapeStartScreen = observer(function EscapeStartScreenFc({ context
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: context.cellSize / 3,
+                    gap: cellSize / 3,
                     maxWidth: "90%",
                     boxSizing: "border-box",
                     background: "#fff",
                     border: `1px solid ${textColor}`,
-                    borderRadius: context.cellSize / 5,
-                    padding: context.cellSize / 2,
+                    borderRadius: cellSize / 5,
+                    padding: cellSize / 2,
                 }}
             >
-                <div style={{ marginBottom: context.cellSize / 3, fontSize: "120%", fontWeight: 700 }}>
+                <div style={{ marginBottom: cellSize / 3, fontSize: "120%", fontWeight: 700 }}>
                     {translate({
                         [LanguageCode.en]: "Are you ready?",
                         [LanguageCode.ru]: "Вы готовы?",
