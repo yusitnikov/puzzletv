@@ -41,7 +41,9 @@ export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
                     left: currentCell.left + xDirection,
                 };
 
-                return isValidCell(newCell, context) ? { cell: newCell } : {};
+                return {
+                    cell: isValidCell(newCell, context) ? newCell : currentCell,
+                };
             },
 
             postProcessPuzzle(puzzle: PuzzleDefinition<EscapePTM>): PuzzleDefinition<EscapePTM> {
