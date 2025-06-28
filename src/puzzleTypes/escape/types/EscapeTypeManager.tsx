@@ -74,7 +74,7 @@ export const EscapeTypeManager = (): PuzzleTypeManager<EscapePTM> =>
                     prioritizeSelection: false,
                     items: [
                         ...items.filter((item) => item !== player && item !== monster && !isFog(item)),
-                        EscapeMonsterConstraint,
+                        EscapeMonsterConstraint(fogConstraints.length !== 0),
                         EscapeKeyboardListenerConstraint,
                         ...fogConstraints,
                     ],

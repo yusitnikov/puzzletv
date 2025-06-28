@@ -177,9 +177,9 @@ const EscapeMonster = observer(function EscapeMonsterFc({ context }: ConstraintP
     );
 });
 
-export const EscapeMonsterConstraint: Constraint<EscapePTM> = {
+export const EscapeMonsterConstraint = (hasFog: boolean): Constraint<EscapePTM> => ({
     name: "monster",
     cells: [],
     props: undefined,
-    component: { [GridLayer.regular]: EscapeMonster },
-};
+    component: { [hasFog ? GridLayer.regular : GridLayer.top]: EscapeMonster },
+});
