@@ -97,7 +97,7 @@ export const EscapeStartScreen = observer(function EscapeStartScreenFc({ context
                 </div>
 
                 <Button autoFocus={true} onClick={startGame}>
-                    Start
+                    {translate("Start the game")}
                 </Button>
             </div>
         </div>
