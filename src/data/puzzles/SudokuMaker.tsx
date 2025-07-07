@@ -185,10 +185,12 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                     }
                 },
                 constraints: (constraints) => {
-                    for (const { name, disabled, ...constraint } of constraints) {
+                    for (const { name, disabled, solverIgnored = false, ...constraint } of constraints) {
                         if (disabled) {
                             continue;
                         }
+
+                        importer.toggleImportCosmeticConstraints(solverIgnored);
 
                         switch (constraint.type) {
                             case ConstraintType.Givens:
@@ -1103,6 +1105,8 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                 console.warn("Unrecognized SudokuMaker constraint type", (constraint as any).type);
                                 break;
                         }
+
+                        importer.toggleImportCosmeticConstraints(false);
                     }
                 },
                 name: (title) => importer.setTitle(title),
@@ -1244,11 +1248,12 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
     }
     get hasCosmeticElements() {
         return this.puzzleJson.constraints.some(
-            ({ type, disabled }) =>
+            ({ type, disabled, solverIgnored }) =>
                 !disabled &&
-                [ConstraintType.CosmeticLine, ConstraintType.CosmeticCage, ConstraintType.CosmeticSymbol].includes(
-                    type,
-                ),
+                (solverIgnored ||
+                    [ConstraintType.CosmeticLine, ConstraintType.CosmeticCage, ConstraintType.CosmeticSymbol].includes(
+                        type,
+                    )),
         );
     }
     get hasSolutionColors() {

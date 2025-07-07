@@ -660,6 +660,7 @@ export interface CompressedCosmeticConfig {
 export type CompressedConstraint = (ConstraintConfig | CompressedCosmeticConfig) & {
     name?: string;
     disabled?: boolean;
+    solverIgnored?: boolean;
 };
 
 export type CompressedSpec = {

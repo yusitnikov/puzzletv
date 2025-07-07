@@ -1,7 +1,12 @@
 import { Position, PositionLiteral, PositionSet } from "../../types/layout/Position";
 import { CellsMap } from "../../types/puzzle/CellsMap";
 import { CellColorValue } from "../../types/puzzle/CellColor";
-import { Constraint, isValidFinishedPuzzleByConstraints, toInvisibleConstraint } from "../../types/puzzle/Constraint";
+import {
+    Constraint,
+    isValidFinishedPuzzleByConstraints,
+    toDecorativeConstraint,
+    toInvisibleConstraint,
+} from "../../types/puzzle/Constraint";
 import {
     allDrawingModes,
     importGivenColorsAsSolution,
@@ -93,6 +98,10 @@ export class PuzzleImporter<T extends AnyPTM> {
     private emptyContextCache?: PuzzleContext<T>;
     private inactiveCells: PositionSet;
     private importedTitle = false;
+    /**
+     * Turn all new constraints into cosmetics when this flag is on
+     */
+    private importCosmeticConstraints = false;
 
     constructor(
         slug: string,
@@ -289,6 +298,12 @@ export class PuzzleImporter<T extends AnyPTM> {
         });
         if (regions.length > 1 || (this.typeManager.supportSingleRegion && regions.length === 1)) {
             this.regions.push(...regions);
+            if (this.importCosmeticConstraints) {
+                this.puzzle.typeManager = {
+                    ...this.puzzle.typeManager,
+                    cosmeticRegions: true,
+                };
+            }
         }
     }
 
@@ -296,7 +311,15 @@ export class PuzzleImporter<T extends AnyPTM> {
         this.puzzle.disableSudokuRules = !enable;
     }
 
+    toggleImportCosmeticConstraints(enable: boolean) {
+        this.importCosmeticConstraints = enable;
+    }
+
     addItems(...items: Constraint<T, any>[]) {
+        if (this.importCosmeticConstraints) {
+            items = items.map(toDecorativeConstraint);
+        }
+
         this.items.push(...items);
     }
 
@@ -940,7 +963,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             case "number":
                 if (this.finalImportOptions(gridParser).fillableDigitalDisplay) {
                     // TODO: extract to a type manager
-                    this.items.push(FillableCalculatorDigitConstraint({ top: offsetTop, left: offsetLeft }, value));
+                    this.addItems(FillableCalculatorDigitConstraint({ top: offsetTop, left: offsetLeft }, value));
                 } else {
                     if (gridParser.hasSolution) {
                         this.addSolutionDigit(gridParser, top, left, value);
