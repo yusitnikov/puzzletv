@@ -2,7 +2,6 @@ import { defaultProcessArrowDirection, PuzzleTypeManager } from "../../../types/
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { createRegularRegions, GridSize } from "../../../types/puzzle/GridSize";
 import { isSamePosition, Position, PositionWithAngle } from "../../../types/layout/Position";
-import { Rect } from "../../../types/layout/Rect";
 import { darkGreyColor, getRegionBorderWidth } from "../../../components/app/globals";
 import { RegionConstraint } from "../../../components/puzzle/constraints/region/Region";
 import { indexes } from "../../../utils/indexes";
@@ -16,6 +15,7 @@ import { MonumentValleyPTM } from "./MonumentValleyPTM";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { rotateDigit } from "../../../components/puzzle/digit/DigitComponentType";
 import { CellTypeProps } from "../../../types/puzzle/CellTypeProps";
+import { GridRegion, transformCoordsByRegions } from "../../../types/puzzle/GridRegion";
 
 export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
     ...RotatableDigitTypeManagerBase(DigitPuzzleTypeManager(), 0, 120, true, false, false),
@@ -165,73 +165,20 @@ export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
         return { cell };
     },
 
-    transformCoords({ top, left }, { puzzle }) {
-        const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyGridSize(puzzle.gridSize);
-
-        const coeff = Math.sqrt(0.75);
-        const centerX = columnsCount / 2;
-        const centerY = rowsCount / 2 + (gridSize / 2 - intersectionSize) / Math.sqrt(3);
-
-        if (left <= gridSize) {
-            if (top < intersectionSize) {
-                return {
-                    left: centerX + (left - gridSize) * coeff + (intersectionSize - top) * coeff,
-                    top:
-                        centerY -
-                        (gridSize - intersectionSize * 2) * coeff +
-                        (top - intersectionSize) / 2 -
-                        (gridSize - left) / 2,
-                };
-            } else if (top < gridSize - intersectionSize) {
-                return {
-                    left: gridSize + (left - gridSize) * coeff + (gridSize - intersectionSize - top) / 2,
-                    top: centerY + (top - (gridSize - intersectionSize)) * coeff - (gridSize - left) / 2,
-                };
-            } else {
-                return {
-                    left: gridSize + (left - gridSize) * coeff,
-                    top: centerY + (top - (gridSize - intersectionSize)) - (gridSize - left) / 2,
-                };
-            }
-        } else if (left < columnsCount - gridSize) {
-            return {
-                left,
-                top: centerY + (top - (gridSize - intersectionSize)),
-            };
-        } else {
-            const right = columnsCount - left;
-            if (top < intersectionSize) {
-                return {
-                    left: centerX - (right - gridSize) * coeff - (intersectionSize - top) * coeff,
-                    top:
-                        centerY -
-                        (gridSize - intersectionSize * 2) * coeff +
-                        (top - intersectionSize) / 2 -
-                        (gridSize - right) / 2,
-                };
-            } else if (top < gridSize - intersectionSize) {
-                return {
-                    left:
-                        columnsCount - gridSize + (gridSize - right) * coeff - (gridSize - intersectionSize - top) / 2,
-                    top: centerY + (top - (gridSize - intersectionSize)) * coeff - (gridSize - right) / 2,
-                };
-            } else {
-                return {
-                    left: columnsCount - gridSize + (gridSize - right) * coeff,
-                    top: centerY + (top - (gridSize - intersectionSize)) - (gridSize - right) / 2,
-                };
-            }
-        }
-    },
+    transformCoords: transformCoordsByRegions,
 
     getRegionsWithSameCoordsTransformation({
         puzzle: { regions, gridSize: originalGridSize, gridMargin = 0 },
         cellSize,
-    }): Rect[] {
+    }): GridRegion[] {
         const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyGridSize(originalGridSize);
 
         const fullMargin = gridMargin + 1;
         const borderWidth = regions?.length ? getRegionBorderWidth(cellSize) : 1 / cellSize;
+
+        const coeff = Math.sqrt(0.75);
+        const centerX = columnsCount / 2;
+        const centerY = rowsCount / 2 + (gridSize / 2 - intersectionSize) / Math.sqrt(3);
 
         return [
             {
@@ -239,48 +186,118 @@ export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
                 top: -fullMargin,
                 width: gridSize + fullMargin,
                 height: intersectionSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    top -= intersectionSize;
+                    left -= gridSize;
+
+                    return {
+                        left: centerX + left * coeff - top * coeff,
+                        top: centerY - (gridSize - intersectionSize * 2) * coeff + top / 2 + left / 2,
+                    };
+                },
             },
             {
                 left: -fullMargin,
                 top: intersectionSize,
                 width: gridSize + fullMargin,
                 height: gridSize - intersectionSize * 2,
+                transformCoords: ({ top, left }) => {
+                    top -= gridSize - intersectionSize;
+                    left -= gridSize;
+
+                    return {
+                        left: gridSize + left * coeff - top / 2,
+                        top: centerY + top * coeff + left / 2,
+                    };
+                },
             },
             {
                 left: -fullMargin,
                 top: rowsCount - gridSize,
                 width: gridSize + fullMargin,
                 height: gridSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    top -= gridSize - intersectionSize;
+                    left -= gridSize;
+
+                    return {
+                        left: gridSize + left * coeff,
+                        top: centerY + top + left / 2,
+                    };
+                },
             },
             {
                 left: gridSize + borderWidth,
                 top: 0,
                 width: gridSize - intersectionSize * 2 - borderWidth * 2,
                 height: rowsCount - gridSize,
+                transformCoords: ({ top, left }) => {
+                    top -= gridSize - intersectionSize;
+
+                    return {
+                        left,
+                        top: centerY + top,
+                    };
+                },
             },
             {
                 left: gridSize,
                 top: rowsCount - gridSize,
                 width: gridSize - intersectionSize * 2,
                 height: gridSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    top -= gridSize - intersectionSize;
+
+                    return {
+                        left,
+                        top: centerY + top,
+                    };
+                },
             },
             {
                 left: columnsCount - gridSize + intersectionSize,
                 top: -fullMargin,
                 width: gridSize - intersectionSize + fullMargin,
                 height: intersectionSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    left -= columnsCount - gridSize;
+                    top -= intersectionSize;
+
+                    return {
+                        left: centerX + left * coeff + top * coeff,
+                        top: centerY - (gridSize - intersectionSize * 2) * coeff + top / 2 - left / 2,
+                    };
+                },
             },
             {
                 left: columnsCount - gridSize,
                 top: intersectionSize,
                 width: gridSize + fullMargin,
                 height: gridSize - intersectionSize * 2,
+                transformCoords: ({ top, left }) => {
+                    left -= columnsCount - gridSize;
+                    top -= gridSize - intersectionSize;
+
+                    return {
+                        left: columnsCount - gridSize + left * coeff + top / 2,
+                        top: centerY + top * coeff - left / 2,
+                    };
+                },
             },
             {
                 left: columnsCount - gridSize,
                 top: rowsCount - gridSize,
                 width: gridSize + fullMargin,
                 height: gridSize + fullMargin,
+                transformCoords: ({ top, left }) => {
+                    left -= columnsCount - gridSize;
+                    top -= gridSize - intersectionSize;
+
+                    return {
+                        left: columnsCount - gridSize + left * coeff,
+                        top: centerY + top - left / 2,
+                    };
+                },
             },
         ];
     },

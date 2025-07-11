@@ -2,7 +2,7 @@ import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { CustomCellBounds } from "../../../types/puzzle/CustomCellBounds";
 import { getRectPoints, Rect } from "../../../types/layout/Rect";
-import { GridRegion } from "../../../types/puzzle/GridRegion";
+import { GridRegion, transformCoordsByRegions } from "../../../types/puzzle/GridRegion";
 import { Position } from "../../../types/layout/Position";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { indexes } from "../../../utils/indexes";
@@ -163,38 +163,7 @@ export const InfiniteRingsTypeManager = <T extends AnyPTM>(
                 }
             }
         },
-        transformCoords({ top, left }, context): Position {
-            const {
-                puzzle: {
-                    gridSize: { rowsCount: gridSize },
-                },
-                animatedScaleLog: ringOffset,
-            } = context;
-            const ringsCount = gridSize / 2 - 1;
-            const visibleRingsCount = isShowingAllInfiniteRings(context, visibleRingsCountArg)
-                ? ringsCount
-                : visibleRingsCountArg;
-            const loopedRingOffset = loop(ringOffset, ringsCount);
-            const unscaleCoeff = Math.pow(2, ringsCount);
-            const scaleCoeff = Math.pow(2, loopedRingOffset) / unscaleCoeff;
-
-            top -= 2;
-            left -= 2;
-
-            top *= scaleCoeff;
-            left *= scaleCoeff;
-
-            const blackRectSize = 2 / Math.pow(2, visibleRingsCount);
-            if (Math.abs(top) <= blackRectSize && Math.abs(left) <= blackRectSize) {
-                top *= unscaleCoeff;
-                left *= unscaleCoeff;
-            }
-
-            top += 2;
-            left += 2;
-
-            return { top, left };
-        },
+        transformCoords: transformCoordsByRegions,
         getRegionsWithSameCoordsTransformation({
             puzzle: {
                 gridSize: { rowsCount: gridSize },

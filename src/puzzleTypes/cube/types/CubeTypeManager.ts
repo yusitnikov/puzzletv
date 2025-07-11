@@ -2,13 +2,13 @@ import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { createRegularRegions, GridSize } from "../../../types/puzzle/GridSize";
 import { Position, PositionWithAngle } from "../../../types/layout/Position";
-import { Rect } from "../../../types/layout/Rect";
 import { darkGreyColor } from "../../../components/app/globals";
 import { indexes } from "../../../utils/indexes";
 import { RegionConstraint } from "../../../components/puzzle/constraints/region/Region";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { NumberPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { CellTypeProps } from "../../../types/puzzle/CellTypeProps";
+import { GridRegion, transformCoordsByRegions } from "../../../types/puzzle/GridRegion";
 
 export const CubeTypeManager = (continuousRowColumnRegions: boolean): PuzzleTypeManager<NumberPTM> => ({
     ...DigitPuzzleTypeManager(),
@@ -24,9 +24,9 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): PuzzleType
             },
         },
         basePosition,
-        dataSet,
-        dataIndex,
-        positionFunction,
+        _dataSet,
+        _dataIndex,
+        _positionFunction,
         cellPosition,
     ): PositionWithAngle | undefined {
         const position = basePosition;
@@ -41,35 +41,13 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): PuzzleType
         };
     },
 
-    transformCoords(
-        { top, left },
-        {
-            puzzle: {
-                gridSize: { gridSize },
-            },
-        },
-    ) {
-        const realGridSize = gridSize / 2;
-
-        if (top < realGridSize) {
-            return {
-                left: realGridSize + left - top,
-                top: (left + top) / 2,
-            };
-        }
-
-        return {
-            left: left,
-            top: top - Math.abs(left - realGridSize) / 2,
-        };
-    },
-
+    transformCoords: transformCoordsByRegions,
     getRegionsWithSameCoordsTransformation({
         puzzle: {
             gridSize: { gridSize },
             gridMargin = 0,
         },
-    }): Rect[] {
+    }): GridRegion[] {
         const realGridSize = gridSize / 2;
         const fullMargin = gridMargin + gridSize;
 
@@ -79,18 +57,30 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): PuzzleType
                 top: -fullMargin,
                 width: realGridSize + fullMargin,
                 height: realGridSize + fullMargin,
+                transformCoords: ({ top, left }) => ({
+                    left: realGridSize + left - top,
+                    top: (left + top) / 2,
+                }),
             },
             {
                 left: -fullMargin,
                 top: realGridSize,
                 width: realGridSize + fullMargin,
                 height: realGridSize + fullMargin,
+                transformCoords: ({ top, left }) => ({
+                    left,
+                    top: top + (left - realGridSize) / 2,
+                }),
             },
             {
                 left: realGridSize,
                 top: realGridSize,
                 width: realGridSize + fullMargin,
                 height: realGridSize + fullMargin,
+                transformCoords: ({ top, left }) => ({
+                    left,
+                    top: top - (left - realGridSize) / 2,
+                }),
             },
         ];
     },
