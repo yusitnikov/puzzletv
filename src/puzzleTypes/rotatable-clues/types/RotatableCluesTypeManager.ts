@@ -88,11 +88,10 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
                         const {
                             pivot: { top, left },
                         } = clues[index];
-                        const data = context.getCellDigit(top, left);
-                        if (data === undefined) {
+                        const digit = context.getCellDigit(top, left);
+                        if (digit === undefined) {
                             return manualAngle;
                         }
-                        const digit = puzzle.typeManager.getDigitByCellData(data, context, { top, left });
                         const forcedAngle = digit * angleStep;
                         // Find the closest angle to the manual angle, so that we don't have weird animation (but rotate only clockwise)
                         return isEquivalentLoop ? manualAngle + loop(forcedAngle - manualAngle, 360) : forcedAngle;

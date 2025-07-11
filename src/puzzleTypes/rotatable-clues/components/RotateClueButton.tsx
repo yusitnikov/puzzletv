@@ -34,7 +34,7 @@ export const RotateClueButton = <T extends AnyPTM>(direction: number) =>
             .filter(
                 ({ pivot }) =>
                     context.isSelectedCell(pivot.top, pivot.left) &&
-                    (freeRotation || context.getCellDigit(pivot.top, pivot.left) === undefined),
+                    (freeRotation || context.getCellData(pivot.top, pivot.left) === undefined),
             )
             .map(({ index }) => index);
 

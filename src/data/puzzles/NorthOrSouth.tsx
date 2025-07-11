@@ -171,7 +171,7 @@ export const NorthOrSouth2: typeof NorthOrSouth = {
     lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000AJB",
     getLmdSolutionCode: (context) =>
         indexes(9)
-            .map((left) => (context.getCellDigit(8, left) ?? context.puzzle.initialDigits?.[8]?.[left])?.digit)
+            .map((left) => context.getCellDigit(8, left))
             .join(""),
 };
 

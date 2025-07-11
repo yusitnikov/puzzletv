@@ -37,7 +37,7 @@ export const TenInOneTypeManager = (
                 const initialDigits: CellsMap<number> = {};
                 for (const { top, left } of remainingCells) {
                     initialDigits[top] = initialDigits[top] || {};
-                    initialDigits[top][left] = context.getCellDigit(top, left)!;
+                    initialDigits[top][left] = context.getCellData(top, left)!;
                 }
 
                 return {

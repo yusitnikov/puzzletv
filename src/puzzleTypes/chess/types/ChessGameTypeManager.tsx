@@ -136,12 +136,12 @@ export const ChessGameTypeManager: PuzzleTypeManager<ChessPTM> = {
 };
 
 export const makeChessMove = (context: PuzzleContext<ChessPTM>, from: Position, to: Position) => {
-    const piece = context.getCellDigit(from.top, from.left);
+    const piece = context.getCellData(from.top, from.left);
     if (!piece) {
         return;
     }
 
-    const capturedPiece = context.getCellDigit(to.top, to.left);
+    const capturedPiece = context.getCellData(to.top, to.left);
     if (capturedPiece?.color === piece.color) {
         return;
     }

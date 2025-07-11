@@ -34,7 +34,7 @@ export const FogStarsTypeManager = <T extends AnyPTM>(baseTypeManager: PuzzleTyp
                         .flatMap(({ cells }) => cells)
                         .filter(
                             ({ top, left }) =>
-                                fogVisibleCells[top]?.[left] && context.getCellDigit(top, left) === undefined,
+                                fogVisibleCells[top]?.[left] && context.getCellData(top, left) === undefined,
                         );
                     return visibleStars.length !== 0 && !arrayContainsPosition(visibleStars, cell);
                 },

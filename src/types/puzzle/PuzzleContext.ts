@@ -444,12 +444,18 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         },
         { equals: (a, b) => areCellStatesEqual(this, a, b) },
     );
-    readonly getCellDigit = computedFn(
-        function getCellDigit(this: PuzzleContext<T>, top: number, left: number) {
-            return this.getCell(top, left)?.usersDigit;
+    readonly getCellData = computedFn(
+        function getCellData(this: PuzzleContext<T>, top: number, left: number): T["cell"] | undefined {
+            return this.getCell(top, left)?.usersDigit ?? this.allInitialDigits[top]?.[left];
         },
         { equals: comparer.structural },
     );
+    readonly getCellDigit = computedFn(function getCellDigit(this: PuzzleContext<T>, top: number, left: number) {
+        const cellData = this.getCellData(top, left);
+        return cellData !== undefined
+            ? this.puzzle.typeManager.getDigitByCellData(cellData, this, { top, left })
+            : undefined;
+    });
     // noinspection JSUnusedGlobalSymbols
     readonly getCellCenterDigits = computedFn(
         function getCellCenterDigits(this: PuzzleContext<T>, top: number, left: number) {
