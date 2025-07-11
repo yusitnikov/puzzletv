@@ -55,7 +55,7 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
     saveStateKey: "toroidal-yin-yang-v2",
     typeManager: DigitPuzzleTypeManager(),
     gridSize: createRegularGridSize(10),
-    digitsCount: 0,
+    maxDigit: 0,
     loopHorizontally: true,
     loopVertically: true,
     gridMargin: 0.99,

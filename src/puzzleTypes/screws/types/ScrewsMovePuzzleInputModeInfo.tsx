@@ -81,7 +81,7 @@ export const ScrewsMovePuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputMo
         },
         mode: PuzzleInputMode.move,
         isNoSelectionMode: true,
-        digitsCount: 0,
+        maxDigit: 0,
         mainButtonContent: ScrewsMoveButton,
         hotKeyStr: base.hotKeyStr,
         isValidGesture: base.isValidGesture,

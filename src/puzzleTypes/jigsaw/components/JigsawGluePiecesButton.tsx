@@ -136,7 +136,7 @@ export const JigsawGluePiecesButton = observer(function JigsawGluePiecesButton({
         }
     });
 
-    if (context.digitsCountInCurrentMode > 6) {
+    if (context.maxDigitInCurrentMode > 6) {
         return null;
     }
 

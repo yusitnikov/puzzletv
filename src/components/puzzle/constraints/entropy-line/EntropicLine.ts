@@ -82,9 +82,9 @@ export const EntropicLineConstraint = <T extends AnyPTM>(
         "entropic line",
         cellLiterals,
         [
-            (digit, { digitsCount }) => digit * 3 <= digitsCount,
-            (digit, { digitsCount }) => digit * 3 > digitsCount && digit * 3 <= digitsCount * 2,
-            (digit, { digitsCount }) => digit * 3 > digitsCount * 2,
+            (digit, { maxDigit }) => digit * 3 <= maxDigit,
+            (digit, { maxDigit }) => digit * 3 > maxDigit && digit * 3 <= maxDigit * 2,
+            (digit, { maxDigit }) => digit * 3 > maxDigit * 2,
         ],
         split,
         color,

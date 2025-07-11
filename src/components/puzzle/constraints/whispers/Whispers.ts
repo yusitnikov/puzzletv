@@ -15,8 +15,8 @@ export const WhispersConstraint = <T extends AnyPTM>(
         true,
         color,
         cellLiterals,
-        (digit1, digit2, { digitsCount }) => {
-            return Math.abs(digit1 - digit2) >= (minDifference ?? Math.ceil(digitsCount / 2));
+        (digit1, digit2, { maxDigit }) => {
+            return Math.abs(digit1 - digit2) >= (minDifference ?? Math.ceil(maxDigit / 2));
         },
         width,
         split,

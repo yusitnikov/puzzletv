@@ -310,5 +310,5 @@ export const SokobanMovePlayerPuzzleInputModeInfo: PuzzleInputModeInfo<SokobanPT
     hotKeyStr: base.hotKeyStr,
     mainButtonContent: ButtonComponent,
     isNoSelectionMode: true,
-    digitsCount: 0,
+    maxDigit: 0,
 };

@@ -47,7 +47,7 @@ export const SparkKropki: PuzzleDefinition<NumberPTM> = {
     typeManager: SparkTypeManager,
     gridSize,
     regions: createSparkRegions(gridSize),
-    digitsCount: 8,
+    maxDigit: 8,
     rules: () => (
         <>
             <RulesParagraph>
@@ -183,7 +183,7 @@ export const EmptySpark: PuzzleDefinition<NumberPTM> = {
     typeManager: SparkTypeManager,
     gridSize,
     regions: createSparkRegions(gridSize),
-    digitsCount: 8,
+    maxDigit: 8,
     rules: () => (
         <>
             <RulesParagraph>
@@ -213,7 +213,7 @@ export const EmptySpark6x6: PuzzleDefinition<NumberPTM> = {
     typeManager: SparkTypeManager,
     gridSize: gridSize6x6,
     regions: createSparkRegions(gridSize6x6),
-    digitsCount: 9,
+    maxDigit: 9,
     rules: () => (
         <>
             <RulesParagraph>
@@ -245,7 +245,7 @@ export const Sparkster: PuzzleDefinition<NumberPTM> = {
     typeManager: SparkTypeManager,
     gridSize: gridSizeWithNote,
     regions: createSparkRegions(gridSizeWithNote),
-    digitsCount: 8,
+    maxDigit: 8,
     rules: () => (
         <>
             <RulesParagraph>

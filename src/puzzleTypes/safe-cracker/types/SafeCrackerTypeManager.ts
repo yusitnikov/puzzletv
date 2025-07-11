@@ -10,7 +10,7 @@ import { SafeCrackerStarConstraint } from "../constraints/SafeCrackerStarConstra
 import { indexes } from "../../../utils/indexes";
 import { safeCrackerArrowsPuzzleInputModeInfo } from "./LeftRightArrow";
 import { BaseSafeCrackerPuzzle } from "./BaseSafeCrackerPuzzle";
-import { getDefaultDigitsCount, PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
+import { getDefaultMaxDigit, PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { isTextConstraint } from "../../../components/puzzle/constraints/text/Text";
 import { CellMarkType, parseCellMark } from "../../../types/puzzle/CellMark";
 import { CellColor } from "../../../types/puzzle/CellColor";
@@ -34,8 +34,8 @@ export const SafeCrackerTypeManager = <T extends AnyNumberPTM>(
         ignoreRowsColumnCountInTheWrapper: true,
         extraInputModes: [...(baseTypeManager.extraInputModes ?? []), arrowsInputModeInfo],
         getCellTypeProps({ top, left }, puzzle): CellTypeProps<T> {
-            const { digitsCount = getDefaultDigitsCount(puzzle) } = puzzle;
-            if (left >= digitsCount) {
+            const { maxDigit = getDefaultMaxDigit(puzzle) } = puzzle;
+            if (left >= maxDigit) {
                 return { isVisible: false };
             }
 

@@ -87,7 +87,7 @@ export const ChessTypeManager: PuzzleTypeManager<ChessPTM> = addGameStateExToPuz
             },
         ],
 
-        maxDigitsCount: 6,
+        maxDigit: 6,
 
         digitShortcuts: [
             ["P"],

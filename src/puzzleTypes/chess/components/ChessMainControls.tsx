@@ -46,7 +46,7 @@ export const ChessMainControls = observer(function ChessMainControls({ context }
         }
     });
 
-    if (context.digitsCountInCurrentMode > 6) {
+    if (context.maxDigitInCurrentMode > 6) {
         return null;
     }
 

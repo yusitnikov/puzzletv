@@ -37,7 +37,7 @@ export const DigitControlButton = observer(function DigitControlButton<T extends
             setCurrentSecondaryButton,
         },
         cellSizeForSidePanel: cellSize,
-        digitsCountInCurrentMode: count,
+        maxDigitInCurrentMode: count,
     } = context;
 
     const currentButton = getCurrentSecondaryButton?.(context);

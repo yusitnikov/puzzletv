@@ -112,7 +112,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         caterpillar,
     } = importOptions;
 
-    const digitsCount = mainGridParser.maxDigit ?? importOptions.digitsCount ?? mainGridParser.size;
+    const maxDigit = mainGridParser.maxDigit ?? importOptions.maxDigit ?? mainGridParser.size;
 
     const regularTypeManager = DigitPuzzleTypeManager();
     const typesMap: Record<PuzzleImportPuzzleType, PuzzleTypeManager<AnyPTM>> = {
@@ -123,7 +123,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         [PuzzleImportPuzzleType.RotatableCube]: FullCubeTypeManager(),
         [PuzzleImportPuzzleType.Rotatable]: RotatableDigitTypeManager(importOptions),
         [PuzzleImportPuzzleType.SafeCracker]: SafeCrackerTypeManager({
-            size: digitsCount,
+            size: maxDigit,
             circleRegionsCount: Math.ceil((mainGridParser.size - 2) / 2),
             codeCellsCount: Math.min(mainGridParser.size, safeCrackerCodeLength),
         }),

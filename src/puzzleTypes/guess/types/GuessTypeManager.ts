@@ -95,7 +95,7 @@ export const GuessTypeManager = <T extends AnyNumberPTM>(): PuzzleTypeManager<T>
             puzzle,
             multiPlayer: { isEnabled },
             playerObjects,
-            digitsCount,
+            maxDigit,
         } = context;
 
         const {
@@ -119,7 +119,7 @@ export const GuessTypeManager = <T extends AnyNumberPTM>(): PuzzleTypeManager<T>
                         score++;
                     }
                 } else {
-                    for (const digit of indexesFromTo(1, digitsCount, true)) {
+                    for (const digit of indexesFromTo(1, maxDigit, true)) {
                         const cellData = createCellDataByDisplayDigit(digit, context);
                         const playerObject = playerObjects[getExcludedDigitDataHash(position, cellData, context)];
 

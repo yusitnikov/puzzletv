@@ -7,7 +7,7 @@ export const Shuffled: PuzzleDefinitionLoader<NumberPTM> = {
     loadPuzzle: () =>
         FPuzzles.loadPuzzle({
             type: PuzzleImportPuzzleType.Shuffled,
-            digitsCount: 9,
+            maxDigit: 9,
             noPieceRegions: true,
             stickyRegion: {
                 top: 0,

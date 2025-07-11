@@ -192,11 +192,11 @@ export interface PuzzleDefinition<T extends AnyPTM> extends PuzzlePageParams {
      * but from the puzzle context object instead,
      * because it takes default values and import option overrides into account.
      *
-     * @see getDefaultDigitsCount
-     * @see PuzzleImportOptions.digitsCount
-     * @see PuzzleContext.digitsCount
+     * @see getDefaultMaxDigit
+     * @see PuzzleImportOptions.maxDigit
+     * @see PuzzleContext.maxDigit
      */
-    digitsCount?: number;
+    maxDigit?: number;
     /**
      * Can zero be entered into the cell of the puzzle?
      * (by default, the available digits start from 1)
@@ -461,8 +461,8 @@ export const loadPuzzle = <T extends AnyPTM>(
     return puzzle.typeManager.postProcessPuzzle?.(puzzle) ?? puzzle;
 };
 
-export const getDefaultDigitsCount = <T extends AnyPTM>({
-    typeManager: { maxDigitsCount },
+export const getDefaultMaxDigit = <T extends AnyPTM>({
+    typeManager: { maxDigit },
     gridSize: { gridSize },
     importOptions: { stickyRegion } = {},
 }: PuzzleDefinition<T>) => {
@@ -470,7 +470,7 @@ export const getDefaultDigitsCount = <T extends AnyPTM>({
         gridSize = Math.min(gridSize, Math.max(stickyRegion.width, stickyRegion.height));
     }
 
-    return Math.min(maxDigitsCount || gridSize, gridSize);
+    return Math.min(maxDigit || gridSize, gridSize);
 };
 
 export const normalizePuzzlePosition = <T extends AnyPTM>(

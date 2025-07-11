@@ -202,7 +202,7 @@ export const BaseHeptapagonLikeLoop = <T extends AnyNumberPTM>(
             rowsCount: 1,
             columnsCount: bounds.length,
         },
-        digitsCount: 0,
+        maxDigit: 0,
         disableColoring: true,
         hideDeleteButton: true,
         customCellBounds: {

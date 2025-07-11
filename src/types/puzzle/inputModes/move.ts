@@ -23,7 +23,7 @@ export const MovePuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInfo
     disableCellHandlers: true,
     hotKeyStr: ["Alt+Shift"],
     isNoSelectionMode: true,
-    digitsCount: 0,
+    maxDigit: 0,
     isValidGesture: (isCurrentInputMode, { gesture: { pointers } }) =>
         isCurrentInputMode || pointers.length > 1 || !isCellGestureExtraData(pointers[0].start.extraData),
     onMove: ({ gesture: { state: startContext }, startMetrics, currentMetrics }, context, fieldRect) => {

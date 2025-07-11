@@ -37,7 +37,7 @@ export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     typeManager: MonumentValleyTypeManager,
     gridSize: createMonumentValleyGridSize(9, 3),
     regions: createMonumentValleyRegions(9, 3),
-    digitsCount: 9,
+    maxDigit: 9,
     rules: () => <RulesParagraph>{rules("0 1 6 8 9")}</RulesParagraph>,
     items: [MonumentValleyGridBordersConstraint()],
     initialDigits: parseMonumentValleyDigitsMap({
@@ -143,7 +143,7 @@ export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     saveStateKey: "monument-valley-mini-v2",
     typeManager: MonumentValleyTypeManager,
     gridSize: createMonumentValleyGridSize(5, 1, 2),
-    digitsCount: 5,
+    maxDigit: 5,
     rules: () => <RulesParagraph>{rules("0 1 8")}</RulesParagraph>,
     items: [MonumentValleyGridBordersConstraint()],
     initialDigits: parseMonumentValleyDigitsMap({

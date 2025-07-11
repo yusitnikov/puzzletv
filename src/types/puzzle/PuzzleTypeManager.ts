@@ -220,7 +220,10 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
 
     settingsComponents?: ComponentType<SettingsContentProps<T>>[];
 
-    maxDigitsCount?: number;
+    /**
+     * Maximal possible digit for the type.
+     */
+    maxDigit?: number;
 
     disableCellModeLetterShortcuts?: boolean;
     disableArrowLetterShortcuts?: boolean;

@@ -201,7 +201,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         return result;
     }, [load, globalOffsetX, globalOffsetY, extraGrids, source]);
 
-    const { columnsCount, rowsCount, size: gridSize, minDigit, maxDigit } = gridParsers[0];
+    const { columnsCount, rowsCount, size: gridSize, minDigit, maxDigit: gridParserMaxDigit } = gridParsers[0];
     const hasSolution = gridParsers.some((gridParser) => gridParser.hasSolution);
     const hasFog = gridParsers.some((gridParser) => gridParser.hasFog);
     const hasCosmeticElements = gridParsers.some((gridParser) => gridParser.hasCosmeticElements);
@@ -212,7 +212,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     // Transparent arrow circles are always on for the rotatable clues puzzles, so don't allow to change the flag
     const transparentCirclesForced = rotatableClues;
 
-    const [digitsCount, setDigitsCount] = useState(maxDigit ?? Math.min(gridSize, 9));
+    const [maxDigit, setMaxDigit] = useState(gridParserMaxDigit ?? Math.min(gridSize, 9));
 
     const [colorsImportModeState, setColorsImportMode] = useStringFromLocalStorage<ColorsImportMode>(
         "fpwColorsImportMode",
@@ -231,8 +231,10 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         digitType: digitType === PuzzleImportDigitType.Regular ? undefined : digitType,
         htmlRules: areHtmlRules,
         htmlSuccessMessage,
-        digitsCount:
-            maxDigit === undefined && digitsCount === gridSize && !filteredExtraGrids.length ? undefined : digitsCount,
+        maxDigit:
+            gridParserMaxDigit === undefined && maxDigit === gridSize && !filteredExtraGrids.length
+                ? undefined
+                : maxDigit,
         supportZero: minDigit === undefined && supportZero,
         fillableDigitalDisplay: isCalculator && fillableDigitalDisplay,
         loopX: !isSpecialGrid && loopX,
@@ -998,18 +1000,18 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                     )}
 
                     <CollapsableFieldSet legend={"Miscellaneous"}>
-                        {(maxDigit === undefined || minDigit === undefined) && (
+                        {(gridParserMaxDigit === undefined || minDigit === undefined) && (
                             <Paragraph>
-                                {maxDigit === undefined && (
+                                {gridParserMaxDigit === undefined && (
                                     <label>
-                                        Digits count:&nbsp;
+                                        Max digit:&nbsp;
                                         <input
                                             type={"number"}
-                                            value={digitsCount}
+                                            value={maxDigit}
                                             min={1}
                                             max={Math.min(gridSize, 9)}
                                             step={1}
-                                            onChange={(ev) => setDigitsCount(ev.target.valueAsNumber)}
+                                            onChange={(ev) => setMaxDigit(ev.target.valueAsNumber)}
                                         />
                                     </label>
                                 )}

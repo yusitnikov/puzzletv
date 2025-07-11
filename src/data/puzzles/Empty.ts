@@ -112,7 +112,7 @@ export const EmptyCube: PuzzleDefinition<NumberPTM> = {
     typeManager: CubeTypeManager(true),
     gridSize: createCubeGridSize(6),
     regions: createCubeRegions(6, 3),
-    digitsCount: 6,
+    maxDigit: 6,
     allowDrawing: allDrawingModes,
 };
 
@@ -124,7 +124,7 @@ export const EmptyCubedoku: PuzzleDefinition<NumberPTM> = {
     typeManager: CubedokuTypeManager,
     gridSize: createCubeGridSize(6),
     regions: createCubeRegions(6, 3),
-    digitsCount: 6,
+    maxDigit: 6,
     allowDrawing: allDrawingModes,
 };
 
@@ -138,7 +138,7 @@ export const EmptyMonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
     gridSize: createMonumentValleyGridSize(9, 3),
     regions: createMonumentValleyRegions(9, 3),
     items: [MonumentValleyGridBordersConstraint()],
-    digitsCount: 9,
+    maxDigit: 9,
     allowDrawing: allDrawingModes,
 };
 
@@ -151,7 +151,7 @@ export const EmptyMonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
     typeManager: MonumentValleyTypeManager,
     gridSize: createMonumentValleyGridSize(5, 1, 2),
     items: [MonumentValleyGridBordersConstraint()],
-    digitsCount: 5,
+    maxDigit: 5,
     allowDrawing: allDrawingModes,
 };
 

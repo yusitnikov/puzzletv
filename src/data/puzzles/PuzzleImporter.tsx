@@ -110,7 +110,7 @@ export class PuzzleImporter<T extends AnyPTM> {
         gridSize: GridSize,
     ) {
         const {
-            digitsCount,
+            maxDigit,
             noSpecialRules,
             loopX,
             loopY,
@@ -127,7 +127,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             typeManager,
             gridSize,
             regions: this.regions,
-            digitsCount,
+            maxDigit,
             loopHorizontally: loopX,
             loopVertically: loopY,
             gridMargin: loopX || loopY ? 0.99 : 0,
@@ -182,7 +182,7 @@ export class PuzzleImporter<T extends AnyPTM> {
             this.puzzle.supportZero = true;
         }
         if (maxDigit !== undefined) {
-            this.puzzle.digitsCount = Math.max(this.puzzle.digitsCount ?? 0, maxDigit);
+            this.puzzle.maxDigit = Math.max(this.puzzle.maxDigit ?? 0, maxDigit);
         }
 
         this.puzzle.typeManager.preProcessImportGrid?.(this.puzzle, this, gridParser);

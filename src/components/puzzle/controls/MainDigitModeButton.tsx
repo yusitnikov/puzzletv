@@ -10,7 +10,7 @@ export const MainDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
 >({ context, top, left }: ControlButtonItemProps<T>) {
     profiler.trace();
 
-    const { puzzle, digitsCount } = context;
+    const { puzzle, maxDigit } = context;
 
     const {
         typeManager: { createCellDataByDisplayDigit },
@@ -21,7 +21,7 @@ export const MainDigitModeButton: ControlButtonItemPropsGenericFc = observer(fun
             top={top}
             left={left}
             inputMode={PuzzleInputMode.mainDigit}
-            data={{ usersDigit: createCellDataByDisplayDigit(digitsCount, context) }}
+            data={{ usersDigit: createCellDataByDisplayDigit(maxDigit, context) }}
             context={context}
         />
     );

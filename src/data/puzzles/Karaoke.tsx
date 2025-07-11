@@ -335,7 +335,7 @@ export const Karaoke: PuzzleDefinition<NumberPTM> = {
         regionHeight: 3,
     },
     regions: Regions9,
-    digitsCount: 9,
+    maxDigit: 9,
     rules: () => (
         <>
             <RulesParagraph>{translate(normalSudokuRulesApply)}.</RulesParagraph>

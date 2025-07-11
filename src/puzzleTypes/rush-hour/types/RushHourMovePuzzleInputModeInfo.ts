@@ -24,7 +24,7 @@ export const RushHourMovePuzzleInputModeInfo = (
     },
     mode: PuzzleInputMode.move,
     isNoSelectionMode: true,
-    digitsCount: 0,
+    maxDigit: 0,
     mainButtonContent: base.mainButtonContent,
     hotKeyStr: base.hotKeyStr,
     isValidGesture: base.isValidGesture,

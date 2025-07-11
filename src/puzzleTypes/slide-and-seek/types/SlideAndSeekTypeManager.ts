@@ -176,7 +176,7 @@ export const SlideAndSeekTypeManager = <T extends AnyNumberPTM>(
                     ...puzzle,
                     allowEmptyCells: true,
                     supportZero: true,
-                    digitsCount: shapes.length,
+                    maxDigit: shapes.length,
                 };
             }
 

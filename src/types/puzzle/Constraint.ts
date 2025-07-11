@@ -162,7 +162,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
 
     const { puzzleIndex, puzzle, lines, userDigits } = context;
     const {
-        digitsCount,
+        maxDigit,
         gridSize: { rowsCount, columnsCount },
         importOptions: { stickyRegion, noStickyRegionValidation } = {},
         allowEmptyCells,
@@ -189,7 +189,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
         }
     }
 
-    if (digitsCount !== 0) {
+    if (maxDigit !== 0) {
         for (const top of indexes(rowsCount)) {
             for (const left of indexes(columnsCount)) {
                 const position: Position = { left, top };

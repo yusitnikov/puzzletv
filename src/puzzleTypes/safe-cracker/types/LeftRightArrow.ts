@@ -32,7 +32,7 @@ export const safeCrackerArrowsAction = <T extends AnyPTM>(
 
 export const safeCrackerArrowsPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInfo<T> => ({
     mode: PuzzleInputMode.custom,
-    digitsCount: 0,
+    maxDigit: 0,
     handlesRightMouseClick: true,
     isNoSelectionMode: true,
     onCornerClick: ({ gesture: { id } }, context, { exact: { center } }, isRightButton) => {

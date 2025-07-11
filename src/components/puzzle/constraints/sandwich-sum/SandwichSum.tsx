@@ -16,7 +16,7 @@ export const SandwichSumConstraint = <T extends AnyPTM>(
         value,
         color,
         (currentDigit, cellDigits, context, isFinalCheck, _cellIndex, value) => {
-            const { digitsCount: maxDigit } = context;
+            const { maxDigit } = context;
 
             if (currentDigit !== 1 && currentDigit !== maxDigit) {
                 // Highlight only the bread digits as conflicts if something's wrong

@@ -20,7 +20,7 @@ export const YajilinFogTypeManager = <T extends AnyPTM>(
             if (puzzle.gridSize.rowsCount > 9) {
                 puzzle = {
                     ...puzzle,
-                    digitsCount: 9,
+                    maxDigit: 9,
                     disableDiagonalBorderLines: true,
                     disableDiagonalCenterLines: true,
                 };

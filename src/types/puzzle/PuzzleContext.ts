@@ -1,4 +1,4 @@
-import { getDefaultDigitsCount, getRegionCells, PuzzleDefinition } from "./PuzzleDefinition";
+import { getDefaultMaxDigit, getRegionCells, PuzzleDefinition } from "./PuzzleDefinition";
 import {
     GameStateEx,
     gameStateGetCurrentGivenDigitsByCells,
@@ -936,20 +936,20 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.puzzle.typeManager.importOptionOverrides?.(this) ?? {};
     }
 
-    get digitsCount() {
+    get maxDigit() {
         profiler.trace();
-        return this.importOptionOverrides.digitsCount ?? this.puzzle.digitsCount ?? getDefaultDigitsCount(this.puzzle);
+        return this.importOptionOverrides.maxDigit ?? this.puzzle.maxDigit ?? getDefaultMaxDigit(this.puzzle);
     }
 
-    get digitsCountInCurrentMode() {
+    get maxDigitInCurrentMode() {
         profiler.trace();
 
         const { supportZero } = this.puzzle;
 
-        const { isDigitMode, digitsCount: digitsCountFunc = this.digitsCount + (isDigitMode && supportZero ? 1 : 0) } =
+        const { isDigitMode, maxDigit: maxDigitFunc = this.maxDigit + (isDigitMode && supportZero ? 1 : 0) } =
             this.inputModeInfo;
 
-        return typeof digitsCountFunc === "function" ? digitsCountFunc(this) : digitsCountFunc;
+        return typeof maxDigitFunc === "function" ? maxDigitFunc(this) : maxDigitFunc;
     }
 
     onStateChange(actionsOrCallbacks: GameStateActionOrCallback<any, T> | GameStateActionOrCallback<any, T>[]) {

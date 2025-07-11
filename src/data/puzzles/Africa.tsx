@@ -61,7 +61,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         rowsCount: 1,
         columnsCount: 49,
     },
-    digitsCount: 5,
+    maxDigit: 5,
     customCellBounds: processCellsMaps(
         ([bordersLatLng], { left: index }): CustomCellBounds => ({
             borders: bordersLatLng.map((border) => border.map(latLngLiteralToPosition)),

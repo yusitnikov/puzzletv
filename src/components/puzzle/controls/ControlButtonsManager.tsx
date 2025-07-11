@@ -192,7 +192,7 @@ export class ControlButtonsManager<T extends AnyPTM> {
                         />
                     );
 
-                    if (!(context.digitsCountInCurrentMode < 10 || index !== 1)) {
+                    if (!(context.maxDigitInCurrentMode < 10 || index !== 1)) {
                         // Render the button as hidden, but support the hotkeys
                         return (
                             <div key={key} style={{ display: "none" }}>

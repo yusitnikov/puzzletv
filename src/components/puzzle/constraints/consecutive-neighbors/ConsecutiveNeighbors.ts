@@ -65,9 +65,9 @@ const BaseConsecutiveNeighborsConstraint = <T extends AnyPTM>(
 ): Constraint<T> =>
     BaseNeighborsConstraint(
         invert ? "non-consecutive neighbors" : "consecutive neighbors",
-        (digit1, digit2, position1, position2, { digitsCount }) => {
+        (digit1, digit2, position1, position2, { maxDigit }) => {
             const diff = Math.abs(digit2 - digit1);
-            const isConsecutive = diff === 1 || (allowLoop && diff === digitsCount - 1);
+            const isConsecutive = diff === 1 || (allowLoop && diff === maxDigit - 1);
             return invert ? !isConsecutive : isConsecutive;
         },
         excludedTags,

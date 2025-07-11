@@ -202,7 +202,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
             resultChecker: (context) => {
                 // Hack the digits count in the context to check only the global constraints, not the digits
                 const result = isValidFinishedPuzzleByConstraints(
-                    context.cloneWith({ puzzle: { ...context.puzzle, digitsCount: 0 } }),
+                    context.cloneWith({ puzzle: { ...context.puzzle, maxDigit: 0 } }),
                 );
                 if (!result) {
                     return result;

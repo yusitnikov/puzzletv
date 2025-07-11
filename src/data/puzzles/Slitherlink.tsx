@@ -623,7 +623,7 @@ export const ElephantSlitherlink: PuzzleDefinition<NumberPTM> = {
         rowsCount: 1,
         columnsCount: bounds.length,
     },
-    digitsCount: 0,
+    maxDigit: 0,
     customCellBounds: {
         0: Object.fromEntries(bounds.entries()),
     },

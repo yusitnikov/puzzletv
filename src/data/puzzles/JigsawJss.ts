@@ -7,7 +7,7 @@ export const MakeAPicture: PuzzleDefinitionLoader<JigsawPTM> = {
     loadPuzzle: () =>
         FPuzzles.loadPuzzle({
             type: PuzzleImportPuzzleType.Jigsaw,
-            digitsCount: 9,
+            maxDigit: 9,
             jss: true,
             angleStep: 90,
             stickyDigits: true,
@@ -24,7 +24,7 @@ export const JssChicken: PuzzleDefinitionLoader<JigsawPTM> = {
     loadPuzzle: (params, isPreview) =>
         FPuzzles.loadPuzzle({
             type: PuzzleImportPuzzleType.Jigsaw,
-            digitsCount: 9,
+            maxDigit: 9,
             jss: true,
             angleStep: 90,
             stickyDigits: true,

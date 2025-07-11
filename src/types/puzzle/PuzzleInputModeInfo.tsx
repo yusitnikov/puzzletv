@@ -49,7 +49,7 @@ export interface PuzzleInputModeInfo<T extends AnyPTM> {
     isNoSelectionMode?: boolean;
     disableCellHandlers?: boolean;
     applyToWholeGrid?: boolean;
-    digitsCount?: number | ((context: PuzzleContext<T>) => number);
+    maxDigit?: number | ((context: PuzzleContext<T>) => number);
     handlesRightMouseClick?: boolean;
     mainButtonContent?: ComponentType<ControlButtonItemProps<T>>;
     secondaryButtonContent?: (
@@ -122,7 +122,7 @@ export const allPuzzleInputModeInfos = <T extends AnyPTM>(): PuzzleInputModeInfo
         mode: PuzzleInputMode.color,
         mainButtonContent: ColorDigitModeButton,
         hotKeyStr: ["Ctrl+Shift", "Ctrl+Alt+Shift"],
-        digitsCount: 10,
+        maxDigit: 10,
         isActiveForPuzzle: ({ disableColoring, enableShading }) => !disableColoring && !enableShading,
         secondaryButtonContent: (context, _, cellSize, index) => (
             <CellBackground context={context} colors={[index]} size={cellSize} />
@@ -138,7 +138,7 @@ export const getAllowedPuzzleInputModeInfos = <T extends AnyPTM>(
     includeHidden = false,
 ): PuzzleInputModeInfo<T>[] => {
     const {
-        digitsCount,
+        maxDigit,
         typeManager: { extraInputModes = [], disabledInputModes = [] },
     } = puzzle;
 
@@ -146,7 +146,7 @@ export const getAllowedPuzzleInputModeInfos = <T extends AnyPTM>(
         ...allPuzzleInputModeInfos<T>().filter(
             ({ mode, isDigitMode, isActiveForPuzzle }) =>
                 !disabledInputModes.includes(mode) &&
-                (isDigitMode ? digitsCount !== 0 : isActiveForPuzzle?.(puzzle, includeHidden) !== false),
+                (isDigitMode ? maxDigit !== 0 : isActiveForPuzzle?.(puzzle, includeHidden) !== false),
         ),
         ...extraInputModes.filter(({ mainButtonContent }) => mainButtonContent || includeHidden),
     ];

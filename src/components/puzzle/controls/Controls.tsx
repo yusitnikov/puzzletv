@@ -26,7 +26,7 @@ export const Controls = observer(function Controls<T extends AnyPTM>({
 }: ControlsProps<T>) {
     profiler.trace();
 
-    const { puzzle, isReady, digitsCountInCurrentMode } = context;
+    const { puzzle, isReady, maxDigitInCurrentMode } = context;
 
     const controlButtonsManager = useControlButtonsManager(puzzle, isHorizontal);
 
@@ -36,7 +36,7 @@ export const Controls = observer(function Controls<T extends AnyPTM>({
         <Absolute {...rect}>
             {isReady && (
                 <>
-                    {indexes(digitsCountInCurrentMode).map((index) => (
+                    {indexes(maxDigitInCurrentMode).map((index) => (
                         <DigitControlButton key={`digit-${index}`} index={index} context={context} />
                     ))}
                 </>

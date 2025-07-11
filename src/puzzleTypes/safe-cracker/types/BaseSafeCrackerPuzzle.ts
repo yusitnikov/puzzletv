@@ -13,7 +13,7 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(
     params: SafeCrackerPuzzleParams,
 ): Pick<
     PuzzleDefinition<T>,
-    "gridSize" | "regions" | "digitsCount" | "customCellBounds" | "typeManager" | "allowDrawing"
+    "gridSize" | "regions" | "maxDigit" | "customCellBounds" | "typeManager" | "allowDrawing"
 > => {
     const { size, circleRegionsCount, codeCellsCount } = params;
 
@@ -51,7 +51,7 @@ export const BaseSafeCrackerPuzzle = <T extends AnyNumberPTM>(
                 false,
             ),
         ],
-        digitsCount: size,
+        maxDigit: size,
         customCellBounds: createCellsMapFromArray<CustomCellBounds>([
             ...indexes(circleRegionsCount).flatMap((regionIndex) => [
                 indexes(size).map((cellIndexInRegion) => {

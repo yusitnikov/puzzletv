@@ -10,7 +10,7 @@ export const HappyBirthdayDumediat: PuzzleDefinitionLoader<JigsawPTM> = {
     loadPuzzle: () => {
         const puzzle = FPuzzles.loadPuzzle({
             type: PuzzleImportPuzzleType.Jigsaw,
-            digitsCount: 9,
+            maxDigit: 9,
             angleStep: 90,
             stickyRegion: {
                 top: 0,

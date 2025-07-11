@@ -24,7 +24,7 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
     typeManager: CubeTypeManager(true),
     gridSize: createCubeGridSize(3),
     regions: createCubeRegions(3, 3, 3),
-    digitsCount: 9,
+    maxDigit: 9,
     rules: () => (
         <>
             <RulesParagraph>

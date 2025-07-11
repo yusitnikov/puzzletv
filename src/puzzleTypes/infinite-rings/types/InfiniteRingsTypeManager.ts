@@ -229,7 +229,7 @@ export const InfiniteRingsTypeManager = <T extends AnyPTM>(
             }
             return {
                 ...puzzle,
-                digitsCount: visibleRingsCountArg * 3,
+                maxDigit: visibleRingsCountArg * 3,
                 gridSize: {
                     ...puzzle.gridSize,
                     gridSize: 4,

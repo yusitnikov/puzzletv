@@ -64,7 +64,7 @@ export const LinesPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInf
                   )
                 : gameStateResetCurrentMultiLine,
         ),
-    digitsCount: ({ puzzle: { disableLineColors } }) => (disableLineColors ? 0 : 9),
+    maxDigit: ({ puzzle: { disableLineColors } }) => (disableLineColors ? 0 : 9),
     secondaryButtonContent: (context, _, cellSize, index) => (
         <CellBackground context={context} colors={[index]} size={cellSize} noOpacity={true} />
     ),

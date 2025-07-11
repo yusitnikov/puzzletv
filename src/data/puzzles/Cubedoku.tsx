@@ -43,7 +43,7 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
         ]),
         ...createCubeRegions(4, 2).slice(4),
     ],
-    digitsCount: 4,
+    maxDigit: 4,
     gridMargin: 1,
     rules: () => (
         <>
@@ -97,7 +97,7 @@ export const CubeIt: PuzzleDefinition<NumberPTM> = {
         ["R7C9", "R7C10", "R8C10", "R9C10", "R10C10"],
         ["R9C9", "R10C6", "R10C7", "R10C8", "R10C9"],
     ]),
-    digitsCount: 5,
+    maxDigit: 5,
     rules: () => (
         <>
             <RulesParagraph>{translate(cubedokuNormalSudokuRules(5))}.</RulesParagraph>

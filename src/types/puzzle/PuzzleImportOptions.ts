@@ -50,7 +50,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     digitType?: PuzzleImportDigitType;
     htmlRules?: boolean;
     htmlSuccessMessage?: boolean;
-    digitsCount?: number;
+    maxDigit?: number;
     tesseract?: boolean;
     slideAndSeek?: boolean;
     slideAndSeekDigits?: boolean;
@@ -157,7 +157,8 @@ export const sanitizeImportOptions = (
         startOffset = 0,
         allowOverrideColors,
         colorsImportMode,
-        digitsCount,
+        // "digitsCount" is the legacy name for "maxDigit", support it for backward compatibility
+        maxDigit = (importOptions as any).digitsCount,
         angleStep = 0,
         noPieceRegions,
         stickyJigsawPiece,
@@ -223,7 +224,7 @@ export const sanitizeImportOptions = (
         allowOverrideColors,
         colorsImportMode:
             colorsImportMode === ColorsImportMode.Auto ? (undefined as unknown as ColorsImportMode) : colorsImportMode,
-        digitsCount: digitsCount === undefined ? (undefined as unknown as number) : Number(digitsCount),
+        maxDigit: maxDigit === undefined ? (undefined as unknown as number) : Number(maxDigit),
         angleStep: Number(angleStep),
         noPieceRegions,
         stickyJigsawPiece: stickyJigsawPiece && Number(stickyJigsawPiece),

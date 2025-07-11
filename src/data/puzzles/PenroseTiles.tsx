@@ -177,7 +177,7 @@ export const PenroseTiles: PuzzleDefinition<NumberPTM> = {
         rowsCount: 1,
         columnsCount: 72,
     },
-    digitsCount: 8,
+    maxDigit: 8,
     initialDigits: {
         0: Object.fromEntries(cells.map(({ digit }, index) => [index, digit]).filter(([, digit]) => digit > 0)),
     },
