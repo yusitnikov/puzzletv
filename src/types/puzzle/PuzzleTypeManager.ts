@@ -205,7 +205,10 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
 
     getAdditionalNeighbors?(position: Position, puzzle: PuzzleDefinition<T>): Position[];
 
-    borderColor?: string;
+    /**
+     * The color of the grid lines (cell borders)
+     */
+    gridLineColor?: string;
 
     getCellSelectionType?(
         cell: Position,

@@ -32,7 +32,7 @@ export const MeteorShower = (colorful: boolean): PuzzleDefinition<NumberPTM> => 
         </>
     ),
     typeManager: DigitPuzzleTypeManager(),
-    borderColor: darkGreyColor,
+    gridLineColor: darkGreyColor,
     gridSize: createRegularGridSize(8, 2),
     regions: createRegularRegions(8, 8, 2).map((region, index) =>
         (region as Position[]).map(({ left, top }) => ({

@@ -126,7 +126,7 @@ export const MergedCellsTypeManager = <T extends AnyNumberPTM>({
 
                 puzzle = {
                     ...puzzle,
-                    borderColor: lightGreyColor,
+                    gridLineColor: lightGreyColor,
                     items: mergePuzzleItems(puzzle.items, [
                         FractionalSudokuGridLinesConstraint<T>(),
                         ...cells.flat().map((cellShapes) =>

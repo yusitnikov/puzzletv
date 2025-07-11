@@ -369,7 +369,7 @@ export const FullCubeTypeManager = (): PuzzleTypeManager<FullCubePTM> => ({
         };
     },
 
-    borderColor: darkGreyColor,
+    gridLineColor: darkGreyColor,
 
     mapImportedColors: true,
 

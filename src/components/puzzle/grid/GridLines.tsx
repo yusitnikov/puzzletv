@@ -14,18 +14,18 @@ import { comparer } from "mobx";
 import { useComputed } from "../../../hooks/useComputed";
 
 interface GridLinesByDataProps {
-    borderColor: string;
-    borderWidth: number;
+    color: string;
+    width: number;
     customCellBorders: Position[][];
-    regularBorders: Line[];
+    regularGridLines: Line[];
     dashedGrid?: boolean;
 }
 
 const GridLinesByData = observer(function GridLinesByDataFc({
-    borderColor,
-    borderWidth,
+    color,
+    width,
     customCellBorders,
-    regularBorders,
+    regularGridLines,
     dashedGrid,
 }: GridLinesByDataProps) {
     profiler.trace();
@@ -37,20 +37,20 @@ const GridLinesByData = observer(function GridLinesByDataFc({
                     key={`custom-${index}`}
                     points={formatSvgPointsArray(border)}
                     fill={"none"}
-                    stroke={borderColor}
-                    strokeWidth={borderWidth}
+                    stroke={color}
+                    strokeWidth={width}
                 />
             ))}
 
-            {regularBorders.map(({ start, end }) => (
+            {regularGridLines.map(({ start, end }) => (
                 <line
                     key={`regular-${start.top}-${start.left}-${end.top}-${end.left}`}
                     x1={start.left}
                     y1={start.top}
                     x2={end.left}
                     y2={end.top}
-                    stroke={borderColor}
-                    strokeWidth={borderWidth}
+                    stroke={color}
+                    strokeWidth={width}
                     strokeDasharray={dashedGrid ? 0.125 : undefined}
                 />
             ))}
@@ -65,9 +65,9 @@ export const GridLines: ConstraintPropsGenericFcMap = {
         const { puzzle, puzzleIndex, isMyTurn } = context;
 
         const {
-            typeManager: { borderColor: typeBorderColor },
+            typeManager: { gridLineColor: typeGridLineColor },
             gridSize: { columnsCount, rowsCount },
-            borderColor: puzzleBorderColor,
+            gridLineColor: puzzleGridLineColor,
             customCellBounds,
             dashedGrid,
         } = puzzle;
@@ -75,9 +75,6 @@ export const GridLines: ConstraintPropsGenericFcMap = {
         const scale = useTransformScale();
 
         const timer = profiler.track("FieldLines");
-
-        const borderColor = isMyTurn ? puzzleBorderColor || typeBorderColor || textColor : darkGreyColor;
-        const borderWidth = 1 / scale;
 
         const cellHasBorders = (position: Position) =>
             isCellWithBorders(puzzleIndex.getCellTypeProps(position)) &&
@@ -96,8 +93,8 @@ export const GridLines: ConstraintPropsGenericFcMap = {
             { equals: comparer.structural },
         );
 
-        const getRegularBorders = useComputed(
-            function getRegularBorders(): Line[] {
+        const getRegularGridLines = useComputed(
+            function getRegularGridLines(): Line[] {
                 return customCellBounds
                     ? []
                     : [
@@ -134,17 +131,17 @@ export const GridLines: ConstraintPropsGenericFcMap = {
             return null;
         }
 
-        const regularBorders = getRegularBorders();
+        const regularGridLines = getRegularGridLines();
         const customCellBorders = getCustomCellBorders();
 
         timer.stop();
 
         return (
             <GridLinesByData
-                borderWidth={borderWidth}
-                borderColor={borderColor}
+                width={1 / scale}
+                color={isMyTurn ? puzzleGridLineColor || typeGridLineColor || textColor : darkGreyColor}
                 customCellBorders={customCellBorders}
-                regularBorders={regularBorders}
+                regularGridLines={regularGridLines}
                 dashedGrid={dashedGrid}
             />
         );

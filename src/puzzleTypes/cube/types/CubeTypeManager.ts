@@ -163,7 +163,7 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): PuzzleType
         return [];
     },
 
-    borderColor: darkGreyColor,
+    gridLineColor: darkGreyColor,
 });
 
 export const createCubeGridSize = (gridSize: number): GridSize => ({

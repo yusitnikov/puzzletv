@@ -350,7 +350,7 @@ export interface PuzzleDefinition<T extends AnyPTM> extends PuzzlePageParams {
     /**
      * The color of the grid lines (cell borders)
      */
-    borderColor?: string;
+    gridLineColor?: string;
     /**
      * The size of pen tool mark ("X" and "O") on the cell border, in cells.
      * The default is 15% of the cell size.

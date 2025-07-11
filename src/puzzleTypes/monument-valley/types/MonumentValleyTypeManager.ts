@@ -376,7 +376,7 @@ export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
         return results;
     },
 
-    borderColor: darkGreyColor,
+    gridLineColor: darkGreyColor,
 };
 
 const processCellCoords = (
