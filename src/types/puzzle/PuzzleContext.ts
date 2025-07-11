@@ -243,6 +243,10 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return this.cache[key] as ItemT;
     }
 
+    getComputedValue<ItemT>(key: string, getValue: () => ItemT): ItemT {
+        return this.getCachedItem(key, () => computed(getValue, { name: key })).get();
+    }
+
     update(updates: Partial<PuzzleContextOptions<T>>) {
         runInAction(() => {
             const {

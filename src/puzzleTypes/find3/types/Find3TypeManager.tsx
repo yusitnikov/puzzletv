@@ -10,7 +10,7 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { Button } from "../../../components/layout/button/Button";
 import React, { useState } from "react";
 import { AnyFind3PTM } from "./Find3PTM";
-import { computed, IReactionDisposer, reaction } from "mobx";
+import { IReactionDisposer, reaction } from "mobx";
 import { indexes } from "../../../utils/indexes";
 import { Gift } from "@emotion-icons/fluentui-system-filled";
 import { Modal } from "../../../components/layout/modal/Modal";
@@ -23,6 +23,7 @@ import { getNextActionId } from "../../../types/puzzle/GameStateAction";
 import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { addGridStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { translate } from "../../../utils/translate";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 export const Find3TypeManager = <T extends AnyFind3PTM>(
     baseTypeManager: PuzzleTypeManager<any> = DigitPuzzleTypeManager(),
@@ -30,7 +31,6 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
 ): PuzzleTypeManager<T> => ({
     ...addGridStateExToPuzzleTypeManager(baseTypeManager, {
         initialGridStateExtension: {
-            giftsCount: 0,
             giftedCells: [],
         },
     }),
@@ -46,10 +46,9 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
                 typeManager: { getDigitByCellData },
             },
             cellSizeForSidePanel: cellSize,
-            currentGridState: {
-                extension: { giftsCount },
-            },
         } = context;
+
+        const giftsCount = getGiftsCount(context);
 
         if (!giftsCount) {
             return null;
@@ -200,7 +199,6 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
                                                 ...prevState,
                                                 extension: {
                                                     ...prevState.extension,
-                                                    giftsCount: prevState.extension.giftsCount - 1,
                                                     giftedCells: [...prevState.extension.giftedCells, confirmationCell],
                                                 },
                                             }),
@@ -231,52 +229,9 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
     },
 
     getReactions(context): IReactionDisposer[] {
-        const {
-            puzzle: {
-                gridSize: { rowsCount, columnsCount },
-                solution,
-            },
-        } = context;
-
-        const getThreesCount = computed(
-            () =>
-                indexes(rowsCount)
-                    .flatMap((top) => indexes(columnsCount).map((left) => ({ top, left })))
-                    .filter((cell) => {
-                        const { top, left } = cell;
-                        const data = context.getCellDigit(top, left);
-                        return (
-                            solution?.[top]?.[left] === 3 &&
-                            data !== undefined &&
-                            context.puzzle.typeManager.getDigitByCellData(data, context, cell) === 3
-                        );
-                    }).length,
-        );
-
         return [
             reaction(
-                () => getThreesCount.get() - context.currentGridState.extension.giftedCells.length,
-                (giftsCount) => {
-                    if (context.currentGridState.extension.giftsCount !== giftsCount) {
-                        context.onStateChange((prev) => ({
-                            gridStateHistory: gridStateHistoryAddState(
-                                prev,
-                                prev.currentGridState.clientId,
-                                prev.currentGridState.actionId,
-                                (prevState) => ({
-                                    ...prevState,
-                                    extension: {
-                                        ...prevState.extension,
-                                        giftsCount,
-                                    },
-                                }),
-                            ),
-                        }));
-                    }
-                },
-            ),
-            reaction(
-                () => getThreesCount.get(),
+                () => getThreesCount(context),
                 (threesCount, prevThreesCount) => {
                     if (threesCount > prevThreesCount) {
                         gridFireworksController.launch();
@@ -324,3 +279,20 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
 
     saveStateKeySuffix: "v2",
 });
+
+const getThreesCount = <T extends AnyFind3PTM>(context: PuzzleContext<T>) =>
+    context.getComputedValue("threesCount", () => {
+        const {
+            puzzle: {
+                gridSize: { rowsCount, columnsCount },
+                solution,
+            },
+        } = context;
+
+        return indexes(rowsCount)
+            .flatMap((top) => indexes(columnsCount).map((left) => ({ top, left })))
+            .filter(({ top, left }) => solution?.[top]?.[left] === 3 && context.getCellDigit(top, left) === 3).length;
+    });
+
+const getGiftsCount = <T extends AnyFind3PTM>(context: PuzzleContext<T>) =>
+    context.getComputedValue("giftsCount", () => getThreesCount(context) - context.gridExtension.giftedCells.length);
