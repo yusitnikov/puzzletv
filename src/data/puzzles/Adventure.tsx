@@ -1,6 +1,6 @@
 import { FPuzzles } from "./Import";
 import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
-import { PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
+import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
 import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
 import { AdventurePTM } from "../../puzzleTypes/adventure/types/AdventurePTM";
 import { CellsMap, createCellsMapFromArray, mergeCellsMaps } from "../../types/puzzle/CellsMap";
@@ -26,6 +26,9 @@ import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnordered
 import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
 import { KillerCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
 import { RegionSumLineConstraint } from "../../components/puzzle/constraints/region-sum-line/RegionSumLine";
+import { QuadConstraint } from "../../components/puzzle/constraints/quad/Quad";
+import { MaxConstraint, MinConstraint } from "../../components/puzzle/constraints/min-max/MinMax";
+import { LineConstraint } from "../../components/puzzle/constraints/line/Line";
 
 export const Adventure1: PuzzleDefinitionLoader<AdventurePTM<NumberPTM>> = {
     loadPuzzle: () =>
@@ -46,18 +49,22 @@ export const Adventure2: PuzzleDefinition<AdventurePTM<number>> = {
     typeManager: AdventureTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
-    // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfiJlK%2Bw8bMWEVgkQAcDkEdPnL1gBs3uqa-F4GPk7%2BrtZEACzx3gDmmKooePgIUFp0oVoEwZH5-GQhGgX4AMzevs4B7oERjn4ubjZVzVGtDfjaRS31se72xRU6tdFtcdoATOVhBElji-hdqemZ2bkgJQTzkXUx7bMey4PH1qeTPcPVs6MX0%2B4HauMEZYdTvR6Pu%2B99FJpDIEbYoPIAohAzagnLg-6rADsNyGJz%2BR2e%2BAe0JBWThENWekiG1xYIJlWRK0qNSp-ChxOBW3xCMqXT2%2BAGLNKKMu%2Bw8bIBnIxvVOAsJC0q5y5%2Bwl-BpbyRsvcPMxRCqQu%2BdzVXWFWr%2B7LFlU57M%2BCsqr2lgNpSxxTJ27PpZvCSvwlNAJLt8PZUo9sPtAItvrx-vF1vwppAQbJlvlluNgpdRKdMoZMODXoBEajzIdtr9GdWsezIYpLp9jPz5OdX1uJylJpVIvLaej7M5xYLpdTpJzAPWFfTVeV3c9Q6xecHlr0AF06NJcOhsnBMDgENYVCAEABPej8P7b3fuOhQFCpBfKSg0S%2BXog0W%2B32Y0R%2BP69Xu-vh9Pr%2Bvm8fr-PmgqkA4D4hoUDQLIGhIMgoDYLA%2BCIKgpC4KA8D4OgpDAhoLCsMRGg8LwjwaCIoicOw-CKMI4jqLI3DKOokjp28A85UoS8QHQNgIAAdwIMANHQeExDQGAID4VwMGUJR4lvKpZMvWZtFnJRAjwsgiLIPDAlwyDEVwxFp1nDjtw4LgfAgLioEkABiaQ7PswQxEwaQAGscCsaxKBIICQAAI0YNhfIAJTgMxGE8kgkl0JjdCAA
+    // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHYbAc0xVFDx8BCgtOhd%2BADZPe3wyONcAZiT%2BVIMQAKCQsIjbLwJfTKiCRMzs4II8lEjC-FMS%2Br0m%2BNjW12sO-g8KwKrQ8NqC%2BKdugl7zVzGpmLSCDNmy-37cobr4rqX8FtBKtfzShpWc6vWR12LtmYurE4GajdddrNWzw-qr24X5477TwYfeKTb74drbcoQ37g0Ego4vI5bUE3I6LUFfI6NbYY%2BpozG-OH1GFHSHI34I%2BpI-bvYb48buX5famA2mU%2B4HVmjdk0p46X6k5mPUF4onQ8m-G6C84k7ks3kmWVC1GK6WfX5Ut5y2Hq-m-NFSoGuGEGzmXFWGnrm038LGvAFK%2BqSzUO%2BJ6AC6dGkuHQYTgmBwCEU%2BBUIAQAE96PxKDZw5GTHQoCgAt7lJQaGm00QaFmsw4aHm8xn09mS7n8%2BWi5nS%2BWCzRknWG5YaE2m2QaG22-Wu82e632-3u-WWz2O-3ojRx%2BPvDRp9O3DR5-PJxOZ6u5wuN8up2uN4u3TGI%2BlKGmQOg2BAAO4EMAadDDMRoGAQPgINBBpRKSxZ5LftMObQeko0TTmQ85kNO0RTm23hTt4boeqe4YcFwIBeueUCSAAxNIOG4YIYiYNIADWOAoOgQaUCQ9YgAARowbA0QASnAAAmmCMBRJDWLo%2B66EAA
     solution: createCellsMapFromArray([
-        [S, S, S, S, S, S, 6, 5, 3],
-        [S, S, S, S, S, S, S, 8, 2],
-        [S, S, S, S, S, S, S, 1, 7],
-        [S, S, 9, 7, S, S, 8, 6, S],
-        [S, S, S, S, S, S, S, 7, S],
-        [S, S, S, S, S, S, S, 9, S],
-        [1, S, S, 4, 2, 9, 5, 3, 6],
-        [S, S, S, 5, 1, 3, 7, 4, 8],
-        [S, S, S, 6, 7, 8, 1, 2, 9],
+        [9, 1, 4, 2, 8, 7, 6, 5, 3],
+        [3, 7, 5, 1, 9, 6, 4, 8, 2],
+        [8, 2, 6, 3, 5, 4, 9, 1, 7],
+        [2, 4, 9, 7, 3, 1, 8, 6, 5],
+        [5, 6, 8, 9, 4, 2, 3, 7, 1],
+        [7, 3, 1, 8, 6, 5, 2, 9, 4],
+        [1, 8, 7, 4, 2, 9, 5, 3, 6],
+        [6, 9, 2, 5, 1, 3, 7, 4, 8],
+        [4, 5, 3, 6, 7, 8, 1, 2, 9],
     ]),
+    resultChecker: (context) => {
+        return isValidFinishedPuzzleByEmbeddedSolution(context);
+    },
+    successMessage: "TestSuccessMessage",
     items: (context) => {
         return [
             ...getAdventureConstraints(context),
@@ -144,7 +151,40 @@ const adventure2Def: choiceTaken = {
                         KillerCageConstraint(["R1C4", "R2C4", "R3C4", "R3C5"], 11)],
                     rules: [translate(killerCagesExplained),
                             translate(cannotRepeatInCage)],
-                    choices: undefined
+                    choices: {
+                        solveCells: [[2, 4], [2, 8], [6, 1], [7, 1], [8, 1], [7, 6], [7, 8]],
+                        topMessage: "ThirdChoice 3",
+                        option1ChoiceMessage: "ThirdChoice 3 option 1",
+                        option1TakenMessage: "ThirdChoice 3 option 1 Taken",
+                        option2ChoiceMessage: "ThirdChoice 3 option 2",
+                        option2TakenMessage: "ThirdChoice 3 option 2 Taken",
+                        option1: {
+                            initialDigits: { 0: { 6: 6}, 5: { 1: 3 }},
+                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaIMQAHNMVRQ8fAQoLTpwrQJvFNiA12ttEsd-FzdbUNKncvqbMhsY5rrrOw6m2vj8D2rfLsGQsI0i-D1%2BuIqEpM6BhaGbRrUpqOX5%2Bo8dlusAZmDkmt3KvvPDghOz0ZW9q5BC-jID7oJIykmIglnNn8hr9pgB2D6DGz3MqffBHH4pV7-EH8cFzG4NCGrEbpTLZXL5F5bL5Y%2BpVUmVEYwwZkJbo2G9Cm3SLPamrUGeaFjVaRLmPaxU7mtPkXYrBBHXWHwpn4YIcny4rIEAkoArEuEyo60mUckUY3kogjvemQvWwzzizUStIZJU5PKqolAoiG-D3JH4NGA6YbJ3TZ4egEPUUzHG2-EOtVAo4y8km7Hu9VBtn1Tmu42gRURwkel2I9Ux-NAr1%2B-i%2Bj1myHl9UZ4MY9aukYeksVhXh5WR0vuNt4js59XPLN9x2B3QAXTo0lw6FycEwOAQ1hUIAQAE96PxrWuN%2B46FAUOlp8pKDQTyeiDQLxebDQbzez6fL0-r7fXw-z8-X3eaEcf3-gjQAEAWQNAgSBv4QYBUHAaBsGQb%2BQFQWBsGeDQqGoaCNCYZhkQ0LhuHoWhWHETheFkYRGEkWR%2BFjj4278PCJ4gOgbAQAA7gQYAaOgjpiGgMAQHwrgYMoSjBBeRwSSeNjaBOSieJhZC4WQmGeBhIEclhoJyW0l6kZhRCoesY4Tsxa4cFwvgQKxUCSAAxNIjlOYIYiYNIADWOBWNYlAkL%2BIAAEaMGwAUAEpwGYjA%2BSQoR0euDGUBeoypPUy6yPIS5kCBFpYUcpkevYpRyAoyheD%2BAFavl6pENCxVLp42hYReoK4aCjXfFVQI2CW6UlfgSi-h4t7XjYnXTEQeaGHVyiNTVl6yVG40xqZM6rhZ%2BCgK4AAeCCWVONn2ZQR3HSA%2BjJfwhjWRIhB2cdJ26A9KT0e4lA3r4039UQJ7BGBo10Kt62XQdN13UdRxHKdcU7kMlD%2Bb1S7BABnggXKt7af95kXVZwMgLdoPg5DtG6EAA
+                            constraints: [KillerCageConstraint(["R2C1", "R3C1", "R3C2"], 13),
+                                MaxConstraint("R2C2"),
+                                MaxConstraint("R6C1"),
+                                MaxConstraint("R6C8"),
+                                MinConstraint("R4C1"),
+                                MinConstraint("R5C9"),
+                                MinConstraint("R6C3"),
+                                MinConstraint("R8C3")],
+                            // TODO
+                            rules: [],
+                            choices: undefined
+                        },
+                        // TODO
+                        option2: {
+                            initialDigits: { 0: { 6: 6, 8: 3} },
+                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaIMQAHNMVRQ8fAQoLTpwrQJvFNiA12ttEtB0zOzc-JBC-gBmGKdyt1syG3b-Fy67XtKOgaCvPriK91CU5oI9Ef742yTJzvHZtQ0i-GTHZen8D3Wxghbg-d9Rle1hg6mui6uys%2BP7pp3%2BMlOVyMowl8FoCIu4QbsAOy-I42F43I4tAFzIH4RbbUH4KFLR7WGxba6HLrVNIZLIEBooAoouGEyrE163enwrpkNbYjYJezst4tSIfBlHCGeGk4giREUc-BM2kJCVvTzBJEPSWI6FdYJCtW4rnKnmsrUEIVyv5Xeb4H7clawg1SxU21UpWpknJ5SmfDFEcFRL2Gn34fFmj5mtEE0Wo4lO%2BquqkYtqWo5VG3Cv0hgVE00oi01UlRxpmz3I2N%2BrHo3YB6k2vF%2BrOhyVVwu7Ylmkvu3ZXSPk6Ot-gF7N1Tt5lEfDsuwcYvQAXTo0lw6FycEwOAQ1hUIAQAE96PwlWvNz26FAUOlZ8pKDQz2eiDQr1ebDQ73eL%2Bfry-b-f30-L6-3w%2BaC0-wBwQ0EBQFkDQYFgf%2BUHATBoHgfB0H-iBMEQfBng0Oh6EQjQ2HYZEND4fhmEYThpF4QRFHEVhZEUYRE4%2BBuW7nJQZ4gOgbAQAA7gQYAaOgbpiGgMAQHwrgYMoSjBFeLTSWeNjaFOSieNhZD4WQ2GeFhYFCjhEKKTYYFEOR2FEOheITlObEbhwXC%2BBAHFQJIADE0iuW5ghiJg0gANY4FY1iUCQ-4gAARowbAhQASnAZiMAFJChAxe7MVe1ypF0q6yPIK5kGBCo4S0lmBvycgKMoXh-kBLRkEVKJEC8pUrp42g4VeEL4RCLX-LVGI2C2WVlfgSj-h4963jYPW7EQnqWXO642fgoCuAAHggtkzg5zksdt1D6Gl-CGPZEiEE5O0sSAuiXSkjH8IkLF0Gwi4Zauy3uOQdDrgQgU1q9%2BDfR9X3kD4v3-SAn3HEDKS-aQYFg29P0JO9cMQz8imgCDSPgy0kPo-DAP4NjCMo-jwQ4yAv02JjBCk6jNAvXjyMUETlOw%2BDTPA%2BcVPmkDaPk5zrP8xzBNczTQs0yTPOzdZB1rqIXm%2Bf5gNELDG3HSATlgJrLSaZrF26PRuhAA
+                            constraints: [LineConstraint(["R1C2", "R1C1", "R2C1", "R2C2", "R2C3"]),
+                                LineConstraint(["R4C1", "R4C2", "R5C2", "R5C3"]),
+                                LineConstraint(["R4C4", "R5C4", "R5C5"]),
+                                LineConstraint(["R6C2", "R6C3", "R6C4"])],
+                            rules: [],
+                            choices: undefined
+                        }
+                    }
                 },
                 option2: {
                     initialDigits: {},
@@ -152,7 +192,38 @@ const adventure2Def: choiceTaken = {
                     constraints: [RegionSumLineConstraint(["R6C8", "R7C7", "R8C8"]),
                         RegionSumLineConstraint(["R4C7", "R4C6", "R4C5","R5C5"])],
                     rules: ["There are some blue lines in the grid, each of which passes through multiple regions. The digits on each blue line have the same sum in each region it passes through."],
-                    choices: undefined
+                    choices: {
+                        solveCells: [[3,5], [5,7], [6,6], [7, 7]],
+                        topMessage: "ThirdChoice 4",
+                        option1ChoiceMessage: "ThirdChoice 4 option 1",
+                        option1TakenMessage: "ThirdChoice 4 option 1 Taken",
+                        option2ChoiceMessage: "ThirdChoice 4 option 2",
+                        option2TakenMessage: "ThirdChoice 4 option 2 Taken",
+                        option1: {
+                            initialDigits: {},
+                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHZP9-ABsfq5kwfwAzGEEkQa2XgS%2BsS78oUnx%2BKZp-npZrkG5VlHuRU4FBB5l%2BKXmeUUxNSlF1pU5DSZFiW1VTUWtcf6d-a71Q-yZoADmmKooePgIUFp0yeVF%2BV2pG2tFFV19K-jNXdWj0R1F46f4gwcjB5cHu1frV5tXJwf76UcgUzNzCyWVwe6SeBxu3xKvSKbz%2BswIgJQy3Sd3SLwO6PSX38H3SsOm8PmiyRwLq50qP0ePUqb1u20qEP8TzhAOJyP8lxZCLZ7xsXKJQM%2BugAunRpLh0As4JgcAhFPgVCAEABPej8Sg2FVqkx0KAoKYS5SUGjG41EGjm80OGjW62mk0Wx1Wm0u%2B1mp0u200cLe32WGj%2B-1kGjB4M%2B8MByNBkMxiM%2BwOR0MxgI0FMp7w0DMZtw0HM5tOpzNF7O50sF9PF0t54Wa1URSjGkDoNgQADuBDAGnQJLEaBgED4CDQ8qUSks5vCE%2BNDm0oqUAQzZBzZAzAXTwe86e8c4cwaIJYzRBTDksc6IXqIVrNZrcc%2B81u8PoC4WFoqbKo4XBA4pbUEkAGJpCA4DBDETBpAAaxwFB0HlSgSB9EAACNGDYJCACU4AAE0wRg4JIaxa21Q5KH9EA2BlGDlCUMhrQCY1vEoOdwnDa1JwDJi3ywHAJg4dD9WwHAABUIAQLsOy7ElJWVT98FAH8JEIf8HBQaQkLAMBQNEcCoJg-CiFCIixkoa1vzkBRlC4j9%2BHkiBfwAhtHMoFiQF0IzomcsULBHWyoGgv98BXOgcKmOVlDYzMa1icU-LQRxgxAELMDChV-RTMgot8-yCHHYLMFCkdrWDU8RToaTZNAbjeJQAAZSiJIUFA3JrXQgA
+                            constraints: [ThermometerConstraint(["R9C1", "R9C2", "R8C1"]),
+                                ThermometerConstraint(["R2C4", "R1C3", "R2C3", "R3C3", "R2C2", "R3C1"]),
+                                QuadConstraint("R5C2", [2, 4, 5]),
+                                QuadConstraint("R3C6", [4, 5, 6]),
+                                QuadConstraint("R6C8", [2, 3, 7])],
+                            // TODO
+                            rules: [],
+                            choices: undefined
+                        },
+                        // TODO
+                        option2: {
+                            initialDigits: {},
+                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHZP9-ABsfq5kwfwAzGEEkQa2XgS%2BsS78oUnx%2BKZp-npZrkG5VlHuRU4FBB5l%2BKXmeUUxNSlF1pU5DSZFiW1VTUWtcf6d-a71Q-yZoADmmKooePgIUFp0yeVF%2BV2pG2tFFV19K-jNXdWj0R1F46f4gwcjB5cHu1frV5tXJwf76UcgUzNzCyWVwe6SeBxu3xKvSKbz%2BswIgJQy3Sd3SLwO6PSX38H3SsOm8PmiyRwLq50qP0ePUqb1u20qEP8TzhAOJyP8lxZCLZ7xsXKJQM%2BugAunRpLh0As4JgcAhFPgVCAEABPej8Sg2FVqkx0KAoKYS5SUGjG41EGjm80OGjW62mk0Wx1Wm0u%2B1mp0u200cLe32WGj%2B-1kGjB4M%2B8MByNBkMxiM%2BwOR0MxgI0FMp7w0DMZtw0HM5tOpzNF7O50sF9PF0t54Wa1URSjGkDoNgQADuBDAGnQJLEaBgED4CDQ8qUSks5vCE%2BNDm0oqUAQzZBzZAzAXTwe86e8c4cwaIJYzRBTDksc6IXqIVrNZrcc%2B81u8PoC4WFoqbKo4XBA4pbUEkAGJpCA4DBDETBpAAaxwFB0HlSgSB9EAACNGDYJCACU4AAE0wRg4JIaxa21Q5KH9EA2BlGDlCUMhrQCY1vEoOdwnDa1JwDJi3ywHAJg4dD9WwHAABUIAQLsOy7ElJWVT98FAH8JEIf8HBQaQkLAMBQNEcCoJg-CiFCIixkoa1vzkBRlC4j9%2BHkiBfwAhtHMoFiQF0IzomcsULBHWyoGgv98BXOgcKmOVlDYzMa1icU-LQRxgxAELMDChV-RTMgot8-yCHHYLMFCkdrWDU8RToaTZNAbjeJQAAZSiJIUFA3JrXQgA
+                            constraints: [ThermometerConstraint(["R9C1", "R9C2", "R8C1"]),
+                                ThermometerConstraint(["R2C4", "R1C3", "R2C3", "R3C3", "R2C2", "R3C1"]),
+                                QuadConstraint("R5C2", [2, 4, 5]),
+                                QuadConstraint("R3C6", [4, 5, 6]),
+                                QuadConstraint("R6C8", [2, 3, 7])],
+                            rules: [],
+                            choices: undefined
+                        }
+                    }
                 }
             }
         }
