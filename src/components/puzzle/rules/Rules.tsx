@@ -25,7 +25,6 @@ import { Heart } from "@emotion-icons/fluentui-system-filled";
 import { Button } from "../../layout/button/Button";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
-import { useWindowSize } from "../../../hooks/useWindowSize";
 import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
 import { MultiPlayerInfo } from "./MultiPlayerInfo";
@@ -49,8 +48,6 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
     profiler.trace();
 
     const isFullScreen = useIsFullScreen();
-    const windowSize = useWindowSize();
-    const isPortrait = windowSize.width < windowSize.height;
 
     const {
         puzzle: {
@@ -58,7 +55,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
             title,
             author,
             rules,
-            typeManager: { getPlayerScore, getAboveRules },
+            typeManager: { getPlayerScore, aboveRulesComponent: AboveRulesComponent },
             lmdLink,
             initialLives = 0,
         },
@@ -261,7 +258,7 @@ export const Rules = observer(function Rules<T extends AnyPTM>({ rect, context }
                 </div>
             )}
 
-            {getAboveRules?.(context, isPortrait)}
+            {AboveRulesComponent && <AboveRulesComponent context={context} />}
 
             <div
                 style={{

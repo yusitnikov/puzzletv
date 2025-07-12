@@ -3,7 +3,7 @@ import { CellDataComponentType } from "../../components/puzzle/cell/CellDataComp
 import { getLineVector, Position, PositionWithAngle } from "../layout/Position";
 import { SetInterface } from "../struct/Set";
 import { GameStateEx, PartialGameStateEx } from "./GameState";
-import { ComponentType, ReactNode } from "react";
+import { ComponentType } from "react";
 import { ControlsProps } from "../../components/puzzle/controls/Controls";
 import { getIsSamePuzzlePosition, PuzzleDefinition } from "./PuzzleDefinition";
 import { CellSelectionColor, CellSelectionByDataProps } from "../../components/puzzle/cell/CellSelection";
@@ -251,8 +251,10 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
 
     getPlayerScore?(context: PuzzleContext<T>, clientId: string): string | number;
 
-    // TODO: transform into a component
-    getAboveRules?(context: PuzzleContext<T>, isPortrait: boolean): ReactNode;
+    /**
+     * Component to show above the rules (and below the puzzle title area)
+     */
+    aboveRulesComponent?: ComponentType<PuzzleContextProps<T>>;
 
     postProcessPuzzle?(puzzle: PuzzleDefinition<T>): PuzzleDefinition<T>;
 

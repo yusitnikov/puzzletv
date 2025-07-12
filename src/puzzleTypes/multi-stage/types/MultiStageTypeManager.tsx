@@ -16,6 +16,7 @@ import { PartiallyTranslatable } from "../../../types/translations/Translatable"
 import { processTranslations, translate } from "../../../utils/translate";
 import { AnyMultiStagePTM } from "./MultiStagePTM";
 import { addGameStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
+import { observer } from "mobx-react-lite";
 
 interface MultiStageOptions<T extends AnyMultiStagePTM> {
     baseTypeManager?: PuzzleTypeManager<any>;
@@ -36,15 +37,17 @@ export const MultiStageTypeManager = <T extends AnyMultiStagePTM>({
         initialGameStateExtension: { stage: 1 },
     }),
 
-    getAboveRules: (context, isPortrait) => {
+    aboveRulesComponent: observer(function MultiStageAboveRules({ context }) {
         const { cellSizeForSidePanel: cellSize } = context;
         const stage = getStage(context);
         const isNext = stage > context.stateExtension.stage;
         const coeff = isNext ? 1 : 0;
 
+        const BaseComponent = baseTypeManager.aboveRulesComponent;
+
         return (
             <>
-                {baseTypeManager.getAboveRules?.(context, isPortrait)}
+                {BaseComponent && <BaseComponent context={context} />}
 
                 <div
                     style={{
@@ -54,7 +57,7 @@ export const MultiStageTypeManager = <T extends AnyMultiStagePTM>({
                         padding: `${(cellSize * rulesHeaderPaddingCoeff * coeff) / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
                         fontSize: cellSize * aboveRulesTextHeightCoeff,
                         lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
-                        height: cellSize * aboveRulesTextHeightCoeff * 1.5 * (isPortrait ? 3 : 2) * coeff,
+                        height: cellSize * aboveRulesTextHeightCoeff * 3 * coeff,
                         border: "2px solid #f00",
                         opacity: coeff,
                         overflow: "hidden",
@@ -104,7 +107,7 @@ export const MultiStageTypeManager = <T extends AnyMultiStagePTM>({
                 </div>
             </>
         );
-    },
+    }),
 });
 
 export const isValidFinishedPuzzleByStageConstraints =

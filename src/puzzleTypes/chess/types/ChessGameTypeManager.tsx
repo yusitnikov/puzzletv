@@ -111,9 +111,7 @@ export const ChessGameTypeManager: PuzzleTypeManager<ChessPTM> = {
         ];
     },
 
-    getAboveRules(context) {
-        return <ChessEngine context={context} />;
-    },
+    aboveRulesComponent: ChessEngine,
 
     postProcessPuzzle(puzzle): PuzzleDefinition<ChessPTM> {
         puzzle = ChessTypeManager.postProcessPuzzle?.(puzzle) ?? puzzle;

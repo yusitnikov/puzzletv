@@ -24,6 +24,7 @@ import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { addGridStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { translate } from "../../../utils/translate";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
+import { observer } from "mobx-react-lite";
 
 export const Find3TypeManager = <T extends AnyFind3PTM>(
     baseTypeManager: PuzzleTypeManager<any> = DigitPuzzleTypeManager(),
@@ -35,7 +36,7 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
         },
     }),
 
-    getAboveRules: function Find3AboveRules(context, isPortrait) {
+    aboveRulesComponent: observer(function Find3Gifts({ context }) {
         // Cell to use as a gift - a confirmation popup will be shown when it's set
         const [confirmationCell, setConfirmationCell] = useState<Position | undefined>(undefined);
         const [showExplanation, setShowExplanation] = useState(false);
@@ -54,9 +55,11 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
             return null;
         }
 
+        const BaseComponent = baseTypeManager.aboveRulesComponent;
+
         return (
             <>
-                {baseTypeManager.getAboveRules?.(context, isPortrait)}
+                {BaseComponent && <BaseComponent context={context} />}
 
                 <div
                     style={{
@@ -226,7 +229,7 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
                 )}
             </>
         );
-    },
+    }),
 
     getReactions(context): IReactionDisposer[] {
         return [
