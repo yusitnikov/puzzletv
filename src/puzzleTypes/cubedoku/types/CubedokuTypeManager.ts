@@ -1,5 +1,5 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
-import { CellSelectionColor, CellSelectionByDataProps } from "../../../components/puzzle/cell/CellSelection";
+import { CellHighlightColor, CellHighlightByDataProps } from "../../../components/puzzle/cell/CellHighlight";
 import { CubeTypeManager } from "../../cube/types/CubeTypeManager";
 import { mergePuzzleItems, PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { CubedokuIndexingConstraint } from "../constraints/CubedokuIndexing";
@@ -8,7 +8,7 @@ import { NumberPTM } from "../../../types/puzzle/PuzzleTypeMap";
 export const CubedokuTypeManager: PuzzleTypeManager<NumberPTM> = {
     ...CubeTypeManager(false),
 
-    getCellSelectionType(
+    getCellHighlight(
         { top, left },
         {
             puzzle: {
@@ -19,12 +19,12 @@ export const CubedokuTypeManager: PuzzleTypeManager<NumberPTM> = {
     ) {
         const realGridSize = gridSize / 2;
 
-        const tooltipResult: Required<Pick<CellSelectionByDataProps<NumberPTM>, "color" | "strokeWidth">> = {
-            color: CellSelectionColor.secondary,
+        const tooltipResult: Required<Pick<CellHighlightByDataProps<NumberPTM>, "color" | "strokeWidth">> = {
+            color: CellHighlightColor.secondary,
             strokeWidth: 1,
         };
-        const trackResult: Required<Pick<CellSelectionByDataProps<NumberPTM>, "color" | "strokeWidth">> = {
-            color: CellSelectionColor.secondary,
+        const trackResult: Required<Pick<CellHighlightByDataProps<NumberPTM>, "color" | "strokeWidth">> = {
+            color: CellHighlightColor.secondary,
             strokeWidth: 0.5,
         };
 

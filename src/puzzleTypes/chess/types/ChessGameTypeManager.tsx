@@ -13,7 +13,7 @@ import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { ChessEngine, ChessEngineManager } from "../components/ChessEngine";
 import { ChessHistory } from "../components/ChessHistory";
 import { GridStateChessBoard } from "./ChessBoard";
-import { CellSelectionByDataProps, CellSelectionColor } from "../../../components/puzzle/cell/CellSelection";
+import { CellHighlightByDataProps, CellHighlightColor } from "../../../components/puzzle/cell/CellHighlight";
 import { arrayContainsPosition, Position } from "../../../types/layout/Position";
 
 const initialHeavyPieces = [
@@ -72,14 +72,14 @@ export const ChessGameTypeManager: PuzzleTypeManager<ChessPTM> = {
         };
     },
 
-    getCellSelectionType(
+    getCellHighlight(
         cell,
         context,
-    ): Required<Pick<CellSelectionByDataProps<ChessPTM>, "color" | "strokeWidth">> | undefined {
+    ): Required<Pick<CellHighlightByDataProps<ChessPTM>, "color" | "strokeWidth">> | undefined {
         const { movesForSelectedCell = [] } = ChessEngineManager.getInstance(context);
         if (arrayContainsPosition(movesForSelectedCell, cell)) {
             return {
-                color: CellSelectionColor.secondary,
+                color: CellHighlightColor.secondary,
                 strokeWidth: 1,
             };
         }

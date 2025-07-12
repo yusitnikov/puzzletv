@@ -45,7 +45,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                 disableBackgroundColorOpacity,
                 disableConflictChecker,
                 settingsComponents = [],
-                getCellSelectionType,
+                getCellHighlight,
             },
         },
         multiPlayer: { isEnabled },
@@ -247,7 +247,7 @@ export const SettingsContent = observer(function SettingsContent<T extends AnyPT
                 </SettingsItem>
             )}
 
-            {!getCellSelectionType && (
+            {!getCellHighlight && (
                 <SettingsItem>
                     {translate("Highlight cells seen by selection")}:
                     <SettingsCheckbox

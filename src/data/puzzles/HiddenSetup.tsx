@@ -26,7 +26,7 @@ import { CellsMap } from "../../types/puzzle/CellsMap";
 import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
 import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import React from "react";
-import { CellSelectionColor, CellSelectionByDataProps } from "../../components/puzzle/cell/CellSelection";
+import { CellHighlightColor, CellHighlightByDataProps } from "../../components/puzzle/cell/CellHighlight";
 import { Raumplaner } from "../authors";
 import {
     isValidFinishedPuzzleByStageConstraints,
@@ -158,16 +158,16 @@ export const HiddenSetup: PuzzleDefinition<MultiStagePTM> = {
     saveStateKey: "hidden-setup-v2",
     typeManager: {
         ...MultiStageTypeManager({ getStage }),
-        getCellSelectionType(
+        getCellHighlight(
             { top, left },
             { stateExtension: { stage } },
-        ): Required<Pick<CellSelectionByDataProps<MultiStagePTM>, "color" | "strokeWidth">> | undefined {
+        ): Required<Pick<CellHighlightByDataProps<MultiStagePTM>, "color" | "strokeWidth">> | undefined {
             const colors = getStageCellsMap(stage);
 
             return colors[top]?.[left] === undefined
                 ? undefined
                 : {
-                      color: CellSelectionColor.secondary,
+                      color: CellHighlightColor.secondary,
                       strokeWidth: 1,
                   };
         },

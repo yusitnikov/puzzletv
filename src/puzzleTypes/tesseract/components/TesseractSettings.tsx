@@ -1,7 +1,7 @@
 import { SettingsContentProps } from "../../../components/puzzle/controls/settings/SettingsContent";
 import { SettingsItem } from "../../../components/puzzle/controls/settings/SettingsItem";
 import { SettingsSelect } from "../../../components/puzzle/controls/settings/SettingsSelect";
-import { TesseractSelectionType, useTesseractSelectionType } from "../types/TesseractSelection";
+import { TesseractHighlightType, useTesseractHighlightType } from "../types/TesseractHighlight";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { ReactElement } from "react";
@@ -14,7 +14,7 @@ export const TesseractSettings = observer(function TesseractSettings<T extends A
 }: SettingsContentProps<T>) {
     profiler.trace();
 
-    const [selectionType, setSelectionType] = useTesseractSelectionType();
+    const [selectionType, setSelectionType] = useTesseractHighlightType();
 
     return (
         <SettingsItem>
@@ -30,23 +30,23 @@ export const TesseractSettings = observer(function TesseractSettings<T extends A
             <SettingsSelect
                 cellSize={cellSize}
                 value={selectionType}
-                onChange={({ target: { value } }) => setSelectionType(value as TesseractSelectionType)}
+                onChange={({ target: { value } }) => setSelectionType(value as TesseractHighlightType)}
             >
-                <option value={TesseractSelectionType.Always}>
+                <option value={TesseractHighlightType.Always}>
                     {translate({
                         [LanguageCode.en]: "Always",
                         [LanguageCode.ru]: "Всегда",
                         [LanguageCode.de]: "Immer",
                     })}
                 </option>
-                <option value={TesseractSelectionType.Clues}>
+                <option value={TesseractHighlightType.Clues}>
                     {translate({
                         [LanguageCode.en]: "Only circles",
                         [LanguageCode.ru]: "Только круги",
                         [LanguageCode.de]: "Nur Kreise",
                     })}
                 </option>
-                <option value={TesseractSelectionType.Never}>
+                <option value={TesseractHighlightType.Never}>
                     {translate({
                         [LanguageCode.en]: "Never",
                         [LanguageCode.ru]: "Никогда",

@@ -3,7 +3,7 @@ import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { GridLayer } from "../../../types/puzzle/GridLayer";
 import { observer } from "mobx-react-lite";
 import { isCellInRect, Rect } from "../../../types/layout/Rect";
-import { CellSelectionColor } from "../../../components/puzzle/cell/CellSelection";
+import { CellHighlightColor } from "../../../components/puzzle/cell/CellHighlight";
 
 const borderWidth = 0.1;
 
@@ -28,7 +28,7 @@ const CaterpillarGridFocus: ConstraintPropsGenericFcMap<Rect> = {
                 width={bounds.width + borderWidth}
                 height={bounds.height + borderWidth}
                 fill={"none"}
-                stroke={CellSelectionColor.secondary}
+                stroke={CellHighlightColor.secondary}
                 strokeWidth={borderWidth}
             />
         );

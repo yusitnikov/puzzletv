@@ -3,7 +3,7 @@ import { WindowSize } from "../../../hooks/useWindowSize";
 import { getDimensions, getGridRect, parseSolutionString } from "./utils";
 import { Absolute } from "../../layout/absolute/Absolute";
 import { Fragment, MouseEvent, useMemo } from "react";
-import { CellSelectionColor } from "../../puzzle/cell/CellSelection";
+import { CellHighlightColor } from "../../puzzle/cell/CellHighlight";
 import { SudokuPad } from "./SudokuPad";
 import { normalizeSclMetadata, puzzleIdToScl } from "../../../utils/sudokuPad";
 import { errorColor, mutedBlueColor } from "../globals";
@@ -107,7 +107,7 @@ export const GridsCompilation = ({
                         <Absolute
                             key={"selection" + guid}
                             {...transformRect({ ...offset, width: size, height: size })}
-                            borderColor={CellSelectionColor.mainCurrent}
+                            borderColor={CellHighlightColor.mainCurrent}
                             borderWidth={5}
                         />
                     ),

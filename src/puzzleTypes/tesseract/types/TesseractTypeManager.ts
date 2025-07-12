@@ -1,14 +1,14 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
-import { getTesseractCellSelectionType } from "./TesseractSelection";
+import { getTesseractCellHighlight } from "./TesseractHighlight";
 import { TesseractSettings } from "../components/TesseractSettings";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 
 export const TesseractTypeManager = <T extends AnyPTM>({
-    getCellSelectionType,
+    getCellHighlight,
     settingsComponents = [],
     ...baseTypeManager
 }: PuzzleTypeManager<T>): PuzzleTypeManager<T> => ({
     ...baseTypeManager,
-    getCellSelectionType: (...args) => getTesseractCellSelectionType?.(...args) ?? getCellSelectionType?.(...args),
+    getCellHighlight: (...args) => getTesseractCellHighlight(...args) ?? getCellHighlight?.(...args),
     settingsComponents: [...settingsComponents, TesseractSettings],
 });

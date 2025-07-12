@@ -6,7 +6,7 @@ import { useEventListener } from "../../../hooks/useEventListener";
 import { controlKeysState } from "../../../hooks/useControlKeysState";
 import React, { ReactElement, ReactNode, useState } from "react";
 import { GridCellBackground } from "../cell/CellBackground";
-import { CellSelectionByCoords } from "../cell/CellSelection";
+import { CellHighlightByCoords } from "../cell/CellHighlight";
 import { GridCellDigits } from "../cell/CellDigits";
 import { GridSvg } from "./GridSvg";
 import {
@@ -199,7 +199,7 @@ export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }
             <g data-layer="selection">
                 {renderCellsLayer(
                     (top, left) => (
-                        <CellSelectionByCoords context={context} top={top} left={left} />
+                        <CellHighlightByCoords context={context} top={top} left={left} />
                     ),
                     region,
                 )}

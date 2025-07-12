@@ -6,7 +6,7 @@ import { GameStateEx, PartialGameStateEx } from "./GameState";
 import { ComponentType } from "react";
 import { ControlsProps } from "../../components/puzzle/controls/Controls";
 import { getIsSamePuzzlePosition, PuzzleDefinition } from "./PuzzleDefinition";
-import { CellSelectionColor, CellSelectionByDataProps } from "../../components/puzzle/cell/CellSelection";
+import { CellHighlightColor, CellHighlightByDataProps } from "../../components/puzzle/cell/CellHighlight";
 import { GridRegion } from "./GridRegion";
 import { Constraint } from "./Constraint";
 import { PuzzleContext, PuzzleContextProps } from "./PuzzleContext";
@@ -210,10 +210,13 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
      */
     gridLineColor?: string;
 
-    getCellSelectionType?(
+    /**
+     * Allows to add additional highlighting to a cell.
+     */
+    getCellHighlight?(
         cell: Position,
         context: PuzzleContext<T>,
-    ): Required<Pick<CellSelectionByDataProps<T>, "color" | "strokeWidth">> | undefined;
+    ): Required<Pick<CellHighlightByDataProps<T>, "color" | "strokeWidth">> | undefined;
 
     mainControlsComponent?: ComponentType<ControlsProps<T>>;
     controlButtons?: (ControlButtonItem<T> | undefined | false)[];
@@ -424,10 +427,10 @@ export const defaultGetDefaultNumberByDigits = (digits: number[]) => {
     return num;
 };
 
-export const getDefaultCellSelectionType = <T extends AnyPTM>(
+export const getDefaultCellHighlight = <T extends AnyPTM>(
     cell: Position,
     context: PuzzleContext<T>,
-): ReturnType<Required<PuzzleTypeManager<T>>["getCellSelectionType"]> => {
+): ReturnType<Required<PuzzleTypeManager<T>>["getCellHighlight"]> => {
     const { puzzle, selectedCells } = context;
 
     if (context.selectedCellsCount === 0) {
@@ -446,7 +449,7 @@ export const getDefaultCellSelectionType = <T extends AnyPTM>(
     );
     return isSeen
         ? {
-              color: CellSelectionColor.secondary,
+              color: CellHighlightColor.secondary,
               strokeWidth: 1,
           }
         : undefined;

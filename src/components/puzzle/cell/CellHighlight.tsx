@@ -9,24 +9,24 @@ import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { ReactElement, useMemo } from "react";
 import { settings } from "../../../types/layout/Settings";
-import { getDefaultCellSelectionType } from "../../../types/puzzle/PuzzleTypeManager";
+import { getDefaultCellHighlight } from "../../../types/puzzle/PuzzleTypeManager";
 import { profiler } from "../../../utils/profiler";
 
-export const CellSelectionColor = {
+export const CellHighlightColor = {
     mainCurrent: blueColor,
     mainPrevious: lighterBlueColor,
     secondary: lightOrangeColor,
 };
 
-export interface CellSelectionByCoordsProps<T extends AnyPTM> extends Position {
+export interface CellHighlightByCoordsProps<T extends AnyPTM> extends Position {
     context: PuzzleContext<T>;
 }
 
-export const CellSelectionByCoords = observer(function CellSelectionByCoords<T extends AnyPTM>({
+export const CellHighlightByCoords = observer(function CellHighlightByCoords<T extends AnyPTM>({
     context,
     top,
     left,
-}: CellSelectionByCoordsProps<T>) {
+}: CellHighlightByCoordsProps<T>) {
     profiler.trace();
 
     const cellPosition = useMemo((): Position => ({ top, left }), [top, left]);
@@ -36,16 +36,16 @@ export const CellSelectionByCoords = observer(function CellSelectionByCoords<T e
 
     if (context.isSelectedCell(top, left)) {
         color = context.isLastSelectedCell(top, left)
-            ? CellSelectionColor.mainCurrent
-            : CellSelectionColor.mainPrevious;
+            ? CellHighlightColor.mainCurrent
+            : CellHighlightColor.mainPrevious;
     } else {
-        const { getCellSelectionType = settings.highlightSeenCells.get() ? getDefaultCellSelectionType : undefined } =
+        const { getCellHighlight = settings.highlightSeenCells.get() ? getDefaultCellHighlight : undefined } =
             context.puzzle.typeManager;
 
-        const customSelection = getCellSelectionType?.(cellPosition, context);
-        if (customSelection) {
-            color = customSelection.color;
-            width = customSelection.strokeWidth;
+        const customHighlight = getCellHighlight?.(cellPosition, context);
+        if (customHighlight) {
+            color = customHighlight.color;
+            width = customHighlight.strokeWidth;
         }
     }
 
@@ -53,28 +53,28 @@ export const CellSelectionByCoords = observer(function CellSelectionByCoords<T e
         return null;
     }
 
-    return <CellSelectionByData context={context} cellPosition={cellPosition} color={color} strokeWidth={width} />;
-}) as <T extends AnyPTM>(props: CellSelectionByCoordsProps<T>) => ReactElement | null;
+    return <CellHighlightByData context={context} cellPosition={cellPosition} color={color} strokeWidth={width} />;
+}) as <T extends AnyPTM>(props: CellHighlightByCoordsProps<T>) => ReactElement | null;
 
-export interface CellSelectionByDataProps<T extends AnyPTM> {
+export interface CellHighlightByDataProps<T extends AnyPTM> {
     context: PuzzleContext<T>;
     cellPosition: Position;
     color?: string;
     strokeWidth?: number;
 }
 
-export const CellSelectionByData = observer(function CellSelectionByData<T extends AnyPTM>({
+export const CellHighlightByData = observer(function CellHighlightByData<T extends AnyPTM>({
     context,
     cellPosition,
-    color = CellSelectionColor.mainCurrent,
+    color = CellHighlightColor.mainCurrent,
     strokeWidth = 1,
-}: CellSelectionByDataProps<T>) {
+}: CellHighlightByDataProps<T>) {
     profiler.trace();
 
     const scale = useTransformScale();
 
-    let selectionBorderWidth = 0.1 * strokeWidth;
-    const selectionBorderWidth2 = 2 / scale;
+    let highlightBorderWidth = 0.1 * strokeWidth;
+    const highlightBorderWidth2 = 2 / scale;
 
     const { areCustomBounds } = context.puzzleIndex.allCells[cellPosition.top][cellPosition.left];
 
@@ -82,7 +82,7 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
         const { userArea } = context.getCellTransformedBounds(cellPosition.top, cellPosition.left);
         const cellTransformedSize = getTransformedRectAverageSize(userArea);
 
-        selectionBorderWidth = Math.max(selectionBorderWidth * cellTransformedSize, 7 / scale);
+        highlightBorderWidth = Math.max(highlightBorderWidth * cellTransformedSize, 7 / scale);
 
         return (
             <AutoSvg clip={<GridCellShape context={context} cellPosition={cellPosition} />}>
@@ -90,13 +90,13 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
                     context={context}
                     cellPosition={cellPosition}
                     stroke={"#fff"}
-                    strokeWidth={selectionBorderWidth + selectionBorderWidth2}
+                    strokeWidth={highlightBorderWidth + highlightBorderWidth2}
                 />
                 <GridCellShape
                     context={context}
                     cellPosition={cellPosition}
                     stroke={color}
-                    strokeWidth={selectionBorderWidth}
+                    strokeWidth={highlightBorderWidth}
                 />
             </AutoSvg>
         );
@@ -105,23 +105,23 @@ export const CellSelectionByData = observer(function CellSelectionByData<T exten
     return (
         <>
             <rect
-                x={cellPosition.left + selectionBorderWidth / 2}
-                y={cellPosition.top + selectionBorderWidth / 2}
-                width={1 - selectionBorderWidth}
-                height={1 - selectionBorderWidth}
+                x={cellPosition.left + highlightBorderWidth / 2}
+                y={cellPosition.top + highlightBorderWidth / 2}
+                width={1 - highlightBorderWidth}
+                height={1 - highlightBorderWidth}
                 fill={"none"}
-                strokeWidth={selectionBorderWidth}
+                strokeWidth={highlightBorderWidth}
                 stroke={color}
             />
             <rect
-                x={cellPosition.left + selectionBorderWidth + selectionBorderWidth2 / 2}
-                y={cellPosition.top + selectionBorderWidth + selectionBorderWidth2 / 2}
-                width={1 - selectionBorderWidth * 2 - selectionBorderWidth2}
-                height={1 - selectionBorderWidth * 2 - selectionBorderWidth2}
+                x={cellPosition.left + highlightBorderWidth + highlightBorderWidth2 / 2}
+                y={cellPosition.top + highlightBorderWidth + highlightBorderWidth2 / 2}
+                width={1 - highlightBorderWidth * 2 - highlightBorderWidth2}
+                height={1 - highlightBorderWidth * 2 - highlightBorderWidth2}
                 fill={"none"}
-                strokeWidth={selectionBorderWidth2}
+                strokeWidth={highlightBorderWidth2}
                 stroke={"#fff"}
             />
         </>
     );
-}) as <T extends AnyPTM>(props: CellSelectionByDataProps<T>) => ReactElement;
+}) as <T extends AnyPTM>(props: CellHighlightByDataProps<T>) => ReactElement;

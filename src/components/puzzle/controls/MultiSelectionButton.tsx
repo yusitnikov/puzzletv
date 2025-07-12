@@ -1,7 +1,7 @@
 import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./ControlButtonsManager";
 import { ControlButton } from "./ControlButton";
 import { Grid } from "@emotion-icons/fluentui-system-filled";
-import { CellSelectionColor } from "../cell/CellSelection";
+import { CellHighlightColor } from "../cell/CellHighlight";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
@@ -24,7 +24,7 @@ export const MultiSelectionButton: ControlButtonItemPropsGenericFc = observer(fu
             onClick={() => context.onStateChange({ isMultiSelection: !isMultiSelection })}
             title={translate("Multi-selection")}
         >
-            <Grid color={CellSelectionColor.mainCurrent} />
+            <Grid color={CellHighlightColor.mainCurrent} />
         </ControlButton>
     );
 });

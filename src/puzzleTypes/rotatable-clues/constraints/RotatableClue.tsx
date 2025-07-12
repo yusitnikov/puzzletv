@@ -11,7 +11,7 @@ import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 import { gameStateSetSelectedCells, gameStateToggleSelectedCells } from "../../../types/puzzle/GameState";
 import { rgba } from "../../../utils/color";
-import { CellSelectionColor } from "../../../components/puzzle/cell/CellSelection";
+import { CellHighlightColor } from "../../../components/puzzle/cell/CellHighlight";
 import { cancelOutsideClickProps } from "../../../utils/gestures";
 import { runInAction } from "mobx";
 import { notFinishedResultCheck, successResultCheck } from "../../../types/puzzle/PuzzleResultCheck";
@@ -154,7 +154,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
                                 r={0.5}
                                 stroke={"none"}
                                 strokeWidth={0}
-                                fill={isSelected ? rgba(CellSelectionColor.mainCurrent, 0.3) : "none"}
+                                fill={isSelected ? rgba(CellHighlightColor.mainCurrent, 0.3) : "none"}
                                 style={{
                                     pointerEvents: "all",
                                     cursor: "pointer",

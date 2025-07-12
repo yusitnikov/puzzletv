@@ -1,27 +1,27 @@
 import { useCallback, useState } from "react";
 import { loadStringFromLocalStorage, saveStringToLocalStorage } from "../../../utils/localStorage";
 import { isSamePosition, Position } from "../../../types/layout/Position";
-import { CellSelectionColor } from "../../../components/puzzle/cell/CellSelection";
+import { CellHighlightColor } from "../../../components/puzzle/cell/CellHighlight";
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 
-export enum TesseractSelectionType {
+export enum TesseractHighlightType {
     Always = "always",
     Clues = "clues",
     Never = "never",
 }
 
-const localStorageKey = "tesseractSelection";
+const localStorageKey = "tesseractHighlight";
 
-const getTesseractSelectionType = () =>
-    loadStringFromLocalStorage<TesseractSelectionType>(localStorageKey, TesseractSelectionType.Clues);
+const getTesseractHighlightType = () =>
+    loadStringFromLocalStorage<TesseractHighlightType>(localStorageKey, TesseractHighlightType.Clues);
 
-export const useTesseractSelectionType = (): [TesseractSelectionType, (type: TesseractSelectionType) => void] => {
-    const [type, setType] = useState<TesseractSelectionType>(getTesseractSelectionType);
+export const useTesseractHighlightType = (): [TesseractHighlightType, (type: TesseractHighlightType) => void] => {
+    const [type, setType] = useState<TesseractHighlightType>(getTesseractHighlightType);
 
     const handleSetType = useCallback(
-        (type: TesseractSelectionType) => {
+        (type: TesseractHighlightType) => {
             setType(type);
             saveStringToLocalStorage(localStorageKey, type);
         },
@@ -31,19 +31,19 @@ export const useTesseractSelectionType = (): [TesseractSelectionType, (type: Tes
     return [type, handleSetType];
 };
 
-export const getTesseractCellSelectionType = <T extends AnyPTM>(
+export const getTesseractCellHighlight = <T extends AnyPTM>(
     cell: Position,
     context: PuzzleContext<T>,
-): ReturnType<Required<PuzzleTypeManager<T>>["getCellSelectionType"]> => {
+): ReturnType<Required<PuzzleTypeManager<T>>["getCellHighlight"]> => {
     if (context.selectedCellsCount !== 1) {
         return undefined;
     }
     const selectedCell = context.firstSelectedCell!;
 
-    switch (getTesseractSelectionType()) {
-        case TesseractSelectionType.Never:
+    switch (getTesseractHighlightType()) {
+        case TesseractHighlightType.Never:
             return undefined;
-        case TesseractSelectionType.Clues:
+        case TesseractHighlightType.Clues:
             if (
                 !context.allItems.some(
                     ({ name, cells }) => name === "ellipse" && isSamePosition(cells[0], selectedCell),
@@ -69,7 +69,7 @@ export const getTesseractCellSelectionType = <T extends AnyPTM>(
     }
 
     return {
-        color: CellSelectionColor.secondary,
+        color: CellHighlightColor.secondary,
         strokeWidth: 1,
     };
 };
