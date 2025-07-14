@@ -19,7 +19,14 @@ import {
     germanWhispersExplained,
     thermometersExplained,
     killerCagesExplained,
-    cannotRepeatInCage
+    cannotRepeatInCage,
+    arrowsExplained,
+    renbanExplained,
+    renbanTitle,
+    canRepeatOnArrows,
+    xExplained,
+    vExplained,
+    notAllXVGiven
 } from "../ruleSnippets";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
@@ -29,6 +36,9 @@ import { RegionSumLineConstraint } from "../../components/puzzle/constraints/reg
 import { QuadConstraint } from "../../components/puzzle/constraints/quad/Quad";
 import { MaxConstraint, MinConstraint } from "../../components/puzzle/constraints/min-max/MinMax";
 import { LineConstraint } from "../../components/puzzle/constraints/line/Line";
+import { VMarkConstraint, XMarkConstraint } from "../../components/puzzle/constraints/xv/XV";
+import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
+import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
 
 export const Adventure1: PuzzleDefinitionLoader<AdventurePTM<NumberPTM>> = {
     loadPuzzle: () =>
@@ -115,10 +125,36 @@ const adventure2Def: choiceTaken = {
                 option2ChoiceMessage: "SecondChoice 1 option 2",
                 option2TakenMessage: "SecondChoice 1 option 2 Taken",
                 option1: {
-                    initialDigits: {},
-                    constraints: [KropkiDotConstraint("R2C1", "R2C2", true)],
-                    rules: [translate(blackKropkiDotsExplained)],
-                    choices: undefined
+                    // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATgBMAFgC%2BNVeq06EegiaLnLINZu279xgGwWr723t8AGYDAA4-V2sPO30wg18XNxtPB0ojSIBzTAA3FDx8BChGFDocuDYSgkTQcsr%2BMkjkmKDTJujA-SJKIhqogNT8Mko%2B5s6CbqIIpI7BkwNKdoHYggNjJZSV-Hnp-02ggHZ1meXD712QOqr8DJP9uOO9lv1gsMW754J426fxkO9nL9BmEARtPv8LmNBkcfpcKtciJErvwDmC-uF3kCtiZzmjBhi8diwrCoVs2h8-iZiYTDgkaV1Hv17gQyKNZti6RS5pysUF5n1kat6QRybV4fwSezWm9hfgiIzsnkCkUSmVxRNZQSuVturLddq%2BTKDfoqZimeDTbKDmFIVL9AdccaHBdFfkCCrSnD6hqnSEwoDzX9XgHBdskeqbuHvYYo9dGi5Q8FY-w2acupQzaGDHqM5q%2Bq7lcVPaHEQmI0my9HUZXriGI7a0xMjGbSUEiM29R3fZbu0beSa%2B16EVlcm7CkW1dHYQX3ROh-xswBdOjSXDoIpwTA4BD6FQgBAAT3o-DNh%2BPEzoUBQ2TXykoNHv96INGfz6MNHf78fD5fv7fH4A78nz-ADPxoYJwMgkwaGg6CyBoeD4Ig5CYNQuCEIwlCINg1DEIw7waAIgiDhoEiSLCGgKIoojCNIujyMoxiaOI%2BjGKoxdIjPfgTB6Og2C3IIlCUbwDFI0SDmfbxnzIIxlyUIx4KMAiiBI3pKMXZcQBgLcABFMDAMA0HyWQWTodcDw4LhXAgNgJEIABibwDjAEYDkEMRMGkABrHA9H0SgSCIRpOKPbjKAokAACNGDYSL0AAdUwMQAEEoCgCAAHdd1AaLYoAYTkBRlG8ShNLgNLMt3YT73OBCwg0yJcsigr5F3AEyoqrLlGEuDYIIkwSLIA4GpcJqWqK-AlFCDr0q6yaptE4Jn0cGDSo4zTzMs-AcpiyKrKwZgTxICKwEweRJHsgyrrAQR13Srz%2BFADzvN89B-Kod9rNsqALrgP7-pAMwLCETqrOeny-IIALKHgr67JAez-oBuhRBQOANAAZUwQ6oZIYJgrMDizCAA
+                    initialDigits: {4: {8: 1}},
+                    constraints: [ArrowConstraint("R5C4", ["R4C5", "R5C6", "R5C5"]),
+                        ArrowConstraint("R8C2", ["R7C1", "R6C2", "R6C3", "R7C4"]),
+                        ArrowConstraint("R7C7", ["R8C6", "R7C5"])],
+                    rules: [`${translate(arrowsExplained)}, ${translate(canRepeatOnArrows)}`],
+                    choices: {
+                        solveCells: [[4, 3], [4, 5], [6, 3], [6, 4], [6, 6], [7, 1], [7, 5]],
+                        topMessage: "ThirdChoice 1",
+                        option1ChoiceMessage: "ThirdChoice 1 option 1",
+                        option1TakenMessage: "ThirdChoice 1 option 1 Taken",
+                        option2ChoiceMessage: "ThirdChoice 1 option 2",
+                        option2TakenMessage: "ThirdChoice 1 option 2 Taken",
+                        option1: {
+                            initialDigits: {8: {4: 7}},
+                            constraints: [RenbanConstraint(["R2C3", "R3C3", "R4C4"]),
+                                RenbanConstraint(["R4C7", "R4C8", "R5C8"]),
+                                RenbanConstraint(["R9C1", "R9C2", "R9C3"]),
+                                WhispersConstraint(["R1C1", "R2C1", "R3C1", "R3C2", "R2C2", "R1C2"]),
+                                ArrowConstraint("R3C7", ["R3C6", "R3C5"])],
+                            rules: [`${translate(renbanTitle)}: ${translate(renbanExplained())}`],
+                            choices: undefined
+                        },
+                        option2: {
+                            initialDigits: {},
+                            constraints: [KropkiDotConstraint("R2C1", "R2C2", false)],
+                            rules: [translate(whiteKropkiDotsExplained)],
+                            choices: undefined
+                        }
+                    }
                 },
                 option2: {
                     initialDigits: {},
@@ -149,8 +185,7 @@ const adventure2Def: choiceTaken = {
                         KillerCageConstraint(["R8C7", "R9C7", "R9C8", "R9C9", "R8C9"], 27),
                         KillerCageConstraint(["R3C9", "R4C9", "R4C8"], 18),
                         KillerCageConstraint(["R1C4", "R2C4", "R3C4", "R3C5"], 11)],
-                    rules: [translate(killerCagesExplained),
-                            translate(cannotRepeatInCage)],
+                    rules: [`${translate(killerCagesExplained)}, ${translate(cannotRepeatInCage)}`],
                     choices: {
                         solveCells: [[2, 4], [2, 8], [6, 1], [7, 1], [8, 1], [7, 6], [7, 8]],
                         topMessage: "ThirdChoice 3",
@@ -181,6 +216,7 @@ const adventure2Def: choiceTaken = {
                                 LineConstraint(["R4C1", "R4C2", "R5C2", "R5C3"]),
                                 LineConstraint(["R4C4", "R5C4", "R5C5"]),
                                 LineConstraint(["R6C2", "R6C3", "R6C4"])],
+                            // TODO nabner
                             rules: [],
                             choices: undefined
                         }
@@ -213,14 +249,16 @@ const adventure2Def: choiceTaken = {
                         },
                         // TODO
                         option2: {
-                            initialDigits: {},
-                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHZP9-ABsfq5kwfwAzGEEkQa2XgS%2BsS78oUnx%2BKZp-npZrkG5VlHuRU4FBB5l%2BKXmeUUxNSlF1pU5DSZFiW1VTUWtcf6d-a71Q-yZoADmmKooePgIUFp0yeVF%2BV2pG2tFFV19K-jNXdWj0R1F46f4gwcjB5cHu1frV5tXJwf76UcgUzNzCyWVwe6SeBxu3xKvSKbz%2BswIgJQy3Sd3SLwO6PSX38H3SsOm8PmiyRwLq50qP0ePUqb1u20qEP8TzhAOJyP8lxZCLZ7xsXKJQM%2BugAunRpLh0As4JgcAhFPgVCAEABPej8Sg2FVqkx0KAoKYS5SUGjG41EGjm80OGjW62mk0Wx1Wm0u%2B1mp0u200cLe32WGj%2B-1kGjB4M%2B8MByNBkMxiM%2BwOR0MxgI0FMp7w0DMZtw0HM5tOpzNF7O50sF9PF0t54Wa1URSjGkDoNgQADuBDAGnQJLEaBgED4CDQ8qUSks5vCE%2BNDm0oqUAQzZBzZAzAXTwe86e8c4cwaIJYzRBTDksc6IXqIVrNZrcc%2B81u8PoC4WFoqbKo4XBA4pbUEkAGJpCA4DBDETBpAAaxwFB0HlSgSB9EAACNGDYJCACU4AAE0wRg4JIaxa21Q5KH9EA2BlGDlCUMhrQCY1vEoOdwnDa1JwDJi3ywHAJg4dD9WwHAABUIAQLsOy7ElJWVT98FAH8JEIf8HBQaQkLAMBQNEcCoJg-CiFCIixkoa1vzkBRlC4j9%2BHkiBfwAhtHMoFiQF0IzomcsULBHWyoGgv98BXOgcKmOVlDYzMa1icU-LQRxgxAELMDChV-RTMgot8-yCHHYLMFCkdrWDU8RToaTZNAbjeJQAAZSiJIUFA3JrXQgA
-                            constraints: [ThermometerConstraint(["R9C1", "R9C2", "R8C1"]),
-                                ThermometerConstraint(["R2C4", "R1C3", "R2C3", "R3C3", "R2C2", "R3C1"]),
-                                QuadConstraint("R5C2", [2, 4, 5]),
-                                QuadConstraint("R3C6", [4, 5, 6]),
-                                QuadConstraint("R6C8", [2, 3, 7])],
-                            rules: [],
+                            initialDigits: { 1: {1: 7}},
+                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ADgCcAJgC%2BNVeq06EegsYAsFq5u279AZgPnLINW629vhEzn4BNh4OAGxhrpF2%2BiaOlC7%2B1u6JBCYmqeEZQUnJaRGZwUS5JQVR%2BNGe0WkA5pgAbih4%2BAhQjCh0LXBsPQQA7FWBNRUN%2BeNZIXHpM8HRlAZjCeUVa2X6pmn9g-yr0%2Bv6y1uFBN558duXBtcLJ3cPpRchvjdvnmQfj7f4yQe%2ByG%2BCMewGIKI5xqJh%2B0NmFXmrwmxT8wP4YLREP4o2O-1RoHRBChfmabQ6XR6fWxDnhwSMU0%2BKKR1VmZEoLMWXmGRyZbMojJARNBdKS82Fv2RsxMREFUuCOU5TwB7NFxLIctZwU8Ly1%2BiIZF5QpphjVoM1XIIDLNBsFwsxfPKhqarXaBEpvWNB2JZs8lTxb0cjiNwvFJt%2B9vB3vwZBd5Pd3U9ws8ZqDRvlO1iZoM9VTcKx0djpNdFMT1OjJMJJpTAYmuwLIKV-zTZo1rYtyrbDf4dpNuKr0aNZLdnTLXshcZHHvLIN%2Bw9LVPHGLMAF06NJcOgunBMDgEPoVCAEABPej8B4ns-EuhQFDNTfKSg0J9Pog0N9vkw0L9fl-P98AZ%2B37AX%2Br6AcBP40J4UEwY4NBwXBZA0EhSHQWh8EYYhyHYeh0EIRhKHYdENDEcRww0OR5EGDQ1HUaRJEUYxVE0Sx9FkUxLG0SuaSXvwOpPiA6BsBAADuBBgAM6CemIaAwBAfB2BgyhKI4b6eGpT4mEYa5KNE5GGsh5HRGRSHDGRww6bC77MeRsrfo4K5roJJ4cFw-gQMJUCSAAxNIfn%2BYIYiYNIADWOB6PolAkNBIAAEaMGwsUAEpwFojCRSQzg8ae-ApHBIBsLuwRKEoPwkU%2BwyUDpnhoV%2B6nwVVTlYDgjQcEld7YDgAAqEAIJJ4mSZ6W7Hq5%2BCqB5EiEN5JgoNIsVgGAgWiMFYURQQUUGmY2VXgClBfv4BwHgOkICSgGiNPwRDfFGIJISAZ0XdkN2Xad52XUWx0vXQD38ASS7Eq9j34H6z0A99b0EI4H3-SEgMYlCTnhY0iCuso3HcWYQA
+                            constraints: [VMarkConstraint("R1C2", "R1C3"),
+                                XMarkConstraint("R3C1", "R4C1"),
+                                XMarkConstraint("R8C1", "R9C1"),
+                                XMarkConstraint("R6C1", "R6C2"),
+                                XMarkConstraint("R1C7", "R2C7"),
+                                XMarkConstraint("R2C6", "R2C7"),
+                                XMarkConstraint("R3C6", "R2C6")],
+                            rules: [`${translate(xExplained)}, ${translate(vExplained)}. ${translate(notAllXVGiven)}`],
                             choices: undefined
                         }
                     }
