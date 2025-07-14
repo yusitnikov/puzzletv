@@ -26,7 +26,9 @@ import {
     canRepeatOnArrows,
     xExplained,
     vExplained,
-    notAllXVGiven
+    notAllXVGiven,
+    evenExplained,
+    oddExplained
 } from "../ruleSnippets";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
@@ -39,6 +41,8 @@ import { LineConstraint } from "../../components/puzzle/constraints/line/Line";
 import { VMarkConstraint, XMarkConstraint } from "../../components/puzzle/constraints/xv/XV";
 import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow";
 import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
+import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
+import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
 
 export const Adventure1: PuzzleDefinitionLoader<AdventurePTM<NumberPTM>> = {
     loadPuzzle: () =>
@@ -139,6 +143,7 @@ const adventure2Def: choiceTaken = {
                         option2ChoiceMessage: "ThirdChoice 1 option 2",
                         option2TakenMessage: "ThirdChoice 1 option 2 Taken",
                         option1: {
+                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATgBMAFgC%2BNVeq06EegiaLnLINZu279xgGwWr723t8AGYDAA4-V2sPO30wg18XNxtPB0ojSIBzTAA3FDx8BChGFDocuDYSgkTQcsr%2BMkjkmKDTJujA-SJKIhqogNT8Mko%2B5s6CbqIIpI7BkwNKdoHYggNjJZSV-Hnp-02ggHZ1meXD712QOqr8DJP9uOO9lv1gsMW754J426fxkO9nL9BmEARtPv8LmNBkcfpcKtciJErvwDmC-uF3kCtiZzmjBhi8diwrCoVs2h8-iZiYTDgkaV1Hv17gQyKNZti6RS5pysUF5n1kat6QRybV4fwSezWm9hfgiIzsnkCkUSmVxRNZQSuVturLddq%2BTKDfoqZimeDTbKDmFIVL9AdccaHBdFfkCCrSnD6hqnSEwoDzX9XgHBdskeqbuHvYYo9dGi5Q8FY-w2acupQzaGDHqM5q%2Bq7lcVPaHEQmI0my9HUZXriGI7a0xMjGbSUEiM29R3fZbu0beSa%2B16EVlcm7CkW1dHYQX3ROh-xswBdOjSXDoIpwTA4BD6FQgBAAT3o-DNh%2BPEzoUBQ2TXykoNHv96INGfz6MNHf78fD5fv7fH4A78nz-ADPxoYJwMgkwaGg6CyBoeD4Ig5CYNQuCEIwlCINg1DEIw7waAIgiDhoEiSLCGgKIoojCNIujyMoxiaOI%2BjGKoxdIjPfgTB6Og2C3IIlCUbwDFI0SDmfbxnzIIxlyUIx4KMAiiBI3pKLk%2B9RKmF8tKfRdlxAGAtwAEUwMAwDQfJZBZOh1wPDguFcCA2AkQgAGJvAOMARgOQQxEwaQAGscD0fRKBIIhGk4o9uMoCiQAAI0YNgEvQAB1TAxAAQSgKAIAAd13UAkpSgBhOQFGUbxKAMuBcoK3dhPvc4ELCfTIhKhLyvkXcAVq%2BrCuUYS4NggiTBIsgDnalxOu6yr8CUUJ%2BrywaFsW0TgmfRwYJqjiZuSrqKt3UxloaobTA-CCjFkjiDLshz8GKg7HKwZgTxIeKwEweRJDc8z-rAQR1zywL%2BFAfygpC9Awqod8nJcqBfrgZGUZAMwLCEAbHIh4LQoIcLKHg%2BHXJANyUdRuhRBQOANAAZUwN78ZIYIoui89tgzPiBMaog33vYIapoRbkNg4I5IOd8Dggg4TH02zDwe1RnJJv6fO8vzRAC3HoaZyL0Y4swgA
                             initialDigits: {8: {4: 7}},
                             constraints: [RenbanConstraint(["R2C3", "R3C3", "R4C4"]),
                                 RenbanConstraint(["R4C7", "R4C8", "R5C8"]),
@@ -149,9 +154,16 @@ const adventure2Def: choiceTaken = {
                             choices: undefined
                         },
                         option2: {
-                            initialDigits: {},
-                            constraints: [KropkiDotConstraint("R2C1", "R2C2", false)],
-                            rules: [translate(whiteKropkiDotsExplained)],
+                            initialDigits: {4: {0: 5}},
+                            constraints: [EvenConstraint("R1C4"),
+                                EvenConstraint("R1C5"),
+                                EvenConstraint("R2C6"),
+                                EvenConstraint("R6C5"),
+                                OddConstraint("R4C1"),
+                                OddConstraint("R4C9"),
+                                ArrowConstraint("R1C1", ["R2C1", "R3C2", "R4C2"]),
+                                WhispersConstraint(["R4C2", "R4C3", "R3C4", "R2C5"])],
+                            rules: [`${translate(evenExplained)}, ${translate(oddExplained)}`],
                             choices: undefined
                         }
                     }
