@@ -1,7 +1,4 @@
-import { FPuzzles } from "./Import";
-import { PuzzleImportOptions } from "../../types/puzzle/PuzzleImportOptions";
-import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition, PuzzleDefinitionLoader } from "../../types/puzzle/PuzzleDefinition";
-import { NumberPTM } from "../../types/puzzle/PuzzleTypeMap";
+import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { AdventurePTM } from "../../puzzleTypes/adventure/types/AdventurePTM";
 import { CellsMap, createCellsMapFromArray, mergeCellsMaps } from "../../types/puzzle/CellsMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
@@ -46,21 +43,11 @@ import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
 import { lightOrangeColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 
-export const Adventure1: PuzzleDefinitionLoader<AdventurePTM<NumberPTM>> = {
-    loadPuzzle: () =>
-        FPuzzles.loadPuzzle({
-            load: "N4IgzglgXgpiBcBOANCALhNAbO8QGEALGAJxIE8ACAISwHsww6BbEVAQwFc1C6SEQAWXZYSdAOZsQJTjjAw0AgHJ9mIymE4ATOgGtOlGXMrsADqazkAdAB0AdgBEI4zGA0xT7EuzQwtlACMqdkoAd0JMGEodNBMSKIBjOjt5BO4IADcYW0dnV0oIOxMwiN9KBIgSBJxKZk4wWLNTGC8TWJx2BspkhKjCyh4ogDM6ThINMbFOOy1C8XKYLCwwHIAFMYsomLcvKNNMuljTOkK0NxHx9jsqas4YNzRRhIi7ecHKhaXkEohnuKixGgfH5yvQErpQhB5HFRjMBsQPvsModKMdTvCpuJCJQlBpfKY3HQhpREAAGaIwcTxe7fcKkKK4qHwqIZER3bpFQaog5oHIAJUOwP8t3utXYVDoWRIWDMgW4tXqsTsKJgAA9fHDRmcIFoolyqTqrFIDVoEABtM3AAC+yGttptdsdDud9oAushLS6nfafd7re7Pb6vcGgwG/SHw26PZGY8GwxGE6Ho4nY1HA6nY/Gg9nM+6QLMhkN6XZeubQL0lmBzSA+QBmfAARikdfwACYQK6HSAK8tq3zW/gAOzN+vDzu27uLXvwM01gAs+AArM2FwA2DtdntVmfzpfNxd78flqfb2d8wf4WvNi9zjcTrd9gAce9Q58Pm5PT8vzef7c7eYAR04dgtBkTYy0nSs+wHJtXwHdtX3rWCa3rP9UFZLA7lPBtkEXZBECPSDpzPBs22bUirzgsiqKvPMMKw81a2QQdCIfHc+VI4dX1Ix9mwHLiawHXi6LZe5zTnZBH1Yz92KEvj8EQEd8F4xCFI7dDROw3D8OkqD2IPAS+QPFSa1XIdmzM4SNMwsSZ1bZAJNXXTiN3ddXwXQyDzcmsDPUkB6Nss0mLwliPz0s8LxMt9FNfZ8oufRSRJs097KYudnNPHzv1fA9b1fMzKNM/BbyShiZxwxcMr7BcEN3QqjOorLaOssqzQkvCnLCly32Qt9ar5Z9et/PyAtPWt/1QCoqhwCC2LPGC/ICToYHwAQAGJECHRdNqkLUsEKFb1tJY6TqkEY7DQVa8DWk7TtQSEtB4BBSSsVs8JABEsUUeAXrerrMv7b88yW+QrpADatp21A9oOsGbtu0kzuSS6joRqQHqen7Xvez7CG+37F3+6DzOB5a4c2wdttW6HuH2uxDuuhHEdQc6UcZtH7p1TGCdQXH8exonZLU0nQfWimqd22nYdR26kYuuGmfRrnCGe7HeZgZw8dVv77xks810Wsmxch6mQBh+mFY5kBWct2XOcelWsbe9XNf5nXj3CrKrJAEGGfB8WobNqWLZlu7reR22w4xx2eY+jWvu1wndc96LDdF66A9N82/fhu3w/l0PjqVh3E5dhOnaTj3urMkrUF98mTcl7BpfZvObcL5mQGj0u49dxPBbPA80J9o2M8bmnm5D1uw/b6ei/t7m1d78uCYHmthpFnPM6bumc8VlmI474vF+d5etYrq08wSdhxFwS1/NEgRmDAcQkjIGAEjQeBKHwZIqR8WQPgIDJDAAAQnsAAdUWEkZgeo6DMkMDAZEmEMDJFAVIOaNZSJNjzNnOGhYCFDHnvnNm4NCGFiLpfVAmgEi9EYIIe4YAb64AIH/bwaBAGoJSOAuwUCsAwLgQg+IyD0hoKkEwFBwC7DmjwigCSOF7KrmYpJZATEmIKOUSgR8yAlF4Ucso7RwUHLIHsjhFAijkA4QkoObSTEtH4WMXheyhjLHKKUS4mxSizHaQkvZGx2jdHGPsigdRrjgkqKYjY/RejbEOK8SovxnYgA==",
-        } as PuzzleImportOptions),
-    noIndex: false,
-    slug: "adventure1",
-};
-
-const S = undefined;
-export const Adventure2: PuzzleDefinition<AdventurePTM<number>> = {
+export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     
     title: { [LanguageCode.en]: "Adventure is out there!" },
     author: { [LanguageCode.en]: "Tumbo" },
-    slug: "adventure2",
+    slug: "choose-your-own-adventure",
     initialDigits: { 8: { 4: 1 } },
     typeManager: AdventureTypeManager(),
     gridSize: GridSize9,
@@ -106,7 +93,7 @@ type choiceTaken = {
     choices: choiceDefinitions | undefined
 }
 
-const adventure2Def: choiceTaken = {
+const adventureDef: choiceTaken = {
     initialDigits: { 6: { 0: 1 }, 7: { 4: 1}, 8: { 7: 2, 8: 9}},
     constraints: [],
     rules: [],
@@ -318,7 +305,7 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
     let constraints: Constraint<AdventurePTM, any>[] = [];
     let digits: CellsMap<number> = {};
     let rules: string[] = [];
-    let currentChoice: choiceTaken | undefined = adventure2Def;
+    let currentChoice: choiceTaken | undefined = adventureDef;
     var depth = 0;
     while (currentChoice !== undefined)
     {

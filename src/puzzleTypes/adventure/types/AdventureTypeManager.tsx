@@ -71,7 +71,7 @@ export const AdventureTypeManager = (
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>
-                                        <div>{"Congratulations "}{context.stateExtension.message}!</div>
+                                        <div>{context.stateExtension.message}</div>
                                     </>
                         </div>
     
