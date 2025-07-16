@@ -28,7 +28,7 @@ export const AdventureTypeManager = (
         
             const handleOption1 = () => {
                 context.gridExtension.choicesMade = [...context.gridExtension.choicesMade, 1];
-                context.stateExtension.message = "";
+                context.stateExtension.message = undefined;
                 context.stateExtension.messageChoice1 = "";
                 context.stateExtension.messageChoice2 = "";
                 context.stateExtension.messageTaken = context.stateExtension.messageChoice1Taken;
@@ -43,7 +43,7 @@ export const AdventureTypeManager = (
 
             const handleOption2 = () => {
                 context.gridExtension.choicesMade = [...context.gridExtension.choicesMade, 2];
-                context.stateExtension.message = "";
+                context.stateExtension.message = undefined;
                 context.stateExtension.messageChoice1 = "";
                 context.stateExtension.messageChoice2 = "";
                 context.stateExtension.messageTaken = context.stateExtension.messageChoice2Taken;
@@ -56,10 +56,14 @@ export const AdventureTypeManager = (
                 );
             };
 
-            const handleClose = () => {
-                context.stateExtension.messageTaken = "";
+            const handleChoiceTakenClose = () => {
+                context.stateExtension.messageTaken = undefined;
                 context.stateExtension.messageChoice1Taken = "";
                 context.stateExtension.messageChoice2Taken = "";
+            };
+
+            const handleIntroClose = () => {
+                context.stateExtension.introViewed = true;
             };
         
             return (
@@ -67,7 +71,7 @@ export const AdventureTypeManager = (
                 
                 {baseTypeManager.getAboveRules?.(context, isPortrait)}
 
-                {context.stateExtension.message !== "" && (
+                {context.stateExtension.message !== undefined && (
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>
@@ -107,9 +111,7 @@ export const AdventureTypeManager = (
                     </Modal>
                 )}
 
-                
-
-                {context.stateExtension.messageTaken !== "" && (
+                {context.stateExtension.messageTaken !== undefined && (
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>
@@ -121,7 +123,32 @@ export const AdventureTypeManager = (
                             <Button
                                 type={"button"}
                                 cellSize={cellSize}
-                                onClick={handleClose}
+                                onClick={handleChoiceTakenClose}
+                                autoFocus={true}
+                                style={{
+                                    marginTop: cellSize * globalPaddingCoeff,
+                                    padding: "0.5em 1em",
+                                }}
+                            >
+                                Ok
+                            </Button>
+                        </div>
+                    </Modal>
+                )}
+
+                {context.stateExtension.introViewed === undefined && (
+                    <Modal cellSize={cellSize} >
+                        <div>
+                                    <>
+                                        <div>Introduction!</div>
+                                    </>
+                        </div>
+    
+                        <div>
+                            <Button
+                                type={"button"}
+                                cellSize={cellSize}
+                                onClick={handleIntroClose}
                                 autoFocus={true}
                                 style={{
                                     marginTop: cellSize * globalPaddingCoeff,

@@ -1,8 +1,9 @@
 export interface AdventureGameState {
-    message: string;
+    message: string | undefined;
     messageChoice1: string;
     messageChoice2: string;
     messageChoice1Taken: string;
     messageChoice2Taken: string;
-    messageTaken: string;
+    messageTaken: string | undefined;
+    introViewed: boolean | undefined;
 }
