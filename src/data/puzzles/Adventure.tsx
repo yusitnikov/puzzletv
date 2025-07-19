@@ -25,7 +25,8 @@ import {
     vExplained,
     notAllXVGiven,
     evenExplained,
-    oddExplained
+    oddExplained,
+    normalSudokuRulesApply
 } from "../ruleSnippets";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
@@ -99,24 +100,24 @@ const adventureDef: choiceTaken = {
     rules: [],
     choices: {
         solveCells: [[8, 6]],
-        topMessage: "FirstChoice",
-        option1ChoiceMessage: "FirstChoice option 1",
-        option1TakenMessage: "FirstChoice option 1 Taken",
-        option2ChoiceMessage: "FirstChoice option 2",
-        option2TakenMessage: "FirstChoice option 2 Taken",
+        topMessage: "You've arrived at the edge of your neighbors land, marking your starting point and taking in the sights before taking your first step.",
+        option1ChoiceMessage: "Explore the nearby bogs",
+        option1TakenMessage: "You find a species of garter snake you haven't seen before and sketch them (not to scale) on your map.",
+        option2ChoiceMessage: "Investigate the bare patches ground between the nearby trees",
+        option2TakenMessage: "The bare patch is a game trail, the local wildlife appear to use these paths to navigate to the top of the areas hills.",
         option1: {
             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATjIA2AL41V6rToR6CRgBznLm7bv2PnINa5t3DZE4W3lZuth4mXj7W7vaBXgDmmABuKHj4CFCMKHTJcGzZBGbB0WH%2BACxBLjHhBABM5VGhfvpElETF1WWt7VUhvrH4bUR9pS0Ew6PNg8Od-TX%2Bk00DtfgODcsL%2BgDsxn15Bfx1m90EDgbHJdOr55dd42sXJw%2B3z4OvVyv%2BH-fvG8EHQpDLyA-jbN6rNp1SgQxaUOp3eanIbwxFjGao2E9aFYiaYz5bM51KZffQNGEE5FEBG4lE4ykPKFo65wmkMjFs36Q%2BEUrms5mkokkwn4cm06kCkVQ3lIxn4vnYyVU%2BWyjky9Hczmqm7E2m7YVUrVJVLpTLZXL5IFEcXtJVy6k2h3s7lOhV413air7S38ADM4o9Gv8xl9cyD%2BhDYZZEdDtMjiRSaQIZpyIFBEzjsYBPoI4Odiw96bWtLIlEa%2Bf0pfLbvwVZLZfr1c9lYb2cOGeCxqTGSyqaLiK7pt7FvbhlMAF06NJcOhMnBMDgEPoVCAEABPej8GXrzcTOhQFBJGfKSg0U%2Bnog0S%2BXuo0W%2B389nq-Pm93t%2BPi8vt-3mi%2B3--8oaEAwCyBoUDQL-SCgOgkCwLgqC-2A6DwLg4waDQtDthoLCsIcGg8LwjD0OwkjcPw8iiMw0jyII8cvB3fhynaOg2AXfwlCUYwDGw7jtkvYxLzIOpJyUOpQLqNCiCwjp8PHScQBgBcABFMDAMA0DSWQCFAkBZzXDguG8CA2AkQgAGJjG2MBKEswQxEwaQAGscD0fRKBIIgyFMCdvKAA
             initialDigits: { 0: {6: 6}},
             constraints: [WhispersConstraint(["R8C7", "R9C8", "R8C9", "R7C8", "R6C8"]),
                         WhispersConstraint(["R3C8", "R3C9", "R2C9", "R2C8", "R1C9"])],
-            rules: [`${translate(germanWhispersTitle)}: ${translate(germanWhispersExplained())}`],
+            rules: [`Garter Snakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}`],
             choices: {
                 solveCells: [[1, 8], [2, 7], [2, 8], [6, 7], [7, 6], [7, 8]],
-                topMessage: "SecondChoice 1",
-                option1ChoiceMessage: "SecondChoice 1 option 1",
-                option1TakenMessage: "SecondChoice 1 option 1 Taken",
-                option2ChoiceMessage: "SecondChoice 1 option 2",
-                option2TakenMessage: "SecondChoice 1 option 2 Taken",
+                topMessage: "You've made a detailed sketch of the snakes and tried unsuccessfully to coax one into a specimen jar before deciding to move on.",
+                option1ChoiceMessage: "You hear a whistling sound from over the hill",
+                option1TakenMessage: "The whistling sound is a dust devil, a small whirlwind of dust and debris. They appear large and die down quickly as they move away from you.",
+                option2ChoiceMessage: "You catch a glint of something golden",
+                option2TakenMessage: "You discover a wild crop of wheat ready for harvest.",
                 option1: {
                     // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATgBMAFgC%2BNVeq06EegiaLnLINZu279xgGwWr723t8AGYDAA4-V2sPO30wg18XNxtPB0ojSIBzTAA3FDx8BChGFDocuDYSgkTQcsr%2BMkjkmKDTJujA-SJKIhqogNT8Mko%2B5s6CbqIIpI7BkwNKdoHYggNjJZSV-Hnp-02ggHZ1meXD712QOqr8DJP9uOO9lv1gsMW754J426fxkO9nL9BmEARtPv8LmNBkcfpcKtciJErvwDmC-uF3kCtiZzmjBhi8diwrCoVs2h8-iZiYTDgkaV1Hv17gQyKNZti6RS5pysUF5n1kat6QRybV4fwSezWm9hfgiIzsnkCkUSmVxRNZQSuVturLddq%2BTKDfoqZimeDTbKDmFIVL9AdccaHBdFfkCCrSnD6hqnSEwoDzX9XgHBdskeqbuHvYYo9dGi5Q8FY-w2acupQzaGDHqM5q%2Bq7lcVPaHEQmI0my9HUZXriGI7a0xMjGbSUEiM29R3fZbu0beSa%2B16EVlcm7CkW1dHYQX3ROh-xswBdOjSXDoIpwTA4BD6FQgBAAT3o-DNh%2BPEzoUBQ2TXykoNHv96INGfz6MNHf78fD5fv7fH4A78nz-ADPxoYJwMgkwaGg6CyBoeD4Ig5CYNQuCEIwlCINg1DEIw7waAIgiDhoEiSLCGgKIoojCNIujyMoxiaOI%2BjGKoxdIjPfgTB6Og2C3IIlCUbwDFI0SDmfbxnzIIxlyUIx4KMAiiBI3pKMXZcQBgLcABFMDAMA0HyWQWTodcDw4LhXAgNgJEIABibwDjAEYDkEMRMGkABrHA9H0SgSCIRpOKPbjKAokAACNGDYSL0AAdUwMQAEEoCgCAAHdd1AaLYoAYTkBRlG8ShNLgNLMt3YT73OBCwg0yJcsigr5F3AEyoqrLlGEuDYIIkwSLIA4GpcJqWqK-AlFCDr0q6yaptE4Jn0cGDSo4zTzMs-AcpiyKrKwZgTxICKwEweRJHsgyrrAQR13Srz%2BFADzvN89B-Kod9rNsqALrgP7-pAMwLCETqrOeny-IIALKHgr67JAez-oBuhRBQOANAAZUwQ6oZIYJgrMDizCAA
                     initialDigits: {4: {8: 1}},
@@ -126,9 +127,9 @@ const adventureDef: choiceTaken = {
                     rules: [`${translate(arrowsExplained)}, ${translate(canRepeatOnArrows)}`],
                     choices: {
                         solveCells: [[4, 3], [4, 5], [6, 3], [6, 4], [6, 6], [7, 1], [7, 5]],
-                        topMessage: "ThirdChoice 1",
-                        option1ChoiceMessage: "ThirdChoice 1 option 1",
-                        option1TakenMessage: "ThirdChoice 1 option 1 Taken",
+                        topMessage: "You study the dust devils for a while, even managing to jump into the path of one before it dissipates. After wiping the dust from your face you orient towards the distant edge of your map.",
+                        option1ChoiceMessage: "You catch a floral scent on the breeze",
+                        option1TakenMessage: "You follow the scent and find rows of lavendar bushes, their flowers in full bloom.",
                         option2ChoiceMessage: "ThirdChoice 1 option 2",
                         option2TakenMessage: "ThirdChoice 1 option 2 Taken",
                         option1: {
@@ -139,7 +140,7 @@ const adventureDef: choiceTaken = {
                                 RenbanConstraint(["R9C1", "R9C2", "R9C3"]),
                                 WhispersConstraint(["R1C1", "R2C1", "R3C1", "R3C2", "R2C2", "R1C2"]),
                                 ArrowConstraint("R3C7", ["R3C6", "R3C5"])],
-                            rules: [`${translate(renbanTitle)}: ${translate(renbanExplained())}`],
+                            rules: [`Lavendar Rows (${translate(renbanTitle)}): ${translate(renbanExplained())})`],
                             choices: undefined
                         },
                         option2: {
@@ -164,8 +165,8 @@ const adventureDef: choiceTaken = {
                         WhispersConstraint(["R7C6", "R7C7"], true, 4, lightOrangeColor),
                         WhispersConstraint(["R8C3", "R9C4", "R8C5"], true, 4, lightOrangeColor),
                         WhispersConstraint(["R9C1", "R8C2", "R8C3", "R7C3", "R6C3"])],
-                    // TODO
-                    rules: [],
+                    // TODO dutch whispers
+                    rules: [`Wild wheat (dutch whispers): TODO`],
                     choices: {
                         solveCells: [[4, 2], [5, 2], [6, 2], [7, 2], [7, 1], [8, 0], [6, 5], [6, 6]],
                         topMessage: "ThirdChoice 2",
@@ -204,7 +205,7 @@ const adventureDef: choiceTaken = {
             constraints: [ThermometerConstraint(["R8C5", "R7C5", "R7C4", "R9C4", "R9C6"]),
                 ThermometerConstraint(["R5C6", "R4C5", "R4C3"]),
                 ThermometerConstraint(["R3C8", "R2C9", "R1C9", "R1C8", "R2C8", "R3C7"])],
-            rules: [translate(thermometersExplained)],
+            rules: [`Game trails (Thermometers): ${translate(thermometersExplained)}`],
             choices: {
                 solveCells: [[3, 2], [3, 3], [6, 3], [6, 4], [6, 5], [7, 3], [7, 5], [8, 3], [8, 4], [8, 5]],
                 topMessage: "SecondChoice 2",
@@ -353,7 +354,7 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
         <>
             <RulesParagraph>
                 <summary>
-                    Normal sudoku rules apply.
+                    {translate(normalSudokuRulesApply)}. As you annotate your map (fill in digits) you will be presented with choices to decide what to explore next (causing new rules to appear). Upon choosing you may see new landmarks and notate them on your map (new given digits may appear).
                 </summary>
             </RulesParagraph>
             

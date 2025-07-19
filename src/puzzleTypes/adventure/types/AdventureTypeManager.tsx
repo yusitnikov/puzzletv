@@ -115,7 +115,7 @@ export const AdventureTypeManager = (
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>
-                                        <div>{context.stateExtension.messageTaken}!</div>
+                                        <div>{context.stateExtension.messageTaken}</div>
                                     </>
                         </div>
     
@@ -140,7 +140,10 @@ export const AdventureTypeManager = (
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>
-                                        <div>Introduction!</div>
+                                        <div>While plenty of 12 year olds love adventure most don't have bedrooms like yours, filled with fossil replicates, antique maps, and hiking gear.
+                                              With heroes like Jane Goodall, John Muir, and Jacques Cousteau you have wanted to go on an adventure of your own for years.
+                                              Your parents, ever-cautious, have decided you are old enough and have gotten permission of some town members to explore their land.
+                                              With your compass, specimen jars, and your map (this puzzle) ready to be filled in, you set off!</div>
                                     </>
                         </div>
     
@@ -155,7 +158,7 @@ export const AdventureTypeManager = (
                                     padding: "0.5em 1em",
                                 }}
                             >
-                                Ok
+                                Your adventure begins!
                             </Button>
                         </div>
                     </Modal>
