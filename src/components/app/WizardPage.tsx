@@ -115,6 +115,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [hasStickyJigsawPiece, setHasStickyJigsawPiece] = useBoolFromLocalStorage("fpwHasStickyJigsawPiece", false);
     const [stickyJigsawPiece, setStickyJigsawPiece] = useNumberFromLocalStorage("fpwStickyJigsawPiece", 1);
     const [hideZeroRegion, setHideZeroRegion] = useBoolFromLocalStorage("fpwHideZeroRegion", false);
+    const [regionMargin, setRegionMargin] = useNumberFromLocalStorage("fpwRegionMargin", 0);
     const [noPieceRegions, setNoPieceRegions] = useBoolFromLocalStorage("fpwNoPieceRegions", false);
     const [isFirstStickyGrid, setIsFirstStickyGrid] = useBoolFromLocalStorage("fpwIsFirstStickyGrid", true);
     const [noStickyRegionValidation, setNoStickyRegionValidation] =
@@ -268,6 +269,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         angleStep: finalAngleStep,
         noSudoku: isJigsawLike && noSudoku,
         hideZeroRegion: isJigsaw && hideZeroRegion,
+        regionMargin: isJigsaw && hideZeroRegion && regionMargin !== 0 ? regionMargin : undefined,
         noPieceRegions: (isJigsawLike && noPieceRegions) || isShuffled,
         stickyRegion: finalIsFirstGridSticky
             ? {
@@ -916,6 +918,20 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                             onChange={(ev) => setHideZeroRegion(ev.target.checked)}
                                         />
                                     </label>
+
+                                    {hideZeroRegion && (
+                                        <label>
+                                            &nbsp; with a margin: &nbsp;
+                                            <input
+                                                type={"number"}
+                                                value={regionMargin}
+                                                min={0}
+                                                step={0.1}
+                                                onChange={(ev) => setRegionMargin(ev.target.valueAsNumber)}
+                                                style={{ width: 50, textAlign: "center" }}
+                                            />
+                                        </label>
+                                    )}
                                 </Paragraph>
                             )}
 

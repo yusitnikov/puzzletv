@@ -89,6 +89,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     stickyDigits?: boolean;
     splitUnconnectedRegions?: boolean;
     hideZeroRegion?: boolean;
+    regionMargin?: number;
     givenDigitsBlockCars?: boolean;
     supportZero?: boolean;
     caterpillar?: boolean;
@@ -167,6 +168,7 @@ export const sanitizeImportOptions = (
         stickyDigits,
         splitUnconnectedRegions,
         hideZeroRegion,
+        regionMargin,
         givenDigitsBlockCars,
         supportZero,
         caterpillar,
@@ -238,6 +240,7 @@ export const sanitizeImportOptions = (
         stickyDigits,
         splitUnconnectedRegions,
         hideZeroRegion,
+        regionMargin,
         givenDigitsBlockCars,
         supportZero,
         caterpillar,

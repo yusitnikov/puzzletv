@@ -29,6 +29,8 @@ export const GridRect = observer(function GridRectFc<T extends AnyPTM>({
 
     const transformedRect = getGridRectTransform(context, position);
 
+    const margin = context.puzzle.importOptions?.regionMargin ?? 0;
+
     return (
         <TransformedRectGraphics rect={transformedRect}>
             <AutoSvg
@@ -41,16 +43,22 @@ export const GridRect = observer(function GridRectFc<T extends AnyPTM>({
                             {cells.map(({ top, left }) => (
                                 <rect
                                     key={`cell-${top}-${left}`}
-                                    x={left - position.left}
-                                    y={top - position.top}
-                                    width={1}
-                                    height={1}
+                                    x={left - position.left - margin}
+                                    y={top - position.top - margin}
+                                    width={1 + margin * 2}
+                                    height={1 + margin * 2}
                                     strokeWidth={0}
                                 />
                             ))}
                         </>
                     ) : (
-                        true
+                        <rect
+                            x={-margin}
+                            y={-margin}
+                            width={width + margin * 2}
+                            height={height + margin * 2}
+                            strokeWidth={0}
+                        />
                     ))
                 }
             >
