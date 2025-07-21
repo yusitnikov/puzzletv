@@ -167,7 +167,7 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                                 ...item,
                                 isValidPuzzle(_lines, _digits, _cells, context): PuzzleResultCheck {
                                     return hasParkedCar(context, boundingBox)
-                                        ? successResultCheck(context.puzzle)
+                                        ? successResultCheck(context)
                                         : notFinishedResultCheck();
                                 },
                             };

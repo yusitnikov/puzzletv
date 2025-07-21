@@ -186,7 +186,7 @@ export const RotatableClueConstraint = <T extends AnyPTM>(
 
                 // Verify that the rotated cells are still within the grid
                 return processedCells.every(({ top, left }) => top % 1 !== 0 || left % 1 !== 0 || allCells[top]?.[left])
-                    ? successResultCheck(context.puzzle)
+                    ? successResultCheck(context)
                     : notFinishedResultCheck();
             },
             isValidCell(cell, digits, regionCells, context, constraints, constraint, isFinalCheck): boolean {

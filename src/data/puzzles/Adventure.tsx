@@ -68,7 +68,7 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     resultChecker: (context) => {
         return isValidFinishedPuzzleByEmbeddedSolution(context);
     },
-    successMessage: "TestSuccessMessage",
+    successMessage: (context) => "TestSuccessMessage: " + context.gridExtension.choicesMade.join(", "),
     items: (context) => {
         return [
             ...getAdventureConstraints(context),

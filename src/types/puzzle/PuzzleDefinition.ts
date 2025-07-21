@@ -264,7 +264,7 @@ export interface PuzzleDefinition<T extends AnyPTM> extends PuzzlePageParams {
     /**
      * The message to show to the user when they successfully finish solving the puzzle.
      */
-    successMessage?: ReactNode;
+    successMessage?: ReactNode | ((context: PuzzleContext<T>) => ReactNode);
     /**
      * Automatically notify the user when they solve the puzzle,
      * disregarding the relevant user setting.
@@ -680,7 +680,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
 
     if (finished) {
         timer.stop();
-        return successResultCheck(puzzle);
+        return successResultCheck(context);
     }
 
     if (areCorrectColorsByDigits) {

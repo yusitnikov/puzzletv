@@ -133,7 +133,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         }
 
         // Dots are counted twice
-        return product === 0 && dots === 18 ? successResultCheck(context.puzzle) : errorResultCheck();
+        return product === 0 && dots === 18 ? successResultCheck(context) : errorResultCheck();
     },
     // TODO: allowDrawing: ["border-mark"],
 };

@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { translate } from "../../utils/translate";
 import { AnyPTM } from "./PuzzleTypeMap";
-import { PuzzleDefinition } from "./PuzzleDefinition";
 import { LanguageCode } from "../translations/LanguageCode";
 import { PuzzleContext } from "./PuzzleContext";
 
@@ -48,11 +47,11 @@ export type PuzzleResultChecker<T extends AnyPTM> = (context: PuzzleContext<T>) 
 /**
  * Puzzle check result for finishing the puzzle successfully.
  */
-export const successResultCheck = <T extends AnyPTM>(puzzle: PuzzleDefinition<T>): PuzzleResultCheck => ({
+export const successResultCheck = <T extends AnyPTM>(context: PuzzleContext<T>): PuzzleResultCheck => ({
     isCorrectResult: true,
     isPending: false,
     resultPhrase:
-        puzzle.successMessage ??
+        (typeof context.puzzle.successMessage === "function" ? context.puzzle.successMessage(context) : context.puzzle.successMessage) ??
         translate({
             [LanguageCode.en]: "Absolutely right!",
             [LanguageCode.ru]: "Совершенно верно!",
