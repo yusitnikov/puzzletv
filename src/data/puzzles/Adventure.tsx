@@ -41,7 +41,7 @@ import { ArrowConstraint } from "../../components/puzzle/constraints/arrow/Arrow
 import { RenbanConstraint } from "../../components/puzzle/constraints/renban/Renban";
 import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
 import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
-import { lightOrangeColor } from "../../components/app/globals";
+import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
@@ -124,7 +124,7 @@ const adventureDef: choiceTaken = {
                     constraints: [ArrowConstraint("R5C4", ["R4C5", "R5C6", "R5C5"]),
                         ArrowConstraint("R8C2", ["R7C1", "R6C2", "R6C3", "R7C4"]),
                         ArrowConstraint("R7C7", ["R8C6", "R7C5"])],
-                    rules: [`${translate(arrowsExplained)}, ${translate(canRepeatOnArrows)}`],
+                    rules: [`Dust Devils (arrows): ${translate(arrowsExplained)}, ${translate(canRepeatOnArrows)}`],
                     choices: {
                         solveCells: [[4, 3], [4, 5], [6, 3], [6, 4], [6, 6], [7, 1], [7, 5]],
                         topMessage: "You study the dust devils for a while, even managing to jump into the path of one before it dissipates. After wiping the dust from your face you orient towards the distant edge of your map.",
@@ -165,23 +165,21 @@ const adventureDef: choiceTaken = {
                         WhispersConstraint(["R7C6", "R7C7"], true, 4, lightOrangeColor),
                         WhispersConstraint(["R8C3", "R9C4", "R8C5"], true, 4, lightOrangeColor),
                         WhispersConstraint(["R9C1", "R8C2", "R8C3", "R7C3", "R6C3"])],
-                    // TODO dutch whispers
-                    rules: [`Wild wheat (dutch whispers): TODO`],
+                    rules: [`Wild wheat (dutch whispers): Consecutive digits along the orange line must have difference of 4 or more`],
                     choices: {
                         solveCells: [[4, 2], [5, 2], [6, 2], [7, 2], [7, 1], [8, 0], [6, 5], [6, 6]],
-                        topMessage: "ThirdChoice 2",
-                        option1ChoiceMessage: "ThirdChoice 2 option 1",
-                        option1TakenMessage: "ThirdChoice 2 option 1 Taken",
-                        option2ChoiceMessage: "ThirdChoice 2 option 2",
-                        option2TakenMessage: "ThirdChoice 2 option 2 Taken",
+                        topMessage: "You decide to collect some of the wheat, maybe the town baker will teach out how to make bread. Looking through the gap in the wheat row something catches your eye.",
+                        option1ChoiceMessage: "You see some flat stones that look arranged",
+                        option1TakenMessage: "The flat stones appear to be the ruins of an old road with grass growing through the gaps.",
+                        option2ChoiceMessage: "The sun glints off some black and white stones in the dirt",
+                        option2TakenMessage: "The stones are quartz, they are rounded and polished, maybe they were used as tokens in a game.",
                         option1: {
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHYbAc0xVFDx8BCgtOhd%2BADZPe3wyONcAZiT%2BVINbLwJfTKiCRLzs-FMi%2BL0y11jKqzSCDxrHOvdmp0b8avMU5sKu2vaKvpNm3KH8NrHrTICgkLCIrPKR5oyx0rGGsc7F116d-j38jubN-YJBs-wpsYnL1cvRy-WHlebno9Oj7ZnggnmUSLFQ7FW5HC5Ha4gH5zcIAp4nZbtSFHUHFcFA17tbZfZro%2BK3aF-WGA%2BJ7QmhYnw9r3I6PCEIpE9fyBX4UhZHGnFbHFOnFT7FZ7k-4k1wElkw9lo3QAXTo0lw6DCcEwOAQinwKhACAAnvR%2BJQbDq9SY6FAUAEFcpKDRrdaiDR7faHDRnc7bTaHZ6nS6fe67V6fa6aMlg6HLDRw%2BGyDRo9GQ-GI4mozGUwmQ5HE7GU9EaDmc94aAWC24aCWS3nc4Wq8XS7WK-nq7Wy9LDbqrJR7SA2CqUOqlEpotpC0PvPbovayA5ZUoHNGHDmiAWiDm3NPLAWyHno9Fw94p7KQDAVQARTBgMBoYKyAp0RXajhcEDytgSQgAYmi3jAlE-gjEmGkABrHBe3VSgSCIRJW2NK4OzobsQL7JQyCHaJKGnaJo28bdvGnBwS2SEtLGiaUDyPHBT3PS8cGvK5bx1B98FAZ9XxAN9zzgNDqDof8gMQsCIKgzIjXbZ0ux7JDkmtZJ7UsCdZOdSxkmnZIQwccNIIdcMHBDIh02nMhrTQ0j6PvfhmIgF8oEkN84Ds%2By-1EADgNAghwMg3QZU8oA
                             initialDigits: {},
                             constraints: [PalindromeConstraint(["R1C5", "R2C5", "R3C6", "R2C6", "R2C7", "R3C7", "R4C7"]),
                                 PalindromeConstraint(["R4C4", "R4C5", "R5C6", "R6C7", "R5C7", "R5C8"]),
                                 PalindromeConstraint(["R6C6", "R7C7"])],
-                            //TODO
-                            rules: [],
+                            rules: [`Road ruins (Palindrome): Digits on a grey line must be the same read backwards and forwards.`],
                             choices: undefined
                         },
                         option2: {
@@ -192,7 +190,7 @@ const adventureDef: choiceTaken = {
                                 KropkiDotConstraint("R4C6", "R5C6", true),
                                 KropkiDotConstraint("R5C5", "R5C6", true),
                                 WhispersConstraint(["R3C3", "R2C4", "R2C5", "R3C6"])],
-                            rules: [`${translate(whiteKropkiDotsExplained)}, ${translate(blackKropkiDotsExplained)}`],
+                            rules: [`Quartz (Kropki dots): ${translate(whiteKropkiDotsExplained)}, ${translate(blackKropkiDotsExplained)}`],
                             choices: undefined
                         }
                     }
@@ -208,11 +206,11 @@ const adventureDef: choiceTaken = {
             rules: [`Game trails (Thermometers): ${translate(thermometersExplained)}`],
             choices: {
                 solveCells: [[3, 2], [3, 3], [6, 3], [6, 4], [6, 5], [7, 3], [7, 5], [8, 3], [8, 4], [8, 5]],
-                topMessage: "SecondChoice 2",
-                option1ChoiceMessage: "SecondChoice 2 option 1",
-                option1TakenMessage: "SecondChoice 2 option 1 Taken",
-                option2ChoiceMessage: "SecondChoice 2 option 2",
-                option2TakenMessage: "SecondChoice 2 option 2 Taken",
+                topMessage: "Having followed the game trail and arrive at the top of one of the areas hills. From this vantage point you see some large landscape features in the distance.",
+                option1ChoiceMessage: "You spot wooden planks in a field",
+                option1TakenMessage: "You reach the planks and find that they were part of a fence around a pasture.",
+                option2ChoiceMessage: "You see the refaction of sunlight off moving water",
+                option2TakenMessage: "The water is a small stream that runs through the fields.",
                 option1: {
                     initialDigits: {},
                     // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaINfJwDXIJtQlNj0t3xtbxy0l3ysmJL42zIbCv9S6zta4vqqjyLHVoz3bLUNLQI9Frju2yS6kfyPXpBwgfxkzsnMibzrAGZgxdSu-O1mpbWCTe3chvcD2f7%2BMlXzhcow68GniPdX%2BYB2O6qbU8rRutHik5joPvxvsMjrYZmcqh0QABzTCqFB4fAIKBaOiggj-XbWQo-UZEqH3MjjMm-exUwGRS5w0afTz45Z41nQhGMsoc%2B6eYLAw73IHE-LBZmixo0oVVdYUyUEZm8qqRba4-C3Wk8hX4fmCnZs-AilLI1HozHYq5vfBEcF4u34SF9a0zdWXdVDGUkhGmtEEC0oHHPI060le-Ish2eg2ctXBzWgX3mrGBq3zW0g4PrB1OtP8V3B5WjcqZ60JmP3EvO%2BYI9W59XbJP%2BlNB60ZxMov0Ylt5hI%2BJvdy0e3QAXTo0lw6ExcEwOAQ1hUIAQAE96Px9Su1%2B46FAUMjJ8pKDQj0eiDQz2ebDQr1eT8fzw-L9fn3fT4-nzeaOsvz-gjQ-3%2BZA0EBQHfmB-4QYBwHQeB34ARBIHQZ4NDIchnw0Oh6GRDQ2HYahKEYYRWE4SR%2BFoURJG4SOPibvwQJHiA6BsBAADuBBgBo6CpmIaAwBAfCuBgyhKMEZ7rGJR42NoY5KJ46FkNhZDoZ4aFAcyGGfDJNhAUQxHoUQyFZCOY6MSuHBcL4EDMVAkgAMTSA5jmCGImDSAA1jgVjWJQJDfiAABGjBsP5ABKcBmIw3kkKENGrnRlBnqkiL5IusjyAuZBAfyGHrCZboMnICjKF4X5-nKeXBkQpyFQunjaBhZ6fNhnz1ZElAVdaNi5mlRX4Eo34eNel42B16a2iZU7LuZ%2BCgK4AAeCAWRO1l2ZQa3rSA%2BhJfwhhWRIhC2etG26Cd1G6EAA
@@ -220,14 +218,14 @@ const adventureDef: choiceTaken = {
                         KillerCageConstraint(["R8C7", "R9C7", "R9C8", "R9C9", "R8C9"], 27),
                         KillerCageConstraint(["R3C9", "R4C9", "R4C8"], 18),
                         KillerCageConstraint(["R1C4", "R2C4", "R3C4", "R3C5"], 11)],
-                    rules: [`${translate(killerCagesExplained)}, ${translate(cannotRepeatInCage)}`],
+                    rules: [`Fences (Killer Cages): ${translate(killerCagesExplained)}, ${translate(cannotRepeatInCage)}`],
                     choices: {
                         solveCells: [[2, 4], [2, 8], [6, 1], [7, 1], [8, 1], [7, 6], [7, 8]],
-                        topMessage: "ThirdChoice 3",
-                        option1ChoiceMessage: "ThirdChoice 3 option 1",
-                        option1TakenMessage: "ThirdChoice 3 option 1 Taken",
-                        option2ChoiceMessage: "ThirdChoice 3 option 2",
-                        option2TakenMessage: "ThirdChoice 3 option 2 Taken",
+                        topMessage: "You have fully mapped out the pastures on your map and calculated the area of each. Maybe someone in town will know what kind of animals were kept here.",
+                        option1ChoiceMessage: "Adjacent to the pastures you see what appears to be the remnant of a stone structure",
+                        option1TakenMessage: "The stone structure seems like it may have once been a castle and its walls.",
+                        option2ChoiceMessage: "You see a small dirt mount nearby",
+                        option2TakenMessage: "Its an ant hill and there are several red ants climbing onto your shoes, you back away and shake them off hoping they aren't fire ants.",
                         option1: {
                             initialDigits: { 0: { 6: 6}, 5: { 1: 3 }},
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaIMQAHNMVRQ8fAQoLTpwrQJvFNiA12ttEsd-FzdbUNKncvqbMhsY5rrrOw6m2vj8D2rfLsGQsI0i-D1%2BuIqEpM6BhaGbRrUpqOX5%2Bo8dlusAZmDkmt3KvvPDghOz0ZW9q5BC-jID7oJIykmIglnNn8hr9pgB2D6DGz3MqffBHH4pV7-EH8cFzG4NCGrEbpTLZXL5F5bL5Y%2BpVUmVEYwwZkJbo2G9Cm3SLPamrUGeaFjVaRLmPaxU7mtPkXYrBBHXWHwpn4YIcny4rIEAkoArEuEyo60mUckUY3kogjvemQvWwzzizUStIZJU5PKqolAoiG-D3JH4NGA6YbJ3TZ4egEPUUzHG2-EOtVAo4y8km7Hu9VBtn1Tmu42gRURwkel2I9Ux-NAr1%2B-i%2Bj1myHl9UZ4MY9aukYeksVhXh5WR0vuNt4js59XPLN9x2B3QAXTo0lw6FycEwOAQ1hUIAQAE96PxrWuN%2B46FAUOlp8pKDQTyeiDQLxebDQbzez6fL0-r7fXw-z8-X3eaEcf3-gjQAEAWQNAgSBv4QYBUHAaBsGQb%2BQFQWBsGeDQqGoaCNCYZhkQ0LhuHoWhWHETheFkYRGEkWR%2BFjj4278PCJ4gOgbAQAA7gQYAaOgjpiGgMAQHwrgYMoSjBBeRwSSeNjaBOSieJhZC4WQmGeBhIEclhoJyW0l6kZhRCoesY4Tsxa4cFwvgQKxUCSAAxNIjlOYIYiYNIADWOBWNYlAkL%2BIAAEaMGwAUAEpwGYjA%2BSQoR0euDGUBeoypPUy6yPIS5kCBFpYUcpkevYpRyAoyheD%2BAFavl6pENCxVLp42hYReoK4aCjXfFVQI2CW6UlfgSi-h4t7XjYnXTEQeaGHVyiNTVl6yVG40xqZM6rhZ%2BCgK4AAeCCWVONn2ZQR3HSA%2BjJfwhjWRIhB2cdJ26A9KT0e4lA3r4039UQJ7BGBo10Kt62XQdN13UdRxHKdcU7kMlD%2Bb1S7BABnggXKt7af95kXVZwMgLdoPg5DtG6EAA
@@ -239,20 +237,17 @@ const adventureDef: choiceTaken = {
                                 MinConstraint("R5C9"),
                                 MinConstraint("R6C3"),
                                 MinConstraint("R8C3")],
-                            // TODO min/max
-                            rules: [],
+                            rules: [`Castle remnants (Min/Max): In a grey cell with four arrows facing outwards, the digit in the cell must be greater than the digits in the four orthogonally neighboring cells. In a grey cell with four arrows facing inwards, the digit in the cell must be less than the digits in the four orthogonally neighboring cells.`],
                             choices: undefined
                         },
-                        // TODO
                         option2: {
                             initialDigits: { 0: { 6: 6, 8: 3} },
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaIMQAHNMVRQ8fAQoLTpwrQJvFNiA12ttEtB0zOzc-JBC-gBmGKdyt1syG3b-Fy67XtKOgaCvPriK91CU5oI9Ef742yTJzvHZtQ0i-GTHZen8D3Wxghbg-d9Rle1hg6mui6uys%2BP7pp3%2BMlOVyMowl8FoCIu4QbsAOy-I42F43I4tAFzIH4RbbUH4KFLR7WGxba6HLrVNIZLIEBooAoouGEyrE163enwrpkNbYjYJezst4tSIfBlHCGeGk4giREUc-BM2kJCVvTzBJEPSWI6FdYJCtW4rnKnmsrUEIVyv5Xeb4H7clawg1SxU21UpWpknJ5SmfDFEcFRL2Gn34fFmj5mtEE0Wo4lO%2BquqkYtqWo5VG3Cv0hgVE00oi01UlRxpmz3I2N%2BrHo3YB6k2vF%2BrOhyVVwu7Ylmkvu3ZXSPk6Ot-gF7N1Tt5lEfDsuwcYvQAXTo0lw6FycEwOAQ1hUIAQAE96PwlWvNz26FAUOlZ8pKDQz2eiDQr1ebDQ73eL%2Bfry-b-f30-L6-3w%2BaC0-wBwQ0EBQFkDQYFgf%2BUHATBoHgfB0H-iBMEQfBng0Oh6EQjQ2HYZEND4fhmEYThpF4QRFHEVhZEUYRE4%2BBuW7nJQZ4gOgbAQAA7gQYAaOgbpiGgMAQHwrgYMoSjBFeLTSWeNjaFOSieNhZD4WQ2GeFhYFCjhEKKTYYFEOR2FEOheITlObEbhwXC%2BBAHFQJIADE0iuW5ghiJg0gANY4FY1iUCQ-4gAARowbAhQASnAZiMAFJChAxe7MVe1ypF0q6yPIK5kGBCo4S0lmBvycgKMoXh-kBLRkEVKJEC8pUrp42g4VeEL4RCLX-LVGI2C2WVlfgSj-h4963jYPW7EQnqWXO642fgoCuAAHggtkzg5zksdt1D6Gl-CGPZEiEE5O0sSAuiXSkjH8IkLF0Gwi4Zauy3uOQdDrgQgU1q9%2BDfR9X3kD4v3-SAn3HEDKS-aQYFg29P0JO9cMQz8imgCDSPgy0kPo-DAP4NjCMo-jwQ4yAv02JjBCk6jNAvXjyMUETlOw%2BDTPA%2BcVPmkDaPk5zrP8xzBNczTQs0yTPOzdZB1rqIXm%2Bf5gNELDG3HSATlgJrLSaZrF26PRuhAA
-                            constraints: [LineConstraint(["R1C2", "R1C1", "R2C1", "R2C2", "R2C3"]),
-                                LineConstraint(["R4C1", "R4C2", "R5C2", "R5C3"]),
-                                LineConstraint(["R4C4", "R5C4", "R5C5"]),
-                                LineConstraint(["R6C2", "R6C3", "R6C4"])],
-                            // TODO nabner
-                            rules: [],
+                            constraints: [LineConstraint(["R1C2", "R1C1", "R2C1", "R2C2", "R2C3"], lightRedColor),
+                                LineConstraint(["R4C1", "R4C2", "R5C2", "R5C3"], lightRedColor),
+                                LineConstraint(["R4C4", "R5C4", "R5C5"], lightRedColor),
+                                LineConstraint(["R6C2", "R6C3", "R6C4"], lightRedColor)],
+                            rules: [`Red ants (Nabner lines): On red lines there may be no consecutive or repeated digits.`],
                             choices: undefined
                         }
                     }
@@ -262,7 +257,7 @@ const adventureDef: choiceTaken = {
                     // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8RSgCZKAXxqr1WnQj0FDRo%2Bcubtu-WUPOQa1zbsGACzevtbuBAAcAGzBFj5Wbrb6RoFmcaGJAY5pLmFJBI6xuZn6RCYhCf76AOwxFX7h%2BLVR9XlZZEXxDflBrSUEUZQRfVUFqSON2d4AbnBsjPzD6ZWNgxM9ZEPrAZtLxaP4u9ulTsvdAQDMZKf7k%2BNxs-P8AJwzcwv2xwXXXwYpv2VOo8PvhXg93vxqr9-uCnp84gBzTDTFB4fAIKALOjAxa-Z4tM5tE6dDIHTYklYbSgE25UmkgHEEMG0rJAiEFaFEemkyYwlnJTYAsjcykBIhkPZdIn2CVvOH4SU8nr4vEi86lYVykHMqX9AyyxHI1EEDFYhnsgy-QKBRWi-TWyWM-Bs%2BU3c3ynVOsjeJEotGmlDYi0XK021UU9VMuqEvWBH6wkHew1%2Bk2YwPukFELX8EMxg5EZ5up0R6XOsN5xqaisbNWlqugJ30p1QhO45PG9FpoPyrPt-1djP8N2%2BjsB7va0wAXTo0lw6AxcEwOAQ%2BhUIAQAE96Pwcuut-wiHQoCgkXPlJQaBeL4ebzQjHeH1fLzRb4f7%2B-n0-Xw%2BPxcaH%2B-0CGggKAsgaDAsCAP-YCYNA8D4KgwDYPgiCaCiNCMOqGgsKwiIaDwvD0KI7CSNw-DyOI9CcJIgj8MnbxN23AgLkoC8QHQNgIAAdwIMA5nQdMxDQGAID4WwMGUJRAkPC4ZIvIxnmnJQoiwiVwKwqIqLA2psOqJSjDAogyKwrk70CSdp3YzcOC4HwIE4qBJAAYmkVy3MEMRMGkABrHA9H0SgSD-EAACNGDYEKACU4C0RgApIYIGP3AhUiAkA2CXAIlCUa40IvapKCUi4APvWTgMKyysBwBEOEik9sBwAAVCAEH43j%2BPTecNxs-BVHsiRCCcowUGkEKwDADzRC83z-IIQLxVMKdFqAA
                     constraints: [RegionSumLineConstraint(["R6C8", "R7C7", "R8C8"]),
                         RegionSumLineConstraint(["R4C7", "R4C6", "R4C5","R5C5"])],
-                    rules: ["There are some blue lines in the grid, each of which passes through multiple regions. The digits on each blue line have the same sum in each region it passes through."],
+                    rules: ["Streams (Region sum lines): There are some blue lines in the grid, each of which passes through multiple regions. The digits on each blue line have the same sum in each region it passes through."],
                     choices: {
                         solveCells: [[3,5], [5,7], [6,6], [7, 7]],
                         topMessage: "ThirdChoice 4",
@@ -278,8 +273,7 @@ const adventureDef: choiceTaken = {
                                 QuadConstraint("R5C2", [2, 4, 5]),
                                 QuadConstraint("R3C6", [4, 5, 6]),
                                 QuadConstraint("R6C8", [2, 3, 7])],
-                            // TODO quad
-                            rules: [],
+                            rules: [`Cornerstones (Quadruples): Digits in a circle must appear in at least one of the four surrounding cells.`],
                             choices: undefined
                         },
                         option2: {
@@ -292,7 +286,7 @@ const adventureDef: choiceTaken = {
                                 XMarkConstraint("R1C7", "R2C7"),
                                 XMarkConstraint("R2C6", "R2C7"),
                                 XMarkConstraint("R3C6", "R2C6")],
-                            rules: [`${translate(xExplained)}, ${translate(vExplained)}. ${translate(notAllXVGiven)}`],
+                            rules: [`Roman scripts (X/V): ${translate(xExplained)}, ${translate(vExplained)}. ${translate(notAllXVGiven)}`],
                             choices: undefined
                         }
                     }

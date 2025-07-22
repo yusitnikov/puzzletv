@@ -130,7 +130,7 @@ export const AdventureTypeManager = (
                                     padding: "0.5em 1em",
                                 }}
                             >
-                                Ok
+                                Continue
                             </Button>
                         </div>
                     </Modal>
