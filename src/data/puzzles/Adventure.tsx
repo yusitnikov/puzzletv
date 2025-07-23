@@ -43,6 +43,7 @@ import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
 import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
 import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
+import { indexes } from "../../utils/indexes";
 
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     
@@ -74,6 +75,11 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
             ...getAdventureConstraints(context),
         ].map(toDecorativeConstraint);
     },
+    /* lmdLink: "TODO",
+    getLmdSolutionCode: ({ puzzle: { solution } }) =>
+        indexes(9)
+            .map((index) => solution![0][index])
+            .join(""),*/
 }
 
 type choiceDefinitions = {
@@ -223,9 +229,9 @@ const adventureDef: choiceTaken = {
                         solveCells: [[2, 4], [2, 8], [6, 1], [7, 1], [8, 1], [7, 6], [7, 8]],
                         topMessage: "You have fully mapped out the pastures on your map and calculated the area of each. Maybe someone in town will know what kind of animals were kept here.",
                         option1ChoiceMessage: "Adjacent to the pastures you see what appears to be the remnant of a stone structure",
-                        option1TakenMessage: "The stone structure seems like it may have once been a castle and its walls.",
+                        option1TakenMessage: "The stone structure seems like it may have once been the older location of the towns homes. Some are elevated while others are sunked in and may have been cellars.",
                         option2ChoiceMessage: "You see a small dirt mount nearby",
-                        option2TakenMessage: "Its an ant hill and there are several red ants climbing onto your shoes, you back away and shake them off hoping they aren't fire ants.",
+                        option2TakenMessage: "It's an ant hill and there are several red ants climbing onto your shoes, you back away and shake them off hoping they aren't fire ants.",
                         option1: {
                             initialDigits: { 0: { 6: 6}, 5: { 1: 3 }},
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaIMQAHNMVRQ8fAQoLTpwrQJvFNiA12ttEsd-FzdbUNKncvqbMhsY5rrrOw6m2vj8D2rfLsGQsI0i-D1%2BuIqEpM6BhaGbRrUpqOX5%2Bo8dlusAZmDkmt3KvvPDghOz0ZW9q5BC-jID7oJIykmIglnNn8hr9pgB2D6DGz3MqffBHH4pV7-EH8cFzG4NCGrEbpTLZXL5F5bL5Y%2BpVUmVEYwwZkJbo2G9Cm3SLPamrUGeaFjVaRLmPaxU7mtPkXYrBBHXWHwpn4YIcny4rIEAkoArEuEyo60mUckUY3kogjvemQvWwzzizUStIZJU5PKqolAoiG-D3JH4NGA6YbJ3TZ4egEPUUzHG2-EOtVAo4y8km7Hu9VBtn1Tmu42gRURwkel2I9Ux-NAr1%2B-i%2Bj1myHl9UZ4MY9aukYeksVhXh5WR0vuNt4js59XPLN9x2B3QAXTo0lw6FycEwOAQ1hUIAQAE96PxrWuN%2B46FAUOlp8pKDQTyeiDQLxebDQbzez6fL0-r7fXw-z8-X3eaEcf3-gjQAEAWQNAgSBv4QYBUHAaBsGQb%2BQFQWBsGeDQqGoaCNCYZhkQ0LhuHoWhWHETheFkYRGEkWR%2BFjj4278PCJ4gOgbAQAA7gQYAaOgjpiGgMAQHwrgYMoSjBBeRwSSeNjaBOSieJhZC4WQmGeBhIEclhoJyW0l6kZhRCoesY4Tsxa4cFwvgQKxUCSAAxNIjlOYIYiYNIADWOBWNYlAkL%2BIAAEaMGwAUAEpwGYjA%2BSQoR0euDGUBeoypPUy6yPIS5kCBFpYUcpkevYpRyAoyheD%2BAFavl6pENCxVLp42hYReoK4aCjXfFVQI2CW6UlfgSi-h4t7XjYnXTEQeaGHVyiNTVl6yVG40xqZM6rhZ%2BCgK4AAeCCWVONn2ZQR3HSA%2BjJfwhjWRIhB2cdJ26A9KT0e4lA3r4039UQJ7BGBo10Kt62XQdN13UdRxHKdcU7kMlD%2Bb1S7BABnggXKt7af95kXVZwMgLdoPg5DtG6EAA
@@ -237,7 +243,7 @@ const adventureDef: choiceTaken = {
                                 MinConstraint("R5C9"),
                                 MinConstraint("R6C3"),
                                 MinConstraint("R8C3")],
-                            rules: [`Castle remnants (Min/Max): In a grey cell with four arrows facing outwards, the digit in the cell must be greater than the digits in the four orthogonally neighboring cells. In a grey cell with four arrows facing inwards, the digit in the cell must be less than the digits in the four orthogonally neighboring cells.`],
+                            rules: [`Town remnants (Min/Max): In a grey cell with four arrows facing outwards, the digit in the cell must be greater than the digits in the four orthogonally neighboring cells. In a grey cell with four arrows facing inwards, the digit in the cell must be less than the digits in the four orthogonally neighboring cells.`],
                             choices: undefined
                         },
                         option2: {
@@ -260,9 +266,9 @@ const adventureDef: choiceTaken = {
                     rules: ["Streams (Region sum lines): There are some blue lines in the grid, each of which passes through multiple regions. The digits on each blue line have the same sum in each region it passes through."],
                     choices: {
                         solveCells: [[3,5], [5,7], [6,6], [7, 7]],
-                        topMessage: "ThirdChoice 4",
-                        option1ChoiceMessage: "ThirdChoice 4 option 1",
-                        option1TakenMessage: "ThirdChoice 4 option 1 Taken",
+                        topMessage: "You find the thinnest part of the stream and are able to jump across. You are excited to finish your adventure without wet socks and shoes.",
+                        option1ChoiceMessage: "You see a large square stone near some rubble",
+                        option1TakenMessage: "You think you have found the cornerstone of one of the old towns buildings. Most of the text is worn away but you are able to make out some of the numbers from the date.",
                         option2ChoiceMessage: "ThirdChoice 4 option 2",
                         option2TakenMessage: "ThirdChoice 4 option 2 Taken",
                         option1: {
