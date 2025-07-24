@@ -105,13 +105,13 @@ export const isValidUserDigit = <T extends AnyPTM>(
 
         const normalizedConstraintCells = normalizeConstraintCells(cells, context.puzzle);
         if (normalizedConstraintCells.length) {
+            if (!arrayContainsPosition(normalizedConstraintCells, cell)) {
+                continue;
+            }
             if (
                 !isFinalCheck &&
                 normalizedConstraintCells.some(({ top, left }) => !context.isVisibleCellForState(top, left))
             ) {
-                continue;
-            }
-            if (!arrayContainsPosition(normalizedConstraintCells, cell)) {
                 continue;
             }
         }
