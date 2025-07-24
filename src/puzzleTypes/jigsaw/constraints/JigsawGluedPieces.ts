@@ -5,6 +5,8 @@ import { getRegionBoundingBox } from "../../../utils/regions";
 import { PositionSet } from "../../../types/layout/Position";
 import { profiler } from "../../../utils/profiler";
 import { notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "../../../types/puzzle/PuzzleResultCheck";
+import { roundToStep } from "../../../utils/math";
+import { roundStep } from "../types/JigsawMovePuzzleInputModeInfo";
 
 export const JigsawGluedPiecesConstraint: Constraint<JigsawPTM> = {
     name: "glued jigsaw pieces",
@@ -16,7 +18,10 @@ export const JigsawGluedPiecesConstraint: Constraint<JigsawPTM> = {
             const groups = groupJigsawPiecesByZIndex(context);
             const cells = getJigsawCellCenterAbsolutePositionsIndex(groups)
                 .flatMap(({ cells }) => cells)
-                .map(({ position }) => position);
+                .map(({ position: { top, left } }) => ({
+                    top: roundToStep(top, roundStep),
+                    left: roundToStep(left, roundStep),
+                }));
 
             // Check that the cells don't overlap
             if (new PositionSet(cells).size !== cells.length) {
