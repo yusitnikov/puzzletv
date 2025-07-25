@@ -90,11 +90,11 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
     private get regionsByCellsMap() {
         profiler.trace();
 
-        const result: CellsMap<GridRegion> = {};
-        for (const region of this.regions ?? []) {
+        const result: CellsMap<{ index: number; region: GridRegion }> = {};
+        for (const [index, region] of (this.regions ?? []).entries()) {
             for (const { top, left } of getGridRegionCells(region)) {
                 result[top] ??= {};
-                result[top][left] = region;
+                result[top][left] = { index, region };
             }
         }
 
@@ -105,7 +105,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         this: PuzzleContext<T>,
         top: number,
         left: number,
-    ): GridRegion | undefined {
+    ): { index: number; region: GridRegion } | undefined {
         return this.regionsByCellsMap[top]?.[left];
     });
 

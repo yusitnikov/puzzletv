@@ -76,6 +76,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     yajilinFog?: boolean;
     fogStars?: boolean;
     cosmeticsBehindFog?: boolean;
+    bumpCosmeticLayers?: boolean;
     safeCrackerCodeLength?: number;
     visibleRingsCount?: number;
     startOffset?: number;
@@ -153,6 +154,7 @@ export const sanitizeImportOptions = (
         yajilinFog,
         fogStars,
         cosmeticsBehindFog,
+        bumpCosmeticLayers,
         safeCrackerCodeLength,
         visibleRingsCount,
         startOffset = 0,
@@ -218,6 +220,7 @@ export const sanitizeImportOptions = (
         yajilinFog,
         fogStars,
         cosmeticsBehindFog,
+        bumpCosmeticLayers,
         safeCrackerCodeLength:
             safeCrackerCodeLength === undefined ? (undefined as unknown as number) : Number(safeCrackerCodeLength),
         visibleRingsCount:

@@ -50,6 +50,7 @@ const FieldSet = styled("fieldset")({
     },
 });
 const Details = styled("div")({ marginTop: "0.25em", color: "#888" });
+const DetailsWarning = styled(Details)({ fontWeight: 700, color: "#c44" });
 const Select = styled("select")({ font: "inherit" });
 
 const typeLabelMap: Record<PuzzleImportSource, string> = {
@@ -108,6 +109,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [yajilinFog, setYajilinFog] = useBoolFromLocalStorage("fpwYajilinFog");
     const [fogStars, setFogStars] = useBoolFromLocalStorage("fpwFogStars");
     const [cosmeticsBehindFog, setCosmeticsBehindFog] = useBoolFromLocalStorage("fpwCosmeticsBehindFog");
+    const [bumpCosmeticLayers, setBumpCosmeticLayers] = useBoolFromLocalStorage("fpwBumpCosmeticLayers");
     const [safeCrackerCodeLength, setSafeCrackerCodeLength] = useNumberFromLocalStorage("fpwSafeCrackerCodeLength", 6);
     const [visibleRingsCount, setVisibleRingsCount] = useNumberFromLocalStorage("fpwVisibleRingsCount", 2);
     const [startOffset, setStartOffset] = useNumberFromLocalStorage("fpwStartOffset", 0);
@@ -260,6 +262,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         yajilinFog: hasFog && yajilinFog,
         fogStars: hasFog && fogStars,
         cosmeticsBehindFog: hasFog && cosmeticsBehindFog,
+        bumpCosmeticLayers: isJigsawLike && hasCosmeticElements && bumpCosmeticLayers,
         safeCrackerCodeLength: isSafeCracker ? safeCrackerCodeLength : undefined,
         visibleRingsCount: isInfiniteRings ? visibleRingsCount || gridSize / 2 - 1 : undefined,
         startOffset: isInfiniteRings ? startOffset : undefined,
@@ -956,6 +959,26 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                     />
                                 </label>
                             </Paragraph>
+
+                            {hasCosmeticElements && (
+                                <Paragraph>
+                                    <label>
+                                        Bump layers for cosmetics:&nbsp;
+                                        <input
+                                            type={"checkbox"}
+                                            checked={bumpCosmeticLayers}
+                                            onChange={(ev) => setBumpCosmeticLayers(ev.target.checked)}
+                                        />
+                                    </label>
+                                    <DetailsWarning>Experimental feature! Use it with caution!</DetailsWarning>
+                                    <Details>
+                                        When enabled, all cosmetic elements marked as "below the grid" in Sudoku Maker
+                                        will become "above the grid" in Puzzle TV, and all cosmetic elements marked as
+                                        "above the grid" in Sudoku Maker will be on top of all{" "}
+                                        {isJigsaw ? "jigsaw" : "tetris"} pieces.
+                                    </Details>
+                                </Paragraph>
+                            )}
                         </CollapsableFieldSet>
                     )}
 

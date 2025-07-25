@@ -3,6 +3,7 @@ import { JigsawGameState, JigsawJssCluesVisibility } from "./JigsawGameState";
 import { JigsawDigit } from "./JigsawDigit";
 import {
     emptyPositionWithAngle,
+    getAveragePosition,
     getLineVector,
     Position,
     PositionSet,
@@ -70,6 +71,7 @@ import {
     addGameStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { createEmptyContextForPuzzle, PuzzleContext } from "../../../types/puzzle/PuzzleContext";
+import { isCosmeticConstraint } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
 
 interface JigsawTypeManagerOptions {
     supportGluePieces?: boolean;
@@ -452,36 +454,87 @@ export const JigsawTypeManager = (
                         };
                     }
 
+                    const contextDraft = createEmptyContextForPuzzle(puzzle);
+
                     const { inactiveCells, resultChecker } = puzzle;
 
                     // Mark all cells that don't belong to a region as inactive
                     let newInactiveCells = new PositionSet(inactiveCells);
-                    const contextDraft = createEmptyContextForPuzzle(puzzle);
                     for (let top = 0; top < puzzle.gridSize.rowsCount; top++) {
                         for (let left = 0; left < puzzle.gridSize.columnsCount; left++) {
-                            const region = contextDraft.getCellRegion(top, left);
-                            if (!region || region.noInteraction) {
+                            const regionInfo = contextDraft.getCellRegion(top, left);
+                            if (!regionInfo || regionInfo.region.noInteraction) {
                                 newInactiveCells = newInactiveCells.add({ top, left });
                             }
                         }
                     }
-                    contextDraft.dispose();
 
                     puzzle = {
                         ...puzzle,
                         inactiveCells: newInactiveCells.items,
                         items: processPuzzleItems(
                             (items) => [
-                                ...items.map((constraint) =>
-                                    constraint.tags?.includes(jssTag)
-                                        ? { ...constraint, component: { [GridLayer.noClip]: JigsawJss } }
-                                        : constraint,
-                                ),
+                                ...items.map((constraint) => {
+                                    if (constraint.tags?.includes(jssTag)) {
+                                        return { ...constraint, component: { [GridLayer.noClip]: JigsawJss } };
+                                    }
+
+                                    if (
+                                        puzzle.importOptions?.bumpCosmeticLayers &&
+                                        isCosmeticConstraint(constraint) &&
+                                        constraint.component
+                                    ) {
+                                        const topComponent = constraint.component[GridLayer.afterLines];
+                                        constraint = {
+                                            ...constraint,
+                                            component: {
+                                                [topComponent ? GridLayer.noClipTop : GridLayer.afterLines]:
+                                                    Object.values(constraint.component)[0],
+                                            },
+                                        };
+
+                                        if (topComponent) {
+                                            const getRegionIndexByCell = ({ top, left }: Position) => {
+                                                const roundedTop = Math.floor(top + 0.5);
+                                                const roundedLeft = Math.floor(left + 0.5);
+                                                return (
+                                                    contextDraft.getCellRegion(roundedTop, roundedLeft) ??
+                                                    contextDraft.getCellRegion(roundedTop - 1, roundedLeft - 1) ??
+                                                    contextDraft.getCellRegion(roundedTop - 1, roundedLeft) ??
+                                                    contextDraft.getCellRegion(roundedTop, roundedLeft - 1)
+                                                )?.index;
+                                            };
+
+                                            if (constraint.renderSingleCellInUserArea) {
+                                                return {
+                                                    ...constraint,
+                                                    regionIndex: getRegionIndexByCell(
+                                                        getAveragePosition(constraint.cells),
+                                                    ),
+                                                };
+                                            }
+
+                                            const regionIndexes = constraint.cells
+                                                .map(getRegionIndexByCell)
+                                                .filter((index) => index !== undefined);
+                                            if (new Set(regionIndexes).size === 1) {
+                                                return {
+                                                    ...constraint,
+                                                    regionIndex: regionIndexes[0],
+                                                };
+                                            }
+                                        }
+                                    }
+
+                                    return constraint;
+                                }),
                                 JigsawGluedPiecesConstraint,
                             ],
                             puzzle.items,
                         ),
                     };
+
+                    contextDraft.dispose();
 
                     if (resultChecker) {
                         puzzle = {
