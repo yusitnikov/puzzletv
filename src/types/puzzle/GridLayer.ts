@@ -11,5 +11,6 @@ export enum GridLayer {
     newUserLines,
     top,
     noClip,
+    noClipTop,
     interactive,
 }

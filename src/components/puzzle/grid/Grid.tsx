@@ -385,6 +385,19 @@ export const Grid = observer(function GridFc<T extends AnyPTM>({ context, rect }
                                     );
                                 }}
                             </GridRegionsWithSameCoordsTransformation>
+                            <GridRegionsWithSameCoordsTransformation
+                                context={readOnlySafeContext}
+                                regionNoClipChildren={(region, regionIndex) => (
+                                    <g data-layer="items-no-clip">
+                                        <GridItems
+                                            layer={GridLayer.noClipTop}
+                                            context={readOnlySafeContext}
+                                            region={region}
+                                            regionIndex={regionIndex}
+                                        />
+                                    </g>
+                                )}
+                            />
                         </GridSvg>
                     </Absolute>
 
