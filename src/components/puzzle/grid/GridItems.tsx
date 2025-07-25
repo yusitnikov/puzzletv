@@ -40,86 +40,104 @@ const GridItemsInner = observer(function GridItemsInnerFc<T extends AnyPTM>({
         <>
             {context
                 .getVisibleItemsForLayer(layer)
-                .map(({ component, cells, renderSingleCellInUserArea, ...otherData }, index) => {
-                    const Component = component![layer]!;
+                .map(
+                    (
+                        {
+                            component,
+                            cells,
+                            renderSingleCellInUserArea,
+                            regionIndex: constraintRegionIndex,
+                            ...otherData
+                        },
+                        index,
+                    ) => {
+                        const Component = component![layer]!;
 
-                    if (
-                        region &&
-                        layer !== GridLayer.noClip &&
-                        (!context.puzzle.customCellBounds || region.cells) &&
-                        cells.length &&
-                        cells.every(({ top, left }) => top % 1 === 0 && left % 1 === 0) &&
-                        !cells.some((cell) => doesGridRegionContainCell(region, cell))
-                    ) {
-                        return null;
-                    }
+                        if (constraintRegionIndex !== undefined && regionIndex !== constraintRegionIndex) {
+                            return null;
+                        }
 
-                    if (renderSingleCellInUserArea && cells.length === 1) {
-                        const position = cells[0];
+                        if (
+                            region &&
+                            layer !== GridLayer.noClip &&
+                            (!context.puzzle.customCellBounds || region.cells) &&
+                            cells.length &&
+                            cells.every(({ top, left }) => top % 1 === 0 && left % 1 === 0) &&
+                            !cells.some((cell) => doesGridRegionContainCell(region, cell))
+                        ) {
+                            return null;
+                        }
 
-                        if (position.top % 1 === 0 && position.left % 1 === 0) {
+                        if (renderSingleCellInUserArea && cells.length === 1) {
+                            const position = cells[0];
+
+                            if (position.top % 1 === 0 && position.left % 1 === 0) {
+                                return (
+                                    <SingleCellGridItemPositionFix
+                                        key={index}
+                                        context={context}
+                                        position={position}
+                                        region={region}
+                                    >
+                                        <Component
+                                            context={context.readOnlySafeContext}
+                                            region={region}
+                                            regionIndex={regionIndex}
+                                            cells={[emptyPosition]}
+                                            {...otherData}
+                                        />
+                                    </SingleCellGridItemPositionFix>
+                                );
+                            }
+                        }
+
+                        if (renderSingleCellInUserArea && cells.length === 2) {
+                            const [cell1, cell2] = cells.map(({ top, left }) => {
+                                const cellInfo = context.puzzleIndex.allCells[top]?.[left];
+                                return cellInfo
+                                    ? { ...cellInfo.center, radius: cellInfo.bounds.userArea.width / 2 }
+                                    : { left: left + 0.5, top: top + 0.5, radius: 0.5 };
+                            });
+                            const centerPoint = {
+                                top:
+                                    (cell1.top * cell2.radius + cell2.top * cell1.radius) /
+                                    (cell1.radius + cell2.radius),
+                                left:
+                                    (cell1.left * cell2.radius + cell2.left * cell1.radius) /
+                                    (cell1.radius + cell2.radius),
+                                radius: (cell1.radius + cell2.radius) / 2,
+                            };
+                            const centerRect: Rect = {
+                                top: centerPoint.top - centerPoint.radius,
+                                left: centerPoint.left - centerPoint.radius,
+                                width: centerPoint.radius * 2,
+                                height: centerPoint.radius * 2,
+                            };
                             return (
-                                <SingleCellGridItemPositionFix
-                                    key={index}
-                                    context={context}
-                                    position={position}
-                                    region={region}
-                                >
+                                <TransformedRectGraphics key={index} rect={transformRect(centerRect)}>
                                     <Component
                                         context={context.readOnlySafeContext}
                                         region={region}
                                         regionIndex={regionIndex}
-                                        cells={[emptyPosition]}
+                                        cells={[emptyPosition, emptyPosition]}
                                         {...otherData}
                                     />
-                                </SingleCellGridItemPositionFix>
+                                </TransformedRectGraphics>
                             );
                         }
-                    }
 
-                    if (renderSingleCellInUserArea && cells.length === 2) {
-                        const [cell1, cell2] = cells.map(({ top, left }) => {
-                            const cellInfo = context.puzzleIndex.allCells[top]?.[left];
-                            return cellInfo
-                                ? { ...cellInfo.center, radius: cellInfo.bounds.userArea.width / 2 }
-                                : { left: left + 0.5, top: top + 0.5, radius: 0.5 };
-                        });
-                        const centerPoint = {
-                            top: (cell1.top * cell2.radius + cell2.top * cell1.radius) / (cell1.radius + cell2.radius),
-                            left:
-                                (cell1.left * cell2.radius + cell2.left * cell1.radius) / (cell1.radius + cell2.radius),
-                            radius: (cell1.radius + cell2.radius) / 2,
-                        };
-                        const centerRect: Rect = {
-                            top: centerPoint.top - centerPoint.radius,
-                            left: centerPoint.left - centerPoint.radius,
-                            width: centerPoint.radius * 2,
-                            height: centerPoint.radius * 2,
-                        };
                         return (
-                            <TransformedRectGraphics key={index} rect={transformRect(centerRect)}>
-                                <Component
-                                    context={context.readOnlySafeContext}
-                                    region={region}
-                                    regionIndex={regionIndex}
-                                    cells={[emptyPosition, emptyPosition]}
-                                    {...otherData}
-                                />
-                            </TransformedRectGraphics>
+                            <Component
+                                key={index}
+                                context={context.readOnlySafeContext}
+                                region={region}
+                                regionIndex={regionIndex}
+                                cells={cells}
+                                {...otherData}
+                            />
                         );
-                    }
-
-                    return (
-                        <Component
-                            key={index}
-                            context={context.readOnlySafeContext}
-                            region={region}
-                            regionIndex={regionIndex}
-                            cells={cells}
-                            {...otherData}
-                        />
-                    );
-                })}
+                    },
+                )}
         </>
     );
 }) as <T extends AnyPTM>(props: GridItemsProps<T>) => ReactElement;

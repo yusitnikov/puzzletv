@@ -21,6 +21,10 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
     cells: Position[];
     renderSingleCellInUserArea?: boolean;
     layer?: GridLayer;
+    /**
+     * Render the constraint only in the region with the specified index.
+     */
+    regionIndex?: number;
     component?: Partial<Record<GridLayer, ComponentType<ConstraintProps<T, DataT>>>>;
     color?: string;
     angle?: number;
