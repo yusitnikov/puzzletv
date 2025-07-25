@@ -8,7 +8,10 @@ import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManag
 import { emptyPosition, Position } from "../../../types/layout/Position";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { isCageConstraint } from "../../../components/puzzle/constraints/killer-cage/KillerCage";
-import { cosmeticTag, isEllipse } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
+import {
+    isCosmeticConstraint,
+    isEllipse,
+} from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
 import { SokobanClueConstraint, sokobanTag } from "../constraints/SokobanClue";
 import { SokobanPlayerConstraint } from "../constraints/SokobanPlayer";
 import { moveSokobanPlayer, SokobanMovePlayerPuzzleInputModeInfo } from "./SokobanMovePlayerPuzzleInputModeInfo";
@@ -90,7 +93,7 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
             }
 
             // Drag cosmetic elements that are fully inside the crate together with the crate
-            if (item.tags?.includes(cosmeticTag)) {
+            if (isCosmeticConstraint(item)) {
                 const index = clues.findIndex((clue) =>
                     item.cells.every(({ top, left }) =>
                         clue.cells.some((cell) =>
