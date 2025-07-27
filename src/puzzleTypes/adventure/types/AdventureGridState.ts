@@ -10,11 +10,11 @@ export interface AdventureGridState {
 }
 
 export const choicesMadeStateChangeAction =
-    (
-        startContext: PuzzleContext<AdventurePTM>,
+    <T extends AdventurePTM>(
+        startContext: PuzzleContext<T>,
         clientId: string,
         actionId: string,
-    ): GameStateActionCallback<AdventurePTM> =>
+    ): GameStateActionCallback<T> =>
     (context) => {
         const {
             gridExtension: { choicesMade, choicesMadeSolutionStrings, introViewed },

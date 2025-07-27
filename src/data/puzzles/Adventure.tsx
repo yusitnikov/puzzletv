@@ -49,6 +49,11 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     
     title: { [LanguageCode.en]: "Adventure is out there!" },
     author: { [LanguageCode.en]: "Tumbo" },
+    extension: {
+        choicesMade: [],
+        choicesMadeSolutionStrings: [],
+        introViewed: false
+    },
     slug: "choose-your-own-adventure",
     initialDigits: { 8: { 4: 1 } },
     typeManager: AdventureTypeManager(),
