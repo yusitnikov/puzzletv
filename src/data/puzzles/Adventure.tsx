@@ -69,7 +69,7 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     resultChecker: (context) => {
         return isValidFinishedPuzzleByEmbeddedSolution(context);
     },
-    successMessage: (context) => "TestSuccessMessage: " + context.gridExtension.choicesMade.join(", "),
+    successMessage: (context) => `You are exhausted having fully filled in your map, the sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${context.gridExtension.choicesMadeSolutionStrings[0]}, ${context.gridExtension.choicesMadeSolutionStrings[1]}, and ${context.gridExtension.choicesMadeSolutionStrings[2]}`,
     items: (context) => {
         return [
             ...getAdventureConstraints(context),
@@ -87,8 +87,10 @@ type choiceDefinitions = {
     topMessage: string,
     option1ChoiceMessage: string
     option1TakenMessage: string
+    option1SolutionMessage: string
     option2ChoiceMessage: string
     option2TakenMessage: string
+    option2SolutionMessage: string
     option1: choiceTaken
     option2: choiceTaken
 }
@@ -109,8 +111,10 @@ const adventureDef: choiceTaken = {
         topMessage: "You've arrived at the edge of your neighbors land, marking your starting point and taking in the sights before taking your first step.",
         option1ChoiceMessage: "Explore the nearby bogs",
         option1TakenMessage: "You find a species of garter snake you haven't seen before and sketch them (not to scale) on your map.",
+        option1SolutionMessage: "Garter Snakes",
         option2ChoiceMessage: "Investigate the bare patches ground between the nearby trees",
         option2TakenMessage: "The bare patch is a game trail, the local wildlife appear to use these paths to navigate to the top of the areas hills.",
+        option2SolutionMessage: "Game Trails",
         option1: {
             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATjIA2AL41V6rToR6CRgBznLm7bv2PnINa5t3DZE4W3lZuth4mXj7W7vaBXgDmmABuKHj4CFCMKHTJcGzZBGbB0WH%2BACxBLjHhBABM5VGhfvpElETF1WWt7VUhvrH4bUR9pS0Ew6PNg8Od-TX%2Bk00DtfgODcsL%2BgDsxn15Bfx1m90EDgbHJdOr55dd42sXJw%2B3z4OvVyv%2BH-fvG8EHQpDLyA-jbN6rNp1SgQxaUOp3eanIbwxFjGao2E9aFYiaYz5bM51KZffQNGEE5FEBG4lE4ykPKFo65wmkMjFs36Q%2BEUrms5mkokkwn4cm06kCkVQ3lIxn4vnYyVU%2BWyjky9Hczmqm7E2m7YVUrVJVLpTLZXL5IFEcXtJVy6k2h3s7lOhV413air7S38ADM4o9Gv8xl9cyD%2BhDYZZEdDtMjiRSaQIZpyIFBEzjsYBPoI4Odiw96bWtLIlEa%2Bf0pfLbvwVZLZfr1c9lYb2cOGeCxqTGSyqaLiK7pt7FvbhlMAF06NJcOhMnBMDgEPoVCAEABPej8GXrzcTOhQFBJGfKSg0U%2Bnog0S%2BXuo0W%2B389nq-Pm93t%2BPi8vt-3mi%2B3--8oaEAwCyBoUDQL-SCgOgkCwLgqC-2A6DwLg4waDQtDthoLCsIcGg8LwjD0OwkjcPw8iiMw0jyII8cvB3fhynaOg2AXfwlCUYwDGw7jtkvYxLzIOpJyUOpQLqNCiCwjp8PHScQBgBcABFMDAMA0DSWQCFAkBZzXDguG8CA2AkQgAGJjG2MBKEswQxEwaQAGscD0fRKBIIgyFMCdvKAA
             initialDigits: { 0: {6: 6}},
@@ -122,8 +126,10 @@ const adventureDef: choiceTaken = {
                 topMessage: "You've made a detailed sketch of the snakes and tried unsuccessfully to coax one into a specimen jar before deciding to move on.",
                 option1ChoiceMessage: "You hear a whistling sound from over the hill",
                 option1TakenMessage: "The whistling sound is a dust devil, a small whirlwind of dust and debris. They appear large and die down quickly as they move away from you.",
+                option1SolutionMessage: "Dust Devils",
                 option2ChoiceMessage: "You catch a glint of something golden",
                 option2TakenMessage: "You discover a wild crop of wheat ready for harvest.",
+                option2SolutionMessage: "Wild Wheat",
                 option1: {
                     // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATgBMAFgC%2BNVeq06EegiaLnLINZu279xgGwWr723t8AGYDAA4-V2sPO30wg18XNxtPB0ojSIBzTAA3FDx8BChGFDocuDYSgkTQcsr%2BMkjkmKDTJujA-SJKIhqogNT8Mko%2B5s6CbqIIpI7BkwNKdoHYggNjJZSV-Hnp-02ggHZ1meXD712QOqr8DJP9uOO9lv1gsMW754J426fxkO9nL9BmEARtPv8LmNBkcfpcKtciJErvwDmC-uF3kCtiZzmjBhi8diwrCoVs2h8-iZiYTDgkaV1Hv17gQyKNZti6RS5pysUF5n1kat6QRybV4fwSezWm9hfgiIzsnkCkUSmVxRNZQSuVturLddq%2BTKDfoqZimeDTbKDmFIVL9AdccaHBdFfkCCrSnD6hqnSEwoDzX9XgHBdskeqbuHvYYo9dGi5Q8FY-w2acupQzaGDHqM5q%2Bq7lcVPaHEQmI0my9HUZXriGI7a0xMjGbSUEiM29R3fZbu0beSa%2B16EVlcm7CkW1dHYQX3ROh-xswBdOjSXDoIpwTA4BD6FQgBAAT3o-DNh%2BPEzoUBQ2TXykoNHv96INGfz6MNHf78fD5fv7fH4A78nz-ADPxoYJwMgkwaGg6CyBoeD4Ig5CYNQuCEIwlCINg1DEIw7waAIgiDhoEiSLCGgKIoojCNIujyMoxiaOI%2BjGKoxdIjPfgTB6Og2C3IIlCUbwDFI0SDmfbxnzIIxlyUIx4KMAiiBI3pKMXZcQBgLcABFMDAMA0HyWQWTodcDw4LhXAgNgJEIABibwDjAEYDkEMRMGkABrHA9H0SgSCIRpOKPbjKAokAACNGDYSL0AAdUwMQAEEoCgCAAHdd1AaLYoAYTkBRlG8ShNLgNLMt3YT73OBCwg0yJcsigr5F3AEyoqrLlGEuDYIIkwSLIA4GpcJqWqK-AlFCDr0q6yaptE4Jn0cGDSo4zTzMs-AcpiyKrKwZgTxICKwEweRJHsgyrrAQR13Srz%2BFADzvN89B-Kod9rNsqALrgP7-pAMwLCETqrOeny-IIALKHgr67JAez-oBuhRBQOANAAZUwQ6oZIYJgrMDizCAA
                     initialDigits: {4: {8: 1}},
@@ -136,8 +142,10 @@ const adventureDef: choiceTaken = {
                         topMessage: "You study the dust devils for a while, even managing to jump into the path of one before it dissipates. After wiping the dust from your face you orient towards the distant edge of your map.",
                         option1ChoiceMessage: "You catch a floral scent on the breeze",
                         option1TakenMessage: "You follow the scent and find rows of lavendar bushes, their flowers in full bloom.",
-                        option2ChoiceMessage: "ThirdChoice 1 option 2",
-                        option2TakenMessage: "ThirdChoice 1 option 2 Taken",
+                        option1SolutionMessage: "Lavendar Rows",
+                        option2ChoiceMessage: "Mixed in with the stones you see some that look too geometric to be natural",
+                        option2TakenMessage: "Sorting through the stones you find a mixture of circular and square cut stones, they may have been used as tokens for trade.",
+                        option2SolutionMessage: "Stone Tokens",
                         option1: {
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATgBMAFgC%2BNVeq06EegiaLnLINZu279xgGwWr723t8AGYDAA4-V2sPO30wg18XNxtPB0ojSIBzTAA3FDx8BChGFDocuDYSgkTQcsr%2BMkjkmKDTJujA-SJKIhqogNT8Mko%2B5s6CbqIIpI7BkwNKdoHYggNjJZSV-Hnp-02ggHZ1meXD712QOqr8DJP9uOO9lv1gsMW754J426fxkO9nL9BmEARtPv8LmNBkcfpcKtciJErvwDmC-uF3kCtiZzmjBhi8diwrCoVs2h8-iZiYTDgkaV1Hv17gQyKNZti6RS5pysUF5n1kat6QRybV4fwSezWm9hfgiIzsnkCkUSmVxRNZQSuVturLddq%2BTKDfoqZimeDTbKDmFIVL9AdccaHBdFfkCCrSnD6hqnSEwoDzX9XgHBdskeqbuHvYYo9dGi5Q8FY-w2acupQzaGDHqM5q%2Bq7lcVPaHEQmI0my9HUZXriGI7a0xMjGbSUEiM29R3fZbu0beSa%2B16EVlcm7CkW1dHYQX3ROh-xswBdOjSXDoIpwTA4BD6FQgBAAT3o-DNh%2BPEzoUBQ2TXykoNHv96INGfz6MNHf78fD5fv7fH4A78nz-ADPxoYJwMgkwaGg6CyBoeD4Ig5CYNQuCEIwlCINg1DEIw7waAIgiDhoEiSLCGgKIoojCNIujyMoxiaOI%2BjGKoxdIjPfgTB6Og2C3IIlCUbwDFI0SDmfbxnzIIxlyUIx4KMAiiBI3pKLk%2B9RKmF8tKfRdlxAGAtwAEUwMAwDQfJZBZOh1wPDguFcCA2AkQgAGJvAOMARgOQQxEwaQAGscD0fRKBIIhGk4o9uMoCiQAAI0YNgEvQAB1TAxAAQSgKAIAAd13UAkpSgBhOQFGUbxKAMuBcoK3dhPvc4ELCfTIhKhLyvkXcAVq%2BrCuUYS4NggiTBIsgDnalxOu6yr8CUUJ%2BrywaFsW0TgmfRwYJqjiZuSrqKt3UxloaobTA-CCjFkjiDLshz8GKg7HKwZgTxIeKwEweRJDc8z-rAQR1zywL%2BFAfygpC9Awqod8nJcqBfrgZGUZAMwLCEAbHIh4LQoIcLKHg%2BHXJANyUdRuhRBQOANAAZUwN78ZIYIoui89tgzPiBMaog33vYIapoRbkNg4I5IOd8Dggg4TH02zDwe1RnJJv6fO8vzRAC3HoaZyL0Y4swgA
                             initialDigits: {8: {4: 7}},
@@ -159,7 +167,7 @@ const adventureDef: choiceTaken = {
                                 OddConstraint("R4C9"),
                                 ArrowConstraint("R1C1", ["R2C1", "R3C2", "R4C2"]),
                                 WhispersConstraint(["R4C2", "R4C3", "R3C4", "R2C5"])],
-                            rules: [`${translate(evenExplained)}, ${translate(oddExplained)}`],
+                            rules: [`Stone Tokens (Even/Odd): ${translate(evenExplained)}, ${translate(oddExplained)}`],
                             choices: undefined
                         }
                     }
@@ -177,8 +185,10 @@ const adventureDef: choiceTaken = {
                         topMessage: "You decide to collect some of the wheat, maybe the town baker will teach out how to make bread. Looking through the gap in the wheat row something catches your eye.",
                         option1ChoiceMessage: "You see some flat stones that look arranged",
                         option1TakenMessage: "The flat stones appear to be the ruins of an old road with grass growing through the gaps.",
+                        option1SolutionMessage: "Road Ruins",
                         option2ChoiceMessage: "The sun glints off some black and white stones in the dirt",
-                        option2TakenMessage: "The stones are quartz, they are rounded and polished, maybe they were used as tokens in a game.",
+                        option2TakenMessage: "The stones are quartz, they are rounded and polished, maybe they were used in a game.",
+                        option2SolutionMessage: "Quartz Stones",
                         option1: {
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHYbAc0xVFDx8BCgtOhd%2BADZPe3wyONcAZiT%2BVINbLwJfTKiCRLzs-FMi%2BL0y11jKqzSCDxrHOvdmp0b8avMU5sKu2vaKvpNm3KH8NrHrTICgkLCIrPKR5oyx0rGGsc7F116d-j38jubN-YJBs-wpsYnL1cvRy-WHlebno9Oj7ZnggnmUSLFQ7FW5HC5Ha4gH5zcIAp4nZbtSFHUHFcFA17tbZfZro%2BK3aF-WGA%2BJ7QmhYnw9r3I6PCEIpE9fyBX4UhZHGnFbHFOnFT7FZ7k-4k1wElkw9lo3QAXTo0lw6DCcEwOAQinwKhACAAnvR%2BJQbDq9SY6FAUAEFcpKDRrdaiDR7faHDRnc7bTaHZ6nS6fe67V6fa6aMlg6HLDRw%2BGyDRo9GQ-GI4mozGUwmQ5HE7GU9EaDmc94aAWC24aCWS3nc4Wq8XS7WK-nq7Wy9LDbqrJR7SA2CqUOqlEpotpC0PvPbovayA5ZUoHNGHDmiAWiDm3NPLAWyHno9Fw94p7KQDAVQARTBgMBoYKyAp0RXajhcEDytgSQgAYmi3jAlE-gjEmGkABrHBe3VSgSCIRJW2NK4OzobsQL7JQyCHaJKGnaJo28bdvGnBwS2SEtLGiaUDyPHBT3PS8cGvK5bx1B98FAZ9XxAN9zzgNDqDof8gMQsCIKgzIjXbZ0ux7JDkmtZJ7UsCdZOdSxkmnZIQwccNIIdcMHBDIh02nMhrTQ0j6PvfhmIgF8oEkN84Ds%2By-1EADgNAghwMg3QZU8oA
                             initialDigits: {},
@@ -215,8 +225,10 @@ const adventureDef: choiceTaken = {
                 topMessage: "Having followed the game trail and arrive at the top of one of the areas hills. From this vantage point you see some large landscape features in the distance.",
                 option1ChoiceMessage: "You spot wooden planks in a field",
                 option1TakenMessage: "You reach the planks and find that they were part of a fence around a pasture.",
+                option1SolutionMessage: "Pasture Fences",
                 option2ChoiceMessage: "You see the refaction of sunlight off moving water",
                 option2TakenMessage: "The water is a small stream that runs through the fields.",
+                option2SolutionMessage: "Streams",
                 option1: {
                     initialDigits: {},
                     // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaINfJwDXIJtQlNj0t3xtbxy0l3ysmJL42zIbCv9S6zta4vqqjyLHVoz3bLUNLQI9Frju2yS6kfyPXpBwgfxkzsnMibzrAGZgxdSu-O1mpbWCTe3chvcD2f7%2BMlXzhcow68GniPdX%2BYB2O6qbU8rRutHik5joPvxvsMjrYZmcqh0QABzTCqFB4fAIKBaOiggj-XbWQo-UZEqH3MjjMm-exUwGRS5w0afTz45Z41nQhGMsoc%2B6eYLAw73IHE-LBZmixo0oVVdYUyUEZm8qqRba4-C3Wk8hX4fmCnZs-AilLI1HozHYq5vfBEcF4u34SF9a0zdWXdVDGUkhGmtEEC0oHHPI060le-Ish2eg2ctXBzWgX3mrGBq3zW0g4PrB1OtP8V3B5WjcqZ60JmP3EvO%2BYI9W59XbJP%2BlNB60ZxMov0Ylt5hI%2BJvdy0e3QAXTo0lw6ExcEwOAQ1hUIAQAE96Px9Su1%2B46FAUMjJ8pKDQj0eiDQz2ebDQr1eT8fzw-L9fn3fT4-nzeaOsvz-gjQ-3%2BZA0EBQHfmB-4QYBwHQeB34ARBIHQZ4NDIchnw0Oh6GRDQ2HYahKEYYRWE4SR%2BFoURJG4SOPibvwQJHiA6BsBAADuBBgBo6CpmIaAwBAfCuBgyhKMEZ7rGJR42NoY5KJ46FkNhZDoZ4aFAcyGGfDJNhAUQxHoUQyFZCOY6MSuHBcL4EDMVAkgAMTSA5jmCGImDSAA1jgVjWJQJDfiAABGjBsP5ABKcBmIw3kkKENGrnRlBnqkiL5IusjyAuZBAfyGHrCZboMnICjKF4X5-nKeXBkQpyFQunjaBhZ6fNhnz1ZElAVdaNi5mlRX4Eo34eNel42B16a2iZU7LuZ%2BCgK4AAeCAWRO1l2ZQa3rSA%2BhJfwhhWRIhC2etG26Cd1G6EAA
@@ -230,8 +242,10 @@ const adventureDef: choiceTaken = {
                         topMessage: "You have fully mapped out the pastures on your map and calculated the area of each. Maybe someone in town will know what kind of animals were kept here.",
                         option1ChoiceMessage: "Adjacent to the pastures you see what appears to be the remnant of a stone structure",
                         option1TakenMessage: "The stone structure seems like it may have once been the older location of the towns homes. Some are elevated while others are sunked in and may have been cellars.",
+                        option1SolutionMessage: "Town Remnants",
                         option2ChoiceMessage: "You see a small dirt mount nearby",
                         option2TakenMessage: "It's an ant hill and there are several red ants climbing onto your shoes, you back away and shake them off hoping they aren't fire ants.",
+                        option2SolutionMessage: "Red Ant Hills",
                         option1: {
                             initialDigits: { 0: { 6: 6}, 5: { 1: 3 }},
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGqGlwcAE0wnEKRfgBMd-YeNmLCKwSI2AbA5BHT5y2siABYfdU1%2BAA4fP2dAghtKaIMQAHNMVRQ8fAQoLTpwrQJvFNiA12ttEsd-FzdbUNKncvqbMhsY5rrrOw6m2vj8D2rfLsGQsI0i-D1%2BuIqEpM6BhaGbRrUpqOX5%2Bo8dlusAZmDkmt3KvvPDghOz0ZW9q5BC-jID7oJIykmIglnNn8hr9pgB2D6DGz3MqffBHH4pV7-EH8cFzG4NCGrEbpTLZXL5F5bL5Y%2BpVUmVEYwwZkJbo2G9Cm3SLPamrUGeaFjVaRLmPaxU7mtPkXYrBBHXWHwpn4YIcny4rIEAkoArEuEyo60mUckUY3kogjvemQvWwzzizUStIZJU5PKqolAoiG-D3JH4NGA6YbJ3TZ4egEPUUzHG2-EOtVAo4y8km7Hu9VBtn1Tmu42gRURwkel2I9Ux-NAr1%2B-i%2Bj1myHl9UZ4MY9aukYeksVhXh5WR0vuNt4js59XPLN9x2B3QAXTo0lw6FycEwOAQ1hUIAQAE96PxrWuN%2B46FAUOlp8pKDQTyeiDQLxebDQbzez6fL0-r7fXw-z8-X3eaEcf3-gjQAEAWQNAgSBv4QYBUHAaBsGQb%2BQFQWBsGeDQqGoaCNCYZhkQ0LhuHoWhWHETheFkYRGEkWR%2BFjj4278PCJ4gOgbAQAA7gQYAaOgjpiGgMAQHwrgYMoSjBBeRwSSeNjaBOSieJhZC4WQmGeBhIEclhoJyW0l6kZhRCoesY4Tsxa4cFwvgQKxUCSAAxNIjlOYIYiYNIADWOBWNYlAkL%2BIAAEaMGwAUAEpwGYjA%2BSQoR0euDGUBeoypPUy6yPIS5kCBFpYUcpkevYpRyAoyheD%2BAFavl6pENCxVLp42hYReoK4aCjXfFVQI2CW6UlfgSi-h4t7XjYnXTEQeaGHVyiNTVl6yVG40xqZM6rhZ%2BCgK4AAeCCWVONn2ZQR3HSA%2BjJfwhjWRIhB2cdJ26A9KT0e4lA3r4039UQJ7BGBo10Kt62XQdN13UdRxHKdcU7kMlD%2Bb1S7BABnggXKt7af95kXVZwMgLdoPg5DtG6EAA
@@ -269,8 +283,10 @@ const adventureDef: choiceTaken = {
                         topMessage: "You find the thinnest part of the stream and are able to jump across. You are excited to finish your adventure without wet socks and shoes.",
                         option1ChoiceMessage: "You see a large square stone near some rubble",
                         option1TakenMessage: "You think you have found the cornerstone of one of the old towns buildings. Most of the text is worn away but you are able to make out some of the numbers from the date.",
-                        option2ChoiceMessage: "ThirdChoice 4 option 2",
-                        option2TakenMessage: "ThirdChoice 4 option 2 Taken",
+                        option1SolutionMessage: "Cornerstones",
+                        option2ChoiceMessage: "What you first take as a large clump of grass turns out to be a rotting wagon",
+                        option2TakenMessage: "As you investigate the wagon you find the wheels have rotted away and all that is left are the spokes. Some have 4 spokes left and other only have 2.",
+                        option2SolutionMessage: "Wagon Spokes",
                         option1: {
                             initialDigits: {},
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHZP9-ABsfq5kwfwAzGEEkQa2XgS%2BsS78oUnx%2BKZp-npZrkG5VlHuRU4FBB5l%2BKXmeUUxNSlF1pU5DSZFiW1VTUWtcf6d-a71Q-yZoADmmKooePgIUFp0yeVF%2BV2pG2tFFV19K-jNXdWj0R1F46f4gwcjB5cHu1frV5tXJwf76UcgUzNzCyWVwe6SeBxu3xKvSKbz%2BswIgJQy3Sd3SLwO6PSX38H3SsOm8PmiyRwLq50qP0ePUqb1u20qEP8TzhAOJyP8lxZCLZ7xsXKJQM%2BugAunRpLh0As4JgcAhFPgVCAEABPej8Sg2FVqkx0KAoKYS5SUGjG41EGjm80OGjW62mk0Wx1Wm0u%2B1mp0u200cLe32WGj%2B-1kGjB4M%2B8MByNBkMxiM%2BwOR0MxgI0FMp7w0DMZtw0HM5tOpzNF7O50sF9PF0t54Wa1URSjGkDoNgQADuBDAGnQJLEaBgED4CDQ8qUSks5vCE%2BNDm0oqUAQzZBzZAzAXTwe86e8c4cwaIJYzRBTDksc6IXqIVrNZrcc%2B81u8PoC4WFoqbKo4XBA4pbUEkAGJpCA4DBDETBpAAaxwFB0HlSgSB9EAACNGDYJCACU4AAE0wRg4JIaxa21Q5KH9EA2BlGDlCUMhrQCY1vEoOdwnDa1JwDJi3ywHAJg4dD9WwHAABUIAQLsOy7ElJWVT98FAH8JEIf8HBQaQkLAMBQNEcCoJg-CiFCIixkoa1vzkBRlC4j9%2BHkiBfwAhtHMoFiQF0IzomcsULBHWyoGgv98BXOgcKmOVlDYzMa1icU-LQRxgxAELMDChV-RTMgot8-yCHHYLMFCkdrWDU8RToaTZNAbjeJQAAZSiJIUFA3JrXQgA
@@ -292,7 +308,7 @@ const adventureDef: choiceTaken = {
                                 XMarkConstraint("R1C7", "R2C7"),
                                 XMarkConstraint("R2C6", "R2C7"),
                                 XMarkConstraint("R3C6", "R2C6")],
-                            rules: [`Roman scripts (X/V): ${translate(xExplained)}, ${translate(vExplained)}. ${translate(notAllXVGiven)}`],
+                            rules: [`Rotten wagon wheels (X/V): ${translate(xExplained)}, ${translate(vExplained)}. ${translate(notAllXVGiven)}`],
                             choices: undefined
                         }
                     }
@@ -319,6 +335,7 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
             if (context.gridExtension.choicesMade.length === depth + 1 && !solved)
             {
                 context.gridExtension.choicesMade.pop();
+                context.gridExtension.choicesMadeSolutionStrings.pop();
                 currentChoice = undefined;
             }
             else if (context.gridExtension.choicesMade.length === depth + 1 && solved)
@@ -331,6 +348,8 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
                 context.stateExtension.messageChoice2 = currentChoice.choices.option2ChoiceMessage;
                 context.stateExtension.messageChoice1Taken = currentChoice.choices.option1TakenMessage;
                 context.stateExtension.messageChoice2Taken = currentChoice.choices.option2TakenMessage;
+                context.stateExtension.option1SolutionMessage = currentChoice.choices.option1SolutionMessage;
+                context.stateExtension.option2SolutionMessage = currentChoice.choices.option2SolutionMessage;
                 context.stateExtension.message = currentChoice.choices.topMessage;
                 currentChoice = undefined;
             }

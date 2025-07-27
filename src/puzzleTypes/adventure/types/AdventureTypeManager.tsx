@@ -17,7 +17,9 @@ export const AdventureTypeManager = (
         
                 ...(addGridStateExToPuzzleTypeManager<AdventurePTM, AdventureGridState>(baseTypeManager, {
                     initialGridStateExtension: {
-                        choicesMade: []
+                        choicesMade: [],
+                        choicesMadeSolutionStrings: [],
+                        introViewed: false
                     },
                 }) as unknown as PuzzleTypeManager<AdventurePTM>),
     getAboveRules: function AdventureAboveRules(context, isPortrait) {
@@ -28,6 +30,7 @@ export const AdventureTypeManager = (
         
             const handleOption1 = () => {
                 context.gridExtension.choicesMade = [...context.gridExtension.choicesMade, 1];
+                context.gridExtension.choicesMadeSolutionStrings = [...context.gridExtension.choicesMadeSolutionStrings, context.stateExtension.option1SolutionMessage];
                 context.stateExtension.message = undefined;
                 context.stateExtension.messageChoice1 = "";
                 context.stateExtension.messageChoice2 = "";
@@ -43,6 +46,7 @@ export const AdventureTypeManager = (
 
             const handleOption2 = () => {
                 context.gridExtension.choicesMade = [...context.gridExtension.choicesMade, 2];
+                context.gridExtension.choicesMadeSolutionStrings = [...context.gridExtension.choicesMadeSolutionStrings, context.stateExtension.option2SolutionMessage];
                 context.stateExtension.message = undefined;
                 context.stateExtension.messageChoice1 = "";
                 context.stateExtension.messageChoice2 = "";
@@ -63,7 +67,14 @@ export const AdventureTypeManager = (
             };
 
             const handleIntroClose = () => {
-                context.stateExtension.introViewed = true;
+                context.gridExtension.introViewed = true;
+                context.onStateChange(
+                    choicesMadeStateChangeAction(
+                        context,
+                        myClientId,
+                        context.gridStateHistory.current.actionId
+                    ),
+                );
             };
         
             return (
@@ -136,7 +147,7 @@ export const AdventureTypeManager = (
                     </Modal>
                 )}
 
-                {context.stateExtension.introViewed === undefined && (
+                {context.gridExtension.introViewed === false && (
                     <Modal cellSize={cellSize} >
                         <div>
                                     <>

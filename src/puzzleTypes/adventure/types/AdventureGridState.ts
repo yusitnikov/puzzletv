@@ -5,6 +5,8 @@ import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
 export interface AdventureGridState {
     choicesMade: number[];
+    choicesMadeSolutionStrings: string[];
+    introViewed: boolean;
 }
 
 export const choicesMadeStateChangeAction =
@@ -15,7 +17,7 @@ export const choicesMadeStateChangeAction =
     ): GameStateActionCallback<AdventurePTM> =>
     (context) => {
         const {
-            gridExtension: { choicesMade },
+            gridExtension: { choicesMade, choicesMadeSolutionStrings, introViewed },
         } = startContext;
 
         return {
@@ -26,7 +28,9 @@ export const choicesMadeStateChangeAction =
                 ({ extension: {}, ...gridState }) => ({
                     ...gridState,
                     extension: {
-                        choicesMade: choicesMade
+                        choicesMade: choicesMade,
+                        choicesMadeSolutionStrings: choicesMadeSolutionStrings,
+                        introViewed: introViewed
                     },
                 }),
             ),
