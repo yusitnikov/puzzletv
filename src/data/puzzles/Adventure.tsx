@@ -149,7 +149,7 @@ const adventureDef: choiceTaken = {
                         option1TakenMessage: "You follow the scent and find rows of lavendar bushes, their flowers in full bloom.",
                         option1SolutionMessage: "Lavendar Rows",
                         option2ChoiceMessage: "Mixed in with the stones you see some that look too geometric to be natural",
-                        option2TakenMessage: "Sorting through the stones you find a mixture of circular and square cut stones, they may have been used as tokens for trade.",
+                        option2TakenMessage: "Sorting through the stones you find several which have been cut to be square or circular, they may have been used as tokens for trade.",
                         option2SolutionMessage: "Stone Tokens",
                         option1: {
                             // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATgBMAFgC%2BNVeq06EegiaLnLINZu279xgGwWr723t8AGYDAA4-V2sPO30wg18XNxtPB0ojSIBzTAA3FDx8BChGFDocuDYSgkTQcsr%2BMkjkmKDTJujA-SJKIhqogNT8Mko%2B5s6CbqIIpI7BkwNKdoHYggNjJZSV-Hnp-02ggHZ1meXD712QOqr8DJP9uOO9lv1gsMW754J426fxkO9nL9BmEARtPv8LmNBkcfpcKtciJErvwDmC-uF3kCtiZzmjBhi8diwrCoVs2h8-iZiYTDgkaV1Hv17gQyKNZti6RS5pysUF5n1kat6QRybV4fwSezWm9hfgiIzsnkCkUSmVxRNZQSuVturLddq%2BTKDfoqZimeDTbKDmFIVL9AdccaHBdFfkCCrSnD6hqnSEwoDzX9XgHBdskeqbuHvYYo9dGi5Q8FY-w2acupQzaGDHqM5q%2Bq7lcVPaHEQmI0my9HUZXriGI7a0xMjGbSUEiM29R3fZbu0beSa%2B16EVlcm7CkW1dHYQX3ROh-xswBdOjSXDoIpwTA4BD6FQgBAAT3o-DNh%2BPEzoUBQ2TXykoNHv96INGfz6MNHf78fD5fv7fH4A78nz-ADPxoYJwMgkwaGg6CyBoeD4Ig5CYNQuCEIwlCINg1DEIw7waAIgiDhoEiSLCGgKIoojCNIujyMoxiaOI%2BjGKoxdIjPfgTB6Og2C3IIlCUbwDFI0SDmfbxnzIIxlyUIx4KMAiiBI3pKLk%2B9RKmF8tKfRdlxAGAtwAEUwMAwDQfJZBZOh1wPDguFcCA2AkQgAGJvAOMARgOQQxEwaQAGscD0fRKBIIhGk4o9uMoCiQAAI0YNgEvQAB1TAxAAQSgKAIAAd13UAkpSgBhOQFGUbxKAMuBcoK3dhPvc4ELCfTIhKhLyvkXcAVq%2BrCuUYS4NggiTBIsgDnalxOu6yr8CUUJ%2BrywaFsW0TgmfRwYJqjiZuSrqKt3UxloaobTA-CCjFkjiDLshz8GKg7HKwZgTxIeKwEweRJDc8z-rAQR1zywL%2BFAfygpC9Awqod8nJcqBfrgZGUZAMwLCEAbHIh4LQoIcLKHg%2BHXJANyUdRuhRBQOANAAZUwN78ZIYIoui89tgzPiBMaog33vYIapoRbkNg4I5IOd8Dggg4TH02zDwe1RnJJv6fO8vzRAC3HoaZyL0Y4swgA
@@ -163,12 +163,11 @@ const adventureDef: choiceTaken = {
                             choices: undefined
                         },
                         option2: {
-                            initialDigits: {4: {0: 5}},
-                            constraints: [EvenConstraint("R1C4"),
-                                EvenConstraint("R1C5"),
+                            // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1Q0uDgAmmDYhSL8ATgBMAFgC%2BNVeq06EegiaLnLINZu279xgGwWr723t8AGYDAA4-V2sPO30wg18XNxtPB0ojSIBzTAA3FDx8BChGFDocuDYSgkTQcsr%2BMkjkmKDTJujA-SJKIhqQbLyCopKyiqr8AHZ2gNT8bqIIpI7ZkwNKaZTYggNjDZb9VcX-TaCJ3aWZrcnvI5A68YyLk7jz4-2CYLD1p-f8eMe3p0Pt5nIDZmEQXsgSEblDZmcAXcxvwiJF7vwpj9oeFvmCriZYVjZji4fiwojmtC2kSyRTllczn1KbMiK8opcgmQ%2BgN8gRhqUkfUCI0aUFVkz6WKEmjkdtSa1QYKHvL9EYviqCKzETyhsUBejNRrDOrRV1ceznprzcyydbJQcTXixY6Lb8JmFbjbToSnQ6srleYU9aMhXMjZ9FV79BGZaHFQb8IiEwZY%2BMRbVZSFU-wJRyzebk0buna89tuQHdSMlSjsx9a5N6-HM577ZqjCXLXN20Xu6aHC6o-2O78TC6E6iXDq%2BcHqwRtRXp1XCwBdOjSXDoIpwTA4BD6FQgBAAT3o-HNx9PmroUBQ2Q3ykoNEfj6INFfr6MNE-n%2BfT7f-4-L8gN-F8AKA78aGCSDoJMGhYNgsgaEQxCoNQuD0IQpCsLQqD4PQ5CsO8GgiKIiYaDIsiwhoKiqJI4jyIYyjqOYujSMY5iaOXSIL34EwejoNgdyCJQlG8AxyPEiZX28V8yCMVclCMRCjCIogyN6aiFLVL9xKMd9gmXVcQBgHcABFMDAMA0HyWRhToTcjw4LhXAgNgJEIABibwJjAShvMEMRMGkABrHA9H0SgSCIRpuJPXjKCokAACNGDYJL0AAdUwMQAEEoCgCAAHd91AFK0oAYTkBRlG8SgjLgfKiv3UTHxuJCwkMyIyqSyr5H3EF6sa4rlFEhD4KIkwyLICZOpcbreuq-AlFCQaCuGpblvE4JX0cOC6q4ubUp6qr9zqugGrW5rH3E1kvw6rijIcpz8FKo7nKwZgzxIRKwEweRJA8yygbAQRNwK4L%2BFAQKQrC9AIqoT8XLcqAAbgNH0ZAMwLCEIbnOh0LwoISLKEQpH3JADz0YxuhRBQOANAAZUwT6iZIYIYtiy85koR9XBO5QnHQowZvs49ntUVzyY8nmZcoYJglB5mvoiTmUX4vm%2BuUdnHrFyGyZRzzZZ5%2BXFZZ-BIpVrizCAA
+                            initialDigits: {1: {1: 7}, 4: {0: 5}},
+                            constraints: [EvenConstraint("R1C5"),
                                 EvenConstraint("R2C6"),
-                                EvenConstraint("R6C5"),
-                                OddConstraint("R4C1"),
+                                EvenConstraint("R4C1"),
                                 OddConstraint("R4C9"),
                                 ArrowConstraint("R1C1", ["R2C1", "R3C2", "R4C2"]),
                                 WhispersConstraint(["R4C2", "R4C3", "R3C4", "R2C5"])],

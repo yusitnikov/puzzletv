@@ -21,6 +21,7 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             introViewed: false
         },
     }),
+    disableConflictChecker: true,
     aboveRulesComponent: observer(function AdventureAboveRules({ context }) {
 
         const {
