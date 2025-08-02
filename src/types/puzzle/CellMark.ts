@@ -19,7 +19,7 @@ export interface CellMark {
     position: Position;
     color?: CellColorValue;
     type: CellMarkType;
-    isCenter?: boolean;
+    isCenter: boolean;
     regionIndex?: number;
 }
 

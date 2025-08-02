@@ -70,6 +70,7 @@ export const LinesDigitModeButton: ControlButtonItemPropsGenericFc = observer(fu
                                 cellSize={contentSize}
                                 position={{ left: 0.5, top: 1 }}
                                 type={CellMarkType.X}
+                                isCenter={false}
                             />
                         )}
 
@@ -78,6 +79,7 @@ export const LinesDigitModeButton: ControlButtonItemPropsGenericFc = observer(fu
                                 cellSize={contentSize}
                                 position={{ left: 1, top: 0 }}
                                 type={CellMarkType.X}
+                                isCenter={false}
                             />
                         )}
                     </AutoSvg>
