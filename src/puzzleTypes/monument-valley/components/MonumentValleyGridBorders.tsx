@@ -8,10 +8,16 @@ import { observer } from "mobx-react-lite";
 import { profiler } from "../../../utils/profiler";
 
 export const MonumentValleyGridBorders = {
-    [GridLayer.lines]: observer(function MonumentValleyGridBorders({
+    [GridLayer.noClip]: observer(function MonumentValleyGridBorders({
         context: { puzzle, isMyTurn },
+        regionIndex,
     }: ConstraintProps<MonumentValleyPTM>) {
         profiler.trace();
+
+        // Draw the constraint only in the bottom region
+        if (regionIndex !== 3) {
+            return null;
+        }
 
         const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyGridSize(puzzle.gridSize);
 

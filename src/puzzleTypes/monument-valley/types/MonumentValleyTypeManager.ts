@@ -2,7 +2,7 @@ import { defaultProcessArrowDirection, PuzzleTypeManager } from "../../../types/
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { createRegularRegions, GridSize } from "../../../types/puzzle/GridSize";
 import { isSamePosition, Position, PositionWithAngle } from "../../../types/layout/Position";
-import { darkGreyColor, getRegionBorderWidth } from "../../../components/app/globals";
+import { darkGreyColor } from "../../../components/app/globals";
 import { RegionConstraint } from "../../../components/puzzle/constraints/region/Region";
 import { indexes } from "../../../utils/indexes";
 import { DigitCellDataComponentType } from "../../default/components/DigitCellData";
@@ -167,14 +167,10 @@ export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
 
     transformCoords: transformCoordsByRegions,
 
-    getRegionsWithSameCoordsTransformation({
-        puzzle: { regions, gridSize: originalGridSize, gridMargin = 0 },
-        cellSize,
-    }): GridRegion[] {
+    getRegionsWithSameCoordsTransformation({ puzzle: { gridSize: originalGridSize, gridMargin = 0 } }): GridRegion[] {
         const { gridSize, intersectionSize, columnsCount, rowsCount } = parseMonumentValleyGridSize(originalGridSize);
 
         const fullMargin = gridMargin + 1;
-        const borderWidth = regions?.length ? getRegionBorderWidth(cellSize) : 1 / cellSize;
 
         const coeff = Math.sqrt(0.75);
         const centerX = columnsCount / 2;
@@ -223,20 +219,6 @@ export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
                     return {
                         left: gridSize + left * coeff,
                         top: centerY + top + left / 2,
-                    };
-                },
-            },
-            {
-                left: gridSize + borderWidth,
-                top: 0,
-                width: gridSize - intersectionSize * 2 - borderWidth * 2,
-                height: rowsCount - gridSize,
-                transformCoords: ({ top, left }) => {
-                    top -= gridSize - intersectionSize;
-
-                    return {
-                        left,
-                        top: centerY + top,
                     };
                 },
             },
