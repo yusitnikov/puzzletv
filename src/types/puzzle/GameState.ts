@@ -1024,7 +1024,21 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
                         };
 
                         if (type !== "center") {
-                            marks = marks.toggle(xMark);
+                            const clones =
+                                context.puzzle.typeManager.getCellCornerClones?.(round, context.puzzle) ?? [];
+                            marks = marks.toggleAll(
+                                [
+                                    xMark,
+                                    ...clones.map((position) => ({
+                                        position,
+                                        color: selectedColor,
+                                        type: CellMarkType.X,
+                                        isCenter: false,
+                                        regionIndex,
+                                    })),
+                                ],
+                                !marks.contains(xMark),
+                            );
                         } else {
                             const allMarkOptions: (CellMark | undefined)[] = [undefined, circleMark, xMark];
                             const currentMark = marks.find(xMark)?.type;

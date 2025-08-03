@@ -403,8 +403,9 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
         const queue = new PrioritizedQueue([start]);
         while (!queue.isEmpty() && map[endKey] === undefined) {
             const position = queue.shift()!;
+            const positionKey = this.getPositionHash(position);
 
-            const info = this.realCellPointMap[this.getPositionHash(position)];
+            const info = this.realCellPointMap[positionKey];
             if (!info) {
                 console.warn(`Didn't find point info by key: ${stringifyPosition(position)}`);
                 continue;
@@ -438,6 +439,11 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                             },
                         ],
                     };
+
+                    const borderSegment = this.borderLineMap[positionKey]?.[nextKey];
+                    if (borderSegment?.clones?.length) {
+                        map[nextKey].lines.push(...borderSegment.clones.map(({ line }) => ({ ...line, color })));
+                    }
 
                     queue.push(2, next);
                 }
