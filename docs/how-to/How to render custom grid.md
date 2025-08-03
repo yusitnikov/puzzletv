@@ -69,7 +69,7 @@ And here's how to implement it:
    and fall back to the default handler by using the `defaultProcessArrowDirection()` function for other cases.
    If the transformed regions have rotation/skew transformations significant enough
    for the default arrow navigation to make no sense, the manual implementation should compensate for that as well.
-6. Implement [`PuzzleTypeManager.getAdditionalNeighbors`](../../src/types/puzzle/PuzzleTypeManager.ts)
+6. Implement [`PuzzleTypeManager.getCellCornerClones`](../../src/types/puzzle/PuzzleTypeManager.ts)
    to describe inter-region connections between the cells
    (important for drawing lines with the pen tool, and for some other things).
 7. Implement a custom grid wrapper component if you need to render something not related to the transformed regions.

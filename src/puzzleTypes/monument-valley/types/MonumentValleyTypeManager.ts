@@ -316,16 +316,16 @@ export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
         });
     },
 
-    getAdditionalNeighbors({ top, left }, puzzle) {
+    getCellCornerClones({ top, left }, puzzle) {
         const { gridSize, intersectionSize, columnsCount } = parseMonumentValleyGridSize(puzzle.gridSize);
 
         const results: Position[] = [];
 
-        if (top < intersectionSize) {
-            if (left === gridSize - 1) {
+        if (top <= intersectionSize) {
+            if (left === gridSize) {
                 results.push({
                     top: intersectionSize,
-                    left: columnsCount - gridSize + (intersectionSize - 1 - top),
+                    left: columnsCount - gridSize + (intersectionSize - top),
                 });
             }
 
@@ -349,8 +349,8 @@ export const MonumentValleyTypeManager: PuzzleTypeManager<MonumentValleyPTM> = {
                 top === intersectionSize
             ) {
                 results.push({
-                    top: columnsCount - (gridSize - intersectionSize) - 1 - left,
-                    left: gridSize - 1,
+                    top: columnsCount - (gridSize - intersectionSize) - left,
+                    left: gridSize,
                 });
             }
         }

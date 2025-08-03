@@ -203,7 +203,7 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
 
     supportSingleRegion?: boolean;
 
-    getAdditionalNeighbors?(position: Position, puzzle: PuzzleDefinition<T>): Position[];
+    getCellCornerClones?(position: Position, puzzle: PuzzleDefinition<T>): Position[];
 
     /**
      * The color of the grid lines (cell borders)

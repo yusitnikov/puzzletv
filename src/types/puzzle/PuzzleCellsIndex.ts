@@ -35,7 +35,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
             typeManager: {
                 transformCoords = (coords: Position) => coords,
                 isNonLinearTransformCoords,
-                getAdditionalNeighbors = () => [],
+                getCellCornerClones = () => [],
             },
             gridSize: { rowsCount, columnsCount },
             customCellBounds = {},
@@ -122,14 +122,36 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     return;
                 }
 
+                const centerCells = new PuzzlePositionSet(puzzle, [cellPosition]);
                 this.realCellPointMap[this.getPositionHash(center)] = {
                     position: center,
-                    cells: new PuzzlePositionSet(puzzle, [cellPosition]),
+                    ownCells: centerCells,
+                    cells: centerCells,
                     type: CellPart.center,
                     neighbors: new PuzzlePositionSet(puzzle),
                     diagonalNeighbors: new PuzzlePositionSet(puzzle),
+                    clones: [],
                 };
 
+                // Init corner points
+                borders.forEach((border) =>
+                    border.forEach((point) => {
+                        const pointKey = this.getPositionHash(point);
+
+                        const pointInfo = (this.realCellPointMap[pointKey] = this.realCellPointMap[pointKey] || {
+                            position: point,
+                            ownCells: new PuzzlePositionSet(puzzle),
+                            cells: new PuzzlePositionSet(puzzle),
+                            type: (puzzle.mergeGridLines ?? areCustomBounds) ? CellPart.border : CellPart.corner,
+                            neighbors: new PuzzlePositionSet(puzzle),
+                            diagonalNeighbors: new PuzzlePositionSet(puzzle),
+                            clones: [],
+                        });
+                        pointInfo.cells = pointInfo.ownCells = pointInfo.ownCells.add(cellPosition);
+                    }),
+                );
+
+                // Init border lines
                 borders.forEach((border) =>
                     border.forEach((point, index) => {
                         const pointKey = this.getPositionHash(point);
@@ -140,28 +162,62 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                         const borderLineStartMap = (this.borderLineMap[pointKey] = this.borderLineMap[pointKey] || {});
                         for (const end of [next, prev]) {
                             const endKey = this.getPositionHash(end);
+
                             const borderLineInfo = (borderLineStartMap[endKey] = borderLineStartMap[endKey] || {
                                 line: { start: point, end },
+                                ownCells: new PuzzlePositionSet(puzzle),
                                 cells: new PuzzlePositionSet(puzzle),
+                                clones: [],
                             });
-                            borderLineInfo.cells = borderLineInfo.cells.add(cellPosition);
+                            borderLineInfo.cells = borderLineInfo.ownCells = borderLineInfo.ownCells.add(cellPosition);
                         }
 
-                        const pointInfo = (this.realCellPointMap[pointKey] = this.realCellPointMap[pointKey] || {
-                            position: point,
-                            cells: new PuzzlePositionSet(puzzle),
-                            type: (puzzle.mergeGridLines ?? areCustomBounds) ? CellPart.border : CellPart.corner,
-                            neighbors: new PuzzlePositionSet(puzzle),
-                            diagonalNeighbors: new PuzzlePositionSet(puzzle),
-                        });
-                        pointInfo.cells = pointInfo.cells.add(cellPosition);
+                        // TODO: adjust for clones
                         if (Object.keys(borderLineStartMap).length > 2) {
+                            const pointInfo = this.realCellPointMap[pointKey];
                             pointInfo.type = CellPart.corner;
                         }
                     }),
                 );
             }),
         );
+
+        // Init corner point clones
+        for (const info of Object.values(this.realCellPointMap)) {
+            if (info.type === CellPart.center) {
+                continue;
+            }
+
+            info.clones = getCellCornerClones(info.position, puzzle);
+
+            info.cells = PuzzlePositionSet.merge(
+                info.ownCells,
+                ...info.clones.map((position) => this.realCellPointMap[this.getPositionHash(position)].ownCells),
+            );
+        }
+
+        // Init border line clones
+        for (const [startKey, map] of Object.entries(this.borderLineMap)) {
+            const startInfo = this.realCellPointMap[startKey];
+            const startClones = [startInfo.position, ...startInfo.clones];
+
+            for (const [endKey, borderLineInfo] of Object.entries(map)) {
+                const endInfo = this.realCellPointMap[endKey];
+                const endClones = [endInfo.position, ...endInfo.clones];
+
+                borderLineInfo.clones = startClones.flatMap((start) =>
+                    endClones
+                        .filter((end) => start !== startInfo.position || end !== endInfo.position)
+                        .map((end) => this.borderLineMap[this.getPositionHash(start)]?.[this.getPositionHash(end)])
+                        .filter(Boolean),
+                );
+
+                borderLineInfo.cells = PuzzlePositionSet.merge(
+                    borderLineInfo.cells,
+                    ...borderLineInfo.clones.map(({ cells }) => cells),
+                );
+            }
+        }
 
         // Calculate neighbors for cells and cell center points
         this.allCells.forEach((row) =>
@@ -176,10 +232,6 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 if (!isInteractableCell(cellTypeProps)) {
                     return;
                 }
-
-                // Add neighbors by type manager's special geometry
-                info.neighbors = info.neighbors.bulkAdd(getAdditionalNeighbors(cellPosition, puzzle));
-                // TODO: getAdditionalDiagonalNeighbors
 
                 borders.forEach((border) =>
                     border.forEach((point, index) => {
@@ -344,6 +396,15 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
             if (!info) {
                 console.warn(`Didn't find point info by key: ${stringifyPosition(position)}`);
                 continue;
+            }
+
+            for (const next of info.clones) {
+                const nextKey = this.getPositionHash(next);
+
+                if (map[nextKey] === undefined) {
+                    map[nextKey] = position;
+                    queue.push(0, next);
+                }
             }
 
             for (const next of info.neighbors.items) {
@@ -638,15 +699,19 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
 
 export interface PuzzleCellPointInfo {
     position: Position;
+    ownCells: SetInterface<Position>;
     cells: SetInterface<Position>;
     type: CellPart;
     neighbors: SetInterface<Position>;
     diagonalNeighbors: SetInterface<Position>;
+    clones: Position[];
 }
 
 export interface PuzzleCellBorderInfo {
     line: Line;
+    ownCells: SetInterface<Position>;
     cells: SetInterface<Position>;
+    clones: PuzzleCellBorderInfo[];
 }
 
 export interface PuzzleCellBorderSegmentInfo {

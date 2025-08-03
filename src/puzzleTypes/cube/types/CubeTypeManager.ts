@@ -137,27 +137,25 @@ export const CubeTypeManager = (continuousRowColumnRegions: boolean): PuzzleType
         }
     },
 
-    getAdditionalNeighbors({ top, left }, { gridSize: { gridSize } }) {
+    getCellCornerClones({ top, left }, { gridSize: { gridSize } }) {
         const realGridSize = gridSize / 2;
 
-        if (continuousRowColumnRegions) {
-            if (left === realGridSize - 1 && top < realGridSize) {
-                return [
-                    {
-                        top: realGridSize,
-                        left: gridSize - 1 - top,
-                    },
-                ];
-            }
+        if (left === realGridSize && top < realGridSize) {
+            return [
+                {
+                    top: realGridSize,
+                    left: gridSize - top,
+                },
+            ];
+        }
 
-            if (top === realGridSize && left >= realGridSize) {
-                return [
-                    {
-                        top: gridSize - 1 - left,
-                        left: realGridSize - 1,
-                    },
-                ];
-            }
+        if (top === realGridSize && left > realGridSize) {
+            return [
+                {
+                    top: gridSize - left,
+                    left: realGridSize,
+                },
+            ];
         }
 
         return [];
