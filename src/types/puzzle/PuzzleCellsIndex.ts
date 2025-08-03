@@ -387,7 +387,19 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
         const startKey = this.getPositionHash(start);
         const endKey = this.getPositionHash(end);
 
-        const map: Record<string, Position> = { [startKey]: start };
+        interface Segment {
+            point: Position;
+            prevPoint: Position;
+            lines: LineWithColor[];
+        }
+
+        const map: Record<string, Segment> = {
+            [startKey]: {
+                prevPoint: start,
+                point: start,
+                lines: [],
+            },
+        };
         const queue = new PrioritizedQueue([start]);
         while (!queue.isEmpty() && map[endKey] === undefined) {
             const position = queue.shift()!;
@@ -402,7 +414,11 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 const nextKey = this.getPositionHash(next);
 
                 if (map[nextKey] === undefined) {
-                    map[nextKey] = position;
+                    map[nextKey] = {
+                        prevPoint: position,
+                        point: next,
+                        lines: [],
+                    };
                     queue.push(0, next);
                 }
             }
@@ -411,7 +427,18 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 const nextKey = this.getPositionHash(next);
 
                 if (map[nextKey] === undefined) {
-                    map[nextKey] = position;
+                    map[nextKey] = {
+                        prevPoint: position,
+                        point: next,
+                        lines: [
+                            {
+                                start: position,
+                                end: next,
+                                color,
+                            },
+                        ],
+                    };
+
                     queue.push(2, next);
                 }
             }
@@ -420,31 +447,33 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 const nextKey = this.getPositionHash(next);
 
                 if (map[nextKey] === undefined) {
-                    map[nextKey] = position;
+                    map[nextKey] = {
+                        prevPoint: position,
+                        point: next,
+                        lines: [
+                            {
+                                start: position,
+                                end: next,
+                                color,
+                            },
+                        ],
+                    };
+
                     queue.push(3, next);
                 }
             }
         }
 
-        const points: Position[] = [];
+        const points: Segment[] = [];
         for (
-            let position: Position | undefined = end;
-            position && !this.isSamePosition(position, start);
-            position = map[this.getPositionHash(position)]
+            let position: Segment | undefined = map[endKey];
+            position && !this.isSamePosition(position.point, start);
+            position = map[this.getPositionHash(position.prevPoint)]
         ) {
             points.unshift(position);
         }
 
-        return points.map((position, index) =>
-            normalizePuzzleLine(
-                {
-                    start: index ? points[index - 1] : start,
-                    end: position,
-                    color,
-                },
-                this.puzzle,
-            ),
-        );
+        return points.flatMap(({ lines }) => lines).map((line) => normalizePuzzleLine(line, this.puzzle));
     }
 
     getCenterLines(lines: Line[], convertToCellPoints: boolean): Line[] {
