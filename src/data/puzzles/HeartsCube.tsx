@@ -1,4 +1,4 @@
-import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
 import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
@@ -119,4 +119,5 @@ export const HeartsCube = (showRatio: boolean): PuzzleDefinition<NumberPTM> => (
             context.getCellDigit(5, 2),
         ].join("");
     },
+    allowDrawing: allDrawingModes,
 });

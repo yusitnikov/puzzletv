@@ -1,4 +1,4 @@
-import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { CubedokuTypeManager } from "../../puzzleTypes/cubedoku/types/CubedokuTypeManager";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
@@ -67,6 +67,7 @@ export const IntroToCubedoku: PuzzleDefinition<NumberPTM> = {
     },
     items: [CubedokuIndexingConstraint()],
     resultChecker: isValidFinishedPuzzleByConstraints,
+    allowDrawing: allDrawingModes,
 };
 
 export const CubeIt: PuzzleDefinition<NumberPTM> = {
@@ -114,4 +115,5 @@ export const CubeIt: PuzzleDefinition<NumberPTM> = {
         CubedokuIndexingConstraint(),
     ],
     resultChecker: isValidFinishedPuzzleByConstraints,
+    allowDrawing: allDrawingModes,
 };

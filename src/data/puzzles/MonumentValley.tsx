@@ -1,4 +1,4 @@
-import { PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
+import { allDrawingModes, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { PartiallyTranslatable } from "../../types/translations/Translatable";
 import { isValidFinishedPuzzleByConstraints } from "../../types/puzzle/Constraint";
@@ -131,6 +131,7 @@ export const MonumentValley: PuzzleDefinition<MonumentValleyPTM> = {
         },
     }),
     resultChecker: isValidFinishedPuzzleByConstraints,
+    allowDrawing: allDrawingModes,
 };
 
 export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
@@ -180,4 +181,5 @@ export const MonumentValleyMini: PuzzleDefinition<MonumentValleyPTM> = {
         },
     }),
     resultChecker: isValidFinishedPuzzleByConstraints,
+    allowDrawing: allDrawingModes,
 };
