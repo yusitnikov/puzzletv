@@ -69,6 +69,18 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     ),
                 };
 
+                let cellTypeProps = this.puzzle.typeManager.getCellTypeProps?.({ top, left }, this.puzzle) ?? {};
+                let isActive = !inactiveCellsIndex.contains({ top, left });
+                if (!isActive) {
+                    cellTypeProps = {
+                        ...cellTypeProps,
+                        noInteraction: true,
+                        noBorders: true,
+                    };
+                } else {
+                    isActive = isInteractableCell(cellTypeProps);
+                }
+
                 return {
                     position: { top, left },
                     bounds,
@@ -89,7 +101,8 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     neighbors: new PuzzlePositionSet(puzzle),
                     diagonalNeighbors: new PuzzlePositionSet(puzzle),
                     borderSegments: {},
-                    isActive: !inactiveCellsIndex.contains({ top, left }),
+                    isActive,
+                    cellTypeProps,
                 };
             }),
         );
@@ -460,21 +473,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
     }
 
     getCellTypeProps(cell: Position): CellTypeProps<T> {
-        const cache = (this.cache.cellTypeProps = this.cache.cellTypeProps ?? {});
-        const key = stringifyPosition(cell);
-        if (!cache[key]) {
-            let props = this.puzzle.typeManager.getCellTypeProps?.(cell, this.puzzle) ?? {};
-            const cellInfo = this.allCells[cell.top]?.[cell.left];
-            if (cellInfo && !cellInfo.isActive) {
-                props = {
-                    ...props,
-                    noInteraction: true,
-                    noBorders: true,
-                };
-            }
-            cache[key] = props;
-        }
-        return cache[key];
+        return this.allCells[cell.top]?.[cell.left]?.cellTypeProps ?? {};
     }
 
     // region Custom regions
@@ -657,6 +656,7 @@ export interface CellInfo<T extends AnyPTM> {
     diagonalNeighbors: SetInterface<Position>;
     borderSegments: Record<string, PuzzleCellBorderSegmentInfo>;
     isActive: boolean;
+    cellTypeProps: CellTypeProps<T>;
 }
 
 interface PuzzleCustomRegionsMap {
