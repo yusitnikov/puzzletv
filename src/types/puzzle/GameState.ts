@@ -1140,6 +1140,7 @@ export const gameStateContinueMultiLine = <T extends AnyPTM>(
     }
 
     return mergeGameStateUpdates(result, {
+        // TODO: wrong region index
         currentMultiLine: [...context.currentMultiLine, ...newLines.map((line) => ({ ...line, regionIndex }))],
         currentMultiLineEnd: normalizePuzzlePosition(position, puzzle),
         dragAction:
