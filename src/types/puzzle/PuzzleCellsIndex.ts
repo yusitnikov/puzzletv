@@ -20,7 +20,7 @@ import { LineWithColor } from "./LineWithColor";
 import { PrioritizedQueue } from "../struct/PrioritizedQueue";
 import { PuzzleContext } from "./PuzzleContext";
 import { AnyPTM } from "./PuzzleTypeMap";
-import { CellTypeProps } from "./CellTypeProps";
+import { CellTypeProps, isInteractableCell } from "./CellTypeProps";
 
 export class PuzzleCellsIndex<T extends AnyPTM> {
     public readonly allCells: CellInfo<T>[][];
@@ -115,7 +115,12 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     center,
                     bounds: { borders },
                     areCustomBounds,
+                    cellTypeProps,
                 } = info;
+
+                if (!isInteractableCell(cellTypeProps)) {
+                    return;
+                }
 
                 this.realCellPointMap[this.getPositionHash(center)] = {
                     position: center,
@@ -165,7 +170,12 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     position: cellPosition,
                     center,
                     bounds: { borders },
+                    cellTypeProps,
                 } = info;
+
+                if (!isInteractableCell(cellTypeProps)) {
+                    return;
+                }
 
                 // Add neighbors by type manager's special geometry
                 info.neighbors = info.neighbors.bulkAdd(getAdditionalNeighbors(cellPosition, puzzle));
