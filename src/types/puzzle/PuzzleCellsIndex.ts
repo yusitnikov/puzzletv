@@ -1,4 +1,12 @@
-import { getLineVector, getVectorLength, Line, Position, PositionSet, stringifyPosition } from "../layout/Position";
+import {
+    getLineCenter,
+    getLineVector,
+    getVectorLength,
+    Line,
+    Position,
+    PositionSet,
+    stringifyPosition,
+} from "../layout/Position";
 import {
     getIsSamePuzzlePosition,
     getPuzzleLineHasher,
@@ -238,10 +246,33 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                         // Add neighbors by shared borders
                         const next = incrementArrayItemByIndex(border, index);
 
+                        const borderInfo = this.borderLineMap[this.getPositionHash(point)][this.getPositionHash(next)];
                         info.neighbors = info.neighbors.bulkAdd(
-                            this.borderLineMap[this.getPositionHash(point)][this.getPositionHash(next)].cells.remove(
-                                cellPosition,
-                            ).items,
+                            borderInfo.cells.remove(cellPosition).items.map((cell): PositionWithConnector => {
+                                if (borderInfo.ownCells.contains(cell)) {
+                                    return cell;
+                                }
+
+                                const borderClone = borderInfo.clones.find(({ ownCells }) => ownCells.contains(cell));
+                                if (!borderClone) {
+                                    return cell;
+                                }
+
+                                return {
+                                    ...cell,
+                                    // TODO: the real line centers
+                                    connector: [
+                                        {
+                                            start: info.center,
+                                            end: getLineCenter(borderInfo.line),
+                                        },
+                                        {
+                                            start: getLineCenter(borderClone.line),
+                                            end: this.allCells[cell.top][cell.left].center,
+                                        },
+                                    ],
+                                };
+                            }),
                         );
 
                         // Add neighbors by shared corners
@@ -249,7 +280,32 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
 
                         if (!disableDiagonalCenterLines) {
                             info.diagonalNeighbors = info.diagonalNeighbors.bulkAdd(
-                                cornerInfo.cells.remove(cellPosition).items,
+                                cornerInfo.cells.remove(cellPosition).items.map((cell): PositionWithConnector => {
+                                    if (cornerInfo.ownCells.contains(cell)) {
+                                        return cell;
+                                    }
+
+                                    const cornerClone = cornerInfo.clones
+                                        .map((corner) => this.realCellPointMap[this.getPositionHash(corner)])
+                                        .find(({ ownCells }) => ownCells.contains(cell));
+                                    if (!cornerClone) {
+                                        return cell;
+                                    }
+
+                                    return {
+                                        ...cell,
+                                        connector: [
+                                            {
+                                                start: info.center,
+                                                end: cornerInfo.position,
+                                            },
+                                            {
+                                                start: cornerClone.position,
+                                                end: this.allCells[cell.top][cell.left].center,
+                                            },
+                                        ],
+                                    };
+                                }),
                             );
                         }
 
@@ -271,10 +327,16 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 // Set center point's neighbors by cell's neighbors
                 const centerInfo = this.realCellPointMap[this.getPositionHash(center)];
                 centerInfo.neighbors = centerInfo.neighbors.set(
-                    info.neighbors.items.map(({ top, left }) => this.allCells[top][left].center),
+                    info.neighbors.items.map(({ top, left, connector }) => ({
+                        ...this.allCells[top][left].center,
+                        connector,
+                    })),
                 );
                 centerInfo.diagonalNeighbors = centerInfo.diagonalNeighbors.set(
-                    info.diagonalNeighbors.items.map(({ top, left }) => this.allCells[top][left].center),
+                    info.diagonalNeighbors.items.map(({ top, left, connector }) => ({
+                        ...this.allCells[top][left].center,
+                        connector,
+                    })),
                 );
             }),
         );
@@ -431,7 +493,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     map[nextKey] = {
                         prevPoint: position,
                         point: next,
-                        lines: [
+                        lines: next.connector?.map((line) => ({ ...line, color })) ?? [
                             {
                                 start: position,
                                 end: next,
@@ -456,7 +518,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                     map[nextKey] = {
                         prevPoint: position,
                         point: next,
-                        lines: [
+                        lines: next.connector?.map((line) => ({ ...line, color })) ?? [
                             {
                                 start: position,
                                 end: next,
@@ -732,13 +794,17 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
     //endregion
 }
 
+interface PositionWithConnector extends Position {
+    connector?: Line[];
+}
+
 export interface PuzzleCellPointInfo {
     position: Position;
     ownCells: SetInterface<Position>;
     cells: SetInterface<Position>;
     type: CellPart;
-    neighbors: SetInterface<Position>;
-    diagonalNeighbors: SetInterface<Position>;
+    neighbors: SetInterface<PositionWithConnector>;
+    diagonalNeighbors: SetInterface<PositionWithConnector>;
     clones: Position[];
 }
 
@@ -762,8 +828,8 @@ export interface CellInfo<T extends AnyPTM> {
     getTransformedBounds: (context: PuzzleContext<T>) => TransformedCustomCellBounds;
     areCustomBounds: boolean;
     center: Position;
-    neighbors: SetInterface<Position>;
-    diagonalNeighbors: SetInterface<Position>;
+    neighbors: SetInterface<PositionWithConnector>;
+    diagonalNeighbors: SetInterface<PositionWithConnector>;
     borderSegments: Record<string, PuzzleCellBorderSegmentInfo>;
     isActive: boolean;
     cellTypeProps: CellTypeProps<T>;

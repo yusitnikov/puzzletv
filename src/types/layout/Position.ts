@@ -98,6 +98,11 @@ export const invertLine = <LineT extends Line = Line>(line: LineT): LineT => ({
     end: line.start,
 });
 
+export const getLineCenter = ({ start, end }: Line): Position => ({
+    left: (end.left + start.left) / 2,
+    top: (end.top + start.top) / 2,
+});
+
 export const getLineVector = ({ start, end }: Line): Position => ({
     left: end.left - start.left,
     top: end.top - start.top,
