@@ -7,4 +7,4 @@ import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 export const SafeCrackerStarConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     layer = GridLayer.afterLines,
-) => TextConstraint<T>(cellLiterals, "☆", lightOrangeColor, 1, 0, layer);
+) => TextConstraint<T>(cellLiterals, "☆", { color: lightOrangeColor, size: 1, layer });

@@ -338,7 +338,7 @@ export const NewDiscovery: PuzzleDefinition<ChessPTM> = {
         ChessBoardIndexesConstraint(),
         ValidChessPositionConstraint,
         AntiBishopConstraint(),
-        TextConstraint(["R8C8"], "7", undefined, 0.7),
+        TextConstraint(["R8C8"], "7", { size: 0.7 }),
     ],
     allowDrawing: allDrawingModes,
     resultChecker: (context) => {

@@ -78,7 +78,7 @@ import {
     EllipseConstraint,
     RectConstraint,
 } from "../../components/puzzle/constraints/decorative-shape/DecorativeShape";
-import { TextConstraint } from "../../components/puzzle/constraints/text/Text";
+import { TextConstraint, TextConstraintOptions } from "../../components/puzzle/constraints/text/Text";
 import { FogConstraint, FogProps } from "../../components/puzzle/constraints/fog/Fog";
 import { DoubleArrowConstraint } from "../../components/puzzle/constraints/double-arrow/DoubleArrow";
 import {
@@ -903,22 +903,16 @@ export class PuzzleImporter<T extends AnyPTM> {
         gridParser: GridParser<T, any>,
         cellLiterals: PositionLiteral[],
         text: string,
-        color?: string,
-        size?: number,
-        angle?: number,
+        options: TextConstraintOptions,
         beforeLines?: boolean,
     ) {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
         this.addItems(
-            TextConstraint(
-                this.fixCellPositions(cells),
-                text,
-                color,
-                size,
-                angle,
-                this.cosmeticsLayer(gridParser, beforeLines),
-            ),
+            TextConstraint(this.fixCellPositions(cells), text, {
+                layer: this.cosmeticsLayer(gridParser, beforeLines),
+                ...options,
+            }),
         );
     }
     addCosmeticCage(

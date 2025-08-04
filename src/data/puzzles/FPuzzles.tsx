@@ -557,7 +557,7 @@ export class FPuzzlesGridParser<T extends AnyPTM> extends GridParser<T, FPuzzles
                             continue;
                         }
 
-                        importer.addCosmeticText(this, cells, value, fontC, size, angle);
+                        importer.addCosmeticText(this, cells, value, { color: fontC, size, angle });
                     }
                 }
             },

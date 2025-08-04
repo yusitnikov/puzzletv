@@ -67,13 +67,15 @@ const chessPiecesMap: Record<string, { type: ChessPieceType; color: ChessColor }
 export interface TextProps {
     text: string;
     size?: number;
+    stroke?: string;
+    strokeWidth?: number;
 }
 
 export const TextComponent: ConstraintPropsGenericFc<TextProps> = observer(function TextFc<T extends AnyPTM>({
     cells,
     angle = 0,
     color = textColor,
-    props: { text, size = 0.5 },
+    props: { text, size = 0.5, stroke, strokeWidth = 0 },
     context,
 }: ConstraintProps<T, TextProps>) {
     profiler.trace();
@@ -87,7 +89,14 @@ export const TextComponent: ConstraintPropsGenericFc<TextProps> = observer(funct
     return (
         <AutoSvg top={top + 0.5} left={left + 0.5} angle={angle - compensationAngle}>
             {!chessPiece && (
-                <CenteredText size={size} fill={color}>
+                <CenteredText
+                    size={size}
+                    fill={color}
+                    stroke={stroke}
+                    strokeWidth={strokeWidth}
+                    strokeLinejoin={"round"}
+                    paintOrder={"stroke"}
+                >
                     {text}
                 </CenteredText>
             )}
@@ -101,19 +110,22 @@ export const TextComponent: ConstraintPropsGenericFc<TextProps> = observer(funct
 
 export const textTag = "text";
 
+export interface TextConstraintOptions extends Omit<TextProps, "text"> {
+    color?: string;
+    angle?: number;
+    layer?: GridLayer;
+}
+
 export const TextConstraint = <T extends AnyPTM>(
     cellLiterals: PositionLiteral[],
     text: string,
-    color?: string,
-    size?: number,
-    angle?: number,
-    layer = GridLayer.afterLines,
+    { color, angle, layer = GridLayer.afterLines, ...other }: TextConstraintOptions = {},
 ): Constraint<T, TextProps> => {
     return {
         name: `text: ${text}`,
         tags: [textTag, cosmeticTag],
         cells: parsePositionLiterals(cellLiterals),
-        props: { text, size },
+        props: { text, ...other },
         color,
         angle,
         layer,

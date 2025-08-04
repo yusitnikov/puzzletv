@@ -923,14 +923,12 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                         case SymbolType.Text:
                                             new ObjectParser<TextSymbolParams>({
                                                 ...baseSymbolValidator,
-                                                text: (text, { size, fill, angle }) => {
+                                                text: (text, { size, fill, angle, stroke, strokeWidth }) => {
                                                     importer.addCosmeticText(
                                                         this,
                                                         [cell],
                                                         text,
-                                                        fill,
-                                                        size,
-                                                        angle,
+                                                        { color: fill, size, angle, stroke, strokeWidth },
                                                         beforeLines,
                                                     );
                                                 },
