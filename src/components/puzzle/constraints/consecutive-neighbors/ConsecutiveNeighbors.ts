@@ -42,7 +42,7 @@ export const BaseNeighborsConstraint = <T extends AnyPTM>(
                 }
             }
 
-            return puzzleIndex.cellsDynamicInfo[top][left].neighbors.items.every((cell2) => {
+            return puzzleIndex.allCellNeighbors[top][left].neighbors.items.every((cell2) => {
                 if (excludedCellsMap.contains({ start: cell, end: cell2 })) {
                     return true;
                 }

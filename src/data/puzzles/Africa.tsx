@@ -79,7 +79,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
 
                 const { puzzle, puzzleIndex } = context;
 
-                const { neighbors } = puzzleIndex.cellsDynamicInfo[cell.top][cell.left];
+                const { neighbors } = puzzleIndex.allCellNeighbors[cell.top][cell.left];
 
                 for (const neighbor of neighbors.items) {
                     const digit2 = digits[neighbor.top]?.[neighbor.left];
@@ -115,7 +115,7 @@ export const Africa: PuzzleDefinition<GoogleMapsPTM> = {
         }
 
         const digits = indexes(context.puzzle.gridSize.columnsCount).map((left) => context.getCellDigit(0, left)!);
-        const cellInfos = context.puzzleIndex.cellsDynamicInfo[0];
+        const cellInfos = context.puzzleIndex.allCellNeighbors[0];
 
         let product = 1;
         let dots = 0;

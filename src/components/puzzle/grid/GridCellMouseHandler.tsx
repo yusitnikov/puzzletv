@@ -79,7 +79,7 @@ const GridCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<T
     const { puzzleIndex } = context;
 
     const { areCustomBounds, center, borderSegments } = puzzleIndex.allCells[top][left];
-    const { borderSegmentNeighbors } = puzzleIndex.cellsDynamicInfo[top][left];
+    const borderSegmentNeighbors = puzzleIndex.getCellBorderSegmentNeighbors(top, left);
 
     const getCornersMap = () => {
         const cornersMap: Record<string, { corner: Position; length: number }> = {};
@@ -89,15 +89,9 @@ const GridCellMouseHandlerInner = observer(function FieldCellMouseHandlerInner<T
             const length = getVectorLength(getLineVector({ start, end }));
 
             for (const corner of [start, end]) {
-                if (outsideHandlers) {
-                    /*
-                     * Process only outside corners.
-                     * Point is outside when it has more connected lines than connected cells.
-                     */
-                    const pointInfo = puzzleIndex.getPointDynamicInfo(corner);
-                    if (pointInfo?.cells.size === pointInfo?.neighbors.size) {
-                        continue;
-                    }
+                // Process only outside corners in the "outsideHandlers" mode
+                if (outsideHandlers && !puzzleIndex.isOutsideCornerPoint(corner)) {
+                    continue;
                 }
 
                 const key = stringifyPosition(corner);

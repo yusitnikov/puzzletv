@@ -369,7 +369,7 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
     enableBackwardSteps = true,
 ): { cell?: Position; state?: undefined } => {
     const { center } = puzzleIndex.allCells[top][left];
-    const { neighbors } = puzzleIndex.cellsDynamicInfo[top][left];
+    const { neighbors } = puzzleIndex.allCellNeighbors[top][left];
 
     let bestDist: number | undefined = undefined;
     let bestCell: Position | undefined = undefined;

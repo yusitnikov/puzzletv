@@ -59,7 +59,7 @@ export const TapaCellConstraint = <T extends AnyPTM>(
     }
 
     const getNeighborCenters = (context: PuzzleContext<T>) =>
-        context.puzzleIndex.cellsDynamicInfo[cell.top][cell.left].neighbors.map(
+        context.puzzleIndex.allCellNeighbors[cell.top][cell.left].neighbors.map(
             ({ top, left }) => context.puzzleIndex.allCells[top][left].center,
         );
 

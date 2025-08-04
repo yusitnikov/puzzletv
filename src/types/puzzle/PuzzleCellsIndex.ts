@@ -29,35 +29,358 @@ import { PrioritizedQueue } from "../struct/PrioritizedQueue";
 import { PuzzleContext } from "./PuzzleContext";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { CellTypeProps, isInteractableCell } from "./CellTypeProps";
+import { comparer, computed, makeAutoObservable } from "mobx";
+import { computedFn } from "mobx-utils";
+import { profiler } from "../../utils/profiler";
 
 export class PuzzleCellsIndex<T extends AnyPTM> {
     public readonly allCells: CellInfo<T>[][];
-    public readonly cellsDynamicInfo: CellDynamicInfo[][];
-
-    public readonly cache: Record<string, any> = {};
 
     private readonly realCellPointMap: Record<string, PuzzleCellPointInfo> = {};
-    private readonly realCellCornerClones: Record<string, Position[]> = {};
-    private readonly realCellPointDynamicInfoMap: Record<string, PuzzleCellPointDynamicInfo> = {};
     private readonly borderLineMap: Record<string, Record<string, PuzzleCellBorderInfo>> = {};
-    private readonly borderLineDynamicInfoMap: Record<string, Record<string, PuzzleCellBorderDynamicInfo>> = {};
+
+    private get realCellCornerClones() {
+        profiler.trace();
+
+        const result: Record<string, Position[]> = {};
+
+        const { puzzle, realCellPointMap } = this;
+
+        for (const [key, info] of Object.entries(realCellPointMap)) {
+            if (info.type !== CellPart.center) {
+                const clones = puzzle.typeManager.getCellCornerClones?.(info.position, puzzle);
+
+                if (clones?.length) {
+                    result[key] = clones;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private get realCellCornerCellsMap() {
+        profiler.trace();
+
+        const result: Record<string, SetInterface<Position>> = {};
+
+        const { realCellPointMap, realCellCornerClones } = this;
+
+        for (const [key, info] of Object.entries(realCellPointMap)) {
+            if (info.type === CellPart.center) {
+                continue;
+            }
+
+            result[key] = PuzzlePositionSet.merge(
+                info.ownCells,
+                ...(realCellCornerClones[key] ?? []).map(
+                    (position) => realCellPointMap[this.getPositionHash(position)].ownCells,
+                ),
+            );
+        }
+
+        return result;
+    }
+
+    private get borderLineDynamicInfoMap() {
+        profiler.trace();
+
+        const result: Record<string, Record<string, PuzzleCellBorderDynamicInfo>> = {};
+
+        const { borderLineMap, realCellPointMap, realCellCornerClones } = this;
+
+        for (const [startKey, map] of Object.entries(borderLineMap)) {
+            const startInfo = realCellPointMap[startKey];
+            const startClones = [startInfo.position, ...(realCellCornerClones[startKey] ?? [])];
+
+            result[startKey] = {};
+
+            for (const [endKey, borderLineInfo] of Object.entries(map)) {
+                const endInfo = realCellPointMap[endKey];
+                const endClones = [endInfo.position, ...(realCellCornerClones[endKey] ?? [])];
+
+                const borderClones = startClones.flatMap((start) =>
+                    endClones
+                        .filter((end) => start !== startInfo.position || end !== endInfo.position)
+                        .map((end) => borderLineMap[this.getPositionHash(start)]?.[this.getPositionHash(end)])
+                        .filter(Boolean),
+                );
+
+                result[startKey][endKey] = {
+                    clones: borderClones,
+                    cells: PuzzlePositionSet.merge(
+                        borderLineInfo.ownCells,
+                        ...borderClones.map(({ ownCells }) => ownCells),
+                    ),
+                };
+            }
+        }
+
+        return result;
+    }
+
+    public get allCellNeighbors() {
+        profiler.trace();
+
+        const {
+            puzzle,
+            allCells,
+            realCellPointMap,
+            borderLineMap,
+            realCellCornerClones,
+            realCellCornerCellsMap,
+            borderLineDynamicInfoMap,
+        } = this;
+
+        return allCells.map((row) =>
+            row.map((info) => {
+                const result: CellNeighbors = {
+                    neighbors: new PuzzlePositionSet(puzzle),
+                    diagonalNeighbors: new PuzzlePositionSet(puzzle),
+                };
+
+                const {
+                    position: cellPosition,
+                    bounds: { borders },
+                    cellTypeProps,
+                } = info;
+
+                if (!isInteractableCell(cellTypeProps)) {
+                    return result;
+                }
+
+                borders.forEach((border) =>
+                    border.forEach((point, index) => {
+                        // Add neighbors by shared borders
+                        const next = incrementArrayItemByIndex(border, index);
+
+                        const borderInfo = borderLineMap[this.getPositionHash(point)][this.getPositionHash(next)];
+                        const borderDynamicInfo =
+                            borderLineDynamicInfoMap[this.getPositionHash(point)][this.getPositionHash(next)];
+                        result.neighbors = result.neighbors.bulkAdd(
+                            borderDynamicInfo.cells.remove(cellPosition).items.map((cell): PositionWithConnector => {
+                                if (borderInfo.ownCells.contains(cell)) {
+                                    return cell;
+                                }
+
+                                const borderClone = borderDynamicInfo.clones.find(({ ownCells }) =>
+                                    ownCells.contains(cell),
+                                );
+                                if (!borderClone) {
+                                    return cell;
+                                }
+
+                                return {
+                                    ...cell,
+                                    // TODO: the real line centers
+                                    connector: [
+                                        {
+                                            start: info.center,
+                                            end: getLineCenter(borderInfo.line),
+                                        },
+                                        {
+                                            start: getLineCenter(borderClone.line),
+                                            end: allCells[cell.top][cell.left].center,
+                                        },
+                                    ],
+                                };
+                            }),
+                        );
+
+                        // Add neighbors by shared corners
+                        if (!puzzle.disableDiagonalCenterLines) {
+                            const cornerInfo = realCellPointMap[this.getPositionHash(point)];
+
+                            result.diagonalNeighbors = result.diagonalNeighbors.bulkAdd(
+                                realCellCornerCellsMap[this.getPositionHash(point)]
+                                    .remove(cellPosition)
+                                    .items.map((cell): PositionWithConnector => {
+                                        if (cornerInfo.ownCells.contains(cell)) {
+                                            return cell;
+                                        }
+
+                                        const cornerClone = realCellCornerClones[this.getPositionHash(point)]
+                                            ?.map((corner) => realCellPointMap[this.getPositionHash(corner)])
+                                            ?.find(({ ownCells }) => ownCells.contains(cell));
+                                        if (!cornerClone) {
+                                            return cell;
+                                        }
+
+                                        return {
+                                            ...cell,
+                                            connector: [
+                                                {
+                                                    start: info.center,
+                                                    end: cornerInfo.position,
+                                                },
+                                                {
+                                                    start: cornerClone.position,
+                                                    end: allCells[cell.top][cell.left].center,
+                                                },
+                                            ],
+                                        };
+                                    }),
+                            );
+                        }
+                    }),
+                );
+
+                // Ensure that the regular neighbors are not duplicated as diagonal neighbors
+                result.diagonalNeighbors = result.diagonalNeighbors.bulkRemove(result.neighbors.items);
+
+                return result;
+            }),
+        );
+    }
+
+    private get realCellCornerNeighborsMap() {
+        profiler.trace();
+
+        const result: Record<string, PuzzleCellPointNeighbors> = {};
+
+        const { puzzle, allCells, realCellPointMap } = this;
+
+        for (const [key, info] of Object.entries(realCellPointMap)) {
+            if (info.type === CellPart.center) {
+                continue;
+            }
+
+            result[key] = {
+                neighbors: new PuzzlePositionSet(puzzle),
+                diagonalNeighbors: new PuzzlePositionSet(puzzle),
+            };
+        }
+
+        // Add other border points as diagonal neighbors to the corner point
+        if (!puzzle.disableDiagonalBorderLines) {
+            allCells.forEach((row) =>
+                row.forEach((info) => {
+                    const {
+                        bounds: { borders },
+                        cellTypeProps,
+                    } = info;
+
+                    if (!isInteractableCell(cellTypeProps)) {
+                        return;
+                    }
+
+                    borders.forEach((border) =>
+                        border.forEach((point, index) => {
+                            const info = result[this.getPositionHash(point)];
+                            info.diagonalNeighbors = info.diagonalNeighbors.bulkAdd(
+                                border.filter((_, index2) => {
+                                    const indexDiff = Math.abs(index2 - index);
+                                    return indexDiff > 1 && indexDiff < border.length - 1;
+                                }),
+                            );
+                        }),
+                    );
+                }),
+            );
+        }
+
+        // Calculate neighbors for corner points
+        allCells.forEach((row) =>
+            row.forEach((info) => {
+                for (const { line } of Object.values(info.borderSegments)) {
+                    const start = line[0];
+                    const end = line[line.length - 1];
+
+                    const startInfo = result[this.getPositionHash(start)];
+                    startInfo.neighbors = startInfo.neighbors.add(end);
+                    const endInfo = result[this.getPositionHash(end)];
+                    endInfo.neighbors = endInfo.neighbors.add(start);
+                }
+            }),
+        );
+
+        return result;
+    }
+
+    private get realCellCenterNeighborsMap() {
+        profiler.trace();
+
+        const result: Record<string, PuzzleCellPointNeighbors> = {};
+
+        const { puzzle, allCells, realCellPointMap, allCellNeighbors } = this;
+
+        for (const [key, info] of Object.entries(realCellPointMap)) {
+            if (info.type === CellPart.center) {
+                result[key] = {
+                    neighbors: new PuzzlePositionSet(puzzle),
+                    diagonalNeighbors: new PuzzlePositionSet(puzzle),
+                };
+            }
+        }
+
+        allCells.forEach((row) =>
+            row.forEach((info) => {
+                const { position: cellPosition, center, cellTypeProps } = info;
+
+                if (!isInteractableCell(cellTypeProps)) {
+                    return;
+                }
+
+                // Set center point's neighbors by cell's neighbors
+                const centerInfo = result[this.getPositionHash(center)];
+                const cellNeighbors = allCellNeighbors[cellPosition.top][cellPosition.left];
+                centerInfo.neighbors = centerInfo.neighbors.set(
+                    cellNeighbors.neighbors.items.map(({ top, left, connector }) => ({
+                        ...allCells[top][left].center,
+                        connector,
+                    })),
+                );
+                centerInfo.diagonalNeighbors = centerInfo.diagonalNeighbors.set(
+                    cellNeighbors.diagonalNeighbors.items.map(({ top, left, connector }) => ({
+                        ...allCells[top][left].center,
+                        connector,
+                    })),
+                );
+            }),
+        );
+
+        return result;
+    }
+
+    public getCellBorderSegmentNeighbors = computedFn(function getCellBorderSegmentNeighbors(
+        this: PuzzleCellsIndex<T>,
+        top: number,
+        left: number,
+    ) {
+        const result: Record<string, SetInterface<Position>> = {};
+
+        const { borderLineDynamicInfoMap, allCells } = this;
+        const info = allCells[top][left];
+
+        for (const [lineKey, { line }] of Object.entries(info.borderSegments)) {
+            const [start, branch] = line;
+            const startKey = this.getPositionHash(start);
+            const branchKey = this.getPositionHash(branch);
+
+            result[lineKey] = borderLineDynamicInfoMap[startKey][branchKey].cells.remove(info.position);
+        }
+
+        return result;
+    });
 
     constructor(public readonly puzzle: PuzzleDefinition<T>) {
+        makeAutoObservable<typeof this, "realCellPointMap" | "borderLineMap" | "realCellCornerClones">(this, {
+            // read-only fields:
+            puzzle: false,
+            allCells: false,
+            realCellPointMap: false,
+            borderLineMap: false,
+            // dynamic fields:
+            realCellCornerClones: computed({ equals: comparer.structural }),
+        });
+
         const {
-            typeManager: {
-                transformCoords = (coords: Position) => coords,
-                isNonLinearTransformCoords,
-                getCellCornerClones,
-            },
+            typeManager: { transformCoords = (coords: Position) => coords, isNonLinearTransformCoords },
             gridSize: { rowsCount, columnsCount },
             customCellBounds = {},
-            disableDiagonalCenterLines,
-            disableDiagonalBorderLines,
         } = puzzle;
 
         const inactiveCellsIndex = new PositionSet(puzzle.inactiveCells ?? []);
-
-        // region Static info
 
         // Init all cell infos
         this.allCells = indexes(rowsCount).map((top) =>
@@ -280,234 +603,17 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 }
             }
         }
-
-        // endregion
-
-        // region Dynamic info
-
-        // Init corner point clones
-        for (const [key, info] of Object.entries(this.realCellPointMap)) {
-            if (info.type === CellPart.center) {
-                continue;
-            }
-
-            const clones = getCellCornerClones?.(info.position, puzzle);
-            if (clones?.length) {
-                this.realCellCornerClones[key] = clones;
-            }
-        }
-
-        // Init point dynamic info (only cells, no neighbors so far)
-        for (const [key, info] of Object.entries(this.realCellPointMap)) {
-            this.realCellPointDynamicInfoMap[key] = {
-                cells:
-                    info.type === CellPart.center
-                        ? new PuzzlePositionSet(puzzle, [info.cell])
-                        : PuzzlePositionSet.merge(
-                              info.ownCells,
-                              ...(this.realCellCornerClones[key] ?? []).map(
-                                  (position) => this.realCellPointMap[this.getPositionHash(position)].ownCells,
-                              ),
-                          ),
-                neighbors: new PuzzlePositionSet(puzzle),
-                diagonalNeighbors: new PuzzlePositionSet(puzzle),
-            };
-        }
-
-        // Init border line dynamic info (clones and cells)
-        for (const [startKey, map] of Object.entries(this.borderLineMap)) {
-            const startInfo = this.realCellPointMap[startKey];
-            const startClones = [startInfo.position, ...(this.realCellCornerClones[startKey] ?? [])];
-
-            this.borderLineDynamicInfoMap[startKey] = {};
-
-            for (const [endKey, borderLineInfo] of Object.entries(map)) {
-                const endInfo = this.realCellPointMap[endKey];
-                const endClones = [endInfo.position, ...(this.realCellCornerClones[endKey] ?? [])];
-
-                const borderClones = startClones.flatMap((start) =>
-                    endClones
-                        .filter((end) => start !== startInfo.position || end !== endInfo.position)
-                        .map((end) => this.borderLineMap[this.getPositionHash(start)]?.[this.getPositionHash(end)])
-                        .filter(Boolean),
-                );
-
-                this.borderLineDynamicInfoMap[startKey][endKey] = {
-                    clones: borderClones,
-                    cells: PuzzlePositionSet.merge(
-                        borderLineInfo.ownCells,
-                        ...borderClones.map(({ ownCells }) => ownCells),
-                    ),
-                };
-            }
-        }
-
-        // Calculate neighbors for cells and cell center points
-        this.cellsDynamicInfo = this.allCells.map((row) =>
-            row.map(() => {
-                return {
-                    neighbors: new PuzzlePositionSet(puzzle),
-                    diagonalNeighbors: new PuzzlePositionSet(puzzle),
-                    borderSegmentNeighbors: {},
-                };
-            }),
-        );
-
-        this.allCells.forEach((row) =>
-            row.forEach((info) => {
-                const {
-                    position: cellPosition,
-                    center,
-                    bounds: { borders },
-                    cellTypeProps,
-                } = info;
-
-                if (!isInteractableCell(cellTypeProps)) {
-                    return;
-                }
-
-                const dynamicInfo = this.cellsDynamicInfo[cellPosition.top][cellPosition.left];
-
-                borders.forEach((border) =>
-                    border.forEach((point, index) => {
-                        // Add neighbors by shared borders
-                        const next = incrementArrayItemByIndex(border, index);
-
-                        const borderInfo = this.borderLineMap[this.getPositionHash(point)][this.getPositionHash(next)];
-                        const borderDynamicInfo =
-                            this.borderLineDynamicInfoMap[this.getPositionHash(point)][this.getPositionHash(next)];
-                        dynamicInfo.neighbors = dynamicInfo.neighbors.bulkAdd(
-                            borderDynamicInfo.cells.remove(cellPosition).items.map((cell): PositionWithConnector => {
-                                if (borderInfo.ownCells.contains(cell)) {
-                                    return cell;
-                                }
-
-                                const borderClone = borderDynamicInfo.clones.find(({ ownCells }) =>
-                                    ownCells.contains(cell),
-                                );
-                                if (!borderClone) {
-                                    return cell;
-                                }
-
-                                return {
-                                    ...cell,
-                                    // TODO: the real line centers
-                                    connector: [
-                                        {
-                                            start: info.center,
-                                            end: getLineCenter(borderInfo.line),
-                                        },
-                                        {
-                                            start: getLineCenter(borderClone.line),
-                                            end: this.allCells[cell.top][cell.left].center,
-                                        },
-                                    ],
-                                };
-                            }),
-                        );
-
-                        // Add neighbors by shared corners
-                        const cornerInfo = this.realCellPointMap[this.getPositionHash(point)];
-                        const cornerDynamicInfo = this.realCellPointDynamicInfoMap[this.getPositionHash(point)];
-
-                        if (!disableDiagonalCenterLines) {
-                            dynamicInfo.diagonalNeighbors = dynamicInfo.diagonalNeighbors.bulkAdd(
-                                cornerDynamicInfo.cells
-                                    .remove(cellPosition)
-                                    .items.map((cell): PositionWithConnector => {
-                                        if (cornerInfo.ownCells.contains(cell)) {
-                                            return cell;
-                                        }
-
-                                        const cornerClone = this.realCellCornerClones[this.getPositionHash(point)]
-                                            ?.map((corner) => this.realCellPointMap[this.getPositionHash(corner)])
-                                            ?.find(({ ownCells }) => ownCells.contains(cell));
-                                        if (!cornerClone) {
-                                            return cell;
-                                        }
-
-                                        return {
-                                            ...cell,
-                                            connector: [
-                                                {
-                                                    start: info.center,
-                                                    end: cornerInfo.position,
-                                                },
-                                                {
-                                                    start: cornerClone.position,
-                                                    end: this.allCells[cell.top][cell.left].center,
-                                                },
-                                            ],
-                                        };
-                                    }),
-                            );
-                        }
-
-                        // Add other border points as diagonal neighbors to the corner point
-                        if (!disableDiagonalBorderLines) {
-                            cornerDynamicInfo.diagonalNeighbors = cornerDynamicInfo.diagonalNeighbors.bulkAdd(
-                                border.filter((_, index2) => {
-                                    const indexDiff = Math.abs(index2 - index);
-                                    return indexDiff > 1 && indexDiff < border.length - 1;
-                                }),
-                            );
-                        }
-                    }),
-                );
-
-                // Ensure that the regular neighbors are not duplicated as diagonal neighbors
-                dynamicInfo.diagonalNeighbors = dynamicInfo.diagonalNeighbors.bulkRemove(dynamicInfo.neighbors.items);
-
-                // Set center point's neighbors by cell's neighbors
-                const centerInfo = this.realCellPointDynamicInfoMap[this.getPositionHash(center)];
-                centerInfo.neighbors = centerInfo.neighbors.set(
-                    dynamicInfo.neighbors.items.map(({ top, left, connector }) => ({
-                        ...this.allCells[top][left].center,
-                        connector,
-                    })),
-                );
-                centerInfo.diagonalNeighbors = centerInfo.diagonalNeighbors.set(
-                    dynamicInfo.diagonalNeighbors.items.map(({ top, left, connector }) => ({
-                        ...this.allCells[top][left].center,
-                        connector,
-                    })),
-                );
-            }),
-        );
-
-        // Calculate neighbors for corners and cell border segments
-        this.allCells.forEach((row) =>
-            row.forEach((info) => {
-                const cell = info.position;
-                const { borderSegmentNeighbors } = this.cellsDynamicInfo[cell.top][cell.left];
-
-                for (const [lineKey, { line }] of Object.entries(info.borderSegments)) {
-                    const [start, branch] = line;
-                    const end = line[line.length - 1];
-                    const startKey = this.getPositionHash(start);
-                    const branchKey = this.getPositionHash(branch);
-                    const endKey = this.getPositionHash(end);
-
-                    borderSegmentNeighbors[lineKey] =
-                        this.borderLineDynamicInfoMap[startKey][branchKey].cells.remove(cell);
-
-                    const startInfo = this.realCellPointDynamicInfoMap[startKey];
-                    startInfo.neighbors = startInfo.neighbors.add(end);
-                    const endInfo = this.realCellPointDynamicInfoMap[endKey];
-                    endInfo.neighbors = endInfo.neighbors.add(start);
-                }
-            }),
-        );
-
-        // endregion
     }
 
     getPointInfo(point: Position): PuzzleCellPointInfo | undefined {
         return this.realCellPointMap[this.getPositionHash(point)];
     }
 
-    getPointDynamicInfo(point: Position): PuzzleCellPointDynamicInfo | undefined {
-        return this.realCellPointDynamicInfoMap[this.getPositionHash(point)];
+    isOutsideCornerPoint(corner: Position): boolean {
+        const key = this.getPositionHash(corner);
+
+        // Point is outside when it has more connected lines than connected cells.
+        return this.realCellCornerCellsMap[key]?.size !== this.realCellCornerNeighborsMap[key]?.neighbors.size;
     }
 
     getPath({ start, end }: Line, color?: CellColorValue): LineWithColor[] {
@@ -532,7 +638,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
             const position = queue.shift()!;
             const positionKey = this.getPositionHash(position);
 
-            const info = this.realCellPointDynamicInfoMap[positionKey];
+            const info = this.realCellCenterNeighborsMap[positionKey] ?? this.realCellCornerNeighborsMap[positionKey];
             if (!info) {
                 console.warn(`Didn't find point info by key: ${stringifyPosition(position)}`);
                 continue;
@@ -763,14 +869,12 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
             map[this.getPositionHash(currentCell)] = newRegionIndex;
 
             const cellInfo = this.allCells[currentCell.top][currentCell.left];
-            const cellDynamicInfo = this.cellsDynamicInfo[currentCell.top][currentCell.left];
-            let connectedNeighbors = cellDynamicInfo.neighbors;
+            const borderSegmentNeighbors = this.getCellBorderSegmentNeighbors(currentCell.top, currentCell.left);
+            let connectedNeighbors = this.allCellNeighbors[currentCell.top][currentCell.left].neighbors;
 
             for (const [key, { line }] of Object.entries(cellInfo.borderSegments)) {
                 if (lines.contains({ start: line[0], end: line[line.length - 1] })) {
-                    connectedNeighbors = connectedNeighbors.bulkRemove(
-                        cellDynamicInfo.borderSegmentNeighbors[key].items,
-                    );
+                    connectedNeighbors = connectedNeighbors.bulkRemove(borderSegmentNeighbors[key].items);
                 }
             }
 
@@ -808,7 +912,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                         cells: [{ top, left }],
                     });
 
-                    for (const { top: top2, left: left2 } of this.cellsDynamicInfo[top][left].neighbors.items) {
+                    for (const { top: top2, left: left2 } of this.allCellNeighbors[top][left].neighbors.items) {
                         const info2 = cellRegions[top2]?.[left2];
                         if (info2 && info2.index === info.index && info2.id !== info.id) {
                             info.cells.push(...info2.cells);
@@ -874,8 +978,7 @@ export interface PuzzleCellPointInfo {
     type: CellPart;
 }
 
-export interface PuzzleCellPointDynamicInfo {
-    cells: SetInterface<Position>;
+export interface PuzzleCellPointNeighbors {
     neighbors: SetInterface<PositionWithConnector>;
     diagonalNeighbors: SetInterface<PositionWithConnector>;
 }
@@ -907,10 +1010,9 @@ export interface CellInfo<T extends AnyPTM> {
     cellTypeProps: CellTypeProps<T>;
 }
 
-export interface CellDynamicInfo {
+export interface CellNeighbors {
     neighbors: SetInterface<PositionWithConnector>;
     diagonalNeighbors: SetInterface<PositionWithConnector>;
-    borderSegmentNeighbors: Record<string, SetInterface<Position>>;
 }
 
 interface PuzzleCustomRegionsMap {
