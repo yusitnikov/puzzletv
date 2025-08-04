@@ -155,7 +155,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                             diagonalNeighbors: new PuzzlePositionSet(puzzle),
                             clones: [],
                         });
-                        pointInfo.cells = pointInfo.ownCells = pointInfo.ownCells.add(cellPosition);
+                        pointInfo.ownCells = pointInfo.ownCells.add(cellPosition);
                     }),
                 );
 
@@ -177,7 +177,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                                 cells: new PuzzlePositionSet(puzzle),
                                 clones: [],
                             });
-                            borderLineInfo.cells = borderLineInfo.ownCells = borderLineInfo.ownCells.add(cellPosition);
+                            borderLineInfo.ownCells = borderLineInfo.ownCells.add(cellPosition);
                         }
 
                         // TODO: adjust for clones
@@ -221,8 +221,8 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 );
 
                 borderLineInfo.cells = PuzzlePositionSet.merge(
-                    borderLineInfo.cells,
-                    ...borderLineInfo.clones.map(({ cells }) => cells),
+                    borderLineInfo.ownCells,
+                    ...borderLineInfo.clones.map(({ ownCells }) => ownCells),
                 );
             }
         }
@@ -354,6 +354,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                 {
                     line: { end: branch },
                     cells,
+                    ownCells,
                 },
             ] of Object.entries(this.borderLineMap[startKey])) {
                 let nextKey: string | undefined = branchKey;
@@ -423,7 +424,7 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
                         ":" +
                         this.getLineHash({ start, end: line[1] ?? next });
 
-                    for (const cell of cells.items) {
+                    for (const cell of ownCells.items) {
                         this.allCells[cell.top][cell.left].borderSegments[lineKey] = {
                             line,
                             center,
