@@ -131,6 +131,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                 gridSize: { gridSize },
                 ...puzzle
             },
+            puzzleIndex,
         } = context;
         return getDefaultRegionsForRowsAndColumns(
             context.cloneWith({
@@ -142,6 +143,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                         columnsCount: gridSize,
                     },
                 },
+                puzzleIndex,
             }),
         );
     },
@@ -268,6 +270,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                     puzzle.resultChecker = (context) => {
                         const {
                             puzzle,
+                            puzzleIndex,
                             gridExtension: { cars: carPositions },
                         } = context;
                         const { initialDigits = {} } = puzzle;
@@ -305,6 +308,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                                     return item;
                                 }),
                             },
+                            puzzleIndex,
                         });
 
                         if (resultChecker !== isValidFinishedPuzzleByConstraints) {

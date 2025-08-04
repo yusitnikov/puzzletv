@@ -252,6 +252,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         runInAction(() => {
             const {
                 puzzle,
+                puzzleIndex,
                 myGameState,
                 onStateChange,
                 cellSize,
@@ -264,8 +265,10 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
             if (puzzle !== undefined) {
                 (window as any).puzzle = this.puzzle;
                 (window as any).context = this;
-                this.puzzle = puzzle;
-                this.puzzleIndex = new PuzzleCellsIndex(this.puzzle);
+                if (puzzle !== this.puzzle) {
+                    this.puzzle = puzzle;
+                    this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(this.puzzle);
+                }
             }
             if (myGameState !== undefined /* && !areSameGameStates(this, myGameState, this.myGameState)*/) {
                 this.myGameState = myGameState;
