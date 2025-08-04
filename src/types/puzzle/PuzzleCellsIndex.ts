@@ -44,11 +44,11 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
 
         const result: Record<string, Position[]> = {};
 
-        const { puzzle, realCellPointMap } = this;
+        const { context, puzzle, realCellPointMap } = this;
 
         for (const [key, info] of Object.entries(realCellPointMap)) {
             if (info.type !== CellPart.center) {
-                const clones = puzzle.typeManager.getCellCornerClones?.(info.position, puzzle);
+                const clones = puzzle.typeManager.getCellCornerClones?.(info.position, puzzle, context);
 
                 if (clones?.length) {
                     result[key] = clones;
@@ -363,7 +363,10 @@ export class PuzzleCellsIndex<T extends AnyPTM> {
         return result;
     });
 
-    constructor(public readonly puzzle: PuzzleDefinition<T>) {
+    constructor(
+        public readonly puzzle: PuzzleDefinition<T>,
+        public readonly context?: PuzzleContext<T>,
+    ) {
         makeAutoObservable<typeof this, "realCellPointMap" | "borderLineMap" | "realCellCornerClones">(this, {
             // read-only fields:
             puzzle: false,

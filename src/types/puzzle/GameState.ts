@@ -1025,7 +1025,7 @@ export const gameStateApplyCurrentMultiLine = <T extends AnyPTM>(
 
                         if (type !== "center") {
                             const clones =
-                                context.puzzle.typeManager.getCellCornerClones?.(round, context.puzzle) ?? [];
+                                context.puzzle.typeManager.getCellCornerClones?.(round, context.puzzle, context) ?? [];
                             marks = marks.toggleAll(
                                 [
                                     xMark,

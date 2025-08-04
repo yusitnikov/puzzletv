@@ -204,7 +204,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         );
 
         this.puzzle = puzzle;
-        this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(puzzle);
+        this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(puzzle, this);
         this._onStateChange = onStateChange;
         this.cellSize = cellSize;
         this.cellSizeForSidePanel = cellSizeForSidePanel;
@@ -267,7 +267,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                 (window as any).context = this;
                 if (puzzle !== this.puzzle) {
                     this.puzzle = puzzle;
-                    this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(this.puzzle);
+                    this.puzzleIndex = puzzleIndex ?? new PuzzleCellsIndex(this.puzzle, this);
                 }
             }
             if (myGameState !== undefined /* && !areSameGameStates(this, myGameState, this.myGameState)*/) {

@@ -9,6 +9,7 @@ import {
     PositionSet,
     PositionWithAngle,
     rotateVectorClockwise,
+    stringifyPosition,
 } from "../../../types/layout/Position";
 import { loop, roundToStep } from "../../../utils/math";
 import { JigsawDigitCellDataComponentType } from "../components/JigsawDigitCellData";
@@ -41,7 +42,7 @@ import { rotateNumber } from "../../../components/puzzle/digit/DigitComponentTyp
 import { JigsawPieceHighlightHandlerControlButtonItem } from "../components/JigsawPieceHighlightHandler";
 import { getCellDataSortIndexes } from "../../../components/puzzle/cell/CellDigits";
 import { JigsawGridPieceState, JigsawGridState } from "./JigsawGridState";
-import { getReverseIndexMap } from "../../../utils/array";
+import { getReverseIndexMap, incrementArrayItemByIndex } from "../../../utils/array";
 import { PuzzleImportOptions } from "../../../types/puzzle/PuzzleImportOptions";
 import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
 import {
@@ -72,6 +73,7 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { createEmptyContextForPuzzle, PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { isCosmeticConstraint } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
+import { isInteractableCell } from "../../../types/puzzle/CellTypeProps";
 
 interface JigsawTypeManagerOptions {
     supportGluePieces?: boolean;
@@ -370,8 +372,6 @@ export const JigsawTypeManager = (
                     return regions;
                 },
 
-                regionSpecificUserMarks: true,
-
                 getRegionsForRowsAndColumns(context): Constraint<JigsawPTM, any>[] {
                     if (context.puzzle.importOptions?.noSudoku) {
                         return [];
@@ -416,6 +416,94 @@ export const JigsawTypeManager = (
                             return results;
                         }),
                     );
+                },
+
+                getCellCornerClones(position, _puzzle, context): Position[] {
+                    if (!context) {
+                        return [];
+                    }
+
+                    const sourcePointsMap = context.getComputedValue("jigsawRealPointsForClones", () => {
+                        enum PointType {
+                            corner,
+                            borderCenter,
+                        }
+                        interface SourcePointInfo {
+                            type: PointType;
+                            sourcePosition: Position;
+                            transformedPosition: Position;
+                        }
+                        const sourcePointsMap: Record<string, SourcePointInfo> = {};
+
+                        const normalizePosition = ({ top, left }: Position): Position => ({
+                            top: roundToStep(top, 0.1),
+                            left: roundToStep(left, 0.1),
+                        });
+
+                        for (const row of context.puzzleIndex.allCells) {
+                            for (const info of row) {
+                                const {
+                                    position: { top, left },
+                                    cellTypeProps,
+                                    bounds: { borders },
+                                } = info;
+
+                                if (!isInteractableCell(cellTypeProps)) {
+                                    continue;
+                                }
+
+                                const regionInfo = context.getCellRegion(top, left);
+                                if (!regionInfo) {
+                                    continue;
+                                }
+
+                                const indexPoints = (points: Position[], type: PointType) => {
+                                    for (const point of points) {
+                                        sourcePointsMap[stringifyPosition(point)] ??= {
+                                            type,
+                                            sourcePosition: point,
+                                            transformedPosition: normalizePosition(
+                                                regionInfo.region.transformCoords?.(point) ?? point,
+                                            ),
+                                        };
+                                    }
+                                };
+                                indexPoints(borders.flat(), PointType.corner);
+                                indexPoints(
+                                    borders.flatMap((points) =>
+                                        points.map((point, index) =>
+                                            getAveragePosition([point, incrementArrayItemByIndex(points, index)]),
+                                        ),
+                                    ),
+                                    PointType.borderCenter,
+                                );
+                            }
+                        }
+
+                        const transformedPointsMap: Record<PointType, Record<string, SourcePointInfo[]>> = {
+                            [PointType.corner]: {},
+                            [PointType.borderCenter]: {},
+                        };
+
+                        for (const sourceInfo of Object.values(sourcePointsMap)) {
+                            const { type, transformedPosition } = sourceInfo;
+
+                            (transformedPointsMap[type][stringifyPosition(transformedPosition)] ??= []).push(
+                                sourceInfo,
+                            );
+                        }
+
+                        return Object.fromEntries(
+                            Object.entries(sourcePointsMap).map(([key, sourceInfo]) => [
+                                key,
+                                transformedPointsMap[sourceInfo.type][stringifyPosition(sourceInfo.transformedPosition)]
+                                    .filter((item) => item !== sourceInfo)
+                                    .map(({ sourcePosition }) => sourcePosition),
+                            ]),
+                        );
+                    });
+
+                    return sourcePointsMap[stringifyPosition(position)] ?? [];
                 },
 
                 controlButtons: [
