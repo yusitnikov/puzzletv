@@ -53,7 +53,7 @@ export const getCenterMarksMap = <T extends AnyPTM>(
     for (const mark of marks) {
         const cellInfo = cellsIndex.getPointInfo(mark.position);
         if (cellInfo?.type === CellPart.center) {
-            const { top, left } = cellInfo.cells.first()!;
+            const { top, left } = cellInfo.cell;
             map[top] = map[top] ?? {};
             map[top][left] = mark;
         }

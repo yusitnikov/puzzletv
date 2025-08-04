@@ -368,7 +368,8 @@ export const defaultProcessArrowDirectionForCustomCellBounds = <T extends AnyPTM
     _isMainKeyboard?: boolean,
     enableBackwardSteps = true,
 ): { cell?: Position; state?: undefined } => {
-    const { center, neighbors } = puzzleIndex.allCells[top][left];
+    const { center } = puzzleIndex.allCells[top][left];
+    const { neighbors } = puzzleIndex.cellsDynamicInfo[top][left];
 
     let bestDist: number | undefined = undefined;
     let bestCell: Position | undefined = undefined;

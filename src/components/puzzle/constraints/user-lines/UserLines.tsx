@@ -153,7 +153,7 @@ export const UserMarkByData = observer(function UserMarkByData<T extends AnyPTM>
         } = puzzle;
 
         if (isCenter) {
-            const cellPosition = puzzleIndex.getPointInfo(position)?.cells.first();
+            const cellPosition = puzzleIndex.getPointInfo(position)?.cell;
             if (cellPosition) {
                 const {
                     bounds: { userArea },

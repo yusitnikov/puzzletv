@@ -58,10 +58,10 @@ export const TapaCellConstraint = <T extends AnyPTM>(
         cluesMap[key] = (cluesMap[key] || 0) + 1;
     }
 
-    const getCellInfo = ({ puzzleIndex: { allCells } }: PuzzleContext<T>) => allCells[cell.top][cell.left];
-
     const getNeighborCenters = (context: PuzzleContext<T>) =>
-        getCellInfo(context).neighbors.map(({ top, left }) => context.puzzleIndex.allCells[top][left].center);
+        context.puzzleIndex.cellsDynamicInfo[cell.top][cell.left].neighbors.map(
+            ({ top, left }) => context.puzzleIndex.allCells[top][left].center,
+        );
 
     return {
         name: "tapa cell",
@@ -69,15 +69,15 @@ export const TapaCellConstraint = <T extends AnyPTM>(
         props: { clues },
         component: TapaCell,
         renderSingleCellInUserArea: true,
-        isValidPuzzle(lines, digits, cells, context) {
+        isValidPuzzle(_lines, _digits, _cells, context) {
             const neighborCenters = getNeighborCenters(context);
 
             return context.centerLineSegments.some(({ points }) => neighborCenters.containsOneOf(points))
                 ? successResultCheck(context.puzzle)
                 : notFinishedResultCheck();
         },
-        getInvalidUserLines(lines, digits, cells, context, isFinalCheck): Line[] {
-            const { center } = getCellInfo(context);
+        getInvalidUserLines(_lines, _digits, _cells, context, isFinalCheck): Line[] {
+            const { center } = context.puzzleIndex.allCells[cell.top][cell.left];
             const neighborCenters = getNeighborCenters(context);
             const lineSegments = context.centerLineSegments;
 
