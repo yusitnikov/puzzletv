@@ -39,15 +39,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: npm-v2-${{ hashFiles('package-lock.json') }}
+          key: npm-${{ hashFiles('package-lock.json') }}
 
       - run: npm ci
       - run: npm run build
       - run: mv build builds
-      - run: git checkout before-mobx
-      - run: echo PUBLIC_URL=/puzzletv/stage > .env.production
-      - run: npm run build
-      - run: mv build builds/stage
+#      - run: git checkout before-mobx
+#      - run: echo PUBLIC_URL=/puzzletv/stage > .env.production
+#      - run: npm ci
+#      - run: npm run build
+#      - run: mv build builds/stage
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
