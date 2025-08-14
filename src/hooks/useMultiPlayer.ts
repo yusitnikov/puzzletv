@@ -1,4 +1,4 @@
-import { Types } from "ably/promises";
+import { ClientOptions, PresenceMessage } from "ably";
 import { useAblyChannelPresence, useSetMyAblyChannelPresence } from "./useAbly";
 import { useEffect } from "react";
 import { autorun, comparer, makeAutoObservable, runInAction } from "mobx";
@@ -14,7 +14,7 @@ const emptyObject = {};
 export const myClientId: string = (window.localStorage.clientId =
     window.localStorage.clientId || Math.random().toString().substring(2));
 
-const ablyOptions: Types.ClientOptions = {
+const ablyOptions: ClientOptions = {
     key: "fzkxHw.6QoA4w:VLouQX2faOhELoyD3HPD9ZmXyYw62i334WrFN5HjIBQ",
     clientId: myClientId,
 };
@@ -38,7 +38,7 @@ export interface MessageWithClientId {
 export class UseMultiPlayerResult<T extends AnyPTM> {
     readonly context: PuzzleContext<T>;
 
-    presenceData: Types.PresenceMessage[] = [];
+    presenceData: PresenceMessage[] = [];
     isLoaded = false;
 
     private myMessages: Message[] = [];

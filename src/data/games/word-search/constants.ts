@@ -1,6 +1,6 @@
 import { darkBlueColor, darkGreenColor, orangeColor, purpleColor, redColor } from "../../../components/app/globals";
 import { localStorageManager } from "../../../utils/localStorage";
-import { Types } from "ably/promises";
+import { ClientOptions } from "ably";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 
 export const clientColors = [darkBlueColor, redColor, darkGreenColor, purpleColor, orangeColor];
@@ -13,7 +13,7 @@ export const fieldSizePreference = {
     height: localStorageManager.getNumberManager<number>("wordSearchHeight", 4),
 };
 
-export const wordSearchAblyOptions: Types.ClientOptions = {
+export const wordSearchAblyOptions: ClientOptions = {
     key: "pZYp8g.371mQw:gfbfLeibUGp7uuZBJCwOq84pdVhzQ6vOlhIal6dS9ZU",
     clientId: myClientId,
 };

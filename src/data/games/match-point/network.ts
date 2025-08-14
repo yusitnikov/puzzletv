@@ -1,7 +1,7 @@
-import { Types } from "ably/promises";
+import { ClientOptions } from "ably";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 
-export const matchPointAblyOptions: Types.ClientOptions = {
+export const matchPointAblyOptions: ClientOptions = {
     key: "rkOvZw.6Icfbw:VmbfYny1jIczARaMFtyIbjDpKi_tl6UrSAuZtG929nA",
     clientId: myClientId,
 };

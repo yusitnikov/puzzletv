@@ -1,4 +1,4 @@
-import { Realtime, Types } from "ably/promises";
+import { Realtime, ClientOptions, Message, PresenceMessage } from "ably";
 import { useSingleton } from "./useSingleton";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePureState } from "./usePureState";
@@ -11,10 +11,10 @@ import { settings } from "../types/layout/Settings";
 import { myClientId } from "./useMultiPlayer";
 import { translate } from "../utils/translate";
 
-export const useAbly = (options: Types.ClientOptions) =>
+export const useAbly = (options: ClientOptions) =>
     useSingleton(`ably-${options.key}`, () => new Realtime({ ...options, autoConnect: false }));
 
-export const useAblyChannel = (options: Types.ClientOptions, name: string, enabled = true) => {
+export const useAblyChannel = (options: ClientOptions, name: string, enabled = true) => {
     const ably = useAbly(options);
 
     return useSingleton(
@@ -29,9 +29,9 @@ export const useAblyChannel = (options: Types.ClientOptions, name: string, enabl
 };
 
 export const useAblyChannelMessages = (
-    options: Types.ClientOptions,
+    options: ClientOptions,
     channelName: string,
-    callback: (message: Types.Message) => void,
+    callback: (message: Message) => void,
     enabled = callback !== undefined,
 ) => {
     const channel = useAblyChannel(options, channelName, enabled);
@@ -45,8 +45,10 @@ export const useAblyChannelMessages = (
             return;
         }
 
-        const callback = (message: Types.Message) => callbackRef.current(message);
-        chain.then(() => channel.subscribe(callback));
+        const callback = (message: Message) => callbackRef.current(message);
+        chain.then(async () => {
+            await channel.subscribe(callback);
+        });
         return () => {
             chain.then(() => channel.unsubscribe(callback));
         };
@@ -54,7 +56,7 @@ export const useAblyChannelMessages = (
 };
 
 export const useAblyChannelState = <T>(
-    options: Types.ClientOptions,
+    options: ClientOptions,
     channelName: string,
     initialState: T | undefined = undefined,
     enabled = true,
@@ -88,11 +90,13 @@ export const useAblyChannelState = <T>(
 
         channel.whenState("attached").then(() => setConnected(true));
 
-        const callback = (message: Types.Message) => {
+        const callback = (message: Message) => {
             // console.log("Got message!", message.data);
             setState(message.data);
         };
-        chain.then(() => channel.subscribe(callback));
+        chain.then(async () => {
+            await channel.subscribe(callback);
+        });
         return () => {
             chain.then(() => channel.unsubscribe(callback));
         };
@@ -101,15 +105,15 @@ export const useAblyChannelState = <T>(
     return [state, updateState, connected];
 };
 
-const noMessages: Types.PresenceMessage[] = [];
+const noMessages: PresenceMessage[] = [];
 export const useAblyChannelPresence = (
-    options: Types.ClientOptions,
+    options: ClientOptions,
     channelName: string,
     enabled = true,
-): [messages: Types.PresenceMessage[], loaded: boolean] => {
+): [messages: PresenceMessage[], loaded: boolean] => {
     const channel = useAblyChannel(options, channelName, enabled);
 
-    const [presenceMessages, setPresenceMessages] = usePureState<Types.PresenceMessage[] | undefined>(undefined);
+    const [presenceMessages, setPresenceMessages] = usePureState<PresenceMessage[] | undefined>(undefined);
 
     const chain = useSingleton(`ably-${options.key}-presence-chain-${channelName}`, () => new Chain());
 
@@ -145,7 +149,7 @@ export const useAblyChannelPresence = (
 };
 
 export const useAblyChannelPresenceMap = <T>(
-    options: Types.ClientOptions,
+    options: ClientOptions,
     channelName: string,
     preserve: boolean,
     enabled = true,
@@ -166,7 +170,7 @@ export const useAblyChannelPresenceMap = <T>(
 };
 
 export const useSetMyAblyChannelPresence = (
-    options: Types.ClientOptions,
+    options: ClientOptions,
     channelName: string,
     myPresenceData: any,
     enabled = true,
@@ -205,10 +209,7 @@ export interface UseUserNamesOptions {
     showYouLabel?: boolean;
 }
 export type UserNameFunc = (clientId: string, options?: UseUserNamesOptions) => string;
-export const useUserNames = (
-    ablyOptions: Types.ClientOptions,
-    defaultOptions: UseUserNamesOptions = {},
-): UserNameFunc => {
+export const useUserNames = (ablyOptions: ClientOptions, defaultOptions: UseUserNamesOptions = {}): UserNameFunc => {
     useSetMyAblyChannelPresence(ablyOptions, userNamesChannelName, settings.nickname.get());
     const [namesMap] = useAblyChannelPresenceMap<string>(ablyOptions, userNamesChannelName, true);
 

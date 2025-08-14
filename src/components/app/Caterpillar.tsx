@@ -22,9 +22,9 @@ import { sortGrids } from "./caterpillar/compileGrids";
 import { GridsCompilation } from "./caterpillar/GridsCompilation";
 import { PublishModal } from "./caterpillar/PublishModal";
 import { DownloadModal } from "./caterpillar/DownloadModal";
-import { Types } from "ably/promises";
+import { ClientOptions } from "ably";
 
-export const caterpillarAblyOptions: Types.ClientOptions = {
+export const caterpillarAblyOptions: ClientOptions = {
     key: "Iwws0A.CqxuBA:0nLZIYLU8iJBz3rEjipcw3WvWa76sJN0mxxMpO2cqTY",
     clientId: myClientId,
 };
