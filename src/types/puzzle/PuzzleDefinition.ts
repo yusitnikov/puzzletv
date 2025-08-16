@@ -575,7 +575,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
     let loggedEmptyColors = false;
     for (const [top, row] of cells.entries()) {
         for (const [left, { colors }] of row.entries()) {
-            if (!isSolutionCheckCell(puzzleIndex.getCellTypeProps({ top, left }))) {
+            if (!isSolutionCheckCell(context, puzzleIndex.getCellTypeProps({ top, left }))) {
                 continue;
             }
 

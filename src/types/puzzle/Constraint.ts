@@ -218,7 +218,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
                 }
 
                 if (digit === undefined) {
-                    if (!allowEmptyCells && isSolutionCheckCell(cellTypeProps)) {
+                    if (!allowEmptyCells && isSolutionCheckCell(context, cellTypeProps)) {
                         result = notFinishedResultCheck();
                     }
                     continue;

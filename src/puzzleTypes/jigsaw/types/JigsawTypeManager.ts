@@ -73,7 +73,7 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { createEmptyContextForPuzzle, PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { isCosmeticConstraint } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
-import { isInteractableCell } from "../../../types/puzzle/CellTypeProps";
+import { CellTypeProps, isInteractableCell } from "../../../types/puzzle/CellTypeProps";
 
 interface JigsawTypeManagerOptions {
     supportGluePieces?: boolean;
@@ -416,6 +416,75 @@ export const JigsawTypeManager = (
                             return results;
                         }),
                     );
+                },
+
+                getCellTypeProps(cell: Position): CellTypeProps<JigsawPTM> {
+                    return {
+                        // Check the solution only for visible cells
+                        isCheckingSolution: (context) => {
+                            const visibilityMap = context.getComputedValue("jigsawCellVisibility", () => {
+                                interface PointInfo {
+                                    key: string;
+                                    index: number;
+                                    zIndex: number;
+                                }
+
+                                const normalizePosition = ({ top, left }: Position): Position => ({
+                                    top: roundToStep(top, 0.1),
+                                    left: roundToStep(left, 0.1),
+                                });
+
+                                const sourceCellsMap = context.puzzleIndex.allCells.map((row) =>
+                                    row.map((info): PointInfo | undefined => {
+                                        const { position, center, cellTypeProps } = info;
+
+                                        if (!isInteractableCell(cellTypeProps)) {
+                                            return undefined;
+                                        }
+
+                                        const regionInfo = context.getCellRegion(position.top, position.left);
+                                        if (!regionInfo) {
+                                            return undefined;
+                                        }
+
+                                        return {
+                                            key: stringifyPosition(
+                                                normalizePosition(
+                                                    regionInfo.region.transformCoords?.(center) ?? center,
+                                                ),
+                                            ),
+                                            index: regionInfo.index,
+                                            zIndex: regionInfo.region.zIndex ?? 0,
+                                        };
+                                    }),
+                                );
+
+                                const centersMap: Record<string, PointInfo> = {};
+
+                                for (const row of sourceCellsMap) {
+                                    for (const info of row) {
+                                        if (info === undefined) {
+                                            continue;
+                                        }
+
+                                        const prevInfo = centersMap[info.key];
+                                        if (
+                                            prevInfo === undefined ||
+                                            (info.zIndex - prevInfo.zIndex || info.index - prevInfo.index) >= 0
+                                        ) {
+                                            centersMap[info.key] = info;
+                                        }
+                                    }
+                                }
+
+                                return sourceCellsMap.map((row) =>
+                                    row.map((info) => info !== undefined && centersMap[info.key] === info),
+                                );
+                            });
+
+                            return !!visibilityMap[cell.top]?.[cell.left];
+                        },
+                    };
                 },
 
                 getCellCornerClones(position, _puzzle, context): Position[] {
