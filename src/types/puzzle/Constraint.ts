@@ -109,7 +109,7 @@ export const isValidUserDigit = <T extends AnyPTM>(
             continue;
         }
 
-        if (isFogPuzzle && !isCheckingFog) {
+        if (isFogPuzzle && !isCheckingFog && !isFinalCheck) {
             continue;
         }
 
