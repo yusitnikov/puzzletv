@@ -13,7 +13,6 @@ import { ComponentType, Fragment, ReactElement } from "react";
 import { gameStateGetCurrentGivenDigitsByCells } from "../../../../types/puzzle/GameState";
 import { darkGreyColor } from "../../../app/globals";
 import { GridCellBackground } from "../../cell/CellBackground";
-import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
 import { useAutoIncrementId } from "../../../../hooks/useAutoIncrementId";
 import { CellColor } from "../../../../types/puzzle/CellColor";
 import { PuzzlePositionSet } from "../../../../types/puzzle/PuzzlePositionSet";
@@ -309,9 +308,13 @@ const FogCellsBackground = observer(function FogCellsBackground<T extends AnyPTM
             {indexes(rowsCount).map((top) =>
                 indexes(columnsCount).map((left) => {
                     return (
-                        <AutoSvg key={`${top}-${left}`} top={top} left={left}>
-                            <GridCellBackground context={context} noGivenColors={true} top={top} left={left} />
-                        </AutoSvg>
+                        <GridCellBackground
+                            key={`${top}-${left}`}
+                            context={context}
+                            noGivenColors={true}
+                            top={top}
+                            left={left}
+                        />
                     );
                 }),
             )}
