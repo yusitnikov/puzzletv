@@ -6,7 +6,7 @@ import { PartialGameStateEx } from "../../../types/puzzle/GameState";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { emptyPosition, Position } from "../../../types/layout/Position";
-import { Constraint } from "../../../types/puzzle/Constraint";
+import { Constraint, withIsValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
 import { isCageConstraint } from "../../../components/puzzle/constraints/killer-cage/KillerCage";
 import {
     isCosmeticConstraint,
@@ -143,6 +143,7 @@ export const SokobanTypeManager = (options: SokobanOptions = {}): PuzzleTypeMana
                 sokobanStartPosition: sokobanPlayer.cells[0],
                 options,
             },
+            resultChecker: withIsValidFinishedPuzzleByConstraints(puzzle.resultChecker),
         };
     },
 
