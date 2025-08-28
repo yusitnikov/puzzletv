@@ -7,7 +7,7 @@ import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { ControlButtonItem, ControlButtonRegion } from "../../../components/puzzle/controls/ControlButtonsManager";
 import { RotatableClue } from "./RotatableCluesPuzzleExtension";
-import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
+import { Constraint, withIsValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
 import {
     DecorativeShapeProps,
     isEllipse,
@@ -179,24 +179,10 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
             },
         };
 
-        const { resultChecker } = puzzle;
-        if (resultChecker) {
-            puzzle = {
-                ...puzzle,
-                resultChecker: (context) => {
-                    const result = resultChecker(context);
-
-                    if (result.isCorrectResult && resultChecker !== isValidFinishedPuzzleByConstraints) {
-                        const result2 = isValidFinishedPuzzleByConstraints(context);
-                        if (!result2.isCorrectResult) {
-                            return result2;
-                        }
-                    }
-
-                    return result;
-                },
-            };
-        }
+        puzzle = {
+            ...puzzle,
+            resultChecker: withIsValidFinishedPuzzleByConstraints(puzzle.resultChecker),
+        };
 
         return puzzle;
     },

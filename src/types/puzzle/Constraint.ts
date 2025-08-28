@@ -12,7 +12,13 @@ import { GridRegion } from "./GridRegion";
 import { CellColorValue, resolveCellColorValue } from "./CellColor";
 import { profiler } from "../../utils/profiler";
 import { indexes } from "../../utils/indexes";
-import { errorResultCheck, notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "./PuzzleResultCheck";
+import {
+    errorResultCheck,
+    notFinishedResultCheck,
+    PuzzleResultCheck,
+    PuzzleResultChecker,
+    successResultCheck,
+} from "./PuzzleResultCheck";
 import { settings } from "../layout/Settings";
 
 export type Constraint<T extends AnyPTM, DataT = undefined> = {
@@ -241,6 +247,24 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
     timer.stop();
     return result;
 };
+
+export const withIsValidFinishedPuzzleByConstraints = <T extends AnyPTM>(
+    resultChecker: PuzzleResultChecker<T> | undefined,
+): PuzzleResultChecker<T> | undefined =>
+    resultChecker && resultChecker !== isValidFinishedPuzzleByConstraints
+        ? (context) => {
+              const result = resultChecker(context);
+
+              if (result.isCorrectResult) {
+                  const result2 = isValidFinishedPuzzleByConstraints(context);
+                  if (!result2.isCorrectResult) {
+                      return result2;
+                  }
+              }
+
+              return result;
+          }
+        : undefined;
 
 export interface CloneConstraintOptions {
     processCellsCoords: (coords: Position[]) => Position[];

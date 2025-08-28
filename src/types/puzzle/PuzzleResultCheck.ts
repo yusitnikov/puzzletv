@@ -3,6 +3,7 @@ import { translate } from "../../utils/translate";
 import { AnyPTM } from "./PuzzleTypeMap";
 import { PuzzleDefinition } from "./PuzzleDefinition";
 import { LanguageCode } from "../translations/LanguageCode";
+import { PuzzleContext } from "./PuzzleContext";
 
 /**
  * Result object for a puzzle solution check:
@@ -38,6 +39,11 @@ export interface PuzzleResultCheck {
      */
     forceShowResult?: boolean;
 }
+
+/**
+ * Callback that performs puzzle solution check for the context.
+ */
+export type PuzzleResultChecker<T extends AnyPTM> = (context: PuzzleContext<T>) => PuzzleResultCheck;
 
 /**
  * Puzzle check result for finishing the puzzle successfully.

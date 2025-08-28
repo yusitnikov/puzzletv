@@ -19,7 +19,13 @@ import {
     stringifyLine,
     stringifyPosition,
 } from "../layout/Position";
-import { errorResultCheck, notFinishedResultCheck, PuzzleResultCheck, successResultCheck } from "./PuzzleResultCheck";
+import {
+    errorResultCheck,
+    notFinishedResultCheck,
+    PuzzleResultCheck,
+    PuzzleResultChecker,
+    successResultCheck,
+} from "./PuzzleResultCheck";
 import { CellMark, getCenterMarksMap, parseCellMark } from "./CellMark";
 import { loop } from "../../utils/math";
 import { LanguageCode } from "../translations/LanguageCode";
@@ -250,7 +256,7 @@ export interface PuzzleDefinition<T extends AnyPTM> extends PuzzlePageParams {
      * did the user already finish the puzzle successfully, is the solve process still in progress,
      * is the puzzle already broken according to the entered digits, colors and other user inputs.
      */
-    resultChecker?: (context: PuzzleContext<T>) => PuzzleResultCheck;
+    resultChecker?: PuzzleResultChecker<T>;
     /**
      * The message to show to the user when they successfully finish solving the puzzle.
      */

@@ -44,7 +44,7 @@ import { getCellDataSortIndexes } from "../../../components/puzzle/cell/CellDigi
 import { JigsawGridPieceState, JigsawGridState } from "./JigsawGridState";
 import { getReverseIndexMap, incrementArrayItemByIndex } from "../../../utils/array";
 import { PuzzleImportOptions } from "../../../types/puzzle/PuzzleImportOptions";
-import { Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
+import { Constraint, withIsValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
 import {
     getRegionCells,
     isStickyRegionCell,
@@ -613,7 +613,7 @@ export const JigsawTypeManager = (
 
                     const contextDraft = createEmptyContextForPuzzle(puzzle);
 
-                    const { inactiveCells, resultChecker } = puzzle;
+                    const { inactiveCells } = puzzle;
 
                     // Mark all cells that don't belong to a region as inactive
                     let newInactiveCells = new PositionSet(inactiveCells);
@@ -693,23 +693,10 @@ export const JigsawTypeManager = (
 
                     contextDraft.dispose();
 
-                    if (resultChecker) {
-                        puzzle = {
-                            ...puzzle,
-                            resultChecker: (context) => {
-                                const result = resultChecker(context);
-
-                                if (result.isCorrectResult && resultChecker !== isValidFinishedPuzzleByConstraints) {
-                                    const result2 = isValidFinishedPuzzleByConstraints(context);
-                                    if (!result2.isCorrectResult) {
-                                        return result2;
-                                    }
-                                }
-
-                                return result;
-                            },
-                        };
-                    }
+                    puzzle = {
+                        ...puzzle,
+                        resultChecker: withIsValidFinishedPuzzleByConstraints(puzzle.resultChecker),
+                    };
 
                     return puzzle;
                 },
