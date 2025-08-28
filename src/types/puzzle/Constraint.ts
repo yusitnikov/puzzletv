@@ -264,7 +264,7 @@ export const withIsValidFinishedPuzzleByConstraints = <T extends AnyPTM>(
 
               return result;
           }
-        : undefined;
+        : resultChecker;
 
 export interface CloneConstraintOptions {
     processCellsCoords: (coords: Position[]) => Position[];
