@@ -76,6 +76,7 @@ import {
     SuperpositionSeries,
 } from "./FractionalSudoku";
 import { NarrowEscapeBoss, NarrowEscapeIntro } from "./NarrowEscape";
+import { TheCode } from "./TheCode";
 
 export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // region Empty
@@ -196,6 +197,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region My puzzles
+    TheCode,
+
     NarrowEscapeIntro,
     NarrowEscapeBoss,
 

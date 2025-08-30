@@ -25,6 +25,7 @@
         "@googlemaps/react-wrapper": "^1.1.32",
         "@types/pako": "^2.0.0",
         "ably": "^2.11.0",
+        "an-array-of-english-words": "^2.0.0",
         "cross-env": "^7.0.3",
         "focus-trap-react": "^9.0.2",
         "hash.js": "^1.1.7",

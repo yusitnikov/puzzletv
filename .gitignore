@@ -26,3 +26,5 @@ yarn-error.log*
 build-storybook.log
 
 src/components/layout/debugger
+
+test.ts
