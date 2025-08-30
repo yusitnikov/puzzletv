@@ -25,7 +25,7 @@ import { Position, PositionSet } from "../layout/Position";
 import { isSelectableCell } from "./CellTypeProps";
 import { TransformedCustomCellBounds } from "./CustomCellBounds";
 import { controlKeysState } from "../../hooks/useControlKeysState";
-import { getAllowedPuzzleInputModeInfos } from "./PuzzleInputModeInfo";
+import { getAllowedPuzzleInputModeInfos, PuzzleInputModeInfo } from "./PuzzleInputModeInfo";
 import { PuzzleInputMode } from "./PuzzleInputMode";
 import { Constraint, toDecorativeConstraint } from "./Constraint";
 import { GridLayer } from "./GridLayer";
@@ -901,12 +901,12 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         return persistentInputMode;
     }
 
-    get inputModeInfo() {
+    get inputModeInfo(): PuzzleInputModeInfo<T> {
         profiler.trace();
 
         const { inputMode } = this;
 
-        return this.allInputModeInfos.find(({ mode }) => mode === inputMode)!;
+        return this.allInputModeInfos.find(({ mode }) => mode === inputMode) ?? { mode: -1 };
     }
 
     get lmdSolutionCode() {

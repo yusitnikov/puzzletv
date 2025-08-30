@@ -187,7 +187,7 @@ export const getEmptyGameState = <T extends AnyPTM>(
             ],
             0,
         ),
-        persistentInputMode: savedGameState?.[5] ?? initialInputMode ?? getAllowedPuzzleInputModeInfos(puzzle)[0].mode,
+        persistentInputMode: savedGameState?.[5] ?? initialInputMode ?? getAllowedPuzzleInputModeInfos(puzzle)[0]?.mode,
         gestureInputMode: undefined,
         selectedCells: new PositionSet(),
         isMultiSelection: false,
