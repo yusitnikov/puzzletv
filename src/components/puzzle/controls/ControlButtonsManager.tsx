@@ -57,10 +57,10 @@ export class ControlButtonsManager<T extends AnyPTM> {
     public readonly height: number;
 
     constructor(
-        private readonly puzzle: PuzzleDefinition<T>,
+        puzzle: PuzzleDefinition<T>,
         private readonly isHorizontal: boolean,
     ) {
-        const { resultChecker, forceAutoCheckOnFinish = false, hideDeleteButton } = puzzle;
+        const { resultChecker, forceAutoCheckOnFinish = false, hideDeleteButton, disableHistory } = puzzle;
 
         const {
             [ControlButtonRegion.modes]: modes,
@@ -109,16 +109,18 @@ export class ControlButtonsManager<T extends AnyPTM> {
             });
         }
 
-        bottom.push(
-            {
-                key: "undo",
-                Component: UndoButton,
-            },
-            {
-                key: "redo",
-                Component: RedoButton,
-            },
-        );
+        if (!disableHistory) {
+            bottom.push(
+                {
+                    key: "undo",
+                    Component: UndoButton,
+                },
+                {
+                    key: "redo",
+                    Component: RedoButton,
+                },
+            );
+        }
 
         if (!hideDeleteButton) {
             bottom.push({

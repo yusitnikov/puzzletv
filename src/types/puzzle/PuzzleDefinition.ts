@@ -248,6 +248,10 @@ export interface PuzzleDefinition<T extends AnyPTM> extends PuzzlePageParams {
      * (same as the color input mode, but dedicated and optimized to support only 2 colors).
      */
     enableShading?: boolean;
+    /**
+     * Disallow "undo" and "redo"
+     */
+    disableHistory?: boolean;
     // endregion
 
     // region Conflict checker and solution checker
