@@ -111,6 +111,23 @@ export const TheCode: PuzzleDefinition<CrackTheCodePTM> = {
                 return uniqueLetters === "denorv" ? 1 : 0.5;
             },
 
+            // One unique vowel in every word
+            (code) => {
+                code = normalizeCode(code);
+
+                return (
+                    code !== "" &&
+                    splitWords(code).every(
+                        (word) =>
+                            new Set(
+                                parseVowels(word)
+                                    .filter(({ isVowel }) => isVowel)
+                                    .map(({ letter }) => letter),
+                            ).size === 1,
+                    )
+                );
+            },
+
             // Only English letters and spaces, no extra spaces
             // (code) => /^[a-z ]+$/i.test(code) && code.toLowerCase() === normalizeCode(code),
 
