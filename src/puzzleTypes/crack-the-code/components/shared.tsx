@@ -24,16 +24,20 @@ export const BaseInput = styled("input")({
 
 // noinspection UnnecessaryLocalVariableJS
 export const buttonHighlightColor = lighterGreyColor;
-export const BaseButton = styled("button")({
-    font: "inherit",
-    cursor: "pointer",
-    boxSizing: "border-box",
-    borderRadius: 0,
-    background: "none",
-    ":hover, :active, :focus": {
-        background: buttonHighlightColor,
+export const BaseButton = styled("button")<{ disabled?: boolean }>(({ disabled }) => [
+    {
+        font: "inherit",
+        cursor: "pointer",
+        boxSizing: "border-box",
+        borderRadius: 0,
+        background: "none",
     },
-});
+    !disabled && {
+        ":hover, :active, :focus": {
+            background: buttonHighlightColor,
+        },
+    },
+]);
 export const BorderlessButton = styled(BaseButton)({
     border: "none",
     padding: "0 0.5rem",

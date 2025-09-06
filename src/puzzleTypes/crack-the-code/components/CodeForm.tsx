@@ -10,6 +10,7 @@ import { LanguageCode } from "../../../types/translations/LanguageCode";
 export const CodeForm = observer(function CodeFormFc({ context }: PuzzleContextProps<CrackTheCodePTM>) {
     const {
         stateExtension: { currentWord, submittedWords },
+        isReady,
     } = context;
 
     const { lineHeight, gap } = getSizes(context);
@@ -35,9 +36,10 @@ export const CodeForm = observer(function CodeFormFc({ context }: PuzzleContextP
                 value={currentWord}
                 onInput={(event) => context.onStateChange({ extension: { currentWord: event.currentTarget.value } })}
                 autoComplete={"off"}
-                autoFocus={true}
+                autoFocus={isReady}
+                disabled={!isReady}
             />
-            <BigButton type="submit">
+            <BigButton type="submit" disabled={!isReady}>
                 {translate({
                     [LanguageCode.en]: "Save",
                     [LanguageCode.ru]: "Сохранить",

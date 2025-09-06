@@ -16,6 +16,7 @@ export const ConditionIndicators = observer(function ConditionIndicatorsFc({
         },
         cellSize,
         stateExtension: { currentWord, assumptionsPanelOpened, assumptions },
+        isReady,
     } = context;
 
     const { fontSize, lineHeight, gap } = getSizes(context);
@@ -25,6 +26,7 @@ export const ConditionIndicators = observer(function ConditionIndicatorsFc({
             <div>
                 <BorderlessButton
                     type={"button"}
+                    disabled={!isReady}
                     onClick={() =>
                         context.onStateChange({
                             extension: { assumptionsPanelOpened: !assumptionsPanelOpened },
@@ -59,6 +61,7 @@ export const ConditionIndicators = observer(function ConditionIndicatorsFc({
                         >
                             <BaseInput
                                 autoComplete={"off"}
+                                disabled={!isReady}
                                 placeholder={
                                     translate({
                                         [LanguageCode.en]: "Your assumptions about",
