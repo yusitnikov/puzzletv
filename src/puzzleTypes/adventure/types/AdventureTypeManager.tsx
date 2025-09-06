@@ -1,6 +1,6 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
-import { globalPaddingCoeff, textColor } from "../../../components/app/globals";
+import { globalPaddingCoeff } from "../../../components/app/globals";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { AdventurePTM} from "./AdventurePTM";
 import {
@@ -8,7 +8,7 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { Modal } from "../../../components/layout/modal/Modal";
 import { Button } from "../../../components/layout/button/Button";
-import { AdventureGridState, choicesMadeStateChangeAction } from "./AdventureGridState";
+import { choicesMadeStateChangeAction } from "./AdventureGridState";
 import { observer } from "mobx-react-lite";
 
 export const AdventureTypeManager = <T extends AdventurePTM>(
@@ -21,7 +21,6 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             introViewed: false
         },
     }),
-    disableConflictChecker: true,
     aboveRulesComponent: observer(function AdventureAboveRules({ context }) {
 
         const {

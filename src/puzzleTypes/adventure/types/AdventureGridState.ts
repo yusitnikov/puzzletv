@@ -25,7 +25,7 @@ export const choicesMadeStateChangeAction =
                 context,
                 clientId,
                 actionId,
-                ({ extension: {}, ...gridState }) => ({
+                ({ extension, ...gridState }) => ({
                     ...gridState,
                     extension: {
                         choicesMade: choicesMade,

@@ -43,7 +43,6 @@ import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
 import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
 import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
-import { indexes } from "../../utils/indexes";
 
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     
@@ -115,8 +114,8 @@ const adventureDef: choiceTaken = {
         solveCells: [[8, 6]],
         topMessage: "You've arrived at the edge of your neighbors land, marking your starting point and taking in the sights before taking your first step.",
         option1ChoiceMessage: "Explore the nearby bogs",
-        option1TakenMessage: "You find a species of garter snake you haven't seen before and sketch them (not to scale) on your map.",
-        option1SolutionMessage: "Garter Snakes",
+        option1TakenMessage: "You find a species of grass snake you haven't seen before but know to be harmless and sketch them (overexaggerating their size) on your map.",
+        option1SolutionMessage: "Grass Snakes",
         option2ChoiceMessage: "Investigate the bare patches ground between the nearby trees",
         option2TakenMessage: "The bare patch is a game trail, the local wildlife appear to use these paths to navigate to the top of the areas hills.",
         option2SolutionMessage: "Game Trails",
@@ -125,7 +124,7 @@ const adventureDef: choiceTaken = {
             initialDigits: { 0: {6: 6}},
             constraints: [WhispersConstraint(["R8C7", "R9C8", "R8C9", "R7C8", "R6C8"]),
                         WhispersConstraint(["R3C8", "R3C9", "R2C9", "R2C8", "R1C9"])],
-            rules: [`Garter Snakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}`],
+            rules: [`Grass Snakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}`],
             choices: {
                 solveCells: [[1, 8], [2, 7], [2, 8], [6, 7], [7, 6], [7, 8]],
                 topMessage: "You've made a detailed sketch of the snakes and tried unsuccessfully to coax one into a specimen jar before deciding to move on.",
