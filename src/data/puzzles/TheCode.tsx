@@ -22,7 +22,7 @@ const isAlternatingVowels = (word: string) => {
 };
 
 export const TheCode: PuzzleDefinition<CrackTheCodePTM> = {
-    noIndex: true,
+    noIndex: false,
     slug: "the-code",
     title: {
         [LanguageCode.en]: "The code",
