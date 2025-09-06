@@ -145,8 +145,8 @@ const adventureDef: choiceTaken = {
                         solveCells: [[4, 3], [4, 5], [6, 3], [6, 4], [6, 6], [7, 1], [7, 5]],
                         topMessage: "You study the dust devils for a while, even managing to jump into the path of one before it dissipates. After wiping the dust from your face you orient towards the distant edge of your map.",
                         option1ChoiceMessage: "You catch a floral scent on the breeze",
-                        option1TakenMessage: "You follow the scent and find rows of lavendar bushes, their flowers in full bloom.",
-                        option1SolutionMessage: "Lavendar Rows",
+                        option1TakenMessage: "You follow the scent and find rows of lavender bushes, their flowers in full bloom.",
+                        option1SolutionMessage: "Lavender Rows",
                         option2ChoiceMessage: "Mixed in with the stones you see some that look too geometric to be natural",
                         option2TakenMessage: "Sorting through the stones you find several which have been cut to be square or circular, they may have been used as tokens for trade.",
                         option2SolutionMessage: "Stone Tokens",
@@ -158,7 +158,7 @@ const adventureDef: choiceTaken = {
                                 RenbanConstraint(["R9C1", "R9C2", "R9C3"]),
                                 WhispersConstraint(["R1C1", "R2C1", "R3C1", "R3C2", "R2C2", "R1C2"]),
                                 ArrowConstraint("R3C7", ["R3C6", "R3C5"])],
-                            rules: [`Lavendar Rows (${translate(renbanTitle)}): ${translate(renbanExplained())})`],
+                            rules: [`Lavender Rows (${translate(renbanTitle)}): ${translate(renbanExplained())}`],
                             choices: undefined
                         },
                         option2: {
@@ -225,11 +225,11 @@ const adventureDef: choiceTaken = {
             rules: [`Game trails (Thermometers): ${translate(thermometersExplained)}`],
             choices: {
                 solveCells: [[3, 2], [3, 3], [6, 3], [6, 4], [6, 5], [7, 3], [7, 5], [8, 3], [8, 4], [8, 5]],
-                topMessage: "Having followed the game trail and arrive at the top of one of the areas hills. From this vantage point you see some large landscape features in the distance.",
+                topMessage: "Having followed the game trail and arrived at the top of one of the area's hills. From this vantage point you see some large landscape features in the distance.",
                 option1ChoiceMessage: "You spot wooden planks in a field",
                 option1TakenMessage: "You reach the planks and find that they were part of a fence around a pasture.",
                 option1SolutionMessage: "Pasture Fences",
-                option2ChoiceMessage: "You see the refaction of sunlight off moving water",
+                option2ChoiceMessage: "You see the refraction of sunlight off moving water",
                 option2TakenMessage: "The water is a small stream that runs through the fields.",
                 option2SolutionMessage: "Streams",
                 option1: {
@@ -244,7 +244,7 @@ const adventureDef: choiceTaken = {
                         solveCells: [[2, 4], [2, 8], [6, 1], [7, 1], [8, 1], [7, 6], [7, 8]],
                         topMessage: "You have fully mapped out the pastures on your map and calculated the area of each. Maybe someone in town will know what kind of animals were kept here.",
                         option1ChoiceMessage: "Adjacent to the pastures you see what appears to be the remnant of a stone structure",
-                        option1TakenMessage: "The stone structure seems like it may have once been the older location of the towns homes. Some are elevated while others are sunked in and may have been cellars.",
+                        option1TakenMessage: "The stone structure seems like it may have once been the older location of the town's homes. Some are elevated while others are sunken in and may have been cellars.",
                         option1SolutionMessage: "Town Remnants",
                         option2ChoiceMessage: "You see a small dirt mount nearby",
                         option2TakenMessage: "It's an ant hill and there are several red ants climbing onto your shoes, you back away and shake them off hoping they aren't fire ants.",

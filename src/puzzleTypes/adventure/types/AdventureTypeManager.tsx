@@ -154,7 +154,7 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                                 <>
                                     <div>While plenty of 12 year olds love adventure most don't have bedrooms like yours, filled with fossil replicates, antique maps, and hiking gear.
                                             With heroes like Jane Goodall, John Muir, and Jacques Cousteau you have wanted to go on an adventure of your own for years.
-                                            Your parents, ever-cautious, have decided you are old enough and have gotten permission of some town members to explore their land.
+                                            Your parents, ever-cautious, have decided you are old enough and have gotten permission from some town members to explore their land.
                                             With your compass, specimen jars, and your map (this puzzle) ready to be filled in, you set off!</div>
                                 </>
                     </div>
