@@ -124,7 +124,7 @@ const adventureDef: choiceTaken = {
             initialDigits: { 0: {6: 6}},
             constraints: [WhispersConstraint(["R8C7", "R9C8", "R8C9", "R7C8", "R6C8"]),
                         WhispersConstraint(["R3C8", "R3C9", "R2C9", "R2C8", "R1C9"])],
-            rules: [`Grass gnakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}`],
+            rules: [`Grass snakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}`],
             choices: {
                 solveCells: [[1, 8], [2, 7], [2, 8], [6, 7], [7, 6], [7, 8]],
                 topMessage: "You've made a detailed sketch of the snakes and tried unsuccessfully to coax one into a specimen jar before deciding to move on.",
