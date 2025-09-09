@@ -177,6 +177,7 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
         makeAutoObservable<typeof this, "cache" | "disposers">(
             this,
             {
+                puzzle: false,
                 userDigits: computed({ equals: comparer.structural }),
                 cells: computed<CellState<T>[][]>({
                     equals: (as, bs) =>

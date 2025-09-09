@@ -44,10 +44,11 @@ import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
 import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 import { choiceTaken } from "../../puzzleTypes/adventure/types/AdventureGridState";
+import { ReactNode } from "react";
 
 
 const adventureDef: choiceTaken = {
-    initialDigits: { 6: { 0: 1 }, 7: { 4: 1}, 8: { 7: 2, 8: 9}},
+    initialDigits: {},
     constraints: [],
     rules: [],
     choices: {
@@ -261,6 +262,52 @@ const adventureDef: choiceTaken = {
     }
 }
 
+const getAdventureRules = (context: PuzzleContext<AdventurePTM>) : ReactNode => {
+    let rules: string[] = [];
+    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
+    var depth = 0;
+    while (currentChoice !== undefined)
+    {
+        rules = rules.concat(currentChoice.rules);
+        if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
+        {
+            var solved = checkSolved(context, currentChoice.choices.solveCells)
+            if (context.gridExtension.choicesMade.length === depth + 1 && solved)
+            {
+                currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+            }
+            else
+            {
+                currentChoice = undefined;
+            }
+        }
+        else if (currentChoice.choices !== undefined)
+        {
+            currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+        }
+        else
+        {
+            currentChoice = undefined;
+        }
+        depth++;
+    }
+    return (
+        <>
+            <RulesParagraph>
+                <summary>
+                    {translate(normalSudokuRulesApply)}. As you annotate your map (fill in digits) you will be presented with choices to decide what to explore next (causing new rules to appear). Upon choosing you may see new landmarks and notate them on your map (new given digits may appear).
+                </summary>
+            </RulesParagraph>
+            
+            <RulesParagraph>
+                <RulesUnorderedList>
+                    {rules.map(item => <li>{item}</li>)}
+                </RulesUnorderedList>
+            </RulesParagraph>
+        </>
+    );
+}
+
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     
     title: { [LanguageCode.en]: "Adventure is out there!" },
@@ -269,7 +316,8 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
         rootChoiceTaken: adventureDef
     },
     slug: "choose-your-own-adventure",
-    initialDigits: {},
+    initialDigits: { 6: { 0: 1 }, 7: { 4: 1}, 8: { 7: 2, 8: 9}},
+    rules: getAdventureRules,
     typeManager: AdventureTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
@@ -306,17 +354,13 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
                 //}
 }
 
-const getAdventureConstraintsAndDigits = (context: PuzzleContext<AdventurePTM>): [Constraint<AdventurePTM, any>[], CellsMap<number>] => {
-let constraints: Constraint<AdventurePTM, any>[] = [];
-    let digits: CellsMap<number> = {};
-    let rules: string[] = [];
+const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
+    let constraints: Constraint<AdventurePTM, any>[] = [];
     let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
     var depth = 0;
     while (currentChoice !== undefined)
     {
-        digits = mergeCellsMaps(digits, currentChoice.initialDigits);
         constraints = constraints.concat(currentChoice.constraints);
-        rules = rules.concat(currentChoice.rules);
         if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
         {
             var solved = checkSolved(context, currentChoice.choices.solveCells)
@@ -356,27 +400,7 @@ let constraints: Constraint<AdventurePTM, any>[] = [];
         }
         depth++;
     }
-    //context.puzzle.initialDigits = digits;
-    context.puzzle.rules = () => (
-        <>
-            <RulesParagraph>
-                <summary>
-                    {translate(normalSudokuRulesApply)}. As you annotate your map (fill in digits) you will be presented with choices to decide what to explore next (causing new rules to appear). Upon choosing you may see new landmarks and notate them on your map (new given digits may appear).
-                </summary>
-            </RulesParagraph>
-            
-            <RulesParagraph>
-                <RulesUnorderedList>
-                    {rules.map(item => <li>{item}</li>)}
-                </RulesUnorderedList>
-            </RulesParagraph>
-        </>
-    )
-    return [constraints, digits];
-}
-
-const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
-    return getAdventureConstraintsAndDigits(context)[0];
+    return constraints;
 }
 
 const checkSolved = (context: PuzzleContext<AdventurePTM>, solveCells: [number, number][]): boolean => {
