@@ -43,68 +43,8 @@ import { EvenConstraint } from "../../components/puzzle/constraints/even/Even";
 import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
 import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
+import { choiceTaken } from "../../puzzleTypes/adventure/types/AdventureGridState";
 
-export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
-    
-    title: { [LanguageCode.en]: "Adventure is out there!" },
-    author: { [LanguageCode.en]: "Tumbo" },
-    extension: {
-        choicesMade: [],
-        choicesMadeSolutionStrings: [],
-        introViewed: false
-    },
-    slug: "choose-your-own-adventure",
-    initialDigits: { 8: { 4: 1 } },
-    typeManager: AdventureTypeManager(),
-    gridSize: GridSize9,
-    regions: Regions9,
-    // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHYbAc0xVFDx8BCgtOhd%2BADZPe3wyONcAZiT%2BVIMQAKCQsIjbLwJfTKiCRMzs4II8lEjC-FMS%2Br0m%2BNjW12sO-g8KwKrQ8NqC%2BKdugl7zVzGpmLSCDNmy-37cobr4rqX8FtBKtfzShpWc6vWR12LtmYurE4GajdddrNWzw-qr24X5477TwYfeKTb74drbcoQ37g0Ego4vI5bUE3I6LUFfI6NbYY%2BpozG-OH1GFHSHI34I%2BpI-bvYb48buX5famA2mU%2B4HVmjdk0p46X6k5mPUF4onQ8m-G6C84k7ks3kmWVC1GK6WfX5Ut5y2Hq-m-NFSoGuGEGzmXFWGnrm038LGvAFK%2BqSzUO%2BJ6AC6dGkuHQYTgmBwCEU%2BBUIAQAE96PxKDZw5GTHQoCgAt7lJQaGm00QaFmsw4aHm8xn09mS7n8%2BWi5nS%2BWCzRknWG5YaE2m2QaG22-Wu82e632-3u-WWz2O-3ojRx%2BPvDRp9O3DR5-PJxOZ6u5wuN8up2uN4u3TGI%2BlKGmQOg2BAAO4EMAadDDMRoGAQPgINBBpRKSxZ5LftMObQeko0TTmQ85kNO0RTm23hTt4boeqe4YcFwIBeueUCSAAxNIOG4YIYiYNIADWOAoOgQaUCQ9YgAARowbA0QASnAAAmmCMBRJDWLo%2B66EAA
-    solution: createCellsMapFromArray([
-        [9, 1, 4, 2, 8, 7, 6, 5, 3],
-        [3, 7, 5, 1, 9, 6, 4, 8, 2],
-        [8, 2, 6, 3, 5, 4, 9, 1, 7],
-        [2, 4, 9, 7, 3, 1, 8, 6, 5],
-        [5, 6, 8, 9, 4, 2, 3, 7, 1],
-        [7, 3, 1, 8, 6, 5, 2, 9, 4],
-        [1, 8, 7, 4, 2, 9, 5, 3, 6],
-        [6, 9, 2, 5, 1, 3, 7, 4, 8],
-        [4, 5, 3, 6, 7, 8, 1, 2, 9],
-    ]),
-    resultChecker: (context) => {
-        return isValidFinishedPuzzleByEmbeddedSolution(context);
-    },
-    successMessage: (context) => `You are exhausted having fully filled in your map. The sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${context.gridExtension.choicesMadeSolutionStrings[0]}, ${context.gridExtension.choicesMadeSolutionStrings[1]}, and ${context.gridExtension.choicesMadeSolutionStrings[2]}!`,
-    items: (context) => {
-        return [
-            ...getAdventureConstraints(context),
-        ].map(toDecorativeConstraint);
-    },
-    /* lmdLink: "TODO",
-    getLmdSolutionCode: ({ puzzle: { solution } }) =>
-        indexes(9)
-            .map((index) => solution![0][index])
-            .join(""),*/
-}
-
-type choiceDefinitions = {
-    solveCells: [number, number][]
-    topMessage: string,
-    option1ChoiceMessage: string
-    option1TakenMessage: string
-    option1SolutionMessage: string
-    option2ChoiceMessage: string
-    option2TakenMessage: string
-    option2SolutionMessage: string
-    option1: choiceTaken
-    option2: choiceTaken
-}
-
-type choiceTaken = {
-    initialDigits: CellsMap<number>
-    constraints: Constraint<AdventurePTM, any>[]
-    rules: string[]
-    choices: choiceDefinitions | undefined
-}
 
 const adventureDef: choiceTaken = {
     initialDigits: { 6: { 0: 1 }, 7: { 4: 1}, 8: { 7: 2, 8: 9}},
@@ -321,11 +261,56 @@ const adventureDef: choiceTaken = {
     }
 }
 
-const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
-    let constraints: Constraint<AdventurePTM, any>[] = [];
+export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
+    
+    title: { [LanguageCode.en]: "Adventure is out there!" },
+    author: { [LanguageCode.en]: "Tumbo" },
+    extension: {
+        rootChoiceTaken: adventureDef
+    },
+    slug: "choose-your-own-adventure",
+    initialDigits: {},
+    typeManager: AdventureTypeManager(),
+    gridSize: GridSize9,
+    regions: Regions9,
+    // https://sudokumaker.app/?puzzle=N4IgZg9gTgtghgFwGoFMoGcCWEB2IBcIAjAHQCsJADCADQgAOArgF7MA2KBoOcMnhtEHEYIAFtAIhBAYxRs26AgG1QANzhtG-AJwBfGmo1aCRfYc38ALGZDqLBAEw27x-AA5nR-gHYbAc0xVFDx8BCgtOhd%2BADZPe3wyONcAZiT%2BVIMQAKCQsIjbLwJfTKiCRMzs4II8lEjC-FMS%2Br0m%2BNjW12sO-g8KwKrQ8NqC%2BKdugl7zVzGpmLSCDNmy-37cobr4rqX8FtBKtfzShpWc6vWR12LtmYurE4GajdddrNWzw-qr24X5477TwYfeKTb74drbcoQ37g0Ego4vI5bUE3I6LUFfI6NbYY%2BpozG-OH1GFHSHI34I%2BpI-bvYb48buX5famA2mU%2B4HVmjdk0p46X6k5mPUF4onQ8m-G6C84k7ks3kmWVC1GK6WfX5Ut5y2Hq-m-NFSoGuGEGzmXFWGnrm038LGvAFK%2BqSzUO%2BJ6AC6dGkuHQYTgmBwCEU%2BBUIAQAE96PxKDZw5GTHQoCgAt7lJQaGm00QaFmsw4aHm8xn09mS7n8%2BWi5nS%2BWCzRknWG5YaE2m2QaG22-Wu82e632-3u-WWz2O-3ojRx%2BPvDRp9O3DR5-PJxOZ6u5wuN8up2uN4u3TGI%2BlKGmQOg2BAAO4EMAadDDMRoGAQPgINBBpRKSxZ5LftMObQeko0TTmQ85kNO0RTm23hTt4boeqe4YcFwIBeueUCSAAxNIOG4YIYiYNIADWOAoOgQaUCQ9YgAARowbA0QASnAAAmmCMBRJDWLo%2B66EAA
+    solution: createCellsMapFromArray([
+        [9, 1, 4, 2, 8, 7, 6, 5, 3],
+        [3, 7, 5, 1, 9, 6, 4, 8, 2],
+        [8, 2, 6, 3, 5, 4, 9, 1, 7],
+        [2, 4, 9, 7, 3, 1, 8, 6, 5],
+        [5, 6, 8, 9, 4, 2, 3, 7, 1],
+        [7, 3, 1, 8, 6, 5, 2, 9, 4],
+        [1, 8, 7, 4, 2, 9, 5, 3, 6],
+        [6, 9, 2, 5, 1, 3, 7, 4, 8],
+        [4, 5, 3, 6, 7, 8, 1, 2, 9],
+    ]),
+    resultChecker: (context) => {
+        return isValidFinishedPuzzleByEmbeddedSolution(context);
+    },
+    successMessage: (context) => `You are exhausted having fully filled in your map. The sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${context.gridExtension.choicesMadeSolutionStrings[0]}, ${context.gridExtension.choicesMadeSolutionStrings[1]}, and ${context.gridExtension.choicesMadeSolutionStrings[2]}!`,
+    items: (context) => {
+        return [
+            ...getAdventureConstraints(context),
+        ].map(toDecorativeConstraint);
+    },
+    /* lmdLink: "TODO",
+    getLmdSolutionCode: ({ puzzle: { solution } }) =>
+        indexes(9)
+            .map((index) => solution![0][index])
+            .join(""),*/
+
+            
+                //constructor() {
+                //    makeAutoObservable(this);
+                //}
+}
+
+const getAdventureConstraintsAndDigits = (context: PuzzleContext<AdventurePTM>): [Constraint<AdventurePTM, any>[], CellsMap<number>] => {
+let constraints: Constraint<AdventurePTM, any>[] = [];
     let digits: CellsMap<number> = {};
     let rules: string[] = [];
-    let currentChoice: choiceTaken | undefined = adventureDef;
+    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
     var depth = 0;
     while (currentChoice !== undefined)
     {
@@ -371,7 +356,7 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
         }
         depth++;
     }
-    context.puzzle.initialDigits = digits;
+    //context.puzzle.initialDigits = digits;
     context.puzzle.rules = () => (
         <>
             <RulesParagraph>
@@ -387,7 +372,11 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
             </RulesParagraph>
         </>
     )
-    return constraints;
+    return [constraints, digits];
+}
+
+const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
+    return getAdventureConstraintsAndDigits(context)[0];
 }
 
 const checkSolved = (context: PuzzleContext<AdventurePTM>, solveCells: [number, number][]): boolean => {

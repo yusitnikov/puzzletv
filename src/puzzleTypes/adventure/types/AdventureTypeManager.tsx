@@ -3,13 +3,15 @@ import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManag
 import { globalPaddingCoeff } from "../../../components/app/globals";
 import { myClientId } from "../../../hooks/useMultiPlayer";
 import { AdventurePTM} from "./AdventurePTM";
-import {
-    addGridStateExToPuzzleTypeManager,
-} from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { Modal } from "../../../components/layout/modal/Modal";
 import { Button } from "../../../components/layout/button/Button";
-import { choicesMadeStateChangeAction } from "./AdventureGridState";
+import { choicesMadeStateChangeAction, choiceTaken } from "./AdventureGridState";
 import { observer } from "mobx-react-lite";
+import { comparer, IReactionDisposer, reaction } from "mobx";
+import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
+import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
+import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
+import { addGridStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 
 export const AdventureTypeManager = <T extends AdventurePTM>(
     baseTypeManager: PuzzleTypeManager<any> = DigitPuzzleTypeManager(),
@@ -21,6 +23,49 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             introViewed: false
         },
     }),
+    
+    getReactions(context): IReactionDisposer[] {
+        return [
+            reaction(
+                () => {
+                    let digits: CellsMap<number> = {};
+                    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
+                    var depth = 0;
+                    while (currentChoice !== undefined)
+                    {
+                        digits = mergeCellsMaps(digits, currentChoice.initialDigits);
+                        if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
+                        {
+                            var solved = checkSolved(context, currentChoice.choices.solveCells)
+                            if (context.gridExtension.choicesMade.length === depth + 1 && solved)
+                            {
+                                currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+                            }
+                            else
+                            {
+                                currentChoice = undefined;
+                            }
+                        }
+                        else if (currentChoice.choices !== undefined)
+                        {
+                            currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+                        }
+                        else
+                        {
+                            currentChoice = undefined;
+                        }
+                        depth++;
+                    }
+                    return digits;
+                },
+                (newInitialDigits, prevInitialDigits) => {
+                    context.onStateChange({
+                        initialDigits: newInitialDigits,
+                    });
+                }
+            )
+        ]
+    },
     aboveRulesComponent: observer(function AdventureAboveRules({ context }) {
 
         const {
@@ -179,3 +224,17 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
         );
     })
 });
+
+
+const checkSolved = <T extends AnyPTM>(context: PuzzleContext<T>, solveCells: [number, number][]): boolean => {
+    var solved = true;
+    solveCells.forEach((cell: [number, number]) => {
+        var userDigit = context.getCell(cell[0], cell[1])?.usersDigit;
+        if (userDigit === undefined || userDigit !== context.puzzle.solution![cell[0]][cell[1]])
+        {
+            solved = false;
+            return;
+        }
+    });
+    return solved;
+}
