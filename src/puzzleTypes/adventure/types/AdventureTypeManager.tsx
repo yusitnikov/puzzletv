@@ -7,7 +7,7 @@ import { Modal } from "../../../components/layout/modal/Modal";
 import { Button } from "../../../components/layout/button/Button";
 import { choicesMadeStateChangeAction, choiceTaken } from "./AdventureGridState";
 import { observer } from "mobx-react-lite";
-import { comparer, IReactionDisposer, reaction } from "mobx";
+import { IReactionDisposer, reaction } from "mobx";
 import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";

@@ -1,6 +1,6 @@
 import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition } from "../../types/puzzle/PuzzleDefinition";
 import { AdventurePTM } from "../../puzzleTypes/adventure/types/AdventurePTM";
-import { CellsMap, createCellsMapFromArray, mergeCellsMaps } from "../../types/puzzle/CellsMap";
+import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { AdventureTypeManager } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
 import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
