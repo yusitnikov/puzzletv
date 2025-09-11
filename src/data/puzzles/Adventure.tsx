@@ -4,7 +4,7 @@ import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { AdventureTypeManager } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
 import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
-import { Constraint, toDecorativeConstraint } from "../../types/puzzle/Constraint";
+import { Constraint } from "../../types/puzzle/Constraint";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
 import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
 import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
@@ -356,13 +356,13 @@ const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constrai
             }
             else if (context.gridExtension.choicesMade.length === depth && solved)
             {
-                context.stateExtension.messageChoice1 = currentChoice.choices.option1ChoiceMessage;
+                /*context.stateExtension.messageChoice1 = currentChoice.choices.option1ChoiceMessage;
                 context.stateExtension.messageChoice2 = currentChoice.choices.option2ChoiceMessage;
                 context.stateExtension.messageChoice1Taken = currentChoice.choices.option1TakenMessage;
                 context.stateExtension.messageChoice2Taken = currentChoice.choices.option2TakenMessage;
                 context.stateExtension.option1SolutionMessage = currentChoice.choices.option1SolutionMessage;
                 context.stateExtension.option2SolutionMessage = currentChoice.choices.option2SolutionMessage;
-                context.stateExtension.message = currentChoice.choices.topMessage;
+                context.stateExtension.message = currentChoice.choices.topMessage;*/
                 currentChoice = undefined;
             }
             else

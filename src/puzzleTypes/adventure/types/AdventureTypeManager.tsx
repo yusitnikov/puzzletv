@@ -11,6 +11,12 @@ import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { addGridStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
+import {
+    aboveRulesTextHeightCoeff,
+    rulesHeaderPaddingCoeff,
+    rulesMarginCoeff,
+    lightOrangeColor,
+} from "../../../components/app/globals";
 
 export const AdventureTypeManager = <T extends AdventurePTM>(
     baseTypeManager: PuzzleTypeManager<any> = DigitPuzzleTypeManager(),
@@ -61,6 +67,9 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
         const {
             cellSizeForSidePanel: cellSize,
         } = context;
+        const stage = getStage(context);
+        const isNext = stage > context.gridExtension.choicesMade.length;
+        const coeff = isNext ? 1 : 0;
         
         const handleOption1 = () => {
             context.gridExtension.choicesMade = [...context.gridExtension.choicesMade, 1];
@@ -111,12 +120,69 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             );
         };
 
+        const handleNextStage = () => {
+            let currentChoice: choiceTaken = context.puzzle.extension.rootChoiceTaken;
+            var depth = 0;
+            while (depth <= context.gridExtension.choicesMade.length)
+            {
+                if (context.gridExtension.choicesMade.length > depth)
+                {
+                    currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices!.option1 : currentChoice.choices!.option2;
+                }
+                else
+                {
+                    context.stateExtension.messageChoice1 = currentChoice.choices!.option1ChoiceMessage;
+                    context.stateExtension.messageChoice2 = currentChoice.choices!.option2ChoiceMessage;
+                    context.stateExtension.messageChoice1Taken = currentChoice.choices!.option1TakenMessage;
+                    context.stateExtension.messageChoice2Taken = currentChoice.choices!.option2TakenMessage;
+                    context.stateExtension.option1SolutionMessage = currentChoice.choices!.option1SolutionMessage;
+                    context.stateExtension.option2SolutionMessage = currentChoice.choices!.option2SolutionMessage;
+                    context.stateExtension.message = currentChoice.choices!.topMessage;
+                }
+                depth++;
+            }
+        }
+
         const BaseComponent = baseTypeManager.aboveRulesComponent;
     
         return (
             <>
             
             {BaseComponent && <BaseComponent context={context} />}
+            
+            <div
+                style={{
+                    background: lightOrangeColor,
+                    marginTop: cellSize * rulesMarginCoeff * coeff,
+                    marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
+                    padding: `${(cellSize * rulesHeaderPaddingCoeff * coeff) / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
+                    fontSize: cellSize * aboveRulesTextHeightCoeff,
+                    lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
+                    height: cellSize * aboveRulesTextHeightCoeff * 3 * coeff,
+                    border: "2px solid #f00",
+                    opacity: coeff,
+                    overflow: "hidden",
+                    transition: "0.3s all linear",
+                    textAlign: "center",
+                }}
+            >
+                {"You've fully explored this area! "}
+                &nbsp;
+                <Button
+                    type={"button"}
+                    cellSize={cellSize}
+                    style={{
+                        fontFamily: "inherit",
+                        fontSize: "inherit",
+                        lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5 - 2}px`,
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                    }}
+                    onClick={handleNextStage}
+                >
+                    {"Choose your next area"}
+                </Button>
+            </div>
 
             {context.stateExtension.message !== undefined && (
                 <Modal cellSize={cellSize} >
@@ -225,4 +291,38 @@ const checkSolved = <T extends AnyPTM>(context: PuzzleContext<T>, solveCells: [n
         }
     });
     return solved;
+}
+
+const getStage = <T extends AnyPTM>(context: PuzzleContext<T>): number => {
+    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
+    var depth = 0;
+    while (currentChoice !== undefined)
+    {
+        if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
+        {
+            var solved = checkSolved(context, currentChoice.choices.solveCells)
+            if (context.gridExtension.choicesMade.length === depth + 1 && solved)
+            {
+                currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+            }
+            else if (context.gridExtension.choicesMade.length === depth && solved)
+            {
+                return depth + 1;
+            }
+            else
+            {
+                currentChoice = undefined;
+            }
+        }
+        else if (currentChoice.choices !== undefined)
+        {
+            currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+        }
+        else
+        {
+            currentChoice = undefined;
+        }
+        depth++;
+    }
+    return depth - 1;
 }
