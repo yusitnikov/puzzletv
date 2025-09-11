@@ -37,19 +37,7 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
         while (currentChoice !== undefined)
         {
             digits = mergeCellsMaps(digits, currentChoice.initialDigits);
-            if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
-            {
-                var solved = checkSolved(context, currentChoice.choices.solveCells)
-                if (context.gridExtension.choicesMade.length === depth + 1 && solved)
-                {
-                    currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
-                }
-                else
-                {
-                    currentChoice = undefined;
-                }
-            }
-            else if (currentChoice.choices !== undefined)
+            if (currentChoice.choices !== undefined && context.gridExtension.choicesMade.length > depth)
             {
                 currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
             }
@@ -180,7 +168,7 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                     }}
                     onClick={handleNextStage}
                 >
-                    {"Choose your next area"}
+                    {"Make your next choice"}
                 </Button>
             </div>
 
@@ -298,14 +286,10 @@ const getStage = <T extends AnyPTM>(context: PuzzleContext<T>): number => {
     var depth = 0;
     while (currentChoice !== undefined)
     {
-        if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
+        if (currentChoice.choices !== undefined && context.gridExtension.choicesMade.length === depth)
         {
-            var solved = checkSolved(context, currentChoice.choices.solveCells)
-            if (context.gridExtension.choicesMade.length === depth + 1 && solved)
-            {
-                currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
-            }
-            else if (context.gridExtension.choicesMade.length === depth && solved)
+            var solved = checkSolved(context, currentChoice.choices.solveCells);
+            if (context.gridExtension.choicesMade.length === depth && solved)
             {
                 return depth + 1;
             }
