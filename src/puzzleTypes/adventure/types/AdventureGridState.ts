@@ -1,7 +1,6 @@
 import { GameStateActionCallback } from "../../../types/puzzle/GameStateAction";
 import { AdventurePTM } from "./AdventurePTM";
 import { gridStateHistoryAddState } from "../../../types/puzzle/GridStateHistory";
-import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { Constraint } from "../../../types/puzzle/Constraint";
 
@@ -32,15 +31,13 @@ export type choiceTaken = {
 
 export const choicesMadeStateChangeAction =
     <T extends AdventurePTM>(
-        startContext: PuzzleContext<T>,
         clientId: string,
         actionId: string,
+        choicesMade: number[],
+        choicesMadeSolutionStrings: string[],
+        introViewed: boolean,
     ): GameStateActionCallback<T> =>
     (context) => {
-        const {
-            gridExtension: { choicesMade, choicesMadeSolutionStrings, introViewed },
-        } = startContext;
-
         return {
             gridStateHistory: gridStateHistoryAddState(
                 context,
