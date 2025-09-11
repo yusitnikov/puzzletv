@@ -295,7 +295,7 @@ const getAdventureRules = (context: PuzzleContext<AdventurePTM>) : ReactNode => 
 }
 
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
-    
+    noIndex: true,
     title: { [LanguageCode.en]: "Adventure is out there!" },
     author: { [LanguageCode.en]: "Tumbo" },
     extension: {
@@ -325,7 +325,7 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
     items: (context) => {
         return [
             ...getAdventureConstraints(context),
-        ].map(toDecorativeConstraint);
+        ];
     },
     /* lmdLink: "TODO",
     getLmdSolutionCode: ({ puzzle: { solution } }) =>

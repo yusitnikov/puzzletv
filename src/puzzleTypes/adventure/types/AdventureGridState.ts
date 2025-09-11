@@ -38,7 +38,7 @@ export const choicesMadeStateChangeAction =
     ): GameStateActionCallback<T> =>
     (context) => {
         const {
-            gridExtension: { choicesMade, choicesMadeSolutionStrings, introViewed, rootChoiceTaken },
+            gridExtension: { choicesMade, choicesMadeSolutionStrings, introViewed },
         } = startContext;
 
         return {
@@ -51,8 +51,7 @@ export const choicesMadeStateChangeAction =
                     extension: {
                         choicesMade: choicesMade,
                         choicesMadeSolutionStrings: choicesMadeSolutionStrings,
-                        introViewed: introViewed,
-                        rootChoiceTaken: rootChoiceTaken
+                        introViewed: introViewed
                     },
                 }),
             ),

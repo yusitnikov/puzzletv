@@ -7,7 +7,6 @@ import { Modal } from "../../../components/layout/modal/Modal";
 import { Button } from "../../../components/layout/button/Button";
 import { choicesMadeStateChangeAction, choiceTaken } from "./AdventureGridState";
 import { observer } from "mobx-react-lite";
-import { IReactionDisposer, reaction } from "mobx";
 import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
@@ -23,49 +22,40 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             introViewed: false
         },
     }),
+
     
-    getReactions(context): IReactionDisposer[] {
-        return [
-            reaction(
-                () => {
-                    let digits: CellsMap<number> = {};
-                    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
-                    var depth = 0;
-                    while (currentChoice !== undefined)
-                    {
-                        digits = mergeCellsMaps(digits, currentChoice.initialDigits);
-                        if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
-                        {
-                            var solved = checkSolved(context, currentChoice.choices.solveCells)
-                            if (context.gridExtension.choicesMade.length === depth + 1 && solved)
-                            {
-                                currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
-                            }
-                            else
-                            {
-                                currentChoice = undefined;
-                            }
-                        }
-                        else if (currentChoice.choices !== undefined)
-                        {
-                            currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
-                        }
-                        else
-                        {
-                            currentChoice = undefined;
-                        }
-                        depth++;
-                    }
-                    return digits;
-                },
-                (newInitialDigits, prevInitialDigits) => {
-                    context.onStateChange({
-                        initialDigits: newInitialDigits,
-                    });
+    getInitialDigits(context) {
+        let digits: CellsMap<number> = {};
+        let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
+        var depth = 0;
+        while (currentChoice !== undefined)
+        {
+            digits = mergeCellsMaps(digits, currentChoice.initialDigits);
+            if (currentChoice.choices !== undefined && (context.gridExtension.choicesMade.length === depth || context.gridExtension.choicesMade.length === depth + 1))
+            {
+                var solved = checkSolved(context, currentChoice.choices.solveCells)
+                if (context.gridExtension.choicesMade.length === depth + 1 && solved)
+                {
+                    currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
                 }
-            )
-        ]
+                else
+                {
+                    currentChoice = undefined;
+                }
+            }
+            else if (currentChoice.choices !== undefined)
+            {
+                currentChoice = context.gridExtension.choicesMade[depth] === 1 ? currentChoice.choices.option1 : currentChoice.choices.option2;
+            }
+            else
+            {
+                currentChoice = undefined;
+            }
+            depth++;
+        }
+        return digits;
     },
+
     aboveRulesComponent: observer(function AdventureAboveRules({ context }) {
 
         const {
@@ -141,7 +131,6 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                             type={"button"}
                             cellSize={cellSize}
                             onClick={handleOption1}
-                            autoFocus={true}
                             style={{
                                 marginTop: cellSize * globalPaddingCoeff,
                                 padding: "0.5em 1em",
@@ -156,7 +145,6 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                             type={"button"}
                             cellSize={cellSize}
                             onClick={handleOption2}
-                            autoFocus={true}
                             style={{
                                 marginTop: cellSize * globalPaddingCoeff,
                                 padding: "0.5em 1em",

@@ -108,6 +108,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    ChooseYourOwnAdventure,
+    
     CloseQuarters,
     CloseQuartersSeries,
     Mitosis,
@@ -151,7 +153,6 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     WheelsOnTheBus,
 
     Gears,
-    ChooseYourOwnAdventure,
     Astronavigation,
     CherryBlossom,
     SumwhereAroundHere,
