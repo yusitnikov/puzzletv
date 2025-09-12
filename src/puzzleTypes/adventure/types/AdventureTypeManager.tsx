@@ -62,15 +62,7 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
 
             const handleOption = (index: number) => {
                 context.onStateChange(
-                    choicesMadeStateChangeAction(
-                        myClientId,
-                        getNextActionId(),
-                        [...context.gridExtension.choicesMade, index],
-                        [
-                            ...context.gridExtension.choicesMadeSolutionStrings,
-                            currentChoice!.options[index].solutionMessage,
-                        ],
-                    ),
+                    choicesMadeStateChangeAction(index, currentChoice!.options[index].solutionMessage),
                 );
                 setShowChoices(false);
                 setShowChoiceMessageIndex(index);

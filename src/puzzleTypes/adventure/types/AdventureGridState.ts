@@ -1,8 +1,9 @@
-import { GameStateActionCallback } from "../../../types/puzzle/GameStateAction";
+import { GameStateActionCallback, getNextActionId } from "../../../types/puzzle/GameStateAction";
 import { AdventurePTM } from "./AdventurePTM";
 import { gridStateHistoryAddState } from "../../../types/puzzle/GridStateHistory";
 import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { Constraint } from "../../../types/puzzle/Constraint";
+import { myClientId } from "../../../hooks/useMultiPlayer";
 
 export interface AdventureGridState {
     choicesMade: number[];
@@ -30,20 +31,20 @@ export type choiceTaken = {
 };
 
 export const choicesMadeStateChangeAction =
-    <T extends AdventurePTM>(
-        clientId: string,
-        actionId: string,
-        choicesMade: number[],
-        choicesMadeSolutionStrings: string[],
-    ): GameStateActionCallback<T> =>
+    (choiceIndex: number, choiceSolutionString: string): GameStateActionCallback<AdventurePTM> =>
     (context) => {
         return {
-            gridStateHistory: gridStateHistoryAddState(context, clientId, actionId, ({ extension, ...gridState }) => ({
-                ...gridState,
-                extension: {
-                    choicesMade: choicesMade,
-                    choicesMadeSolutionStrings: choicesMadeSolutionStrings,
-                },
-            })),
+            gridStateHistory: gridStateHistoryAddState(
+                context,
+                myClientId,
+                getNextActionId(),
+                ({ extension, ...gridState }) => ({
+                    ...gridState,
+                    extension: {
+                        choicesMade: [...extension.choicesMade, choiceIndex],
+                        choicesMadeSolutionStrings: [...extension.choicesMadeSolutionStrings, choiceSolutionString],
+                    },
+                }),
+            ),
         };
     };
