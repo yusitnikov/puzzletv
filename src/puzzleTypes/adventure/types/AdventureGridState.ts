@@ -7,7 +7,6 @@ import { Constraint } from "../../../types/puzzle/Constraint";
 export interface AdventureGridState {
     choicesMade: number[];
     choicesMadeSolutionStrings: string[];
-    introViewed: boolean;
 }
 export type choiceDefinitions = {
     solveCells: [number, number][]
@@ -34,8 +33,7 @@ export const choicesMadeStateChangeAction =
         clientId: string,
         actionId: string,
         choicesMade: number[],
-        choicesMadeSolutionStrings: string[],
-        introViewed: boolean,
+        choicesMadeSolutionStrings: string[]
     ): GameStateActionCallback<T> =>
     (context) => {
         return {
@@ -47,8 +45,7 @@ export const choicesMadeStateChangeAction =
                     ...gridState,
                     extension: {
                         choicesMade: choicesMade,
-                        choicesMadeSolutionStrings: choicesMadeSolutionStrings,
-                        introViewed: introViewed
+                        choicesMadeSolutionStrings: choicesMadeSolutionStrings
                     },
                 }),
             ),

@@ -5,19 +5,15 @@ import { myClientId } from "../../../hooks/useMultiPlayer";
 import { AdventurePTM} from "./AdventurePTM";
 import { Modal } from "../../../components/layout/modal/Modal";
 import { Button } from "../../../components/layout/button/Button";
+import { getNextActionId } from "../../../types/puzzle/GameStateAction";
 import { choicesMadeStateChangeAction, choiceTaken, choiceDefinitions } from "./AdventureGridState";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
-import { addGridStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
-import {
-    aboveRulesTextHeightCoeff,
-    rulesHeaderPaddingCoeff,
-    rulesMarginCoeff,
-    lightOrangeColor,
-} from "../../../components/app/globals";
+import { addGridStateExToPuzzleTypeManager, addGameStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
+import { AboveRulesActionItem } from "../../../components/puzzle/rules/AboveRulesActionItem";
 
 export const AdventureTypeManager = <T extends AdventurePTM>(
     baseTypeManager: PuzzleTypeManager<any> = DigitPuzzleTypeManager(),
@@ -25,7 +21,11 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
     ...addGridStateExToPuzzleTypeManager(baseTypeManager, {
         initialGridStateExtension: {
             choicesMade: [],
-            choicesMadeSolutionStrings: [],
+            choicesMadeSolutionStrings: []
+        },
+    }),
+    ...addGameStateExToPuzzleTypeManager(baseTypeManager, {
+        initialGameStateExtension: {
             introViewed: false
         },
     }),
@@ -57,7 +57,6 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
         } = context;
         const [stage, currentChoice, previousChoice] = getStage(context);
         const isNext = stage > context.gridExtension.choicesMade.length;
-        const coeff = isNext ? 1 : 0;
         const [showChoices, setShowChoices] = useState(false);
         const [showChoice1Message, setShowChoice1Message] = useState(false);
         const [showChoice2Message, setShowChoice2Message] = useState(false);
@@ -66,10 +65,9 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             context.onStateChange(
                 choicesMadeStateChangeAction(
                     myClientId,
-                    context.gridStateHistory.current.actionId,
+                    getNextActionId(),
                     [...context.gridExtension.choicesMade, 1],
-                    [...context.gridExtension.choicesMadeSolutionStrings, currentChoice!.option1SolutionMessage],
-                    context.gridExtension.introViewed
+                    [...context.gridExtension.choicesMadeSolutionStrings, currentChoice!.option1SolutionMessage]
                 ),
             );
             setShowChoices(false);
@@ -80,27 +78,13 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             context.onStateChange(
                 choicesMadeStateChangeAction(
                     myClientId,
-                    context.gridStateHistory.current.actionId,
+                    getNextActionId(),
                     [...context.gridExtension.choicesMade, 2],
-                    [...context.gridExtension.choicesMadeSolutionStrings, currentChoice!.option2SolutionMessage],
-                    context.gridExtension.introViewed
+                    [...context.gridExtension.choicesMadeSolutionStrings, currentChoice!.option2SolutionMessage]
                 ),
             );
             setShowChoices(false);
             setShowChoice2Message(true);
-        };
-
-        const handleIntroClose = () => {
-            context.gridExtension.introViewed = true;
-            context.onStateChange(
-                choicesMadeStateChangeAction(
-                    myClientId,
-                    context.gridStateHistory.current.actionId,
-                    context.gridExtension.choicesMade,
-                    context.gridExtension.choicesMadeSolutionStrings,
-                    true
-                ),
-            );
         };
 
         const handleNextStage = () => {
@@ -123,40 +107,14 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
             <>
             
             {BaseComponent && <BaseComponent context={context} />}
-            
-            <div
-                style={{
-                    background: lightOrangeColor,
-                    marginTop: cellSize * rulesMarginCoeff * coeff,
-                    marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
-                    padding: `${(cellSize * rulesHeaderPaddingCoeff * coeff) / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
-                    fontSize: cellSize * aboveRulesTextHeightCoeff,
-                    lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
-                    height: cellSize * aboveRulesTextHeightCoeff * 3 * coeff,
-                    border: "2px solid #f00",
-                    opacity: coeff,
-                    overflow: "hidden",
-                    transition: "0.3s all linear",
-                    textAlign: "center",
-                }}
-            >
-                {"You've fully explored this area! "}
-                &nbsp;
-                <Button
-                    type={"button"}
-                    cellSize={cellSize}
-                    style={{
-                        fontFamily: "inherit",
-                        fontSize: "inherit",
-                        lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5 - 2}px`,
-                        paddingTop: 0,
-                        paddingBottom: 0,
-                    }}
-                    onClick={handleNextStage}
-                >
-                    {"Make your next choice"}
-                </Button>
-            </div>
+              
+            <AboveRulesActionItem
+                context={context}
+                visible={isNext}
+                message={"You've fully explored this area!"}
+                buttonText={"Make your next choice"}
+                onClick={handleNextStage}
+            />
 
             {showChoices && (
                 <Modal cellSize={cellSize} >
@@ -246,7 +204,7 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                 </Modal>
             )}
 
-            {context.gridExtension.introViewed === false && (
+            {context.stateExtension.introViewed === false && (
                 <Modal cellSize={cellSize} >
                     <div>
                                 <>
@@ -261,7 +219,7 @@ export const AdventureTypeManager = <T extends AdventurePTM>(
                         <Button
                             type={"button"}
                             cellSize={cellSize}
-                            onClick={handleIntroClose}
+                            onClick={() => context.onStateChange({ extension: { introViewed: true } })}
                             autoFocus={true}
                             style={{
                                 marginTop: cellSize * globalPaddingCoeff,
