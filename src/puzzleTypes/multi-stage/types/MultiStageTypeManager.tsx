@@ -1,15 +1,8 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { mergeGameStateUpdates, PartialGameStateEx } from "../../../types/puzzle/GameState";
-import {
-    aboveRulesTextHeightCoeff,
-    rulesHeaderPaddingCoeff,
-    rulesMarginCoeff,
-    lightOrangeColor,
-} from "../../../components/app/globals";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
-import { Button } from "../../../components/layout/button/Button";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
 import { PartiallyTranslatable } from "../../../types/translations/Translatable";
@@ -17,6 +10,7 @@ import { processTranslations, translate } from "../../../utils/translate";
 import { AnyMultiStagePTM } from "./MultiStagePTM";
 import { addGameStateExToPuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { observer } from "mobx-react-lite";
+import { AboveRulesActionItem } from "../../../components/puzzle/rules/AboveRulesActionItem";
 
 interface MultiStageOptions<T extends AnyMultiStagePTM> {
     baseTypeManager?: PuzzleTypeManager<any>;
@@ -38,10 +32,8 @@ export const MultiStageTypeManager = <T extends AnyMultiStagePTM>({
     }),
 
     aboveRulesComponent: observer(function MultiStageAboveRules({ context }) {
-        const { cellSizeForSidePanel: cellSize } = context;
         const stage = getStage(context);
         const isNext = stage > context.stateExtension.stage;
-        const coeff = isNext ? 1 : 0;
 
         const BaseComponent = baseTypeManager.aboveRulesComponent;
 
@@ -49,23 +41,10 @@ export const MultiStageTypeManager = <T extends AnyMultiStagePTM>({
             <>
                 {BaseComponent && <BaseComponent context={context} />}
 
-                <div
-                    style={{
-                        background: lightOrangeColor,
-                        marginTop: cellSize * rulesMarginCoeff * coeff,
-                        marginBottom: cellSize * rulesMarginCoeff * coeff * 2,
-                        padding: `${(cellSize * rulesHeaderPaddingCoeff * coeff) / 2}px ${cellSize * rulesHeaderPaddingCoeff}px`,
-                        fontSize: cellSize * aboveRulesTextHeightCoeff,
-                        lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5}px`,
-                        height: cellSize * aboveRulesTextHeightCoeff * 3 * coeff,
-                        border: "2px solid #f00",
-                        opacity: coeff,
-                        overflow: "hidden",
-                        transition: "0.3s all linear",
-                        textAlign: "center",
-                    }}
-                >
-                    {translate(
+                <AboveRulesActionItem
+                    context={context}
+                    visible={isNext}
+                    message={translate(
                         getStageCompletionText?.(context) ??
                             processTranslations<ReactNode>(
                                 (congratulations, youCompletedTheStage) => (
@@ -79,32 +58,19 @@ export const MultiStageTypeManager = <T extends AnyMultiStagePTM>({
                                     [LanguageCode.ru]: <>Вы завершили этап</>,
                                 },
                             ),
-                    )}{" "}
-                    &nbsp;
-                    <Button
-                        type={"button"}
-                        cellSize={cellSize}
-                        style={{
-                            fontFamily: "inherit",
-                            fontSize: "inherit",
-                            lineHeight: `${cellSize * aboveRulesTextHeightCoeff * 1.5 - 2}px`,
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                        }}
-                        onClick={() =>
-                            context.onStateChange(
-                                mergeGameStateUpdates({ extension: { stage } }, onStageChange?.(context, stage) ?? {}),
-                            )
-                        }
-                    >
-                        {translate(
-                            getStageButtonText?.(context) ?? {
-                                [LanguageCode.en]: "Go to the next stage",
-                                [LanguageCode.ru]: "Перейти на следующий этап",
-                            },
-                        )}
-                    </Button>
-                </div>
+                    )}
+                    buttonText={translate(
+                        getStageButtonText?.(context) ?? {
+                            [LanguageCode.en]: "Go to the next stage",
+                            [LanguageCode.ru]: "Перейти на следующий этап",
+                        },
+                    )}
+                    onClick={() =>
+                        context.onStateChange(
+                            mergeGameStateUpdates({ extension: { stage } }, onStageChange?.(context, stage) ?? {}),
+                        )
+                    }
+                />
             </>
         );
     }),
