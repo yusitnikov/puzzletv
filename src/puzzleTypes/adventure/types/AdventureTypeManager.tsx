@@ -10,6 +10,9 @@ import {
 import { IntroModal } from "../components/IntroModal";
 import { ChoiceSelection } from "../components/ChoiceSelection";
 import { getChoicesTaken } from "./helpers";
+import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
+import { RulesUnorderedList } from "../../../components/puzzle/rules/RulesUnorderedList";
+import { RulesParagraph } from "../../../components/puzzle/rules/RulesParagraph";
 
 export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
     const baseTypeManager: PuzzleTypeManager<AdventurePTM> = addGridStateExToPuzzleTypeManager(
@@ -46,6 +49,29 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                 </>
             );
         }),
+
+        items: (context) => getChoicesTaken(context).flatMap((choice) => choice.constraints),
+
+        postProcessPuzzle({ rules, ...puzzle }): PuzzleDefinition<AdventurePTM> {
+            return {
+                ...puzzle,
+                rules: (context) => (
+                    <>
+                        {rules?.(context)}
+
+                        <RulesParagraph>
+                            <RulesUnorderedList>
+                                {getChoicesTaken(context)
+                                    .flatMap((choice) => choice.rules)
+                                    .map((item, index) => (
+                                        <li key={index}>{item}</li>
+                                    ))}
+                            </RulesUnorderedList>
+                        </RulesParagraph>
+                    </>
+                ),
+            };
+        },
 
         saveStateKeySuffix: "v2",
     };

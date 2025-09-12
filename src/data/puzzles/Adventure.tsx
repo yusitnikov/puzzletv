@@ -4,7 +4,6 @@ import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
 import { AdventureTypeManager } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
 import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
-import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
 import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
 import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
 import { translate } from "../../utils/translate";
@@ -28,7 +27,6 @@ import {
     normalSudokuRulesApply,
 } from "../ruleSnippets";
 import { RulesParagraph } from "../../components/puzzle/rules/RulesParagraph";
-import { RulesUnorderedList } from "../../components/puzzle/rules/RulesUnorderedList";
 import { ThermometerConstraint } from "../../components/puzzle/constraints/thermometer/Thermometer";
 import { KillerCageConstraint } from "../../components/puzzle/constraints/killer-cage/KillerCage";
 import { RegionSumLineConstraint } from "../../components/puzzle/constraints/region-sum-line/RegionSumLine";
@@ -44,7 +42,6 @@ import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 import { choiceTaken } from "../../puzzleTypes/adventure/types/AdventureGridState";
 import { joinListSemantically } from "../../utils/array";
-import { getChoicesTaken } from "../../puzzleTypes/adventure/types/helpers";
 
 const adventureDef: choiceTaken = {
     initialDigits: {},
@@ -439,28 +436,6 @@ const adventureDef: choiceTaken = {
     },
 };
 
-const getAdventureRules = (context: PuzzleContext<AdventurePTM>) => (
-    <>
-        <RulesParagraph>
-            <summary>
-                {translate(normalSudokuRulesApply)}. As you annotate your map (fill in digits) you will be presented
-                with choices to decide what to explore next (causing new rules to appear). Upon choosing you may see new
-                landmarks and notate them on your map (new given digits may appear).
-            </summary>
-        </RulesParagraph>
-
-        <RulesParagraph>
-            <RulesUnorderedList>
-                {getChoicesTaken(context)
-                    .flatMap((choice) => choice.rules)
-                    .map((item, index) => (
-                        <li key={index}>{item}</li>
-                    ))}
-            </RulesUnorderedList>
-        </RulesParagraph>
-    </>
-);
-
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
     noIndex: true,
     title: { [LanguageCode.en]: "Adventure is out there!" },
@@ -479,7 +454,15 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
     },
     slug: "choose-your-own-adventure",
     initialDigits: { 6: { 0: 1 }, 7: { 4: 1 }, 8: { 7: 2, 8: 9 } },
-    rules: getAdventureRules,
+    rules: () => (
+        <RulesParagraph>
+            <summary>
+                {translate(normalSudokuRulesApply)}. As you annotate your map (fill in digits) you will be presented
+                with choices to decide what to explore next (causing new rules to appear). Upon choosing you may see new
+                landmarks and notate them on your map (new given digits may appear).
+            </summary>
+        </RulesParagraph>
+    ),
     typeManager: AdventureTypeManager(),
     gridSize: GridSize9,
     regions: Regions9,
@@ -494,12 +477,9 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
         [6, 9, 2, 5, 1, 3, 7, 4, 8],
         [4, 5, 3, 6, 7, 8, 1, 2, 9],
     ]),
-    resultChecker: (context) => {
-        return isValidFinishedPuzzleByEmbeddedSolution(context);
-    },
+    resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
     successMessage: (context) =>
         `You are exhausted having fully filled in your map. The sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${joinListSemantically(context.gridExtension.choicesMadeSolutionStrings, translate("and"))}!`,
-    items: (context) => getChoicesTaken(context).flatMap((choice) => choice.constraints),
     /* lmdLink: "TODO",
     getLmdSolutionCode: ({ puzzle: { solution } }) =>
         indexes(9)
