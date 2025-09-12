@@ -48,7 +48,7 @@ const adventureDef: choiceTaken = {
     constraints: [],
     rules: [],
     choices: {
-        solveCells: [[8, 6]],
+        solveCells: ["R9C7"],
         topMessage:
             "You've arrived at the edge of your neighbor’s land. You mark your starting point and take in the sights before taking your first step.",
         options: [
@@ -67,14 +67,7 @@ const adventureDef: choiceTaken = {
                         `Grass snakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}`,
                     ],
                     choices: {
-                        solveCells: [
-                            [1, 8],
-                            [2, 7],
-                            [2, 8],
-                            [6, 7],
-                            [7, 6],
-                            [7, 8],
-                        ],
+                        solveCells: ["R2C9", "R3C8", "R3C9", "R7C8", "R8C7", "R8C9"],
                         topMessage:
                             "You've made a detailed sketch of the snakes and tried unsuccessfully to coax one into a specimen jar before deciding to move on.",
                         options: [
@@ -94,15 +87,7 @@ const adventureDef: choiceTaken = {
                                         `Dust devils (arrows): ${translate(arrowsExplained)}, ${translate(canRepeatOnArrows)}`,
                                     ],
                                     choices: {
-                                        solveCells: [
-                                            [4, 3],
-                                            [4, 5],
-                                            [6, 3],
-                                            [6, 4],
-                                            [6, 6],
-                                            [7, 1],
-                                            [7, 5],
-                                        ],
+                                        solveCells: ["R5C4", "R5C6", "R7C4", "R7C5", "R7C7", "R8C2", "R8C6"],
                                         topMessage:
                                             "You study the dust devils for a while, even managing to jump into the path of one before it dissipates. After wiping the dust from your face, you orient towards the distant edge of your map.",
                                         options: [
@@ -173,16 +158,7 @@ const adventureDef: choiceTaken = {
                                         `Wild wheat (dutch whispers): Consecutive digits along the orange line must have difference of 4 or more`,
                                     ],
                                     choices: {
-                                        solveCells: [
-                                            [4, 2],
-                                            [5, 2],
-                                            [6, 2],
-                                            [7, 2],
-                                            [7, 1],
-                                            [8, 0],
-                                            [6, 5],
-                                            [6, 6],
-                                        ],
+                                        solveCells: ["R5C3", "R6C3", "R7C3", "R8C3", "R8C2", "R9C1", "R7C6", "R7C7"],
                                         topMessage:
                                             "You decide to collect some of the wheat. Maybe the town baker will teach you how to make bread. Looking through the gap in the wheat row, something catches your eye.",
                                         options: [
@@ -261,18 +237,7 @@ const adventureDef: choiceTaken = {
                     ],
                     rules: [`Game trails (Thermometers): ${translate(thermometersExplained)}`],
                     choices: {
-                        solveCells: [
-                            [3, 2],
-                            [3, 3],
-                            [6, 3],
-                            [6, 4],
-                            [6, 5],
-                            [7, 3],
-                            [7, 5],
-                            [8, 3],
-                            [8, 4],
-                            [8, 5],
-                        ],
+                        solveCells: ["R4C3", "R4C4", "R7C4", "R7C5", "R7C6", "R8C4", "R8C6", "R9C4", "R9C5", "R9C6"],
                         topMessage:
                             "You followed the game trail and arrived at the top of one of the area's hills. From this vantage point you see some large landscape features in the distance.",
                         options: [
@@ -293,15 +258,7 @@ const adventureDef: choiceTaken = {
                                         `Fences (Killer Cages): ${translate(killerCagesExplained)}, ${translate(cannotRepeatInCage)}`,
                                     ],
                                     choices: {
-                                        solveCells: [
-                                            [2, 4],
-                                            [2, 8],
-                                            [6, 1],
-                                            [7, 1],
-                                            [8, 1],
-                                            [7, 6],
-                                            [7, 8],
-                                        ],
+                                        solveCells: ["R3C5", "R3C9", "R7C2", "R8C2", "R9C2", "R8C7", "R8C9"],
                                         topMessage:
                                             "You have fully mapped out the pastures on your map and calculated the area of each. Maybe someone in town will know what kind of animals were kept here.",
                                         options: [
@@ -367,12 +324,7 @@ const adventureDef: choiceTaken = {
                                         "Streams (Region sum lines): There are some blue lines in the grid, each of which passes through multiple regions. The digits on each blue line have the same sum in each region it passes through.",
                                     ],
                                     choices: {
-                                        solveCells: [
-                                            [3, 5],
-                                            [5, 7],
-                                            [6, 6],
-                                            [7, 7],
-                                        ],
+                                        solveCells: ["R4C6", "R6C8", "R7C7", "R8C8"],
                                         topMessage:
                                             "You find the thinnest part of the stream and are able to jump across. You are excited to finish your adventure without wet socks and shoes.",
                                         options: [

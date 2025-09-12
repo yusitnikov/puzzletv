@@ -4,6 +4,7 @@ import { gridStateHistoryAddState } from "../../../types/puzzle/GridStateHistory
 import { CellsMap } from "../../../types/puzzle/CellsMap";
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { myClientId } from "../../../hooks/useMultiPlayer";
+import { PositionLiteral } from "../../../types/layout/Position";
 
 export interface AdventureGridState {
     choicesMade: number[];
@@ -18,7 +19,7 @@ export type choiceOption = {
 };
 
 export type choiceDefinitions = {
-    solveCells: [number, number][];
+    solveCells: PositionLiteral[];
     topMessage: string;
     options: choiceOption[];
 };

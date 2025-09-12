@@ -9,6 +9,7 @@ import { IntroModal } from "./IntroModal";
 import { PuzzleContextProps } from "../../../types/puzzle/PuzzleContext";
 import { AdventurePTM } from "../types/AdventurePTM";
 import { getChoicesTaken } from "../types/helpers";
+import { parsePositionLiterals } from "../../../types/layout/Position";
 
 export const ChoiceSelection = observer(function ChoiceSelectionFc({ context }: PuzzleContextProps<AdventurePTM>) {
     const { cellSizeForSidePanel: cellSize } = context;
@@ -17,9 +18,9 @@ export const ChoiceSelection = observer(function ChoiceSelectionFc({ context }: 
     const isNext =
         choices.length - 1 === context.gridExtension.choicesMade.length &&
         currentChoice.choices !== undefined &&
-        currentChoice.choices.solveCells.every((cell) => {
-            const userDigit = context.getCellDigit(cell[0], cell[1]);
-            return userDigit !== undefined && userDigit === context.puzzle.solution![cell[0]][cell[1]];
+        parsePositionLiterals(currentChoice.choices.solveCells).every(({ top, left }) => {
+            const userDigit = context.getCellDigit(top, left);
+            return userDigit !== undefined && userDigit === context.puzzle.solution![top][left];
         });
     const [showChoices, setShowChoices] = useState(false);
     const [choiceTakenMessage, setChoiceTakenMessage] = useState<string>();
