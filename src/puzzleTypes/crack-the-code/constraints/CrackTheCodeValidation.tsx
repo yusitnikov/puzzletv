@@ -6,8 +6,10 @@ export const CrackTheCodeValidationConstraint: Constraint<CrackTheCodePTM> = {
     name: "code validation",
     cells: [],
     props: undefined,
-    isValidPuzzle: (_lines, _digits, _cells, { puzzle, stateExtension: { currentWord } }) =>
-        puzzle.extension.conditions.every((condition) => [1, true].includes(condition(currentWord)))
-            ? successResultCheck(puzzle)
-            : notFinishedResultCheck(),
+    isValidPuzzle(_lines, _digits, _cells, context) {
+        const { puzzle, stateExtension: { currentWord } } = context;
+        return puzzle.extension.conditions.every((condition) => [1, true].includes(condition(currentWord)))
+            ? successResultCheck(context)
+            : notFinishedResultCheck();
+    }
 };

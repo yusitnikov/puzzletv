@@ -89,6 +89,6 @@ export const ToroidalYinYang: PuzzleDefinition<NumberPTM> = {
             }
         }
 
-        return finished ? successResultCheck(context.puzzle) : notFinishedResultCheck();
+        return finished ? successResultCheck(context) : notFinishedResultCheck();
     },
 };

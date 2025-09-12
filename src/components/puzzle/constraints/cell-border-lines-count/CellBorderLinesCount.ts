@@ -33,7 +33,7 @@ export const CellBorderLinesCountConstraint = <T extends AnyPTM>(
             return borders.length > expectedCount
                 ? errorResultCheck()
                 : borders.length === expectedCount
-                  ? successResultCheck(context.puzzle)
+                  ? successResultCheck(context)
                   : notFinishedResultCheck();
         },
         getInvalidUserLines(lines, _digits, _cells, context): Line[] {

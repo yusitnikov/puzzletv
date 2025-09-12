@@ -73,7 +73,7 @@ export const TapaCellConstraint = <T extends AnyPTM>(
             const neighborCenters = getNeighborCenters(context);
 
             return context.centerLineSegments.some(({ points }) => neighborCenters.containsOneOf(points))
-                ? successResultCheck(context.puzzle)
+                ? successResultCheck(context)
                 : notFinishedResultCheck();
         },
         getInvalidUserLines(_lines, _digits, _cells, context, isFinalCheck): Line[] {

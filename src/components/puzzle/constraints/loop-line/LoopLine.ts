@@ -18,7 +18,7 @@ export const LoopLineConstraint = <T extends AnyPTM>(type: CellPart): Constraint
         return lineSegments.length > 1
             ? errorResultCheck()
             : lineSegments.length === 1 && lineSegments[0].isLoop
-              ? successResultCheck(context.puzzle)
+              ? successResultCheck(context)
               : notFinishedResultCheck();
     },
     getInvalidUserLines(_lines, _digits, _cells, context, isFinalCheck): Line[] {

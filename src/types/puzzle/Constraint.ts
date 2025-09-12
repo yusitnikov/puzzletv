@@ -179,7 +179,7 @@ export const isValidFinishedPuzzleByConstraints = <T extends AnyPTM>(context: Pu
     } = puzzle;
     const constraints = context.allItems;
 
-    let result = successResultCheck(puzzle);
+    let result = successResultCheck(context);
 
     for (const constraint of constraints) {
         const normalizedConstraintCells = normalizeConstraintCells(constraint.cells, context.puzzle);

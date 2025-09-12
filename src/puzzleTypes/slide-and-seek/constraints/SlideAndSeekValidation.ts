@@ -136,7 +136,7 @@ export const SlideAndSeekValidationConstraint = <T extends AnyPTM>(
             }
         }
 
-        return !finished ? notFinishedResultCheck() : broken ? errorResultCheck() : successResultCheck(context.puzzle);
+        return !finished ? notFinishedResultCheck() : broken ? errorResultCheck() : successResultCheck(context);
     },
     getInvalidUserLines(lines, _digits, _regionCells, context, isFinalCheck): Line[] {
         const { fogVisibleCells } = context;

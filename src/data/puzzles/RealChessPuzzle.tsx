@@ -59,7 +59,7 @@ const isValidSolution = (
     );
 
     return areSameCellsMapsByContext(context, currentFinalDigits, correctFinalDigits)
-        ? successResultCheck(context.puzzle)
+        ? successResultCheck(context)
         : errorResultCheck();
 };
 

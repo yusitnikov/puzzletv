@@ -40,7 +40,7 @@ export const JigsawGluedPiecesConstraint: Constraint<JigsawPTM> = {
                 }
             }
 
-            return successResultCheck(context.puzzle);
+            return successResultCheck(context);
         },
     ),
 };

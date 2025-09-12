@@ -44,6 +44,7 @@ import { EasterSokoban, Sudokuban } from "./Sudokuban";
 import { Pacman } from "./Pacman";
 import { Astronavigation } from "./Astronavigation";
 import { CherryBlossom, Revolutionary, SumwhereAroundHere } from "./RotatableClues";
+import { ChooseYourOwnAdventure } from "./Adventure";
 import { Gears } from "./Gears";
 import { WheelsOnTheBus } from "./WheelsOnTheBus";
 import { HappyBirthdayDumediat } from "./HbdDumediat";
@@ -107,6 +108,8 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     // endregion
 
     // region Other authors
+    ChooseYourOwnAdventure,
+    
     CloseQuarters,
     CloseQuartersSeries,
     Mitosis,
@@ -150,7 +153,6 @@ export const AllPuzzles: PuzzleDefinitionOrLoader<AnyPTM>[] = [
     WheelsOnTheBus,
 
     Gears,
-
     Astronavigation,
     CherryBlossom,
     SumwhereAroundHere,
