@@ -42,13 +42,12 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
             const { cellSizeForSidePanel: cellSize } = context;
             const choices = getChoicesTaken(context);
             const currentChoice = choices[choices.length - 1];
-            const previousChoice = choices[choices.length - 2];
             const isNext =
-                choices.length === context.gridExtension.choicesMade.length + 1 &&
+                choices.length - 1 === context.gridExtension.choicesMade.length &&
                 currentChoice.choices !== undefined &&
                 checkSolved(context, currentChoice.choices.solveCells);
             const [showChoices, setShowChoices] = useState(false);
-            const [showChoiceMessageIndex, setShowChoiceMessageIndex] = useState<number>();
+            const [choiceTakenMessage, setChoiceTakenMessage] = useState<string>();
 
             const BaseComponent = baseTypeManager.aboveRulesComponent;
 
@@ -78,7 +77,7 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                                                 choicesMadeStateChangeAction(index, option.solutionMessage),
                                             );
                                             setShowChoices(false);
-                                            setShowChoiceMessageIndex(index);
+                                            setChoiceTakenMessage(option.takenMessage);
                                         }}
                                         style={{
                                             marginTop: cellSize * globalPaddingCoeff,
@@ -92,15 +91,15 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                         </Modal>
                     )}
 
-                    {showChoiceMessageIndex !== undefined && previousChoice?.choices !== undefined && (
+                    {choiceTakenMessage !== undefined && (
                         <Modal cellSize={cellSize}>
-                            <div>{previousChoice.choices.options[showChoiceMessageIndex].takenMessage}</div>
+                            <div>{choiceTakenMessage}</div>
 
                             <div>
                                 <Button
                                     type={"button"}
                                     cellSize={cellSize}
-                                    onClick={() => setShowChoiceMessageIndex(undefined)}
+                                    onClick={() => setChoiceTakenMessage(undefined)}
                                     autoFocus={true}
                                     style={{
                                         marginTop: cellSize * globalPaddingCoeff,
