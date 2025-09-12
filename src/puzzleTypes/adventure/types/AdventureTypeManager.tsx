@@ -44,9 +44,7 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                 digits = mergeCellsMaps(digits, currentChoice.initialDigits);
                 if (currentChoice.choices !== undefined && context.gridExtension.choicesMade.length > depth) {
                     currentChoice =
-                        context.gridExtension.choicesMade[depth] === 1
-                            ? currentChoice.choices.option1
-                            : currentChoice.choices.option2;
+                        currentChoice.choices.options[context.gridExtension.choicesMade[depth]].consequences;
                 } else {
                     currentChoice = undefined;
                 }
@@ -60,33 +58,22 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
             const [stage, currentChoice, previousChoice] = getStage(context);
             const isNext = stage > context.gridExtension.choicesMade.length;
             const [showChoices, setShowChoices] = useState(false);
-            const [showChoice1Message, setShowChoice1Message] = useState(false);
-            const [showChoice2Message, setShowChoice2Message] = useState(false);
+            const [showChoiceMessageIndex, setShowChoiceMessageIndex] = useState<number>();
 
-            const handleOption1 = () => {
+            const handleOption = (index: number) => {
                 context.onStateChange(
                     choicesMadeStateChangeAction(
                         myClientId,
                         getNextActionId(),
-                        [...context.gridExtension.choicesMade, 1],
-                        [...context.gridExtension.choicesMadeSolutionStrings, currentChoice!.option1SolutionMessage],
+                        [...context.gridExtension.choicesMade, index],
+                        [
+                            ...context.gridExtension.choicesMadeSolutionStrings,
+                            currentChoice!.options[index].solutionMessage,
+                        ],
                     ),
                 );
                 setShowChoices(false);
-                setShowChoice1Message(true);
-            };
-
-            const handleOption2 = () => {
-                context.onStateChange(
-                    choicesMadeStateChangeAction(
-                        myClientId,
-                        getNextActionId(),
-                        [...context.gridExtension.choicesMade, 2],
-                        [...context.gridExtension.choicesMadeSolutionStrings, currentChoice!.option2SolutionMessage],
-                    ),
-                );
-                setShowChoices(false);
-                setShowChoice2Message(true);
+                setShowChoiceMessageIndex(index);
             };
 
             const handleNextStage = () => {
@@ -95,9 +82,7 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                 while (depth <= context.gridExtension.choicesMade.length) {
                     if (context.gridExtension.choicesMade.length > depth) {
                         currentChoice =
-                            context.gridExtension.choicesMade[depth] === 1
-                                ? currentChoice.choices!.option1
-                                : currentChoice.choices!.option2;
+                            currentChoice.choices!.options[context.gridExtension.choicesMade[depth]].consequences;
                     }
                     depth++;
                 }
@@ -120,80 +105,35 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
 
                     {showChoices && (
                         <Modal cellSize={cellSize}>
-                            <div>
-                                <>
-                                    <div>{currentChoice?.topMessage}</div>
-                                </>
-                            </div>
+                            <div>{currentChoice!.topMessage}</div>
 
-                            <div>
-                                <Button
-                                    type={"button"}
-                                    cellSize={cellSize}
-                                    onClick={handleOption1}
-                                    style={{
-                                        marginTop: cellSize * globalPaddingCoeff,
-                                        padding: "0.5em 1em",
-                                    }}
-                                >
-                                    {currentChoice?.option1ChoiceMessage}
-                                </Button>
-                            </div>
-
-                            <div>
-                                <Button
-                                    type={"button"}
-                                    cellSize={cellSize}
-                                    onClick={handleOption2}
-                                    style={{
-                                        marginTop: cellSize * globalPaddingCoeff,
-                                        padding: "0.5em 1em",
-                                    }}
-                                >
-                                    {currentChoice?.option2ChoiceMessage}
-                                </Button>
-                            </div>
+                            {currentChoice!.options.map((option, index) => (
+                                <div key={index}>
+                                    <Button
+                                        type={"button"}
+                                        cellSize={cellSize}
+                                        onClick={() => handleOption(index)}
+                                        style={{
+                                            marginTop: cellSize * globalPaddingCoeff,
+                                            padding: "0.5em 1em",
+                                        }}
+                                    >
+                                        {option.choiceMessage}
+                                    </Button>
+                                </div>
+                            ))}
                         </Modal>
                     )}
 
-                    {showChoice1Message && (
+                    {showChoiceMessageIndex !== undefined && (
                         <Modal cellSize={cellSize}>
-                            <div>
-                                <>
-                                    <div>{previousChoice?.option1TakenMessage}</div>
-                                </>
-                            </div>
+                            <div>{previousChoice?.options[showChoiceMessageIndex].takenMessage}</div>
 
                             <div>
                                 <Button
                                     type={"button"}
                                     cellSize={cellSize}
-                                    onClick={() => setShowChoice1Message(false)}
-                                    autoFocus={true}
-                                    style={{
-                                        marginTop: cellSize * globalPaddingCoeff,
-                                        padding: "0.5em 1em",
-                                    }}
-                                >
-                                    Continue
-                                </Button>
-                            </div>
-                        </Modal>
-                    )}
-
-                    {showChoice2Message && (
-                        <Modal cellSize={cellSize}>
-                            <div>
-                                <>
-                                    <div>{previousChoice?.option2TakenMessage}</div>
-                                </>
-                            </div>
-
-                            <div>
-                                <Button
-                                    type={"button"}
-                                    cellSize={cellSize}
-                                    onClick={() => setShowChoice2Message(false)}
+                                    onClick={() => setShowChoiceMessageIndex(undefined)}
                                     autoFocus={true}
                                     style={{
                                         marginTop: cellSize * globalPaddingCoeff,
@@ -209,17 +149,12 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                     {context.stateExtension.introViewed === false && (
                         <Modal cellSize={cellSize}>
                             <div>
-                                <>
-                                    <div>
-                                        While plenty of 12-year-olds love adventure, most don't have bedrooms like
-                                        yours: filled with fossil replicas, antique maps, and hiking gear. With heroes
-                                        like Jane Goodall, John Muir, and Jacques Cousteau, you have wanted to go on an
-                                        adventure of your own for years. Your parents, ever-cautious, have decided you
-                                        are old enough and have gotten permission from some neighbors to explore their
-                                        land. With your compass, specimen jars, and your map (this puzzle) ready to be
-                                        filled in, you set off!
-                                    </div>
-                                </>
+                                While plenty of 12-year-olds love adventure, most don't have bedrooms like yours: filled
+                                with fossil replicas, antique maps, and hiking gear. With heroes like Jane Goodall, John
+                                Muir, and Jacques Cousteau, you have wanted to go on an adventure of your own for years.
+                                Your parents, ever-cautious, have decided you are old enough and have gotten permission
+                                from some neighbors to explore their land. With your compass, specimen jars, and your
+                                map (this puzzle) ready to be filled in, you set off!
                             </div>
 
                             <div>
@@ -241,6 +176,8 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                 </>
             );
         }),
+
+        saveStateKeySuffix: "v2",
     };
 };
 
@@ -270,10 +207,7 @@ const getStage = <T extends AnyPTM>(
             }
         } else if (currentChoice.choices !== undefined) {
             previousChoice = currentChoice;
-            currentChoice =
-                context.gridExtension.choicesMade[depth] === 1
-                    ? currentChoice.choices.option1
-                    : currentChoice.choices.option2;
+            currentChoice = currentChoice.choices.options[context.gridExtension.choicesMade[depth]].consequences;
         } else {
             currentChoice = undefined;
         }

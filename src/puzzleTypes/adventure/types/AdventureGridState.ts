@@ -8,24 +8,25 @@ export interface AdventureGridState {
     choicesMade: number[];
     choicesMadeSolutionStrings: string[];
 }
+
+export type choiceOption = {
+    choiceMessage: string;
+    takenMessage: string;
+    solutionMessage: string;
+    consequences: choiceTaken;
+};
+
 export type choiceDefinitions = {
     solveCells: [number, number][];
     topMessage: string;
-    option1ChoiceMessage: string;
-    option1TakenMessage: string;
-    option1SolutionMessage: string;
-    option2ChoiceMessage: string;
-    option2TakenMessage: string;
-    option2SolutionMessage: string;
-    option1: choiceTaken;
-    option2: choiceTaken;
+    options: choiceOption[];
 };
 
 export type choiceTaken = {
     initialDigits: CellsMap<number>;
     constraints: Constraint<AdventurePTM, any>[];
     rules: string[];
-    choices: choiceDefinitions | undefined;
+    choices?: choiceDefinitions;
 };
 
 export const choicesMadeStateChangeAction =
