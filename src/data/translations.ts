@@ -11,6 +11,10 @@ export const translationsExactType = {
         [LanguageCode.ru]: "Вы",
         [LanguageCode.de]: "Du",
     },
+    and: {
+        [LanguageCode.ru]: "и",
+        [LanguageCode.de]: "und",
+    },
     or: {
         [LanguageCode.ru]: "или",
         [LanguageCode.de]: "oder",

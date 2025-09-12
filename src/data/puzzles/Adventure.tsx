@@ -45,6 +45,7 @@ import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 import { choiceTaken } from "../../puzzleTypes/adventure/types/AdventureGridState";
 import { ReactNode } from "react";
+import { joinListSemantically } from "../../utils/array";
 
 const adventureDef: choiceTaken = {
     initialDigits: {},
@@ -501,7 +502,7 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
         return isValidFinishedPuzzleByEmbeddedSolution(context);
     },
     successMessage: (context) =>
-        `You are exhausted having fully filled in your map. The sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${context.gridExtension.choicesMadeSolutionStrings[0]}, ${context.gridExtension.choicesMadeSolutionStrings[1]}, and ${context.gridExtension.choicesMadeSolutionStrings[2]}!`,
+        `You are exhausted having fully filled in your map. The sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${joinListSemantically(context.gridExtension.choicesMadeSolutionStrings, translate("and"))}!`,
     items: (context) => {
         return [...getAdventureConstraints(context)];
     },
