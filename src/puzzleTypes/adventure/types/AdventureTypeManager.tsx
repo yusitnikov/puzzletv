@@ -68,19 +68,6 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                 setShowChoiceMessageIndex(index);
             };
 
-            const handleNextStage = () => {
-                let currentChoice: choiceTaken = context.puzzle.extension.rootChoiceTaken;
-                let depth = 0;
-                while (depth <= context.gridExtension.choicesMade.length) {
-                    if (context.gridExtension.choicesMade.length > depth) {
-                        currentChoice =
-                            currentChoice.choices!.options[context.gridExtension.choicesMade[depth]].consequences;
-                    }
-                    depth++;
-                }
-                setShowChoices(true);
-            };
-
             const BaseComponent = baseTypeManager.aboveRulesComponent;
 
             return (
@@ -92,7 +79,7 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                         visible={isNext}
                         message={"You've fully explored this area!"}
                         buttonText={"Make your next choice"}
-                        onClick={handleNextStage}
+                        onClick={() => setShowChoices(true)}
                     />
 
                     {showChoices && (
