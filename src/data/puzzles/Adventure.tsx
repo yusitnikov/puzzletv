@@ -2,7 +2,7 @@ import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition } from "../..
 import { AdventurePTM } from "../../puzzleTypes/adventure/types/AdventurePTM";
 import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { AdventureTypeManager, getChoicesTaken } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
+import { AdventureTypeManager } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
 import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
 import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
@@ -44,6 +44,7 @@ import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 import { choiceTaken } from "../../puzzleTypes/adventure/types/AdventureGridState";
 import { joinListSemantically } from "../../utils/array";
+import { getChoicesTaken } from "../../puzzleTypes/adventure/types/helpers";
 
 const adventureDef: choiceTaken = {
     initialDigits: {},
