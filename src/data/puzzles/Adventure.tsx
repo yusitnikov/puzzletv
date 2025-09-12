@@ -399,7 +399,7 @@ const getAdventureRules = (context: PuzzleContext<AdventurePTM>): ReactNode => {
     );
 };
 
-export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM<number>> = {
+export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
     noIndex: true,
     title: { [LanguageCode.en]: "Adventure is out there!" },
     author: { [LanguageCode.en]: "Tumbo" },
