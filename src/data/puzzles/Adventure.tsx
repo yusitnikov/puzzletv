@@ -390,8 +390,8 @@ const getAdventureRules = (context: PuzzleContext<AdventurePTM>): ReactNode => {
 
             <RulesParagraph>
                 <RulesUnorderedList>
-                    {rules.map((item) => (
-                        <li>{item}</li>
+                    {rules.map((item, index) => (
+                        <li key={index}>{item}</li>
                     ))}
                 </RulesUnorderedList>
             </RulesParagraph>
