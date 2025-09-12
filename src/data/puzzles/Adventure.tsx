@@ -467,6 +467,15 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
     author: { [LanguageCode.en]: "Tumbo" },
     extension: {
         rootChoiceTaken: adventureDef,
+        intro: () => (
+            <div>
+                While plenty of 12-year-olds love adventure, most don't have bedrooms like yours: filled with fossil
+                replicas, antique maps, and hiking gear. With heroes like Jane Goodall, John Muir, and Jacques Cousteau,
+                you have wanted to go on an adventure of your own for years. Your parents, ever-cautious, have decided
+                you are old enough and have gotten permission from some neighbors to explore their land. With your
+                compass, specimen jars, and your map (this puzzle) ready to be filled in, you set off!
+            </div>
+        ),
     },
     slug: "choose-your-own-adventure",
     initialDigits: { 6: { 0: 1 }, 7: { 4: 1 }, 8: { 7: 2, 8: 9 } },
