@@ -299,7 +299,12 @@ const CardLink = observer(function CardLinkFc({ cellSize }: CardLinkProps) {
             <CardImage onClick={() => setShowModal(true)} style={{ maxWidth: "100%" }} />
 
             {showModal && (
-                <Modal cellSize={cellSize} borderless={true} onClose={() => setShowModal(false)}>
+                <Modal
+                    cellSize={cellSize}
+                    borderless={true}
+                    noPuzzleContainer={true}
+                    onClose={() => setShowModal(false)}
+                >
                     <CardImage
                         style={{
                             maxWidth: "90vw",

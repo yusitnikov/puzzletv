@@ -13,6 +13,7 @@ export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
     textAlign?: CSSProperties["textAlign"];
     borderless?: boolean;
     noHeader?: boolean;
+    noPuzzleContainer?: boolean;
     children: ReactNode;
 }
 
@@ -22,6 +23,7 @@ export const Modal = observer(function ModalFc({
     textAlign = "center",
     borderless,
     noHeader,
+    noPuzzleContainer,
     children,
     ...divProps
 }: ModalProps) {
@@ -63,7 +65,7 @@ export const Modal = observer(function ModalFc({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...(puzzleContainer ?? { inset: 0 }),
+                    ...((noPuzzleContainer ? undefined : puzzleContainer) ?? { inset: 0 }),
                 }}
             >
                 <div
