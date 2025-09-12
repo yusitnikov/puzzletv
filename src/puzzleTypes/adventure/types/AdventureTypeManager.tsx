@@ -1,15 +1,13 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
 import { globalPaddingCoeff } from "../../../components/app/globals";
-import { myClientId } from "../../../hooks/useMultiPlayer";
 import { AdventurePTM } from "./AdventurePTM";
 import { Modal } from "../../../components/layout/modal/Modal";
 import { Button } from "../../../components/layout/button/Button";
-import { getNextActionId } from "../../../types/puzzle/GameStateAction";
-import { choicesMadeStateChangeAction, choiceTaken, choiceDefinitions } from "./AdventureGridState";
+import { choicesMadeStateChangeAction, choiceTaken } from "./AdventureGridState";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { CellsMap, mergeCellsMaps } from "../../../types/puzzle/CellsMap";
+import { mergeCellsMaps } from "../../../types/puzzle/CellsMap";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import {
@@ -37,36 +35,20 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
         ...baseTypeManager,
 
         getInitialDigits(context) {
-            let digits: CellsMap<number> = {};
-            let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
-            let depth = 0;
-            while (currentChoice !== undefined) {
-                digits = mergeCellsMaps(digits, currentChoice.initialDigits);
-                if (currentChoice.choices !== undefined && context.gridExtension.choicesMade.length > depth) {
-                    currentChoice =
-                        currentChoice.choices.options[context.gridExtension.choicesMade[depth]].consequences;
-                } else {
-                    currentChoice = undefined;
-                }
-                depth++;
-            }
-            return digits;
+            return mergeCellsMaps(...getChoicesTaken(context).map((choice) => choice.initialDigits));
         },
 
         aboveRulesComponent: observer(function AdventureAboveRules({ context }) {
             const { cellSizeForSidePanel: cellSize } = context;
-            const [stage, currentChoice, previousChoice] = getStage(context);
-            const isNext = stage > context.gridExtension.choicesMade.length;
+            const choices = getChoicesTaken(context);
+            const currentChoice = choices[choices.length - 1];
+            const previousChoice = choices[choices.length - 2];
+            const isNext =
+                choices.length === context.gridExtension.choicesMade.length + 1 &&
+                currentChoice.choices !== undefined &&
+                checkSolved(context, currentChoice.choices.solveCells);
             const [showChoices, setShowChoices] = useState(false);
             const [showChoiceMessageIndex, setShowChoiceMessageIndex] = useState<number>();
-
-            const handleOption = (index: number) => {
-                context.onStateChange(
-                    choicesMadeStateChangeAction(index, currentChoice!.options[index].solutionMessage),
-                );
-                setShowChoices(false);
-                setShowChoiceMessageIndex(index);
-            };
 
             const BaseComponent = baseTypeManager.aboveRulesComponent;
 
@@ -82,16 +64,22 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                         onClick={() => setShowChoices(true)}
                     />
 
-                    {showChoices && (
+                    {showChoices && currentChoice.choices !== undefined && (
                         <Modal cellSize={cellSize}>
-                            <div>{currentChoice!.topMessage}</div>
+                            <div>{currentChoice.choices.topMessage}</div>
 
-                            {currentChoice!.options.map((option, index) => (
+                            {currentChoice.choices.options.map((option, index) => (
                                 <div key={index}>
                                     <Button
                                         type={"button"}
                                         cellSize={cellSize}
-                                        onClick={() => handleOption(index)}
+                                        onClick={() => {
+                                            context.onStateChange(
+                                                choicesMadeStateChangeAction(index, option.solutionMessage),
+                                            );
+                                            setShowChoices(false);
+                                            setShowChoiceMessageIndex(index);
+                                        }}
                                         style={{
                                             marginTop: cellSize * globalPaddingCoeff,
                                             padding: "0.5em 1em",
@@ -104,9 +92,9 @@ export const AdventureTypeManager = (): PuzzleTypeManager<AdventurePTM> => {
                         </Modal>
                     )}
 
-                    {showChoiceMessageIndex !== undefined && (
+                    {showChoiceMessageIndex !== undefined && previousChoice?.choices !== undefined && (
                         <Modal cellSize={cellSize}>
-                            <div>{previousChoice?.options[showChoiceMessageIndex].takenMessage}</div>
+                            <div>{previousChoice.choices.options[showChoiceMessageIndex].takenMessage}</div>
 
                             <div>
                                 <Button
@@ -170,27 +158,17 @@ const checkSolved = <T extends AnyPTM>(context: PuzzleContext<T>, solveCells: [n
     return true;
 };
 
-const getStage = <T extends AnyPTM>(
-    context: PuzzleContext<T>,
-): [number, choiceDefinitions | undefined, choiceDefinitions | undefined] => {
-    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
-    let previousChoice: choiceTaken | undefined = undefined;
-    let depth = 0;
-    while (currentChoice !== undefined) {
-        if (currentChoice.choices !== undefined && context.gridExtension.choicesMade.length === depth) {
-            const solved = checkSolved(context, currentChoice.choices.solveCells);
-            if (context.gridExtension.choicesMade.length === depth && solved) {
-                return [depth + 1, currentChoice.choices, previousChoice?.choices];
-            } else {
-                currentChoice = undefined;
-            }
-        } else if (currentChoice.choices !== undefined) {
-            previousChoice = currentChoice;
-            currentChoice = currentChoice.choices.options[context.gridExtension.choicesMade[depth]].consequences;
-        } else {
-            currentChoice = undefined;
-        }
-        depth++;
+export const getChoicesTaken = ({
+    gridExtension: { choicesMade },
+    puzzle: {
+        extension: { rootChoiceTaken },
+    },
+}: PuzzleContext<AdventurePTM>): choiceTaken[] => {
+    let currentChoice = rootChoiceTaken;
+    const result = [currentChoice];
+    for (const choiceIndex of choicesMade) {
+        currentChoice = currentChoice.choices!.options[choiceIndex].consequences;
+        result.push(currentChoice);
     }
-    return [depth - 1, undefined, previousChoice?.choices];
+    return result;
 };

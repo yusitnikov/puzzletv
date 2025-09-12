@@ -2,9 +2,8 @@ import { isValidFinishedPuzzleByEmbeddedSolution, PuzzleDefinition } from "../..
 import { AdventurePTM } from "../../puzzleTypes/adventure/types/AdventurePTM";
 import { createCellsMapFromArray } from "../../types/puzzle/CellsMap";
 import { LanguageCode } from "../../types/translations/LanguageCode";
-import { AdventureTypeManager } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
+import { AdventureTypeManager, getChoicesTaken } from "../../puzzleTypes/adventure/types/AdventureTypeManager";
 import { GridSize9, Regions9 } from "../../types/puzzle/GridSize";
-import { Constraint } from "../../types/puzzle/Constraint";
 import { PuzzleContext } from "../../types/puzzle/PuzzleContext";
 import { KropkiDotConstraint } from "../../components/puzzle/constraints/kropki-dot/KropkiDot";
 import { WhispersConstraint } from "../../components/puzzle/constraints/whispers/Whispers";
@@ -44,7 +43,6 @@ import { OddConstraint } from "../../components/puzzle/constraints/odd/Odd";
 import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 import { choiceTaken } from "../../puzzleTypes/adventure/types/AdventureGridState";
-import { ReactNode } from "react";
 import { joinListSemantically } from "../../utils/array";
 
 const adventureDef: choiceTaken = {
@@ -440,39 +438,27 @@ const adventureDef: choiceTaken = {
     },
 };
 
-const getAdventureRules = (context: PuzzleContext<AdventurePTM>): ReactNode => {
-    let rules: string[] = [];
-    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
-    let depth = 0;
-    while (currentChoice !== undefined) {
-        rules = rules.concat(currentChoice.rules);
-        if (currentChoice.choices !== undefined && context.gridExtension.choicesMade.length > depth) {
-            currentChoice = currentChoice.choices.options[context.gridExtension.choicesMade[depth]].consequences;
-        } else {
-            currentChoice = undefined;
-        }
-        depth++;
-    }
-    return (
-        <>
-            <RulesParagraph>
-                <summary>
-                    {translate(normalSudokuRulesApply)}. As you annotate your map (fill in digits) you will be presented
-                    with choices to decide what to explore next (causing new rules to appear). Upon choosing you may see
-                    new landmarks and notate them on your map (new given digits may appear).
-                </summary>
-            </RulesParagraph>
+const getAdventureRules = (context: PuzzleContext<AdventurePTM>) => (
+    <>
+        <RulesParagraph>
+            <summary>
+                {translate(normalSudokuRulesApply)}. As you annotate your map (fill in digits) you will be presented
+                with choices to decide what to explore next (causing new rules to appear). Upon choosing you may see new
+                landmarks and notate them on your map (new given digits may appear).
+            </summary>
+        </RulesParagraph>
 
-            <RulesParagraph>
-                <RulesUnorderedList>
-                    {rules.map((item, index) => (
+        <RulesParagraph>
+            <RulesUnorderedList>
+                {getChoicesTaken(context)
+                    .flatMap((choice) => choice.rules)
+                    .map((item, index) => (
                         <li key={index}>{item}</li>
                     ))}
-                </RulesUnorderedList>
-            </RulesParagraph>
-        </>
-    );
-};
+            </RulesUnorderedList>
+        </RulesParagraph>
+    </>
+);
 
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
     noIndex: true,
@@ -503,28 +489,10 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
     },
     successMessage: (context) =>
         `You are exhausted having fully filled in your map. The sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${joinListSemantically(context.gridExtension.choicesMadeSolutionStrings, translate("and"))}!`,
-    items: (context) => {
-        return [...getAdventureConstraints(context)];
-    },
+    items: (context) => getChoicesTaken(context).flatMap((choice) => choice.constraints),
     /* lmdLink: "TODO",
     getLmdSolutionCode: ({ puzzle: { solution } }) =>
         indexes(9)
             .map((index) => solution![0][index])
             .join(""),*/
-};
-
-const getAdventureConstraints = (context: PuzzleContext<AdventurePTM>): Constraint<AdventurePTM, any>[] => {
-    let constraints: Constraint<AdventurePTM, any>[] = [];
-    let currentChoice: choiceTaken | undefined = context.puzzle.extension.rootChoiceTaken;
-    let depth = 0;
-    while (currentChoice !== undefined) {
-        constraints = constraints.concat(currentChoice.constraints);
-        if (currentChoice.choices !== undefined && context.gridExtension.choicesMade.length > depth) {
-            currentChoice = currentChoice.choices.options[context.gridExtension.choicesMade[depth]].consequences;
-        } else {
-            currentChoice = undefined;
-        }
-        depth++;
-    }
-    return constraints;
 };
