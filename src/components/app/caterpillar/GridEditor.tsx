@@ -60,7 +60,7 @@ export const GridEditor = observer(function GridEditor({ grid, onSubmit, onCance
     const throttledEditedData = useThrottleData(500, editedData);
 
     return (
-        <Modal cellSize={cellSize * 2} onClose={onCancel} textAlign={"center"}>
+        <Modal cellSize={cellSize * 2} onClose={onCancel} style={{ gap: 0 }}>
             <div>
                 <label>
                     Puzzle data:&nbsp;

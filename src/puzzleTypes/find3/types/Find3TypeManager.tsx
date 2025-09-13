@@ -1,13 +1,7 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { DigitPuzzleTypeManager } from "../../default/types/DigitPuzzleTypeManager";
-import {
-    aboveRulesTextHeightCoeff,
-    rulesMarginCoeff,
-    lightRedColor,
-    globalPaddingCoeff,
-} from "../../../components/app/globals";
+import { aboveRulesTextHeightCoeff, rulesMarginCoeff, lightRedColor } from "../../../components/app/globals";
 import { LanguageCode } from "../../../types/translations/LanguageCode";
-import { Button } from "../../../components/layout/button/Button";
 import React, { useState } from "react";
 import { AnyFind3PTM } from "./Find3PTM";
 import { IReactionDisposer, reaction } from "mobx";
@@ -134,7 +128,7 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
                 </div>
 
                 {showExplanation && (
-                    <Modal cellSize={cellSize} onClose={() => setShowExplanation(false)}>
+                    <Modal cellSize={cellSize} onClose={() => setShowExplanation(false)} buttons={["OK"]}>
                         <div>
                             {translate({
                                 [LanguageCode.en]:
@@ -152,47 +146,17 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
                             })}
                             !
                         </div>
-
-                        <Button
-                            type={"button"}
-                            cellSize={cellSize}
-                            onClick={() => setShowExplanation(false)}
-                            autoFocus={true}
-                            style={{
-                                marginTop: cellSize * globalPaddingCoeff,
-                                padding: "0.5em 1em",
-                            }}
-                        >
-                            OK
-                        </Button>
                     </Modal>
                 )}
 
                 {confirmationCell && (
-                    <Modal cellSize={cellSize} onClose={() => setConfirmationCell(undefined)}>
-                        <div>
-                            {translate({
-                                [LanguageCode.en]: "Are you sure that you want to use the gift for this cell",
-                                [LanguageCode.ru]:
-                                    "Пожалуйста, выберите одну пустую ячейку, чтобы показать цифру в ней",
-                                [LanguageCode.de]:
-                                    "Bitte wählen Sie eine leere Zelle aus, um die darin enthaltene Ziffer anzuzeigen",
-                            })}
-                            ?
-                        </div>
-
-                        <div
-                            style={{
-                                marginTop: cellSize * globalPaddingCoeff,
-                                display: "flex",
-                                justifyContent: "center",
-                                gap: cellSize * globalPaddingCoeff,
-                            }}
-                        >
-                            <Button
-                                type={"button"}
-                                cellSize={cellSize}
-                                onClick={() => {
+                    <Modal
+                        cellSize={cellSize}
+                        onClose={() => setConfirmationCell(undefined)}
+                        buttons={[
+                            {
+                                label: translate("Yes"),
+                                onClick: () => {
                                     context.onStateChange((prev) => ({
                                         gridStateHistory: gridStateHistoryAddState(
                                             prev,
@@ -209,21 +173,21 @@ export const Find3TypeManager = <T extends AnyFind3PTM>(
                                     }));
 
                                     setConfirmationCell(undefined);
-                                }}
-                                style={{ padding: "0.5em 1em" }}
-                            >
-                                {translate("Yes")}
-                            </Button>
-
-                            <Button
-                                type={"button"}
-                                cellSize={cellSize}
-                                onClick={() => setConfirmationCell(undefined)}
-                                autoFocus={true}
-                                style={{ padding: "0.5em 1em" }}
-                            >
-                                {translate("No")}
-                            </Button>
+                                },
+                            },
+                            translate("No"),
+                        ]}
+                        autoFocusButtonIndex={1}
+                    >
+                        <div>
+                            {translate({
+                                [LanguageCode.en]: "Are you sure that you want to use the gift for this cell",
+                                [LanguageCode.ru]:
+                                    "Пожалуйста, выберите одну пустую ячейку, чтобы показать цифру в ней",
+                                [LanguageCode.de]:
+                                    "Bitte wählen Sie eine leere Zelle aus, um die darin enthaltene Ziffer anzuzeigen",
+                            })}
+                            ?
                         </div>
                     </Modal>
                 )}

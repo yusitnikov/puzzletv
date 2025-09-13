@@ -1,30 +1,35 @@
 import { createPortal } from "react-dom";
-import { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 import { useEventListener } from "../../../hooks/useEventListener";
 import { globalPaddingCoeff, headerHeight, textColor, textHeightCoeff } from "../../app/globals";
 import { usePuzzleContainer } from "../../../contexts/PuzzleContainerContext";
 import { runInAction } from "mobx";
 import { profiler } from "../../../utils/profiler";
 import { observer } from "mobx-react-lite";
+import { Button, ButtonProps } from "../button/Button";
 
 export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
     cellSize: number;
     onClose?: () => void;
-    textAlign?: CSSProperties["textAlign"];
     borderless?: boolean;
     noHeader?: boolean;
     noPuzzleContainer?: boolean;
     children: ReactNode;
+    buttons?: ((Omit<ButtonProps, "children"> & { label: string }) | string)[];
+    buttonsDirection?: "row" | "column";
+    autoFocusButtonIndex?: number | false;
 }
 
 export const Modal = observer(function ModalFc({
     cellSize,
     onClose,
-    textAlign = "center",
     borderless,
     noHeader,
     noPuzzleContainer,
     children,
+    buttons = [],
+    buttonsDirection = "row",
+    autoFocusButtonIndex = 0,
     ...divProps
 }: ModalProps) {
     profiler.trace();
@@ -77,11 +82,54 @@ export const Modal = observer(function ModalFc({
                         padding: borderless ? 0 : `${padding}px ${padding * 2}px`,
                         borderRadius: borderless ? 0 : padding / 3,
                         fontSize: cellSize * textHeightCoeff,
-                        textAlign,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        gap: padding,
                         ...divProps.style,
                     }}
                 >
                     {children}
+
+                    {buttons.length !== 0 && (
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: buttonsDirection,
+                                gap: `${padding}px ${cellSize * textHeightCoeff}px`,
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            {buttons.map((button, index) => {
+                                let label: string;
+                                let props: ButtonProps = {};
+                                if (typeof button === "object" && "label" in button) {
+                                    const { label: buttonLabel, ...buttonProps } = button;
+                                    label = buttonLabel;
+                                    props = buttonProps;
+                                } else {
+                                    label = button;
+                                }
+
+                                return (
+                                    <Button
+                                        key={index}
+                                        type={"button"}
+                                        cellSize={cellSize}
+                                        autoFocus={index === autoFocusButtonIndex}
+                                        onClick={onClose}
+                                        {...props}
+                                        style={{ padding: "0.5em 1em", ...props.style }}
+                                    >
+                                        {label}
+                                    </Button>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>,

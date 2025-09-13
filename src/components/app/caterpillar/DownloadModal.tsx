@@ -58,7 +58,7 @@ export const DownloadModal = observer(function DownloadModal({ grids, onClose }:
     });
 
     return (
-        <Modal noHeader={true} cellSize={modalCellSize} onClose={onClose}>
+        <Modal noHeader={true} cellSize={modalCellSize} onClose={onClose} style={{ gap: 0 }}>
             {compiledGrids && (
                 <SettingsItem>
                     <span>Puzzle JSON:</span>

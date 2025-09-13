@@ -2,7 +2,6 @@ import { ControlButtonItemProps, ControlButtonItemPropsGenericFc } from "./Contr
 import { ControlButton } from "./ControlButton";
 import { Check } from "@emotion-icons/material";
 import { Modal } from "../../layout/modal/Modal";
-import { Button } from "../../layout/button/Button";
 import { globalPaddingCoeff, textColor } from "../../app/globals";
 import { useState } from "react";
 import { useEffectExceptInit } from "../../../hooks/useEffectExceptInit";
@@ -80,7 +79,7 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
             )}
             {/* The score could be mis-calculated before getting confirmation from the host, so don't display the results until then */}
             {isShowingResult && myPendingMessages.length === 0 && (
-                <Modal cellSize={cellSize} onClose={handleCloseCheckResult}>
+                <Modal cellSize={cellSize} onClose={handleCloseCheckResult} buttons={["OK"]}>
                     <div>
                         {getPlayerScore ? (
                             isEnabled ? (
@@ -99,10 +98,8 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
                     </div>
 
                     {(isLmdAllowed || openedLmdOnce) && isCorrectResult && lmdSolutionCode !== undefined && (
-                        <>
-                            <div style={{ marginTop: cellSize * globalPaddingCoeff }}>
-                                {translate("Solution code")}:
-                            </div>
+                        <div>
+                            <div>{translate("Solution code")}:</div>
                             <div>
                                 <input
                                     value={lmdSolutionCode}
@@ -117,23 +114,8 @@ export const ResultCheckButton: ControlButtonItemPropsGenericFc = observer(funct
                                     }}
                                 />
                             </div>
-                        </>
+                        </div>
                     )}
-
-                    <div>
-                        <Button
-                            type={"button"}
-                            cellSize={cellSize}
-                            onClick={handleCloseCheckResult}
-                            autoFocus={true}
-                            style={{
-                                marginTop: cellSize * globalPaddingCoeff,
-                                padding: "0.5em 1em",
-                            }}
-                        >
-                            OK
-                        </Button>
-                    </div>
                 </Modal>
             )}
         </>

@@ -1,4 +1,4 @@
-import { globalPaddingCoeff, lightRedColor } from "../../../components/app/globals";
+import { lightRedColor } from "../../../components/app/globals";
 import { GridLayer } from "../../../types/puzzle/GridLayer";
 import { Constraint, ConstraintProps, ConstraintPropsGenericFcMap } from "../../../types/puzzle/Constraint";
 import { observer } from "mobx-react-lite";
@@ -10,7 +10,6 @@ import { AutoSvg } from "../../../components/svg/auto-svg/AutoSvg";
 import styled from "@emotion/styled";
 import { Modal } from "../../../components/layout/modal/Modal";
 import { ReactNode, useState } from "react";
-import { Button } from "../../../components/layout/button/Button";
 import { AnyRuleBoxPTM } from "../types/RuleBoxPTM";
 import { RuleBoxGameState } from "../types/RuleBoxGameState";
 
@@ -89,21 +88,8 @@ export const RuleBox: ConstraintPropsGenericFcMap<RuleBoxProps, AnyRuleBoxPTM> =
                 )}
 
                 {showModal && (
-                    <Modal cellSize={cellSize} onClose={closeModal}>
+                    <Modal cellSize={cellSize} onClose={closeModal} buttons={["OK"]}>
                         <div>{rulesNode}</div>
-
-                        <Button
-                            type={"button"}
-                            cellSize={cellSize}
-                            autoFocus={true}
-                            onClick={closeModal}
-                            style={{
-                                marginTop: cellSize * globalPaddingCoeff,
-                                padding: "0.5em 1em",
-                            }}
-                        >
-                            OK
-                        </Button>
                     </Modal>
                 )}
             </>

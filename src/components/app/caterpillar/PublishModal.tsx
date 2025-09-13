@@ -124,7 +124,7 @@ export const PublishModal = observer(function PublishModal({ grids, onClose }: P
     const [fullPublishStatus, setFullPublishStatus] = useState<PublishStatus>({});
 
     return (
-        <Modal noHeader={true} cellSize={modalCellSize} onClose={onClose} style={{ maxWidth: "70%" }}>
+        <Modal noHeader={true} cellSize={modalCellSize} onClose={onClose} style={{ maxWidth: "70%", gap: 0 }}>
             <SettingsItem>
                 <span>Puzzle short ID:</span>
 

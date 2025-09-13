@@ -470,7 +470,7 @@ export const CaterpillarEditor = observer(function CaterpillarEditor({ chunk }: 
 
             {otherEditor && (
                 <Modal cellSize={modalCellSize * 2.5}>
-                    {otherEditor.nickname || "Other person"} is editing the grids, please wait...
+                    <div>{otherEditor.nickname || "Other person"} is editing the grids, please wait...</div>
                 </Modal>
             )}
         </>

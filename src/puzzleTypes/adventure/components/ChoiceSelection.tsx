@@ -2,9 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { AboveRulesActionItem } from "../../../components/puzzle/rules/AboveRulesActionItem";
 import { Modal } from "../../../components/layout/modal/Modal";
-import { Button } from "../../../components/layout/button/Button";
 import { choicesMadeStateChangeAction } from "../types/AdventureGridState";
-import { globalPaddingCoeff } from "../../../components/app/globals";
 import { IntroModal } from "./IntroModal";
 import { PuzzleContextProps } from "../../../types/puzzle/PuzzleContext";
 import { AdventurePTM } from "../types/AdventurePTM";
@@ -36,49 +34,26 @@ export const ChoiceSelection = observer(function ChoiceSelectionFc({ context }: 
             />
 
             {showChoices && currentChoice.choices !== undefined && (
-                <Modal cellSize={cellSize}>
+                <Modal
+                    cellSize={cellSize}
+                    buttons={currentChoice.choices.options.map((option, index) => ({
+                        label: option.choiceMessage,
+                        onClick: () => {
+                            context.onStateChange(choicesMadeStateChangeAction(index, option.solutionMessage));
+                            setShowChoices(false);
+                            setChoiceTakenMessage(option.takenMessage);
+                        },
+                    }))}
+                    buttonsDirection={"column"}
+                    autoFocusButtonIndex={false}
+                >
                     <div>{currentChoice.choices.topMessage}</div>
-
-                    {currentChoice.choices.options.map((option, index) => (
-                        <div key={index}>
-                            <Button
-                                type={"button"}
-                                cellSize={cellSize}
-                                onClick={() => {
-                                    context.onStateChange(choicesMadeStateChangeAction(index, option.solutionMessage));
-                                    setShowChoices(false);
-                                    setChoiceTakenMessage(option.takenMessage);
-                                }}
-                                style={{
-                                    marginTop: cellSize * globalPaddingCoeff,
-                                    padding: "0.5em 1em",
-                                }}
-                            >
-                                {option.choiceMessage}
-                            </Button>
-                        </div>
-                    ))}
                 </Modal>
             )}
 
             {choiceTakenMessage !== undefined && (
-                <Modal cellSize={cellSize}>
+                <Modal cellSize={cellSize} onClose={() => setChoiceTakenMessage(undefined)} buttons={["Continue"]}>
                     <div>{choiceTakenMessage}</div>
-
-                    <div>
-                        <Button
-                            type={"button"}
-                            cellSize={cellSize}
-                            onClick={() => setChoiceTakenMessage(undefined)}
-                            autoFocus={true}
-                            style={{
-                                marginTop: cellSize * globalPaddingCoeff,
-                                padding: "0.5em 1em",
-                            }}
-                        >
-                            Continue
-                        </Button>
-                    </div>
                 </Modal>
             )}
 

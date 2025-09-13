@@ -3,8 +3,6 @@ import { ControlButton } from "./ControlButton";
 import { Absolute } from "../../layout/absolute/Absolute";
 import { Replay } from "@emotion-icons/material";
 import { Modal } from "../../layout/modal/Modal";
-import { Button } from "../../layout/button/Button";
-import { globalPaddingCoeff, textHeightCoeff } from "../../app/globals";
 import { useCallback, useState } from "react";
 import { getEmptyGameState, mergeGameStateWithUpdates } from "../../../types/puzzle/GameState";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
@@ -73,60 +71,35 @@ export const ResetButton: ControlButtonItemPropsGenericFc = observer(function Re
                 )}
             </ControlButton>
             {isShowingRestartConfirmation && (
-                <Modal cellSize={cellSize} onClose={handleCloseRestart}>
+                <Modal
+                    cellSize={cellSize}
+                    onClose={handleCloseRestart}
+                    buttons={
+                        canRestart
+                            ? [
+                                  {
+                                      label: translate("Yes"),
+                                      onClick: handleSureRestart,
+                                  },
+                                  translate("Cancel"),
+                              ]
+                            : ["OK"]
+                    }
+                >
                     {!canRestart && (
-                        <>
+                        <div>
                             <div>{translate("You can't restart the game because you're not hosting it")}.</div>
                             <div>
                                 {translate("If you want to restart the game, please ask the game host to do it")}.
                             </div>
-
-                            <Button
-                                type={"button"}
-                                cellSize={cellSize}
-                                onClick={handleCloseRestart}
-                                autoFocus={true}
-                                style={{
-                                    marginTop: cellSize * globalPaddingCoeff,
-                                    padding: "0.5em 1em",
-                                }}
-                            >
-                                OK
-                            </Button>
-                        </>
+                        </div>
                     )}
 
                     {canRestart && (
-                        <>
+                        <div>
                             <div>{translate("Are you sure that you want to restart")}?</div>
                             <div>{translate("All progress will be lost")}.</div>
-
-                            <div style={{ marginTop: cellSize * globalPaddingCoeff }}>
-                                <Button
-                                    type={"button"}
-                                    cellSize={cellSize}
-                                    onClick={handleSureRestart}
-                                    autoFocus={true}
-                                    style={{
-                                        padding: "0.5em 1em",
-                                    }}
-                                >
-                                    {translate("Yes")}
-                                </Button>
-
-                                <Button
-                                    type={"button"}
-                                    cellSize={cellSize}
-                                    onClick={handleCloseRestart}
-                                    style={{
-                                        marginLeft: cellSize * textHeightCoeff,
-                                        padding: "0.5em 1em",
-                                    }}
-                                >
-                                    {translate("Cancel")}
-                                </Button>
-                            </div>
-                        </>
+                        </div>
                     )}
                 </Modal>
             )}
