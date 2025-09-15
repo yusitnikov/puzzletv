@@ -42,6 +42,7 @@ import { lightOrangeColor, lightRedColor } from "../../components/app/globals";
 import { PalindromeConstraint } from "../../components/puzzle/constraints/palindrome/Palindrome";
 import { choiceTaken } from "../../puzzleTypes/adventure/types/AdventureGridState";
 import { joinListSemantically } from "../../utils/array";
+import { indexes } from "../../utils/indexes";
 
 const adventureDef: choiceTaken = {
     initialDigits: {},
@@ -64,7 +65,7 @@ const adventureDef: choiceTaken = {
                         WhispersConstraint(["R3C8", "R3C9", "R2C9", "R2C8", "R1C9"]),
                     ],
                     rules: [
-                        `Grass snakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}`,
+                        `Grass snakes (${translate(germanWhispersTitle)}): ${translate(germanWhispersExplained())}.`,
                     ],
                     choices: {
                         solveCells: ["R2C9", "R3C8", "R3C9", "R7C8", "R8C7", "R8C9"],
@@ -84,7 +85,7 @@ const adventureDef: choiceTaken = {
                                         ArrowConstraint("R7C7", ["R8C6", "R7C5"]),
                                     ],
                                     rules: [
-                                        `Dust devils (arrows): ${translate(arrowsExplained)}, ${translate(canRepeatOnArrows)}`,
+                                        `Dust devils (arrows): ${translate(arrowsExplained)}, ${translate(canRepeatOnArrows)}.`,
                                     ],
                                     choices: {
                                         solveCells: ["R5C4", "R5C6", "R7C4", "R7C5", "R7C7", "R8C2", "R8C6"],
@@ -113,7 +114,7 @@ const adventureDef: choiceTaken = {
                                                         ArrowConstraint("R3C7", ["R3C6", "R3C5"]),
                                                     ],
                                                     rules: [
-                                                        `Lavender rows (${translate(renbanTitle)}): ${translate(renbanExplained())}`,
+                                                        `Lavender rows (${translate(renbanTitle)}): ${translate(renbanExplained())}.`,
                                                     ],
                                                 },
                                             },
@@ -134,7 +135,7 @@ const adventureDef: choiceTaken = {
                                                         WhispersConstraint(["R4C2", "R4C3", "R3C4", "R2C5"]),
                                                     ],
                                                     rules: [
-                                                        `Stone tokens (Even/Odd): ${translate(evenExplained)}, ${translate(oddExplained)}`,
+                                                        `Stone tokens (Even/Odd): ${translate(evenExplained)}, ${translate(oddExplained)}.`,
                                                     ],
                                                 },
                                             },
@@ -155,7 +156,7 @@ const adventureDef: choiceTaken = {
                                         WhispersConstraint(["R9C1", "R8C2", "R8C3", "R7C3", "R6C3"]),
                                     ],
                                     rules: [
-                                        `Wild wheat (dutch whispers): Consecutive digits along the orange line must have difference of 4 or more`,
+                                        `Wild wheat (dutch whispers): Consecutive digits along the orange line must have difference of 4 or more.`,
                                     ],
                                     choices: {
                                         solveCells: ["R5C3", "R6C3", "R7C3", "R8C3", "R8C2", "R9C1", "R7C6", "R7C7"],
@@ -211,7 +212,7 @@ const adventureDef: choiceTaken = {
                                                         WhispersConstraint(["R3C3", "R2C4", "R2C5", "R3C6"]),
                                                     ],
                                                     rules: [
-                                                        `Quartz (Kropki dots): ${translate(whiteKropkiDotsExplained)}, ${translate(blackKropkiDotsExplained)}`,
+                                                        `Quartz (Kropki dots): ${translate(whiteKropkiDotsExplained)}, ${translate(blackKropkiDotsExplained)}.`,
                                                     ],
                                                 },
                                             },
@@ -235,7 +236,7 @@ const adventureDef: choiceTaken = {
                         ThermometerConstraint(["R5C6", "R4C5", "R4C3"]),
                         ThermometerConstraint(["R3C8", "R2C9", "R1C9", "R1C8", "R2C8", "R3C7"]),
                     ],
-                    rules: [`Game trails (Thermometers): ${translate(thermometersExplained)}`],
+                    rules: [`Game trails (Thermometers): ${translate(thermometersExplained)}.`],
                     choices: {
                         solveCells: ["R4C3", "R4C4", "R7C4", "R7C5", "R7C6", "R8C4", "R8C6", "R9C4", "R9C5", "R9C6"],
                         topMessage:
@@ -255,7 +256,7 @@ const adventureDef: choiceTaken = {
                                         KillerCageConstraint(["R1C4", "R2C4", "R3C4", "R3C5"], 11),
                                     ],
                                     rules: [
-                                        `Fences (Killer Cages): ${translate(killerCagesExplained)}, ${translate(cannotRepeatInCage)}`,
+                                        `Fences (Killer Cages): ${translate(killerCagesExplained)}, ${translate(cannotRepeatInCage)}.`,
                                     ],
                                     choices: {
                                         solveCells: ["R3C5", "R3C9", "R7C2", "R8C2", "R9C2", "R8C7", "R8C9"],
@@ -372,7 +373,7 @@ const adventureDef: choiceTaken = {
                                                         XMarkConstraint("R3C6", "R2C6"),
                                                     ],
                                                     rules: [
-                                                        `Rotten wagon wheels (X/V): ${translate(xExplained)}, ${translate(vExplained)}. ${translate(notAllXVGiven)}`,
+                                                        `Rotten wagon wheels (X/V): ${translate(xExplained)}, ${translate(vExplained)}. ${translate(notAllXVGiven)}.`,
                                                     ],
                                                 },
                                             },
@@ -389,7 +390,6 @@ const adventureDef: choiceTaken = {
 };
 
 export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
-    noIndex: true,
     title: { [LanguageCode.en]: "Adventure is out there!" },
     author: { [LanguageCode.en]: "Tumbo" },
     extension: {
@@ -432,9 +432,9 @@ export const ChooseYourOwnAdventure: PuzzleDefinition<AdventurePTM> = {
     resultChecker: isValidFinishedPuzzleByEmbeddedSolution,
     successMessage: (context) =>
         `You are exhausted having fully filled in your map. The sun is getting low and you'll need to hurry to make it home before curfew. You can't wait to tell your parents about the ${joinListSemantically(context.gridExtension.choicesMadeSolutionStrings, translate("and"))}!`,
-    /* lmdLink: "TODO",
+    lmdLink: "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?id=000P7F",
     getLmdSolutionCode: ({ puzzle: { solution } }) =>
         indexes(9)
             .map((index) => solution![0][index])
-            .join(""),*/
+            .join(""),
 };
