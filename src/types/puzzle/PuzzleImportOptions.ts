@@ -95,6 +95,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     supportZero?: boolean;
     caterpillar?: boolean;
     dashedGrid?: boolean;
+    noGridLines?: boolean;
     fractionalSudoku?: boolean;
     cellPieceWidth?: number;
     cellPieceHeight?: number;
@@ -175,6 +176,7 @@ export const sanitizeImportOptions = (
         supportZero,
         caterpillar,
         dashedGrid,
+        noGridLines,
         fractionalSudoku,
         cellPieceWidth = 2,
         cellPieceHeight = 2,
@@ -248,6 +250,7 @@ export const sanitizeImportOptions = (
         supportZero,
         caterpillar,
         dashedGrid,
+        noGridLines,
         fractionalSudoku,
         cellPieceWidth: Number(cellPieceWidth),
         cellPieceHeight: Number(cellPieceHeight),

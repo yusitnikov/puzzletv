@@ -739,6 +739,10 @@ export class PuzzleContext<T extends AnyPTM> implements PuzzleContextOptions<T> 
                     region = RegionConstraint<T>(region);
                 }
 
+                if (noGridLines) {
+                    region.component = undefined;
+                }
+
                 if (cosmeticRegions) {
                     region = toDecorativeConstraint(region);
                 }

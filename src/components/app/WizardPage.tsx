@@ -126,7 +126,10 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [splitUnconnectedRegions, setSplitUnconnectedRegions] = useBoolFromLocalStorage("fpwSplitUnconnectedRegions");
     const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
     const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
-    const [dashedGrid, setDashedGrid] = useBoolFromLocalStorage("fpwDashedGrid");
+    const [gridLinesType, setGridLinesType] = useStringFromLocalStorage<"regular" | "dashed" | "none">(
+        "fpwGridLinesType",
+        "regular",
+    );
     const [fractionalSudoku, setFractionalSudoku] = useBoolFromLocalStorage("fpwFractionalSudoku");
     const [cellPieceWidth, setCellPieceWidth] = useNumberFromLocalStorage("fpwCellPieceWidth", 2);
     const [cellPieceHeight, setCellPieceHeight] = useNumberFromLocalStorage("fpwCellPieceHeight", 2);
@@ -287,7 +290,8 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         stickyJigsawPiece: isJigsaw && finalAngleStep && hasStickyJigsawPiece ? stickyJigsawPiece : undefined,
         splitUnconnectedRegions,
         givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
-        dashedGrid,
+        dashedGrid: gridLinesType === "dashed",
+        noGridLines: gridLinesType === "none",
         fractionalSudoku: isMergedCells && fractionalSudoku,
         cellPieceWidth: isMergedCells && fractionalSudoku ? cellPieceWidth : undefined,
         cellPieceHeight: isMergedCells && fractionalSudoku ? cellPieceHeight : undefined,
@@ -1109,12 +1113,15 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
 
                         <Paragraph>
                             <label>
-                                Dashed grid:&nbsp;
-                                <input
-                                    type={"checkbox"}
-                                    checked={dashedGrid}
-                                    onChange={(ev) => setDashedGrid(ev.target.checked)}
-                                />
+                                Grid lines:&nbsp;
+                                <Select
+                                    value={gridLinesType}
+                                    onChange={(ev) => setGridLinesType(ev.target.value as typeof gridLinesType)}
+                                >
+                                    <option value={"regular"}>regular</option>
+                                    <option value={"dashed"}>dashed</option>
+                                    <option value={"none"}>none</option>
+                                </Select>
                             </label>
                         </Paragraph>
 
