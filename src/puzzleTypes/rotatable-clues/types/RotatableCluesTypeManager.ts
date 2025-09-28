@@ -1,6 +1,6 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { RotatableCluesGameState } from "./RotatableCluesGameState";
-import { getAveragePosition, stringifyPosition } from "../../../types/layout/Position";
+import { getAveragePosition, Position, stringifyPosition } from "../../../types/layout/Position";
 import { AnimatedValue } from "../../../types/struct/AnimatedValue";
 import { RotatableCluesPTM } from "./RotatableCluesPTM";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
@@ -263,7 +263,40 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
                     items = items.filter((item) => !isPivot(item));
                 }
 
-                const getCluePivot = ({ cells }: Constraint<RotatableCluesPTM<T>>) => {
+                const getWheelDigit = (clue: Constraint<any, any>, pivot: Position) => {
+                    const { cells } = clue;
+                    if (!isTextConstraint(clue) || cells.length > 2) {
+                        return undefined;
+                    }
+
+                    const value = Number(clue.props.text);
+                    if (!Number.isFinite(value)) {
+                        return undefined;
+                    }
+
+                    const { top, left } = getAveragePosition(cells);
+                    const dx = pivot.left - left;
+                    const dy = pivot.top - top;
+
+                    if (dx === 0 && dy === -0.5) {
+                        return { index: 3, value };
+                    }
+                    if (dx === 0.5 && dy === 0) {
+                        return { index: 0, value };
+                    }
+                    if (dx === 0 && dy === 0.5) {
+                        return { index: 1, value };
+                    }
+                    if (dx === -0.5 && dy === 0) {
+                        return { index: 2, value };
+                    }
+
+                    return undefined;
+                };
+
+                const getCluePivot = (clue: Constraint<RotatableCluesPTM<T>>) => {
+                    const { cells } = clue;
+
                     if (cells.length) {
                         for (const { top, left } of [...cells, getAveragePosition(cells)]) {
                             for (const { cell, radius } of pivots) {
@@ -271,7 +304,9 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
                                 const dy = cell.top - top;
 
                                 if (dx * dx + dy * dy <= radius * radius) {
-                                    return cell;
+                                    if (!isWheels || getWheelDigit(clue, cell)) {
+                                        return cell;
+                                    }
                                 }
                             }
                         }
@@ -299,31 +334,9 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
                         const digits = Array<number | undefined>(4).fill(undefined);
 
                         for (const clue of clues) {
-                            const { cells } = clue;
-                            if (!isTextConstraint(clue) || cells.length > 2) {
-                                continue;
-                            }
-
-                            const value = Number(clue.props.text);
-                            if (!Number.isFinite(value)) {
-                                continue;
-                            }
-
-                            const { top, left } = getAveragePosition(cells);
-                            const dx = pivot.left - left;
-                            const dy = pivot.top - top;
-
-                            if (dx === 0 && dy === -0.5) {
-                                digits[3] = value;
-                            }
-                            if (dx === 0.5 && dy === 0) {
-                                digits[0] = value;
-                            }
-                            if (dx === 0 && dy === 0.5) {
-                                digits[1] = value;
-                            }
-                            if (dx === -0.5 && dy === 0) {
-                                digits[2] = value;
+                            const wheelDigit = getWheelDigit(clue, pivot);
+                            if (wheelDigit) {
+                                digits[wheelDigit.index] = wheelDigit.value;
                             }
                         }
 
