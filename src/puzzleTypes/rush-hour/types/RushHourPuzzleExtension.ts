@@ -4,7 +4,7 @@ import { Rect } from "../../../types/layout/Rect";
 export interface RushHourCar {
     cells: Position[];
     boundingRect: Rect;
-    color: string;
+    color?: string;
     invert?: boolean;
 }
 

@@ -135,7 +135,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         [PuzzleImportPuzzleType.Jigsaw]: JigsawTypeManager(importOptions),
         [PuzzleImportPuzzleType.Tetris]: TetrisTypeManager(importOptions),
         [PuzzleImportPuzzleType.Shuffled]: ShuffledTypeManager(importOptions),
-        [PuzzleImportPuzzleType.RushHour]: RushHourTypeManager,
+        [PuzzleImportPuzzleType.RushHour]: RushHourTypeManager(importOptions),
         [PuzzleImportPuzzleType.MergedCells]: MergedCellsTypeManager(importOptions),
         [PuzzleImportPuzzleType.Escape]: EscapeTypeManager(),
     };

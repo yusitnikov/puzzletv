@@ -16,11 +16,12 @@ import { processCellsMaps } from "../../../types/puzzle/CellsMap";
 const base = MovePuzzleInputModeInfo<RushHourPTM>();
 
 export const RushHourMovePuzzleInputModeInfo = (
+    isCars: boolean,
     restrictCarCoords?: (car: Rect, isVertical: boolean, context: PuzzleContext<RushHourPTM>) => number,
 ): PuzzleInputModeInfo<RushHourPTM> => ({
     title: {
-        [LanguageCode.en]: "Move the cars",
-        [LanguageCode.ru]: "Двигать машины",
+        [LanguageCode.en]: isCars ? "Move the cars" : "Move the clues",
+        [LanguageCode.ru]: isCars ? "Двигать машины" : "Двигать элементы головоломки",
     },
     mode: PuzzleInputMode.move,
     isNoSelectionMode: true,

@@ -34,6 +34,14 @@ export enum PuzzleImportSource {
     SudokuMaker = "sudoku-maker",
 }
 
+// How to import a rush hour puzzle
+export enum RushHourImportMode {
+    // Import each area of connected cell color as a car
+    Colors = "colors",
+    // Import each clue as an individual car without car visuals
+    Clues = "clues",
+}
+
 export interface PuzzleGridImportOptions {
     source?: PuzzleImportSource;
     load: string;
@@ -99,6 +107,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     fractionalSudoku?: boolean;
     cellPieceWidth?: number;
     cellPieceHeight?: number;
+    rushHourImportMode?: RushHourImportMode;
 }
 
 // Ensure that the object contains only properties of PuzzleImportOptions
@@ -180,6 +189,7 @@ export const sanitizeImportOptions = (
         fractionalSudoku,
         cellPieceWidth = 2,
         cellPieceHeight = 2,
+        rushHourImportMode = RushHourImportMode.Colors,
     } = importOptions as Required<PuzzleImportOptions>;
 
     // noinspection UnnecessaryLocalVariableJS
@@ -254,6 +264,7 @@ export const sanitizeImportOptions = (
         fractionalSudoku,
         cellPieceWidth: Number(cellPieceWidth),
         cellPieceHeight: Number(cellPieceHeight),
+        rushHourImportMode,
     };
 
     return result;

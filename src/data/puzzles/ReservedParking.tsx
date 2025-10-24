@@ -69,19 +69,22 @@ export const ReservedParking: PuzzleDefinitionLoader<ReservedParkingPTM> = {
                     }),
                 }),
                 extraInputModes: [
-                    RushHourMovePuzzleInputModeInfo(({ top, left, width, height }, isVertical, { stateExtension }) => {
-                        const value = isVertical ? top : left;
-                        const size = isVertical ? height : width;
-                        if (!isVertical && top === 2) {
-                            // It's the red car
-                            return value;
-                        }
-                        if ((stateExtension as unknown as MultiStageGameState).stage === 2) {
-                            // There's no cage anymore
-                            return value;
-                        }
-                        return Math.min(value, 6 + carMargin - size);
-                    }) as unknown as PuzzleInputModeInfo<ReservedParkingPTM>,
+                    RushHourMovePuzzleInputModeInfo(
+                        true,
+                        ({ top, left, width, height }, isVertical, { stateExtension }) => {
+                            const value = isVertical ? top : left;
+                            const size = isVertical ? height : width;
+                            if (!isVertical && top === 2) {
+                                // It's the red car
+                                return value;
+                            }
+                            if ((stateExtension as unknown as MultiStageGameState).stage === 2) {
+                                // There's no cage anymore
+                                return value;
+                            }
+                            return Math.min(value, 6 + carMargin - size);
+                        },
+                    ) as unknown as PuzzleInputModeInfo<ReservedParkingPTM>,
                 ],
                 getReactions(context): IReactionDisposer[] {
                     return [

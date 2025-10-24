@@ -25,6 +25,7 @@ import {
     PuzzleImportOptions,
     PuzzleImportPuzzleType,
     PuzzleImportSource,
+    RushHourImportMode,
 } from "../../types/puzzle/PuzzleImportOptions";
 import { loadPuzzle } from "../../types/puzzle/PuzzleDefinition";
 import { observer } from "mobx-react-lite";
@@ -124,6 +125,10 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         useBoolFromLocalStorage("fpwNoStickyRegionValidation");
     const [stickyDigits, setStickyDigits] = useBoolFromLocalStorage("fpwStickyDigits");
     const [splitUnconnectedRegions, setSplitUnconnectedRegions] = useBoolFromLocalStorage("fpwSplitUnconnectedRegions");
+    const [rushHourImportMode, setRushHourImportMode] = useStringFromLocalStorage<RushHourImportMode>(
+        "fpwRushHourImportMode",
+        RushHourImportMode.Colors,
+    );
     const [givenDigitsBlockCars, setGivenDigitsBlockCars] = useBoolFromLocalStorage("fpwGivenDigitsBlockCars");
     const [supportZero, setSupportZero] = useBoolFromLocalStorage("fpwSupportZero");
     const [gridLinesType, setGridLinesType] = useStringFromLocalStorage<"regular" | "dashed" | "none">(
@@ -289,6 +294,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         stickyDigits: (!!finalAngleStep || type === PuzzleImportPuzzleType.Rotatable) && stickyDigits,
         stickyJigsawPiece: isJigsaw && finalAngleStep && hasStickyJigsawPiece ? stickyJigsawPiece : undefined,
         splitUnconnectedRegions,
+        rushHourImportMode: isRushHour ? rushHourImportMode : undefined,
         givenDigitsBlockCars: isRushHour && givenDigitsBlockCars,
         dashedGrid: gridLinesType === "dashed",
         noGridLines: gridLinesType === "none",
@@ -419,7 +425,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                     <option value={PuzzleImportPuzzleType.Jigsaw}>Jigsaw</option>
                                     <option value={PuzzleImportPuzzleType.Tetris}>Tetris</option>
                                     <option value={PuzzleImportPuzzleType.Shuffled}>Shuffled</option>
-                                    <option value={PuzzleImportPuzzleType.RushHour}>Rush hour</option>
+                                    <option value={PuzzleImportPuzzleType.RushHour}>Rush hour / The 15 game</option>
                                     <option value={PuzzleImportPuzzleType.MergedCells}>Merged cells</option>
                                     <option value={PuzzleImportPuzzleType.Escape}>Narrow escape</option>
                                 </Select>
@@ -987,10 +993,25 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                     )}
 
                     {isRushHour && (
-                        <CollapsableFieldSet legend={"Rush Hour"}>
+                        <CollapsableFieldSet legend={"Rush hour / The 15 game"}>
                             <Paragraph>
                                 <label>
-                                    Given digits block cars:&nbsp;
+                                    Import mode:&nbsp;
+                                    <Select
+                                        value={rushHourImportMode}
+                                        onChange={(ev) => setRushHourImportMode(ev.target.value as RushHourImportMode)}
+                                    >
+                                        <option value={RushHourImportMode.Colors}>
+                                            Colors - import each colored area as a car
+                                        </option>
+                                        <option value={RushHourImportMode.Clues}>Clues - make each clue movable</option>
+                                    </Select>
+                                </label>
+                            </Paragraph>
+
+                            <Paragraph>
+                                <label>
+                                    Given digits block cars/tiles:&nbsp;
                                     <input
                                         type={"checkbox"}
                                         checked={givenDigitsBlockCars}

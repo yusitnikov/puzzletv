@@ -309,6 +309,10 @@ export const RushHourCars = observer(function RushHourCars({ region, context }: 
     return (
         <g opacity={hideCars && inputMode !== PuzzleInputMode.move ? 0.3 : undefined}>
             {extension.cars.map(({ boundingRect: { top, left, width, height }, color, invert }, index) => {
+                if (color === undefined) {
+                    return null;
+                }
+
                 const carPosition = getAnimatedCarPosition(context, index);
 
                 return (

@@ -23,15 +23,17 @@ import { CellTypeProps } from "../../../types/puzzle/CellTypeProps";
 import { createRandomGenerator } from "../../../utils/random";
 import { cloneConstraint, Constraint, isValidFinishedPuzzleByConstraints } from "../../../types/puzzle/Constraint";
 import { settings } from "../../../types/layout/Settings";
-import { ColorsImportMode } from "../../../types/puzzle/PuzzleImportOptions";
+import { ColorsImportMode, PuzzleImportOptions, RushHourImportMode } from "../../../types/puzzle/PuzzleImportOptions";
 import {
-    addGridStateExToPuzzleTypeManager,
     addGameStateExToPuzzleTypeManager,
+    addGridStateExToPuzzleTypeManager,
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { RushHourGridState } from "./RushHourGridState";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 
-export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
+export const RushHourTypeManager = ({
+    rushHourImportMode = RushHourImportMode.Colors,
+}: PuzzleImportOptions): PuzzleTypeManager<RushHourPTM> => ({
     ...addGameStateExToPuzzleTypeManager(
         addGridStateExToPuzzleTypeManager(DigitPuzzleTypeManager(), {
             initialGridStateExtension(puzzle): RushHourGridState {
@@ -152,7 +154,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
     colorsImportMode: ColorsImportMode.Initials,
 
     disabledInputModes: [PuzzleInputMode.move],
-    extraInputModes: [RushHourMovePuzzleInputModeInfo()],
+    extraInputModes: [RushHourMovePuzzleInputModeInfo(rushHourImportMode === RushHourImportMode.Colors)],
 
     postProcessPuzzle(puzzle): PuzzleDefinition<RushHourPTM> {
         let {
@@ -161,6 +163,10 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
             resultChecker,
             items = [],
         } = puzzle;
+
+        if (!Array.isArray(items)) {
+            throw new Error("puzzle.items is expected to be an array for RushHourTypeManager");
+        }
 
         puzzle = {
             ...puzzle,
@@ -171,58 +177,72 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
             allowDrawing: undefined,
         };
 
-        if (typeof initialColors === "object") {
-            puzzle.initialColors = {};
+        const moveClueToCar = (item: Constraint<RushHourPTM, any>, carIndex: number) => ({
+            ...cloneConstraint(item, {
+                processCellCoords: ({ top, left }) => ({ top, left: left + gridSize }),
+            }),
+            carIndex,
+        });
 
-            const carsMap: Record<string, RushHourCar> = {};
-            for (const [topStr, row] of Object.entries(initialColors)) {
-                const top = Number(topStr);
-                puzzle.initialColors[top] = {};
-                for (const [leftStr, colors] of Object.entries(row)) {
-                    const left = Number(leftStr);
-                    const offsetLeft = left + gridSize;
-                    if (colors.length === 0) {
-                        continue;
-                    }
-                    const resolvedColors = colors.map(resolveCellColorValue);
-                    const averageColor = getAverageColorsStr(resolvedColors);
+        let cars: RushHourCar[] = [];
+        let processedItems: (Constraint<RushHourPTM, any> & { carIndex?: number })[] = items;
 
-                    const { [left]: initialDigit, ...rowInitialDigits } = puzzle.initialDigits?.[top] ?? {};
-                    if (initialDigit !== undefined) {
-                        puzzle.initialDigits = {
-                            ...puzzle.initialDigits,
-                            [top]: {
-                                ...rowInitialDigits,
-                                [offsetLeft]: initialDigit,
-                            },
-                        };
-                    }
-
-                    const key = resolvedColors.join(",");
-                    carsMap[key] = carsMap[key] ?? {
-                        cells: [],
-                        color: averageColor,
-                    };
-                    carsMap[key].cells.push({ top, left: offsetLeft });
+        switch (puzzle.importOptions?.rushHourImportMode ?? RushHourImportMode.Colors) {
+            case RushHourImportMode.Colors: {
+                if (typeof initialColors !== "object") {
+                    break;
                 }
-            }
 
-            const cellsIndex = new PuzzleCellsIndex(puzzle);
-            const randomizer = createRandomGenerator(0);
-            const cars = Object.values(carsMap).flatMap(({ color, cells }) =>
-                cellsIndex.splitUnconnectedRegions([cells]).map(
-                    (cells): RushHourCar => ({
-                        color,
-                        invert: randomizer() < 0.5,
-                        cells,
-                        boundingRect: getRegionBoundingBox(cells, 1),
-                    }),
-                ),
-            );
-            puzzle.extension = { cars };
+                puzzle.initialColors = {};
 
-            if (Array.isArray(items)) {
-                const processedItems = items.map(
+                const carsMap: Record<string, RushHourCar> = {};
+                for (const [topStr, row] of Object.entries(initialColors)) {
+                    const top = Number(topStr);
+                    puzzle.initialColors[top] = {};
+                    for (const [leftStr, colors] of Object.entries(row)) {
+                        const left = Number(leftStr);
+                        const offsetLeft = left + gridSize;
+                        if (colors.length === 0) {
+                            continue;
+                        }
+                        const resolvedColors = colors.map(resolveCellColorValue);
+                        const averageColor = getAverageColorsStr(resolvedColors);
+
+                        const { [left]: initialDigit, ...rowInitialDigits } = puzzle.initialDigits?.[top] ?? {};
+                        if (initialDigit !== undefined) {
+                            puzzle.initialDigits = {
+                                ...puzzle.initialDigits,
+                                [top]: {
+                                    ...rowInitialDigits,
+                                    [offsetLeft]: initialDigit,
+                                },
+                            };
+                        }
+
+                        const key = resolvedColors.join(",");
+                        carsMap[key] = carsMap[key] ?? {
+                            cells: [],
+                            color: averageColor,
+                        };
+                        carsMap[key].cells.push({ top, left: offsetLeft });
+                    }
+                }
+
+                const cellsIndex = new PuzzleCellsIndex(puzzle);
+                const randomizer = createRandomGenerator(0);
+                cars = Object.values(carsMap).flatMap(({ color, cells }) =>
+                    cellsIndex.splitUnconnectedRegions([cells]).map(
+                        (cells): RushHourCar => ({
+                            color,
+                            invert: randomizer() < 0.5,
+                            cells,
+                            boundingRect: getRegionBoundingBox(cells, 1),
+                        }),
+                    ),
+                );
+                puzzle.extension = { cars };
+
+                puzzle.items = processedItems = items.map(
                     (item: Constraint<RushHourPTM, any>): typeof item & { carIndex?: number } => {
                         if (item.cells.length === 0) {
                             return item;
@@ -249,86 +269,95 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
                                 itemBottom <= top + height &&
                                 itemRight <= left + width
                             ) {
-                                return {
-                                    ...cloneConstraint(item, {
-                                        processCellCoords: ({ top, left }) => ({ top, left: left + gridSize }),
-                                    }),
-                                    carIndex,
-                                };
+                                return moveClueToCar(item, carIndex);
                             }
                         }
 
                         return item;
                     },
                 );
-                puzzle = {
-                    ...puzzle,
-                    items: processedItems,
-                };
-
-                if (resultChecker) {
-                    puzzle.resultChecker = (context) => {
-                        const {
-                            puzzle,
-                            puzzleIndex,
-                            gridExtension: { cars: carPositions },
-                        } = context;
-                        const { initialDigits = {} } = puzzle;
-
-                        const carInitialDigits: CellsMap<number> = {};
-                        for (const [index, { cells }] of cars.entries()) {
-                            let { top, left } = carPositions[index];
-                            top = Math.round(top);
-                            left = Math.round(left);
-                            for (const cell of cells) {
-                                const digit = initialDigits[cell.top]?.[cell.left];
-                                if (digit !== undefined) {
-                                    const offsetTop = cell.top + top;
-                                    const offsetLeft = cell.left + left;
-                                    carInitialDigits[offsetTop] = carInitialDigits[offsetTop] ?? {};
-                                    carInitialDigits[offsetTop][offsetLeft] = digit;
-                                }
-                            }
-                        }
-
-                        const fixedContext = context.cloneWith({
-                            puzzle: {
-                                ...puzzle,
-                                initialDigits: mergeCellsMaps(carInitialDigits, initialDigits),
-                                items: processedItems.map(({ carIndex, ...item }) => {
-                                    if (carIndex !== undefined) {
-                                        const position = carPositions[carIndex];
-                                        return cloneConstraint(item, {
-                                            processCellCoords: ({ top, left }) => ({
-                                                top: Math.round(top + position.top),
-                                                left: Math.round(left + position.left),
-                                            }),
-                                        });
-                                    }
-                                    return item;
-                                }),
-                            },
-                            puzzleIndex,
-                        });
-
-                        if (resultChecker !== isValidFinishedPuzzleByConstraints) {
-                            const result2 = isValidFinishedPuzzleByConstraints(fixedContext);
-                            if (!result2.isCorrectResult) {
-                                return result2;
-                            }
-                        }
-
-                        return resultChecker!(fixedContext);
-                    };
-                }
+                break;
             }
+            case RushHourImportMode.Clues: {
+                puzzle.extension = { cars };
+                puzzle.items = processedItems = items.map((item) => {
+                    const { cells } = item;
+                    if (cells.length === 0) {
+                        return item;
+                    }
+
+                    const movedItem = moveClueToCar(item, cars.length);
+                    cars.push({
+                        cells: movedItem.cells,
+                        boundingRect: getRegionBoundingBox(movedItem.cells, 1),
+                    });
+                    return movedItem;
+                });
+                break;
+            }
+        }
+
+        if (resultChecker) {
+            puzzle.resultChecker = (context) => {
+                const {
+                    puzzle,
+                    puzzleIndex,
+                    gridExtension: { cars: carPositions },
+                } = context;
+                const { initialDigits = {} } = puzzle;
+
+                const carInitialDigits: CellsMap<number> = {};
+                for (const [index, { cells }] of cars.entries()) {
+                    let { top, left } = carPositions[index];
+                    top = Math.round(top);
+                    left = Math.round(left);
+                    for (const cell of cells) {
+                        const digit = initialDigits[cell.top]?.[cell.left];
+                        if (digit !== undefined) {
+                            const offsetTop = cell.top + top;
+                            const offsetLeft = cell.left + left;
+                            carInitialDigits[offsetTop] = carInitialDigits[offsetTop] ?? {};
+                            carInitialDigits[offsetTop][offsetLeft] = digit;
+                        }
+                    }
+                }
+
+                const fixedContext = context.cloneWith({
+                    puzzle: {
+                        ...puzzle,
+                        initialDigits: mergeCellsMaps(carInitialDigits, initialDigits),
+                        items: processedItems.map(({ carIndex, ...item }) => {
+                            if (carIndex !== undefined) {
+                                const position = carPositions[carIndex];
+                                return cloneConstraint(item, {
+                                    processCellCoords: ({ top, left }) => ({
+                                        top: Math.round(top + position.top),
+                                        left: Math.round(left + position.left),
+                                    }),
+                                });
+                            }
+                            return item;
+                        }),
+                    },
+                    puzzleIndex,
+                });
+
+                if (resultChecker !== isValidFinishedPuzzleByConstraints) {
+                    const result2 = isValidFinishedPuzzleByConstraints(fixedContext);
+                    if (!result2.isCorrectResult) {
+                        return result2;
+                    }
+                }
+
+                return resultChecker!(fixedContext);
+            };
         }
 
         return puzzle;
     },
 
     controlButtons: [
-        {
+        rushHourImportMode === RushHourImportMode.Colors && {
             key: "rush-hour-hide-cars",
             region: ControlButtonRegion.right,
             Component: RushHourHideCarsButton,
@@ -338,7 +367,7 @@ export const RushHourTypeManager: PuzzleTypeManager<RushHourPTM> = {
     items: [RushHourCarsConstraint],
 
     // TODO: support shared games
-};
+});
 
 export const getAnimatedCarPosition = (context: PuzzleContext<RushHourPTM>, index: number) =>
     context.getCachedItem(
