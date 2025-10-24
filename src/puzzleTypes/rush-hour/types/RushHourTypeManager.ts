@@ -164,10 +164,6 @@ export const RushHourTypeManager = ({
             items = [],
         } = puzzle;
 
-        if (!Array.isArray(items)) {
-            throw new Error("puzzle.items is expected to be an array for RushHourTypeManager");
-        }
-
         puzzle = {
             ...puzzle,
             gridSize: {
@@ -185,7 +181,7 @@ export const RushHourTypeManager = ({
         });
 
         let cars: RushHourCar[] = [];
-        let processedItems: (Constraint<RushHourPTM, any> & { carIndex?: number })[] = items;
+        let processedItems: (Constraint<RushHourPTM, any> & { carIndex?: number })[] | undefined = undefined;
 
         switch (puzzle.importOptions?.rushHourImportMode ?? RushHourImportMode.Colors) {
             case RushHourImportMode.Colors: {
@@ -242,6 +238,10 @@ export const RushHourTypeManager = ({
                 );
                 puzzle.extension = { cars };
 
+                if (!Array.isArray(items)) {
+                    break;
+                }
+
                 puzzle.items = processedItems = items.map(
                     (item: Constraint<RushHourPTM, any>): typeof item & { carIndex?: number } => {
                         if (item.cells.length === 0) {
@@ -280,6 +280,11 @@ export const RushHourTypeManager = ({
             }
             case RushHourImportMode.Clues: {
                 puzzle.extension = { cars };
+
+                if (!Array.isArray(items)) {
+                    throw new Error("puzzle.items is expected to be an array for RushHourTypeManager");
+                }
+
                 puzzle.items = processedItems = items.map((item) => {
                     const { cells } = item;
                     if (cells.length === 0) {
@@ -297,7 +302,7 @@ export const RushHourTypeManager = ({
             }
         }
 
-        if (resultChecker) {
+        if (resultChecker && processedItems !== undefined) {
             puzzle.resultChecker = (context) => {
                 const {
                     puzzle,
@@ -326,7 +331,7 @@ export const RushHourTypeManager = ({
                     puzzle: {
                         ...puzzle,
                         initialDigits: mergeCellsMaps(carInitialDigits, initialDigits),
-                        items: processedItems.map(({ carIndex, ...item }) => {
+                        items: processedItems!.map(({ carIndex, ...item }) => {
                             if (carIndex !== undefined) {
                                 const position = carPositions[carIndex];
                                 return cloneConstraint(item, {
