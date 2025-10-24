@@ -64,7 +64,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
 
         const borderPadding = (inverted ? -1 : 1) * (prioritizeSelection ? 0.15 : 0.1);
         const sumPadding = prioritizeSelection ? 0.17 : largeSum ? 0.12 : borderPadding;
-        const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.15;
+        const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.2;
 
         const angle = useCompensationAngle(context);
 
