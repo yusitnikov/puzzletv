@@ -11,7 +11,7 @@ import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { PuzzleInputMode } from "../../../types/puzzle/PuzzleInputMode";
 import { Rect } from "../../../types/layout/Rect";
 import { carMargin } from "../components/RushHourCar";
-import { processCellsMaps } from "../../../types/puzzle/CellsMap";
+import { CellsMap, processCellsMaps } from "../../../types/puzzle/CellsMap";
 
 const base = MovePuzzleInputModeInfo<RushHourPTM>();
 
@@ -48,7 +48,8 @@ export const RushHourMovePuzzleInputModeInfo = (
         }
         const carRects = puzzle.extension.cars.map(({ boundingRect }) => boundingRect);
         const carRect = carRects[carIndex];
-        const isVertical = carRect.height > carRect.width;
+
+        const { direction, cells } = puzzle.extension.cars[carIndex];
 
         context.onStateChange(
             rushHourCarStateChangeAction(
@@ -57,25 +58,26 @@ export const RushHourMovePuzzleInputModeInfo = (
                 `gesture-${id}`,
                 carIndex,
                 ({ top, left }, prevPositions) => {
-                    const offsetRects = carRects.map(
-                        ({ top, left, width, height }, index): Rect => ({
-                            top: top + prevPositions[index].top,
-                            left: left + prevPositions[index].left,
-                            width,
-                            height,
-                        }),
-                    );
-                    offsetRects.splice(carIndex, 1);
+                    const blockedCells: CellsMap<boolean> = {};
+
+                    const blockCell = (top: number, left: number) => {
+                        blockedCells[top] ??= {};
+                        blockedCells[top][left] = true;
+                    };
+
+                    for (const [index, position] of prevPositions.entries()) {
+                        if (index === carIndex) {
+                            continue;
+                        }
+
+                        for (const cell of puzzle.extension.cars[index].cells) {
+                            blockCell(cell.top + position.top, cell.left + position.left);
+                        }
+                    }
 
                     if (givenDigitsBlockCars) {
                         processCellsMaps(
-                            ([_digit], position) => {
-                                offsetRects.push({
-                                    ...position,
-                                    width: 1,
-                                    height: 1,
-                                });
-                            },
+                            (_, position) => blockCell(position.top, position.left),
                             [puzzle.initialDigits ?? {}],
                         );
                     }
@@ -83,75 +85,96 @@ export const RushHourMovePuzzleInputModeInfo = (
                     const offsetTop = top + carRect.top;
                     const offsetLeft = left + carRect.left;
 
-                    if (isVertical) {
-                        let newTop = offsetTop + (currentMetrics.y - startMetrics.y) / cellSize;
-                        newTop = Math.max(-carMargin, newTop);
-                        newTop = Math.min(gridSize + carMargin - carRect.height, newTop);
+                    let targetTop = offsetTop,
+                        targetLeft = offsetLeft;
+                    if (direction !== "horizontal") {
+                        targetTop = offsetTop + (currentMetrics.y - startMetrics.y) / cellSize;
+                        targetTop = Math.max(-carMargin, targetTop);
+                        targetTop = Math.min(gridSize + carMargin - carRect.height, targetTop);
 
                         if (restrictCarCoords) {
-                            newTop = restrictCarCoords(
+                            targetTop = restrictCarCoords(
                                 {
                                     ...carRect,
-                                    top: newTop,
-                                    left: offsetLeft,
+                                    top: targetTop,
+                                    left: targetLeft,
                                 },
-                                isVertical,
+                                true,
                                 context,
                             );
                         }
-
-                        for (const offsetRect of offsetRects) {
-                            if (
-                                offsetRect.left + offsetRect.width > offsetLeft &&
-                                offsetRect.left < offsetLeft + carRect.width
-                            ) {
-                                if (offsetRect.top < offsetTop) {
-                                    newTop = Math.max(offsetRect.top + offsetRect.height - carMargin * 2, newTop);
-                                } else {
-                                    newTop = Math.min(offsetRect.top + carMargin * 2 - carRect.height, newTop);
-                                }
-                            }
-                        }
-
-                        return {
-                            top: newTop - carRect.top,
-                            left,
-                        };
-                    } else {
-                        let newLeft = offsetLeft + (currentMetrics.x - startMetrics.x) / cellSize;
-                        newLeft = Math.max(-carMargin, newLeft);
-                        newLeft = Math.min(gridSize + carMargin - carRect.width, newLeft);
-
-                        if (restrictCarCoords) {
-                            newLeft = restrictCarCoords(
-                                {
-                                    ...carRect,
-                                    top: offsetTop,
-                                    left: newLeft,
-                                },
-                                isVertical,
-                                context,
-                            );
-                        }
-
-                        for (const offsetRect of offsetRects) {
-                            if (
-                                offsetRect.top + offsetRect.height > offsetTop &&
-                                offsetRect.top < offsetTop + carRect.height
-                            ) {
-                                if (offsetRect.left < offsetLeft) {
-                                    newLeft = Math.max(offsetRect.left + offsetRect.width - carMargin * 2, newLeft);
-                                } else {
-                                    newLeft = Math.min(offsetRect.left + carMargin * 2 - carRect.width, newLeft);
-                                }
-                            }
-                        }
-
-                        return {
-                            top,
-                            left: newLeft - carRect.left,
-                        };
                     }
+                    if (direction !== "vertical") {
+                        targetLeft = offsetLeft + (currentMetrics.x - startMetrics.x) / cellSize;
+                        targetLeft = Math.max(-carMargin, targetLeft);
+                        targetLeft = Math.min(gridSize + carMargin - carRect.width, targetLeft);
+
+                        if (restrictCarCoords) {
+                            targetLeft = restrictCarCoords(
+                                {
+                                    ...carRect,
+                                    top: targetTop,
+                                    left: targetLeft,
+                                },
+                                false,
+                                context,
+                            );
+                        }
+                    }
+
+                    let newTop = Math.round(prevPositions[carIndex].top + carRect.top),
+                        newLeft = Math.round(prevPositions[carIndex].left + carRect.left);
+
+                    const canMoveTo = (newTop: number, newLeft: number) =>
+                        cells.every(
+                            ({ top, left }) =>
+                                !blockedCells[top + newTop - carRect.top]?.[left + newLeft - carRect.left],
+                        );
+
+                    while (true) {
+                        const dx = Math.round(targetLeft) - newLeft;
+                        const dy = Math.round(targetTop) - newTop;
+                        const newLeft2 = newLeft + Math.sign(dx);
+                        const newTop2 = newTop + Math.sign(dy);
+                        const canMoveX = Math.abs(dx) >= 1 && canMoveTo(newTop, newLeft2);
+                        const canMoveY = Math.abs(dy) >= 1 && canMoveTo(newTop2, newLeft);
+                        if (!canMoveX && !canMoveY) {
+                            break;
+                        }
+
+                        if (!canMoveY || (canMoveX && Math.abs(dx) > Math.abs(dy))) {
+                            newLeft = newLeft2;
+                        } else {
+                            newTop = newTop2;
+                        }
+                    }
+
+                    const dx = targetLeft - newLeft;
+                    const dy = targetTop - newTop;
+                    const newLeft2 = newLeft + Math.sign(dx);
+                    const newTop2 = newTop + Math.sign(dy);
+                    let canMoveX = canMoveTo(newTop, newLeft2);
+                    let canMoveY = canMoveTo(newTop2, newLeft);
+                    if (canMoveX && canMoveY && canMoveTo(newTop2, newLeft2)) {
+                        newTop = targetTop;
+                        newLeft = targetLeft;
+                    } else {
+                        if (canMoveX && canMoveY) {
+                            if (Math.abs(dx) > Math.abs(dy)) {
+                                canMoveY = false;
+                            } else {
+                                canMoveX = false;
+                            }
+                        }
+
+                        newLeft += Math.sign(dx) * Math.min(Math.abs(dx), canMoveX ? 1 : carMargin * 2);
+                        newTop += Math.sign(dy) * Math.min(Math.abs(dy), canMoveY ? 1 : carMargin * 2);
+                    }
+
+                    return {
+                        top: newTop - carRect.top,
+                        left: newLeft - carRect.left,
+                    };
                 },
                 false,
             ),

@@ -6,6 +6,7 @@ export interface RushHourCar {
     boundingRect: Rect;
     color?: string;
     invert?: boolean;
+    direction?: "vertical" | "horizontal";
 }
 
 export interface RushHourPuzzleExtension {

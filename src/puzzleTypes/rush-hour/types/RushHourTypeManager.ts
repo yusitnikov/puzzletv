@@ -227,14 +227,17 @@ export const RushHourTypeManager = ({
                 const cellsIndex = new PuzzleCellsIndex(puzzle);
                 const randomizer = createRandomGenerator(0);
                 cars = Object.values(carsMap).flatMap(({ color, cells }) =>
-                    cellsIndex.splitUnconnectedRegions([cells]).map(
-                        (cells): RushHourCar => ({
+                    cellsIndex.splitUnconnectedRegions([cells]).map((cells): RushHourCar => {
+                        const boundingRect = getRegionBoundingBox(cells, 1);
+
+                        return {
                             color,
                             invert: randomizer() < 0.5,
                             cells,
-                            boundingRect: getRegionBoundingBox(cells, 1),
-                        }),
-                    ),
+                            boundingRect,
+                            direction: boundingRect.height > boundingRect.width ? "vertical" : "horizontal",
+                        };
+                    }),
                 );
                 puzzle.extension = { cars };
 
