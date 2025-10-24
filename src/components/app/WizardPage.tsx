@@ -171,7 +171,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
 
     const finalAngleStep = isTetris
         ? 90
-        : isJigsaw || (rotatableClues && freeRotation)
+        : isJigsaw || (!isSpecialGrid && rotatableClues && freeRotation)
           ? angleStep || undefined
           : undefined;
 
