@@ -31,6 +31,7 @@ import {
 import { RushHourGridState } from "./RushHourGridState";
 import { PuzzleContext } from "../../../types/puzzle/PuzzleContext";
 import { isRect } from "../../../components/puzzle/constraints/decorative-shape/DecorativeShape";
+import { isTextConstraint } from "../../../components/puzzle/constraints/text/Text";
 
 export const RushHourTypeManager = ({
     rushHourImportMode = RushHourImportMode.Colors,
@@ -291,7 +292,7 @@ export const RushHourTypeManager = ({
 
                 puzzle.items = processedItems = items.map((item) => {
                     const { cells } = item;
-                    if (cells.length === 0 || isRect(item)) {
+                    if (cells.length === 0 || isRect(item) || isTextConstraint(item)) {
                         return item;
                     }
 
