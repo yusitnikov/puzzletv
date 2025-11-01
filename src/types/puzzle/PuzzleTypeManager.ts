@@ -313,6 +313,8 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     disableMouseHandlers?: boolean;
 
     disableSelectAllCells?: boolean;
+
+    boldCages?: boolean;
 }
 
 // region Helper functions

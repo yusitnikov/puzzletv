@@ -376,6 +376,8 @@ export const RushHourTypeManager = ({
 
     items: [RushHourCarsConstraint],
 
+    boldCages: true,
+
     // TODO: support shared games
 });
 

@@ -15,7 +15,7 @@ import { indexes } from "../../../../utils/indexes";
 import { CenteredText } from "../../../svg/centered-text/CenteredText";
 import { incrementArrayItemByIndex } from "../../../../utils/array";
 import { AnyPTM } from "../../../../types/puzzle/PuzzleTypeMap";
-import { useCompensationAngle } from "../../../../contexts/TransformContext";
+import { useCompensationAngle, useTransformScale } from "../../../../contexts/TransformContext";
 import { AutoSvg } from "../../../svg/auto-svg/AutoSvg";
 import { observer } from "mobx-react-lite";
 import { profiler } from "../../../../utils/profiler";
@@ -66,6 +66,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
         const sumPadding = prioritizeSelection ? 0.17 : largeSum ? 0.12 : borderPadding;
         const sumDigitSize = prioritizeSelection || largeSum ? 0.25 : 0.2;
 
+        const scale = useTransformScale();
         const angle = useCompensationAngle(context);
 
         return (
@@ -86,7 +87,7 @@ export const KillerCage: ConstraintPropsGenericFcMap<KillerCageProps> = {
                             };
                         }),
                     )}
-                    strokeWidth={0.02}
+                    strokeWidth={(puzzle.typeManager.boldCages ? 2 : 1) / scale}
                     strokeDasharray={0.15}
                     stroke={lineColor}
                     fill={"none"}
