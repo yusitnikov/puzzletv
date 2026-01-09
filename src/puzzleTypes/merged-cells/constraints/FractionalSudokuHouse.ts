@@ -1,9 +1,11 @@
 import { Constraint } from "../../../types/puzzle/Constraint";
 import { AnyPTM } from "../../../types/puzzle/PuzzleTypeMap";
 import { MergedCellShape } from "../types/MergedCellShape";
+import { regionTag } from "../../../components/puzzle/constraints/region/Region";
 
 export const FractionalSudokuHouseConstraint = <T extends AnyPTM>(cellShapes: MergedCellShape[]): Constraint<T> => ({
     name: "house",
+    tags: [regionTag],
     cells: cellShapes.map((region) => region.mainCell),
     props: undefined,
     isObvious: true,
