@@ -14,7 +14,7 @@ export const LinesPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInf
     isActiveForPuzzle: ({ allowDrawing = [] }) => allowDrawing.length !== 0,
     hotKeyStr: ["Alt"],
     isNoSelectionMode: true,
-    onCornerClick: ({ gesture: { id } }, context, { exact }) =>
+    onCornerClick: (_props, context, { exact }) =>
         context.onStateChange((context) => gameStateStartMultiLine(context, exact)),
     onCornerEnter: (
         {
@@ -22,7 +22,10 @@ export const LinesPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInf
                 id,
                 pointers: [
                     {
-                        start: { extraData },
+                        start: {
+                            extraData,
+                            event: { button },
+                        },
                     },
                 ],
             },
@@ -34,7 +37,7 @@ export const LinesPuzzleInputModeInfo = <T extends AnyPTM>(): PuzzleInputModeInf
         if (context.puzzle.typeManager.regionSpecificUserMarks && startRegionIndex !== cellData.regionIndex) {
             return;
         }
-        context.onStateChange((context) => gameStateContinueMultiLine(context, cellData));
+        context.onStateChange((context) => gameStateContinueMultiLine(context, cellData, !!button));
     },
     onGestureEnd: (
         {
