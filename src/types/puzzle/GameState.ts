@@ -1145,7 +1145,7 @@ export const gameStateContinueMultiLine = <T extends AnyPTM>(
         currentMultiLineEnd: normalizePuzzlePosition(position, puzzle),
         dragAction:
             context.currentMultiLine.length === 0
-                ? context.lines.contains(newLines[0])
+                ? context.lines.find(newLines[0])?.color === newLines[0].color
                     ? DragAction.SetUndefined
                     : DragAction.SetTrue
                 : context.dragAction,
