@@ -47,6 +47,7 @@ import { SudokuMakerGridParserFactory } from "./SudokuMaker";
 import { SlideAndSeekTypeManager } from "../../puzzleTypes/slide-and-seek/types/SlideAndSeekTypeManager";
 import { MergedCellsTypeManager } from "../../puzzleTypes/merged-cells/types/MergedCellsTypeManager";
 import { EscapeTypeManager } from "../../puzzleTypes/escape/types/EscapeTypeManager";
+import { MasyuTypeManager } from "../../puzzleTypes/masyu/types/MasyuTypeManager";
 
 const getGridParsersByImportOptions = <T extends AnyPTM>(
     importOptions: PuzzleImportOptions,
@@ -107,6 +108,7 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
         eggs,
         screws,
         fillableQuads,
+        masyu,
         find3,
         giftsInSight,
         caterpillar,
@@ -185,6 +187,9 @@ export const detectTypeManagerByImportOptions = <T extends AnyPTM, JsonT>(
                 return position !== undefined && arrayContainsPosition(givenQuads, position);
             },
         });
+    }
+    if (masyu) {
+        typeManager = MasyuTypeManager(typeManager);
     }
     if (find3) {
         typeManager = Find3TypeManager(typeManager, giftsInSight);

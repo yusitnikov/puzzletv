@@ -137,7 +137,10 @@ export class ControlButtonsManager<T extends AnyPTM> {
         }
 
         this.isCompact = !allowedInputModes.some(
-            ({ mode, isDigitMode }) => isDigitMode || [PuzzleInputMode.color, PuzzleInputMode.shading].includes(mode),
+            ({ mode, isDigitMode, secondaryButtonContent }) =>
+                isDigitMode ||
+                !secondaryButtonContent ||
+                [PuzzleInputMode.color, PuzzleInputMode.shading].includes(mode),
         );
 
         const hasBottomRowControls = additional.length !== 0 || modes.length + right.length > 8;

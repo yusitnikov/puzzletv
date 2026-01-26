@@ -103,6 +103,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const [slideAndSeek, setSlideAndSeek] = useBoolFromLocalStorage("fpwSlideAndSeek");
     const [slideAndSeekDigits, setSlideAndSeekDigits] = useBoolFromLocalStorage("fpwSlideAndSeekDigits");
     const [fillableQuads, setFillableQuads] = useBoolFromLocalStorage("fpwFillableQuads");
+    const [masyu, setMasyu] = useBoolFromLocalStorage("fpwMasyu");
     const [find3, setFind3] = useBoolFromLocalStorage("fpwFind3");
     const [giftsInSight, setGiftsInSight] = useBoolFromLocalStorage("fpwGiftsInSight");
     const [productArrow, setProductArrow] = useBoolFromLocalStorage("fpwProductArrow");
@@ -263,6 +264,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         slideAndSeek: !isSpecialGrid && slideAndSeek,
         slideAndSeekDigits: !isSpecialGrid && slideAndSeek && slideAndSeekDigits,
         fillableQuads: !isSpecialGrid && fillableQuads,
+        masyu: !isSpecialGrid && masyu,
         find3,
         giftsInSight: find3 && giftsInSight,
         "product-arrow": hasArrows && productArrow,
@@ -655,6 +657,17 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                             type={"checkbox"}
                                             checked={fillableQuads}
                                             onChange={(ev) => setFillableQuads(ev.target.checked)}
+                                        />
+                                    </label>
+                                </Paragraph>
+
+                                <Paragraph>
+                                    <label>
+                                        Masyu:&nbsp;
+                                        <input
+                                            type={"checkbox"}
+                                            checked={masyu}
+                                            onChange={(ev) => setMasyu(ev.target.checked)}
                                         />
                                     </label>
                                 </Paragraph>

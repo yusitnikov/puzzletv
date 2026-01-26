@@ -63,6 +63,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     slideAndSeek?: boolean;
     slideAndSeekDigits?: boolean;
     fillableQuads?: boolean;
+    masyu?: boolean;
     find3?: boolean;
     giftsInSight?: boolean;
     fillableDigitalDisplay?: boolean;
@@ -143,6 +144,7 @@ export const sanitizeImportOptions = (
         slideAndSeek,
         slideAndSeekDigits,
         fillableQuads,
+        masyu,
         find3,
         giftsInSight,
         fillableDigitalDisplay,
@@ -211,6 +213,7 @@ export const sanitizeImportOptions = (
         slideAndSeek,
         slideAndSeekDigits,
         fillableQuads,
+        masyu,
         find3,
         giftsInSight,
         fillableDigitalDisplay,
