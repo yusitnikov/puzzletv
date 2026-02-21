@@ -27,6 +27,7 @@ import { PuzzleImporter } from "../../data/puzzles/PuzzleImporter";
 import { GridParser } from "../../data/puzzles/GridParser";
 import { GridState } from "./GridState";
 import { PuzzleLine } from "./PuzzleLine";
+import { GridLayer } from "./GridLayer";
 
 export interface PuzzleTypeManager<T extends AnyPTM> {
     /*
@@ -277,6 +278,12 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
         prop: P,
         value: PuzzleDefinition<T>[P],
     ): boolean;
+
+    overrideImportedCosmeticLayer?(
+        puzzle: PuzzleDefinition<T>,
+        item: Constraint<T, any>,
+        currentLayer: GridLayer,
+    ): GridLayer | undefined;
 
     fixCellPosition?(position: Position, puzzle: PuzzleDefinition<T>): Position | undefined;
 

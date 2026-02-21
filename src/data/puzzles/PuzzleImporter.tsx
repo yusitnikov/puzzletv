@@ -164,11 +164,23 @@ export class PuzzleImporter<T extends AnyPTM> {
     }
 
     private cosmeticsLayer(gridParser: GridParser<T, any>, beforeLines = false) {
-        const { rotatableClues, keepCircles, cosmeticsBehindFog } = this.finalImportOptions(gridParser);
+        const { cosmeticsBehindFog } = this.finalImportOptions(gridParser);
 
-        return (rotatableClues && keepCircles) || beforeLines || cosmeticsBehindFog
-            ? GridLayer.beforeSelection
-            : GridLayer.afterLines;
+        return beforeLines || cosmeticsBehindFog ? GridLayer.beforeSelection : GridLayer.afterLines;
+    }
+
+    private withCosmeticLayer<DataT>(
+        getItem: (layer: GridLayer) => Constraint<T, DataT>,
+        gridParser: GridParser<T, any>,
+        beforeLines = false,
+    ): Constraint<T, DataT> {
+        const layer = this.cosmeticsLayer(gridParser, beforeLines);
+        const item = getItem(layer);
+        const newLayer = this.typeManager.overrideImportedCosmeticLayer?.(this.puzzle, item, layer);
+        if (newLayer !== undefined && newLayer !== layer) {
+            return getItem(newLayer);
+        }
+        return item;
     }
 
     addGrid<JsonT>(gridParser: GridParser<T, JsonT>) {
@@ -810,7 +822,11 @@ export class PuzzleImporter<T extends AnyPTM> {
             cells,
             true,
             (cells, split, lineColor, lineWidth) =>
-                LineConstraint(cells, lineColor, lineWidth, split, this.cosmeticsLayer(gridParser, beforeGridLines)),
+                this.withCosmeticLayer(
+                    (layer) => LineConstraint(cells, lineColor, lineWidth, split, layer),
+                    gridParser,
+                    beforeGridLines,
+                ),
             lineColor,
             lineWidth,
         );
@@ -831,16 +847,21 @@ export class PuzzleImporter<T extends AnyPTM> {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
         this.addItems(
-            RectConstraint(
-                this.fixCellPositions(cells),
-                { width, height },
-                backgroundColor,
-                borderColor,
-                borderWidth,
-                text,
-                textColor,
-                angle,
-                this.cosmeticsLayer(gridParser, beforeLines),
+            this.withCosmeticLayer(
+                (layer) =>
+                    RectConstraint(
+                        this.fixCellPositions(cells),
+                        { width, height },
+                        backgroundColor,
+                        borderColor,
+                        borderWidth,
+                        text,
+                        textColor,
+                        angle,
+                        layer,
+                    ),
+                gridParser,
+                beforeLines,
             ),
         );
     }
@@ -860,16 +881,21 @@ export class PuzzleImporter<T extends AnyPTM> {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
         this.addItems(
-            EllipseConstraint(
-                this.fixCellPositions(cells),
-                { width, height },
-                backgroundColor,
-                borderColor,
-                borderWidth,
-                text,
-                textColor,
-                angle,
-                this.cosmeticsLayer(gridParser, beforeLines),
+            this.withCosmeticLayer(
+                (layer) =>
+                    EllipseConstraint(
+                        this.fixCellPositions(cells),
+                        { width, height },
+                        backgroundColor,
+                        borderColor,
+                        borderWidth,
+                        text,
+                        textColor,
+                        angle,
+                        layer,
+                    ),
+                gridParser,
+                beforeLines,
             ),
         );
     }
@@ -888,16 +914,21 @@ export class PuzzleImporter<T extends AnyPTM> {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
         this.addItems(
-            CosmeticArrowConstraint(
-                this.fixCellPositions(cells),
-                length,
-                headSize,
-                borderColor,
-                borderWidth,
-                text,
-                textColor,
-                angle,
-                this.cosmeticsLayer(gridParser, beforeLines),
+            this.withCosmeticLayer(
+                (layer) =>
+                    CosmeticArrowConstraint(
+                        this.fixCellPositions(cells),
+                        length,
+                        headSize,
+                        borderColor,
+                        borderWidth,
+                        text,
+                        textColor,
+                        angle,
+                        layer,
+                    ),
+                gridParser,
+                beforeLines,
             ),
         );
     }
@@ -911,10 +942,11 @@ export class PuzzleImporter<T extends AnyPTM> {
         const cells = gridParser.offsetCoordsArray(cellLiterals);
         this.checkForOutsideCells(gridParser, cells);
         this.addItems(
-            TextConstraint(this.fixCellPositions(cells), text, {
-                layer: this.cosmeticsLayer(gridParser, beforeLines),
-                ...options,
-            }),
+            this.withCosmeticLayer(
+                (layer) => TextConstraint(this.fixCellPositions(cells), text, { layer, ...options }),
+                gridParser,
+                beforeLines,
+            ),
         );
     }
     addCosmeticCage(

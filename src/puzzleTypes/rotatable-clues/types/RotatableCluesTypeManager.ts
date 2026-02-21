@@ -28,6 +28,7 @@ import {
 } from "../../../types/puzzle/PuzzleTypeManagerPlugin";
 import { RotatableCluesGridState } from "./RotatableCluesGridState";
 import { rotateNumber } from "../../../components/puzzle/digit/DigitComponentType";
+import { GridLayer } from "../../../types/puzzle/GridLayer";
 
 interface CluesImporterResult<T extends AnyPTM> {
     clues: RotatableClue[];
@@ -224,8 +225,13 @@ export const RotatableCluesTypeManager = <T extends AnyPTM>({
 
 export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
     options: Omit<RotatableCluesOptions<T>, "isEquivalentLoop" | "cluesImporter">,
-) =>
-    RotatableCluesTypeManager({
+) => {
+    const isPivot = (
+        item: Constraint<RotatableCluesPTM<T>, any>,
+    ): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
+        isEllipse(item) && item.cells.length === 1 && item.cells[0].top % 0.5 === 0 && item.cells[0].left % 0.5 === 0;
+
+    const manager = RotatableCluesTypeManager({
         ...options,
         isEquivalentLoop: true,
         cluesImporter: (puzzle) => {
@@ -245,14 +251,6 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
                           } as Constraint<RotatableCluesPTM<T>, ArrowProps>)
                         : item,
                 );
-
-                const isPivot = (
-                    item: Constraint<RotatableCluesPTM<T>, any>,
-                ): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
-                    isEllipse(item) &&
-                    item.cells.length === 1 &&
-                    item.cells[0].top % 0.5 === 0 &&
-                    item.cells[0].left % 0.5 === 0;
 
                 const pivots = items.filter(isPivot).map(({ cells: [cell], props: { width: diameter } }) => ({
                     cell,
@@ -354,6 +352,18 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
             return { clues: [] };
         },
     });
+
+    return {
+        ...manager,
+        overrideImportedCosmeticLayer(puzzle, item, ...args): GridLayer | undefined {
+            if (puzzle.importOptions?.keepCircles && isPivot(item)) {
+                return GridLayer.beforeSelection;
+            }
+
+            return manager.overrideImportedCosmeticLayer?.(puzzle, item, ...args);
+        },
+    } as typeof manager;
+};
 
 export const getAnimatedRotatableClueAngle = <T extends AnyPTM>(
     context: PuzzleContext<RotatableCluesPTM<T>>,
