@@ -255,7 +255,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         rotatableClues: !isSpecialGrid && rotatableClues,
         wheels: !isSpecialGrid && rotatableClues && wheels,
         freeRotation: !isSpecialGrid && rotatableClues && freeRotation,
-        keepCircles: !isSpecialGrid && rotatableClues && !wheels && keepCircles,
+        keepCircles: !isSpecialGrid && rotatableClues && keepCircles,
         stickyConstraintDigitAngle: !isSpecialGrid && rotatableClues && !wheels && stickyConstraintDigitAngle,
         screws: !isSpecialGrid && screws,
         sokoban: !isSpecialGrid && sokoban,
@@ -552,18 +552,18 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                                 />
                                             </Paragraph>
                                         )}
+                                        <Paragraph>
+                                            <label>
+                                                Keep imported circle shapes and colors:&nbsp;
+                                                <input
+                                                    type={"checkbox"}
+                                                    checked={keepCircles}
+                                                    onChange={(ev) => setKeepCircles(ev.target.checked)}
+                                                />
+                                            </label>
+                                        </Paragraph>
                                         {!wheels && (
                                             <>
-                                                <Paragraph>
-                                                    <label>
-                                                        Keep imported circle shapes and colors:&nbsp;
-                                                        <input
-                                                            type={"checkbox"}
-                                                            checked={keepCircles}
-                                                            onChange={(ev) => setKeepCircles(ev.target.checked)}
-                                                        />
-                                                    </label>
-                                                </Paragraph>
                                                 <Paragraph>
                                                     <label>
                                                         Rotate constraint clue digits (e.g. killer cage sum) together

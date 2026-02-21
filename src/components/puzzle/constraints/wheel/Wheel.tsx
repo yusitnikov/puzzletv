@@ -19,6 +19,9 @@ export interface WheelProps {
 
 export const Wheel: ConstraintPropsGenericFcMap<WheelProps> = {
     [GridLayer.afterLines]: observer(function WheelFc<T extends AnyPTM>({
+        context: {
+            puzzle: { importOptions: { keepCircles } = {} },
+        },
         cells: [cell, ...digitCells],
         props: { digits },
     }: ConstraintProps<T, WheelProps>) {
@@ -28,14 +31,19 @@ export const Wheel: ConstraintPropsGenericFcMap<WheelProps> = {
 
         return (
             <>
-                <circle
-                    cx={cell.left + 0.5}
-                    cy={cell.top + 0.5}
-                    r={wheelRadius}
-                    strokeWidth={0.1}
-                    stroke={lightGreyColor}
-                    fill={"none"}
-                />
+                {
+                    /* show our circles only if the importer didn't keep the original circles */
+                    !keepCircles && (
+                        <circle
+                            cx={cell.left + 0.5}
+                            cy={cell.top + 0.5}
+                            r={wheelRadius}
+                            strokeWidth={0.1}
+                            stroke={lightGreyColor}
+                            fill={"none"}
+                        />
+                    )
+                }
 
                 {digits.map((digit, index) => {
                     if (digit === undefined) {
