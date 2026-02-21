@@ -1,6 +1,6 @@
 import { PuzzleTypeManager } from "../../../types/puzzle/PuzzleTypeManager";
 import { RotatableCluesGameState } from "./RotatableCluesGameState";
-import { getAveragePosition, Position, stringifyPosition } from "../../../types/layout/Position";
+import { getAveragePosition, Position, PositionSet, stringifyPosition } from "../../../types/layout/Position";
 import { AnimatedValue } from "../../../types/struct/AnimatedValue";
 import { RotatableCluesPTM } from "./RotatableCluesPTM";
 import { PuzzleDefinition } from "../../../types/puzzle/PuzzleDefinition";
@@ -264,10 +264,6 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
                         radius: Math.max(keepCircles && !isWheels ? diameter / 2 : 0.5, 0.5),
                     }));
 
-                if (!keepCircles) {
-                    items = items.filter((item) => !isPivot(puzzle, item));
-                }
-
                 const getWheelDigit = (clue: Constraint<any, any>, pivot: Position) => {
                     const { cells } = clue;
                     if (!isTextConstraint(clue) || cells.length > 2) {
@@ -298,6 +294,35 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
 
                     return undefined;
                 };
+
+                const wheelDigitPositions = new PositionSet(
+                    isWheels
+                        ? items
+                              .filter((item) => pivots.some((pivot) => getWheelDigit(item, pivot.cell)))
+                              .map(({ cells }) => getAveragePosition(cells))
+                        : [],
+                );
+
+                // remove circle items that are replaced by rotatable clues
+                items = items.filter((item) => {
+                    // All items that are not circles should stay
+                    if (!isEllipse(item)) {
+                        return true;
+                    }
+
+                    // Remove pivot circles when requested
+                    if (!keepCircles && isPivot(puzzle, item)) {
+                        return false;
+                    }
+
+                    // Always remove imported circles that stay behind the wheel digits
+                    // noinspection RedundantIfStatementJS
+                    if (isWheels && wheelDigitPositions.contains(getAveragePosition(item.cells))) {
+                        return false;
+                    }
+
+                    return true;
+                });
 
                 const getCluePivot = (clue: Constraint<RotatableCluesPTM<T>>) => {
                     const { cells } = clue;
