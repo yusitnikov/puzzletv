@@ -15,6 +15,7 @@ import {
     CloneConstraintConfig,
     ColumnIndexerConstraintConfig,
     CompressedCell,
+    CompressedConstraint,
     CompressedCosmeticConfig,
     CompressedPuzzle,
     ConstraintType,
@@ -185,12 +186,15 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                     }
                 },
                 constraints: (constraints) => {
-                    for (const { name, disabled, solverIgnored = false, ...constraint } of constraints) {
+                    for (const fullConstraint of constraints) {
+                        const { name, disabled, solverIgnored = false, ...constraint } = fullConstraint;
+
                         if (disabled) {
                             continue;
                         }
 
                         importer.toggleImportCosmeticConstraints(solverIgnored);
+                        importer.currentImportedLayerName = name;
 
                         switch (constraint.type) {
                             case ConstraintType.Givens:
@@ -852,6 +856,8 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                                 }).parse(constraint, "cosmetic cages");
                                 break;
                             case ConstraintType.CosmeticSymbol:
+                                importer.currentImportedLayerName = getCircleLayerName(fullConstraint);
+
                                 const baseSymbolValidator = {
                                     type: undefined,
                                     angle: undefined,
@@ -1105,6 +1111,7 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                         }
 
                         importer.toggleImportCosmeticConstraints(false);
+                        importer.currentImportedLayerName = undefined;
                     }
                 },
                 name: (title) => importer.setTitle(title),
@@ -1268,7 +1275,15 @@ export class SudokuMakerGridParser<T extends AnyPTM> extends GridParser<T, Compr
                 : [],
         );
     }
+
+    get circleLayers(): string[] {
+        return this.puzzleJson.constraints
+            .filter((constraint) => !constraint.disabled && constraint.type === ConstraintType.CosmeticSymbol)
+            .map(getCircleLayerName);
+    }
 }
+
+const getCircleLayerName = ({ name = "Cosmetic symbols" }: CompressedConstraint) => name;
 
 type OutsideClueConstraintConfig =
     | SandwichSumsConstraintConfig

@@ -102,6 +102,7 @@ export class PuzzleImporter<T extends AnyPTM> {
      * Turn all new constraints into cosmetics when this flag is on
      */
     private importCosmeticConstraints = false;
+    public currentImportedLayerName?: string;
 
     constructor(
         slug: string,
@@ -332,6 +333,13 @@ export class PuzzleImporter<T extends AnyPTM> {
     addItems(...items: Constraint<T, any>[]) {
         if (this.importCosmeticConstraints) {
             items = items.map(toDecorativeConstraint);
+        }
+
+        if (this.currentImportedLayerName) {
+            items = items.map((item) => ({
+                ...item,
+                importedLayerName: this.currentImportedLayerName,
+            }));
         }
 
         this.items.push(...items);

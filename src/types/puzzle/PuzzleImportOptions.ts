@@ -76,6 +76,7 @@ export interface PuzzleImportOptions extends PuzzleGridImportOptions {
     wheels?: boolean;
     freeRotation?: boolean;
     keepCircles?: boolean;
+    rotatablePivotLayers?: string[];
     stickyConstraintDigitAngle?: boolean;
     screws?: boolean;
     sokoban?: boolean;
@@ -157,6 +158,7 @@ export const sanitizeImportOptions = (
         wheels,
         freeRotation,
         keepCircles,
+        rotatablePivotLayers = [],
         stickyConstraintDigitAngle,
         screws,
         sokoban,
@@ -226,6 +228,9 @@ export const sanitizeImportOptions = (
         wheels,
         freeRotation,
         keepCircles,
+        rotatablePivotLayers: Array.isArray(rotatablePivotLayers)
+            ? rotatablePivotLayers
+            : Object.values(rotatablePivotLayers),
         stickyConstraintDigitAngle,
         screws,
         sokoban,

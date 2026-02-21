@@ -37,6 +37,7 @@ export type Constraint<T extends AnyPTM, DataT = undefined> = {
     isObvious?: boolean;
     isCheckingFog?: boolean;
     noPencilmarkCheck?: boolean;
+    importedLayerName?: string;
     isValidCell?(
         cell: Position,
         digits: CellsMap<T["cell"]>,

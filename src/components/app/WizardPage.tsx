@@ -221,6 +221,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
     const hasSolutionColorsByGrid = gridParsers.some((gridParser) => gridParser.hasSolutionColors);
     const hasColors = hasInitialColorsByGrid || hasSolutionColorsByGrid;
     const hasArrows = gridParsers.some((gridParser) => gridParser.hasArrows);
+    const circleLayers = [...new Set(gridParsers.flatMap((gridParser) => gridParser.circleLayers))];
     // Transparent arrow circles are always on for the rotatable clues puzzles, so don't allow to change the flag
     const transparentCirclesForced = rotatableClues;
 
@@ -235,6 +236,8 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         hasColors &&
         colorsImportMode !== ColorsImportMode.Solution &&
         (hasInitialColorsByGrid || colorsImportMode === ColorsImportMode.Initials);
+
+    const [rotatablePivotLayers, setRotatablePivotLayers] = useState<string[]>([]);
 
     const getImportOptions = (colorsImportMode: ColorsImportMode): PuzzleImportOptions => ({
         title: customTitle.trim() || undefined,
@@ -256,6 +259,8 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         wheels: !isSpecialGrid && rotatableClues && wheels,
         freeRotation: !isSpecialGrid && rotatableClues && freeRotation,
         keepCircles: !isSpecialGrid && rotatableClues && keepCircles,
+        rotatablePivotLayers:
+            !isSpecialGrid && rotatableClues && rotatablePivotLayers.length ? rotatablePivotLayers : undefined,
         stickyConstraintDigitAngle: !isSpecialGrid && rotatableClues && !wheels && stickyConstraintDigitAngle,
         screws: !isSpecialGrid && screws,
         sokoban: !isSpecialGrid && sokoban,
@@ -551,6 +556,30 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
                                                     style={{ width: 40 }}
                                                 />
                                             </Paragraph>
+                                        )}
+                                        {circleLayers.length > 1 && (
+                                            <CollapsableFieldSet legend={"Rotatable pivot layers"}>
+                                                {circleLayers.map((name) => (
+                                                    <Paragraph key={name}>
+                                                        <label>
+                                                            {name}:&nbsp;
+                                                            <input
+                                                                type={"checkbox"}
+                                                                checked={rotatablePivotLayers.includes(name)}
+                                                                onChange={(ev) =>
+                                                                    setRotatablePivotLayers(
+                                                                        ev.target.checked
+                                                                            ? [...rotatablePivotLayers, name]
+                                                                            : rotatablePivotLayers.filter(
+                                                                                  (name2) => name2 !== name,
+                                                                              ),
+                                                                    )
+                                                                }
+                                                            />
+                                                        </label>
+                                                    </Paragraph>
+                                                ))}
+                                            </CollapsableFieldSet>
                                         )}
                                         <Paragraph>
                                             <label>

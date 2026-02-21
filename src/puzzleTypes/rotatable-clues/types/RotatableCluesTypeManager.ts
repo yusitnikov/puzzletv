@@ -227,9 +227,14 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
     options: Omit<RotatableCluesOptions<T>, "isEquivalentLoop" | "cluesImporter">,
 ) => {
     const isPivot = (
+        { importOptions: { rotatablePivotLayers = [] } = {} }: PuzzleDefinition<RotatableCluesPTM<T>>,
         item: Constraint<RotatableCluesPTM<T>, any>,
     ): item is Constraint<RotatableCluesPTM<T>, DecorativeShapeProps> =>
-        isEllipse(item) && item.cells.length === 1 && item.cells[0].top % 0.5 === 0 && item.cells[0].left % 0.5 === 0;
+        isEllipse(item) &&
+        item.cells.length === 1 &&
+        item.cells[0].top % 0.5 === 0 &&
+        item.cells[0].left % 0.5 === 0 &&
+        (!rotatablePivotLayers.length || rotatablePivotLayers.includes(item.importedLayerName ?? ""));
 
     const manager = RotatableCluesTypeManager({
         ...options,
@@ -252,13 +257,15 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
                         : item,
                 );
 
-                const pivots = items.filter(isPivot).map(({ cells: [cell], props: { width: diameter } }) => ({
-                    cell,
-                    radius: Math.max(keepCircles && !isWheels ? diameter / 2 : 0.5, 0.5),
-                }));
+                const pivots = items
+                    .filter((item) => isPivot(puzzle, item))
+                    .map(({ cells: [cell], props: { width: diameter } }) => ({
+                        cell,
+                        radius: Math.max(keepCircles && !isWheels ? diameter / 2 : 0.5, 0.5),
+                    }));
 
                 if (!keepCircles) {
-                    items = items.filter((item) => !isPivot(item));
+                    items = items.filter((item) => !isPivot(puzzle, item));
                 }
 
                 const getWheelDigit = (clue: Constraint<any, any>, pivot: Position) => {
@@ -356,7 +363,7 @@ export const ImportedRotatableCluesTypeManager = <T extends AnyPTM>(
     return {
         ...manager,
         overrideImportedCosmeticLayer(puzzle, item, ...args): GridLayer | undefined {
-            if (puzzle.importOptions?.keepCircles && isPivot(item)) {
+            if (puzzle.importOptions?.keepCircles && isPivot(puzzle, item)) {
                 return GridLayer.beforeSelection;
             }
 

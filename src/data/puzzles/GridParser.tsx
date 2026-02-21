@@ -117,6 +117,10 @@ export abstract class GridParser<T extends AnyPTM, JsonT> {
     get quadruplePositions(): Position[] {
         return [];
     }
+
+    get circleLayers(): string[] {
+        return [];
+    }
 }
 
 export type GridParserFactory<T extends AnyPTM, JsonT> = (
