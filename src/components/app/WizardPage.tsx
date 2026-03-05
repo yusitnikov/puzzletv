@@ -247,7 +247,7 @@ export const WizardPage = observer(({ load, slug, title, source }: WizardPagePro
         htmlRules: areHtmlRules,
         htmlSuccessMessage,
         maxDigit:
-            gridParserMaxDigit === undefined && maxDigit === gridSize && !filteredExtraGrids.length
+            gridParserMaxDigit !== undefined || (maxDigit === gridSize && !filteredExtraGrids.length)
                 ? undefined
                 : maxDigit,
         supportZero: minDigit === undefined && supportZero,
