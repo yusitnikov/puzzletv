@@ -322,6 +322,11 @@ export interface PuzzleTypeManager<T extends AnyPTM> {
     disableSelectAllCells?: boolean;
 
     boldCages?: boolean;
+
+    /**
+     * Treat cell center marks as digits for embedded solution
+     */
+    supportCenterMarksSolution?: boolean;
 }
 
 // region Helper functions

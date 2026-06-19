@@ -31,6 +31,7 @@ export const SafeCrackerTypeManager = <T extends AnyNumberPTM>(
 
     return {
         ...baseTypeManager,
+        supportCenterMarksSolution: true,
         ignoreRowsColumnCountInTheWrapper: true,
         extraInputModes: [...(baseTypeManager.extraInputModes ?? []), arrowsInputModeInfo],
         getCellTypeProps({ top, left }, puzzle): CellTypeProps<T> {

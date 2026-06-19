@@ -561,7 +561,7 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
         currentGridStateWithFogDemo: { cells, marks },
     } = context;
     const {
-        typeManager: { getDigitByCellData },
+        typeManager: { getDigitByCellData, supportCenterMarksSolution },
         initialCellMarks = [],
         solution = {},
         solutionColors = {},
@@ -612,7 +612,11 @@ export const isValidFinishedPuzzleByEmbeddedSolution = <T extends AnyPTM>(
             const actualMark = (initialCenterMarks?.[top]?.[left] ?? userCenterMarks?.[top]?.[left])?.type;
             const actualDigit = userDigits[top]?.[left];
             const actualData =
-                actualDigit !== undefined ? getDigitByCellData(actualDigit, context, { top, left }) : actualMark;
+                actualDigit !== undefined
+                    ? getDigitByCellData(actualDigit, context, { top, left })
+                    : supportCenterMarksSolution
+                      ? actualMark
+                      : undefined;
             if (actualData !== expectedData) {
                 if (settings.debugSolutionChecker.get()) {
                     if (actualData !== undefined || !loggedEmptyDigits) {
